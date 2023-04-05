@@ -10,7 +10,6 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
