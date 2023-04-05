@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local Table = require('Module:Table')
@@ -80,7 +79,6 @@ function ShortenBracket._processMatchesToArgs(newArgs, matches, idLength, skipRo
 
 		-- valid match we want to keep
 		elseif round > skipRounds then
-			hasFoundMatches = true
 			local newMatchId = 'R' .. (round - skipRounds) .. 'M' .. tonumber(string.sub(matchId, -3))
 			newArgs[newMatchId] = Json.stringify(match)
 		end
