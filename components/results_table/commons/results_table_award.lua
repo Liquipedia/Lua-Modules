@@ -38,6 +38,7 @@ end
 
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
+		:addClass(self:rowHighlight(placement))
 		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
