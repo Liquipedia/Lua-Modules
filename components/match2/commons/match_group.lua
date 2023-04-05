@@ -82,7 +82,7 @@ function MatchGroup.MatchGroupById(args)
 	assert(bracketId, 'Missing bracket ID')
 
 	if args.shortTemplate then
-		return MatchGroup.Bracket(ShortenBracket.getMatches{
+		return MatchGroup.Bracket(ShortenBracket.buildArgs{
 			bracketId = bracketId,
 			shortTemplate = args.shortTemplate,
 			args = args,
