@@ -69,7 +69,13 @@ function CustomEarnings.calculateForPlayer(args)
 end
 
 function CustomEarnings._determineValue(placement)
-	-- they set 1 lpdb_placement object per player with indiv prizemoney in prizemoney field
+	local indivPrize = tonumber(placement.individualprizemoney) or 0
+	if indivPrize > 0 then
+		return indivPrize
+	end
+
+	-- they currently set 1 lpdb_placement object per player with individualprizemoney in prizemoney field
+	-- in many cases individualprizemoney field is unset
 	return tonumber(placement.prizemoney) or 0
 end
 
