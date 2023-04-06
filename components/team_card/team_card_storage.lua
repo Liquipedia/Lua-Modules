@@ -75,7 +75,6 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	lpdbData.startdate = startDate
 	lpdbData.date = args.date
 		or Variables.varDefault(lpdbData.objectName .. '_placementdate')
-		or Variables.varDefault('enddate_' .. team .. lpdbPrefix .. '_date')
 		or endDate
 	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = Qualifier.parseQualifier(args.qualifier)
 
