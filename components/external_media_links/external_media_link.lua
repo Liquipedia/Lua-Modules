@@ -65,15 +65,13 @@ function ExternalMediaLink._store(args)
 	}
 
 	local authors = {}
-	local numberOfAuthors = 0
 	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
-		numberOfAuthors = authorIndex
 		authors['author' .. authorIndex] =
 			mw.ext.TeamLiquidIntegration.resolve_redirect(args['by_link' .. authorIndex] or author)
 		authors['author' .. authorIndex .. 'dn'] = author
 	end
 	-- set a maximum for authors due to the same being used in queries
-	assert(numberOfAuthors <= MAXIMUM_VALUES.authors,
+	assert(Table.size(authors) <= 2 * MAXIMUM_VALUES.authors,
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
 	lpdbData.authors = mw.ext.LiquipediaDB.lpdb_create_json(authors)
 
