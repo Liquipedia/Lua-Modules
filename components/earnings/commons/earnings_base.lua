@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
@@ -19,9 +20,6 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 local DEFAULT_DATE = '1970-01-01 00:00:00'
 
 local Earnings = {}
-
--- customizable in /Custom
-Earnings.defaultNumberOfPlayersInTeam = 5
 
 -- customizable in /Custom
 Earnings.defaultNumberOfStoredPlayersPerMatch = 10
@@ -64,21 +62,9 @@ function Earnings.calculateForPlayer(args)
 		'[[opponentname::' .. playerAsPageName .. ']]',
 	}
 
-	if Earnings.legacyMode then
-		table.insert(playerConditions, '[[participant::' .. player .. ']]')
-		table.insert(playerConditions, '[[participant::' .. playerAsPageName .. ']]')
-		table.insert(playerConditions, '[[participantlink::' .. player .. ']]')
-		table.insert(playerConditions, '[[participantlink::' .. playerAsPageName .. ']]')
-	end
-
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
-
-		if Earnings.legacyMode then
-			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. player .. ']]')
-			table.insert(playerConditions, '[[players_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
-		end
 	end
 	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
@@ -119,9 +105,7 @@ function Earnings.calculateForTeam(args)
 				return 0
 			end
 
-			for _, historicalTeam in pairs(historicalNames) do
-				table.insert(queryTeams, historicalTeam)
-			end
+			Array.extendWith(queryTeams, historicalNames)
 		end
 	elseif not Logic.readBool(args.noRedirect) then
 		for index, team in pairs(teams) do
@@ -137,11 +121,12 @@ function Earnings.calculateForTeam(args)
 			.. ']])'
 	end
 
+	local teamConditions = {formatParticipant('opponentname')}
+
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear)
+		return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, queryTeams)
 	end
 
-	local teamConditions = {formatParticipant('opponentname', queryTeams)}
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
 	end
@@ -210,12 +195,7 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	local indivPrize = tonumber(placement.individualprizemoney)
 
 	if isPlayerQuery then
-		--workaround for smash and fighters since they store wrongly 0 in that field on lots of cases
-		if indivPrize and indivPrize > 0 then
-			return indivPrize
-		end
-
-		return placement.prizemoney / Earnings.divisionFactorPlayer(placement.mode)
+		return indivPrize or 0
 	elseif placement.opponenttype == Opponent.team and Table.includes(aliases, placement.opponentname) then
 		return placement.prizemoney
 	end
@@ -233,22 +213,6 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	end
 
 	return indivPrize * numberOfPlayersFromTeam
-end
-
--- legacy for the case of outdated data or misusage of PPT/TC
--- @deprecated
-function Earnings.divisionFactorPlayer(mode)
-	if mode == '4v4' then
-		return 4
-	elseif mode == '3v3' then
-		return 3
-	elseif mode == '2v2' then
-		return 2
-	elseif mode == '1v1' or mode == 'individual' or mode == 'award_individual' then
-		return 1
-	end
-
-	return Earnings.defaultNumberOfPlayersInTeam
 end
 
 return Class.export(Earnings)
