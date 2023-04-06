@@ -50,25 +50,10 @@ function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	end
 end
 
---[[
-Fills in the team of the player on the specified date, if it is not specified
-in the arguments. The team is determined from previous invocations of
-PlayerExt.syncTeam, and then lpdb. The team is stored to page variables for
-future use. The returned value is a team template resolved to a specific date,
-or nil if the player is teamless or if the team cannot be determined.
-
-pageName: page of the player, and must be resolved (cannot be a redirect).
-template: team template, or nil. Specify 'noteam' to clear a previously set team
-
-options.date: Needed if the player was on a different team in the past.
-Defaults to the tournament end date or now.
-options.fetchPlayer: Whether to look up lpdb records of the player page. Enabled
-by default.
-options.savePageVar: Whether to save results to page variables. Enabled by
-default.
-options.useTimeless: Whether to use the template passed to a previous call of
-PlayerExt.syncTeam. Enabled by default.
-]]
+--- Fills in the team of the player on the specified date, if it is not specified in the arguments.
+---@pageName string
+---@template string?
+---@options {date: string?, fetchPlayer: boolean?, savePageVar: boolean?, useTimeless: boolean?}
 function CustomPlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
 	local date = options.date or PlayerExt.getContextualDateOrNow()
