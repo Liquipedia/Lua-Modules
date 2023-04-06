@@ -20,11 +20,9 @@ local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 local CustomPlayerExt = Table.deepCopy(PlayerExt)
 
---[[
-Asks LPDB for the team a player belonged to on a page.
-
-For specific uses only.
-]]
+--- Asks LPDB for the team a player belonged to on a page. For specific uses only.
+---@param resolvedPageName string
+---@date resolvedPageName string
 function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	if Logic.isEmpty(resolvedPageName) then
 		return
