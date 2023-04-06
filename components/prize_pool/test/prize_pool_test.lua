@@ -76,7 +76,7 @@ function suite:testHeaderInput()
 			showBaseCurrency = true,
 			storeLpdb = true,
 			storeSmw = true,
-			syncPlayers = false,
+			syncPlayers = true,
 		},
 		ppt.options
 	)
