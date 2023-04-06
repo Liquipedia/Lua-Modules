@@ -9,14 +9,11 @@
 -- Legacy version for smash, brawhalla and fighters as they are not on standardized prize pools yet
 -- they do not have team events (and no teamCard usage) hence only overwrite the player function
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
-local MathUtils = require('Module:Math')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true}))
 
@@ -29,7 +26,6 @@ CustomEarnings.defaultNumberOfStoredPlayersPerMatch = 10
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
--- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function CustomEarnings.calculateForPlayer(args)
@@ -48,8 +44,6 @@ function CustomEarnings.calculateForPlayer(args)
 	-- since TeamCards on some wikis store players with underscores and some with spaces
 	-- we need to check for both options
 	local playerAsPageName = player:gsub(' ', '_')
-
-	local prefix = args.prefix or 'p'
 
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or CustomEarnings.defaultNumberOfStoredPlayersPerMatch
 	if playerPositionLimit <= 0 then
