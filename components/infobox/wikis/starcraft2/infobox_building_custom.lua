@@ -28,8 +28,8 @@ local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
 local ICON_GAS = mw.loadData('Module:Gas')
 local ICON_TIME = mw.loadData('Module:Buildtime')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICON_SHIELDS = '[[File:IconICON_SHIELDS.png|link=Plasma Shield]]'
-local ICON_ARMOR = '[[File:IconICON_ARMOR.png|link=Armor]]'
+local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
