@@ -162,7 +162,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 
 	local queryParameters = {
 		conditions = conditions,
-		query = 'individualprizemoney, prizemoney, opponentplayers, date, mode, opponenttype, opponentname',
+		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname',
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
