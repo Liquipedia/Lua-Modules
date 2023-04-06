@@ -12,13 +12,12 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Lpdb = require('Module:Lpdb')
+local MathUtils = require('Module:Math')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true}))
-
--- customizable in /Custom
-CustomEarnings.defaultNumberOfStoredPlayersPerMatch = 10
 
 ---
 -- Entry point for players and individuals
@@ -50,16 +49,68 @@ function CustomEarnings.calculateForPlayer(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
-	-- they set 1 lpdb_placement object per player, so no additional conditions on player data needed
 	local playerConditions = {
 		'[[participant::' .. player .. ']]',
 		'[[participant::' .. playerAsPageName .. ']]',
 		'[[participantlink::' .. player .. ']]',
 		'[[participantlink::' .. playerAsPageName .. ']]',
+		'[[opponentname::' .. player .. ']]',
+		'[[opponentname::' .. playerAsPageName .. ']]',
 	}
+
+	for playerIndex = 1, playerPositionLimit do
+		table.insert(playerConditions, '[[opponentplayers_p' .. playerIndex .. '::' .. player .. ']]')
+		table.insert(playerConditions, '[[opponentplayers_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
+		table.insert(playerConditions, '[[players_p' .. playerIndex .. '::' .. player .. ']]')
+		table.insert(playerConditions, '[[players_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
+	end
+
 	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
 	return CustomEarnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
+end
+
+---
+-- Calculates earnings for this participant in a certain mode
+-- @participantCondition - the condition to find the player/team
+-- @year - (optional) the year to calculate earnings for
+-- @mode - (optional) the mode to calculate earnings for
+-- @perYear - (optional) query all earnings per year and return the values in a lua table
+-- @aliases - players/teams to determine earnings for
+function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
+	conditions = CustomEarnings._buildConditions(conditions, queryYear, mode)
+
+	local sums = {}
+	local totalEarnings = 0
+	local sumUp = function(placement)
+		local value = CustomEarnings._determineValue(placement, aliases, isPlayerQuery)
+		if perYear then
+			local year = string.sub(placement.date, 1, 4)
+			if not sums[year] then
+				sums[year] = 0
+			end
+			sums[year] = sums[year] + value
+		end
+
+		totalEarnings = totalEarnings + value
+	end
+
+	local queryParameters = {
+		conditions = conditions,
+		query = 'individualprizemoney, prizemoney, opponentplayers, date, opponenttype, opponentname',
+	}
+	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
+
+	if not perYear then
+		return MathUtils._round(totalEarnings)
+	end
+
+	local totalEarningsByYear = {}
+	for year, earningsOfYear in pairs(sums) do
+		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
+	end
+
+	return MathUtils._round(totalEarnings), totalEarningsByYear
 end
 
 function CustomEarnings._determineValue(placement)
