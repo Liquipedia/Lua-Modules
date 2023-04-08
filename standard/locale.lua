@@ -32,6 +32,7 @@ function Locale.formatLocations(args)
 	local LOCATION_KEYS = {
 		'venue${index}',
 		'venue${index}link',
+		'venue${index}name',
 		'city${index}',
 		'country${index}',
 		'region${index}'
