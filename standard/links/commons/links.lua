@@ -119,6 +119,7 @@ local PREFIXES = {
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
+	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
 		'',

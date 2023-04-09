@@ -118,6 +118,7 @@ local _PRIORITY_GROUPS = {
 		'kuaishou',
 		'kick',
 		'cc',
+		'niconico',
 		'nimotv',
 		'openrec',
 		'steamtv',
