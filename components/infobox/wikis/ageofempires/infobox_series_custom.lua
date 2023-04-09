@@ -9,6 +9,7 @@
 local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Tier = require('Module:Tier/Custom')
 
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -24,6 +25,7 @@ function CustomSeries.run(frame)
 	local series = Series(frame)
 	series.addToLpdb = CustomSeries.addToLpdb
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	series.createLiquipediaTierDisplay = CustomSeries.createLiquipediaTierDisplay
 	_series = series
 
 	return series:createInfobox()
@@ -61,6 +63,13 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomSeries._getSeriesPrizepools(_series.name)}
 	}))
 	return widgets
+end
+
+function CustomSeries:createLiquipediaTierDisplay(args)
+	return (Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype
+	) or '') .. self.appendLiquipediatierDisplay(args)
 end
 
 return CustomSeries
