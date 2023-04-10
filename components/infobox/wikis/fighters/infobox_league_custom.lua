@@ -118,7 +118,11 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.name{game = _args.game}}},
+			Cell{name = 'Game', content = {Page.makeInternalLink(
+				{onlyIfExists = true},
+				Game.name{game = _args.game},
+				Game.link{game = _args.game}
+			) or Game.name{game = _args.game}}},
 			Cell{name = 'Version', content = {_args.version}},
 		}
 	end
