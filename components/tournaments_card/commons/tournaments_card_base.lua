@@ -16,7 +16,6 @@ local HighlightConditions = require('Module:HighlightConditions')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local LeagueIcon = require('Module:LeagueIcon')
-local Lua = require('Module:Lua')
 local Medal = require('Module:Medal')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
@@ -180,7 +179,7 @@ function BaseTournamentsCard:buildBaseConditions()
 
 	if args.organizer then
 		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for organizerIndex, organizer in mw.text.split(args.organizer, ',', true) do
+		for _, organizer in mw.text.split(args.organizer, ',', true) do
 			organizer = mw.text.trim(organizer)
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
@@ -192,7 +191,7 @@ function BaseTournamentsCard:buildBaseConditions()
 
 	if args.region then
 		local regionConditions = ConditionTree(BooleanOperator.any)
-		for regionIndex, region in mw.text.split(args.region, ',', true) do
+		for _, region in mw.text.split(args.region, ',', true) do
 			region = mw.text.trim(region)
 			regionConditions:add{
 				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
@@ -282,7 +281,6 @@ function BaseTournamentsCard:_header()
 		header:tag('div'):addClass('gridCell Tier'):wikitext('Tier')
 	end
 
-	local iconAbbreviation
 	local gameHeader = header:tag('div'):addClass('gridCell')
 	if config.showGameIcon then
 		gameHeader:addClass('GameSeries'):wikitext(Abbreviation.make('G & S', 'Game and Series'))
@@ -303,7 +301,7 @@ function BaseTournamentsCard:_header()
 		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make('P#', 'Number of Participants'))
 
 	if config.showQualifierColumnOverWinnerRunnerup then
-		header:tag('div'):addClass('gridCell'):wikitext('Qualified')		
+		header:tag('div'):addClass('gridCell'):wikitext('Qualified')
 	else
 		header
 			:tag('div'):addClass('gridCell'):wikitext('Winner'):done()
@@ -413,19 +411,19 @@ function BaseTournamentsCard:_row(tournamentData)
 			:wikitext('Cancelled')
 
 		self.display:node(row)
-		return 
+		return
 	end
 
 	local placements = self:_fetchPlacementData(tournamentData)
 
 	if placements.qualified then
-		local qualifiedCell = row:tag('div')
+		row:tag('div')
 			:addClass('gridCell Placement Qualified')
 			:node(mw.html.create('span'):addClass('Medal'):wikitext(Medal.qual .. NONBREAKING_SPACE))
 			:node(self:_buildParticipantsSpan(placements.qualified))
 
 		self.display:node(row)
-		return 
+		return
 	end
 
 	local firstPlaceCell = mw.html.create('div')
@@ -495,8 +493,8 @@ function BaseTournamentsCard._displayLocations(locationData, tournamentType)
 		location = BaseTournamentsCard._displayLocation(locationData, locationIndex)
 	end
 
-	locations = Array.map(locations, function(location)
-		return tostring(mw.html.create('span'):addClass('FlagText'):wikitext(location))
+	locations = Array.map(locations, function(loc)
+		return tostring(mw.html.create('span'):addClass('FlagText'):wikitext(loc))
 	end)
 
 	if Table.isEmpty(locations) then
@@ -536,8 +534,8 @@ function BaseTournamentsCard._dateDisplay(startDate, endDate, status)
 		return LANG:formatDate('M j, Y', startDate)
 	end
 
-	local startYear, startMonth, startDay = startDate:match('(%d+)-(%d+)-(%d+)')
-	local endYear, endMonth, endDay = endDate:match('(%d+)-(%d+)-(%d+)')
+	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
+	local endYear, endMonth = endDate:match('(%d+)-(%d+)-%d+')
 
 	if startYear ~= endYear then
 		return LANG:formatDate('M j, Y', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
