@@ -53,7 +53,8 @@ function DateExt.readTimestampOrNil(dateString)
 	return success and timestamp or nil
 end
 
---- Formats a timestamp according to the specified format. The format string is the same used by mw.language.formatDate and {{#time}}.
+--- Formats a timestamp according to the specified format.
+--- The format string is the same used by mw.language.formatDate and {{#time}}.
 ---@param format string
 ---@param timestamp string|integer
 ---@return string
@@ -89,7 +90,7 @@ end
 --- Fetches contextualDate on a tournament page with fallback to now.
 ---@return string
 function DateExt.getContextualDateOrNow()
-	return TournamentUtil.getContextualDate()
+	return DateExt.getContextualDate()
 		or os.date('%F')
 end
 
