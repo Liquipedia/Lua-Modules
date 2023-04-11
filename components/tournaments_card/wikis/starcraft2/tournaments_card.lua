@@ -6,13 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Info = require('Module:Info')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
 local TournamentsCard = Lua.import('Module:TournamentsCard/Base', {requireDevIfEnabled = true})
 
