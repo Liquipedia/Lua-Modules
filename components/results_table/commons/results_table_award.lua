@@ -38,6 +38,7 @@ end
 
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
+		:addClass(self:rowHighlight(placement))
 		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
@@ -69,7 +70,7 @@ function AwardsTable:buildRow(placement)
 		))
 	end
 
-	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
+	row:tag('td'):wikitext('$' .. Currency.formatMoney(
 			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
 			or placement.prizemoney, nil, true
 		))
