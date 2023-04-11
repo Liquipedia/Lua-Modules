@@ -25,6 +25,7 @@ local CustomInjector = Class.new(Injector)
 
 local PLATFORMS = {
 	pc = 'PC',
+	xbox = 'Xbox (2001)',
 	xbox360 = 'Xbox 360',
 	xboxone = 'Xbox One',
 	ps3 = 'PlayStation 3',

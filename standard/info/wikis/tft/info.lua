@@ -16,16 +16,17 @@ return {
 			name = 'Teamfight Tactics',
 			link = 'Teamfight Tactics',
 			logo = {
-				darkMode = 'Teamfight Tactics Default.png',
-				lightMode = 'Teamfight Tactics Default.png',
+				darkMode = 'Teamfight Tactics LOGO darkmode.png',
+				lightMode = 'Teamfight Tactics LOGO lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Teamfight Tactics Default.png',
-				lightMode = 'Teamfight Tactics Default.png',
+				darkMode = 'Teamfight Tactics Double Up darkmode.png',
+				lightMode = 'Teamfight Tactics Double Up lightmode.png',
 			},
 		},
 	},
 	defaultGame = 'tft',
-	defaultTeamLogo = 'Teamfight Tactics Default.png', ---@deprecated
-	defaultTeamLogoDark = 'Teamfight Tactics Default.png', ---@deprecated
+	defaultRoundPrecision = 0,
+	defaultTeamLogo = 'Teamfight Tactics Double Up lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Teamfight Tactics Double Up darkmode.png', ---@deprecated
 }

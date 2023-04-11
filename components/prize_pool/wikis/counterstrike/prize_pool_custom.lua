@@ -50,6 +50,8 @@ function CustomPrizePool.run(frame)
 	HEADER_DATA.tournamentName = args['tournament name']
 	HEADER_DATA.resultName = args['custom-name']
 
+	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
+
 	if Logic.readBool(args.qualifier) then
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json{

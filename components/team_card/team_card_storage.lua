@@ -65,8 +65,8 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	local title = mw.title.getCurrentTitle().text
 	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
 	local date = Variables.varDefault('tournament_date')
-	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
-	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
+	local startDate = Variables.varDefault('tournament_startdate', date)
+	local endDate = Variables.varDefault('tournament_enddate', date)
 
 	lpdbData.participant = team
 	lpdbData.tournament = tournamentName or title

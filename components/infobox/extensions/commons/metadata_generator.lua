@@ -14,7 +14,7 @@ local Variables = require('Module:Variables')
 local StringUtils = require('Module:StringUtils')
 local Class = require('Module:Class')
 local AnOrA = require('Module:A or an')
-local Tier = mw.loadData('Module:Tier')
+local Tier = require('Module:Tier/Utils')
 local Table = require('Module:Table')
 
 local MetadataGenerator = {}
@@ -23,7 +23,7 @@ local TIME_FUTURE = 1
 local TIME_ONGOING = 0
 local TIME_PAST = -1
 
-local TYPES_TO_DISPLAY = {'qualifier', 'showmatch', 'show match'}
+local TYPES_TO_DISPLAY = {'qualifier', 'showmatch'}
 
 function MetadataGenerator.tournament(args)
 	local output
@@ -39,19 +39,12 @@ function MetadataGenerator.tournament(args)
 		args['organizer3-name'] or args.organizer3,
 	}
 
+	---@type integer|string|nil
 	---@type string?
-	local tier = args.liquipediatier and MetadataGenerator.getTierText(args.liquipediatier) or nil
-
-	if not tier then
-		tier = 'Unknown Tier'
-	end
-
-	local tierType = 'tournament'
-	if args.liquipediatiertype then
-		local tierTypeLower = args.liquipediatiertype:lower()
-		if Table.includes(TYPES_TO_DISPLAY, tierTypeLower) then
-			tierType = tierTypeLower
-		end
+	local tier, tierType = Tier.toName(args.liquipediatier, args.liquipediatiertype)
+	tier = tier or 'Unknown Tier'
+	if not tierType or not Table.includes(TYPES_TO_DISPLAY, Tier.toIdentifier(args.liquipediatiertype)) then
+		tierType = 'tournament'
 	end
 
 	local publisher
@@ -148,14 +141,6 @@ function MetadataGenerator.tournament(args)
 	output = output .. '.'
 
 	return output
-end
-
-function MetadataGenerator.getTierText(tierString)
-	if not Tier.text.tiers then -- allow legacy tier modules
-		return Tier.text[tierString]
-	else -- default case, i.e. tier module with intended format
-		return Tier.text.tiers[tierString:lower()]
-	end
 end
 
 function MetadataGenerator.getDate(startDate, endDate)
