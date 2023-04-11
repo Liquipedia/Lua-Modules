@@ -104,4 +104,18 @@ function DateExt.toYmdInUtc(dateOrTimestamp)
 	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp))
 end
 
+--- Fetches contextualDate on a tournament page.
+---@return string
+function DateExt.getContextualDate()
+	return globalVars:get('tournament_enddate')
+		or globalVars:get('tournament_startdate')
+end
+
+--- Fetches contextualDate on a tournament page with fallback to now.
+---@return string
+function DateExt.getContextualDateOrNow()
+	return TournamentUtil.getContextualDate()
+		or os.date('%F')
+end
+
 return DateExt
