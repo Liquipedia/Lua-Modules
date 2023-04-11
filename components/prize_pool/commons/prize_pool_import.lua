@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
-local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
+local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -63,8 +63,8 @@ function Import._getConfig(args, placements)
 
 	return {
 		importLimit = Import._importLimit(args.importLimit, placements),
-		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
-			or TournamentUtil.currentPageSpec(),
+		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
+			or TournamentStructure.currentPageSpec(),
 		groupElimStatuses = Table.mapValues(
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
 			mw.text.trim
@@ -96,7 +96,7 @@ function Import._getConfig(args, placements)
 end
 
 function Import._enableImport(importInput)
-	local date = TournamentUtil.getContextualDateOrNow()
+	local date = DateExt.getContextualDateOrNow()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
 		date >= AUTOMATION_START_DATE
@@ -115,7 +115,7 @@ end
 
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
-	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
+	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 				local stageIndex = #stages + 1 - reverseStageIndex
@@ -146,7 +146,7 @@ end
 -- tournament stage. The placements are ordered from high placement to low.
 function Import._computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
-		return TournamentUtil.isGroupTable(matchGroup)
+		return TournamentStructure.isGroupTable(matchGroup)
 			and Import._computeGroupTablePlacementEntries(matchGroup, options)
 			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
