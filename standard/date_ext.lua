@@ -7,6 +7,7 @@
 --
 
 local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 --[[
 Functions for working with dates strings and timestamps.
@@ -81,8 +82,8 @@ end
 --- Fetches contextualDate on a tournament page.
 ---@return string
 function DateExt.getContextualDate()
-	return globalVars:get('tournament_enddate')
-		or globalVars:get('tournament_startdate')
+	return Variables.varDefault('tournament_enddate')
+		or Variables.varDefault('tournament_startdate')
 end
 
 --- Fetches contextualDate on a tournament page with fallback to now.
