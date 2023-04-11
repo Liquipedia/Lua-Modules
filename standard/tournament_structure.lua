@@ -232,7 +232,7 @@ function TournamentStructure.fetchGroupTables(spec)
 					end)
 			end))
 
-	local groups = Array.filter(Array.extend(idData, pageData), function(group)
+	local groups = Array.filter(pageData, function(group)
 			return Table.isNotEmpty(group)
 		end)
 
@@ -254,9 +254,11 @@ function TournamentStructure.fetchGroupTableEntries(group)
 	end
 
 	local records = mw.ext.LiquipediaDB.lpdb('standingsentry', {
-		conditions = '[[standingsindex::' .. group.standingsindex .. ']] AND [[pagename::' .. group.pagename .. ']] AND [[roundindex::' .. roundIndex .. ']]',
+		conditions = '[[standingsindex::' .. group.standingsindex .. ']] AND '
+			.. '[[pagename::' .. group.pagename .. ']] AND [[roundindex::' .. roundIndex .. ']]',
 		limit = '100',
-		query = 'scoreboard, currentstatus, extradata, opponenttype, opponentname, opponenttemplate, opponentplayers, placement'
+		query = 'scoreboard, currentstatus, extradata, opponenttype, '
+			.. 'opponentname, opponenttemplate, opponentplayers, placement'
 	})
 
 	local sortFunction = function(record1, record2)
