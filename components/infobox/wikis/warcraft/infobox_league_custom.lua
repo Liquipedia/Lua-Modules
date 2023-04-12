@@ -440,7 +440,7 @@ function CustomLeague._determineGame()
 end
 
 function CustomLeague:addParticipantTypeCategory(args)
-	return {(MODES[_args.mode] or MODES.default.category).category .. ' Tournaments'}
+	return {(MODES[_args.mode] or MODES.default).category .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
