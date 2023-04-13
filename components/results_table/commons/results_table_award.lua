@@ -70,10 +70,12 @@ function AwardsTable:buildRow(placement)
 		))
 	end
 
-	row:tag('td'):wikitext('$' .. Currency.formatMoney(
-			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
-			or placement.prizemoney, nil, true
-		))
+	local money = self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney
+	row:tag('td'):wikitext(
+		(tonumber(money) or 0) > 0
+		and ('$' .. Currency.formatMoney(money, nil, true))
+		or '<b>-</b>'
+	)
 
 	return row
 end
