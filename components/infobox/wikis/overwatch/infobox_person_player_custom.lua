@@ -13,6 +13,7 @@ local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -21,6 +22,8 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local _ROLES = {
 	-- Players
@@ -46,6 +49,7 @@ _ROLES['assistant coach'] = _ROLES.coach
 
 local _SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
+local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
 local CustomPlayer = Class.new()
 
@@ -80,10 +84,23 @@ function CustomInjector:parse(id, widgets)
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		local nationalHistory = _args.nationalteams
+		local automatedHistory = TeamHistoryAuto._results({
+			convertrole = 'true',
+			player = _pagename
+		}) or ''
+		automatedHistory = tostring(automatedHistory)
+		if automatedHistory == _EMPTY_AUTO_HISTORY then
+			automatedHistory = nil
+		end
+
+		if String.isNotEmpty(nationalHistory) or String.isNotEmpty(automatedHistory) then
+			return {
+				Title{name = 'History'},
+				Center{content = {nationalHistory}},
+				Center{content = {automatedHistory}},
+			}
+		end
 	end
 	return widgets
 end
@@ -112,6 +129,13 @@ function CustomInjector:addCustomCells(widgets)
 	Cell{
 		name = 'Game Appearances',
 		content = GameAppearances.player({player = _pagename})
+	}
+
+	-- National Team
+	Cell{
+		mw.logObject(_args.nationalteams),
+		name = 'National Teams',
+		content = Template.safeExpand(mw.getCurrentFrame(), 'National Teams', {_args.nationalteams})
 	}
 	return widgets
 end
