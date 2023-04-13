@@ -56,6 +56,7 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local pagename = mw.title.getCurrentTitle().prefixedText
+local args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -181,7 +182,7 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
+function CustomPlayer:defineCustomPageVariables()
 	-- isplayer needed for SMW
 	local roleData
 	if String.isNotEmpty(args.role) then
