@@ -14,6 +14,8 @@ local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
+local DASH = '-'
+
 function suite:testGetExchangeRate()
 	self:assertEquals(1.45, Currency.getExchangeRate{currency = 'EUR', currencyRate = '1.45', setVariables = true})
 	self:assertEquals(1.45, tonumber(Variables.varDefault('exchangerate_EUR')))
@@ -21,10 +23,13 @@ function suite:testGetExchangeRate()
 end
 
 function suite:testFormatMoney()
-	self:assertEquals(0, Currency.formatMoney('abc'))
-	self:assertEquals(0, Currency.formatMoney(nil))
+	self:assertEquals(DASH, Currency.formatMoney('abc'))
+	self:assertEquals(DASH, Currency.formatMoney(nil))
+	self:assertEquals(0, Currency.formatMoney('abc', nil, nil, true))
+	self:assertEquals(0, Currency.formatMoney(nil, nil, nil, true))
 	self:assertEquals('12', Currency.formatMoney(12))
 	self:assertEquals('1,200', Currency.formatMoney(1200))
+	self:assertEquals('1,200.00', Currency.formatMoney(1200, nil, true))
 	self:assertEquals('1,200.12', Currency.formatMoney(1200.12345))
 	self:assertEquals('1,200.1', Currency.formatMoney(1200.12345, 1))
 	self:assertEquals('1,200.1235', Currency.formatMoney(1200.12345, 4))
