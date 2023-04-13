@@ -44,7 +44,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	Variables.varDefine(participantLower .. '_prizepoints', lpdbData.extradata.prizepoints)
 	lpdbData.extradata.location = Variables.varDefault('tournament_location_region', '')
-	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	return lpdbData
 end
 
