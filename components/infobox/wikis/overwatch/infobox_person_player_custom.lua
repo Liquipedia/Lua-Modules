@@ -84,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 			}},
 		}
 	elseif id == 'history' then
-		local nationalHistory = _args.nationalteams
+		local nationalHistory = args.nationalteams
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
 			player = pagename
@@ -133,7 +133,6 @@ function CustomInjector:addCustomCells(widgets)
 
 	-- National Team
 	Cell{
-		mw.logObject(_args.nationalteams),
 		name = 'National Teams',
 		content = Template.safeExpand(mw.getCurrentFrame(), 'National Teams', {args.nationalteams})
 	}
