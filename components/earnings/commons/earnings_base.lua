@@ -201,6 +201,8 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 		return 0
 	end
 
+	-- calcualte the number of players on the team that are part of the placement
+	-- so we can get the real value of earnings for the team from their players from this placement
 	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('team') end)
 
 	return indivPrize * Table.size(Table.filter(playerData, function(team) return Table.includes(aliases, team) end))
