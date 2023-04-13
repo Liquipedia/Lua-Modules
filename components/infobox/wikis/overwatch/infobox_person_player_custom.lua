@@ -25,7 +25,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local _ROLES = {
+local ROLES = {
 	-- Players
 	['dps'] = {category = 'DPS Players', variable = 'DPS', isplayer = true},
 	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
@@ -45,18 +45,18 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 }
-_ROLES['assistant coach'] = _ROLES.coach
+ROLES['assistant coach'] = ROLES.coach
 
-local _SIZE_HERO = '25x25px'
+local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
+local EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _args
+local pagename = mw.title.getCurrentTitle().prefixedText
+local args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -66,7 +66,7 @@ function CustomPlayer.run(frame)
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
-	_args = player.args
+	args = player.args
 
 	return player:createInfobox()
 end
@@ -79,18 +79,18 @@ function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				CustomPlayer._createRole('role', args.role),
+				CustomPlayer._createRole('role2', args.role2)
 			}},
 		}
 	elseif id == 'history' then
 		local nationalHistory = _args.nationalteams
 		local automatedHistory = TeamHistoryAuto._results({
 			convertrole = 'true',
-			player = _pagename
+			player = pagename
 		}) or ''
 		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
+		if automatedHistory == EMPTY_AUTO_HISTORY then
 			automatedHistory = nil
 		end
 
@@ -107,9 +107,9 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
-	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
+	local heroIcons = Array.map(Player:getAllArgsForBase(args, 'hero'),
 		function(hero)
-			return HeroIcon.getImage{hero, size = _SIZE_HERO}
+			return HeroIcon.getImage{hero, size = SIZE_HERO}
 		end
 	)
 	heroIcons = Array.sub(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
@@ -128,14 +128,14 @@ function CustomInjector:addCustomCells(widgets)
 	-- Active in Games
 	Cell{
 		name = 'Game Appearances',
-		content = GameAppearances.player({player = _pagename})
+		content = GameAppearances.player({player = pagename})
 	}
 
 	-- National Team
 	Cell{
 		mw.logObject(_args.nationalteams),
 		name = 'National Teams',
-		content = Template.safeExpand(mw.getCurrentFrame(), 'National Teams', {_args.nationalteams})
+		content = Template.safeExpand(mw.getCurrentFrame(), 'National Teams', {args.nationalteams})
 	}
 	return widgets
 end
@@ -145,7 +145,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
 	-- store signature heroes with standardized name
-	for heroIndex, hero in ipairs(Player:getAllArgsForBase(_args, 'hero')) do
+	for heroIndex, hero in ipairs(Player:getAllArgsForBase(args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
 		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
 			break
@@ -154,10 +154,10 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
@@ -168,12 +168,12 @@ function CustomPlayer._createRole(key, role)
 		return nil
 	end
 
-	local roleData = _ROLES[role:lower()]
+	local roleData = ROLES[role:lower()]
 	if not roleData then
 		return nil
 	end
 
-	if Player:shouldStoreData(_args) then
+	if Player:shouldStoreData(args) then
 		local categoryCoreText = 'Category:' .. roleData.category
 
 		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
@@ -187,7 +187,7 @@ function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
 	local roleData
 	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+		roleData = ROLES[args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
