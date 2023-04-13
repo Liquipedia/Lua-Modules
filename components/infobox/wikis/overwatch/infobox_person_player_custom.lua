@@ -185,8 +185,8 @@ end
 function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
 	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = ROLES[_args.role:lower()]
+	if String.isNotEmpty(args.role) then
+		roleData = ROLES[args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
