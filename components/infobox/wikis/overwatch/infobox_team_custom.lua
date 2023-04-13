@@ -42,9 +42,7 @@ end
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
-	if String.isNotEmpty(args.league) then
-		lpdbData.extradata.competesin = string.upper(args.league)
-	end
+	lpdbData.extradata.competesin = String.isNotEmpty(args.league) and string.upper(args.league) or nil
 
 	return lpdbData
 end
@@ -53,8 +51,7 @@ function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
 	if String.isNotEmpty(args.league) then
-		local division = string.upper(args.league)
-		table.insert(categories, division .. ' Teams')
+		table.insert(categories, string.upper(args.league) .. ' Teams')
 	end
 
 	return categories
