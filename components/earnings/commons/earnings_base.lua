@@ -142,16 +142,17 @@ end
 -- @mode - (optional) the mode to calculate earnings for
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 -- @aliases - players/teams to determine earnings for
+-- @isPlayerQuery  boolean - if this is a player query or not
 function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
 	conditions = Earnings._buildConditions(conditions, queryYear, mode)
 
-	local sums = {}
+	local earningsByYear = {}
 	local totalEarnings = 0
 	local sumUp = function(placement)
 		local value = Earnings._determineValue(placement, aliases, isPlayerQuery)
 		if perYear then
-			local year = string.sub(placement.date, 1, 4)
-			sums[year] = (sums[year] or 0) + value
+			local year = tonumber(string.sub(placement.date, 1, 4))
+			earningsByYear[year] = (earningsByYear[year] or 0) + value
 		end
 
 		totalEarnings = totalEarnings + value
@@ -163,16 +164,15 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
+	totalEarnings = MathUtils._round(totalEarnings)
+
 	if not perYear then
-		return MathUtils._round(totalEarnings)
+		return totalEarnings
 	end
 
-	local totalEarningsByYear = {}
-	for year, earningsOfYear in pairs(sums) do
-		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
-	end
+	earningsByYear = Table.mapValues(earningsByYear, MathUtils._round)
 
-	return MathUtils._round(totalEarnings), totalEarningsByYear
+	return totalEarnings, earningsByYear
 end
 
 function Earnings._buildConditions(conditions, year, mode)
