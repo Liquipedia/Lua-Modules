@@ -134,7 +134,7 @@ function CustomInjector:addCustomCells(widgets)
 	-- National Team
 	Cell{
 		name = 'National Teams',
-		content = Template.safeExpand(mw.getCurrentFrame(), 'National Teams', {args.nationalteams})
+		content = {args.nationalteams}
 	}
 	return widgets
 end
