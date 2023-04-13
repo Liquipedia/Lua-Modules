@@ -6,14 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local HeroNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
-local HeroNames = mw.loadData('Module:ChampionNames')
+local Variables = require('Module:Variables')
+local Table = require('Module:Table')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -587,18 +588,32 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
-		for playerIndex = 1, _MAX_NUM_PLAYERS do
-			local hero = map['t' .. opponentIndex .. 'c' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'champion' .. playerIndex] = HeroNames[hero and hero:lower()]
+		if not map['t' .. opponentIndex] then
+			local picks = {}
+			for playerIndex = 1, _MAX_NUM_PLAYERS do
+				table.insert(picks, map['t' .. opponentIndex .. 'c' .. playerIndex])
+			end
+			map['t' .. opponentIndex].pick = picks
 		end
 
-		local banIndex = 1
-		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while nextBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan:lower()]
-			banIndex = banIndex + 1
-			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+		if not map['t' .. opponentIndex] then
+			local bans = {}
+			local banIndex = 1
+			local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+			while nextBan do
+				table.insert(bans, nextBan)
+				banIndex = banIndex + 1
+				nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+			end
+			map['t' .. opponentIndex].ban = bans
 		end
+
+		Array.forEach(map['t' .. opponentIndex].pick, function (hero, idx)
+			heroData['team' .. opponentIndex .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
+		end)
+		Array.forEach(map['t' .. opponentIndex].ban, function (hero, idx)
+			heroData['team' .. opponentIndex .. 'bans' .. idx] = HeroNames[hero and hero:lower()]
+		end)
 	end
 
 	map.extradata = heroData

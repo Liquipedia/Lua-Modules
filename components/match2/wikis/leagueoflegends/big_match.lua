@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -614,8 +615,7 @@ function BigMatch.templateHeader()
 	</div>
 	<div class="fb-match-page-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="fb-match-page-header-tournament">{{&dateCountdown}}</div>
-	<br>
-	<div class="fb-match-page-header-tournament">MVP: {{mvp}}}</div>
+	<div class="fb-match-page-header-tournament">MVP: {{mvp}}</div>
 </div>
 ]=]
 end
@@ -626,16 +626,41 @@ function BigMatch.templateGame()
 <div class="fb-match-page-header">
 	<div class="fb-match-page-header-teams" style="display:flex;">
 		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="fb-match-page-header-score">{{team1Score}}&ndash;{{team2Score}}<br>{{length}}</div>
+		<div class="fb-match-page-header-score">{{team1scoreDisplay}}&ndash;{{team2scoreDisplay}}<br>{{length}}</div>
 		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
-	<br>
-	<div class="fb-match-page-header-tournament">MVP: {{mvp}}}</div>
+	<div class="">MVP: {{mvp}}</div>
 </div>
-<div class="fb-match-page-header-teams" style="display:flex;">
-	{{match2opponents.1.name}}
-	{{winner}}
-	{{match2opponents.2.name}}
+<h3>Picks and Bans</h3>
+<div class="fb-match-page-header">
+	<div class="fb-match-page-header-teams" style="display:flex;">
+		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
+		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
+	</div>
+	<div class="fb-match-page-header-teams" style="display:flex;">
+		<div class="fb-match-page-header-team">{{#apiInfo.t1.pick}}{{.}}{{/apiInfo.t1.pick}}{{#apiInfo.t1.ban}}{{.}}{{/apiInfo.t1.ban}}</div>
+		<div class="fb-match-page-header-team">{{#apiInfo.t2.pick}}{{.}}{{/apiInfo.t2.pick}}{{#apiInfo.t2.ban}}{{.}}{{/apiInfo.t2.ban}}</div>
+	</div>
+	<!-- TODO: toogle -->
+	<!-- TODO: Pick and Ban Order -->
+</div>
+<h3>Head-to-Head</h3>
+<div class="fb-match-page-header">
+	<div class="fb-match-page-header-teams" style="display:flex;">
+		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
+		<div></div>
+		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
+	</div>
+	<div class="fb-match-page-header-teams" style="display:flex;">
+		<div class="fb-match-page-header-team">{{kda}}</div>
+		<div class="fb-match-page-header-score">KDA-LOGO<br>KDA</div>
+		<div class="fb-match-page-header-team">{{kda}}</div>
+	</div>
+	<!-- TODO Rest of the stuff -->
+</div>
+<h3>Player Performance</h3>
+<div class="fb-match-page-header">
+	<!-- TODO Player Cards -->
 </div>
 ]=]
 end
@@ -686,6 +711,9 @@ function BigMatch.run(frame)
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		return opponent
 	end)
+	Array.forEach(renderModel.match2games, function (game, index)
+		game.apiInfo = match['map' .. index]
+	end)
 
 	return bigMatch:render(renderModel)
 end
@@ -716,21 +744,44 @@ function BigMatch:_match2Director(args)
 	matchData.opponent1 = Json.parseIfString(args.opponent1)
 	matchData.opponent2 = Json.parseIfString(args.opponent2)
 
+	local prefixWithKey = function(tbl, prefix)
+		local prefixKey = function(key, value)
+			return prefix .. key, value
+		end
+		return Table.map(tbl, prefixKey)
+	end
+
 	local games = Array.mapIndexes(function(gameIndex)
 		local game = mw.ext.LOLDB.getGame(args['map' .. gameIndex])
 		if not game then
-			return nil
+			return
 		end
 
-		game.length = math.floor(game.length/60) .. ":" .. (game.length%60)
+		game.length = math.floor(game.length/60) .. ':' .. (game.length%60)
 		game.team1side = game.team1.color
 		game.team2side = game.team2.color
 
+		Array.sortInPlaceBy(game.championVeto, function(veto) return veto.vetoNumber end)
+
+		local _, vetoesByTeam = Array.groupBy(game.championVeto, function (veto)
+			return veto.team
+		end)
+
+		Table.mergeInto(game, prefixWithKey(Array.map(vetoesByTeam, function (team)
+			return Table.mapValues(Table.groupBy(team, function(_, veto)
+				return veto.type
+			end), function (vetoType)
+				return Array.extractValues(Table.mapValues(vetoType, function(veto)
+					return veto.champion
+				end))
+			end)
+		end), 't'))
+
 		return game
 	end)
-	Table.mergeInto(matchData, Table.map(games, function(index, game) return "map".. index, game end))
+	Table.mergeInto(matchData, Table.map(games, function(index, game) return 'map' .. index, game end))
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
-
+	mw.logObject(match2input, 'Sent toi match2')
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
 
 	local bracketId, matchId = self:_getId()
