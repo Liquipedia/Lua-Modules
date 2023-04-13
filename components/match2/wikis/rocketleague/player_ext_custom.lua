@@ -18,12 +18,10 @@ local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 
 local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
-local CustomPlayerExt = Table.deepCopy(PlayerExt)
-
 --- Asks LPDB for the team a player belonged to on a page. For specific uses only.
 ---@param resolvedPageName string
 ---@date resolvedPageName string
-function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
+function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	if Logic.isEmpty(resolvedPageName) then
 		return
 	end
@@ -48,53 +46,4 @@ function CustomPlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	end
 end
 
---- Fills in the team of the player on the specified date, if it is not specified in the arguments.
----@pageName string
----@template string?
----@options {date: string?, fetchPlayer: boolean?, savePageVar: boolean?, useTimeless: boolean?}
-function CustomPlayerExt.syncTeam(pageName, template, options)
-	options = options or {}
-	local date = options.date or PlayerExt.getContextualDateOrNow()
-
-	local historyVar = playerVars:get(pageName .. '.teamHistory')
-	local history = historyVar and Json.parse(historyVar) or {}
-	local pageVarEntry = options.useTimeless ~= false and history.timeless
-		or Array.find(history, function(entry) return date < entry.leaveDate end)
-
-	local timelessEntry = template and {
-		isResolved = pageVarEntry and template == pageVarEntry.template,
-		isTimeless = true,
-		template = template ~= 'noteam' and template or nil,
-	}
-
-	-- Catch an edge case where pageVarEntry.team is set while pageVarEntry.template is not set
-	-- (pageVarEntry.team being an unresolved team template or lowercased underscore replaced pagename of the team)
-	if pageVarEntry and not pageVarEntry.template then
-		pageVarEntry.template = pageVarEntry.team
-		pageVarEntry.isResolved = nil
-	end
-
-	local entry = timelessEntry
-		or pageVarEntry
-		or options.fetchPlayer ~= false and CustomPlayerExt.fetchTeamHistoryEntry(pageName, options.date)
-
-	if entry and not entry.isResolved then
-		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
-		entry.isResolved = true
-	end
-
-	if options.savePageVar ~= false
-		and (entry and entry.template) ~= (pageVarEntry and pageVarEntry.template) then
-		if entry.isTimeless then
-			history.timeless = entry
-		else
-			table.insert(history, entry)
-			Array.sortInPlaceBy(history, function(e) return e.joinDate end)
-		end
-		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
-	end
-
-	return entry and entry.template
-end
-
-return CustomPlayerExt
+return PlayerExt
