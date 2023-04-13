@@ -787,6 +787,8 @@ function BasePrizePool:storeData()
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
 		end
+
+		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
 	end
 
 	if Table.isNotEmpty(smwTournamentStash) then
