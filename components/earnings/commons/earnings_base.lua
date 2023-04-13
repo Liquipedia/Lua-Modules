@@ -151,10 +151,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 		local value = Earnings._determineValue(placement, aliases, isPlayerQuery)
 		if perYear then
 			local year = string.sub(placement.date, 1, 4)
-			if not sums[year] then
-				sums[year] = 0
-			end
-			sums[year] = sums[year] + value
+			sums[year] = (sums[year] or 0) + value
 		end
 
 		totalEarnings = totalEarnings + value
