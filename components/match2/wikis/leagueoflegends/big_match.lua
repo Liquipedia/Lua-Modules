@@ -14,6 +14,7 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Match = require('Module:Match')
+local Roles = require('Module:PositionIcon/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
@@ -178,7 +179,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 6,
 				["role"] = "top",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Demolish",
@@ -221,7 +222,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 1,
 				["role"] = "jungle",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Conditioning",
@@ -264,7 +265,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 4,
 				["role"] = "bottom",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Ingenious Hunter",
@@ -307,7 +308,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 7,
 				["role"] = "middle",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Last Stand",
@@ -348,7 +349,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 0,
 				["role"] = "support",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Cheap Shot",
@@ -401,7 +402,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 0,
 				["role"] = "support",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Transcendence",
@@ -444,7 +445,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 3,
 				["role"] = "jungle",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Lethal Tempo",
@@ -486,7 +487,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 1,
 				["role"] = "top",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Grasp of the Undying",
@@ -528,7 +529,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 0,
 				["role"] = "bottom",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Magical Footwear",
@@ -570,7 +571,7 @@ function mw.ext.LOLDB.getGame(apiId)
 				},
 				["kills"] = 1,
 				["role"] = "middle",
-				["runes"] = {
+				["runeData"] = {
 					["primary"] = {
 						["runes"] = {
 							"Cut Down",
@@ -659,8 +660,41 @@ function BigMatch.templateGame()
 	<!-- TODO Rest of the stuff -->
 </div>
 <h3>Player Performance</h3>
-<div class="fb-match-page-header">
-	<!-- TODO Player Cards -->
+<div style="display:flex;flex-direction:row;">
+	<div style="width:100%;"><div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
+		<div style="display:flex;flex-direction: column">
+			{{#apiInfo.team1.players}}
+				<div style="display:flex;flex-direction: row;justify-content:space-between;">
+					<div style="display:flex;flex-direction: row;justify-content:space-between;">
+						<div><div style="height: 48px; width: 48px; border-radius:40px;">{{&championDisplay}}</div>{{&roleIcon}}</div>
+						<div style="display:flex;flex-direction: column;">[[{{id}}]]<i>{{champion}}</i></div>
+					</div>
+					<div style="display:flex;flex-direction: row;gap:16px;">
+						<!-- Loadout -->
+						<div style="display:flex;flex-direction:row;gap:4px;">
+							<!-- Runes/Spells -->
+							<div style="display:flex;flex-direction:column;gap:2px;">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
+							<div style="display:flex;flex-direction:column;gap:2px;">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
+						</div>
+						<div style="display:flex;flex-direction:column;gap:2px;">
+							<!-- Items -->
+							<div style="display:flex;flex-direction:row;gap:2px;">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
+							<div style="display:flex;flex-direction:row;gap:2px;">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
+						</div>
+					</div>
+				</div>
+				<div style="display:flex;flex-direction: row;justify-content:space-evenly;align-items:center;">
+					<div style="display:flex;flex-direction: row;align-items:center;"><b>KDA</b> {{kills}}/{{deaths}}/{{assists}}</div>
+					<div style="display:flex;flex-direction: row;align-items:center;"><b>CS</b> {{creepScore}}</div>
+					<div style="display:flex;flex-direction: row;align-items:center;"><div style="width:20px;height:20px;position:relative;"><div class="match-bm-lol-stat-dmg-outer"><div class="match-bm-lol-stat-dmg-blade"></div><div class="match-bm-lol-stat-dmg-hilt"></div></div></div> {{damageDone}}</div>
+				</div>
+			{{/apiInfo.team1.players}}
+		</div>
+	</div>
+	<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}
+	<div style="display:flex;flex-direction: column">
+	</div>
+	</div>
 </div>
 ]=]
 end
@@ -669,16 +703,9 @@ function BigMatch.templateFooter()
 	return
 [=[
 <h3>Additional Information</h3>
-<div>
-{{#links}}
-	[[File:{{icon}}|link={{link}}|15px|{{text}}]]
-{{/links}}
-</div>
+<div class="fb-match-page-header-tournament" style="gap:4px;">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 {{#patch}}
-<br>
-<div>
-	[[Patch {{patch}}|{{patch}}]]
-</div>
+<br><div class="fb-match-page-header-tournament" style="gap:4px;">[[Patch {{patch}}]]</div>
 {{/patch}}
 ]=]
 end
@@ -692,6 +719,36 @@ local LINK_DATA = {
 	gol = {icon = 'Gol.gg_allmode.png', text = 'GolGG Match Report'},
 	factor = {icon = 'Factor.gg lightmode.png', text = 'FactorGG Match Report'},
 }
+
+local KEYSTONES = {
+	-- Precision
+	'Press the Attack',
+	'Lethal Tempo',
+	'Fleet Footwork',
+	'Conqueror',
+
+	-- Domination
+	'Electrocute',
+	'Predator',
+	'Dark Harvest',
+	'Hail of Blades',
+
+	-- Sorcery
+	'Summon Aery',
+	'Arcane Comet',
+	'Phase Rush',
+
+	-- Resolve
+	'Grasp of the Undying',
+	'Aftershock',
+	'Guardian',
+
+	-- Inspiration
+	'Glacial Augment',
+	'Unsealed Spellbook',
+	'First Strike',
+}
+local DEFAULT_ITEM = 'EmptyIcon'
 
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
@@ -713,6 +770,17 @@ function BigMatch.run(frame)
 	end)
 	Array.forEach(renderModel.match2games, function (game, index)
 		game.apiInfo = match['map' .. index]
+		Array.forEach(game.apiInfo.team1.players, function(player)
+			player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
+			player.roleIcon = Roles[player.role]
+			player.runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
+				return Table.includes(KEYSTONES, rune)
+			end)[1]
+			player.runeSecondaryTree = player.runeData.secondary.tree
+			player.items = Array.map(Array.range(1, 6), function (idx)
+				return player.items[idx] or DEFAULT_ITEM
+			end)
+		end)
 	end)
 
 	return bigMatch:render(renderModel)
@@ -792,7 +860,7 @@ function BigMatch:_match2Director(args)
 
 	mw.logObject(match, 'Stored Match')
 
-	return Table.merge(match, matchData)
+	return Table.merge(matchData, match)
 end
 
 function BigMatch:render(model)
