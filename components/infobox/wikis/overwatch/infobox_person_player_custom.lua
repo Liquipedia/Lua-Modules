@@ -56,7 +56,6 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local pagename = mw.title.getCurrentTitle().prefixedText
-local args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
