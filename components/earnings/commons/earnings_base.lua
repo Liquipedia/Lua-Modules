@@ -201,15 +201,9 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 		return 0
 	end
 
-	local numberOfPlayersFromTeam = 0
 	local playerData = Table.filterByKey(placement.opponentplayers or {}, function(key) return key:find('team') end)
-	for _, team in pairs(playerData) do
-		if Table.includes(aliases, team) then
-			numberOfPlayersFromTeam = numberOfPlayersFromTeam + 1
-		end
-	end
 
-	return indivPrize * numberOfPlayersFromTeam
+	return indivPrize * Table.size(Table.filter(playerData, function(team) return Table.includes(aliases, team) end))
 end
 
 return Class.export(Earnings)
