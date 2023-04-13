@@ -42,9 +42,9 @@ end
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
-	lpdbData.extradata = {
-		owl = String.isNotEmpty(args.owl),
-	}
+	if String.isNotEmpty(args.league) then
+		lpdbData.extradata.competesin = string.upper(args.league)
+	end
 
 	return lpdbData
 end
@@ -52,8 +52,9 @@ end
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	if String.isNotEmpty(args.owl) then
-		table.insert(categories, 'Overwatch League Teams')
+	if String.isNotEmpty(args.league) then
+		local division = string.upper(args.league)
+		table.insert(categories, division .. ' Teams')
 	end
 
 	return categories
