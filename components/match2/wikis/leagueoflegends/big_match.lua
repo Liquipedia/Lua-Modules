@@ -14,14 +14,12 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Match = require('Module:Match')
-local Roles = require('Module:PositionIcon/data')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local TemplateEngine = require('Module:TemplateEngine')
+local TemplateEngine = require('Module:TemplateEngine/dev')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 ---@class BigMatch
 local BigMatch = Class.new()
@@ -654,46 +652,72 @@ function BigMatch.templateGame()
 	</div>
 	<div class="fb-match-page-header-teams" style="display:flex;">
 		<div class="fb-match-page-header-team">{{kda}}</div>
-		<div class="fb-match-page-header-score">KDA-LOGO<br>KDA</div>
+		<div class="fb-match-page-header-score">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
 		<div class="fb-match-page-header-team">{{kda}}</div>
 	</div>
 	<!-- TODO Rest of the stuff -->
 </div>
 <h3>Player Performance</h3>
-<div style="display:flex;flex-direction:row;">
-	<div style="width:100%;"><div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div style="display:flex;flex-direction: column">
-			{{#apiInfo.team1.players}}
-				<div style="display:flex;flex-direction: row;justify-content:space-between;">
-					<div style="display:flex;flex-direction: row;justify-content:space-between;">
-						<div><div style="height: 48px; width: 48px; border-radius:40px;">{{&championDisplay}}</div>{{&roleIcon}}</div>
-						<div style="display:flex;flex-direction: column;">[[{{id}}]]<i>{{champion}}</i></div>
+<div class="match-bm-lol-players-wrapper">
+	<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&match2opponents.1.iconDisplay}}</div>
+		{{#apiInfo.team1.players}}
+			<div class="match-bm-lol-players-player">
+				<div class="match-bm-lol-players-player-details">
+					<div class="match-bm-lol-players-player-character">
+						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=]]</div></div>
+						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
 					</div>
-					<div style="display:flex;flex-direction: row;gap:16px;">
+					<div class="match-bm-lol-players-player-loadout">
 						<!-- Loadout -->
-						<div style="display:flex;flex-direction:row;gap:4px;">
+						<div class="match-bm-lol-players-player-loadout-rs-wrap">
 							<!-- Runes/Spells -->
-							<div style="display:flex;flex-direction:column;gap:2px;">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
-							<div style="display:flex;flex-direction:column;gap:2px;">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
 						</div>
-						<div style="display:flex;flex-direction:column;gap:2px;">
+						<div class="match-bm-lol-players-player-loadout-items">
 							<!-- Items -->
-							<div style="display:flex;flex-direction:row;gap:2px;">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
-							<div style="display:flex;flex-direction:row;gap:2px;">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
 						</div>
 					</div>
 				</div>
-				<div style="display:flex;flex-direction: row;justify-content:space-evenly;align-items:center;">
-					<div style="display:flex;flex-direction: row;align-items:center;"><b>KDA</b> {{kills}}/{{deaths}}/{{assists}}</div>
-					<div style="display:flex;flex-direction: row;align-items:center;"><b>CS</b> {{creepScore}}</div>
-					<div style="display:flex;flex-direction: row;align-items:center;"><div style="width:20px;height:20px;position:relative;"><div class="match-bm-lol-stat-dmg-outer"><div class="match-bm-lol-stat-dmg-blade"></div><div class="match-bm-lol-stat-dmg-hilt"></div></div></div> {{damageDone}}</div>
+				<div class="match-bm-lol-players-player-stats">
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=]] {{kills}}/{{deaths}}/{{assists}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=]] {{creepScore}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=]] {{damageDone}}</div>
 				</div>
-			{{/apiInfo.team1.players}}
-		</div>
+			</div>
+		{{/apiInfo.team1.players}}
 	</div>
-	<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}
-	<div style="display:flex;flex-direction: column">
-	</div>
+	<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&match2opponents.2.iconDisplay}}</div>
+		{{#apiInfo.team2.players}}
+			<div class="match-bm-lol-players-player">
+				<div class="match-bm-lol-players-player-details">
+					<div class="match-bm-lol-players-player-character">
+						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=]]</div></div>
+						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
+					</div>
+					<div class="match-bm-lol-players-player-loadout">
+						<!-- Loadout -->
+						<div class="match-bm-lol-players-player-loadout-rs-wrap">
+							<!-- Runes/Spells -->
+							<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
+						</div>
+						<div class="match-bm-lol-players-player-loadout-items">
+							<!-- Items -->
+							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
+							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
+						</div>
+					</div>
+				</div>
+				<div class="match-bm-lol-players-player-stats">
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=]] {{kills}}/{{deaths}}/{{assists}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=]] {{creepScore}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=]] {{damageDone}}</div>
+				</div>
+			</div>
+		{{/apiInfo.team2.players}}
 	</div>
 </div>
 ]=]
@@ -748,6 +772,17 @@ local KEYSTONES = {
 	'Unsealed Spellbook',
 	'First Strike',
 }
+
+local ROLE_ORDER = Table.map({
+	'top',
+	'jungle',
+	'middle',
+	'bottom',
+	'support',
+}, function (key, value)
+	return value, key
+end)
+
 local DEFAULT_ITEM = 'EmptyIcon'
 
 function BigMatch.run(frame)
@@ -770,15 +805,20 @@ function BigMatch.run(frame)
 	end)
 	Array.forEach(renderModel.match2games, function (game, index)
 		game.apiInfo = match['map' .. index]
-		Array.forEach(game.apiInfo.team1.players, function(player)
-			player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
-			player.roleIcon = Roles[player.role]
-			player.runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
-				return Table.includes(KEYSTONES, rune)
-			end)[1]
-			player.runeSecondaryTree = player.runeData.secondary.tree
-			player.items = Array.map(Array.range(1, 6), function (idx)
-				return player.items[idx] or DEFAULT_ITEM
+
+		Array.forEach({'team1', 'team2'}, function(teamIdx)
+			local team = game.apiInfo[teamIdx]
+			Array.forEach(team.players, function(player)
+				player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
+				player.roleIcon = player.role .. ' ' .. team.color
+				player.runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
+					return Table.includes(KEYSTONES, rune)
+				end)[1]
+				player.runeSecondaryTree = player.runeData.secondary.tree
+				player.items = Array.map(Array.range(1, 6), function (idx)
+					return player.items[idx] or DEFAULT_ITEM
+				end)
+				player.damageDone = string.format('%.1fK', player.damageDone / 1000)
 			end)
 		end)
 	end)
@@ -830,6 +870,12 @@ function BigMatch:_match2Director(args)
 		game.team2side = game.team2.color
 
 		Array.sortInPlaceBy(game.championVeto, function(veto) return veto.vetoNumber end)
+
+		local playerSortFunc = function (player)
+			return ROLE_ORDER[player.role]
+		end
+		Array.sortInPlaceBy(game.team1.players, playerSortFunc)
+		Array.sortInPlaceBy(game.team2.players, playerSortFunc)
 
 		local _, vetoesByTeam = Array.groupBy(game.championVeto, function (veto)
 			return veto.team
