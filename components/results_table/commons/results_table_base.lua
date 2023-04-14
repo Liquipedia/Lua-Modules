@@ -481,7 +481,7 @@ function BaseResultsTable.tournamentDisplayName(placement)
 end
 
 function BaseResultsTable:processVsData(placement)
-	local lastVs = placement.lastvsdata
+	local lastVs = placement.lastvsdata or {}
 
 	if String.isNotEmpty(lastVs.groupscore) then
 		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
