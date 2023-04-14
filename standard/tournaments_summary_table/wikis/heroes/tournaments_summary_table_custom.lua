@@ -12,8 +12,8 @@ local CustomTournamentsSummaryTable = require('Module:TournamentsSummaryTable')
 
 local _SECONDS_PER_DAY = 86400
 
-CustomTournamentsSummaryTable.upcomingOffset = _SECONDS_PER_DAY * 30
-CustomTournamentsSummaryTable.completedOffset = _SECONDS_PER_DAY * 30
+CustomTournamentsSummaryTable.upcomingOffset = _SECONDS_PER_DAY * 90
+CustomTournamentsSummaryTable.completedOffset = _SECONDS_PER_DAY * 90
 
 CustomTournamentsSummaryTable.tiers = {1, 2, 3, 'Qualifier'}
 CustomTournamentsSummaryTable.tierTypeExcluded = {'Showmatch'}
