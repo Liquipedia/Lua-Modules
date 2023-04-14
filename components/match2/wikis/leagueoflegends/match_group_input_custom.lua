@@ -593,10 +593,7 @@ function mapFunctions.getParticipants(map, opponents)
 			for playerIndex = 1, _MAX_NUM_PLAYERS do
 				table.insert(picks, map['t' .. opponentIndex .. 'c' .. playerIndex])
 			end
-			map['t' .. opponentIndex].pick = picks
-		end
 
-		if not map['t' .. opponentIndex] then
 			local bans = {}
 			local banIndex = 1
 			local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
@@ -605,7 +602,7 @@ function mapFunctions.getParticipants(map, opponents)
 				banIndex = banIndex + 1
 				nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 			end
-			map['t' .. opponentIndex].ban = bans
+			map['t' .. opponentIndex] = {pick = picks, ban = bans}
 		end
 
 		Array.forEach(map['t' .. opponentIndex].pick, function (hero, idx)
