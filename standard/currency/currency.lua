@@ -22,6 +22,7 @@ local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
 local DEFAULT_ROUND_PRECISION = 2
+local DASH = '-'
 
 function Currency.template(frame)
 	local args = Arguments.getArgs(frame)
@@ -105,17 +106,19 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value, precision, forceRoundPrecision)
-	if not Logic.isNumeric(value) then
-		return 0
+function Currency.formatMoney(value, precision, forceRoundPrecision, displayZero)
+	if not Logic.isNumeric(value) or (value == 0 and not forceRoundPrecision) then
+		return displayZero and 0 or DASH
 	end
 	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
 
 	local roundedValue = Math.round{value, precision}
 	local integer, decimal = math.modf(roundedValue)
+
 	if precision <= 0 or decimal == 0 and not forceRoundPrecision then
 		return LANG:formatNum(integer)
 	end
+
 	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
 end
 
