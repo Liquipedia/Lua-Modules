@@ -306,7 +306,8 @@ end
 
 --- Allows for overriding this functionality
 function League:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
