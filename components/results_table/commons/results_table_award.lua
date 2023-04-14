@@ -72,7 +72,7 @@ function AwardsTable:buildRow(placement)
 
 	row:tag('td'):wikitext('$' .. Currency.formatMoney(
 			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
-			or placement.prizemoney, nil, true
+			or placement.prizemoney
 		))
 
 	return row
