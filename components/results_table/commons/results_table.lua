@@ -94,10 +94,10 @@ function ResultsTable:buildRow(placement)
 	end
 
 	if not self.config.hideResult then
-		local score, vsDisplay = self:processVsData(placement)
+		local score, vsDisplay, groupAbbr = self:processVsData(placement)
 		row
 			:tag('td'):wikitext(score):done()
-			:tag('td'):css('text-align', 'left'):node(vsDisplay)
+			:tag('td'):css('text-align', 'left'):cssText(groupAbbr and 'padding-left:14px' or nil):node(vsDisplay or groupAbbr)
 	end
 
 	row:tag('td'):wikitext('$' .. Currency.formatMoney(
