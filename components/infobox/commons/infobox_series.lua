@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
@@ -15,6 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local WarningBox = require('Module:WarningBox')
+local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
@@ -159,13 +161,13 @@ function Series:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 
 		local lpdbData = {
@@ -222,6 +224,12 @@ end
 --- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
 	return lpdbData
+end
+
+--- Allows for overriding this functionality
+function Series:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function Series:createLiquipediaTierDisplay(args)

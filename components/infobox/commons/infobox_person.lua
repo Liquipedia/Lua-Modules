@@ -336,7 +336,8 @@ end
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
 function Person:shouldStoreData(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
