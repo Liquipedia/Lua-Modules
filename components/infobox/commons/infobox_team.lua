@@ -308,7 +308,8 @@ function Team:addToLpdb(lpdbData, args)
 end
 
 function Team:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Team
