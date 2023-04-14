@@ -684,6 +684,11 @@ function BigMatch.templateGame()
 			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon dragon.png|link=]]<br>Drakes</div>
 			<div>{{apiInfo.team2.dragonKills}}</div>
 		</div>
+		<!--<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.heraldKills}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon herald.png|link=]]<br>Heralds</div>
+			<div>{{apiInfo.team2.heraldKills}}</div>
+		</div>-->
 	</div>
 </div>
 <h3>Player Performance</h3>
