@@ -610,9 +610,9 @@ function BigMatch.templateHeader()
 [=[
 <div class="match-bm-lol-match-header">
 	<div class="match-bm-lol-match-header-overview">
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}<br>[[{{match2opponents.1.name}}]]</div>
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}[[{{match2opponents.1.name}}]]</div>
 		<div class="match-bm-lol-match-header-result">{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}</div>
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}<br>[[{{match2opponents.2.name}}]]</div>
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}[[{{match2opponents.2.name}}]]</div>
 	</div>
 	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
@@ -635,23 +635,39 @@ function BigMatch.templateGame()
 	</div>
 {{#mvp}}<div class="match-bm-lol-game-action">MVP: {{mvp}}</div>{{/mvp}}
 <h3>Picks and Bans</h3>
-<div class="match-bm-lol-game-veto">
+<div class="match-bm-lol-game-veto collapsed general-collapsible">
 	<div class="match-bm-lol-game-veto-overview">
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.1.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-blue"></div></div>{{/apiInfo.t1.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></div>{{/apiInfo.t1.pick}}</div>
 				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t1.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t1.ban}}</div>
 			</div>
 		</div>
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.2.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-red"></div></div>{{/apiInfo.t2.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></div>{{/apiInfo.t2.pick}}</div>
 				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t2.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t2.ban}}</div>
 			</div>
 		</div>
 	</div>
-	<!-- TODO: toogle -->
-	<!-- TODO: Pick and Ban Order -->
+	<div class="match-bm-lol-game-veto-order-toggle ppt-toggle-expand">
+		<div class="general-collapsible-expand-button">Show Order &nbsp;<i class="fa fa-chevron-down"></i></div>
+		<div class="general-collapsible-collapse-button">Hide Order &nbsp;<i class="fa fa-chevron-up"></i></div>
+	</div>
+	<div class="match-bm-lol-game-veto-order-list ppt-hide-on-collapse">
+		<div class="match-bm-lol-game-veto-order-team">
+			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.1.iconDisplay}}</div>
+			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice">
+				{{#apiInfo.championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team1side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.1}}
+			</div></div>
+		</div>
+		<div class="match-bm-lol-game-veto-order-team">
+			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.2.iconDisplay}}</div>
+			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice">
+				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
+			</div></div>
+		</div>
+	</div>
 </div>
 <h3>Head-to-Head</h3>
 <div class="match-bm-lol-h2h">
@@ -868,6 +884,20 @@ function BigMatch.run(frame)
 					return player.items[idx] or DEFAULT_ITEM
 				end)
 				player.damageDone = string.format('%.1fK', player.damageDone / 1000)
+			end)
+		end)
+
+		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, function(veto)
+			return veto.team
+		end)
+
+		Array.forEach(game.apiInfo.championVetoByTeam, function (team)
+			local lastType = 'ban'
+			Array.forEach(team, function(veto)
+				veto.championDisplay = HeroIcon._getImage{veto.champion, '24px', date = renderModel.date}
+				veto.isBan = veto.type == 'ban'
+				veto.isNewGroup = lastType ~= veto.type
+				lastType = veto.type
 			end)
 		end)
 
