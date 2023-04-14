@@ -159,13 +159,13 @@ function Series:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
 		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 
 		local lpdbData = {
@@ -222,6 +222,12 @@ end
 --- Allows for overriding this functionality
 function Series:addToLpdb(lpdbData)
 	return lpdbData
+end
+
+--- Allows for overriding this functionality
+function Series:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function Series:createLiquipediaTierDisplay(args)
