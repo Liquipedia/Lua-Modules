@@ -543,7 +543,7 @@ end
 will print out `p1 p2 p3`
 ]]
 ---@param tbl table
----@param prefix string
+---@param prefix string|string[]
 ---@param options? {requireIndex: boolean}
 ---@return function
 function Table.iter.pairsByPrefix(tbl, prefixes, options)
