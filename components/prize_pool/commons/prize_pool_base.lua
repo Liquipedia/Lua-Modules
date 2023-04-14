@@ -229,23 +229,20 @@ BasePrizePool.prizeTypes = {
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = mw.ext.TeamLiquidIntegration.resolve_redirect(input):gsub(' ', '_')
-			local data = {link = link}
 
 			-- Automatically retrieve information from the Tournament
-			local tournamentData = BasePrizePool._getTournamentInfo(link)
-			if tournamentData then
-				data.title = tournamentData.tickername
-				data.icon = tournamentData.icon
-				data.iconDark = tournamentData.icondark
-			end
-
-			-- Manual inputs
+			local tournamentData = BasePrizePool._getTournamentInfo(link) or {}
 			local prefix = 'qualifies' .. index
-			data.title = context[prefix .. 'name'] or data.title
-			data.icon = data.icon or context[prefix .. 'icon']
-			data.iconDark = data.iconDark or context[prefix .. 'icondark']
-
-			return data
+			return {
+				link = link,
+				title = context[prefix .. 'name'] or Logic.emptyOr(
+					tournamentData.tickername,
+					tournamentData.name,
+					tournamentData.pagename:gsub('_', ' '):gsub('/', ' ')
+				),
+				icon = tournamentData.icon or context[prefix .. 'icon'],
+				iconDark = tournamentData.icondark or context[prefix .. 'icondark']
+			}
 		end,
 		headerDisplay = function (data)
 			return TableCell{content = {'Qualifies To'}}
