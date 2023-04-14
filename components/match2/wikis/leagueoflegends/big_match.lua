@@ -651,8 +651,8 @@ function BigMatch.templateGame()
 		</div>
 	</div>
 	<div class="match-bm-lol-game-veto-order-toggle ppt-toggle-expand">
-		<div class="general-collapsible-expand-button">Show Order &nbsp;<i class="fa fa-chevron-down"></i></div>
-		<div class="general-collapsible-collapse-button">Hide Order &nbsp;<i class="fa fa-chevron-up"></i></div>
+		<div class="general-collapsible-expand-button"><div>Show Order &nbsp;<i class="fa fa-chevron-down"></i></div></div>
+		<div class="general-collapsible-collapse-button"><div>Hide Order &nbsp;<i class="fa fa-chevron-up"></i></div></div>
 	</div>
 	<div class="match-bm-lol-game-veto-order-list ppt-hide-on-collapse">
 		<div class="match-bm-lol-game-veto-order-team">
