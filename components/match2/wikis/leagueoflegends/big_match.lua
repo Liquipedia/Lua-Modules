@@ -13,6 +13,7 @@ local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Math = require('Module:MathUtil')
 local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -644,18 +645,46 @@ function BigMatch.templateGame()
 	<!-- TODO: Pick and Ban Order -->
 </div>
 <h3>Head-to-Head</h3>
-<div class="fb-match-page-header">
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div></div>
-		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
+<div class="match-bm-lol-h2h">
+	<div class="match-bm-lol-h2h-header">
+		<div class="match-bm-lol-h2h-header-team">{{&match2opponents.1.iconDisplay}}</div>
+		<div class="match-bm-lol-h2h-stat-title"></div>
+		<div class="match-bm-lol-h2h-header-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{kda}}</div>
-		<div class="fb-match-page-header-score">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-		<div class="fb-match-page-header-team">{{kda}}</div>
+	<div class="match-bm-lol-h2h-section">
+		<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.kills}}/{{apiInfo.team1.deaths}}/{{apiInfo.team1.assists}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
+			<div>{{apiInfo.team2.kills}}/{{apiInfo.team2.deaths}}/{{apiInfo.team2.assists}}</div>
+		</div>
+		<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.gold}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon gold.png|link=]]<br>Gold</div>
+			<div>{{apiInfo.team2.gold}}</div>
+		</div>
 	</div>
-	<!-- TODO Rest of the stuff -->
+	<div class="match-bm-lol-h2h-section">
+	<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.towerKills}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
+			<div>{{apiInfo.team2.towerKills}}</div>
+		</div>
+		<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.inhibitorKills}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Inhibitors</div>
+			<div>{{apiInfo.team2.inhibitorKills}}</div>
+		</div>
+		<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.baronKills}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Barons</div>
+			<div>{{apiInfo.team2.baronKills}}</div>
+		</div>
+		<div class="match-bm-lol-h2h-stat">
+			<div>{{apiInfo.team1.dragonKills}}</div>
+			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon dragon.png|link=]]<br>Drakes</div>
+			<div>{{apiInfo.team2.dragonKills}}</div>
+		</div>
+	</div>
 </div>
 <h3>Player Performance</h3>
 <div class="match-bm-lol-players-wrapper">
@@ -866,16 +895,23 @@ function BigMatch:_match2Director(args)
 		end
 
 		game.length = math.floor(game.length/60) .. ':' .. (game.length%60)
-		game.team1side = game.team1.color
-		game.team2side = game.team2.color
+		Array.forEach({'team1', 'team2'}, function(teamIdx)
+			local team = game[teamIdx]
+
+			game[teamIdx .. 'side'] = team.color
+			-- Sort players based on role
+			Array.sortInPlaceBy(team.players, function (player)
+				return ROLE_ORDER[player.role]
+			end)
+
+			-- Aggregate stats
+			team.gold = string.format('%.1fK', Math.sum(Array.map(team.players, function (player) return player.gold end)) / 1000)
+			team.kills = Math.sum(Array.map(team.players, function (player) return player.kills end))
+			team.deaths = Math.sum(Array.map(team.players, function (player) return player.deaths end))
+			team.assists = Math.sum(Array.map(team.players, function (player) return player.assists end))
+		end)
 
 		Array.sortInPlaceBy(game.championVeto, function(veto) return veto.vetoNumber end)
-
-		local playerSortFunc = function (player)
-			return ROLE_ORDER[player.role]
-		end
-		Array.sortInPlaceBy(game.team1.players, playerSortFunc)
-		Array.sortInPlaceBy(game.team2.players, playerSortFunc)
 
 		local _, vetoesByTeam = Array.groupBy(game.championVeto, function (veto)
 			return veto.team
