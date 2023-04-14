@@ -382,7 +382,7 @@ return {
 		symbol = {
 			hasSpace = true,
 			isAfter = true,
-			text = 'С̲',
+			text = '<u>С</u>',
 		},
 	},
 	khr = {

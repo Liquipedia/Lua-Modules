@@ -126,7 +126,7 @@ function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	Variables.varDefine('headtohead', match.headtohead)
-	match.publishertier = Logic.emptyOr(match.featured, Variables.varDefault('featured'))
+	match.publishertier = Logic.emptyOr(match.featured, Variables.varDefault('tournament_publishertier'))
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
 

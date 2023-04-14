@@ -95,7 +95,7 @@ function BroadcasterCard.create(frame)
 		return outputList .. '\n**' .. Abbreviation.make('TBA', 'To Be Announced')
 	end
 
-	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id < b.id) end)
+	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
 
 	for _, broadcaster in ipairs(casters) do
 		outputList = outputList .. BroadcasterCard._display(broadcaster)
@@ -156,6 +156,8 @@ function BroadcasterCard.sortValue(broadcaster, sortMode, casterIndex)
 		return broadcaster.flag
 	elseif sortMode == 'manual' then
 		return 99 - (broadcaster.sort or 0)
+	elseif sortMode == 'id' then
+		return broadcaster.id:lower()
 	end
 
 	return casterIndex

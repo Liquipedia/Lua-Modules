@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -225,7 +227,7 @@ function CustomMatchSummary.getByMatchId(args)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = link
+			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
 		end
 		match.links.vod2 = nil
 	end
@@ -348,18 +350,22 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	-- Match vod
-	if secondVods[0] then
+	if Table.isNotEmpty(secondVods[0]) then
 		addVodLink(nil, match.vod, 1)
-		addVodLink(nil, secondVods[0], 2)
+		Array.forEach(secondVods[0], function(vodlink, vodindex)
+				addVodLink(nil, vodlink, vodindex + 1)
+			end)
 	else
 		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		if secondVods[index] then
+		if Table.isNotEmpty(secondVods[index]) then
 			addVodLink(index, vod, 1)
-			addVodLink(index, secondVods[index], 2)
+			Array.forEach(secondVods[index], function(vodlink, vodindex)
+				addVodLink(index, vodlink, vodindex + 1)
+			end)
 		else
 			addVodLink(index, vod, nil)
 		end

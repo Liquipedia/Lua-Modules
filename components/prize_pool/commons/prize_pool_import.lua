@@ -544,7 +544,7 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 
 	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
-		order = 'date desc',
+		order = 'date desc, match2id desc',
 		query = 'date, match2opponents, winner',
 		limit = 1
 	})

@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 local TierData = mw.loadData('Module:Tier/Data')
 
 local NON_BREAKING_SPACE = '&nbsp;'
+local DEFAULT_TIER_TYPE = 'General'
 
 local Tier = {}
 
@@ -112,7 +113,10 @@ end
 ---@param queryData table
 ---@return string?, string?, table
 function Tier.parseFromQueryData(queryData)
-	return queryData.liquipediatier, queryData.liquipediatiertype, {}
+	local tierType = queryData.liquipediatiertype
+	tierType = tierType ~= DEFAULT_TIER_TYPE and tierType or nil
+
+	return queryData.liquipediatier, tierType, {}
 end
 
 --- Builds the display for a given (tier, tierType) tuple
@@ -165,7 +169,7 @@ function Tier.displaySingle(data, options)
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, data.link)
-	elseif String.isNotEmpty(options.link) then
+	elseif Logic.readBoolOrNil(options.link) == nil and String.isNotEmpty(options.link) then
 		return Page.makeInternalLink({}, display, options.link)
 	end
 
@@ -195,8 +199,8 @@ end)
 ---@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
-		or Tier.legacyNumbers[string.lower(tier or ''):gsub(' ', '')]
-		or Tier.legacyShortNumbers[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyShortNumbers()[string.lower(tier or ''):gsub(' ', '')]
 end
 
 return Tier

@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -46,8 +47,10 @@ function LegacyPrizePool.run(dependency)
 
 	local newArgs = {}
 
-	-- disable import legacy prize pools
+	-- disable import in legacy prize pools
 	newArgs.import = false
+	-- disable syncPlayers in legacy prize pools
+	newArgs.syncPlayers = false
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
@@ -67,7 +70,7 @@ function LegacyPrizePool.run(dependency)
 	LegacyPrizePool.assignType(newArgs, header.points2, 'points2')
 	LegacyPrizePool.assignType(newArgs, header.points3, 'points3')
 
-	if header.indiv then
+	if header.indiv or (Logic.readBool(header.award) and not Logic.readBool(header.team)) then
 		newArgs.type = {type = Opponent.solo}
 		IS_SOLO = true
 	else
@@ -110,6 +113,10 @@ function LegacyPrizePool.run(dependency)
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
 
+	if Logic.readBool(header.award) then
+		return CustomAwardPrizePool.run(newArgs)
+	end
+
 	return CustomPrizePool.run(newArgs)
 end
 
@@ -150,15 +157,17 @@ function LegacyPrizePool.sortQualifiers(args)
 end
 
 function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
-	if not slot.place then
+	if not slot.place and not slot.award then
 		return {}
 	end
 
 	local newData = {}
-	if SPECIAL_PLACES[slot.place:lower()] then
+	if slot.place and SPECIAL_PLACES[slot.place:lower()] then
 		newData[SPECIAL_PLACES[slot.place:lower()]] = true
-	else
+	elseif slot.place then
 		newData.place = slot.place
+	else
+		newData.award = slot.award
 	end
 
 	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
@@ -219,13 +228,16 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	if mergeSlots then
 		local newSlot = {
 			opponents = newData.opponents,
-			place = newData.place
+			place = newData.place,
+			award = newData.award,
 		}
 		for _, item in pairs(SPECIAL_PLACES) do
 			newSlot[item] = newData[item]
 		end
+
 		return newSlot
 	end
+
 	return newData
 end
 

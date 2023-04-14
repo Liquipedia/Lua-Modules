@@ -64,6 +64,7 @@ return {
 			short = 'Mon.',
 			link = 'Monthly Tournaments',
 			category = 'Monthly Tournaments',
+			prioTierType = false,
 		},
 		weekly = {
 			value = 'Weekly',
@@ -72,6 +73,7 @@ return {
 			short = 'Week.',
 			link = 'Weekly Tournaments',
 			category = 'Weekly Tournaments',
+			prioTierType = false,
 		},
 		qualifier = {
 			value = 'Qualifier',
@@ -80,6 +82,7 @@ return {
 			short = 'Qual.',
 			link = 'Qualifier Tournaments',
 			category = 'Qualifier Tournaments',
+			prioTierType = true,
 		},
 		showmatch = {
 			value = 'Showmatch',
@@ -88,6 +91,7 @@ return {
 			short = 'Showm.',
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
+			prioTierType = true,
 		},
 		points = {
 			value = 'Points',
@@ -96,6 +100,7 @@ return {
 			short = 'Points',
 			link = 'Point Rankings',
 			category = 'Point Rankings',
+			prioTierType = true,
 		},
 		ladder = {
 			value = 'Ladder',
@@ -104,6 +109,7 @@ return {
 			short = 'Ladder',
 			link = 'Ladder Tournaments',
 			category = 'Ladder Tournaments',
+			prioTierType = true,
 		},
 		onlinestage = {
 			value = 'Online Stage',
@@ -112,6 +118,7 @@ return {
 			short = 'Online',
 			link = 'Online Stages',
 			category = 'Tournament Online Stages',
+			prioTierType = false,
 		},
 	}
 }

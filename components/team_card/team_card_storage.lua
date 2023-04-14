@@ -65,15 +65,17 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	local title = mw.title.getCurrentTitle().text
 	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
 	local date = Variables.varDefault('tournament_date')
-	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
-	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
+	local startDate = Variables.varDefault('tournament_startdate', date)
+	local endDate = Variables.varDefault('tournament_enddate', date)
 
 	lpdbData.participant = team
 	lpdbData.tournament = tournamentName or title
 	lpdbData.series = Variables.varDefault('tournament_series')
 	lpdbData.parent = Variables.varDefault('tournament_parent')
 	lpdbData.startdate = startDate
-	lpdbData.date = args.date or Variables.varDefault('enddate_' .. team .. lpdbPrefix .. '_date') or endDate
+	lpdbData.date = args.date
+		or Variables.varDefault(lpdbData.objectName .. '_placementdate')
+		or endDate
 	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = Qualifier.parseQualifier(args.qualifier)
 
 	if team ~= 'TBD' then

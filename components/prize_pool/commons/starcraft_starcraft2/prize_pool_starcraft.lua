@@ -89,8 +89,6 @@ function CustomPrizePool.run(frame)
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	lpdbData.publishertier = Variables.varDefault('featured')
-
 	-- make these available for the stash further down
 	lpdbData.liquipediatier = _tier
 	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')

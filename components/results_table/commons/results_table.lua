@@ -42,7 +42,7 @@ function ResultsTable:buildHeader()
 	end
 
 	if not self.config.hideResult then
-		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):wikitext('Result')
+		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):addClass('unsortable'):wikitext('Result')
 	end
 
 	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
@@ -64,7 +64,7 @@ function ResultsTable:buildRow(placement)
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
 	if self.config.displayGameIcons then
-		row:tag('th'):node(Game.icon{game = placement.game})
+		row:tag('td'):node(Game.icon{game = placement.game})
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
@@ -94,13 +94,13 @@ function ResultsTable:buildRow(placement)
 	end
 
 	if not self.config.hideResult then
-		local score, vsDisplay = self:processVsData(placement)
+		local score, vsDisplay, groupAbbr = self:processVsData(placement)
 		row
 			:tag('td'):wikitext(score):done()
-			:tag('td'):css('text-align', 'left'):node(vsDisplay)
+			:tag('td'):css('text-align', 'left'):cssText(groupAbbr and 'padding-left:14px' or nil):node(vsDisplay or groupAbbr)
 	end
 
-	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
+	row:tag('td'):wikitext('$' .. Currency.formatMoney(
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney
 			or placement.prizemoney
 		))

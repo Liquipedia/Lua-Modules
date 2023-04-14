@@ -10,13 +10,13 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local HighlightConditions = require('Module:HighlightConditions')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -49,6 +49,8 @@ local VALID_QUERY_TYPES = {
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local DEFAULT_RESULTS_SUB_PAGE = 'Results'
+local INVALID_TIER_DISPLAY = 'Undefined'
+local INVALID_TIER_SORT = 'ZZ'
 
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
@@ -77,6 +79,7 @@ function BaseResultsTable:readConfig()
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
 	}
 
@@ -128,8 +131,6 @@ function BaseResultsTable:create()
 		self.data = {}
 		return self
 	end
-
-	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
 
 	table.sort(data, function(placement1, placement2) return placement1.date > placement2.date end)
 
@@ -367,8 +368,8 @@ function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr')
-			:tag('th'):addClass('sortbottom'):attr('colspan', 42):wikitext(placementData.header):done()
+		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
+			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
 			:done())
 	end
 
@@ -381,29 +382,22 @@ end
 
 -- overwritable
 function BaseResultsTable:rowHighlight(placement)
-	if String.isNotEmpty(placement.publishertier) then
-		return 'valvepremier-highlighted'
+	if HighlightConditions.tournament(placement, self.config) then
+		return 'tournament-highlighted-bg'
 	end
 end
 
 -- overwritable
 function BaseResultsTable:tierDisplay(placement)
-	local tierDisplay
+	local tier, tierType, options = Tier.parseFromQueryData(placement)
+	options.link = true
+	options.onlyTierTypeIfBoth = true
 
-	if String.isEmpty(placement.liquipediatiertype) and String.isEmpty(placement.liquipediatier) then
-		return '', ''
-	elseif String.isNotEmpty(placement.liquipediatiertype) then
-		local tierType = placement.liquipediatiertype:lower()
-		tierDisplay = Tier.text.types[tierType] or placement.liquipediatiertype
-	else
-		tierDisplay = Tier.text.tiers[placement.liquipediatier] or placement.liquipediatier
+	if not Tier.isValid(tier, tierType) then
+		return INVALID_TIER_DISPLAY, INVALID_TIER_SORT
 	end
 
-	return Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	), tierDisplay
+	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 -- overwritable
@@ -443,19 +437,20 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
-	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
 	end
 
 	return teamDisplay
 end
 
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
 	local config = self.config
 
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
+		(isNotLastVs and config.nonAliasTeamTemplates
+			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
 	)
 end
 
@@ -487,32 +482,17 @@ function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata
 
 	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
-	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
-	local vsDisplay = self:opponentDisplay(lastVs, {})
+	local score = ''
+	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	end
+
+	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
 
 	return score, vsDisplay
-end
-
--- overwritable
-function BaseResultsTable:processLegacyVsData(placement)
-	if Table.isNotEmpty(placement.lastvsdata) then
-		return placement
-	end
-
-	local lastVs = {score = placement.lastvsscore, groupscore = placement.groupscore}
-	-- lets assume opponentType of the vs opponent is the same as of the opponent
-	lastVs.opponenttype = placement.opponenttype
-	-- assume lastvs is team template for teams and pagename & displayname for players
-	-- if wikis store them in extradata they can overwrite this function until lastvsdata field is filled
-	lastVs.opponentplayers = {p1 = placement.lastvs, p1dn = placement.lastvs}
-	lastVs.opponenttemplate = placement.lastvs
-
-	placement.lastvsdata = lastVs
-
-	return placement
 end
 
 function BaseResultsTable:buildHeader()
