@@ -42,7 +42,7 @@ function ResultsTable:buildHeader()
 	end
 
 	if not self.config.hideResult then
-		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):wikitext('Result')
+		header:tag('th'):css('min-width', '105px'):attr('colspan', 2):addClass('unsortable'):wikitext('Result')
 	end
 
 	header:tag('th'):attr('data-sort-type', 'currency'):wikitext('Prize')
