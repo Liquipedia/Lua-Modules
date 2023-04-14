@@ -16,7 +16,7 @@ local Namespace = require('Module:Namespace')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -29,8 +29,6 @@ local Cell = Widgets.Cell
 local GAME_MOD = 'mod'
 local GAME_LOTV = Game.name{game = 'lotv'}
 local TODAY = os.date('%Y-%m-%d', os.time())
-local _TIER_MODE_TYPES = 'types'
-local _TIER_MODE_TIERS = 'tiers'
 
 local CustomInjector = Class.new(Injector)
 
@@ -170,8 +168,9 @@ function CustomSeries._addCustomVariables()
 		local name = _args.name or _series.pagename
 		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 		Variables.varDefine('headtohead', _args.headtohead or '')
-		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
+		local tier, tierType = Tier.toValue(_args.liquipediatier, _args.liquipediatiertype)
+		Variables.varDefine('tournament_liquipediatier', tier or '')
+		Variables.varDefine('tournament_liquipediatiertype', tierType or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_tickername', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
@@ -207,43 +206,6 @@ function CustomSeries._validDateOr(...)
 			return dateString
 		end
 	end
-end
-
---function for custom tier handling
-function CustomSeries.createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierText(tierString, tierMode)
-		local tierText = Tier.text[tierMode][tierString]
-		if not tierText then
-			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				_series.warnings,
-				tierString .. ' is not a known Liquipedia ' .. tierMode
-					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
-			)
-			return ''
-		else
-			return tierText
-		end
-	end
-
-	tier = buildTierText(tier, _TIER_MODE_TIERS)
-
-	local tierLink = tier .. ' Tournaments'
-	local tierDisplay
-	if String.isNotEmpty(tierType) then
-		tierType = buildTierText(tierType:lower(), _TIER_MODE_TYPES)
-		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
-	else
-		tierDisplay = tier
-	end
-
-	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]'
 end
 
 return CustomSeries

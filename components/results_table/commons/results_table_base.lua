@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local HighlightConditions = require('Module:HighlightConditions')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -78,6 +79,7 @@ function BaseResultsTable:readConfig()
 		playerResultsOfTeam = Logic.readBool(args.playerResultsOfTeam),
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
 			return mw.text.trim(alias)
 		end) or {}
@@ -384,8 +386,8 @@ end
 
 -- overwritable
 function BaseResultsTable:rowHighlight(placement)
-	if String.isNotEmpty(placement.publishertier) then
-		return 'valvepremier-highlighted'
+	if HighlightConditions.tournament(placement, self.config) then
+		return 'tournament-highlighted-bg'
 	end
 end
 
@@ -439,19 +441,20 @@ function BaseResultsTable:opponentDisplay(data, options)
 
 	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
-	if self:shouldDisplayAdditionalText(rawTeamTemplate) then
+	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
 	end
 
 	return teamDisplay
 end
 
-function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate)
+function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
 	local config = self.config
 
 	return rawTeamTemplate and (
 		Game.isDefaultTeamLogo{logo = rawTeamTemplate.image} or
-		(config.nonAliasTeamTemplates and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
+		(isNotLastVs and config.nonAliasTeamTemplates
+			and not Table.includes(config.nonAliasTeamTemplates, rawTeamTemplate.templatename))
 	)
 end
 
@@ -486,8 +489,12 @@ function BaseResultsTable:processVsData(placement)
 		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
-	local score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
-	local vsDisplay = self:opponentDisplay(lastVs, {})
+	local score = ''
+	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
+	end
+
+	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
 
 	return score, vsDisplay
 end

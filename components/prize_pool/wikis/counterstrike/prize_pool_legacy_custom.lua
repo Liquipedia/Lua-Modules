@@ -20,6 +20,7 @@ end
 
 function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	newArgs.qualifier = header.qualifier
+	newArgs['custom-name'] = header['custom-name']
 	newArgs.points1link = header['points-link']
 
 	return newArgs

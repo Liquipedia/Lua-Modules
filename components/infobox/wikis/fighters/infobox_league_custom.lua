@@ -12,11 +12,13 @@ local Currency = require('Module:Currency')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -43,8 +45,9 @@ function CustomLeague.run(frame)
 
 	-- Auto Icon
 	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(_args.series)
-	_args.icon = _args.icon or seriesIconLight
-	_args.icondark = _args.icondark or seriesIconDark
+	_args.circuitIconLight, _args.circuitIconDark = CustomLeague.getIconFromSeries(_args.circuit)
+	_args.icon = _args.icon or seriesIconLight or _args.circuitIconLight
+	_args.icondark = _args.icondark or seriesIconDark or _args.circuitIconDark
 
 	-- Normalize name
 	_args.game = Game.toIdentifier{game = _args.game}
@@ -88,10 +91,21 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
 			table.insert(widgets, Title{name = 'Circuit Information'})
-			table.insert(widgets, Cell{name = 'Circuit', content = {_args.circuit}})
-			table.insert(widgets, Cell{name = 'Circuit Tier', content = {
-				_args.circuittier and (_args.circuittier .. ' Tier') or nil}
-			})
+			table.insert(
+				widgets,
+				Cell{
+					name = 'Circuit',
+					content = {
+						CustomLeague:_createCircuit(
+							_args.circuit,
+							_args.circuitabbr,
+							_args.circuitIconLight,
+							_args.circuitIconDark or _args.circuitIconLight
+						)
+					}
+				}
+			)
+			table.insert(widgets, Cell{name = 'Circuit Tier', content = {_args.circuittier}})
 			table.insert(widgets, Cell{name = 'Tournament Region', content = {_args.region}})
 			table.insert(widgets, Cell{name = 'Points', content = {_args.points}})
 			table.insert(widgets, Chronology{content = {next = _args.circuit_next, previous = _args.circuit_previous}})
@@ -104,7 +118,11 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.name{game = _args.game}}},
+			Cell{name = 'Game', content = {Page.makeInternalLink(
+				{onlyIfExists = true},
+				Game.name{game = _args.game},
+				Game.link{game = _args.game}
+			) or Game.name{game = _args.game}}},
 			Cell{name = 'Version', content = {_args.version}},
 		}
 	end
@@ -268,6 +286,42 @@ function CustomLeague:_cleanPrizeValue(value, currency)
 	value = string.gsub(value, '%$', '')
 
 	return value
+end
+
+function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
+	if String.isEmpty(circuit) then
+		return
+	end
+
+	local circuitPageExists = Page.exists(circuit)
+
+	local output = LeagueIcon.display{
+		icon = icon,
+		iconDark = iconDark,
+		series = circuit,
+		abbreviation = abbreviation,
+		date = Variables.varDefault('tournament_enddate'),
+		options = {noLink = not circuitPageExists}
+	}
+	if output == LeagueIcon.display{} then
+		output = ''
+	else
+		output = output .. ' '
+		if not _args.icon then
+			League:_setIconVariable(output, icon, iconDark)
+		end
+	end
+
+	if not circuitPageExists then
+		if String.isEmpty(abbreviation) then
+			return output .. circuit
+		else
+			return output .. abbreviation
+		end
+	elseif String.isEmpty(abbreviation) then
+		return output .. '[[' .. circuit .. ']]'
+	end
+	return output .. '[[' .. circuit .. '|' .. abbreviation .. ']]'
 end
 
 return CustomLeague

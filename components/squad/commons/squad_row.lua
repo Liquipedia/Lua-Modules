@@ -64,6 +64,11 @@ function SquadRow:id(args)
 		cell:wikitext('&nbsp;' .. _ICON_SUBSTITUTE)
 	end
 
+	if String.isNotEmpty(args.name) then
+		cell:tag('br'):done():tag('i'):tag('small'):wikitext(args.name)
+		self.lpdbData.name = args.name
+	end
+
 	local teamNode = mw.html.create('td')
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
 		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team))

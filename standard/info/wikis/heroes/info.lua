@@ -26,6 +26,7 @@ return {
 		},
 	},
 	defaultGame = 'hots',
+	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Hots logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Hots logo.png', ---@deprecated
 }

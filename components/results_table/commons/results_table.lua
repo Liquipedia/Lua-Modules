@@ -100,9 +100,9 @@ function ResultsTable:buildRow(placement)
 			:tag('td'):css('text-align', 'left'):node(vsDisplay)
 	end
 
-	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
+	row:tag('td'):wikitext('$' .. Currency.formatMoney(
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney
-			or placement.prizemoney
+			or placement.prizemoney, nil, true
 		))
 
 	return row

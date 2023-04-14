@@ -16,8 +16,8 @@ local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = require('Module:Tier')
 local Table = require('Module:Table')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -35,16 +35,17 @@ local CustomInjector = Class.new(Injector)
 local _league
 local categories = {}
 
-local _TIER_SHOW_MATCH = 9
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
+
+	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
+
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -122,43 +123,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
 	end
 
-	local tier = Variables.varDefault('tournament_liquipediatier', '')
-	local tiertype = Variables.varDefault('tournament_liquipediatiertype', '')
-
-	if String.isEmpty(tier) then
-		table.insert(categories, 'Pages with unsupported Tier')
-	else
-		table.insert(categories, Tier['text'][tier] .. ' Tournaments')
-	end
-
-	if not String.isEmpty(tiertype) then
-		table.insert(categories, tiertype .. ' Tournaments')
-	end
-
 	return categories
-end
-
-function CustomLeague:createLiquipediaTierDisplay(args)
-	local content = ''
-
-	local tierVar = Variables.varDefault('tournament_liquipediatier', '')
-	local tier = Tier['text'][tierVar]
-	local tierDisplay = tonumber(tierVar) == _TIER_SHOW_MATCH
-		and Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. 'es')
-		or Page.makeInternalLink({}, tier, GameLookup.getName({args.game}) .. '/' .. tier .. ' Tournaments')
-
-	local type = Variables.varDefault('tournament_liquipediatiertype', '')
-	if not String.isEmpty(type) then
-		local typeNumber = Tier['number'][type]
-		local typeDisplay = tonumber(typeNumber) == _TIER_SHOW_MATCH
-			and Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. 'es')
-			or Page.makeInternalLink({}, type, GameLookup.getName({args.game}) .. '/' .. type .. ' Tournaments')
-		content = content .. typeDisplay .. ' (' .. tierDisplay .. ')'
-	else
-		content = content .. tierDisplay
-	end
-
-	return content
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -198,31 +163,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
-	-- clean liquipediatiers:
-	-- tier should be a number defining a tier
-	local liquipediatier = args.liquipediatier
-	if not tonumber(liquipediatier) then
-		liquipediatier = Tier['number'][liquipediatier]
-	end
-
-	-- type should be the textual representation of the numbers
-	local liquipediatiertype = args.liquipediatiertype
-	if not tonumber(liquipediatiertype) then
-		liquipediatiertype = Tier['number'][liquipediatiertype]
-	end
-	liquipediatiertype = Tier['text'][liquipediatiertype]
-
-	Variables.varDefine('tournament_liquipediatier', liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', liquipediatiertype)
-
 	-- Legacy tier vars
-	Variables.varDefine('tournament_lptier', liquipediatier)
-	Variables.varDefine('tournament_tier', liquipediatier)
-	Variables.varDefine('tournament_tiertype', liquipediatiertype)
-	Variables.varDefine('ltier', liquipediatier == 1 and 1 or
-		liquipediatier == 2 and 2 or
-		liquipediatier == 3 and 3 or 4
-	)
 
 	-- Legacy notability vars
 	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
@@ -399,6 +340,20 @@ function CustomLeague:_displayMaps(maps)
 		Table.mapValues(maps, function(map) return mapDisplay(map) end),
 		'&nbsp;• '
 	)}
+end
+
+function CustomLeague:createLiquipediaTierDisplay(args)
+	local tierDisplay = Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype,
+		{link = true, game = GameLookup.getName{args.game}}
+	)
+
+	if String.isEmpty(tierDisplay) then
+		return
+	end
+
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
 return CustomLeague

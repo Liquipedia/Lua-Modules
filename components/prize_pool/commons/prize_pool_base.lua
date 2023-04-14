@@ -756,7 +756,7 @@ end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
 function BasePrizePool._getTournamentDate()
-	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
+	return Variables.varDefault('tournament_enddate', TODAY)
 end
 
 function BasePrizePool:storeData()
@@ -768,11 +768,12 @@ function BasePrizePool:storeData()
 		parent = Variables.varDefault('tournament_parent'),
 		series = Variables.varDefault('tournament_series'),
 		shortname = Variables.varDefault('tournament_tickername'),
-		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
+		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
 		type = Variables.varDefault('tournament_type'),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		publishertier = Variables.varDefault('tournament_publishertier'),
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
@@ -802,6 +803,8 @@ function BasePrizePool:storeData()
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
 		end
+
+		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
 	end
 
 	if Table.isNotEmpty(smwTournamentStash) then

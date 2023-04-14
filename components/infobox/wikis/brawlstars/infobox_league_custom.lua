@@ -19,11 +19,17 @@ local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local SUPERCELL_SPONSORED_ICON = '[[File:Supercell icon.png|x18px|link=Supercell|Tournament sponsored by Supercell.]]'
+local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell'
+	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
+	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
 local ORGANIZER_ICONS = {
-	Supercell = '[[File:Supercell icon.png|x18px|link=Supercell|Supercell]] ',
-	['Esports Engine'] = '[[File:Esports Engine icon allmode.png|x18px|link=Esports Engine|Esports Engine]] '
+	supercell = '[[File:Supercell lightmode.png|x18px|link=Supercell|Supercell|class=show-when-light-mode]]'
+		.. '[[File:Supercell darkmode.png|x18px|link=Supercell|Supercell|class=show-when-dark-mode]] ',
+	['esports engine'] = '[[File:Esports Engine icon allmode.png|x18px|link=Esports Engine|Esports Engine]] ',
+	['esl'] = '[[File:ESL 2019 icon lightmode.png|x18px|link=ESL|ESL|class=show-when-light-mode]]'
+		.. '[[File:ESL 2019 icon darkmode.png|x18px|link=ESL|ESL|class=show-when-dark-mode]] ',
+	['faceit'] = '[[File:FACEIT icon allmode.png|x18px|link=Esports Engine|Esports Engine]] ',
 }
 
 local _args
@@ -108,13 +114,19 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('edate', edate)
 end
 
+function CustomLeague._organizerIcon(organizer)
+	if not organizer then return '' end
+
+	return ORGANIZER_ICONS[organizer:lower()] or ''
+end
+
 function CustomLeague._createOrganizers()
 	if not _args.organizer then
 		return {}
 	end
 
 	local organizers = {
-		(ORGANIZER_ICONS[_args.organizer] or '') .. _league:createLink(
+		CustomLeague._organizerIcon(_args.organizer) .. _league:createLink(
 			_args.organizer, _args['organizer-name'], _args['organizer-link'], _args.organizerref),
 	}
 
@@ -122,7 +134,7 @@ function CustomLeague._createOrganizers()
 	while not String.isEmpty(_args['organizer' .. index]) do
 		table.insert(
 			organizers,
-			(ORGANIZER_ICONS[_args['organizer' .. index]] or '') .. _league:createLink(
+			CustomLeague._organizerIcon(_args['organizer' .. index]) .. _league:createLink(
 				_args['organizer' .. index],
 				_args['organizer' .. index .. '-name'],
 				_args['organizer' .. index .. '-link'],
