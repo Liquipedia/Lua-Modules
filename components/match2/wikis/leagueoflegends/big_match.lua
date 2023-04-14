@@ -21,6 +21,7 @@ local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine/dev')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 ---@class BigMatch
 local BigMatch = Class.new()
@@ -607,15 +608,15 @@ end
 function BigMatch.templateHeader()
 	return
 [=[
-<div class="fb-match-page-header">
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}<br>[[{{match2opponents.1.name}}]]</div>
-		<div class="fb-match-page-header-score">{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}</div>
-		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}<br>[[{{match2opponents.2.name}}]]</div>
+<div class="match-bm-lol-match-header">
+	<div class="match-bm-lol-match-header-overview">
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}<br>[[{{match2opponents.1.name}}]]</div>
+		<div class="match-bm-lol-match-header-result">{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}</div>
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}<br>[[{{match2opponents.2.name}}]]</div>
 	</div>
-	<div class="fb-match-page-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
-	<div class="fb-match-page-header-tournament">{{&dateCountdown}}</div>
-	<div class="fb-match-page-header-tournament">MVP: {{mvp}}</div>
+	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
+	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
+	{{#mvp}}<div class="match-bm-lol-game-action">MVP: {{mvp}}</div>{{/mvp}}
 </div>
 ]=]
 end
@@ -623,23 +624,31 @@ end
 function BigMatch.templateGame()
 	return
 [=[
-<div class="fb-match-page-header">
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="fb-match-page-header-score">{{team1scoreDisplay}}&ndash;{{team2scoreDisplay}}<br>{{length}}</div>
-		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
+<div class="match-bm-lol-game-overview">
+	<div class="match-bm-lol-game-summary">
+		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
+		<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png]]</div>
+		<div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}<br>{{length}}</div>
+		<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png]]</div>
+		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
-	<div class="">MVP: {{mvp}}</div>
-</div>
+	</div>
+{{#mvp}}<div class="match-bm-lol-game-action">MVP: {{mvp}}</div>{{/mvp}}
 <h3>Picks and Bans</h3>
-<div class="fb-match-page-header">
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="fb-match-page-header-team">{{&match2opponents.2.iconDisplay}}</div>
-	</div>
-	<div class="fb-match-page-header-teams" style="display:flex;">
-		<div class="fb-match-page-header-team">{{#apiInfo.t1.pick}}{{.}}{{/apiInfo.t1.pick}}{{#apiInfo.t1.ban}}{{.}}{{/apiInfo.t1.ban}}</div>
-		<div class="fb-match-page-header-team">{{#apiInfo.t2.pick}}{{.}}{{/apiInfo.t2.pick}}{{#apiInfo.t2.ban}}{{.}}{{/apiInfo.t2.ban}}</div>
+<div class="match-bm-lol-game-veto">
+	<div class="match-bm-lol-game-veto-overview">
+		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.1.iconDisplay}}</div>
+			<div class="match-bm-lol-game-veto-overview-team-veto">
+				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-blue"></div></div>{{/apiInfo.t1.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t1.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t1.ban}}</div>
+			</div>
+		</div>
+		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.2.iconDisplay}}</div>
+			<div class="match-bm-lol-game-veto-overview-team-veto">
+				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-red"></div></div>{{/apiInfo.t2.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t2.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t2.ban}}</div>
+			</div>
+		</div>
 	</div>
 	<!-- TODO: toogle -->
 	<!-- TODO: Pick and Ban Order -->
@@ -830,6 +839,8 @@ function BigMatch.run(frame)
 	local match = bigMatch:_match2Director(args)
 
 	local renderModel = match
+
+	renderModel.dateCountdown = tostring(DisplayHelper.MatchCountdownBlock(match))
 	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
 		return site, Table.mergeInto({link = link}, LINK_DATA[site])
 	end))
@@ -840,8 +851,12 @@ function BigMatch.run(frame)
 	Array.forEach(renderModel.match2games, function (game, index)
 		game.apiInfo = match['map' .. index]
 
+		game.apiInfo.team1.scoreDisplay = game.winner == 1 and 'W' or 'L'
+		game.apiInfo.team2.scoreDisplay = game.winner == 2 and 'W' or 'L'
+
 		Array.forEach({'team1', 'team2'}, function(teamIdx)
 			local team = game.apiInfo[teamIdx]
+
 			Array.forEach(team.players, function(player)
 				player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
 				player.roleIcon = player.role .. ' ' .. team.color
@@ -853,6 +868,14 @@ function BigMatch.run(frame)
 					return player.items[idx] or DEFAULT_ITEM
 				end)
 				player.damageDone = string.format('%.1fK', player.damageDone / 1000)
+			end)
+		end)
+
+		Array.forEach({'t1', 't2'}, function (team)
+			game.apiInfo[team] = Table.mapValues(game.apiInfo[team], function (champions)
+				return Array.map(champions, function (champion)
+					return HeroIcon._getImage{champion, '24px', date = renderModel.date}
+				end)
 			end)
 		end)
 	end)
