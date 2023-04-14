@@ -372,8 +372,8 @@ function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr')
-			:tag('th'):addClass('sortbottom'):attr('colspan', 42):wikitext(placementData.header):done()
+		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
+			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
 			:done())
 	end
 
