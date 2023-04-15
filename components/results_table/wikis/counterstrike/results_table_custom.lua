@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=counterstrike
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
