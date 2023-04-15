@@ -50,11 +50,15 @@ function suite:testText()
 	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text({game = ''}))
 	self:assertEquals(COMMONS_DATA.name, Game.text({noLink = true}))
 	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.name .. ']]', Game.text({link = 'ABC123'}))
-	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.abbreviation .. ']]', Game.text({useAbbreviation = true}))
+	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.abbreviation .. ']]',
+		Game.text({useAbbreviation = true}))
 	self:assertEquals(COMMONS_DATA.abbreviation, Game.text({noLink = true, useAbbreviation = true}))
-	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.abbreviation .. ']]', Game.text({useAbbreviation = true, link = 'ABC123'}))
-	self:assertEquals('<abbr title="The specified game input is not recognized">Unknown Game</abbr>', Game.text({useDefault = false}))
-	self:assertEquals('<abbr title="The specified game input is not recognized">Unkwn.</abbr>', Game.text({useDefault = false, useAbbreviation = true}))
+	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.abbreviation .. ']]',
+		Game.text({useAbbreviation = true, link = 'ABC123'}))
+	self:assertEquals('<abbr title="The specified game input is not recognized">Unknown Game</abbr>',
+		Game.text({useDefault = false}))
+	self:assertEquals('<abbr title="The specified game input is not recognized">Unkwn.</abbr>',
+		Game.text({useDefault = false, useAbbreviation = true}))
 end
 
 function suite:testList()
