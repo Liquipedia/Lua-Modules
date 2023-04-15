@@ -114,6 +114,13 @@ function Game.link(args)
 	return Game.raw(args).link
 end
 
+---Fetches the category prefix for a given game
+---@param args? {game: string?, useDefault: boolean?}
+---@return string?
+function Game.categoryPrefix(args)
+	return Game.raw(args).categoryPrefix
+end
+
 ---Fetches the defaultTeamLogos (light & dark) for a given game
 ---@param args? {game: string?, useDefault: boolean?}
 ---@return table?
