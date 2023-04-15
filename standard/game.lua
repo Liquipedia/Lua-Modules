@@ -22,6 +22,7 @@ local GamesData = Info.games
 
 local ICON_STRING = '[[File:${icon}|link=${link}|class=${class}|${size}]]'
 local DEFAULT_SIZE = '25x25px'
+local DEFAULT_SPAN_CLASS = 'icon-16px'
 local ICON_PLACEHOLDER = 'LeaguesPlaceholder.png'
 
 local Game = {}
@@ -140,19 +141,22 @@ function Game.icon(args)
 	end
 
 	local link = Logic.readBool(args.noLink) and '' or args.link or gameData.link
+	local spanClass = (Logic.readBool(args.noSpan) and '') or
+		(String.isNotEmpty(args.spanClass) and args.spanClass) or
+			DEFAULT_SPAN_CLASS
 
 	if gameData.logo.lightMode == gameData.logo.darkMode then
-		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
+		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link, spanClass = spanClass}
 	end
 
-	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
+	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode, spanClass = spanClass}
+		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode, spanClass = spanClass}
 end
 
 ---@param args {mode: string?, icon: string?, size: string?, link: string?}
 ---@return string
 function Game._createIcon(args)
-	return String.interpolate(
+	local iconString = String.interpolate(
 		ICON_STRING,
 		{
 			icon = args.icon,
@@ -161,6 +165,11 @@ function Game._createIcon(args)
 			link = args.link or '',
 		}
 	)
+	if String.isNotEmpty(args.spanClass) then
+		return mw.html.create('span'):addClass(args.spanClass):node(iconString)
+	else
+		return iconString
+	end
 end
 
 ---Fetches a text display for a given game
