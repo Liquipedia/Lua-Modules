@@ -14,6 +14,9 @@ local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
 local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled = true})
 
+local INVALID_TIER_DISPLAY = 'Undefined'
+local INVALID_TIER_SORT = 'ZZ'
+
 local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
