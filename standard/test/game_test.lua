@@ -36,7 +36,12 @@ function suite:testDataRetrieve()
 end
 
 function suite:testIcon()
-	self:assertEquals(COMMONS_ICON, Game.icon())
+	self:assertEquals(COMMONS_ICON,
+		Game.icon({noSpan = true}))
+	self:assertEquals('<span class="span-class">' .. COMMONS_ICON .. '</span>',
+		tostring(Game.icon({spanClass = 'span-class'})))
+	self:assertEquals('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
+		tostring(Game.icon()))
 end
 
 function suite:testText()
@@ -45,21 +50,21 @@ function suite:testText()
 	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text({game = ''}))
 	self:assertEquals(COMMONS_DATA.name, Game.text({noLink = true}))
 	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.name .. ']]', Game.text({link = 'ABC123'}))
-	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.abbreviation .. ']]',
-		Game.text({useAbbreviation = true}))
+	self:assertEquals('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.abbreviation .. ']]', Game.text({useAbbreviation = true}))
 	self:assertEquals(COMMONS_DATA.abbreviation, Game.text({noLink = true, useAbbreviation = true}))
-	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.abbreviation .. ']]',
-		Game.text({useAbbreviation = true, link = 'ABC123'}))
-	self:assertEquals('<abbr title="The specified game input is not recognized">Unknown Game</abbr>',
-		Game.text({useDefault = false}))
-	self:assertEquals('<abbr title="The specified game input is not recognized">Unkwn.</abbr>',
-		Game.text({useDefault = false, useAbbreviation = true}))
+	self:assertEquals('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.abbreviation .. ']]', Game.text({useAbbreviation = true, link = 'ABC123'}))
+	self:assertEquals('<abbr title="The specified game input is not recognized">Unknown Game</abbr>', Game.text({useDefault = false}))
+	self:assertEquals('<abbr title="The specified game input is not recognized">Unkwn.</abbr>', Game.text({useDefault = false, useAbbreviation = true}))
 end
 
 function suite:testList()
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames()[1])
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames({ordered = true})[1])
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames({ordered = false})[1])
+end
+
+function suite:testCategoryPrefix()
+	self:assertEquals(nil, Game.categoryPrefix())
 end
 
 function suite:testIsDefaultTeamLogo()
