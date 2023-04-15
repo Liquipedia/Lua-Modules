@@ -49,6 +49,10 @@ function Currency.display(currencyCode, prizeValue, options)
 	options.symbol = Logic.emptyOr(options.symbol, true)
 	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
 
+	if options.dashIfZero and tonumber(prizeValue) == 0 then
+		return DASH
+	end
+
 	local currencyData = Currency.raw(currencyCode)
 
 	if not currencyData then
