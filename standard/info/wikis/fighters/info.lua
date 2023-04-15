@@ -1316,8 +1316,8 @@ return {
 			name = 'Street Fighter 6',
 			link = 'Street Fighter 6',
 			logo = {
-				darkMode = 'SF6 Logo.png',
-				lightMode = 'SF6 Logo.png',
+				darkMode = 'Street Fighter 6 icon darkmode.png',
+				lightMode = 'Street Fighter 6 icon lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'SF6 Logo.png',
