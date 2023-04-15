@@ -107,7 +107,7 @@ function Currency.raw(currencyCode)
 end
 
 function Currency.formatMoney(value, precision, forceRoundPrecision, displayZero)
-	if not Logic.isNumeric(value) or (value == 0 and not forceRoundPrecision) then
+	if not Logic.isNumeric(value) or (tonimber(value) == 0 and not forceRoundPrecision) then
 		return displayZero and 0 or DASH
 	end
 	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
