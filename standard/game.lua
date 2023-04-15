@@ -149,8 +149,10 @@ function Game.icon(args)
 		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link, spanClass = spanClass}
 	end
 
-	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode, spanClass = spanClass}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode, spanClass = spanClass}
+	return Game._createIcon{size = args.size, link = link, mode = 'light',
+		icon = gameData.logo.lightMode, spanClass = spanClass}
+	.. Game._createIcon{size = args.size, link = link, mode = 'dark',
+		icon = gameData.logo.darkMode, spanClass = spanClass}
 end
 
 ---@param args {mode: string?, icon: string?, size: string?, link: string?}
