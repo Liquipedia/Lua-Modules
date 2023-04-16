@@ -25,6 +25,8 @@ end
 function suite:testFormatMoney()
 	self:assertEquals(DASH, Currency.formatMoney('abc'))
 	self:assertEquals(DASH, Currency.formatMoney(nil))
+	self:assertEquals(DASH, Currency.formatMoney('0'))
+	self:assertEquals(DASH, Currency.formatMoney(0))
 	self:assertEquals(0, Currency.formatMoney('abc', nil, nil, true))
 	self:assertEquals(0, Currency.formatMoney(nil, nil, nil, true))
 	self:assertEquals('12', Currency.formatMoney(12))
