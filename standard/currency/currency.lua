@@ -110,9 +110,10 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value, precision, forceRoundPrecision, displayZero)
+function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
+	dashIfZero = Logic.nilOr(Logic.readBoolOrNil(dashIfZero), true)
 	if not Logic.isNumeric(value) or (tonumber(value) == 0 and not forceRoundPrecision) then
-		return displayZero and 0 or DASH
+		return dashIfZero and DASH or 0
 	end
 	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
 
