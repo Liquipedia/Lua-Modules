@@ -289,8 +289,8 @@ return {
 			name = 'DNF Duel',
 			link = 'DNF Duel',
 			logo = {
-				darkMode = 'DNF Duel Logo.png',
-				lightMode = 'DNF Duel Logo.png',
+				darkMode = 'DNF Duel icon allmode.png',
+				lightMode = 'DNF Duel icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'DNF Duel Logo.png',
@@ -406,8 +406,8 @@ return {
 			name = 'Granblue Fantasy: Versus',
 			link = 'Granblue Fantasy: Versus',
 			logo = {
-				darkMode = 'GBFVS Logo.png',
-				lightMode = 'GBFVS Logo.png',
+				darkMode = 'Granblue Fantasy Versus icon darkmode.png',
+				lightMode = 'Granblue Fantasy Versus icon lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'GBFVS Logo.png',
@@ -835,8 +835,8 @@ return {
 			name = 'Melty Blood: Type Lumina',
 			link = 'Melty Blood: Type Lumina',
 			logo = {
-				darkMode = 'Melty Blood Type Lumina Logo.png',
-				lightMode = 'Melty Blood Type Lumina Logo.png',
+				darkMode = 'Melty Blood Type Lumina icon allmode.png',
+				lightMode = 'Melty Blood Type Lumina icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Melty Blood Type Lumina Logo.png',
@@ -1589,8 +1589,8 @@ return {
 			name = 'Under Night In-Birth',
 			link = 'Under Night In-Birth',
 			logo = {
-				darkMode = 'UNIEL Logo.png',
-				lightMode = 'UNIEL Logo.png',
+				darkMode = 'Under Night-In Birth icon allmode.png',
+				lightMode = 'Under Night-In Birth icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'UNIEL Logo.png',
