@@ -102,7 +102,7 @@ function ResultsTable:buildRow(placement)
 
 	row:tag('td'):wikitext(Currency.display('USD',
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney,
-			{setVariables = false, abbreviation = false}
+			{dashIfZero = true, abbreviation = false, formatValue = true}
 		))
 
 	return row
