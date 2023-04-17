@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 
-local CustomTournamentsSummaryTable = require('Module:TournamentsSummaryTable')
+local CustomTournamentsSummaryTable = Lua.import('Module:TournamentsSummaryTable', {requireDevIfEnabled = true})
 
 local SECONDS_PER_DAY = 86400
 
