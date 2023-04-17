@@ -220,6 +220,10 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Infobox league lacking localcurrency')
 	end
 
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
+	end
+
 	if String.isNotEmpty(args.sort_date) then
 		table.insert(categories, 'Tournaments with custom sort date')
 	end
