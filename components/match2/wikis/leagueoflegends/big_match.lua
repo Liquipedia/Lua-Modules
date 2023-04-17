@@ -627,9 +627,11 @@ function BigMatch.templateGame()
 <div class="match-bm-lol-game-overview">
 	<div class="match-bm-lol-game-summary">
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png]]</div>
-		<div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}<br>{{length}}</div>
-		<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png]]</div>
+		<div class="match-bm-lol-game-summary-center">
+			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png]]</div>
+			<div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div></div>
+			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png]]</div>
+		</div>
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
 	</div>
@@ -657,14 +659,14 @@ function BigMatch.templateGame()
 	<div class="match-bm-lol-game-veto-order-list ppt-hide-on-collapse">
 		<div class="match-bm-lol-game-veto-order-team">
 			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.1.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice">
-				{{#apiInfo.championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team1side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.1}}
+			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
+				{{#apiInfo.championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team1side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.1}}
 			</div></div>
 		</div>
 		<div class="match-bm-lol-game-veto-order-team">
 			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.2.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice">
-				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
+			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
+				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
 			</div></div>
 		</div>
 	</div>
