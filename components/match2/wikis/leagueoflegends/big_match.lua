@@ -628,9 +628,9 @@ function BigMatch.templateGame()
 	<div class="match-bm-lol-game-summary">
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
 		<div class="match-bm-lol-game-summary-center">
-			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png]]</div>
+			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png|link=|{{apiInfo.team1.color}} side]]</div>
 			<div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div></div>
-			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png]]</div>
+			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png|link=|{{apiInfo.team2.color}} side]]</div>
 		</div>
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
@@ -641,14 +641,14 @@ function BigMatch.templateGame()
 	<div class="match-bm-lol-game-veto-overview">
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.1.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></div>{{/apiInfo.t1.pick}}</div>
-				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t1.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t1.ban}}</div>
+				<div class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></div>{{/apiInfo.t1.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t1.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t1.ban}}</div>
 			</div>
 		</div>
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.2.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></div>{{/apiInfo.t2.pick}}</div>
-				<div class="match-bm-lol-game-veto-overview-ban">{{#apiInfo.t2.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t2.ban}}</div>
+				<div class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></div>{{/apiInfo.t2.pick}}</div>
+				<div class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t2.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t2.ban}}</div>
 			</div>
 		</div>
 	</div>
@@ -666,7 +666,7 @@ function BigMatch.templateGame()
 		<div class="match-bm-lol-game-veto-order-team">
 			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.2.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
+				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
 			</div></div>
 		</div>
 	</div>
@@ -725,7 +725,7 @@ function BigMatch.templateGame()
 			<div class="match-bm-lol-players-player">
 				<div class="match-bm-lol-players-player-details">
 					<div class="match-bm-lol-players-player-character">
-						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=]]</div></div>
+						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
 						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
 					</div>
 					<div class="match-bm-lol-players-player-loadout">
@@ -743,9 +743,9 @@ function BigMatch.templateGame()
 					</div>
 				</div>
 				<div class="match-bm-lol-players-player-stats">
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=]] {{kills}}/{{deaths}}/{{assists}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=]] {{creepScore}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=]] {{damageDone}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
 				</div>
 			</div>
 		{{/apiInfo.team1.players}}
@@ -755,7 +755,7 @@ function BigMatch.templateGame()
 			<div class="match-bm-lol-players-player">
 				<div class="match-bm-lol-players-player-details">
 					<div class="match-bm-lol-players-player-character">
-						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=]]</div></div>
+						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
 						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
 					</div>
 					<div class="match-bm-lol-players-player-loadout">
@@ -773,15 +773,16 @@ function BigMatch.templateGame()
 					</div>
 				</div>
 				<div class="match-bm-lol-players-player-stats">
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=]] {{kills}}/{{deaths}}/{{assists}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=]] {{creepScore}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=]] {{damageDone}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
+					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
 				</div>
 			</div>
 		{{/apiInfo.team2.players}}
 	</div>
 </div>
 ]=]
+
 end
 
 function BigMatch.templateFooter()
