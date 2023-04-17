@@ -229,12 +229,15 @@ function TournamentsSummaryTable.row(eventInformation, type)
 	local rowComponents = {
 		'\n** ' .. eventInformation.pagename,
 		displayName,
-		'startdate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.startdate),
-		'enddate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.enddate),
 		'icon=' .. icon,
 		'iconfile=' .. iconFile,
 		'icondarkfile=' .. (iconDarkFile or iconFile),
+		'startdate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.startdate),
 	}
+	
+	if eventInformation.startdate ~= eventInformation.enddate then
+		table.insert(rowComponents, 'enddate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.enddate))
+	end
 
 	return table.concat(rowComponents, ' | ')
 end
