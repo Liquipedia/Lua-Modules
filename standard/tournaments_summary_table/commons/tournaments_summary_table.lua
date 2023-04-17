@@ -234,7 +234,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 		'icondarkfile=' .. (iconDarkFile or iconFile),
 		'startdate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.startdate),
 	}
-	
+
 	if eventInformation.startdate ~= eventInformation.enddate then
 		table.insert(rowComponents, 'enddate=' .. TournamentsSummaryTable._dateDisplay(eventInformation.enddate))
 	end
