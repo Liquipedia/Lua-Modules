@@ -64,7 +64,7 @@ function Tier.displaySingle(data, options)
 end
 
 function TierCustom.adjustLink(link, game)
-	return game .. '/' .. link
+	return String.isNotEmpty(game) and (game .. '/' .. link) or link
 end
 
 return TierCustom
