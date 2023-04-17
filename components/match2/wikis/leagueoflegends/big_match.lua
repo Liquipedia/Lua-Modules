@@ -641,14 +641,14 @@ function BigMatch.templateGame()
 	<div class="match-bm-lol-game-veto-overview">
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.1.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t1.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></div>{{/apiInfo.t1.pick}}</div>
-				<div class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t1.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t1.ban}}</div>
+				<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t1.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></li>{{/apiInfo.t1.pick}}</ul>
+				<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t1.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}</li>{{/apiInfo.t1.ban}}</ul>
 			</div>
 		</div>
 		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.2.iconDisplay}}</div>
 			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<div class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t2.pick}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></div>{{/apiInfo.t2.pick}}</div>
-				<div class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t2.ban}}<div class="match-bm-lol-game-veto-overview-item">{{&.}}</div>{{/apiInfo.t2.ban}}</div>
+				<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t2.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></li>{{/apiInfo.t2.pick}}</ul>
+				<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t2.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}</li>{{/apiInfo.t2.ban}}</ul>
 			</div>
 		</div>
 	</div>
