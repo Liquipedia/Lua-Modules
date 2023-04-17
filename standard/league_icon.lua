@@ -73,9 +73,9 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 	local imageOptions = '|link=' .. link .. '|' .. (name or link) .. '|' .. size .. 'x' .. size .. 'px]]'
 
 	if icon == iconDark then
-		return mw.html.create('span')
+		return tostring(mw.html.create('span')
 		:addClass('league-icon-small-image')
-		:wikitext('[[File:' .. icon .. imageOptions)
+		:wikitext('[[File:' .. icon .. imageOptions))
 	end
 
 	local lightSpan = mw.html.create('span')
