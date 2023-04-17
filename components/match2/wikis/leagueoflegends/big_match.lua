@@ -807,7 +807,7 @@ local LINK_DATA = {
 	factor = {icon = 'Factor.gg lightmode.png', text = 'FactorGG Match Report'},
 }
 
-local KEYSTONES = {
+local KEYSTONES = Table.map({
 	-- Precision
 	'Press the Attack',
 	'Lethal Tempo',
@@ -834,7 +834,9 @@ local KEYSTONES = {
 	'Glacial Augment',
 	'Unsealed Spellbook',
 	'First Strike',
-}
+}, function (_, value)
+	return value, true
+end)
 
 local ROLE_ORDER = Table.map({
 	'top',
@@ -881,7 +883,7 @@ function BigMatch.run(frame)
 				player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
 				player.roleIcon = player.role .. ' ' .. team.color
 				player.runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
-					return Table.includes(KEYSTONES, rune)
+					return KEYSTONES[rune]
 				end)[1]
 				player.runeSecondaryTree = player.runeData.secondary.tree
 				player.items = Array.map(Array.range(1, 6), function (idx)
