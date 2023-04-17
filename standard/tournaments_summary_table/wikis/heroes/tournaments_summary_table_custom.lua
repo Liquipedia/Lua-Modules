@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
 local CustomTournamentsSummaryTable = Lua.import('Module:TournamentsSummaryTable', {requireDevIfEnabled = true})
 
