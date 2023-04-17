@@ -42,7 +42,7 @@ end
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
-	lpdbData.extradata.competesin = String.isNotEmpty(args.league) and string.upper(args.league) or nil
+	lpdbData.extradata.competesin = string.upper(args.league or '')
 
 	return lpdbData
 end
