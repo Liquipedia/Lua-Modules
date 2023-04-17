@@ -788,10 +788,12 @@ function BigMatch.templateFooter()
 	return
 [=[
 <h3>Additional Information</h3>
-<div class="fb-match-page-header-tournament" style="gap:4px;">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
-{{#patch}}
-<br><div class="fb-match-page-header-tournament" style="gap:4px;">[[Patch {{patch}}]]</div>
-{{/patch}}
+<div class="match-bm-lol-match-additional">
+	<div class="match-bm-lol-match-additional-list">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
+	{{#patch}}
+	<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
+	{{/patch}}
+</div>
 ]=]
 end
 
