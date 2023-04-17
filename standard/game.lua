@@ -130,7 +130,14 @@ function Game.defaultTeamLogoData(options)
 end
 
 ---Builds the icon for a given game
----@param options? {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?, noSpan: boolean?, spanClass: string?}
+---@param options? {game: string?,
+---		useDefault: boolean?,
+---		size: string?,
+---		noLink: boolean?,
+---		link: string?,
+---		noSpan: boolean?,
+---		spanClass: string?,
+---}
 ---@return string
 function Game.icon(options)
 	options = options or {}
@@ -175,14 +182,7 @@ function Game._createIcon(options)
 end
 
 ---Fetches a text display for a given game
----@param options? {
----		game: string?,
----		useDefault: boolean?,?,
----		noLink: boolean?,?,
----		link: string?,?,
----		useAbbreviation:?,
----		string?
----}
+---@param options? {game: string?, useDefault: boolean?, noLink: boolean?, link: string?, useAbbreviation: string?}
 ---@return string?
 function Game.text(options)
 	options = options or {}
