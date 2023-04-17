@@ -1032,7 +1032,7 @@ function BigMatch:games(model)
 	}
 
 	Array.forEach(games, function (game, idx)
-		tabs['name' .. idx] = 'Map ' .. idx
+		tabs['name' .. idx] = 'Game ' .. idx
 		tabs['content' .. idx] = tostring(game)
 	end)
 
