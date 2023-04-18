@@ -13,6 +13,7 @@ local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local MatchLinks = mw.loadData('Module:MatchLinks')
 local Math = require('Module:MathUtil')
 local Match = require('Module:Match')
 local String = require('Module:StringUtils')
@@ -798,16 +799,6 @@ function BigMatch.templateFooter()
 ]=]
 end
 
-local LINK_DATA = {
-	vod = {icon = 'VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'LiveReport32.png', text = 'Live Report Thread'},
-	recap = {icon = 'Reviews32.png', text = 'Recap'},
-	reddit = {icon = 'Reddit-icon.png', text = 'Head-to-head statistics'},
-	gol = {icon = 'Gol.gg_allmode.png', text = 'GolGG Match Report'},
-	factor = {icon = 'Factor.gg lightmode.png', text = 'FactorGG Match Report'},
-}
-
 local KEYSTONES = Table.map({
 	-- Precision
 	'Press the Attack',
@@ -865,7 +856,7 @@ function BigMatch.run(frame)
 
 	renderModel.dateCountdown = tostring(DisplayHelper.MatchCountdownBlock(match))
 	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
-		return site, Table.mergeInto({link = link}, LINK_DATA[site])
+		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
 	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent)
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)

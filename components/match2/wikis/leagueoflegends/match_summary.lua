@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local HeroIcon = require('Module:ChampionIcon')
+local MatchLinks = mw.loadData('Module:MatchLinks')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
@@ -27,16 +28,6 @@ local _NUM_HEROES_PICK_TEAM = 5
 local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	reddit = {icon = 'File:Reddit-icon.png', text = 'Head-to-head statistics'},
-	gol = {icon = 'File:Gol.gg_allmode.png', text = 'GolGG Match Report'},
-	factor = {icon = 'File:Factor.gg lightmode.png', text = 'FactorGG Match Report'},
-}
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -110,10 +101,10 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 
 		for linkType, link in pairs(match.links) do
-			if not _LINK_DATA[linkType] then
+			if not MatchLinks[linkType] then
 				mw.log('Unknown link: ' .. linkType)
 			else
-				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
+				footer:addElement(buildLink(link, MatchLinks[linkType].icon, MatchLinks[linkType].text))
 			end
 		end
 
