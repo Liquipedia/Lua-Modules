@@ -554,7 +554,7 @@ function matchFunctions.mergeWithStandalone(match)
 
 	-- Remove special keys (maps/games, opponents, bracketdata etc)
 	for key, _ in pairs(standaloneMatch) do
-		if String.startsWith(key, "match2") then
+		if String.startsWith(key, 'match2') then
 			standaloneMatch[key] = nil
 		end
 	end
@@ -609,7 +609,7 @@ function mapFunctions.getParticipants(map, opponents)
 			heroData['team' .. opponentIndex .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
 		end)
 		Array.forEach(map['t' .. opponentIndex].ban, function (hero, idx)
-			heroData['team' .. opponentIndex .. 'bans' .. idx] = HeroNames[hero and hero:lower()]
+			heroData['team' .. opponentIndex .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
 		end)
 	end
 
