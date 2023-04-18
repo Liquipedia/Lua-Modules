@@ -374,6 +374,8 @@ function MatchGroupUtil.matchFromRecord(record)
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
+		liquipediatier = record.liquipediatier,
+		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
 		resultType = nilIfEmpty(record.resulttype),

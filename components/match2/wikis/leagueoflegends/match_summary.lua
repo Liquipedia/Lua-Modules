@@ -30,6 +30,8 @@ local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
+local BIG_MATCH_START_TIME = 1682892000 -- May 1st midnight
+
 -- Hero Ban Class
 local HeroBan = Class.new(
 	function(self, date)
@@ -141,6 +143,14 @@ function CustomMatchSummary._createBody(match)
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
+	end
+
+	if tonumber(match.liquipediatier) == 1 and match.timestamp > BIG_MATCH_START_TIME then
+		local matchPageElement = mw.html.create('center')
+		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+						:css('display', 'block')
+						:css('margin', 'auto')
+		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
 	end
 
 	-- Iterate each map
