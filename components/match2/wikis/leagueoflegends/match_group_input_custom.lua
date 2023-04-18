@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -39,12 +40,12 @@ local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
-local _SECONDS_UNTIL_FINISHED_EXACT = 30800
-local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
+local SECONDS_UNTIL_FINISHED_EXACT = 30800
+local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
 local CURRENT_TIME_UNIX = os.time(os.date('!*t'))
 
@@ -106,7 +107,7 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -115,15 +116,15 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
+	local teamTemplateDate = timestamp
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == DateExt.epochZero then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			CURRENT_TIME_UNIX
 		)
 	end
 
@@ -331,13 +332,12 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
+		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
+			timestamp = DateExt.epochZero,
 		}
 	end
 end
@@ -389,7 +389,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
@@ -483,12 +483,11 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	if isScoreSet and match.hasDate then
+	if isScoreSet and match.timestamp ~= DateExt.epochZero then
 		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
-			or _SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < CURRENT_TIME_UNIX then
+		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
+			or SECONDS_UNTIL_FINISHED_NOT_EXACT
+		if match.timestamp + threshold < CURRENT_TIME_UNIX then
 			match.finished = true
 		end
 	end

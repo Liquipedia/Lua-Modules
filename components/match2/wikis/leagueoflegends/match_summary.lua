@@ -9,6 +9,7 @@
 local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local HeroIcon = require('Module:ChampionIcon')
@@ -28,9 +29,6 @@ local _NUM_HEROES_PICK_TEAM = 5
 local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -137,7 +135,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
