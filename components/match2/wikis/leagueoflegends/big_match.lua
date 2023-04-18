@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local MatchLinks = mw.loadData('Module:MatchLinks')
 local Math = require('Module:MathUtil')
 local Match = require('Module:Match')
@@ -20,6 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine/dev')
+local VodLink = require('Module:VodLink')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
@@ -617,8 +617,8 @@ function BigMatch.templateHeader()
 	</div>
 	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
-	{{#mvp}}<div class="match-bm-lol-game-action">MVP: {{mvp}}</div>{{/mvp}}
 </div>
+{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 ]=]
 end
 
@@ -635,8 +635,7 @@ function BigMatch.templateGame()
 		</div>
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
-	</div>
-{{#mvp}}<div class="match-bm-lol-game-action">MVP: {{mvp}}</div>{{/mvp}}
+</div>
 <h3>Picks and Bans</h3>
 <div class="match-bm-lol-game-veto collapsed general-collapsible">
 	<div class="match-bm-lol-game-veto-overview">
@@ -791,9 +790,12 @@ function BigMatch.templateFooter()
 [=[
 <h3>Additional Information</h3>
 <div class="match-bm-lol-match-additional">
+	{{#vods}}
+		<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
+	{{/vods}}
 	<div class="match-bm-lol-match-additional-list">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 	{{#patch}}
-	<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
+		<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
 	{{/patch}}
 </div>
 ]=]
@@ -916,6 +918,15 @@ function BigMatch.run(frame)
 		end)
 	end)
 
+	renderModel.vods = {
+		icons = Array.map(renderModel.match2games, function(game, gameIdx)
+			return VodLink.display{
+				gamenum = gameIdx,
+				vod = game.vod,
+			}
+		end)
+	}
+
 	return bigMatch:render(renderModel)
 end
 
@@ -1005,6 +1016,7 @@ function BigMatch:_match2Director(args)
 end
 
 function BigMatch:render(model)
+	mw.logObject(model, 'Rendering On')
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 	overall :wikitext(self:header(model))
 			:wikitext(self:games(model))
@@ -1046,12 +1058,10 @@ end
 function BigMatch:_getId()
 	local title = mw.title.getCurrentTitle().text
 
-	-- Match alphanumeric pattern 10 characters long, followed by space and then the match id
-	local staticId = string.match(title, '%w%w%w%w%w%w%w%w%w%w .*')
-	local fullBracketId = string.match(title, '%w%w%w%w%w%w%w%w%w%w')
-	local matchId = string.sub(staticId, 12)
+	-- Title format is `ID bracketID matchID`
+	local titleParts = mw.text.split(title, ' ')
 
-	return fullBracketId, matchId
+	return titleParts[2], titleParts[3]
 end
 
 function BigMatch:_fetchTournamentInfo(page)
