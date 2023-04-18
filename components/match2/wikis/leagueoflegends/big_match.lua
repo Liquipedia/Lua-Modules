@@ -612,12 +612,17 @@ function BigMatch.templateHeader()
 <div class="match-bm-lol-match-header">
 	<div class="match-bm-lol-match-header-overview">
 		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.1.page}}|{{match2opponents.1.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.1.page}}|{{match2opponents.1.shortname}}]]</div></div>
-		<div class="match-bm-lol-match-header-result">{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}</div>
+		<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{match2games.1.apiInfo.team1.scoreDisplay}}&ndash;{{match2games.1.apiInfo.team2.scoreDisplay}}{{/isBestOfOne}}{{^isBestOfOne}}{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}{{/isBestOfOne}}</div>
 		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.2.page}}|{{match2opponents.2.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.2.page}}|{{match2opponents.2.shortname}}]]</div></div>
 	</div>
 	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 </div>
+{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
+<div class="match-bm-lol-game-summary-team">[[File:Lol faction {{match2games.1.apiInfo.team1.color}}.png|link=|{{match2games.1.apiInfo.team1.color}} side]]</div>
+<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{match2games.1.length}}</div></div></div>
+<div class="match-bm-lol-game-summary-team">[[File:Lol faction {{match2games.1.apiInfo.team2.color}}.png|link=|{{match2games.1.apiInfo.team2.color}} side]]</div>
+</div></div>{{/isBestOfOne}}
 {{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 ]=]
 end
@@ -625,7 +630,7 @@ end
 function BigMatch.templateGame()
 	return
 [=[
-<div class="match-bm-lol-game-overview">
+{{^isBestOfOne}}<div class="match-bm-lol-game-overview">
 	<div class="match-bm-lol-game-summary">
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
 		<div class="match-bm-lol-game-summary-center">
@@ -635,7 +640,7 @@ function BigMatch.templateGame()
 		</div>
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
-</div>
+</div>{{/isBestOfOne}}
 <h3>Picks and Bans</h3>
 <div class="match-bm-lol-game-veto collapsed general-collapsible">
 	<div class="match-bm-lol-game-veto-overview">
@@ -858,6 +863,9 @@ function BigMatch.run(frame)
 
 	local renderModel = match
 
+	mw.logObject(renderModel, 'Base from Match2')
+
+	renderModel.isBestOfOne = #renderModel.match2games == 1
 	renderModel.dateCountdown = tostring(DisplayHelper.MatchCountdownBlock(match))
 	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
@@ -1039,6 +1047,10 @@ function BigMatch:games(model)
 		mw.logObject(Table.merge(model, game), 'Game Model')
 		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(model, game))
 	end)
+
+	if #games < 2 then
+		return tostring(games[1])
+	end
 
 	---@type table<string, any>
 	local tabs = {
