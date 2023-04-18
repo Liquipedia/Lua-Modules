@@ -799,6 +799,8 @@ function BigMatch.templateFooter()
 ]=]
 end
 
+local NOT_PLAYED = 'np'
+
 local KEYSTONES = Table.map({
 	-- Precision
 	'Press the Attack',
@@ -883,6 +885,12 @@ function BigMatch.run(frame)
 				end)
 				player.damageDone = string.format('%.1fK', player.damageDone / 1000)
 			end)
+
+			-- Aggregate stats
+			team.gold = string.format('%.1fK', Math.sum(Array.map(team.players, function (player) return player.gold end)) / 1000)
+			team.kills = Math.sum(Array.map(team.players, function (player) return player.kills end))
+			team.deaths = Math.sum(Array.map(team.players, function (player) return player.deaths end))
+			team.assists = Math.sum(Array.map(team.players, function (player) return player.assists end))
 		end)
 
 		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, function(veto)
@@ -912,7 +920,7 @@ function BigMatch.run(frame)
 end
 
 function BigMatch:_contextualEnrichment(args)
-	-- Retrieve tournament link from the bracket
+	-- Retrieve tournament info from the bracket/matchlist
 	if String.isEmpty(args.tournamentlink) then
 		args.tournamentlink = self:_fetchTournamentLinkFromMatch{self:_getId()}
 	end
@@ -928,7 +936,7 @@ function BigMatch:_contextualEnrichment(args)
 	return args
 end
 
--- TODO: WIP
+-- TODO: Add support for GameVods
 function BigMatch:_match2Director(args)
 	local matchData = {}
 
@@ -950,21 +958,18 @@ function BigMatch:_match2Director(args)
 			return
 		end
 
-		game.length = math.floor(game.length/60) .. ':' .. (game.length%60)
+		-- Convert seconds to minutes and seconds
+		game.length = math.floor(game.length / 60) .. ':' .. (game.length % 60)
+
 		Array.forEach({'team1', 'team2'}, function(teamIdx)
 			local team = game[teamIdx]
 
 			game[teamIdx .. 'side'] = team.color
+
 			-- Sort players based on role
 			Array.sortInPlaceBy(team.players, function (player)
 				return ROLE_ORDER[player.role]
 			end)
-
-			-- Aggregate stats
-			team.gold = string.format('%.1fK', Math.sum(Array.map(team.players, function (player) return player.gold end)) / 1000)
-			team.kills = Math.sum(Array.map(team.players, function (player) return player.kills end))
-			team.deaths = Math.sum(Array.map(team.players, function (player) return player.deaths end))
-			team.assists = Math.sum(Array.map(team.players, function (player) return player.assists end))
 		end)
 
 		Array.sortInPlaceBy(game.championVeto, function(veto) return veto.vetoNumber end)
@@ -987,7 +992,7 @@ function BigMatch:_match2Director(args)
 	end)
 	Table.mergeInto(matchData, Table.map(games, function(index, game) return 'map' .. index, game end))
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
-	mw.logObject(match2input, 'Sent toi match2')
+	mw.logObject(match2input, 'Sent to match2')
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
 
 	local bracketId, matchId = self:_getId()
@@ -996,13 +1001,10 @@ function BigMatch:_match2Director(args)
 	-- Don't store match1 as BigMatch records are not complete
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
 
-	mw.logObject(match, 'Stored Match')
-
 	return Table.merge(matchData, match)
 end
 
 function BigMatch:render(model)
-	mw.logObject(model, 'Rendering on')
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 	overall :wikitext(self:header(model))
 			:wikitext(self:games(model))
@@ -1017,7 +1019,7 @@ end
 
 function BigMatch:games(model)
 	local games = Array.map(Array.filter(model.match2games, function (game)
-		return game.resulttype ~= 'np'
+		return game.resulttype ~= NOT_PLAYED
 	end), function (game)
 		mw.logObject(Table.merge(model, game), 'Game Model')
 		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(model, game))
@@ -1065,10 +1067,11 @@ end
 
 function BigMatch:_fetchTournamentLinkFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
-		query = 'parent, pagename',
+		query = 'parent',
 		conditions = '[[match2id::'.. table.concat(identifiers, '_') .. ']]',
+		limit = 1,
 	})[1] or {}
-	return Logic.emptyOr(data.parent, data.pagename)
+	return data.parent
 end
 
 return BigMatch

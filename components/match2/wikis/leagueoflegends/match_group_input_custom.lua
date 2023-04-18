@@ -36,7 +36,6 @@ local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 15
 local _MAX_NUM_GAMES = 7
 local _DEFAULT_MODE = 'team'
-local _DEFAULT_GAME = ''
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
@@ -47,7 +46,7 @@ local _NO_WINNER = -1
 local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local _CURRENT_TIME_UNIX = os.time(os.date('!*t'))
+local CURRENT_TIME_UNIX = os.time(os.date('!*t'))
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -306,7 +305,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
-		if matchUnixTime <= _CURRENT_TIME_UNIX then
+		if matchUnixTime <= CURRENT_TIME_UNIX then
 			setScores = true
 		end
 	end
@@ -345,7 +344,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
+	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	return MatchGroupInput.getCommonTournamentVars(match)
@@ -367,13 +366,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getLinks(match)
-	match.links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		interview = match.interview,
-		review = match.review,
-		recap = match.recap,
-	}
+	match.links = {}
 	if match.reddit then match.links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.gol then match.links.gol = 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' end
 	if match.factor then match.links.factor = 'https://www.factor.gg/match/' .. match.factor end
@@ -495,7 +488,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
 			or _SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < _CURRENT_TIME_UNIX then
+		if matchUnixTime + threshold < CURRENT_TIME_UNIX then
 			match.finished = true
 		end
 	end
