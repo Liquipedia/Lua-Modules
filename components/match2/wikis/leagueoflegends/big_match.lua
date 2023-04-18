@@ -611,9 +611,9 @@ function BigMatch.templateHeader()
 [=[
 <div class="match-bm-lol-match-header">
 	<div class="match-bm-lol-match-header-overview">
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}[[{{match2opponents.1.name}}]]</div>
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.1.page}}|{{match2opponents.1.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.1.page}}|{{match2opponents.1.shortname}}]]</div></div>
 		<div class="match-bm-lol-match-header-result">{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}</div>
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}[[{{match2opponents.2.name}}]]</div>
+		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.2.page}}|{{match2opponents.2.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.2.page}}|{{match2opponents.2.shortname}}]]</div></div>
 	</div>
 	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
@@ -864,6 +864,9 @@ function BigMatch.run(frame)
 	end))
 	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent)
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
+		opponent.page = mw.ext.TeamTemplate.raw(opponent.template).page
+		opponent.name = mw.ext.TeamTemplate.raw(opponent.template).name
 		return opponent
 	end)
 	Array.forEach(renderModel.match2games, function (game, index)
