@@ -611,17 +611,17 @@ function BigMatch.templateHeader()
 [=[
 <div class="match-bm-lol-match-header">
 	<div class="match-bm-lol-match-header-overview">
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.1.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.1.page}}|{{match2opponents.1.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.1.page}}|{{match2opponents.1.shortname}}]]</div></div>
-		<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{match2games.1.apiInfo.team1.scoreDisplay}}&ndash;{{match2games.1.apiInfo.team2.scoreDisplay}}{{/isBestOfOne}}{{^isBestOfOne}}{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}{{/isBestOfOne}}</div>
-		<div class="match-bm-lol-match-header-team">{{&match2opponents.2.iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{match2opponents.2.page}}|{{match2opponents.2.name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{match2opponents.2.page}}|{{match2opponents.2.shortname}}]]</div></div>
+		<div class="match-bm-lol-match-header-team">{{#match2opponents.1}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{page}}|{{name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/match2opponents.1}}</div>
+		<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{#match2games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/match2games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}{{/isBestOfOne}}</div>
+		<div class="match-bm-lol-match-header-team">{{#match2opponents.2}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{page}}|{{name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/match2opponents.2}}</div>
 	</div>
 	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
 	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 </div>
 {{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-<div class="match-bm-lol-game-summary-team">[[File:Lol faction {{match2games.1.apiInfo.team1.color}}.png|link=|{{match2games.1.apiInfo.team1.color}} side]]</div>
+<div class="match-bm-lol-game-summary-team">{{#match2games.1.apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/match2games.1.apiInfo.team1}}</div>
 <div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{match2games.1.length}}</div></div></div>
-<div class="match-bm-lol-game-summary-team">[[File:Lol faction {{match2games.1.apiInfo.team2.color}}.png|link=|{{match2games.1.apiInfo.team2.color}} side]]</div>
+<div class="match-bm-lol-game-summary-team">{{#match2games.1.apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{#match2games.1.apiInfo.team2}}</div>
 </div></div>{{/isBestOfOne}}
 {{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 ]=]
@@ -634,9 +634,9 @@ function BigMatch.templateGame()
 	<div class="match-bm-lol-game-summary">
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
 		<div class="match-bm-lol-game-summary-center">
-			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team1.color}}.png|link=|{{apiInfo.team1.color}} side]]</div>
-			<div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div></div>
-			<div class="match-bm-lol-game-summary-faction">[[File:Lol faction {{apiInfo.team2.color}}.png|link=|{{apiInfo.team2.color}} side]]</div>
+			<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team1}}</div>
+			<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
+			<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team2}}</div>
 		</div>
 		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
 	</div>
@@ -870,7 +870,8 @@ function BigMatch.run(frame)
 	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
-	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent)
+	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent, index)
+		opponent.index = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
 		opponent.page = mw.ext.TeamTemplate.raw(opponent.template).page
@@ -880,8 +881,8 @@ function BigMatch.run(frame)
 	Array.forEach(renderModel.match2games, function (game, index)
 		game.apiInfo = match['map' .. index]
 
-		game.apiInfo.team1.scoreDisplay = game.winner == 1 and 'W' or 'L'
-		game.apiInfo.team2.scoreDisplay = game.winner == 2 and 'W' or 'L'
+		game.apiInfo.team1.scoreDisplay = game.winner == 1 and 'W' or game.winner == 2 and 'L' or '-'
+		game.apiInfo.team2.scoreDisplay = game.winner == 2 and 'W' or game.winner == 1 and 'L' or '-'
 
 		Array.forEach({'team1', 'team2'}, function(teamIdx)
 			local team = game.apiInfo[teamIdx]
@@ -938,13 +939,19 @@ function BigMatch.run(frame)
 		end)
 	}
 
+	renderModel.generateSeriesDots = function(self)
+		return table.concat(Array.map(renderModel.match2games, function (game)
+			return game.apiInfo['team' .. self.index].scoreDisplay
+		end), ' ')
+	end
+
 	return bigMatch:render(renderModel)
 end
 
 function BigMatch:_contextualEnrichment(args)
 	-- Retrieve tournament info from the bracket/matchlist
 	if String.isEmpty(args.tournamentlink) then
-		args.tournamentlink = self:_fetchTournamentLinkFromMatch{self:_getId()}
+		args.tournamentlink = self:_fetchTournamentPageFromMatch{self:_getId()}
 	end
 
 	local tournamentData = self:_fetchTournamentInfo(args.tournamentlink)
@@ -958,7 +965,6 @@ function BigMatch:_contextualEnrichment(args)
 	return args
 end
 
--- TODO: Add support for GameVods
 function BigMatch:_match2Director(args)
 	local matchData = {}
 
@@ -1012,9 +1018,9 @@ function BigMatch:_match2Director(args)
 
 		return game
 	end)
-	Table.mergeInto(matchData, Table.map(games, function(index, game) return 'map' .. index, game end))
+	Table.mergeInto(matchData, prefixWithKey(games, 'map'))
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
-	mw.logObject(match2input, 'Sent to match2')
+
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
 
 	local bracketId, matchId = self:_getId()
@@ -1090,7 +1096,7 @@ function BigMatch:_fetchTournamentInfo(page)
 	})[1] or {}
 end
 
-function BigMatch:_fetchTournamentLinkFromMatch(identifiers)
+function BigMatch:_fetchTournamentPageFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		query = 'parent',
 		conditions = '[[match2id::'.. table.concat(identifiers, '_') .. ']]',
