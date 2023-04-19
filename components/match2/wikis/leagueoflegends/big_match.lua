@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -202,13 +201,12 @@ function BigMatch._match2Director(args)
 			return
 		end
 
-		local map = mw.ext.LeagueOfLegendsDB.getData(args['map' .. gameIndex])
+		local reversed = false -- TODO: Have the input option to reverse the blue/red
+		local map = mw.ext.LeagueOfLegendsDB.getData(args['map' .. gameIndex], reversed)
 
 		if not map or type(map) ~= 'table' then
 			return
 		end
-
-		mw.logObject(map)
 
 		-- Convert seconds to minutes and seconds
 		map.length = math.floor(map.length / 60) .. ':' .. (map.length % 60)
@@ -229,6 +227,7 @@ function BigMatch._match2Director(args)
 
 		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.item('team'))
 
+		-- TODO: have picks sorted on role, bans sorted on number
 		Table.mergeInto(map, prefixWithKey(Array.map(vetoesByTeam, function (team)
 			return Table.mapValues(Table.groupBy(team, function(_, veto)
 				return veto.type
