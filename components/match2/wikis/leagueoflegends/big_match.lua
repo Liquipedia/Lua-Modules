@@ -607,8 +607,6 @@ function mw.ext.LOLDB.getGame(apiId)
 }
 end
 
-local NOT_PLAYED = 'np'
-
 local KEYSTONES = Table.map({
 	-- Precision
 	'Press the Attack',
@@ -650,6 +648,7 @@ local ROLE_ORDER = Table.map({
 	return value, key
 end)
 
+local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
 local TEAMS = Array.range(1, 2)
 
