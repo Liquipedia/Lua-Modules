@@ -484,7 +484,6 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 
 	-- If enough time has passed since match started, it should be marked as finished
 	if isScoreSet and match.timestamp ~= DateExt.epochZero then
-		local lang = mw.getContentLanguage()
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
 			or SECONDS_UNTIL_FINISHED_NOT_EXACT
 		if match.timestamp + threshold < CURRENT_TIME_UNIX then
@@ -642,7 +641,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
+	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game'))
 	return MatchGroupInput.getCommonTournamentVars(map)
 end
 

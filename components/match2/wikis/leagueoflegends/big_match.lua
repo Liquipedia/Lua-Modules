@@ -13,7 +13,6 @@ local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
-local Math = require('Module:MathUtil')
 local Match = require('Module:Match')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
@@ -705,6 +704,7 @@ function BigMatch.run(frame)
 			team.assists = BigMatch._sumItem(team.players, 'assists')
 		end)
 
+		local _
 		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, Operator.item('team'))
 
 		Array.forEach(game.apiInfo.championVetoByTeam, function (team)
