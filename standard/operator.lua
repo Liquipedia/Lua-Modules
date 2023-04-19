@@ -39,8 +39,8 @@ end
 
 function Operator.method(funcName, ...)
 	local args = {...}
-	return function(tbl)
-		return tbl[funcName](unpack(args))
+	return function(obj)
+		return obj[funcName](obj, unpack(args))
 	end
 end
 
