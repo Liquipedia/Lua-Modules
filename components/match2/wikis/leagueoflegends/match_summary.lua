@@ -30,7 +30,7 @@ local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local BIG_MATCH_START_TIME = 1682892000 -- May 1st midnight
+local BIG_MATCH_START_TIME = 1682892000 -- May 1st 2023 midnight
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -97,7 +97,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Match Vod + other links
 		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+			return '[[File:'..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
 		for linkType, link in pairs(match.links) do
