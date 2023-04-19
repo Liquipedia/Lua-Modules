@@ -345,8 +345,8 @@ function League:createLiquipediaTierDisplay(args)
 end
 
 function League:_createPrizepool(args)
-	if (String.isEmpty(args.prizepool) or args.prizepool == '0')
-		and (String.isEmpty(args.prizepoolusd) or args.prizepoolusd == '0') then
+	if (String.isEmpty(args.prizepool) or tonumber(args.prizepool) == 0)
+		and (String.isEmpty(args.prizepoolusd) or tonumber(args.prizepoolusd) == 0) then
 		return nil
 	end
 	local date
