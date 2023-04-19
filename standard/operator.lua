@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
-
 local Operator = {}
 
 function Operator.add(a, b)
@@ -40,9 +38,9 @@ function Operator.item(item)
 end
 
 function Operator.method(funcName, ...)
-	local args = Table.pack(...)
+	local args = {...}
 	return function(tbl)
-		return tbl[funcName](args)
+		return tbl[funcName](unpack(args))
 	end
 end
 
