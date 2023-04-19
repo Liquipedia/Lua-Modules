@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
 local Math = require('Module:MathUtil')
 local Match = require('Module:Match')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
@@ -23,6 +24,7 @@ local VodLink = require('Module:VodLink')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
 
 ---@class BigMatch
 local BigMatch = Class.new()
@@ -603,207 +605,6 @@ function mw.ext.LOLDB.getGame(apiId)
 	["team2Score"] = 0,
 	["winner"] = 1,
 }
-
-end
-
-function BigMatch.templateHeader()
-	return
-[=[
-<div class="match-bm-lol-match-header">
-	<div class="match-bm-lol-match-header-overview">
-		<div class="match-bm-lol-match-header-team">{{#match2opponents.1}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{page}}|{{name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/match2opponents.1}}</div>
-		<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{#match2games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/match2games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{match2opponents.1.score}}&ndash;{{match2opponents.2.score}}{{/isBestOfOne}}</div>
-		<div class="match-bm-lol-match-header-team">{{#match2opponents.2}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{page}}|{{name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/match2opponents.2}}</div>
-	</div>
-	<div class="match-bm-lol-match-header-tournament">[[{{tournament.link}}|{{tournament.name}}]]</div>
-	<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
-</div>
-{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-<div class="match-bm-lol-game-summary-team">{{#match2games.1.apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/match2games.1.apiInfo.team1}}</div>
-<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{match2games.1.length}}</div></div></div>
-<div class="match-bm-lol-game-summary-team">{{#match2games.1.apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{#match2games.1.apiInfo.team2}}</div>
-</div></div>{{/isBestOfOne}}
-{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
-]=]
-end
-
-function BigMatch.templateGame()
-	return
-[=[
-{{^isBestOfOne}}<div class="match-bm-lol-game-overview">
-	<div class="match-bm-lol-game-summary">
-		<div class="match-bm-lol-game-summary-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="match-bm-lol-game-summary-center">
-			<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team1}}</div>
-			<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
-			<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team2}}</div>
-		</div>
-		<div class="match-bm-lol-game-summary-team">{{&match2opponents.2.iconDisplay}}</div>
-	</div>
-</div>{{/isBestOfOne}}
-<h3>Picks and Bans</h3>
-<div class="match-bm-lol-game-veto collapsed general-collapsible">
-	<div class="match-bm-lol-game-veto-overview">
-		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.1.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t1.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></li>{{/apiInfo.t1.pick}}</ul>
-				<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t1.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}</li>{{/apiInfo.t1.ban}}</ul>
-			</div>
-		</div>
-		<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&match2opponents.2.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-overview-team-veto">
-				<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t2.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></li>{{/apiInfo.t2.pick}}</ul>
-				<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t2.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&.}}</li>{{/apiInfo.t2.ban}}</ul>
-			</div>
-		</div>
-	</div>
-	<div class="match-bm-lol-game-veto-order-toggle ppt-toggle-expand">
-		<div class="general-collapsible-expand-button"><div>Show Order &nbsp;<i class="fa fa-chevron-down"></i></div></div>
-		<div class="general-collapsible-collapse-button"><div>Hide Order &nbsp;<i class="fa fa-chevron-up"></i></div></div>
-	</div>
-	<div class="match-bm-lol-game-veto-order-list ppt-hide-on-collapse">
-		<div class="match-bm-lol-game-veto-order-team">
-			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.1.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-				{{#apiInfo.championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team1side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.1}}
-			</div></div>
-		</div>
-		<div class="match-bm-lol-game-veto-order-team">
-			<div class="match-bm-lol-game-veto-order-team-header">{{&match2opponents.2.iconDisplay}}</div>
-			<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-				{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&championDisplay}}</div>{{/apiInfo.championVetoByTeam.2}}
-			</div></div>
-		</div>
-	</div>
-</div>
-<h3>Head-to-Head</h3>
-<div class="match-bm-lol-h2h">
-	<div class="match-bm-lol-h2h-header">
-		<div class="match-bm-lol-h2h-header-team">{{&match2opponents.1.iconDisplay}}</div>
-		<div class="match-bm-lol-h2h-stat-title"></div>
-		<div class="match-bm-lol-h2h-header-team">{{&match2opponents.2.iconDisplay}}</div>
-	</div>
-	<div class="match-bm-lol-h2h-section">
-		<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.kills}}/{{apiInfo.team1.deaths}}/{{apiInfo.team1.assists}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-			<div>{{apiInfo.team2.kills}}/{{apiInfo.team2.deaths}}/{{apiInfo.team2.assists}}</div>
-		</div>
-		<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.gold}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon gold.png|link=]]<br>Gold</div>
-			<div>{{apiInfo.team2.gold}}</div>
-		</div>
-	</div>
-	<div class="match-bm-lol-h2h-section">
-	<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.towerKills}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
-			<div>{{apiInfo.team2.towerKills}}</div>
-		</div>
-		<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.inhibitorKills}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Inhibitors</div>
-			<div>{{apiInfo.team2.inhibitorKills}}</div>
-		</div>
-		<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.baronKills}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Barons</div>
-			<div>{{apiInfo.team2.baronKills}}</div>
-		</div>
-		<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.dragonKills}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon dragon.png|link=]]<br>Drakes</div>
-			<div>{{apiInfo.team2.dragonKills}}</div>
-		</div>
-		<!--<div class="match-bm-lol-h2h-stat">
-			<div>{{apiInfo.team1.heraldKills}}</div>
-			<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon herald.png|link=]]<br>Heralds</div>
-			<div>{{apiInfo.team2.heraldKills}}</div>
-		</div>-->
-	</div>
-</div>
-<h3>Player Performance</h3>
-<div class="match-bm-lol-players-wrapper">
-	<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&match2opponents.1.iconDisplay}}</div>
-		{{#apiInfo.team1.players}}
-			<div class="match-bm-lol-players-player">
-				<div class="match-bm-lol-players-player-details">
-					<div class="match-bm-lol-players-player-character">
-						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
-					</div>
-					<div class="match-bm-lol-players-player-loadout">
-						<!-- Loadout -->
-						<div class="match-bm-lol-players-player-loadout-rs-wrap">
-							<!-- Runes/Spells -->
-							<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
-							<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
-						</div>
-						<div class="match-bm-lol-players-player-loadout-items">
-							<!-- Items -->
-							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
-							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
-						</div>
-					</div>
-				</div>
-				<div class="match-bm-lol-players-player-stats">
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
-				</div>
-			</div>
-		{{/apiInfo.team1.players}}
-	</div>
-	<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&match2opponents.2.iconDisplay}}</div>
-		{{#apiInfo.team2.players}}
-			<div class="match-bm-lol-players-player">
-				<div class="match-bm-lol-players-player-details">
-					<div class="match-bm-lol-players-player-character">
-						<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&championDisplay}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-						<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
-					</div>
-					<div class="match-bm-lol-players-player-loadout">
-						<!-- Loadout -->
-						<div class="match-bm-lol-players-player-loadout-rs-wrap">
-							<!-- Runes/Spells -->
-							<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
-							<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
-						</div>
-						<div class="match-bm-lol-players-player-loadout-items">
-							<!-- Items -->
-							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
-							<div class="match-bm-lol-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
-						</div>
-					</div>
-				</div>
-				<div class="match-bm-lol-players-player-stats">
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
-					<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
-				</div>
-			</div>
-		{{/apiInfo.team2.players}}
-	</div>
-</div>
-]=]
-
-end
-
-function BigMatch.templateFooter()
-	return
-[=[
-<h3>Additional Information</h3>
-<div class="match-bm-lol-match-additional">
-	{{#vods}}
-		<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
-	{{/vods}}
-	<div class="match-bm-lol-match-additional-list">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
-	{{#patch}}
-		<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
-	{{/patch}}
-</div>
-]=]
 end
 
 local NOT_PLAYED = 'np'
@@ -850,6 +651,7 @@ local ROLE_ORDER = Table.map({
 end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
+local TEAMS = Array.range(1, 2)
 
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
@@ -863,15 +665,13 @@ function BigMatch.run(frame)
 
 	local renderModel = match
 
-	mw.logObject(renderModel, 'Base from Match2')
-
 	renderModel.isBestOfOne = #renderModel.match2games == 1
 	renderModel.dateCountdown = tostring(DisplayHelper.MatchCountdownBlock(match))
 	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
 	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent, index)
-		opponent.index = index
+		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
 		opponent.page = mw.ext.TeamTemplate.raw(opponent.template).page
@@ -884,11 +684,10 @@ function BigMatch.run(frame)
 		game.apiInfo.team1.scoreDisplay = game.winner == 1 and 'W' or game.winner == 2 and 'L' or '-'
 		game.apiInfo.team2.scoreDisplay = game.winner == 2 and 'W' or game.winner == 1 and 'L' or '-'
 
-		Array.forEach({'team1', 'team2'}, function(teamIdx)
-			local team = game.apiInfo[teamIdx]
+		Array.forEach(TEAMS, function(teamIdx)
+			local team = game.apiInfo['team' .. teamIdx]
 
 			Array.forEach(team.players, function(player)
-				player.championDisplay = HeroIcon._getImage{player.champion, '48px', date = renderModel.date}
 				player.roleIcon = player.role .. ' ' .. team.color
 				player.runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
 					return KEYSTONES[rune]
@@ -897,35 +696,24 @@ function BigMatch.run(frame)
 				player.items = Array.map(Array.range(1, 6), function (idx)
 					return player.items[idx] or DEFAULT_ITEM
 				end)
-				player.damageDone = string.format('%.1fK', player.damageDone / 1000)
+				player.damageDone = BigMatch._abbreviateNumber(player.damageDone)
 			end)
 
 			-- Aggregate stats
-			team.gold = string.format('%.1fK', Math.sum(Array.map(team.players, function (player) return player.gold end)) / 1000)
-			team.kills = Math.sum(Array.map(team.players, function (player) return player.kills end))
-			team.deaths = Math.sum(Array.map(team.players, function (player) return player.deaths end))
-			team.assists = Math.sum(Array.map(team.players, function (player) return player.assists end))
+			team.gold = BigMatch._abbreviateNumber(BigMatch._sumItem(team.players, 'gold'))
+			team.kills = BigMatch._sumItem(team.players, 'kills')
+			team.deaths = BigMatch._sumItem(team.players, 'deaths')
+			team.assists = BigMatch._sumItem(team.players, 'assists')
 		end)
 
-		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, function(veto)
-			return veto.team
-		end)
+		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, Operator.item('team'))
 
 		Array.forEach(game.apiInfo.championVetoByTeam, function (team)
 			local lastType = 'ban'
 			Array.forEach(team, function(veto)
-				veto.championDisplay = HeroIcon._getImage{veto.champion, '24px', date = renderModel.date}
 				veto.isBan = veto.type == 'ban'
 				veto.isNewGroup = lastType ~= veto.type
 				lastType = veto.type
-			end)
-		end)
-
-		Array.forEach({'t1', 't2'}, function (team)
-			game.apiInfo[team] = Table.mapValues(game.apiInfo[team], function (champions)
-				return Array.map(champions, function (champion)
-					return HeroIcon._getImage{champion, '24px', date = renderModel.date}
-				end)
 			end)
 		end)
 	end)
@@ -941,11 +729,23 @@ function BigMatch.run(frame)
 
 	renderModel.generateSeriesDots = function(self)
 		return table.concat(Array.map(renderModel.match2games, function (game)
-			return game.apiInfo['team' .. self.index].scoreDisplay
+			return game.apiInfo['team' .. self.opponentIndex].scoreDisplay
 		end), ' ')
+	end
+	renderModel.heroIcon = function(self)
+		local champion = type(self) == 'table' and self.champion or self
+		return HeroIcon._getImage{champion, '48px', date = renderModel.date}
 	end
 
 	return bigMatch:render(renderModel)
+end
+
+function BigMatch._sumItem(tbl, item)
+	return Array.reduce(Array.map(tbl, Operator.item(item)), Operator.add)
+end
+
+function BigMatch._abbreviateNumber(number)
+	return string.format('%.1fK', number / 1000)
 end
 
 function BigMatch:_contextualEnrichment(args)
@@ -980,19 +780,19 @@ function BigMatch:_match2Director(args)
 		return Table.map(tbl, prefixKey)
 	end
 
-	local games = Array.mapIndexes(function(gameIndex)
-		local game = mw.ext.LOLDB.getGame(args['map' .. gameIndex])
-		if not game then
+	local maps = Array.mapIndexes(function(gameIndex)
+		local map = mw.ext.LOLDB.getGame(args['map' .. gameIndex])
+		if not map then
 			return
 		end
 
 		-- Convert seconds to minutes and seconds
-		game.length = math.floor(game.length / 60) .. ':' .. (game.length % 60)
+		map.length = math.floor(map.length / 60) .. ':' .. (map.length % 60)
 
-		Array.forEach({'team1', 'team2'}, function(teamIdx)
-			local team = game[teamIdx]
+		Array.forEach(TEAMS, function(teamIdx)
+			local team = map['team' .. teamIdx]
 
-			game[teamIdx .. 'side'] = team.color
+			map['team' .. teamIdx .. 'side'] = team.color
 
 			-- Sort players based on role
 			Array.sortInPlaceBy(team.players, function (player)
@@ -1000,25 +800,24 @@ function BigMatch:_match2Director(args)
 			end)
 		end)
 
-		Array.sortInPlaceBy(game.championVeto, function(veto) return veto.vetoNumber end)
+		-- Break down the picks and bans into per team, per type, in order.
+		Array.sortInPlaceBy(map.championVeto, Operator.item('vetoNumber'))
 
-		local _, vetoesByTeam = Array.groupBy(game.championVeto, function (veto)
-			return veto.team
-		end)
+		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.item('team'))
 
-		Table.mergeInto(game, prefixWithKey(Array.map(vetoesByTeam, function (team)
+		Table.mergeInto(map, prefixWithKey(Array.map(vetoesByTeam, function (team)
 			return Table.mapValues(Table.groupBy(team, function(_, veto)
 				return veto.type
 			end), function (vetoType)
-				return Array.extractValues(Table.mapValues(vetoType, function(veto)
-					return veto.champion
-				end))
+				return Array.extractValues(Table.mapValues(vetoType, Operator.item('champion')))
 			end)
 		end), 't'))
 
-		return game
+
+		return map
 	end)
-	Table.mergeInto(matchData, prefixWithKey(games, 'map'))
+
+	Table.mergeInto(matchData, prefixWithKey(maps, 'map'))
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
 
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
@@ -1033,7 +832,6 @@ function BigMatch:_match2Director(args)
 end
 
 function BigMatch:render(model)
-	mw.logObject(model, 'Rendering On')
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 	overall :wikitext(self:header(model))
 			:wikitext(self:games(model))
@@ -1043,15 +841,14 @@ function BigMatch:render(model)
 end
 
 function BigMatch:header(model)
-	return TemplateEngine():render(BigMatch.templateHeader(), model)
+	return TemplateEngine():render(Template.header, model)
 end
 
 function BigMatch:games(model)
 	local games = Array.map(Array.filter(model.match2games, function (game)
 		return game.resulttype ~= NOT_PLAYED
 	end), function (game)
-		mw.logObject(Table.merge(model, game), 'Game Model')
-		return TemplateEngine():render(BigMatch.templateGame(), Table.merge(model, game))
+		return TemplateEngine():render(Template.game, Table.merge(model, game))
 	end)
 
 	if #games < 2 then
@@ -1073,7 +870,7 @@ function BigMatch:games(model)
 end
 
 function BigMatch:footer(model)
-	return TemplateEngine():render(BigMatch.templateFooter(), model)
+	return TemplateEngine():render(Template.footer, model)
 end
 
 function BigMatch:_getId()
