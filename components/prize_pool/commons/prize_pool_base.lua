@@ -238,7 +238,7 @@ BasePrizePool.prizeTypes = {
 				title = context[prefix .. 'name'] or Logic.emptyOr(
 					tournamentData.tickername,
 					tournamentData.name,
-					tournamentData.pagename:gsub('_', ' '):gsub('/', ' ')
+					(tournamentData.pagename or link):gsub('_', ' '):gsub('/', ' ')
 				),
 				icon = tournamentData.icon or context[prefix .. 'icon'],
 				iconDark = tournamentData.icondark or context[prefix .. 'icondark']
