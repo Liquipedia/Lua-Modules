@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local Logic = require('Module:Logic')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
@@ -181,9 +182,15 @@ function MediaList._row(item, args)
 	end
 
 	local authors = {}
-	for _, author in Table.iter.pairsByPrefix(item.authors, 'author') do
+	for key, author in Table.iter.pairsByPrefix(item.authors, 'author') do
+		local displayname = item.authors[key .. 'dn']
 		if String.isNotEmpty(author) then
-			table.insert(authors, '[[' .. author .. ']]')
+			table.insert(authors,
+				Page.makeInternalLink({},
+					String.isNotEmpty(displayname) and displayname or author,
+					author
+				)
+			)
 		end
 	end
 	if Table.isNotEmpty(authors) then
