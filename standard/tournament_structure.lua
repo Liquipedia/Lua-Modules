@@ -157,7 +157,7 @@ end
 
 --- Checks if a given data set "recordGroup" is a group table (standings table) or not
 ---@param recordGroup table
----@return string
+---@return boolean
 function TournamentStructure.isGroupTable(recordGroup)
 	return recordGroup[1].standingsindex ~= nil
 end
