@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
 local Match = require('Module:Match')
@@ -95,6 +96,10 @@ function BigMatch.run(frame)
 	end)
 	Array.forEach(renderModel.match2games, function (game, index)
 		game.apiInfo = match['map' .. index]
+
+		if not game.apiInfo or not game.apiInfo.team1 or not game.apiInfo.team2 then
+			return
+		end
 
 		game.apiInfo.team1.scoreDisplay = game.winner == 1 and 'W' or game.winner == 2 and 'L' or '-'
 		game.apiInfo.team2.scoreDisplay = game.winner == 2 and 'W' or game.winner == 1 and 'L' or '-'
@@ -197,13 +202,20 @@ function BigMatch._match2Director(args)
 	end
 
 	local maps = Array.mapIndexes(function(gameIndex)
-		if not args['map' .. gameIndex] then
+		local mapInput = Json.parseIfString(args['map' .. gameIndex])
+
+		if not mapInput then
 			return
 		end
 
-		local reversed = false -- TODO: Have the input option to reverse the blue/red
-		local map = mw.ext.LeagueOfLegendsDB.getData(args['map' .. gameIndex], reversed)
+		-- If no key is provided, assume this as a normal match
+		if not mapInput.key then
+			return mapInput
+		end
 
+		local map = mw.ext.LeagueOfLegendsDB.getData(mapInput.key, Logic.readBool(mapInput.reversed))
+
+		-- Match not found on the API
 		if not map or type(map) ~= 'table' then
 			return
 		end
