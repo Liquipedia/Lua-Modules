@@ -24,6 +24,7 @@ local VodLink = require('Module:VodLink')
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local BigMatch = {}
 
@@ -79,9 +80,8 @@ function BigMatch.run(frame)
 
 	local model = BigMatch._match2Director(args)
 
-	model.isBestOfOne = #model.match2games == 1
+	model.isBestOfOne = #model.games == 1
 	model.dateCountdown = DisplayHelper.MatchCountdownBlock(model)
-	mw.log(model.date)
 
 	-- Create an object array for links
 	model.links = Array.extractValues(Table.map(model.links, function (site, link)
@@ -89,7 +89,7 @@ function BigMatch.run(frame)
 	end))
 
 	-- Add more opponet data field
-	Array.forEach(model.match2opponents, function (opponent, index)
+	Array.forEach(model.opponents, function (opponent, index)
 		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
@@ -98,7 +98,7 @@ function BigMatch.run(frame)
 	end)
 
 	-- Enrich game information
-	Array.forEach(model.match2games, function (game, index)
+	Array.forEach(model.games, function (game, index)
 		game.apiInfo = model['map' .. index] or {}
 
 		if not game.apiInfo.team1 or not game.apiInfo.team2 then
@@ -144,16 +144,16 @@ function BigMatch.run(frame)
 	end)
 
 	model.vods = {
-		icons = Array.map(model.match2games, function(game, gameIdx)
-			return VodLink.display{
+		icons = Array.map(model.games, function(game, gameIdx)
+			return game.vod and VodLink.display{
 				gamenum = gameIdx,
 				vod = game.vod,
-			}
+			} or ''
 		end)
 	}
 
 	model.generateSeriesDots = function(self)
-		return table.concat(Array.map(model.match2games, function (game)
+		return table.concat(Array.map(model.games, function (game)
 			if not game.apiInfo['team' .. self.opponentIndex] then
 				return ''
 			end
@@ -185,10 +185,8 @@ function BigMatch._contextualEnrichment(args)
 	local tournamentData = BigMatch._fetchTournamentInfo(args.tournamentlink)
 
 	args.patch = args.patch or tournamentData.patch
-	args.tournament = {
-		name = args.tournament or tournamentData.name,
-		link = args.tournamentlink or tournamentData.pagename,
-	}
+	args.tournament =  args.tournament or tournamentData.name
+	args.parent = args.tournamentlink or tournamentData.pagename
 
 	return args
 end
@@ -269,7 +267,7 @@ function BigMatch._match2Director(args)
 	-- Don't store match1 as BigMatch records are not complete
 	Match.store(match, {storeMatch1 = false, storeSmw = false})
 
-	return Table.merge(matchData, match)
+	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
 end
 
 function BigMatch.render(model)
@@ -286,7 +284,7 @@ function BigMatch.header(model)
 end
 
 function BigMatch.games(model)
-	local games = Array.map(Array.filter(model.match2games, function (game)
+	local games = Array.map(Array.filter(model.games, function (game)
 		return game.resulttype ~= NOT_PLAYED
 	end), function (game)
 		return TemplateEngine():render(Template.game, Table.merge(model, game))

@@ -378,9 +378,11 @@ function MatchGroupUtil.matchFromRecord(record)
 		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
@@ -389,6 +391,9 @@ function MatchGroupUtil.matchFromRecord(record)
 end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
+	if not data then
+		return {}
+	end
 	if data.type == 'bracket' then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
