@@ -404,10 +404,8 @@ end
 ---@param basePageName string
 ---@param stageName string?
 ---@return string
-function TournamentStructure._joinPageName(namespaceName, basePageName, stageName)
-	return (namespaceName and namespaceName .. ':' or '')
-		.. basePageName
-		.. (stageName and '#' .. stageName or '')
+function TournamentStructure._createPageName(namespaceName, basePageName, stageName)
+	return mw.title.makeTitle(namespaceName or '', basePageName, stageName).fullText
 end
 
 return TournamentStructure
