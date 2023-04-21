@@ -164,7 +164,7 @@ end
 
 --- Retrieves the stage name from a data set (either bracket or standings table)
 ---@param recordGroup table
----@return string
+---@return string?
 function TournamentStructure.getStageName(recordGroup)
 	return TournamentStructure.isGroupTable(recordGroup)
 		and recordGroup[1].extradata.stageName
