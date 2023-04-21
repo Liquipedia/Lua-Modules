@@ -22,6 +22,7 @@ local CustomPrizePool = {}
 
 local TIER_VALUE = {10000, 5000, 2}
 local TYPE_MODIFIER = {Online = 0.65}
+local TIER_TYPE_MODIFIER = {Qualifier = 0.001}
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -38,7 +39,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
-		Variables.varDefault('tournament_type')
+		Variables.varDefault('tournament_type'),
+		Variables.varDefault('tournament_liquipediatiertype')
 	)
 
 	local participantLower = mw.ustring.lower(lpdbData.participant)
@@ -53,14 +55,14 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tierType)
 	if String.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
 
-	return tierValue * math.max(prizeMoney, 1) * (TYPE_MODIFIER[type] or 1) / place
+	return tierValue * math.max(prizeMoney, 1) * (TYPE_MODIFIER[type] or 1) * (TIER_TYPE_MODIFIER[tierType] or 1) / place
 end
 
 return CustomPrizePool
