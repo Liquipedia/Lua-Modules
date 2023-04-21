@@ -305,8 +305,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
-		if matchUnixTime <= CURRENT_TIME_UNIX then
+		if match.timestamp <= CURRENT_TIME_UNIX then
 			setScores = true
 		end
 	end

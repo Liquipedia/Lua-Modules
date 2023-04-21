@@ -77,25 +77,29 @@ function BigMatch.run(frame)
 
 	args = BigMatch._contextualEnrichment(args)
 
-	local match = BigMatch._match2Director(args)
+	local model = BigMatch._match2Director(args)
 
-	local renderModel = match
+	model.isBestOfOne = #model.match2games == 1
+	model.dateCountdown = DisplayHelper.MatchCountdownBlock(model)
+	mw.log(model.date)
 
-	renderModel.isBestOfOne = #renderModel.match2games == 1
-	renderModel.dateCountdown = tostring(DisplayHelper.MatchCountdownBlock(match))
-	renderModel.links = Array.extractValues(Table.map(renderModel.links, function (site, link)
+	-- Create an object array for links
+	model.links = Array.extractValues(Table.map(model.links, function (site, link)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
-	renderModel.match2opponents = Array.map(renderModel.match2opponents, function (opponent, index)
+
+	-- Add more opponet data field
+	Array.forEach(model.match2opponents, function (opponent, index)
 		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
 		opponent.page = mw.ext.TeamTemplate.raw(opponent.template).page
 		opponent.name = mw.ext.TeamTemplate.raw(opponent.template).name
-		return opponent
 	end)
-	Array.forEach(renderModel.match2games, function (game, index)
-		game.apiInfo = match['map' .. index] or {}
+
+	-- Enrich game information
+	Array.forEach(model.match2games, function (game, index)
+		game.apiInfo = model['map' .. index] or {}
 
 		if not game.apiInfo.team1 or not game.apiInfo.team2 then
 			return
@@ -139,8 +143,8 @@ function BigMatch.run(frame)
 		end)
 	end)
 
-	renderModel.vods = {
-		icons = Array.map(renderModel.match2games, function(game, gameIdx)
+	model.vods = {
+		icons = Array.map(model.match2games, function(game, gameIdx)
 			return VodLink.display{
 				gamenum = gameIdx,
 				vod = game.vod,
@@ -148,20 +152,20 @@ function BigMatch.run(frame)
 		end)
 	}
 
-	renderModel.generateSeriesDots = function(self)
-		return table.concat(Array.map(renderModel.match2games, function (game)
+	model.generateSeriesDots = function(self)
+		return table.concat(Array.map(model.match2games, function (game)
 			if not game.apiInfo['team' .. self.opponentIndex] then
 				return ''
 			end
 			return game.apiInfo['team' .. self.opponentIndex].scoreDisplay
 		end), ' ')
 	end
-	renderModel.heroIcon = function(self)
+	model.heroIcon = function(self)
 		local champion = type(self) == 'table' and self.champion or self
-		return HeroIcon._getImage{champion, '48px', date = renderModel.date}
+		return HeroIcon._getImage{champion, '48px', date = model.date}
 	end
 
-	return BigMatch.render(renderModel)
+	return BigMatch.render(model)
 end
 
 function BigMatch._sumItem(tbl, item)
@@ -220,11 +224,11 @@ function BigMatch._match2Director(args)
 
 		-- Match not found on the API
 		if not map or type(map) ~= 'table' then
-			return
+			error(mapInput.key .. ' could not be retrieved.')
 		end
 
 		-- Convert seconds to minutes and seconds
-		map.length = math.floor(map.length / 60) .. ':' .. (map.length % 60)
+		map.length = map.length and (math.floor(map.length / 60) .. ':' .. (map.length % 60)) or nil
 
 		Array.forEach(TEAMS, function(teamIdx)
 			local team = map['team' .. teamIdx]
@@ -250,7 +254,6 @@ function BigMatch._match2Director(args)
 				return Array.extractValues(Table.mapValues(vetoType, Operator.item('champion')))
 			end)
 		end), 't'))
-
 
 		return map
 	end)
@@ -317,6 +320,7 @@ function BigMatch._getId()
 	-- Title format is `ID bracketID matchID`
 	local titleParts = mw.text.split(title, ' ')
 
+	-- Return bracketID and matchID
 	return titleParts[2], titleParts[3]
 end
 
