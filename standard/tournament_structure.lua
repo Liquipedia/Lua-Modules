@@ -325,7 +325,7 @@ end
 ---@param finished boolean?
 ---@param slotIndex string|number|nil
 ---@param placement string|number|nil
----@return string
+---@return number?
 function TournamentStructure._groupPlacement(finished, slotIndex, placement)
 	if finished then
 		return tonumber(placement) or tonumber(slotIndex)
