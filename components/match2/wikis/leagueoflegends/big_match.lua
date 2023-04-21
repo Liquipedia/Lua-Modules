@@ -95,9 +95,9 @@ function BigMatch.run(frame)
 		return opponent
 	end)
 	Array.forEach(renderModel.match2games, function (game, index)
-		game.apiInfo = match['map' .. index]
+		game.apiInfo = match['map' .. index] or {}
 
-		if not game.apiInfo or not game.apiInfo.team1 or not game.apiInfo.team2 then
+		if not game.apiInfo.team1 or not game.apiInfo.team2 then
 			return
 		end
 
@@ -150,6 +150,9 @@ function BigMatch.run(frame)
 
 	renderModel.generateSeriesDots = function(self)
 		return table.concat(Array.map(renderModel.match2games, function (game)
+			if not game.apiInfo['team' .. self.opponentIndex] then
+				return ''
+			end
 			return game.apiInfo['team' .. self.opponentIndex].scoreDisplay
 		end), ' ')
 	end
