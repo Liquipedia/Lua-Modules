@@ -15,7 +15,7 @@ local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
 local PlayerExt = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
-	or Lua.requireIfExists('Module:Player/Ext', {requireDevIfEnabled = true})
+	or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 --[[
 Structural type representation of an opponent.
