@@ -67,7 +67,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 		end
 
 		local pageName = basePageName
-			and TournamentStructure._joinPageName(namespaceName, basePageName)
+			and TournamentStructure._createPageName(namespaceName, basePageName)
 			or FULL_PAGENAME
 		local redirectedPage = mw.title.new(TournamentStructure._resolveRedirect(pageName))
 		redirectedPage.fragment = stageName
@@ -128,8 +128,8 @@ function TournamentStructure.groupByStage(groupTables, brackets, spec)
 		local basePageName = recordGroup[1].pagename:gsub('_', ' ')
 		local stageName = TournamentStructure.getStageName(recordGroup)
 		local namespaceName = String.nilIfEmpty(Namespace.nameFromId(recordGroup[1].namespace))
-		local pageName = TournamentStructure._joinPageName(namespaceName, basePageName, stageName)
-		local wholePageName = TournamentStructure._joinPageName(namespaceName, basePageName)
+		local pageName = TournamentStructure._createPageName(namespaceName, basePageName, stageName)
+		local wholePageName = TournamentStructure._createPageName(namespaceName, basePageName)
 
 		local stageIndex = recordGroup[1].stageIndex or stageIndexes[pageName] or stageIndexes[wholePageName]
 
