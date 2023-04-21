@@ -88,7 +88,7 @@ function BigMatch.run(frame)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
 
-	-- Add more opponet data field
+	-- Add more opponent data field
 	Array.forEach(model.opponents, function (opponent, index)
 		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
