@@ -481,10 +481,25 @@ function BasePrizePool._comparePrizes(x, y)
 	return sortX == sortY and x.index < y.index or sortX < sortY
 end
 
+function BasePrizePool:_shouldDisplayPrizeSummary()
+	-- if prizeSummary is disabled do not show it
+	if not self.options.prizeSummary then
+		return false
+	end
+
+	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower()))
+	-- if we have currency conversion (i.e. entered `localcurrency`) or entered usd values display it
+	-- if we have baseMoney being not 0 display it
+	-- if we have unset baseMoney display it (usually TBA/TBD case)
+	if self.options.showBaseCurrency or baseMoney ~= 0 then
+		return true
+	end
+end
+
 function BasePrizePool:build(isAward)
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
-	if self.options.prizeSummary then
+	if self:_shouldDisplayPrizeSummary() then
 		wrapper:wikitext(self:_getPrizeSummaryText())
 	end
 
@@ -631,13 +646,13 @@ end
 function BasePrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
-	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower(), tba)
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
 
 	local displayText = {baseMoneyDisplay}
 
 	if tournamentCurrency and tournamentCurrency:upper() ~= BASE_CURRENCY then
-		local localMoneyRaw = Variables.varDefault('tournament_prizepool_local', tba)
+		local localMoneyRaw = Variables.varDefault('tournament_prizepoollocal', tba)
 		local localMoneyDisplay = Currency.display(tournamentCurrency, localMoneyRaw, {formatValue = true})
 
 		table.insert(displayText, 1, localMoneyDisplay)
