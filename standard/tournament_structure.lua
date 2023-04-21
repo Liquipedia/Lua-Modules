@@ -234,9 +234,7 @@ function TournamentStructure.fetchGroupTables(spec)
 
 	local groups = Array.filter(pageData, Table.isNotEmpty)
 
-	for index, group in ipairs(groups) do
-		groups[index] = TournamentStructure.fetchGroupTableEntries(group)
-	end
+	groups = Array.map(groups, TournamentStructure.fetchGroupTableEntries)
 
 	return groups
 end
