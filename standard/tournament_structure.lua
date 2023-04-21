@@ -383,20 +383,8 @@ end
 ---@param pageName string
 ---@return string?, string?, string?
 function TournamentStructure._splitPageName(pageName)
-	-- Split out namespace
-	local charIndex = pageName:find(':', nil, true)
-	local namespaceName
-	if charIndex and Namespace.idFromName(pageName:sub(1, charIndex - 1)) then
-		namespaceName = pageName:sub(1, charIndex - 1)
-		pageName = pageName:sub(charIndex + 1)
-	end
-
-	-- Split out stage name
-	charIndex = pageName:find('#', nil, true)
-	local basePageName = charIndex and pageName:sub(1, charIndex - 1) or pageName
-	local stageName = charIndex and pageName:sub(charIndex + 1) or nil
-
-	return namespaceName, String.nilIfEmpty(basePageName), String.nilIfEmpty(stageName)
+	local title = mw.title.new(pageName)
+	return String.nilIfEmpty(title.nsText), String.nilIfEmpty(title.text), String.nilIfEmpty(title.fragment)
 end
 
 --- Joins given namespace, base page name, and stage into a page name.
