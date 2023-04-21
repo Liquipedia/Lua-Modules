@@ -579,27 +579,23 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
-		if not map['t' .. opponentIndex] then
-			local picks = {}
+		local team = 't' .. opponentIndex
+		if not map[team] then
+			local picks, bans = {}, {}
 			for playerIndex = 1, _MAX_NUM_PLAYERS do
-				table.insert(picks, map['t' .. opponentIndex .. 'c' .. playerIndex])
+				table.insert(picks, map[team .. 'c' .. playerIndex])
 			end
 
-			local bans = {}
-			local banIndex = 1
-			local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-			while nextBan do
-				table.insert(bans, nextBan)
-				banIndex = banIndex + 1
-				nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+			for _, ban in Table.iter.pairsByPrefix(map, team .. 'b') do
+				table.insert(bans, ban)
 			end
 			map['t' .. opponentIndex] = {pick = picks, ban = bans}
 		end
 
-		Array.forEach(map['t' .. opponentIndex].pick, function (hero, idx)
+		Array.forEach(map[team].pick, function (hero, idx)
 			heroData['team' .. opponentIndex .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
 		end)
-		Array.forEach(map['t' .. opponentIndex].ban, function (hero, idx)
+		Array.forEach(map[team].ban, function (hero, idx)
 			heroData['team' .. opponentIndex .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
 		end)
 	end
