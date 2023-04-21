@@ -69,10 +69,9 @@ function TournamentStructure.readMatchGroupsSpec(args)
 		local pageName = basePageName
 			and TournamentStructure._joinPageName(namespaceName, basePageName)
 			or FULL_PAGENAME
-		return table.concat({
-			TournamentStructure._resolveRedirect(pageName),
-			stageName
-		}, '#')
+		local redirectedPage = mw.title.new(TournamentStructure._resolveRedirect(pageName))
+		redirectedPage.fragment = stageName
+		return redirectedPage.fullText
 	end
 
 	if #matchGroupIds ~= 0 or #pageNames ~= 0 then
