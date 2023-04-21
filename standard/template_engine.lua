@@ -121,7 +121,8 @@ function TemplateEngine:_variable(template, context)
 		if type(value) == 'function' then
 			value = value(context.model)
 		end
-		value = value or variable -- Doesn't follow mustache standard, should be `or ''` to follow.
+		value = value or ''
+		value = tostring(value) -- Call the __tostring meta-method on any structures.
 		return escape and mw.text.nowiki(value) or value
 	end))
 end
@@ -144,8 +145,8 @@ function Context:find(variableName)
 	while context do
 		local path = Table.mapValues(mw.text.split(variableName, TABLE_SPLIT_CHAR, true), toNumberIfNumeric)
 		local key = Table.extract(path, #path)
-		local tbl =  Table.getByPath(context.model, path)
-		if tbl[key] then
+		local tbl =  Table.getByPathOrNil(context.model, path)
+		if tbl and tbl[key] then
 			return tbl[key]
 		end
 		context = context.parent
