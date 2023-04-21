@@ -67,7 +67,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 		end
 
 		local pageName = basePageName
-			and table.concat(Array.extend(namespaceName, basePageName), ':')
+			and TournamentStructure._joinPageName(namespaceName, basePageName)
 			or FULL_PAGENAME
 		return table.concat({
 			TournamentStructure._resolveRedirect(pageName),
