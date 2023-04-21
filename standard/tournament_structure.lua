@@ -66,11 +66,11 @@ function TournamentStructure.readMatchGroupsSpec(args)
 			namespaceName = Namespace.nameFromId(args.ns)
 		end
 
-		local pageName = basePageName
+		local pageName = String.isNotEmpty(basePageName)
 			and TournamentStructure._createPageName(namespaceName, basePageName)
 			or FULL_PAGENAME
 		local redirectedPage = mw.title.new(TournamentStructure._resolveRedirect(pageName))
-		redirectedPage.fragment = stageName
+		redirectedPage.fragment = stageName or ''
 		return redirectedPage.fullText
 	end
 
@@ -389,6 +389,9 @@ end
 ---@param stageName string?
 ---@return string
 function TournamentStructure._createPageName(namespaceName, basePageName, stageName)
+	if String.isEmpty(basePageName) then
+		return ''
+	end
 	return mw.title.makeTitle(namespaceName or '', basePageName, stageName).fullText
 end
 
