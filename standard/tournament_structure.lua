@@ -124,6 +124,7 @@ function TournamentStructure.groupByStage(groupTables, brackets, spec)
 	stageIndexes[currentPage] = stageIndexes[currentPage] or 1000
 
 	local getSortKey = FnUtil.memoize(function(recordGroup)
+		-- gsub needed to match how pagenames are set up in spec via `TournamentStructure.readMatchGroupsSpec`
 		local basePageName = recordGroup[1].pagename:gsub('_', ' ')
 		local stageName = TournamentStructure.getStageName(recordGroup)
 		local namespaceName = String.nilIfEmpty(Namespace.nameFromId(recordGroup[1].namespace))
