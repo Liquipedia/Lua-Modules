@@ -381,10 +381,10 @@ end
 
 --- Splits a page name into a namespace, base, and stage.
 ---@param pageName string
----@return string?, string?, string?
+---@return string?, string, string?
 function TournamentStructure._splitPageName(pageName)
 	local title = mw.title.new(pageName)
-	return String.nilIfEmpty(title.nsText), String.nilIfEmpty(title.text), String.nilIfEmpty(title.fragment)
+	return String.nilIfEmpty(title.nsText), title.text, String.nilIfEmpty(title.fragment)
 end
 
 --- Joins given namespace, base page name, and stage into a page name.
