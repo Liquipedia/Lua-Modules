@@ -83,7 +83,7 @@ function Person:createInfobox()
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
 	--make earnings values available in the /Custom modules
-	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
+	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args, personType)
 
 	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birth_date,
@@ -325,7 +325,7 @@ end
 
 --- Allows for overriding this functionality
 function Person:getPersonType(args)
-	return { store = 'Player', category = 'Player'}
+	return {store = 'Player', category = 'Player'}
 end
 
 --- Allows for overriding this functionality
@@ -368,10 +368,11 @@ function Person:subHeaderDisplay(args)
 end
 
 --- Allows for overriding this functionality
-function Person:calculateEarnings(args)
+function Person:calculateEarnings(args, personType)
 	local totalEarnings, earningsPerYear = Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
-		perYear = true
+		perYear = true,
+		prefix = Table.any(personType, function(_, value) return value:lower():find('coach') end) and 'c' or 'p',
 	}
 
 	-- store earnings values in wiki variables for storage in smw
