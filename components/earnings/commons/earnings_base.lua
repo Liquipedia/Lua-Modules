@@ -18,6 +18,7 @@ local Team = require('Module:Team')
 local Opponent = require('Module:OpponentLibraries').Opponent
 
 local DEFAULT_DATE = '1970-01-01 00:00:00'
+local COACHES_STORED = 5
 
 local Earnings = {}
 
@@ -30,7 +31,6 @@ Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 -- @year - (optional) the year to calculate earnings for
 -- @mode - (optional) the mode to calculate earnings for
 -- @noRedirect - (optional) player redirects get not resolved before query
--- @prefix - (optional) the prefix under which the players are stored in the placements
 -- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 function Earnings.calculateForPlayer(args)
@@ -50,8 +50,6 @@ function Earnings.calculateForPlayer(args)
 	-- we need to check for both options
 	local playerAsPageName = player:gsub(' ', '_')
 
-	local prefix = args.prefix or 'p'
-
 	local playerPositionLimit = tonumber(args.playerPositionLimit) or Earnings.defaultNumberOfStoredPlayersPerMatch
 	if playerPositionLimit <= 0 then
 		error('"playerPositionLimit" has to be >= 1')
@@ -63,8 +61,12 @@ function Earnings.calculateForPlayer(args)
 	}
 
 	for playerIndex = 1, playerPositionLimit do
-		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
-		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
+		table.insert(playerConditions, '[[opponentplayers_p' .. playerIndex .. '::' .. player .. ']]')
+		table.insert(playerConditions, '[[opponentplayers_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
+	end
+	for coachIndex = 1, COACHES_STORED do
+		table.insert(playerConditions, '[[opponentplayers_c' .. coachIndex .. '::' .. player .. ']]')
+		table.insert(playerConditions, '[[opponentplayers_c' .. coachIndex .. '::' .. playerAsPageName .. ']]')
 	end
 	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
