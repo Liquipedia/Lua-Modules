@@ -23,13 +23,13 @@ function suite:testMath()
 	self:assertEquals(15625, Array.reduce(foo, Operator.pow), 'Pow')
 end
 
-function suite:testItem()
+function suite:testProperty()
 	local foo = {
 		{a = 3, b = 'abc'},
 		{a = 5, b = 'cedf'},
 		{a = 4, b = 'sfd'},
 	}
-	self:assertDeepEquals({3, 5, 4}, Array.map(foo, Operator.item('a')))
+	self:assertDeepEquals({3, 5, 4}, Array.map(foo, Operator.property('a')))
 end
 
 function suite:testMethod()

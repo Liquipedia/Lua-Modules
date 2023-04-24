@@ -28,9 +28,9 @@ function Operator.pow(a, b)
 	return math.pow(a, b)
 end
 
-function Operator.item(item)
+function Operator.property(item)
 	if string.find(item, '%.') then
-		error('Pathing not yet supported in itemGetter')
+		error('Pathing not yet supported in property')
 	end
 	return function(tbl)
 		return tbl[item]
