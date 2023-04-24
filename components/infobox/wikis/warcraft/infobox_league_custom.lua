@@ -50,11 +50,10 @@ local GAMES = {
 	[GAME_REIGN] = 'Reign of Chaos',
 }
 
-local DUOS = '2v2'
-local DEFAULT_MODE = '1v1'
 local MODES = {
-	team = 'team',
-	[DUOS] = '2v2',
+	team = {tier = 'Team', store = 'team', category =  'Team'},
+	['2v2'] = {tier = ' 2v2', store = '2v2', category =  '2v2'},
+	default = {store = '1v1', category =  'Individual'},
 }
 
 local TIER_1 = 1
@@ -89,6 +88,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.addParticipantTypeCategory = CustomLeague.addParticipantTypeCategory
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
@@ -439,22 +439,22 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
-function CustomLeague:getWikiCategories()
-	local categories = {}
+function CustomLeague:addParticipantTypeCategory(args)
+	return {(MODES[_args.mode] or MODES.default).category .. ' Tournaments'}
+end
 
-	if String.isNotEmpty(_args.eslprotier) then
+function CustomLeague:getWikiCategories(args)
+	local categories = {'Tournaments'}
+
+	if GAMES[args.game] then
+		table.insert(categories, GAMES[args.game] .. ' Competitions')
+	end
+
+	if String.isNotEmpty(args.eslprotier) then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if GAMES[_args.game] then
-		table.insert(categories, GAMES[_args.game] .. ' Competitions')
-	end
-
-	if _args.mode == DUOS then
-		table.insert(categories, '2v2 Tournaments')
-	end
-
-	local tier = tonumber(_args.liquipediatier)
+	local tier = tonumber(args.liquipediatier)
 	if tier == TIER_1 or tier == TIER_2 then
 		table.insert(categories, 'Big Tournaments')
 	else
@@ -470,7 +470,7 @@ function CustomLeague:getWikiCategories()
 end
 
 function CustomLeague._getMode()
-	return MODES[_args.mode] or DEFAULT_MODE
+	return (MODES[_args.mode] or MODES.default).store
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
@@ -484,7 +484,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	local modeDisplay = MODES[_args.mode]
+	local modeDisplay = (MODES[_args.mode] or {}).tier
 	if not modeDisplay then
 		return ''
 	end

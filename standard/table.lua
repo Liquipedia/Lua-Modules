@@ -543,17 +543,30 @@ end
 will print out `p1 p2 p3`
 ]]
 ---@param tbl table
----@param prefix string
+---@param prefix string|string[]
 ---@param options? {requireIndex: boolean}
 ---@return function
-function Table.iter.pairsByPrefix(tbl, prefix, options)
+function Table.iter.pairsByPrefix(tbl, prefixes, options)
 	options = options or {}
+
+	if type(prefixes) == 'string' then
+		prefixes = {prefixes}
+	end
+
+	local getByPrefixes = function(index)
+		for _, prefix in ipairs(prefixes) do
+			local key = prefix .. index
+			if tbl[key] then
+				return key, tbl[key]
+			end
+		end
+	end
+
 	local i = 1
 	return function()
-		local key = prefix .. i
-		local value = tbl[key]
+		local key, value = getByPrefixes(i)
 		if options.requireIndex == false and i == 1 and not value then
-			key, value = prefix, tbl[prefix]
+			key, value = getByPrefixes('')
 		end
 		i = i + 1
 		if value then

@@ -76,9 +76,9 @@ return {
 				lightMode = 'Tetris 1989 DAS default allmode.png',
 			},
 		},
-		effect  = {
-			abbreviation = 'Effect',
-			name = 'Effect',
+		te  = {
+			abbreviation = 'TE',
+			name = 'Tetris Effect',
 			link = 'Tetris Effect',
 			logo = {
 				darkMode = 'Tetris Effect default darkmode.png',
@@ -91,7 +91,7 @@ return {
 		},
 		tec  = {
 			abbreviation = 'TE:C',
-			name = 'Effect: Connected',
+			name = 'Tetris Effect: Connected',
 			link = 'Tetris Effect: Connected',
 			logo = {
 				darkMode = 'Tetris Effect default darkmode.png',
@@ -285,7 +285,7 @@ return {
 			},
 		},
 		['t99']  = {
-			abbreviation = '99',
+			abbreviation = 'T99',
 			name = 'Tetris 99',
 			link = 'Tetris 99',
 			logo = {
@@ -299,8 +299,8 @@ return {
 		},
 		ds  = {
 			abbreviation = 'DS',
-			name = 'DS (2006)',
-			link = 'Tetris DS (2006)',
+			name = 'Tetris DS',
+			link = 'Tetris DS',
 			logo = {
 				darkMode = 'Tetris DS default allmode.png',
 				lightMode = 'Tetris DS default allmode.png',
@@ -376,7 +376,7 @@ return {
 			},
 		},
 		['tetris friends']  = {
-			abbreviation = 'Friends',
+			abbreviation = 'TF',
 			name = 'Tetris Friends',
 			link = 'Tetris Friends',
 			logo = {
@@ -428,7 +428,7 @@ return {
 			},
 		},
 		['tetrinet 2']  = {
-			abbreviation = 'TTN2',
+			abbreviation = 'Tnet2',
 			name = 'TetriNET 2',
 			link = 'TetriNET 2',
 			logo = {

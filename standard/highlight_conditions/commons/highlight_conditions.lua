@@ -25,6 +25,7 @@ function HighlightConditions.tournament(data, options)
 
 	return Logic.nilOr(
 		Logic.readBoolOrNil(data.publishertier),
+		String.isNotEmpty(data.publishertier) or nil,
 		String.isNotEmpty(data.extradata.publisherpremier)
 	)
 end

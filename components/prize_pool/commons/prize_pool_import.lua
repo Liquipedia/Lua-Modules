@@ -65,9 +65,9 @@ function Import._getConfig(args, placements)
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
-		groupElimStatuses = Table.mapValues(
+		groupElimStatuses = Array.map(
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			mw.text.trim
+			String.trim
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
@@ -86,9 +86,9 @@ function Import._getConfig(args, placements)
 		stageGroupElimStatuses = Table.mapArguments(
 			args,
 			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
-			function(key) return Table.mapValues(
+			function(key) return Array.map(
 				mw.text.split(args[key], ','),
-				mw.text.trim
+				String.trim
 			) end,
 			true
 		),

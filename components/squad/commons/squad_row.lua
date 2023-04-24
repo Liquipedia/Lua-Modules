@@ -66,6 +66,7 @@ function SquadRow:id(args)
 
 	if String.isNotEmpty(args.name) then
 		cell:tag('br'):done():tag('i'):tag('small'):wikitext(args.name)
+		self.lpdbData.name = args.name
 	end
 
 	local teamNode = mw.html.create('td')

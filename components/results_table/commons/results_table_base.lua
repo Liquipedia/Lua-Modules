@@ -80,9 +80,7 @@ function BaseResultsTable:readConfig()
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
-		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), function(alias)
-			return mw.text.trim(alias)
-		end) or {}
+		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
 	}
 
 	config.sort = args.sort or
@@ -133,8 +131,6 @@ function BaseResultsTable:create()
 		self.data = {}
 		return self
 	end
-
-	Array.forEach(data, function(placement) self:processLegacyVsData(placement) end)
 
 	table.sort(data, function(placement1, placement2) return placement1.date > placement2.date end)
 
@@ -222,7 +218,7 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.tier then
 		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(Table.mapValues(mw.text.split(args.tier, ',', true), mw.text.trim)) do
+		for _, tier in pairs(Array.map(mw.text.split(args.tier, ',', true), String.trim)) do
 			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
 		end
 		conditions:add{tierConditions}
@@ -372,8 +368,8 @@ function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
 	if placementData.header then
-		table.insert(rows, mw.html.create('tr')
-			:tag('th'):addClass('sortbottom'):attr('colspan', 42):wikitext(placementData.header):done()
+		table.insert(rows, mw.html.create('tr'):addClass('sortbottom')
+			:tag('th'):attr('colspan', 42):wikitext(placementData.header):done()
 			:done())
 	end
 
@@ -483,10 +479,10 @@ function BaseResultsTable.tournamentDisplayName(placement)
 end
 
 function BaseResultsTable:processVsData(placement)
-	local lastVs = placement.lastvsdata
+	local lastVs = placement.lastvsdata or {}
 
 	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
 	local score = ''
@@ -497,25 +493,6 @@ function BaseResultsTable:processVsData(placement)
 	local vsDisplay = self:opponentDisplay(lastVs, {isLastVs = true})
 
 	return score, vsDisplay
-end
-
--- overwritable
-function BaseResultsTable:processLegacyVsData(placement)
-	if Table.isNotEmpty(placement.lastvsdata) then
-		return placement
-	end
-
-	local lastVs = {score = placement.lastvsscore, groupscore = placement.groupscore}
-	-- lets assume opponentType of the vs opponent is the same as of the opponent
-	lastVs.opponenttype = placement.opponenttype
-	-- assume lastvs is team template for teams and pagename & displayname for players
-	-- if wikis store them in extradata they can overwrite this function until lastvsdata field is filled
-	lastVs.opponentplayers = {p1 = placement.lastvs, p1dn = placement.lastvs}
-	lastVs.opponenttemplate = placement.lastvs
-
-	placement.lastvsdata = lastVs
-
-	return placement
 end
 
 function BaseResultsTable:buildHeader()

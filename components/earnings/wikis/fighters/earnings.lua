@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=smash
+-- wiki=fighters
 -- page=Module:Earnings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
