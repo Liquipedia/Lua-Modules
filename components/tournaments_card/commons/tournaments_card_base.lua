@@ -33,12 +33,12 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local CANCELLED = 'cancelled'
 local LANG = mw.language.new('en')
 local NONBREAKING_SPACE = '&nbsp;'
 local NON_TIER_TYPE_INPUT = 'none'
 local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
+local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
 
 --- @class BaseTournamentsCard
@@ -58,14 +58,17 @@ function BaseTournamentsCard:readConfig()
 	local tier1 = args.tier1 or args.tier
 
 	self.config = {
-		showTier = Logic.readBool(Logic.nilOr(args.showTier, args.tiers, tier1 == '!' or Logic.isNotEmpty(args.tier2))),
+		-- either manually enable/disable tier column or check if it seems useful to have it enabled
+		--- case 1: tier is set as '!' --> we most likely get results with different tiers
+		--- case 2: tier2 is not empty (ier1 is also assumed not empty) --> we most likely get results with different tiers
+		showTier = Logic.readBool(Logic.nilOr(args.showTier, tier1 == '!' or Logic.isNotEmpty(args.tier2))),
 		onlyTierTypeIfBoth = Logic.nilOr(Logic.readBoolOrNil(args.onlyTierTypeIfBoth), true),
 		showOrganizer = Logic.readBool(args.showOrganizer),
 		showGameIcon = Logic.readBool(args.showGameIcon),
 		showHighlight = Logic.nilOr(Logic.readBoolOrNil(args.showHighlight), true),
 		showQualifierColumnOverWinnerRunnerup = Logic.readBool(args.qualifiers),
 		useParent = Logic.nilOr(Logic.readBoolOrNil(args.useParent), true),
-		showRank = Logic.readBool(Logic.nilOr(args.showRank, args.ranked)),
+		showRank = Logic.readBool(Logic.nilOr(args.showRank)),
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
 		allowedPlacements = self:_allowedPlacements(),
@@ -76,9 +79,7 @@ end
 function BaseTournamentsCard:_allowedPlacements()
 	local placeConditions = self.args.placeConditions or DEFAULT_ALLOWED_PLACES
 
-	return Array.map(mw.text.split(placeConditions, ','),
-		function(placeValue) return mw.text.trim(placeValue) end
-	)
+	return Array.map(mw.text.split(placeConditions, ','), String.trim)
 end
 
 function BaseTournamentsCard:create()
@@ -119,7 +120,7 @@ function BaseTournamentsCard:buildBaseConditions()
 	local endDate = args.enddate or args.edate
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('startdate'), Comparator.gt, '1970-01-01')}
+		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, '1970-01-01')}
 
 	if args.year then
 		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
@@ -202,13 +203,11 @@ function BaseTournamentsCard:buildBaseConditions()
 	end
 
 	args.tier1 = args.tier1 or args.tier or '!'
-	if args.tier1 then
-		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in Table.iter.pairsByPrefix(args, 'tier') do
-			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
-		end
-		conditions:add{tierConditions}
+	local tierConditions = ConditionTree(BooleanOperator.any)
+	for _, tier in Table.iter.pairsByPrefix(args, 'tier') do
+		tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
 	end
+	conditions:add{tierConditions}
 
 	args.tiertype1 = args.tiertype1 or args.tiertype
 	if args.tiertype1 then
