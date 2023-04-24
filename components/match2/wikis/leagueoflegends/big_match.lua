@@ -90,11 +90,13 @@ function BigMatch.run(frame)
 
 	-- Add more opponent data field
 	Array.forEach(model.opponents, function (opponent, index)
+		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
+
 		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = mw.ext.TeamTemplate.raw(opponent.template).shortname
-		opponent.page = mw.ext.TeamTemplate.raw(opponent.template).page
-		opponent.name = mw.ext.TeamTemplate.raw(opponent.template).name
+		opponent.shortname = teamTemplate.shortname
+		opponent.page = teamTemplate.page
+		opponent.name = teamTemplate.name
 	end)
 
 	-- Enrich game information
@@ -162,7 +164,7 @@ function BigMatch.run(frame)
 	end
 	model.heroIcon = function(self)
 		local champion = type(self) == 'table' and self.champion or self
-		return HeroIcon._getImage{champion, '48px', date = model.date}
+		return HeroIcon._getImage{champion, date = model.date}
 	end
 
 	return BigMatch.render(model)
@@ -213,7 +215,7 @@ function BigMatch._match2Director(args)
 			return
 		end
 
-		-- If no key is provided, assume this as a normal match
+		-- If no key is provided, assume this as a normal map
 		if not mapInput.key then
 			return mapInput
 		end
@@ -221,9 +223,7 @@ function BigMatch._match2Director(args)
 		local map = mw.ext.LeagueOfLegendsDB.getData(mapInput.key, Logic.readBool(mapInput.reversed))
 
 		-- Match not found on the API
-		if not map or type(map) ~= 'table' then
-			error(mapInput.key .. ' could not be retrieved.')
-		end
+		assert(map and type(map) == 'table', mapInput.key .. ' could not be retrieved.')
 
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. (map.length % 60)) or nil
@@ -271,12 +271,10 @@ function BigMatch._match2Director(args)
 end
 
 function BigMatch.render(model)
-	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
-	overall :wikitext(BigMatch.header(model))
-			:wikitext(BigMatch.games(model))
-			:wikitext(BigMatch.footer(model))
-
-	return overall
+	return mw.html.create('div')
+		:wikitext(BigMatch.header(model))
+		:wikitext(BigMatch.games(model))
+		:wikitext(BigMatch.footer(model))
 end
 
 function BigMatch.header(model)
