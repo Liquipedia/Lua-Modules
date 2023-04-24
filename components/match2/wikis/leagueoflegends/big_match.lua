@@ -133,7 +133,7 @@ function BigMatch.run(frame)
 		end)
 
 		local _
-		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, Operator.item('team'))
+		_, game.apiInfo.championVetoByTeam = Array.groupBy(game.apiInfo.championVeto, Operator.property('team'))
 
 		Array.forEach(game.apiInfo.championVetoByTeam, function (team)
 			local lastType = 'ban'
@@ -171,7 +171,7 @@ function BigMatch.run(frame)
 end
 
 function BigMatch._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.item(item)), Operator.add)
+	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add)
 end
 
 function BigMatch._abbreviateNumber(number)
@@ -240,16 +240,16 @@ function BigMatch._match2Director(args)
 		end)
 
 		-- Break down the picks and bans into per team, per type, in order.
-		Array.sortInPlaceBy(map.championVeto, Operator.item('vetoNumber'))
+		Array.sortInPlaceBy(map.championVeto, Operator.property('vetoNumber'))
 
-		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.item('team'))
+		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.property('team'))
 
 		-- TODO: have picks sorted on role, bans sorted on number
 		Table.mergeInto(map, prefixWithKey(Array.map(vetoesByTeam, function (team)
 			return Table.mapValues(Table.groupBy(team, function(_, veto)
 				return veto.type
 			end), function (vetoType)
-				return Array.extractValues(Table.mapValues(vetoType, Operator.item('champion')))
+				return Array.extractValues(Table.mapValues(vetoType, Operator.property('champion')))
 			end)
 		end), 't'))
 
