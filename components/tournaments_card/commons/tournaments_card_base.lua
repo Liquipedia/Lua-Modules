@@ -485,14 +485,9 @@ function BaseTournamentsCard._organizerDisplay(tournamentData)
 end
 
 function BaseTournamentsCard._displayLocations(locationData, tournamentType)
-	local locations = {}
-	local locationIndex = 1
-	local location = BaseTournamentsCard._displayLocation(locationData, locationIndex)
-	while location do
-		table.insert(locations, location)
-		locationIndex = locationIndex + 1
-		location = BaseTournamentsCard._displayLocation(locationData, locationIndex)
-	end
+	local locations = Array.mapIndexes(function(locationIndex)
+		return BaseTournamentsCard._displayLocation(locationData, locationIndex)
+	end)
 
 	locations = Array.map(locations, function(loc)
 		return tostring(mw.html.create('span'):addClass('FlagText'):wikitext(loc))
