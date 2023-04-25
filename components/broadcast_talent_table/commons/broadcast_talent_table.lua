@@ -137,7 +137,7 @@ function BroadcastTalentTable:_fetchTournaments()
 		limit = args.limit * 2,
 	})
 
-	if type(queryData[1]) ~= 'table' then
+	if not queryData[1] then
 		return
 	end
 
