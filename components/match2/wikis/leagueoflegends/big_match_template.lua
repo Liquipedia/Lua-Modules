@@ -14,7 +14,7 @@ return {
 				<div class="match-bm-lol-match-header-overview">
 					<div class="match-bm-lol-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/opponents.1}}</div>
 					<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}</div>
-					<div class="match-bm-lol-match-header-team">{{#opponents.2}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">[[{{page}}|{{name}}]]</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/opponents.2}}</div>
+					<div class="match-bm-lol-match-header-team">{{#opponents.2}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{generateSeriesDots}}</div>{{/opponents.2}}</div>
 				</div>
 				<div class="match-bm-lol-match-header-tournament">[[{{parent}}|{{tournament}}]]</div>
 				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
