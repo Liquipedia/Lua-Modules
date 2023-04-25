@@ -19,6 +19,7 @@ local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
 
+local BigMatch = Lua.import('Module:BigMatch', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -29,8 +30,6 @@ local _NUM_HEROES_PICK_TEAM = 5
 local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local BIG_MATCH_START_TIME = 1682892000 -- May 1st 2023 midnight
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -145,7 +144,7 @@ function CustomMatchSummary._createBody(match)
 		))
 	end
 
-	if tonumber(match.liquipediatier) == 1 and match.timestamp > BIG_MATCH_START_TIME then
+	if BigMatch.isEnabledFor(match) then
 		local matchPageElement = mw.html.create('center')
 		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
 						:css('display', 'block')
