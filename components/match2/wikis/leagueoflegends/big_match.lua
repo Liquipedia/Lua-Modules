@@ -215,7 +215,7 @@ function BigMatch._match2Director(args)
 			return
 		end
 
-		-- If no key is provided, assume this as a normal map
+		-- If no matchid is provided, assume this as a normal map
 		if not mapInput.matchid then
 			return mapInput
 		end
