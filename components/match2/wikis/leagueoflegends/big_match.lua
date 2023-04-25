@@ -216,14 +216,14 @@ function BigMatch._match2Director(args)
 		end
 
 		-- If no key is provided, assume this as a normal map
-		if not mapInput.key then
+		if not mapInput.matchid then
 			return mapInput
 		end
 
-		local map = mw.ext.LeagueOfLegendsDB.getData(mapInput.key, Logic.readBool(mapInput.reversed))
+		local map = mw.ext.LeagueOfLegendsDB.getData(mapInput.matchid, Logic.readBool(mapInput.reversed))
 
 		-- Match not found on the API
-		assert(map and type(map) == 'table', mapInput.key .. ' could not be retrieved.')
+		assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. (map.length % 60)) or nil
