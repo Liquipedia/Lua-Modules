@@ -90,9 +90,13 @@ function BigMatch.run(frame)
 
 	-- Add more opponent data field
 	Array.forEach(model.opponents, function (opponent, index)
+		opponent.opponentIndex = index
+
+		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
+			return
+		end
 		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
 
-		opponent.opponentIndex = index
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = teamTemplate.shortname
 		opponent.page = teamTemplate.page
