@@ -236,7 +236,7 @@ function BigMatch._match2Director(args)
 		assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 
 		-- Convert seconds to minutes and seconds
-		map.length = map.length and (math.floor(map.length / 60) .. ':' .. (map.length % 60)) or nil
+		map.length = map.length and (math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)) or nil
 
 		Array.forEach(TEAMS, function(teamIdx)
 			local team = map['team' .. teamIdx]
