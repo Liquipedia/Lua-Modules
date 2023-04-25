@@ -72,7 +72,7 @@ function BaseTournamentsCard:readConfig()
 		noLis = Logic.readBool(args.noLis),
 		offset = tonumber(args.offset) or 0,
 		allowedPlacements = self:_allowedPlacements(),
-		onlyHighlightOnValue = args.onlyHighlightOnValue or args.valvetier, -- valvetier for legacy reasons
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 end
 
