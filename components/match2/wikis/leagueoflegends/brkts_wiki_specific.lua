@@ -15,7 +15,7 @@ local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {re
 -- Override functons
 --
 function WikiSpecific.matchHasDetails(match)
-	return Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true}).defaultMatchHasDetails or 
+	return Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true}).defaultMatchHasDetails or
 		Lua.import('Module:BigMatch', {requireDevIfEnabled = true}).isEnabledFor(match)
 end
 
