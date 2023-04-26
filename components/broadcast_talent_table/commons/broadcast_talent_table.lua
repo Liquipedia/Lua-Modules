@@ -95,7 +95,7 @@ end
 function BroadcastTalentTable:_getBroadcaster()
 	local title = mw.title.getCurrentTitle()
 
-	if String.isNotEmpty(title.nsText) then
+	if not Namespace.isMain() then
 		return
 	end
 
