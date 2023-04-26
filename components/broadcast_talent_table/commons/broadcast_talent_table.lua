@@ -131,7 +131,7 @@ function BroadcastTalentTable:_fetchTournaments()
 	local queryLimit = args.limit * 2
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-		query = 'pagename, parent, date, extradata, language, position',
+		query = 'pagename, parent, date, language, position',
 		conditions = conditions:toString(),
 		order = args.sortBy,
 		limit = queryLimit,
@@ -264,40 +264,23 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. tournament.parent .. ']]',
 		query = 'name, tickername, icon, icondark, series, game, '
-			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
+			.. 'liquipediatier, liquipediatiertype, publishertier',
 	})
 
 	if type(queryData[1]) ~= 'table' then
 		return tournament
 	end
 
-	queryData[1].tournamentExtradata = queryData[1].extradata
-
 	return Table.merge(queryData[1], tournament)
 end
 
 function BroadcastTalentTable._tournamentDisplayName(tournament)
-	local extradata = tournament.extradata or {}
-	if Logic.readBool(extradata.showmatch) and String.isNotEmpty(extradata.showmatchname) then
-		return extradata.showmatchname
-	end
-
-	local displayName = String.isNotEmpty(tournament.tickername) and tournament.tickername
+	return String.isNotEmpty(tournament.tickername) and tournament.tickername
 		or String.isNotEmpty(tournament.name) and tournament.name
 		or tournament.parent:gsub('_', ' ')
-
-	if not Logic.readBool(extradata.showmatch) then
-		return displayName
-	end
-
-	return displayName .. ' - Showmatch'
 end
 
 function BroadcastTalentTable:_tierDisplay(tournament)
-	if Logic.readBool((tournament.extradata or {}).showmatch) then
-		return 'Showmatch'
-	end
-
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
 	options.link = true
 	options.shortIfBoth = true
@@ -343,14 +326,6 @@ function BroadcastTalentTable:_getPartners(tournament)
 
 	if String.isNotEmpty(tournament.language) then
 		conditions:add{ConditionNode(ColumnName('language'), Comparator.eq, tournament.language)}
-	end
-
-	local extradata = tournament.extradata or {}
-	if Logic.readBool(extradata.showmatch) then
-		conditions:add{ConditionNode(ColumnName('extradata_showmatch'), Comparator.eq, 'true')}
-		if String.isNotEmpty(extradata.showmatchname) then
-			conditions:add{ConditionNode(ColumnName('extradata_showmatchname'), Comparator.eq, extradata.showmatchname)}
-		end
 	end
 
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
