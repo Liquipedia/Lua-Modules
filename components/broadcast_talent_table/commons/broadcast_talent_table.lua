@@ -277,6 +277,7 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 end
 
 function BroadcastTalentTable._tournamentDisplayName(tournament)
+	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
 	local extradata = tournament.extradata or {}
 	if Logic.readBool(extradata.showmatch) and String.isNotEmpty(extradata.showmatchname) then
 		return extradata.showmatchname
@@ -294,6 +295,7 @@ function BroadcastTalentTable._tournamentDisplayName(tournament)
 end
 
 function BroadcastTalentTable:_tierDisplay(tournament)
+	-- `tournament.extradata` is not the extradata of the tournament but of the broadcaster (they got merged together)
 	if Logic.readBool((tournament.extradata or {}).showmatch) then
 		return 'Showmatch'
 	end
