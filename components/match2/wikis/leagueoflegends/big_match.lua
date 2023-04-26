@@ -8,6 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -87,7 +88,7 @@ function BigMatch.run(frame)
 	local model = BigMatch._match2Director(args)
 
 	model.isBestOfOne = #model.games == 1
-	model.dateCountdown = DisplayHelper.MatchCountdownBlock(model)
+	model.dateCountdown = model.timestamp ~= DateExt.epochZero and DisplayHelper.MatchCountdownBlock(model) or nil
 
 	-- Create an object array for links
 	model.links = Array.extractValues(Table.map(model.links, function (site, link)
