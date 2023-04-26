@@ -8,7 +8,7 @@
 
 return {
 	vod = {icon = 'VOD Icon.png', text = 'Watch VOD'},
-	reddit = {icon = 'Reddit-icon.png', text = 'Head-to-head statistics'},
+	reddit = {icon = 'Reddit-icon.png', text = 'Reddit Thread'},
 	gol = {icon = 'Gol.gg_allmode.png', text = 'GolGG Match Report'},
 	factor = {icon = 'Factor.gg lightmode.png', text = 'FactorGG Match Report'},
 }
