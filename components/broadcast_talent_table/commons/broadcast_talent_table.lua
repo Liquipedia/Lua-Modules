@@ -99,17 +99,7 @@ function BroadcastTalentTable:_getBroadcaster()
 		return
 	end
 
-	local pageName = title.text
-
-	-- if we do not find a `'/'` in the pageName we are on a caster page directly
-	-- hence we can just return that as the caster
-	if not pageName:find('/') then
-		return pageName
-	end
-
-	-- if we find a `'/'` in the pageName we are on a subpage (e.g. `/Broadcasts`)
-	-- hence we have to remove the part after the (last) `'/'` to (probably) get the caster
-	return pageName:sub(1, pageName:find('/') - 1)
+	return title.baseText
 end
 
 function BroadcastTalentTable:_fetchTournaments()
