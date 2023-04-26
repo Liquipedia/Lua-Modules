@@ -419,11 +419,11 @@ end
 
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import._mergeEntry(
+		placement.opponents[opponentIndex] = Import._removeEpochZeroDate(Import._mergeEntry(
 			opponent,
 			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
-		)
+		))
 	end
 
 	assert(
@@ -579,6 +579,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		score = score,
 		vsScore = vsScore,
 	}
+end
+
+function Import._removeEpochZeroDate(entry)
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.epochZero and entry.date
+		or nil
+
+	return entry
 end
 
 return Import
