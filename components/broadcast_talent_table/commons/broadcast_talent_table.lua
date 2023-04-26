@@ -93,16 +93,22 @@ function BroadcastTalentTable:_readArgs(args)
 end
 
 function BroadcastTalentTable:_getBroadcaster()
-	local pageName = mw.title.getCurrentTitle().text
+	local title = mw.title.getCurrentTitle()
 
-	if pageName:find(':') then
+	if String.isNotEmpty(title.nsText) then
 		return
 	end
 
+	local pageName = title.text
+
+	-- if we do not find a `'/'` in the pageName we are on a caster page directly
+	-- hence we can just return that as the caster
 	if not pageName:find('/') then
 		return pageName
 	end
 
+	-- if we find a `'/'` in the pageName we are on a subpage (e.g. `/Broadcasts`)
+	-- hence we have to remove the part after the (last) `'/'` to (probably) get the caster
 	return pageName:sub(1, pageName:find('/') - 1)
 end
 
@@ -130,11 +136,14 @@ function BroadcastTalentTable:_fetchTournaments()
 		end
 	end
 
+	-- double the limit for the query due to potentional merging of results further down the line
+	local queryLimit = args.limit * 2
+
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'pagename, parent, date, extradata, language, position',
 		conditions = conditions:toString(),
 		order = args.sortBy,
-		limit = args.limit * 2,
+		limit = queryLimit,
 	})
 
 	if not queryData[1] then
@@ -147,9 +156,9 @@ function BroadcastTalentTable:_fetchTournaments()
 		if not pageNames[tournament.pagename] then
 			tournament.positions = {tournament.position}
 			table.insert(tournaments, tournament)
-			pageNames[tournament.pagename] = #tournaments
+			pageNames[tournament.pagename] = tournament
 		else
-			table.insert(tournaments[pageNames[tournament.pagename]].positions, tournament.position)
+			table.insert(pageNames[tournament.pagename].positions, tournament.position)
 		end
 	end
 
