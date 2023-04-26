@@ -247,7 +247,7 @@ function BroadcastTalentTable:_row(tournament)
 			link = tournament.pagename,
 			name = tournament.name,
 		}):done()
-		:tag('td'):wikitext(Page.makeInternalLink({},
+		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
 			BroadcastTalentTable._tournamentDisplayName(tournament),
 			tournament.pagename
 		)):done()
