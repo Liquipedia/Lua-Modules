@@ -146,7 +146,7 @@ function mw.html.create(tagName, args) end
 function mw.html:node(builder) end
 
 ---Appends an undetermined number of wikitext strings to the mw.html object. Note that this stops at the first nil item.
----@param ... string?
+---@param ... string|number|nil
 ---@return self
 function mw.html:wikitext(...) end
 
