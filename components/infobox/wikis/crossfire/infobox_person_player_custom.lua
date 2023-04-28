@@ -22,7 +22,6 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _args
 
 function CustomPlayer.run(frame)
@@ -38,20 +37,17 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
+			returnEmptyIfNoResults = true,
 			convertrole = 'true',
 			player = mw.title.getCurrentTitle().prefixedText
-		})
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
-				Center{content = {automatedHistory}},
+				Center{content = {automatedHistory and tostring(automatedHistory) or nil}},
 			}
 		end
 	elseif id == 'region' then return {}

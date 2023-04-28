@@ -81,7 +81,7 @@ function CustomPlayer.run(frame)
 		player.args.history = tostring(TeamHistoryAuto._results{
 			hiderole = 'true',
 			iconModule = 'Module:PositionIcon/data',
-			addlpdbdata='true'
+			addlpdbdata = 'true'
 		})
 	end
 

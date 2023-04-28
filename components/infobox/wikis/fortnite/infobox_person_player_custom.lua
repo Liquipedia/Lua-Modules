@@ -27,7 +27,6 @@ local Center = Widgets.Center
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local CustomPlayer = Class.new()
@@ -51,20 +50,17 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
+			returnEmptyIfNoResults = true,
 			convertrole = 'true',
 			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if String.isNotEmpty(manualHistory) or String.isNotEmpty(automatedHistory) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
-				Center{content = {automatedHistory}},
+				Center{content = {automatedHistory and tostring(automatedHistory) or nil}},
 			}
 		end
 	elseif id == 'region' then return {}
