@@ -65,6 +65,7 @@ function CustomEarnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[players_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
 	end
 
+	---@diagnostic disable-next-line: cast-local-type
 	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
 	return CustomEarnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
@@ -83,7 +84,7 @@ function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases,
 	local sums = {}
 	local totalEarnings = 0
 	local sumUp = function(placement)
-		local value = CustomEarnings._determineValue(placement, aliases, isPlayerQuery)
+		local value = CustomEarnings._determineValue(placement)
 		if perYear then
 			local year = string.sub(placement.date, 1, 4)
 			if not sums[year] then
