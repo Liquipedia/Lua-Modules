@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
-				Center{content = {automatedHistory and tostring(automatedHistory) or nil}},
+				Center{content = {automatedHistory}},
 			}
 			end
 		end

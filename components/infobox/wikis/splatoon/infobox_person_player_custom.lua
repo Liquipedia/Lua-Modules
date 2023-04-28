@@ -35,7 +35,7 @@ local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
+	player.args.history = TeamHistoryAuto._results{convertrole = 'true', returnEmptyIfNoResults = true}
 
 	_player = player
 	_args = player.args

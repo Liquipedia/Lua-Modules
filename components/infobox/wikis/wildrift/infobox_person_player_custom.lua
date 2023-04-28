@@ -78,7 +78,7 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata = 'true'})
+		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', returnEmptyIfNoResults = true}
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
