@@ -16,6 +16,7 @@ local HighlightConditions = require('Module:HighlightConditions')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local LeagueIcon = require('Module:LeagueIcon')
+local Lua = require('Module:Lua')
 local Medal = require('Module:Medal')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
@@ -26,16 +27,10 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Condition = require('Module:Condition')
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
+local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
 
 local LANG = mw.language.new('en')
 local NONBREAKING_SPACE = '&nbsp;'
-local NON_TIER_TYPE_INPUT = 'none'
 local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
 local CANCELLED = 'cancelled'
@@ -104,123 +99,13 @@ end
 
 function BaseTournamentsListing:_buildConditions()
 
-	local conditions = self:buildBaseConditions()
+	local conditions = Conditions.base(self.args)
 
 	if self.args.additionalConditions then
 		return conditions .. self.args.additionalConditions
 	end
 
 	return conditions
-end
-
-function BaseTournamentsListing:buildBaseConditions()
-	local args = self.args
-
-	local startDate = args.startdate or args.sdate
-	local endDate = args.enddate or args.edate
-
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, '1970-01-01')}
-
-	if args.year then
-		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
-	else
-		if startDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.gt, startDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, startDate)
-				},
-			}
-		end
-		if endDate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.lt, endDate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, endDate)
-				},
-			}
-		end
-	end
-
-	if Logic.readBool(args.recent) then
-		conditions:add{ConditionNode(ColumnName('enddate'), Comparator.lt, os.date('%Y-%m-%d'))}
-	end
-
-	if args.prizepool then
-		conditions:add{ConditionNode(ColumnName('prizepool'), Comparator.gt, tonumber(args.prizepool))}
-	end
-
-	if args.mode then
-		conditions:add{ConditionNode(ColumnName('mode'), Comparator.eq, args.mode)}
-	end
-
-	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
-	end
-
-	if args.series then
-		conditions:add{ConditionNode(ColumnName('series'), Comparator.eq, args.series)}
-	end
-
-	if args.location then
-		local locationConditions = ConditionTree(BooleanOperator.any)
-		locationConditions:add{ConditionNode(ColumnName('location'), Comparator.eq, args.location)}
-		if args.location2 then
-			locationConditions:add{ConditionNode(ColumnName('location'), Comparator.eq, args.location2)}
-		end
-		conditions:add{locationConditions}
-	end
-
-	if args.type then
-		conditions:add{ConditionNode(ColumnName('type'), Comparator.eq, args.type)}
-	end
-
-	if args.shortnames then
-		conditions:add{ConditionNode(ColumnName('shortname'), Comparator.neq, '')}
-	end
-
-	if args.organizer then
-		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in mw.text.split(args.organizer, ',', true) do
-			organizer = mw.text.trim(organizer)
-			organizerConditions:add{
-				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
-				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
-			}
-		end
-		conditions:add{organizerConditions}
-	end
-
-	if args.region then
-		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in mw.text.split(args.region, ',', true) do
-			region = mw.text.trim(region)
-			regionConditions:add{
-				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
-				ConditionNode(ColumnName('locations_region2'), Comparator.eq, region),
-			}
-		end
-		conditions:add{regionConditions}
-	end
-
-	args.tier1 = args.tier1 or args.tier or '!'
-	local tierConditions = ConditionTree(BooleanOperator.any)
-	for _, tier in Table.iter.pairsByPrefix(args, 'tier') do
-		tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
-	end
-	conditions:add{tierConditions}
-
-	args.tiertype1 = args.tiertype1 or args.tiertype
-	if args.tiertype1 then
-		local tierTypeConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in Table.iter.pairsByPrefix(args, 'tiertype') do
-			tierTypeConditions:add{
-				ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tier == NON_TIER_TYPE_INPUT and '' or tier)
-			}
-		end
-		conditions:add{tierTypeConditions}
-	end
-
-	return conditions:toString()
 end
 
 function BaseTournamentsListing:additionalConditions()
@@ -548,7 +433,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = self:_buildPlacementConditions(tournamentData),
+		conditions = Conditions.placeConditions(tournamentData, self.config),
 		query = 'opponentname, opponenttype, opponenttemplate, opponentplayers, placement, extradata',
 		order = 'placement asc',
 		limit = 50,
@@ -596,28 +481,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	return placements
 end
 
-function BaseTournamentsListing:_buildPlacementConditions(tournamentData)
-	local config = self.config
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
-			ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tournamentData.liquipediatier),
-			ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tournamentData.liquipediatiertype),
-			ConditionNode(ColumnName(config.useParent and 'parent' or 'pagename'), Comparator.eq, tournamentData.pagename),
-		}
-
-	if config.showQualifierColumnOverWinnerRunnerup then
-		conditions:add{ConditionNode(ColumnName('qualified'), Comparator.eq, '1')}
-		return conditions:toString()
-	end
-
-	local placeConditions = ConditionTree(BooleanOperator.any)
-	for _, allowedPlacement in pairs(config.allowedPlacements) do
-		placeConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, allowedPlacement)}
-	end
-	conditions:add{placeConditions}
-
-	return conditions:toString()
-end
+function BaseTournamentsListing:_buildPlacementConditions(tournamentData)end
 
 function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
