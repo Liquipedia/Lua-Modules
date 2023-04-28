@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:TournamentsCard/Conditions
+-- page=Module:TournamentsListing/Conditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
