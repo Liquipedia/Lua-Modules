@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:TournamentsCard
+-- page=Module:TournamentsListing
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,16 +11,16 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 
-local TournamentsCard = Lua.import('Module:TournamentsCard/Base', {requireDevIfEnabled = true})
+local TournamentsListing = Lua.import('Module:TournamentsListing/Base', {requireDevIfEnabled = true})
 
-local CustomTournamentsCard = Class.new()
+local CustomTournamentsListing = Class.new()
 
 local DEFAULT_START_YEAR = Info.startYear
 local DEFAULT_END_YEAR = tonumber(os.date('%Y'))
 local ALLOWED_PLACES = '1,2,1-2,2-3,1-3,1-4,1-5,1-6,1-7,1-8,W,L'
 local NON_QUALIFIER = '!Qualifier'
 
-function CustomTournamentsCard.run(args)
+function CustomTournamentsListing.run(args)
 	args = args or {}
 
 	args.game = args.game
@@ -30,12 +30,12 @@ function CustomTournamentsCard.run(args)
 	args.allowedPlacements = ALLOWED_PLACES
 	args.tiertype = args.tiertype or NON_QUALIFIER
 
-	local tournamentsCard = TournamentsCard(args)
+	local tournamentsListing = TournamentsListing(args)
 
-	return tournamentsCard:create():build()
+	return tournamentsListing:create():build()
 end
 
-function CustomTournamentsCard.byYear(args)
+function CustomTournamentsListing.byYear(args)
 	args = args or {}
 
 	args.order = 'enddate desc'
@@ -53,15 +53,15 @@ function CustomTournamentsCard.byYear(args)
 	for year = endYear, startYear, -1 do
 		args.year = year
 
-		local tournaments = CustomTournamentsCard.run(args)
+		local tournaments = CustomTournamentsListing.run(args)
 		if tournaments then
 			display
 				:wikitext('\n===' .. year .. '===\n')
-				:node(CustomTournamentsCard.run(args))
+				:node(CustomTournamentsListing.run(args))
 		end
 	end
 
 	return display
 end
 
-return Class.export(CustomTournamentsCard)
+return Class.export(CustomTournamentsListing)

@@ -41,10 +41,10 @@ local DELAYED = 'delayed'
 local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
 
---- @class BaseTournamentsCard
-local BaseTournamentsCard = Class.new(function(self, ...) self:init(...) end)
+--- @class BaseTournamentsListing
+local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
 
-function BaseTournamentsCard:init(args)
+function BaseTournamentsListing:init(args)
 	self.args = args
 
 	self:readConfig()
@@ -52,7 +52,7 @@ function BaseTournamentsCard:init(args)
 	return self
 end
 
-function BaseTournamentsCard:readConfig()
+function BaseTournamentsListing:readConfig()
 	local args = self.args
 
 	local tier1 = args.tier1 or args.tier
@@ -76,13 +76,13 @@ function BaseTournamentsCard:readConfig()
 	}
 end
 
-function BaseTournamentsCard:_allowedPlacements()
+function BaseTournamentsListing:_allowedPlacements()
 	local placeConditions = self.args.placeConditions or DEFAULT_ALLOWED_PLACES
 
 	return Array.map(mw.text.split(placeConditions, ','), String.trim)
 end
 
-function BaseTournamentsCard:create()
+function BaseTournamentsListing:create()
 	local data = self.args.data or self:_query()
 	if Table.isNotEmpty(data) then
 		self.data = data
@@ -91,7 +91,7 @@ function BaseTournamentsCard:create()
 	return self
 end
 
-function BaseTournamentsCard:_query()
+function BaseTournamentsListing:_query()
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = self:_buildConditions(),
 		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
@@ -102,7 +102,7 @@ function BaseTournamentsCard:_query()
 	})
 end
 
-function BaseTournamentsCard:_buildConditions()
+function BaseTournamentsListing:_buildConditions()
 
 	local conditions = self:buildBaseConditions()
 
@@ -113,7 +113,7 @@ function BaseTournamentsCard:_buildConditions()
 	return conditions
 end
 
-function BaseTournamentsCard:buildBaseConditions()
+function BaseTournamentsListing:buildBaseConditions()
 	local args = self.args
 
 	local startDate = args.startdate or args.sdate
@@ -223,11 +223,11 @@ function BaseTournamentsCard:buildBaseConditions()
 	return conditions:toString()
 end
 
-function BaseTournamentsCard:additionalConditions()
+function BaseTournamentsListing:additionalConditions()
 	return {}
 end
 
-function BaseTournamentsCard:build()
+function BaseTournamentsListing:build()
 	if not self.data then
 		return
 	end
@@ -267,7 +267,7 @@ function BaseTournamentsCard:build()
 	return self.display
 end
 
-function BaseTournamentsCard:_header()
+function BaseTournamentsListing:_header()
 	local config = self.config
 
 	local header = mw.html.create('div'):addClass('gridHeader')
@@ -310,7 +310,7 @@ function BaseTournamentsCard:_header()
 	return header
 end
 
-function BaseTournamentsCard:_row(tournamentData)
+function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
 	local highlight = config.showHighlight and self:getHighlightClass(tournamentData) or nil
@@ -361,12 +361,12 @@ function BaseTournamentsCard:_row(tournamentData)
 	if config.showOrganizer then
 		row:tag('div')
 			:addClass('gridCell EventDetails Organizer')
-			:node(BaseTournamentsCard._organizerDisplay(tournamentData))
+			:node(BaseTournamentsListing._organizerDisplay(tournamentData))
 	end
 
 	local dateCell = row:tag('div')
 		:addClass('gridCell EventDetails Date Header')
-		:wikitext(BaseTournamentsCard._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
+		:wikitext(BaseTournamentsListing._dateDisplay(tournamentData.startdate, tournamentData.enddate, status))
 
 	if status == POSTPONED or status == DELAYED then
 		dateCell
@@ -392,12 +392,12 @@ function BaseTournamentsCard:_row(tournamentData)
 
 	row:tag('div')
 		:addClass('gridCell EventDetails Location Header')
-		:wikitext(BaseTournamentsCard._displayLocations(tournamentData.locations or {}, tournamentData.type))
+		:wikitext(BaseTournamentsListing._displayLocations(tournamentData.locations or {}, tournamentData.type))
 
 	local participantsNumberCell = row:tag('div')
 		:addClass('gridCell EventDetails PlayerNumber Header')
 	if participantNumber ~= -1 then
-		participantsNumberCell:node(BaseTournamentsCard.participantsNumber(participantNumber))
+		participantsNumberCell:node(BaseTournamentsListing.participantsNumber(participantNumber))
 	else
 		participantsNumberCell
 			:wikitext('-')
@@ -444,7 +444,7 @@ function BaseTournamentsCard:_row(tournamentData)
 	self.display:node(row)
 end
 
-function BaseTournamentsCard:_buildParticipantsSpan(opponents)
+function BaseTournamentsListing:_buildParticipantsSpan(opponents)
 	local participantsSpan = mw.html.create('span')
 		:addClass('Participants')
 	for _, opponent in ipairs(opponents) do
@@ -455,7 +455,7 @@ function BaseTournamentsCard:_buildParticipantsSpan(opponents)
 end
 
 
-function BaseTournamentsCard:_calculateRank(prize)
+function BaseTournamentsListing:_calculateRank(prize)
 
 	if prize == self.cachedData.prize then
 		self.cachedData.skippedRanks = self.cachedData.skippedRanks + 1
@@ -469,7 +469,7 @@ function BaseTournamentsCard:_calculateRank(prize)
 	}
 end
 
-function BaseTournamentsCard._organizerDisplay(tournamentData)
+function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
 	if type(organizers) == 'string' then
 		organizers = Json.parse(organizers)
@@ -484,9 +484,9 @@ function BaseTournamentsCard._organizerDisplay(tournamentData)
 		:wikitext(table.concat(organizerArray, ', '))
 end
 
-function BaseTournamentsCard._displayLocations(locationData, tournamentType)
+function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	local locations = Array.mapIndexes(function(locationIndex)
-		return BaseTournamentsCard._displayLocation(locationData, locationIndex)
+		return BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	end)
 
 	locations = Array.map(locations, function(loc)
@@ -504,7 +504,7 @@ function BaseTournamentsCard._displayLocations(locationData, tournamentType)
 	return table.concat(locations)
 end
 
-function BaseTournamentsCard._displayLocation(locationData, locationIndex)
+function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	local display = ''
 	local region = locationData['region' .. locationIndex]
 	local country = locationData['country' .. locationIndex]
@@ -521,7 +521,7 @@ function BaseTournamentsCard._displayLocation(locationData, locationIndex)
 	return String.nilIfEmpty(display .. (city or Flags.CountryName(country)))
 end
 
-function BaseTournamentsCard._dateDisplay(startDate, endDate, status)
+function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
@@ -544,7 +544,7 @@ function BaseTournamentsCard._dateDisplay(startDate, endDate, status)
 	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
 end
 
-function BaseTournamentsCard:_fetchPlacementData(tournamentData)
+function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -596,7 +596,7 @@ function BaseTournamentsCard:_fetchPlacementData(tournamentData)
 	return placements
 end
 
-function BaseTournamentsCard:_buildPlacementConditions(tournamentData)
+function BaseTournamentsListing:_buildPlacementConditions(tournamentData)
 	local config = self.config
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -619,7 +619,7 @@ function BaseTournamentsCard:_buildPlacementConditions(tournamentData)
 	return conditions:toString()
 end
 
-function BaseTournamentsCard.participantsNumber(number)
+function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
 	if not number or number <= 0 then
 		return NONBREAKING_SPACE
@@ -631,13 +631,13 @@ function BaseTournamentsCard.participantsNumber(number)
 end
 
 -- overwritable in case wikis want several highlight options
-function BaseTournamentsCard:getHighlightClass(tournamentData)
+function BaseTournamentsListing:getHighlightClass(tournamentData)
 	return HighlightConditions.tournament(tournamentData, self.config)
 		and 'tournament-highlighted-bg'
 		or nil
 end
 
-function BaseTournamentsCard:displayTier(tournamentData)
+function BaseTournamentsListing:displayTier(tournamentData)
 	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
 	options.link = true
 	if self.config.onlyTierTypeIfBoth then
@@ -650,4 +650,4 @@ function BaseTournamentsCard:displayTier(tournamentData)
 		:wikitext(Tier.display(tier, tierType, options))
 end
 
-return BaseTournamentsCard
+return BaseTournamentsListing
