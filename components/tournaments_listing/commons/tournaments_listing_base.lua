@@ -382,10 +382,6 @@ function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 		return tournamentType and mw.getContentLanguage():ucfirst(tournamentType) or nil
 	end
 
-	if String.isNotEmpty(tournamentType) and tournamentType:lower():find('offline') then
-		table.insert(locations, '<i>(' .. mw.getContentLanguage():ucfirst(tournamentType) .. ')</i>')
-	end
-
 	return table.concat(locations)
 end
 
