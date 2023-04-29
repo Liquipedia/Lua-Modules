@@ -11,7 +11,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 
-local TournamentsListing = Lua.import('Module:TournamentsListing/Base', {requireDevIfEnabled = true})
+local TournamentsListing = Lua.import('Module:TournamentsListing/CardList', {requireDevIfEnabled = true})
 
 local CustomTournamentsListing = Class.new()
 
