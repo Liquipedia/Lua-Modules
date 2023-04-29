@@ -88,7 +88,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	if prizeValue then
 		if Logic.isNumeric(prizeValue) and options.formatValue then
-			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision)
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision, false)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
