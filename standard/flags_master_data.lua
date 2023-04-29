@@ -1371,6 +1371,11 @@ local data = {
 		localised = 'East Asian',
 		name = 'East Asia',
 	},
+	['gulfcooperationcouncil'] = {
+		flag = 'File:Gcc hd.png',
+		localised = 'GCC',
+		name = 'GCC',
+	},
 	['iberia'] = {
 		flag = 'File:EsPt hd.png',
 		localised = 'Iberian',
@@ -1390,6 +1395,11 @@ local data = {
 		flag = 'File:ClAr hd.png',
 		localised = 'Latin America South',
 		name = 'Latin America South',
+	},
+	['levant'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Levantine',
+		name = 'Levant',
 	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
@@ -1440,6 +1450,11 @@ local data = {
 		flag = 'File:asean hd.png',
 		localised = 'Southeast Asian',
 		name = 'Southeast Asia',
+	},
+	['westasia'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'West Asian',
+		name = 'West Asia',
 	},
 	['world'] = {
 		flag = 'File:World hd.png',
