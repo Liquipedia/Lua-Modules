@@ -67,7 +67,7 @@ end
 ---@return string
 function DateExt.toCountdownArg(dateOrTimestamp)
 	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' <abbr data-tz="+0:00"></abbr>'
+	return DateExt.formatTimestamp('F j, Y - H:i', timestamp or '') .. ' <abbr data-tz="+0:00"></abbr>'
 end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
@@ -75,7 +75,7 @@ end
 ---@param dateOrTimestamp string|integer
 ---@return string|number
 function DateExt.toYmdInUtc(dateOrTimestamp)
-	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp))
+	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
 --- Fetches contextualDate on a tournament page.
