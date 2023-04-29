@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:TournamentsListing/Base
+-- page=Module:TournamentsListing/CardList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
