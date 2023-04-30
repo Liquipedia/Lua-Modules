@@ -38,6 +38,7 @@ local GSL_STYLE_SCORES = {
 local BYE_OPPONENT_NAME = 'bye'
 
 local _parent
+local _last_vs_group_cache = {}
 
 local Import = {}
 
@@ -542,18 +543,38 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 		table.insert(matchConditions, '[[match2id::' .. matchId .. ']]')
 	end
 
-	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
-		order = 'date desc, match2id desc',
-		query = 'date, match2opponents, winner',
-		limit = 1
-	})
+	if table.concat(matchConditions, ' OR ') ~= _last_vs_group_cache.conditions then
+		_last_vs_group_cache.conditions = table.concat(matchConditions, ' OR ')
+		Import._lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = _last_vs_group_cache.conditions,
+			order = 'date desc, match2id desc',
+			query = 'date, match2opponents, winner',
+			limit = 1000,
+		}))
+	end
 
-	if not type(matchData) == 'table' or not matchData[1] then
+	local matchData = _last_vs_group_cache.data[opponentName]
+
+	if not matchData then
 		return {}
 	end
 
-	return Import._makeAdditionalDataFromMatch(opponentName, matchData[1])
+	return Import._makeAdditionalDataFromMatch(opponentName, matchData)
+end
+
+function Import._lastVsMatchesDataToCache(queryData)
+	local byOpponent = {}
+
+	for _, match in ipairs(queryData) do
+		for _, opponent in pairs(match.match2opponents) do
+			local name = opponent.name
+			if not byOpponent[name] then
+				byOpponent[name] = match
+			end
+		end
+	end
+
+	_last_vs_group_cache.data = byOpponent
 end
 
 function Import._makeAdditionalDataFromMatch(opponentName, match)
