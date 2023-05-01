@@ -174,7 +174,10 @@ function BigMatch.run(frame)
 		end), ' ')
 	end
 	model.heroIcon = function(self)
-		local champion = type(self) == 'table' and self.champion or self
+		local champion = self
+		if type(self) == 'table' then
+			champion = self.champion
+		end
 		return HeroIcon._getImage{champion, date = model.date}
 	end
 
