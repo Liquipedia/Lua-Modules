@@ -543,10 +543,12 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 		table.insert(matchConditions, '[[match2id::' .. matchId .. ']]')
 	end
 
-	if table.concat(matchConditions, ' OR ') ~= _last_vs_group_cache.conditions then
-		_last_vs_group_cache.conditions = table.concat(matchConditions, ' OR ')
+	local conditions = table.concat(matchConditions, ' OR ')
+
+	if conditions ~= _last_vs_group_cache.conditions then
+		_last_vs_group_cache.conditions = conditions
 		Import._lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
-			conditions = _last_vs_group_cache.conditions,
+			conditions = conditions,
 			order = 'date desc, match2id desc',
 			query = 'date, match2opponents, winner',
 			limit = 1000,
