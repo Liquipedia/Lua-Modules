@@ -53,7 +53,7 @@ function BaseTournamentsListing:readConfig()
 	local tier1 = args.tier1 or args.tier
 
 	self.config = {
-		-- either manually enable/disable tier column or check if it seems useful to have it enabled
+		-- either manually toggled tier column or if parameters are made in a way that allows for multiple tiers
 		--- case 1: tier is set as '!' --> we most likely get results with different tiers
 		--- case 2: tier2 is not empty (ier1 is also assumed not empty) --> we most likely get results with different tiers
 		showTier = Logic.readBool(Logic.nilOr(args.showTier, tier1 == '!' or Logic.isNotEmpty(args.tier2))),
