@@ -157,7 +157,7 @@ function BroadcastTalentTable:_fetchTournaments()
 
 	if args.isAchievementsTable then
 		table.sort(tournaments, function(item1, item2)
-			return item1.date == item2.date and item1.pagename < item2.pagename or item1.date < item2.date
+			return item1.date == item2.date and item1.pagename < item2.pagename or item1.date > item2.date
 		end)
 		return {[''] = tournaments}
 	end
