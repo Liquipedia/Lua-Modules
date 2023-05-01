@@ -64,6 +64,11 @@ function SquadRow:id(args)
 		cell:wikitext('&nbsp;' .. _ICON_SUBSTITUTE)
 	end
 
+	if String.isNotEmpty(args.name) then
+		cell:tag('br'):done():tag('i'):tag('small'):wikitext(args.name)
+		self.lpdbData.name = args.name
+	end
+
 	local teamNode = mw.html.create('td')
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
 		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team))
@@ -134,9 +139,8 @@ function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
 
-	cell:tag('div'):addClass('MobileStuffDate'):wikitext(cellTitle)
-
 	if String.isNotEmpty(dateValue) then
+		cell:tag('div'):addClass('MobileStuffDate'):wikitext(cellTitle)
 		cell:tag('div'):addClass('Date'):tag('i'):wikitext(dateValue)
 	end
 	self.content:node(cell)
@@ -196,13 +200,8 @@ function SquadRow:setExtradata(extradata)
 	return self
 end
 
-function SquadRow:addToLpdb(lpdbData)
-	return lpdbData
-end
-
 function SquadRow:create(objectName)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		self.lpdbData = self:addToLpdb(self.lpdbData)
 		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
 	end
 

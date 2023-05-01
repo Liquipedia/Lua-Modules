@@ -14,7 +14,7 @@ return {
 	games = {
 		aoe1 = {
 			abbreviation = 'AoE1',
-			name = 'Age of Empires',
+			name = 'Age of Empires I',
 			link = 'Age of Empires I',
 			logo = {
 				darkMode = 'AoE1 Icon.png',
@@ -95,5 +95,4 @@ return {
 
 	defaultTeamLogo = 'Age of Empires Default Logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Age of Empires Default Logo.png', ---@deprecated
-	opponentLibrary = 'Opponent/Custom',
 }

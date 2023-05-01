@@ -284,8 +284,8 @@ return {
 				lightMode = 'Rocket Arena logo.png',
 			},
 		},
-		reflex = {
-			abbreviation = 'reflex',
+		re = {
+			abbreviation = 're',
 			name = 'Reflex',
 			link = 'Reflex',
 			logo = {
@@ -388,8 +388,8 @@ return {
 				lightMode = 'Warsow logo.png',
 			},
 		},
-		xonotic = {
-			abbreviation = 'xonotic',
+		xo = {
+			abbreviation = 'xo',
 			name = 'Xonotic',
 			link = 'Xonotic',
 			logo = {

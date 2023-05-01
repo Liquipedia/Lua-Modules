@@ -18,6 +18,7 @@ local PageLink = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -46,14 +47,13 @@ local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
 local GAMES = {
 	[GAME_REFORGED] = 'Reforged',
 	[GAME_FROZEN_THRONE] = 'The Frozen Throne',
-	[GAME_REIGN] = 'Reing of Chaos',
+	[GAME_REIGN] = 'Reign of Chaos',
 }
 
-local DUOS = '2v2'
 local MODES = {
-	team = {tier = 'Team', store = 'team'},
-	[DUOS] = {tier = ' 2v2', store = '2v2'},
-	default = {store = '1v1'},
+	team = {tier = 'Team', store = 'team', category =  'Team'},
+	['2v2'] = {tier = ' 2v2', store = '2v2', category =  '2v2'},
+	default = {store = '1v1', category =  'Individual'},
 }
 
 local TIER_1 = 1
@@ -69,11 +69,6 @@ local ESL_TIERS = {
 	qualifier = '[[File:ESL Pro Tour Qualifier.png|20x20px|Qualifier]] Qualifier',
 	['open cup'] = '[[File:ESL 2019 icon.png|20x20px|Open Cup]] Open Cup',
 }
-
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -93,6 +88,8 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
+	league.addParticipantTypeCategory = CustomLeague.addParticipantTypeCategory
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
@@ -340,9 +337,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_game', GAMES[_args.game])
 
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBoolOrNil(_args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if not finished and os.date('%Y-%m-%d') >= queryDate then
+	if finished == nil and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
 			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
 				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
@@ -354,7 +351,7 @@ function CustomLeague:defineCustomPageVariables()
 			finished = true
 		end
 	end
-	Variables.varDefine('tournament_finished', tostring(finished))
+	Variables.varDefine('tournament_finished', tostring(finished or false))
 
 	--maps
 	local maps = CustomLeague._getMaps('map')
@@ -406,9 +403,9 @@ function CustomLeague:addToLpdb(lpdbData)
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
+	local participantsNumber = tonumber(_args.team_number) or 0
 	if participantsNumber == 0 then
-		participantsNumber = _args.team_number or 0
+		participantsNumber = tonumber(_args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.sortdate = Variables.varDefault('tournament_starttime')
@@ -442,22 +439,22 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
-function CustomLeague:getWikiCategories()
-	local categories = {}
+function CustomLeague:addParticipantTypeCategory(args)
+	return {(MODES[_args.mode] or MODES.default).category .. ' Tournaments'}
+end
 
-	if String.isNotEmpty(_args.eslprotier) then
+function CustomLeague:getWikiCategories(args)
+	local categories = {'Tournaments'}
+
+	if GAMES[args.game] then
+		table.insert(categories, GAMES[args.game] .. ' Competitions')
+	end
+
+	if String.isNotEmpty(args.eslprotier) then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if GAMES[_args.game] then
-		table.insert(categories, GAMES[_args.game] .. ' Competitions')
-	end
-
-	if _args.mode == DUOS then
-		table.insert(categories, '2v2 Tournaments')
-	end
-
-	local tier = tonumber(_args.liquipediatier)
+	local tier = tonumber(args.liquipediatier)
 	if tier == TIER_1 or tier == TIER_2 then
 		table.insert(categories, 'Big Tournaments')
 	else
@@ -472,61 +469,26 @@ function CustomLeague:getWikiCategories()
 	return categories
 end
 
-function CustomLeague:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString, tierMode)
-		local tierText = self:_getTierText(tierString, tierMode)
-		if not tierText then
-			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			if self:shouldStore(args) then
-				self.infobox:categories(tierText .. ' Tournaments')
-			end
-			local tierLink = tierText .. CustomLeague._getModeInTier() .. ' Tournaments'
-
-			return '[[' .. tierLink .. '|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay .. CustomLeague._getModeDisplayInTier()
-end
-
 function CustomLeague._getMode()
-	return (MODES[_args.mode] or {}).store or MODES.default.store
+	return (MODES[_args.mode] or MODES.default).store
 end
 
-function CustomLeague._getModeInTier()
-	local mode = (MODES[_args.mode] or {}).tier
-	if mode then
-		return ' ' .. mode
+function CustomLeague:createLiquipediaTierDisplay(args)
+	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true, mode = args.mode})
+
+	if String.isEmpty(tierDisplay) then
+		return
 	end
 
-	return ''
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
-function CustomLeague._getModeDisplayInTier()
-	local mode = (MODES[_args.mode] or {}).tier
-	if mode then
-		return ' (' .. mode .. ')'
+function CustomLeague:appendLiquipediatierDisplay()
+	local modeDisplay = (MODES[_args.mode] or {}).tier
+	if not modeDisplay then
+		return ''
 	end
-
-	return ''
+	return NON_BREAKING_SPACE .. mw.getContentLanguage():ucfirst(modeDisplay)
 end
 
 return CustomLeague

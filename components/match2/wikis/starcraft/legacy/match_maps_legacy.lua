@@ -29,7 +29,7 @@ end
 function MatchMapsLegacy._matchlist(args)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 	)
 
 	local bracketId = args.id

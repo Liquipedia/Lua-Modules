@@ -27,7 +27,10 @@ local PREFIXES = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
 	},
-	aoezone = {'https://aoezone.net/'},
+	aoezone = {
+		'https://aoezone.net/',
+		player = 'https://aoezone.net/members/'
+	},
 	['ask-fm'] = {'https://ask.fm/'},
 	b5csgo = {
 		'',
@@ -48,6 +51,7 @@ local PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -61,6 +65,7 @@ local PREFIXES = {
 		player = 'https://www.dotabuff.com/esports/players/',
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
+	douyin = {'https://live.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -95,6 +100,7 @@ local PREFIXES = {
 		team = 'https://csgo.gamersclub.gg/team/',
 		player = 'https://csgo.gamersclub.gg/jogador/',
 	},
+	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
@@ -105,13 +111,21 @@ local PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
+	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
+	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
+	['nwc3l'] = {
+		'',
+		team = 'https://nwc3l.com/team/',
+		player = 'https://nwc3l.com/profile/',
+	},
 	openrec = {'https://www.openrec.tv/live/'},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
@@ -119,24 +133,27 @@ local PREFIXES = {
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
-	['siege-gg'] = {
+	siegegg = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
-	site = {''},
 	sk = {'https://sk-gaming.com/member/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
-	['start-gg'] = {'https://start.gg/'},
+	['start-gg'] = {
+		'https://start.gg/',
+		player = 'https://start.gg/user/',
+	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
-		'',
-		player = 'https://stratz.com/player/'
+		'https://stratz.com/leagues/',
+		player = 'https://stratz.com/players/',
+		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
@@ -184,6 +201,7 @@ local PREFIXES = {
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
+	cntft = {'/1'},
 	facebook = {
 		'',
 		stream = '/live',
@@ -200,6 +218,7 @@ local SUFFIXES = {
 SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 
 local ALIASES = {
+	['ask-fm'] = {'afk.fm', 'askfm'},
 	douyu = {'douyutv'},
 	esl = {'eslgaming'},
 	['facebook-gaming'] = {'fbgg'},

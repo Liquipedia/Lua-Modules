@@ -39,8 +39,8 @@ return {
 		},
 		wiiu = {
 			abbreviation = 'Wii U',
-			name = 'Super Smash Bros. Wii U',
-			link = 'Portal:Tournaments/All/Ultimate',
+			name = 'Super Smash Bros. for Wii U',
+			link = 'Super Smash Bros. for Wii U',
 			logo = {
 				darkMode = 'Smash default darkmode.png',
 				lightMode = 'Smash default lightmode.png',
@@ -76,9 +76,9 @@ return {
 				lightMode = 'Smash default lightmode.png',
 			},
 		},
-		[64] = {
+		['64'] = {
 			abbreviation = '64',
-			name = 'Super Smash Bros. 64',
+			name = 'Super Smash Bros.',
 			link = 'Super Smash Bros.',
 			logo = {
 				darkMode = 'Smash default darkmode.png',

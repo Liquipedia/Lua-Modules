@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
@@ -16,6 +17,7 @@ local CustomHiddenDataBox = {}
 
 function CustomHiddenDataBox.run(args)
 	args = args or {}
+	args.game = Game.name{game = args.game}
 	args.participantGrabber = false
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
@@ -26,23 +28,12 @@ end
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	queryResult.extradata = queryResult.extradata or {}
 
-	--legacy variables
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_date', Variables.varDefault('tournament_enddate', ''))
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate', ''))
-	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate', ''))
-	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_abbreviation',
-		args.abbreviation or args.shortname,
-		queryResult.shortname
-	)
-
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
+	args.featured = args.featured or args.publishertier
+	args.featured = Logic.readBool(args.featured) and tostring(Logic.readBool(args.featured)) or nil
 	BasicHiddenDataBox.checkAndAssign(
-		'featured',
+		'tournament_publishertier',
 		args.featured,
 		queryResult.publishertier
 	)
@@ -64,8 +55,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 		local prizepool = CustomHiddenDataBox.cleanPrizePool(args.prizepool) or queryResult.prizepool
 		local lpdbData = {
 			name = Variables.varDefault('tournament_name'),
-			tickername = Variables.varDefault('tournament_ticker_name'),
-			shortname = Variables.varDefault('tournament_shortname', Variables.varDefault('tournament_abbreviation')),
+			tickername = Variables.varDefault('tournament_tickername'),
+			shortname = Variables.varDefault('tournament_shortname'),
 			icon = Variables.varDefault('tournament_icon'),
 			icondark = Variables.varDefault('tournament_icon_dark'),
 			series = mw.ext.TeamLiquidIntegration.resolve_redirect(Variables.varDefault('tournament_series', '')),

@@ -80,7 +80,7 @@ function CustomSquad.run(frame)
 
 		local factions = Faction.readMultiFaction(player.race, {alias = false})
 
-		row.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+		row:setExtradata({
 			faction = Faction.toName(factions[1]),
 			faction2 = Faction.toName(factions[2]),
 			faction3 = Faction.toName(factions[3]),

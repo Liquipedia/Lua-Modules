@@ -38,7 +38,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.removeUnsetMaps(match)
@@ -315,8 +315,10 @@ function matchFunctions.getVodStuff(match)
 		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
 		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
 		lpl = match.lpl and 'https://letsplay.live/match/' .. match.lpl or nil,
-		r6esports = match.r6esports and 'https://www.r6esports.com.br/en/match/' .. match.r6esports or nil,
+		r6esports = match.r6esports
+			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
 		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,
+		ebattle = match.ebattle and 'https://www.ebattle.gg/turnier/match/' .. match.ebattle or nil,
 	}
 
 	return match
@@ -352,7 +354,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
@@ -414,7 +416,7 @@ function matchFunctions.getMVP(match)
 	if not match.mvp then return nil end
 
 	-- Split & trim the input
-	local players = Table.mapValues(mw.text.split(match.mvp, ','),mw.text.trim)
+	local players = Array.map(mw.text.split(match.mvp, ','), String.trim)
 
 	return {players = players, points = match.mvppoints or 1}
 end

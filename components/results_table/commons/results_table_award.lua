@@ -25,7 +25,7 @@ function AwardsTable:buildHeader()
 		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
 		:tag('th'):css('min-width', '225px'):wikitext('Award'):done()
 
-	if self.config.opponentType ~= Opponent.team then
+	if self.config.queryType ~= Opponent.team then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
 		header:tag('th'):css('min-width', '105px'):wikitext('Player')
@@ -38,6 +38,7 @@ end
 
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
+		:addClass(self:rowHighlight(placement))
 		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
@@ -62,14 +63,14 @@ function AwardsTable:buildRow(placement)
 
 	row:tag('td'):css('text-align', 'left'):wikitext(placement.extradata.award)
 
-	if self.config.playerResultsOfTeam or self.config.opponentType ~= Opponent.team then
-		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
+	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
+		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
-			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
+			{teamForSolo = not self.config.playerResultsOfTeam}
 		))
 	end
 
-	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
+	row:tag('td'):wikitext('$' .. Currency.formatMoney(
 			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
 			or placement.prizemoney
 		))

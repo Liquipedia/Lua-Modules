@@ -65,9 +65,9 @@ function Import._getConfig(args, placements)
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
 			or TournamentUtil.currentPageSpec(),
-		groupElimStatuses = Table.mapValues(
+		groupElimStatuses = Array.map(
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			mw.text.trim
+			String.trim
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
@@ -86,9 +86,9 @@ function Import._getConfig(args, placements)
 		stageGroupElimStatuses = Table.mapArguments(
 			args,
 			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
-			function(key) return Table.mapValues(
+			function(key) return Array.map(
 				mw.text.split(args[key], ','),
-				mw.text.trim
+				String.trim
 			) end,
 			true
 		),
@@ -412,23 +412,22 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
 	return Placement(
-		{placeStart = placeStart, placeEnd = placeEnd},
-		_parent,
-		priorPlacement.placeEnd or 0
-	)
+		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
+		_parent
+	):create(priorPlacement.placeEnd or 0)
 end
 
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
 		placement.opponents[opponentIndex] = Import._mergeEntry(
 			opponent,
-			Table.mergeInto(placement:_parseOpponents{{}}[1], placement.opponents[opponentIndex]),
+			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
 		)
 	end
 
 	assert(
-		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
+		#placement.opponents <= placement.count,
 		'Import: Too many opponents returned from query for placement range '
 			.. placement:_displayPlace():gsub('&#045;', '-')
 	)
@@ -491,7 +490,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 
 	local lastVs = Import._checkIfParsed(additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
 
-	return placement:_parseOpponents{{
+	return placement:parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
@@ -545,7 +544,7 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 
 	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
-		order = 'date desc',
+		order = 'date desc, match2id desc',
 		query = 'date, match2opponents, winner',
 		limit = 1
 	})

@@ -28,7 +28,9 @@ local ConditionTree = Class.new(_ConditionNode,
 )
 
 function ConditionTree:add(node)
-	if node.is_a ~= nil and node:is_a(_ConditionNode) then
+	if not node then
+		return self
+	elseif node.is_a ~= nil and node:is_a(_ConditionNode) then
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes

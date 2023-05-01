@@ -40,17 +40,15 @@ function NotabilityChecker.run(args)
 	end
 
 	output = output .. '===Summary===\n'
-	output = output .. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
+		.. '<b>Final weight:</b> ' .. tostring(weight) .. '\n\n'
+		.. 'This means this ' .. (isTeamResult and 'team' or 'person')
 
-	if weight < Config.NOTABILITY_THRESHOLD_NOTABLE and weight > Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>OPEN FOR DISCUSSION</b>\n'
-	elseif weight < Config.NOTABILITY_THRESHOLD_MIN then
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>NOT NOTABLE</b>\n'
+	if weight >= Config.NOTABILITY_THRESHOLD_NOTABLE then
+		output = output .. ' is <b>NOTABLE</b>\n'
+	elseif weight >= Config.NOTABILITY_THRESHOLD_MIN then
+		output = output .. ' is <b>OPEN FOR DISCUSSION</b>\n'
 	else
-		output = output .. 'This means this ' .. (isTeamResult and 'team' or 'person') ..
-		' is <b>NOTABLE</b>\n'
+		output = output .. ' is <b>NOT NOTABLE</b>\n'
 	end
 
 	return output
@@ -111,7 +109,7 @@ function NotabilityChecker._calculatePersonNotability(person)
 	-- Add conditions.
 	-- We check for names with spaces, then names with underscores.
 	local conditions = {}
-	for _, name in pairs({person, person:gsub(' ', '_')}) do
+	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
 		table.insert(conditions, '[[participant::' .. name .. ']]')
 		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
 			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
@@ -186,12 +184,21 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 		Config.weights, function(tierWeights) return tierWeights['tier'] == tier end
 		)
 
-	local tierPoints = Array.find(
+	if not weightForTier then
+		return 0
+	end
+
+	local tierPoints = (Array.find(
 		weightForTier['tiertype'],
 		function(pointsForType)
 			return pointsForType['name'] == (tierType or Config.TIER_TYPE_GENERAL)
 		end
-	)['points']
+	) or {}).points
+
+	if not tierPoints then
+		return 0
+	end
+
 	local placementDropOffFunction = Config.placementDropOffFunction(tier, tierType)
 
 	local placementValue = NotabilityChecker._preparePlacement(placement)

@@ -13,7 +13,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
@@ -21,8 +21,7 @@ local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
+local DEFAULT_TIER_TYPE = 'general'
 
 ---Entry point
 function HiddenDataBox.run(args)
@@ -30,14 +29,9 @@ function HiddenDataBox.run(args)
 	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
 	local doQuery = not Logic.readBool(args.noQuery)
 
-	local warnings = {}
-	local warning
-	args.liquipediatier, warning
-		= HiddenDataBox.validateTier(args.liquipediatier, TIER_MODE_TIERS)
-	table.insert(warnings, warning)
-	args.liquipediatiertype, warning
-		= HiddenDataBox.validateTier(args.liquipediatiertype, TIER_MODE_TYPES)
-	table.insert(warnings, warning)
+	local warnings
+	args.liquipediatier, args.liquipediatiertype, warnings
+		= HiddenDataBox.validateTier(args.liquipediatier, args.liquipediatiertype)
 
 	local parent = args.parent or args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
@@ -147,32 +141,24 @@ function HiddenDataBox.setWikiVariableForParticipantKey(participant, participant
 	end
 end
 
--- overridable so that wikis can adjust according to their tier system
-function HiddenDataBox.validateTier(tierString, tierMode)
-	if String.isEmpty(tierString) then
-		return
-	end
-	local warning
-	local tierValue = (Tier.text[tierMode] and
-						Tier.text[tierMode][tierString:lower()]) or
-						Tier.text[tierString]
+function HiddenDataBox.validateTier(tier, tierType)
+	local warnings = {}
 
-	if not tierValue then
-		tierValue = tierString
-		warning = String.interpolate(
-			INVALID_TIER_WARNING,
-			{
-				tierString = tierString,
-				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
-			}
-		)
+	if not tier and not tierType then
+		return nil, nil, warnings
 	end
 
-	-- For types we want to return the normalized value
-	-- For tiers we want to return the input
-	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
+	local tierValue, tierTypeValue = Tier.toValue(tier, tierType)
 
-	return tierValue, warning
+	if tier and not tierValue then
+		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+	end
+
+	if tierType and tierType:lower() ~= DEFAULT_TIER_TYPE and not tierTypeValue then
+		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+	end
+
+	return tierValue, tierTypeValue, warnings
 end
 
 return Class.export(HiddenDataBox)
