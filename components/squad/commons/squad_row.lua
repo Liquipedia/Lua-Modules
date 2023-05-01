@@ -39,6 +39,7 @@ local SquadRow = Class.new(
 SquadRow.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
+	['passed away'] = 'Team/passed away',
 }
 
 
