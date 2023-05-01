@@ -22,7 +22,7 @@ return {
 			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
 			<div class="match-bm-lol-game-summary-team">{{#games.1.apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/games.1.apiInfo.team1}}</div>
 			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{#games.1.apiInfo.team2}}</div>
+			<div class="match-bm-lol-game-summary-team">{{#games.1.apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/games.1.apiInfo.team2}}</div>
 			</div></div>{{/isBestOfOne}}
 			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 		]=],
