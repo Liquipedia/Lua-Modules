@@ -174,7 +174,10 @@ function BigMatch.run(frame)
 		end), ' ')
 	end
 	model.heroIcon = function(self)
-		local champion = type(self) == 'table' and self.champion or self
+		local champion = self
+		if type(self) == 'table' then
+			champion = self.champion
+		end
 		return HeroIcon._getImage{champion, date = model.date}
 	end
 
@@ -182,7 +185,7 @@ function BigMatch.run(frame)
 end
 
 function BigMatch._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add)
+	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
 function BigMatch._abbreviateNumber(number)
@@ -243,6 +246,7 @@ function BigMatch._match2Director(args)
 			local team = map['team' .. teamIdx]
 
 			map['team' .. teamIdx .. 'side'] = team.color
+			team.players = team.players or {}
 
 			-- Sort players based on role
 			Array.sortInPlaceBy(team.players, function (player)
