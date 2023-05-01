@@ -38,7 +38,6 @@ function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results{
-			returnEmptyIfNoResults = true,
 			convertrole = 'true',
 			player = mw.title.getCurrentTitle().prefixedText
 		}

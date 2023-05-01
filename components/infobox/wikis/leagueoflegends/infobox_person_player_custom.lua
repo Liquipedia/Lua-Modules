@@ -79,7 +79,6 @@ function CustomPlayer.run(frame)
 
 	if String.isEmpty(player.args.history) then
 		player.args.history = TeamHistoryAuto._results{
-			returnEmptyIfNoResults = true,
 			hiderole = 'true',
 			iconModule = 'Module:PositionIcon/data',
 			addlpdbdata = 'true'
