@@ -246,6 +246,7 @@ function BigMatch._match2Director(args)
 			local team = map['team' .. teamIdx]
 
 			map['team' .. teamIdx .. 'side'] = team.color
+			team.players = team.players or {}
 
 			-- Sort players based on role
 			Array.sortInPlaceBy(team.players, function (player)
