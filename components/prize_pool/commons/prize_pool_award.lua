@@ -61,7 +61,7 @@ function AwardPrizePool:applyCutAfter(placement, row)
 	end
 end
 
-function AwardPrizePool:applyToggleExpand(placement, rows)
+function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
 	if (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
 		and placement.currentTotalNumberOfParticipants >= self.options.cutafter
 		and placement ~= self.placements[#self.placements] then

@@ -557,9 +557,12 @@ end
 
 function BasePrizePool:_buildRows()
 	local rows = {}
+	local previousPlacement = {}
 
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
+
+		self:applyToggleExpand(previousPlacement, placement, rows)
 
 		local row = TableRow{}
 		row:addClass(placement:getBackground())
@@ -621,7 +624,7 @@ function BasePrizePool:_buildRows()
 
 		table.insert(rows, row)
 
-		self:applyToggleExpand(placement, rows)
+		previousPlacement = placement
 	end
 
 	return rows
@@ -635,7 +638,7 @@ function BasePrizePool:applyCutAfter(placement, row)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
-function BasePrizePool:applyToggleExpand(placement, row)
+function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 

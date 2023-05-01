@@ -71,10 +71,12 @@ function PrizePool:applyCutAfter(placement, row)
 	end
 end
 
-function PrizePool:applyToggleExpand(placement, rows)
+function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
 	if placement.placeStart <= self.options.cutafter
 		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements] then
+		and placement ~= self.placements[#self.placements]
+		and nextPlacement.placeStart ~= placement.placeStart
+		and nextPlacement.placeEnd ~= placement.placeEnd then
 
 		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd))
 	end
