@@ -9,14 +9,17 @@
 local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local HeroIcon = require('Module:ChampionIcon')
+local MatchLinks = mw.loadData('Module:MatchLinks')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
 
+local BigMatch = Lua.import('Module:BigMatch', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -27,19 +30,6 @@ local _NUM_HEROES_PICK_TEAM = 5
 local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	reddit = {icon = 'File:Reddit-icon.png', text = 'Head-to-head statistics'},
-	gol = {icon = 'File:Gol.gg_allmode.png', text = 'GolGG Match Report'},
-	factor = {icon = 'File:Factor.gg lightmode.png', text = 'FactorGG Match Report'},
-}
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -106,14 +96,14 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Match Vod + other links
 		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+			return '[[File:'..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
 		for linkType, link in pairs(match.links) do
-			if not _LINK_DATA[linkType] then
+			if not MatchLinks[linkType] then
 				mw.log('Unknown link: ' .. linkType)
 			else
-				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
+				footer:addElement(buildLink(link, MatchLinks[linkType].icon, MatchLinks[linkType].text))
 			end
 		end
 
@@ -146,12 +136,20 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
+	end
+
+	if BigMatch.isEnabledFor(match) then
+		local matchPageElement = mw.html.create('center')
+		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+						:css('display', 'block')
+						:css('margin', 'auto')
+		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
 	end
 
 	-- Iterate each map

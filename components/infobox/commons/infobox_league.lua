@@ -264,6 +264,9 @@ end
 
 function League:_getCategories(args)
 	local categories = {'Tournaments'}
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
+	end
 	Array.extendWith(categories, self:addParticipantTypeCategory(args))
 	Array.extendWith(categories, self:addTierCategories(args))
 

@@ -29,8 +29,8 @@ DateExt.epochZero = 0
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
 --- Throws if the input string is non-empty and not a valid date.
----@param dateString string
----@return integer=
+---@param dateString string|number
+---@return integer?
 function DateExt.readTimestamp(dateString)
 	if String.isEmpty(dateString) then
 		return nil
@@ -57,27 +57,25 @@ end
 --- The format string is the same used by mw.language.formatDate and {{#time}}.
 ---@param format string
 ---@param timestamp string|integer
----@return string
+---@return string|number
 function DateExt.formatTimestamp(format, timestamp)
 	return mw.getContentLanguage():formatDate(format, '@' .. timestamp)
 end
 
 --- Converts a date string or timestamp into a format that can be used in the date param to Module:Countdown.
----@param format string
 ---@param dateOrTimestamp string|integer
 ---@return string
 function DateExt.toCountdownArg(dateOrTimestamp)
 	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
-	return DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' <abbr data-tz="+0:00"></abbr>'
+	return DateExt.formatTimestamp('F j, Y - H:i', timestamp or '') .. ' <abbr data-tz="+0:00"></abbr>'
 end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
 --- The time of day is truncated in the UTC timezone. The time of day and timezone are discarded.
----@param format string
 ---@param dateOrTimestamp string|integer
----@return string
+---@return string|number
 function DateExt.toYmdInUtc(dateOrTimestamp)
-	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp))
+	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
 --- Fetches contextualDate on a tournament page.

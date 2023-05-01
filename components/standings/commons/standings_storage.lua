@@ -124,6 +124,8 @@ function StandingsStorage.entry(entry, standingsIndex)
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, entry.extradata)),
 	}
 
+	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
+
 	mw.ext.LiquipediaDB.lpdb_standingsentry(
 		'standing_' .. standingsIndex .. '_' .. roundIndex .. '_' .. slotIndex,
 		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))

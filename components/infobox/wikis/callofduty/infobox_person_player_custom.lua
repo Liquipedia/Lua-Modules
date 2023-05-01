@@ -25,7 +25,6 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _args
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
@@ -46,16 +45,12 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
 			player = _pagename
-		})
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if String.isNotEmpty(manualHistory) or String.isNotEmpty(automatedHistory) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
