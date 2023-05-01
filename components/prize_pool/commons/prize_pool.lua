@@ -72,7 +72,8 @@ function PrizePool:applyCutAfter(placement, row)
 end
 
 function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
-	if placement.placeStart <= self.options.cutafter
+	if placement ~= nil
+		and placement.placeStart <= self.options.cutafter
 		and placement.placeEnd >= self.options.cutafter
 		and placement ~= self.placements[#self.placements]
 		and nextPlacement.placeStart ~= placement.placeStart

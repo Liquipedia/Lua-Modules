@@ -557,7 +557,7 @@ end
 
 function BasePrizePool:_buildRows()
 	local rows = {}
-	local previousPlacement = {}
+	local previousPlacement = nil
 
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
