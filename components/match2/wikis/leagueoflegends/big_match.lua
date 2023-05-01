@@ -185,7 +185,7 @@ function BigMatch.run(frame)
 end
 
 function BigMatch._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add)
+	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
 function BigMatch._abbreviateNumber(number)
