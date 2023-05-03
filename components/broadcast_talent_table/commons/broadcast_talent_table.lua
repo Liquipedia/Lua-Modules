@@ -30,6 +30,7 @@ local ColumnName = Condition.ColumnName
 local DEFAULT_LIMIT = 500
 local DEFAULT_ACHIEVEMENTS_LIMIT = 10
 local NONBREAKING_SPACE = '&nbsp;'
+local DASH = '&#8212;'
 local DEFAULT_TIERTYPE = 'General'
 local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
@@ -312,7 +313,7 @@ function BroadcastTalentTable:_partnerList(tournament)
 	local partners = self:_getPartners(tournament)
 
 	if Table.isEmpty(partners) then
-		return 'None'
+		return DASH
 	end
 
 	local list = mw.html.create('ul')
