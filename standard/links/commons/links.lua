@@ -202,6 +202,7 @@ PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
 	cntft = {'/1'},
+	esportal = {'/event/info'},
 	facebook = {
 		'',
 		stream = '/live',
