@@ -149,7 +149,7 @@ function CustomMatchSummary._createBody(match)
 		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
 						:css('display', 'block')
 						:css('margin', 'auto')
-		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
+		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement):addClass('brkts-popup-mvp'))
 	end
 
 	-- Iterate each map
