@@ -141,12 +141,12 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string
+---@param builder? Html|string|number
 ---@return self
 function mw.html:node(builder) end
 
 ---Appends an undetermined number of wikitext strings to the mw.html object. Note that this stops at the first nil item.
----@param ... string?
+---@param ... string|number|nil
 ---@return self
 function mw.html:wikitext(...) end
 
