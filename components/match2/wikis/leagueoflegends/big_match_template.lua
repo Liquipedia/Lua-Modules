@@ -57,14 +57,14 @@ return {
 				<div class="match-bm-lol-game-veto-overview">
 					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t1.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></li>{{/apiInfo.t1.pick}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t1.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.t1.ban}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.team1.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></li>{{/apiInfo.team1.pick}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.team1.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.team1.ban}}</ul>
 						</div>
 					</div>
 					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.t2.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></li>{{/apiInfo.t2.pick}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.t2.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.t2.ban}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.team2.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></li>{{/apiInfo.team2.pick}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.team2.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.team2.ban}}</ul>
 						</div>
 					</div>
 				</div>

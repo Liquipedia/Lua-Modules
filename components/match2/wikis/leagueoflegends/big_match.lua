@@ -244,6 +244,12 @@ function BigMatch._match2Director(args)
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)) or nil
 
+		-- Break down the picks and bans into per team, per type, in order.
+		Array.sortInPlaceBy(map.championVeto, Operator.property('vetoNumber'))
+
+		local _, vetoesByType = Array.groupBy(map.championVeto, Operator.property('type'))
+		local _, bansPerTeam = Array.groupBy(vetoesByType.ban or {}, Operator.property('team'))
+
 		Array.forEach(TEAMS, function(teamIdx)
 			local team = map['team' .. teamIdx]
 
@@ -254,21 +260,10 @@ function BigMatch._match2Director(args)
 			Array.sortInPlaceBy(team.players, function (player)
 				return ROLE_ORDER[player.role]
 			end)
+
+			team.ban = Array.map(bansPerTeam[teamIdx], Operator.property('champion'))
+			team.pick = Array.map(team.players, Operator.property('champion'))
 		end)
-
-		-- Break down the picks and bans into per team, per type, in order.
-		Array.sortInPlaceBy(map.championVeto, Operator.property('vetoNumber'))
-
-		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.property('team'))
-
-		-- TODO: have picks sorted on role, bans sorted on number
-		Table.mergeInto(map, prefixWithKey(Array.map(vetoesByTeam, function (team)
-			return Table.mapValues(Table.groupBy(team, function(_, veto)
-				return veto.type
-			end), function (vetoType)
-				return Array.extractValues(Table.mapValues(vetoType, Operator.property('champion')))
-			end)
-		end), 't'))
 
 		return map
 	end)
