@@ -357,11 +357,11 @@ end
 ---@return {[I]: V}
 
 function Array.extractValuesInOrder(tbl, order)
-    local array = {}
-    for _, item in Table.iter.spairs(tbl, order) do
-        table.insert(array, item)
-    end
-    return array
+	local array = {}
+	for _, item in Table.iter.spairs(tbl, order) do
+		table.insert(array, item)
+	end
+	return array
 end
 
 --[[
