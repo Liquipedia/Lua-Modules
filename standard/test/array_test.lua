@@ -141,4 +141,15 @@ function suite:testReduce()
 	self:assertDeepEquals(1, Array.reduce({2, 3, 5}, pow, 1))
 end
 
+function suite:testExtractValuesInOrder()
+	local a = {i = 1, j = 2, k = 3, z = 0}
+
+	local customOrder1 = function(_, key1, key2) return key1 > key2 end
+	local customOrder2 = function(tbl, key1, key2) return tbl[key1] < tbl[key2] end
+
+	self:assertDeepEquals({1, 2, 3, 0}, Array.extractValuesInOrder(a))
+	self:assertDeepEquals({0, 3, 2, 1}, Array.extractValuesInOrder(a, customOrder1))
+	self:assertDeepEquals({0, 1, 2, 3}, Array.extractValuesInOrder(a, customOrder2))
+end
+
 return suite
