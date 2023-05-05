@@ -350,6 +350,20 @@ function Array.extractValues(tbl)
 	return values
 end
 
+---@comment Extracts values from a given table into an array in a sorted way
+---@generic K, V, I
+---@param tbl {[K]: V}
+---@param order? fun(tbl: {[K]: V}, key1: K, key2: K): boolean
+---@return {[I]: V}
+
+function Array.extractValuesInOrder(tbl, order)
+    local array = {}
+    for _, item in Table.iter.spairs(tbl, order) do
+        table.insert(array, item)
+    end
+    return array
+end
+
 --[[
 Applies a function to each element in an array.
 
