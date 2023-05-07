@@ -154,7 +154,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
+		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
 		body:addRow(rowDisplay)
 	end
 
@@ -215,7 +215,7 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createGame(game, gameIndex)
+function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -241,7 +241,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		:css('padding', '4px')
 		:css('min-height', '32px')
 
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false, date))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -251,7 +251,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
