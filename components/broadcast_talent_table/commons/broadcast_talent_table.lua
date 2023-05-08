@@ -366,11 +366,7 @@ function BroadcastTalentTable:_getPartners(tournament)
 end
 
 function BroadcastTalentTable._removeDuplicatePartners(partners)
-	local uniquePartners = {}
-
-	for _, partner in ipairs(partners) do
-		uniquePartners[partner.page] = partner
-	end
+	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
 
 	return Array.extractValues(uniquePartners)
 end
