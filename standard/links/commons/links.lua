@@ -176,6 +176,7 @@ local PREFIXES = {
 	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
+	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
 	['trackmania-io'] = {
 		'https://trackmania.io/#/competitions/comp/',
