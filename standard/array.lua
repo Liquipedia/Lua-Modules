@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 --
 local Array = {}
 
----Modify a sequence in-place by shuffling its contents.
+---Modify an array in-place by shuffling its contents.
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
