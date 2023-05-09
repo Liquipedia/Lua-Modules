@@ -20,7 +20,7 @@ local RoleOf = {}
 ---@param args {team: string?, role: string}
 ---@return string?
 function RoleOf.get(args)
-	assert(args.role, 'RoleOf.get() requires a role input')
+	assert(args and args.role, 'RoleOf.get() requires a role input')
 
 	local teamPage = (args.team or mw.title.getCurrentTitle().text):gsub(' ', '_')
 	local teamData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
