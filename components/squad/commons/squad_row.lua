@@ -59,6 +59,7 @@ function SquadRow:id(args)
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
+		self.lpdbData.role = 'Captain'
 	end
 
 	if args.role == 'sub' then
