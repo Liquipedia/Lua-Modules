@@ -24,6 +24,7 @@ local VodLink = require('Module:VodLink')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom', {requireDevIfEnabled = true})
 local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
@@ -86,6 +87,7 @@ function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 
 	args = BigMatch._contextualEnrichment(args)
+	HiddenDataBox.run(args) -- Set wiki variables used by match2
 
 	local model = BigMatch._match2Director(args)
 
