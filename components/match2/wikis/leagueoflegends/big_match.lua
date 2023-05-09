@@ -74,9 +74,9 @@ end)
 local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
 local TEAMS = Array.range(1, 2)
-local AVAILABLE_FOR_TIERS = {1, 2}
+local AVAILABLE_FOR_TIERS = {1, 2, 3}
 
-local BIG_MATCH_START_TIME = 1680566400 -- April 4th 2023 midnight
+local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
