@@ -15,6 +15,7 @@ local HighlightConditions = require('Module:HighlightConditions')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -318,6 +319,9 @@ function BroadcastTalentTable:_partnerList(tournament)
 		return 'None'
 	end
 
+	partners = BroadcastTalentTable._removeDuplicatePartners(partners)
+	Array.sortInPlaceBy(partners, Operator.property('page'))
+
 	local list = mw.html.create('ul')
 	for _, partner in ipairs(partners) do
 		list:tag('li'):wikitext(Flags.Icon{flag = partner.flag} .. NONBREAKING_SPACE
@@ -361,8 +365,13 @@ function BroadcastTalentTable:_getPartners(tournament)
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
 		conditions = conditions:toString(),
-		groupBy = 'page asc',
 	})
+end
+
+function BroadcastTalentTable._removeDuplicatePartners(partners)
+	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
+
+	return Array.extractValues(uniquePartners)
 end
 
 function BroadcastTalentTable:_footer()
