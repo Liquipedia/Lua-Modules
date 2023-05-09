@@ -8,17 +8,10 @@
 
 local Table = {}
 
----@generic T
----@param tbl T[]
----@return T[]
+---@deprecated
+---Use Array.randomize
 function Table.randomize(tbl)
-	math.randomseed(os.time())
-
-	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-	end
-	return tbl
+	return require('Module:Array').randomize(tbl)
 end
 
 ---Get the size of a table

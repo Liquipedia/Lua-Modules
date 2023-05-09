@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local WantToHelpList = {}
@@ -24,7 +24,7 @@ function WantToHelpList.get(frame)
 
 	Variables.varDefine('total_number_of_todos', #todos)
 
-	for idx, item in ipairs(Table.randomize(todos)) do
+	for idx, item in ipairs(Array.randomize(todos)) do
 		table.insert(listItems, '*' .. Page.makeInternalLink(item.name, item.pagename) .. ': ' .. item.information .. '\n')
 		if idx == limit then
 			break
