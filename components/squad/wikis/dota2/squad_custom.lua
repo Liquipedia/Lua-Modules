@@ -107,7 +107,8 @@ function CustomSquad.run(frame)
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = ExtendedSquadRow()
-		row	:id{
+		row:status(squad.type)
+		row:id{
 				player.id,
 				flag = player.flag,
 				link = player.link,

@@ -45,7 +45,8 @@ function CustomSquad.run(frame)
 
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
-		row	:id({
+		row:status(squad.type)
+		row:id({
 				player.id,
 				flag = player.flag,
 				race = Faction.read(player.race),

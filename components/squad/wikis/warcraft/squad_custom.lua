@@ -29,6 +29,7 @@ function CustomSquad.run(frame)
 
 	Array.forEach(players, function (player)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		row:status(squad.type)
 		row:id{
 			player.id,
 			flag = player.flag,
