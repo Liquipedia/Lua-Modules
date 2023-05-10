@@ -24,7 +24,7 @@ local Variables = require('Module:Variables')
 local VALID_TYPES = {'player', 'staff'}
 local DEFAULT_TYPE = 'player'
 
-local statusEnum = {
+local STATUS_MAPPING = {
 	[Squad.TYPE_ACTIVE] = 'active',
 	[Squad.TYPE_INACTIVE] = 'inactive',
 	[Squad.TYPE_FORMER] = 'former',
@@ -204,7 +204,7 @@ function SquadRow:setType(type)
 end
 
 function SquadRow:status(status)
-	self.lpdbData.status = statusEnum[status]
+	self.lpdbData.status = STATUS_MAPPING[status]
 	return self
 end
 
