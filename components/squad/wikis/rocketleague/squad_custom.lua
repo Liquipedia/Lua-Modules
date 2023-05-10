@@ -55,6 +55,7 @@ function CustomSquad.run(frame)
 			Variables.varDefault('squad_name',
 			mw.title.getCurrentTitle().prefixedText) .. '_' .. link .. '_' .. ReferenceCleaner.clean(player.joindate)
 			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 
 		index = index + 1

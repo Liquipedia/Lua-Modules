@@ -158,6 +158,7 @@ function CustomSquad._playerRow(player, squadType)
 		.. '_' .. player.id .. '_'
 		.. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

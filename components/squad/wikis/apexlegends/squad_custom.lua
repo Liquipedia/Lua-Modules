@@ -106,6 +106,7 @@ function CustomSquad.run(frame)
 				'_' .. player.id .. '_' ..
 				ReferenceCleaner.clean(player.joindate)
 				.. (player.role and '_' .. player.role or '')
+				.. '_' .. squad.type
 		))
 
 		index = index + 1
