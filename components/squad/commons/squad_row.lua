@@ -13,6 +13,7 @@ local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
 local OpponentDisplay = OpponentLib.OpponentDisplay
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Squad = require('Module:Squad')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
@@ -20,20 +21,26 @@ local Variables = require('Module:Variables')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
-local _VALID_TYPES = {'player', 'staff'}
-local _DEFAULT_TYPE = 'player'
+local VALID_TYPES = {'player', 'staff'}
+local DEFAULT_TYPE = 'player'
 
+local STATUS_MAPPING = {
+	[Squad.TYPE_ACTIVE] = 'active',
+	[Squad.TYPE_INACTIVE] = 'inactive',
+	[Squad.TYPE_FORMER] = 'former',
+	[Squad.TYPE_FORMER_INACTIVE] = 'former',
+}
 
-local _ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
+local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
 	.. '|class=player-role-icon]]'
-local _ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
+local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
 local SquadRow = Class.new(
-	function(self, options)
+	function(self, status, options)
 		self.content = mw.html.create('tr'):addClass('Player')
 		self.options = options or {}
 
-		self.lpdbData = {type = _DEFAULT_TYPE}
+		self.lpdbData = {type = DEFAULT_TYPE}
 	end)
 
 SquadRow.specialTeamsTemplateMapping = {
@@ -58,12 +65,12 @@ function SquadRow:id(args)
 	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
 
 	if String.isNotEmpty(args.captain) then
-		cell:wikitext('&nbsp;' .. _ICON_CAPTAIN)
+		cell:wikitext('&nbsp;' .. ICON_CAPTAIN)
 		self.lpdbData.role = 'Captain'
 	end
 
 	if args.role == 'sub' then
-		cell:wikitext('&nbsp;' .. _ICON_SUBSTITUTE)
+		cell:wikitext('&nbsp;' .. ICON_SUBSTITUTE)
 	end
 
 	if String.isNotEmpty(args.name) then
@@ -191,9 +198,14 @@ end
 
 function SquadRow:setType(type)
 	type = type:lower()
-	if Table.includes(_VALID_TYPES, type) then
+	if Table.includes(VALID_TYPES, type) then
 		self.lpdbData.type = type
 	end
+	return self
+end
+
+function SquadRow:status(status)
+	self.lpdbData.status = STATUS_MAPPING[status]
 	return self
 end
 
