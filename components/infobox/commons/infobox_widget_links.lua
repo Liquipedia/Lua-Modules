@@ -78,6 +78,7 @@ local _PRIORITY_GROUPS = {
 		'sostronk',
 		'start-gg',
 		'stratz',
+		'tonamel',
 		'toornament',
 		'trackmania-io',
 		'vlr',

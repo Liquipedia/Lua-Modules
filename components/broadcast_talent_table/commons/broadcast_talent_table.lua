@@ -15,6 +15,7 @@ local HighlightConditions = require('Module:HighlightConditions')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -48,6 +49,7 @@ local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 ---		edate: string?,
 ---		achievements: string|boolean|nil,
 ---		displayGameIcon: string|boolean|nil,
+---		useTickerNames: string|boolean|nil,
 ---		limit: string|number|nil,
 ---		aboutAchievementsLink: string|boolean|nil,
 ---		onlyHighlightOnValue: string?,
@@ -76,6 +78,7 @@ function BroadcastTalentTable:_readArgs(args)
 		aboutAchievementsLink = args.aboutAchievementsLink or DEFAULT_ABOUT_LINK,
 		showTierType = Logic.nilOr(Logic.readBoolOrNil(args.showtiertype), true),
 		displayGameIcon = Logic.readBool(args.displayGameIcon),
+		useTickerNames = Logic.readBool(args.useTickerNames),
 		isAchievementsTable = isAchievementsTable,
 		year = tonumber(args.year),
 		startDate = args.sdate,
@@ -248,7 +251,7 @@ function BroadcastTalentTable:_row(tournament)
 			name = tournament.name,
 		}):done()
 		:tag('td'):css('text-align', 'left'):wikitext(Page.makeInternalLink({},
-			BroadcastTalentTable._tournamentDisplayName(tournament),
+			self:_tournamentDisplayName(tournament),
 			tournament.pagename
 		)):done()
 		:tag('td'):wikitext(table.concat(tournament.positions, '<br>')):done()
@@ -276,14 +279,15 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 	return Table.merge(queryData[1], tournament)
 end
 
-function BroadcastTalentTable._tournamentDisplayName(tournament)
+function BroadcastTalentTable:_tournamentDisplayName(tournament)
 	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
 	local extradata = tournament.extradata or {}
 	if Logic.readBool(extradata.showmatch) and String.isNotEmpty(extradata.showmatchname) then
 		return extradata.showmatchname
 	end
 
-	local displayName = String.isNotEmpty(tournament.tickername) and tournament.tickername
+	local displayName = String.isNotEmpty(tournament.tickername)
+			and self.args.useTickerNames and tournament.tickername
 		or String.isNotEmpty(tournament.name) and tournament.name
 		or tournament.parent:gsub('_', ' ')
 
@@ -314,6 +318,9 @@ function BroadcastTalentTable:_partnerList(tournament)
 	if Table.isEmpty(partners) then
 		return 'None'
 	end
+
+	partners = BroadcastTalentTable._removeDuplicatePartners(partners)
+	Array.sortInPlaceBy(partners, Operator.property('page'))
 
 	local list = mw.html.create('ul')
 	for _, partner in ipairs(partners) do
@@ -358,8 +365,13 @@ function BroadcastTalentTable:_getPartners(tournament)
 	return mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'id, page, flag',
 		conditions = conditions:toString(),
-		groupBy = 'page asc',
 	})
+end
+
+function BroadcastTalentTable._removeDuplicatePartners(partners)
+	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
+
+	return Array.extractValues(uniquePartners)
 end
 
 function BroadcastTalentTable:_footer()
