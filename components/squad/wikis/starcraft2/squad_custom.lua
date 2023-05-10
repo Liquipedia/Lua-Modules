@@ -92,6 +92,7 @@ function CustomSquad.run(frame)
 		squad:row(row:create(
 			squadName .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 
 		index = index + 1
