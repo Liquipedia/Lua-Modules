@@ -76,6 +76,7 @@ function CustomSquad.run(frame)
 		local elo = CustomSquad._queryTLPD(player.id, 'elo')
 		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
 
+		row:status(squad.type)
 		row:id{
 			id,
 			race = faction,

@@ -123,6 +123,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
+	row:status(squadType)
 	row:id{
 		player.id,
 		flag = player.flag,

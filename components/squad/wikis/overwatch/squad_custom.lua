@@ -174,6 +174,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,

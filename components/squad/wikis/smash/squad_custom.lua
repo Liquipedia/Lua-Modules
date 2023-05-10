@@ -79,6 +79,7 @@ function CustomSquad.run(frame)
 		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game, returnType = 'lua'}
 				or player.mains
 
+		row:status(squad.type)
 		row:id{
 			player.id,
 			flag = Variables.varDefault('nationality') or player.flag,
