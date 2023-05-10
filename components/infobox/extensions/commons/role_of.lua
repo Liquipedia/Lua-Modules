@@ -24,7 +24,8 @@ function RoleOf.get(args)
 
 	local teamPage = (args.team or mw.title.getCurrentTitle().text):gsub(' ', '_')
 	local teamData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-		conditions = '[[pagename::' .. teamPage .. ']] AND [[position::' .. args.role .. ']] AND [[leavedate::1970-01-01]]',
+		conditions = '[[pagename::' .. teamPage .. ']] AND [[status::active]] AND .. ' ..
+			'([[position::' .. args.role .. ']] OR [[role::' .. args.role .. ']])',
 		query = 'id, link, nationality',
 		limit = 1
 	})[1]
