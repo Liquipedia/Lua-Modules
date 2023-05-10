@@ -41,7 +41,7 @@ function ExtendedSquadRow:position(args)
 	self.content:node(cell)
 
 	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end

@@ -75,8 +75,8 @@ function ExtendedSquadRow:position(args)
 
 	self.content:node(cell)
 
-	self.lpdbData['position'] = args.position
-	self.lpdbData['role'] = args.role
+	self.lpdbData.position = args.position
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -104,6 +104,7 @@ function CustomSquad.run(frame)
 	squad.header = CustomSquad.header
 	squad:header()
 
+	local lang = mw.language.new('en')
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
@@ -118,7 +119,7 @@ function CustomSquad.run(frame)
 				teamrole = player.teamrole,
 			}
 			:name{name = player.name}
-			:position{position = player.position, role = mw.language.new('en'):ucfirst(player.role or '')}
+			:position{position = player.position, role = player.role and lang:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
