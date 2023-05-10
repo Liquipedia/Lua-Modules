@@ -100,8 +100,9 @@ function ResultsTable:buildRow(placement)
 			:tag('td'):css('text-align', 'left'):cssText(groupAbbr and 'padding-left:14px' or nil):node(vsDisplay or groupAbbr)
 	end
 
+	local useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team
 	row:tag('td'):wikitext(Currency.display('USD',
-			self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney,
+			useIndivPrize and placement.individualprizemoney or placement.prizemoney,
 			{dashIfZero = true, abbreviation = false, formatValue = true}
 		))
 
