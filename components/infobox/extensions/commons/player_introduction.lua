@@ -6,20 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local AnOrA = require('Module:A or an')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 
 local SHOULD_QUERY_KEYWORD = 'query'
 local DEFAULT_DATAPOINT_LEAVE_DATE = '2999-01-01'
 local TRANSFER_STATUS_FORMER = 'former'
 local TRANSFER_STATUS_LOAN = 'loan'
 local TRANSFER_STATUS_CURRENT = 'current'
+local TYPE_PLAYER = 'player'
 local SKIP_ROLE = 'skip'
+local DEFAULT_DATE = '1970-01-01'
 
 --- @class PlayerIntroduction
 local PlayerIntroduction = Class.new(function(self, ...) self:init(...) end)
@@ -46,41 +51,43 @@ function PlayerIntroduction.run(args)
 	return PlayerIntroduction(args):create()
 end
 
+---@class argsValues
+---@field [1] string?,
+---@field player string?,
+---@field playerInfo string?,
+---@field birthdate string?,
+---@field deathdate string?,
+---@field defaultGame string?,
+---@field faction string?,
+---@field faction2 string?,
+---@field faction3 string?,
+---@field firstname string?,
+---@field lastname string?,
+---@field freetext string?,
+---@field game string?,
+---@field id string?,
+---@field idAudio string?,
+---@field idIPA string?,
+---@field name string?,
+---@field nationality string?,
+---@field nationality2 string?,
+---@field nationality3 string?,
+---@field role string?,
+---@field role2 string?,
+---@field status string?,
+---@field subtext string?,
+---@field team string?,
+---@field team2 string?,
+---@field type string?,
+---@field transferquery string?,
+---@field convert_role boolean?,
+---@field show_role boolean?,
+---@field show_faction boolean?
+---@field formernameX string?,
+---@field akaX string?,
+
 --- Init function for PlayerIntroduction
----@param args {
----	[1]: string?,
----	player: string?,
----	playerInfo: string?,
----	birthdate: string?,
----	deathdate: string?,
----	defaultGame: string?,
----	faction: string?,
----	faction2: string?,
----	faction3: string?,
----	firstname: string?,
----	lastname: string?,
----	freetext: string?,
----	game: string?,
----	id: string?,
----	idAudio: string?,
----	idIPA: string?,
----	name: string?,
----	nationality: string?,
----	nationality2: string?,
----	nationality3: string?,
----	role: string?,
----	role2: string?,
----	status: string?,
----	subtext: string?,
----	team: string?,
----	team2: string?,
----	type: string?,
----	transferquery: 'datapoint'?,
----	convert_role: boolean?,
----	show_role: boolean?,
----	formernameX: string?,
----	akaX: string?,
----}
+---@param args argsValues
 ---@return self
 function PlayerIntroduction:init(args)
 	self.player = mw.ext.TeamLiquidIntegration.resolve_redirect(
@@ -93,6 +100,10 @@ function PlayerIntroduction:init(args)
 	end
 
 	self:_parsePlayerInfo(args, playerInfo)
+
+	if Table.isEmpty(self.playerInfo) then
+		return self
+	end
 
 	self:_readTransferData(args.transferquery)
 
@@ -120,7 +131,7 @@ function PlayerIntroduction:_playerQuery()
 	return {}
 end
 
----@param args table
+---@param args argsValues
 ---@param playerInfo table
 ---@return nil
 function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
@@ -128,8 +139,8 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 
 	local role = (args.role or playerInfo.extradata.role or ''):lower()
 
-	local personType = Logic.emptyOr(args.type, playerInfo.type, 'player'):lower()
-	if personType ~= 'player' and String.isNotEmpty(role) then
+	local personType = Logic.emptyOr(args.type, playerInfo.type, TYPE_PLAYER):lower()
+	if personType ~= TYPE_PLAYER and String.isNotEmpty(role) then
 		personType = role
 	end
 
@@ -297,7 +308,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 	end
 end
 
----@param args table
+---@param args argsValues
 ---@return nil
 function PlayerIntroduction:_roleAdjusts(args)
 	local roleAdjust = Logic.readBool(args.convert_role) and mw.loadData('Module:PlayerIntroduction/role') or {}
@@ -325,16 +336,259 @@ function PlayerIntroduction:_roleAdjusts(args)
 	self.transferInfo.tempRole = tempRole
 end
 
+--- builds the display
+---@return string
 function PlayerIntroduction:create()
+	if Table.isEmpty(self.playerInfo) then
+		return ''
+	end
+
+	local isDeceased = self.playerInfo.deathdate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
+
+	local statusDisplay = self:_statusDisplay(isDeceased)
+	local nationalityDisplay = self:_nationalityDisplay()
+	local gameDisplay = self:_gameDisplay()
+	local factionDisplay = self:_factionDisplay()
+	local typeDisplay = self:_typeDisplay()
+
+	return String.interpolate('${name}${born} ${tense} ${a}${status}${nationality}${game}'
+		.. '${faction}${type}${team}${subText}.${freeText}', {
+			name = self:_nameDisplay(),
+			born = self:_bornDisplay(isDeceased),
+			tense = isDeceased and 'was' or 'is',
+			a = AnOrA._main{
+				statusDisplay or nationalityDisplay or gameDisplay or factionDisplay or typeDisplay ,
+				origStr = 'false' -- hate it, but has to be like this
+			},
+			status = statusDisplay or '',
+			nationality = nationalityDisplay or '',
+			game = gameDisplay or '',
+			faction = factionDisplay or '',
+			type = typeDisplay or '',
+			team = self:_teamDisplay(),
+			subText = self.playerInfo.subText or '',
+			freeText = self.playerInfo.freeText or '',
+		}
+	)
+end
+
+--- builds the name display
+---@return string
+function PlayerIntroduction:_nameDisplay()
+	local nameQuotes = String.isNotEmpty(self.playerInfo.name) and '"' or ''
+
+	local nameDisplay = self._addConcatText(self.playerInfo.firstName, nil, true)
+		.. nameQuotes .. '<b>' .. self.playerInfo.id .. '</b>' .. nameQuotes
+
+	if String.isNotEmpty(self.playerInfo.idAudio) or String.isNotEmpty(self.playerInfo.idIPA) then
+		nameDisplay = nameDisplay .. '(' .. self._addConcatText(self.playerInfo.idIPA, ', ')
+			.. (String.isNotEmpty(self.playerInfo.idAudio)
+				-- TODO: convert the template to a module
+				and Template.safeExpand(mw.getCurrentFrame(), 'Audio', {self.playerInfo.idAudio, 'listen', help = 'no'})
+				or '')
+			.. ')'
+	end
+
+	nameDisplay = nameDisplay .. self._addConcatText(self.playerInfo.lastName)
+
+	if Table.isNotEmpty(self.playerInfo.formerlyKnownAs) then
+		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as')
+			.. mw.text.listToText(self.playerInfo.formerlyKnownAs, ', ', ' and ')
+			.. ')'
+	end
+
+	if Table.isNotEmpty(self.playerInfo.alsoKnownAs) then
+		nameDisplay = nameDisplay .. self._addConcatText('(also known as')
+			.. mw.text.listToText(self.playerInfo.alsoKnownAs, ', ', ' and ')
+			.. ')'
+	end
+
+	return nameDisplay
+end
+
+--- builds the born display
+---@param isDeceased boolean
+---@return string
+function PlayerIntroduction:_bornDisplay(isDeceased)
+	if self.playerInfo.birthDate == DEFAULT_DATE then
+		return ''
+	end
+
+	if not isDeceased then
+		return ' (born '
+---@diagnostic disable-next-line: param-type-mismatch
+			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
+			.. ')'
+	elseif self.playerInfo.deathDate ~= DEFAULT_DATE then
+		return ' ('
+---@diagnostic disable-next-line: param-type-mismatch
+			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthdate))):gsub(' 0',' ')
+			.. ' – '
+---@diagnostic disable-next-line: param-type-mismatch
+			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.deathdate))):gsub(' 0',' ')
+			.. ')'
+	end
+
+	return ''
+end
+
+--- builds the status display
+---@param isDeceased boolean
+---@return string?
+function PlayerIntroduction:_statusDisplay(isDeceased)
+	if self.playerInfo.status ~= 'active' and not isDeceased then
+		return self.playerInfo.status
+	end
+
+	return nil
+end
+
+--- builds the nationality display
+---@return string?
+function PlayerIntroduction:_nationalityDisplay()
+	--TODO
+
+
+	--[=[
+		if playerInfo.nationality ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality ] then
+		playerInfo.nationality = playerInfo.nationality:gsub("^%l", string.upper)
+		local nationality = '[[:Category:' .. playerInfo.nationality .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality ] .. ']]'
+		if articleswitch ~= '' then
+			nationality = ' ' .. nationality
+		else
+			nationality = ' ' .. Article{ nationality }
+			articleswitch = 'true'
+		end
+		if playerInfo.nationality2 ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality2 ]then
+			playerInfo.nationality2 = playerInfo.nationality2:gsub("^%l", string.upper)
+			nationality = nationality .. '/[[:Category:' .. playerInfo.nationality2 .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality2 ] .. ']]'
+			if playerInfo.nationality3 ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality3 ]then
+				playerInfo.nationality3 = playerInfo.nationality3:gsub("^%l", string.upper)
+				nationality = nationality .. '/[[:Category:' .. playerInfo.nationality3 .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality3 ] .. ']]'
+			end
+		end
+		output = output .. nationality
+	end
+	]=]
+end
+
+--- builds the game display
+---@return string?
+function PlayerIntroduction:_gameDisplay()
+	if String.isEmpty(self.playerInfo.game) then
+		return nil
+	end
+
+	return self._addConcatText('<i>' .. self.playerInfo.game .. '</i>')
+end
+
+--- builds the faction display
+---@return string?
+function PlayerIntroduction:_factionDisplay()
+	if not self.options.showFaction or String.isEmpty(self.playerInfo.faction) or self.playerInfo.type == TYPE_PLAYER then
+		return nil
+	end
+
+
+	local factions = {}
+	for _, faction in Table.iter.pairsByPrefix(self.playerInfo, 'faction', '') do
+		table.insert(factions, Faction.toName(Faction.read(faction)))
+	end
+
+	return self._addConcatText(mw.text.listToText(factions, ', ', ' and '))
+end
+
+--- builds the type display
+---@return string?
+function PlayerIntroduction:_typeDisplay()
+	return self._addConcatText(self.playerInfo.type)
+		.. self._addConcatText(self.playerInfo.type ~= TYPE_PLAYER and self.playerInfo.role2, ' and ')
+end
+
+--- builds the team and role display
+---@return string?
+function PlayerIntroduction:_teamDisplay()
+	--TODO
+
+	--[=[
+	local teamText
+	--[[playerInfo.team vs transferInfo.team
+	for r6:
+		playerInfo.team = manual input (via p._get_lpdbtransfer (only current) if automated)
+		transferInfo.team = p._get_lpdbtransfer (all)
+	for aoe:
+		playerInfo.team = manual input
+		transferInfo.team = p._get_lpdbtransfer (active and former)]]
+	--[[old version:
+		current = playerInfo.team
+		former = transferInfo.team]]
+	if playerInfo.team ~= '' or ((transferInfo.team or '') ~= '' and (transferInfo.team or '') ~= 'skip') then
+		if playerInfo.team ~= '' and playerInfo.deathdate == '1970-01-01' and playerInfo.status ~= 'passed away' then
+			teamText = ' who is currently'
+			if playerInfo.type == TYPE_PLAYER then
+				if (transferInfo.role or '') == 'inactive' and transferInfo.type == 'current' then
+					teamText = teamText .. ' on the inactive roster of'
+				elseif args.show_role and tempRole ~= '' then
+					if tempRole == 'streamer' or tempRole == 'content creator' then
+						teamText = teamText .. ' ' .. Article{ tempRole } .. ' for'
+					else
+						teamText = teamText .. ' playing as ' .. Article{ tempRole } .. ' for'
+					end
+				else
+					teamText = teamText .. ' playing for'
+				end
+			else
+				teamText = teamText .. ' working for'
+			end
+			if mw.ext.TeamTemplate.teamexists(playerInfo.team) then
+				local teamOutput = mw.ext.TeamTemplate.raw(playerInfo.team, transferInfo.date)
+				output = output .. teamText .. ' [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
+			else
+				output = output .. teamText .. ' [[' .. playerInfo.team .. ']]'
+			end
+			if transferInfo.type == 'loan' and playerInfo.team2 ~= '' then
+				output = output .. ' on loan from'
+				if mw.ext.TeamTemplate.teamexists(playerInfo.team2) then
+					local teamOutput = mw.ext.TeamTemplate.raw(playerInfo.team2, transferInfo.date)
+					output = output .. ' [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
+				else
+					output = output .. ' [[' .. playerInfo.team2 .. ']]'
+				end
+			end
+		elseif (transferInfo.team or '') ~= '' and transferInfo.team ~= 'skip' and transferInfo.type == 'former' then
+			teamText = ' who last'
+			if playerInfo.type == TYPE_PLAYER then
+				teamText = teamText .. ' played'
+			else
+				teamText = teamText .. ' worked'
+			end
+			if mw.ext.TeamTemplate.teamexists(transferInfo.team) then
+				local teamOutput = mw.ext.TeamTemplate.raw(transferInfo.team, transferInfo.date)
+				output = output .. teamText .. ' for [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
+			else
+				output = output .. teamText .. ' for [[' .. transferInfo.team .. ']]'
+			end
+		end
+		if args.show_role and playerInfo.type ~= TYPE_PLAYER and tempRole ~= '' then
+			output = output .. ' as ' .. Article{ tempRole }
+		end
+	end
+	]=]
 
 end
 
+---@param text string?
+---@param concatDelimiter string?
+---@return string
+function PlayerIntroduction._addConcatText(text, concatDelimiter, concatAfter)
+	if not text then
+		return ''
+	end
 
+	concatDelimiter = concatDelimiter or ' '
 
-
-
-
-
-
+	return concatAfter and (text .. concatDelimiter)
+		or (concatDelimiter .. text)
+end
 
 return PlayerIntroduction
