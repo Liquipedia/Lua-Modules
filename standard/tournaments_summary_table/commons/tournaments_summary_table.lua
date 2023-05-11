@@ -176,8 +176,10 @@ function TournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	local currentTime = os.time()
-	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime + TournamentsSummaryTable.upcomingOffset * SECONDS_PER_DAY)
-	local completedThreshold = os.date('!%Y-%m-%d', currentTime - TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
+	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime
+		+ TournamentsSummaryTable.upcomingOffset * SECONDS_PER_DAY)
+	local completedThreshold = os.date('!%Y-%m-%d', currentTime
+		- TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
 
 	if type == TournamentsSummaryTable.upcomingType then
 		conditions
