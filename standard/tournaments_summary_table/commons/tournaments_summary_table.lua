@@ -91,11 +91,9 @@ function TournamentsSummaryTable.run(args)
 end
 
 function TournamentsSummaryTable._parseArgsToSettings(args)
-	local upcomingOffset = tonumber(args.upcomingOffset) or TournamentsSummaryTable.upcomingOffset
-	TournamentsSummaryTable.upcomingOffset = upcomingOffset * SECONDS_PER_DAY
+	TournamentsSummaryTable.upcomingOffset = tonumber(args.upcomingOffset) or TournamentsSummaryTable.upcomingOffset
 
-	local completedOffset = tonumber(args.completedOffset) or TournamentsSummaryTable.completedOffset
-	TournamentsSummaryTable.completedOffset = completedOffset * SECONDS_PER_DAY
+	TournamentsSummaryTable.completedOffset = tonumber(args.completedOffset) or TournamentsSummaryTable.completedOffset
 
 	local parseTier = function(tier)
 		tier = String.trim(tier)
@@ -178,8 +176,8 @@ function TournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	local currentTime = os.time()
-	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime + TournamentsSummaryTable.upcomingOffset)
-	local completedThreshold = os.date('!%Y-%m-%d', currentTime - TournamentsSummaryTable.completedOffset)
+	local upcomingThreshold = os.date('!%Y-%m-%d', currentTime + TournamentsSummaryTable.upcomingOffset * SECONDS_PER_DAY)
+	local completedThreshold = os.date('!%Y-%m-%d', currentTime - TournamentsSummaryTable.completedOffset * SECONDS_PER_DAY)
 
 	if type == TournamentsSummaryTable.upcomingType then
 		conditions
