@@ -29,15 +29,15 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _SECONDS_PER_DAY = 86400
+local SECONDS_PER_DAY = 86400
 
 local _today = os.date('!%Y-%m-%d', os.time())
 
 -- Default settings
 -- overwritable via /Custom
 TournamentsSummaryTable.tiers = {1, 2}
-TournamentsSummaryTable.upcomingOffset = _SECONDS_PER_DAY * 10
-TournamentsSummaryTable.completedOffset = _SECONDS_PER_DAY * 10
+TournamentsSummaryTable.upcomingOffset = SECONDS_PER_DAY * 10
+TournamentsSummaryTable.completedOffset = SECONDS_PER_DAY * 10
 TournamentsSummaryTable.tierTypeExcluded = {}
 TournamentsSummaryTable.statusExcluded = {'canceled', 'cancelled', 'postponed'}
 TournamentsSummaryTable.disableLIS = false
@@ -56,6 +56,8 @@ local _TYPE_TO_TITLE = {
 
 function TournamentsSummaryTable.run(args)
 	args = args or {}
+	
+	TournamentsSummaryTable._parseArgsToSettings(args)
 
 	local type
 	if args.upcoming == 'true' then
@@ -86,6 +88,31 @@ function TournamentsSummaryTable.run(args)
 	end
 
 	return wrapper
+end
+
+function TournamentsSummaryTable._parseArgsToSettings(args)
+	local upcomingOffset = tonumber(args.upcomingOffset)
+	TournamentsSummaryTable.upcomingOffset = upcomingOffset and (upcomingOffset * SECONDS_PER_DAY)
+		or TournamentsSummaryTable.upcomingOffset
+
+	local completedOffset = tonumber(args.completedOffset)
+	TournamentsSummaryTable.completedOffset = completedOffset and (completedOffset * SECONDS_PER_DAY)
+		or TournamentsSummaryTable.completedOffset
+
+	local parseTier = function(tier)
+		tier = String.trim(tier)
+		return tonumber(tier) or tier
+	end
+
+	TournamentsSummaryTable.tiers = args.tiers
+		and Array.map(mw.text.split(args.tiers, ','), parseTier)
+		or TournamentsSummaryTable.tiers
+
+	TournamentsSummaryTable.disableLIS = Logic.readBool(args.disableLIS) or TournamentsSummaryTable.disableLIS
+
+	TournamentsSummaryTable.tierTypeExcluded = args.tierTypeExcluded
+		and Array.map(mw.text.split(args.tierTypeExcluded, ','), parseTier)
+		or TournamentsSummaryTable.tierTypeExcluded
 end
 
 function TournamentsSummaryTable._getTournaments(conditionType, sort, order, limit)
