@@ -13,8 +13,8 @@ local CustomTournamentsSummaryTable = require('Module:TournamentsSummaryTable')
 CustomTournamentsSummaryTable.tierTypeExcluded = {'Qualifier', 'Charity'}
 CustomTournamentsSummaryTable.disableLIS = true
 CustomTournamentsSummaryTable.defaultLimit = 7
-local _SECONDS_PER_DAY = 86400
-local _COMPLETED_OFFSET = 182 * _SECONDS_PER_DAY --roughly half a year
+local SECONDS_PER_DAY = 86400
+local COMPLETED_OFFSET = 182 * SECONDS_PER_DAY --roughly half a year
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -28,7 +28,7 @@ function CustomTournamentsSummaryTable.dateConditions(type)
 
 	local currentTime = os.time()
 	local today = os.date('!%Y-%m-%d', currentTime)
-	local completedThreshold = os.date('!%Y-%m-%d', currentTime - _COMPLETED_OFFSET)
+	local completedThreshold = os.date('!%Y-%m-%d', currentTime - COMPLETED_OFFSET)
 
 	if type == CustomTournamentsSummaryTable.upcomingType then
 		conditions
