@@ -6,10 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local CustomTournamentsSummaryTable = require('Module:TournamentsSummaryTable')
-
--- overwrite stuff on the local wiki if needed
-
-return Class.export(CustomTournamentsSummaryTable)
+return Lua.import('Module:TournamentsSummaryTable', {requireDevIfEnabled = true})
