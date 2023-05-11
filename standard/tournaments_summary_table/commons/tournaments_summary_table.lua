@@ -56,7 +56,7 @@ local _TYPE_TO_TITLE = {
 
 function TournamentsSummaryTable.run(args)
 	args = args or {}
-	
+
 	TournamentsSummaryTable._parseArgsToSettings(args)
 
 	local type
