@@ -237,7 +237,8 @@ function PlayerIntroduction:_readTransferFromDataPoints()
 				date = os.time(),
 				team = queryData[1].information,
 				-- assuming previous team is main team if it's missing a leavedate
-				team2 = queryData[2] and queryData[2].extradata.leavedate == DEFAULT_DATAPOINT_LEAVE_DATE and queryData[2].information,
+				team2 = queryData[2] and queryData[2].extradata.leavedate == DEFAULT_DATAPOINT_LEAVE_DATE
+					and queryData[2].information or nil,
 				role = (extradata.role or ''):lower(),
 				type = TRANSFER_STATUS_LOAN,
 			}
