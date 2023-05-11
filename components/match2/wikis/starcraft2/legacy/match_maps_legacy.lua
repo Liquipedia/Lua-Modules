@@ -104,7 +104,7 @@ function MatchMapsLegacy._handleMaps()
 
 	while map or mapWinner do
 		storageArgs['map' .. gameIndex] = {
-			map = map or 'unknown',
+			map = map,
 			winner = storageArgs['map' .. gameIndex .. 'win'],
 			race1 = storageArgs['map' .. gameIndex .. 'p1race'],
 			race2 = storageArgs['map' .. gameIndex .. 'p2race'],
