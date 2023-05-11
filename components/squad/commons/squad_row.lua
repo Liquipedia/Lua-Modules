@@ -66,6 +66,7 @@ function SquadRow:id(args)
 
 	if String.isNotEmpty(args.captain) then
 		cell:wikitext('&nbsp;' .. ICON_CAPTAIN)
+		self.lpdbData.role = 'Captain'
 	end
 
 	if args.role == 'sub' then
@@ -122,7 +123,7 @@ function SquadRow:role(args)
 
 	self.content:node(cell)
 
-	self.lpdbData.role = args.role
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	-- Set row background for certain roles
 	local role = string.lower(args.role or '')

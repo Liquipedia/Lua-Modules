@@ -17,6 +17,8 @@ local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
+local LANG = mw.getContentLanguage()
+
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -74,8 +76,8 @@ function ExtendedSquadRow:position(args)
 
 	self.content:node(cell)
 
-	self.lpdbData['position'] = args.position
-	self.lpdbData['role'] = args.role
+	self.lpdbData.position = args.position
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -118,7 +120,7 @@ function CustomSquad.run(frame)
 				teamrole = player.teamrole,
 			}
 			:name{name = player.name}
-			:position{position = player.position, role = mw.language.new('en'):ucfirst(player.role or '')}
+			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
