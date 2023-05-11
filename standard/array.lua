@@ -354,7 +354,7 @@ end
 ---@generic K, V
 ---@param tbl {[K]: V}
 ---@param order? fun(tbl: {[K]: V}, key1: K, key2: K): boolean
----@return {[I]: V}
+---@return V[]
 
 function Array.extractValuesInOrder(tbl, order)
 	local array = {}
