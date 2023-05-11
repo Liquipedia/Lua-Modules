@@ -577,7 +577,7 @@ function PlayerIntroduction:_teamDisplay()
 
 end
 
----@param text string?
+---@param text string|false|nil
 ---@param concatDelimiter string?
 ---@return string
 function PlayerIntroduction._addConcatText(text, concatDelimiter, concatAfter)
