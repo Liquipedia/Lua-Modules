@@ -343,7 +343,7 @@ function PlayerIntroduction:create()
 		return ''
 	end
 
-	local isDeceased = self.playerInfo.deathdate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
+	local isDeceased = self.playerInfo.deathDate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
 
 	local statusDisplay = self:_statusDisplay(isDeceased)
 	local nationalityDisplay = self:_nationalityDisplay()
@@ -422,10 +422,10 @@ function PlayerIntroduction:_bornDisplay(isDeceased)
 	elseif self.playerInfo.deathDate ~= DEFAULT_DATE then
 		return ' ('
 ---@diagnostic disable-next-line: param-type-mismatch
-			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthdate))):gsub(' 0',' ')
+			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
 			.. ' – '
 ---@diagnostic disable-next-line: param-type-mismatch
-			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.deathdate))):gsub(' 0',' ')
+			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
 			.. ')'
 	end
 
@@ -485,7 +485,7 @@ end
 --- builds the faction display
 ---@return string?
 function PlayerIntroduction:_factionDisplay()
-	if not self.options.showFaction or String.isEmpty(self.playerInfo.faction) or self.playerInfo.type == TYPE_PLAYER then
+	if not self.options.showFaction or String.isEmpty(self.playerInfo.faction) or self.playerInfo.type ~= TYPE_PLAYER then
 		return nil
 	end
 
