@@ -36,8 +36,8 @@ local _today = os.date('!%Y-%m-%d', os.time())
 -- Default settings
 -- overwritable via /Custom
 TournamentsSummaryTable.tiers = {1, 2}
-TournamentsSummaryTable.upcomingOffset = SECONDS_PER_DAY * 10
-TournamentsSummaryTable.completedOffset = SECONDS_PER_DAY * 10
+TournamentsSummaryTable.upcomingOffset = 10
+TournamentsSummaryTable.completedOffset = 10
 TournamentsSummaryTable.tierTypeExcluded = {}
 TournamentsSummaryTable.statusExcluded = {'canceled', 'cancelled', 'postponed'}
 TournamentsSummaryTable.disableLIS = false
@@ -91,13 +91,11 @@ function TournamentsSummaryTable.run(args)
 end
 
 function TournamentsSummaryTable._parseArgsToSettings(args)
-	local upcomingOffset = tonumber(args.upcomingOffset)
-	TournamentsSummaryTable.upcomingOffset = upcomingOffset and (upcomingOffset * SECONDS_PER_DAY)
-		or TournamentsSummaryTable.upcomingOffset
+	local upcomingOffset = tonumber(args.upcomingOffset) or TournamentsSummaryTable.upcomingOffset
+	TournamentsSummaryTable.upcomingOffset = upcomingOffset * SECONDS_PER_DAY
 
-	local completedOffset = tonumber(args.completedOffset)
-	TournamentsSummaryTable.completedOffset = completedOffset and (completedOffset * SECONDS_PER_DAY)
-		or TournamentsSummaryTable.completedOffset
+	local completedOffset = tonumber(args.completedOffset) or TournamentsSummaryTable.completedOffset
+	TournamentsSummaryTable.completedOffset = completedOffset * SECONDS_PER_DAY
 
 	local parseTier = function(tier)
 		tier = String.trim(tier)
