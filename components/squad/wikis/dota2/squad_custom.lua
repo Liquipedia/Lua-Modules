@@ -17,6 +17,8 @@ local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
+local LANG = mw.getContentLanguage()
+
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -103,7 +105,6 @@ function CustomSquad.run(frame)
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local lang = mw.language.new('en')
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
@@ -119,7 +120,7 @@ function CustomSquad.run(frame)
 				teamrole = player.teamrole,
 			}
 			:name{name = player.name}
-			:position{position = player.position, role = player.role and lang:ucfirst(player.role) or nil}
+			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then

@@ -22,7 +22,8 @@ local RoleOf = {}
 function RoleOf.get(args)
 	assert(args and args.role, 'RoleOf.get() requires a role input')
 
-	local teamPage = (args.team or mw.title.getCurrentTitle().text):gsub(' ', '_')
+	local team = args.team or mw.title.getCurrentTitle().text
+	local teamPage = mw.ext.TeamLiquidIntegration.resolve_redirect(team):gsub(' ', '_')
 	local teamData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
 		conditions = '[[pagename::' .. teamPage .. ']] AND [[status::active]] AND ' ..
 			'([[position::' .. args.role .. ']] OR [[role::' .. args.role .. ']])',
