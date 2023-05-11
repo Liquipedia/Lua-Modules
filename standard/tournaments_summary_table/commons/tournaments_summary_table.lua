@@ -198,7 +198,7 @@ function TournamentsSummaryTable.dateConditions(type)
 				}),
 				ConditionTree(BooleanOperator.any):add({
 					ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
-					ConditionNode(ColumnName('enddate'), Comparator.gt, today),
+					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
 				}),
 			})
 	elseif type == TournamentsSummaryTable.recentType then
