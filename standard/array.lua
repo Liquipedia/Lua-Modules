@@ -351,7 +351,7 @@ function Array.extractValues(tbl)
 end
 
 ---@comment Extracts values from a given table into an array in a sorted way
----@generic K, V, I
+---@generic K, V
 ---@param tbl {[K]: V}
 ---@param order? fun(tbl: {[K]: V}, key1: K, key2: K): boolean
 ---@return {[I]: V}
