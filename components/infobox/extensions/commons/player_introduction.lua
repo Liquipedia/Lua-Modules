@@ -10,7 +10,6 @@ local AnOrA = require('Module:A or an')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -161,27 +160,27 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		or {}
 
 	local function readNames(prefix)
-		return Array.extractValues(Table.filter(args, function(entry) return entry:find('^' .. prefix .. '%d+$') end))
+		return Array.extractValues(Table.filterByKey(args, function(key) return key:find('^' .. prefix .. '%d+$') end) or {})
 	end
 
 	self.playerInfo = {
-		team = args.team or playerInfo.teampagename,
-		team2 = args.team2 or playerInfo.extradata.team2,
+		team = Logic.emptyOr(args.team, playerInfo.teampagename),
+		team2 = Logic.emptyOr(args.team2, playerInfo.extradata.team2),
 		name = name,
 		status = Logic.emptyOr(args.status, playerInfo.status, 'active'):lower(),
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, playerInfo.extradata.game, args.defaultGame),
-		id = args.id or playerInfo.id,
-		idIPA = args.idIPA or playerInfo.extradata.idIPA,
-		idAudio = args.idAudio or playerInfo.extradata.idAudio,
-		birthDate = args.birthdate or playerInfo.birthdate,
-		deathDate = args.deathdate or playerInfo.deathdate,
-		nationality = args.nationality or playerInfo.nationality,
-		nationality2 = args.nationality2 or playerInfo.nationality2,
-		nationality3 = args.nationality3 or playerInfo.nationality3,
-		faction = args.faction or playerInfo.extradata.faction,
-		faction2 = args.faction2 or playerInfo.extradata.faction2,
-		faction3 = args.faction3 or playerInfo.extradata.faction3,
+		id = Logic.emptyOr(args.id, playerInfo.id),
+		idIPA = Logic.emptyOr(args.idIPA, playerInfo.extradata.idIPA),
+		idAudio = Logic.emptyOr(args.idAudio, playerInfo.extradata.idAudio),
+		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate),
+		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate),
+		nationality = Logic.emptyOr(args.nationality, playerInfo.nationality),
+		nationality2 = Logic.emptyOr(args.nationality2, playerInfo.nationality2),
+		nationality3 = Logic.emptyOr(args.nationality3, playerInfo.nationality3),
+		faction = Logic.emptyOr(args.faction, playerInfo.extradata.faction),
+		faction2 = Logic.emptyOr(args.faction2, playerInfo.extradata.faction2),
+		faction3 = Logic.emptyOr(args.faction3, playerInfo.extradata.faction3),
 		subText = args.subtext,
 		freeText = args.freetext,
 		role = role,
@@ -464,7 +463,7 @@ function PlayerIntroduction:_nationalityDisplay()
 	local nationalities = {}
 	for _, nationality in Table.iter.pairsByPrefix(self.playerInfo, 'nationality', {requireIndex = false}) do
 		table.insert(nationalities, '[[:Category:' .. nationality:gsub("^%l", string.upper)
-			.. '|' .. (Flags.getLocalisation(nationality) or '') .. ']]')
+				.. '|' .. (Flags.getLocalisation(nationality) or '') .. ']]')
 	end
 
 	if Table.isEmpty(nationalities) then
@@ -491,10 +490,9 @@ function PlayerIntroduction:_factionDisplay()
 		return nil
 	end
 
-
 	local factions = {}
 	for _, faction in Table.iter.pairsByPrefix(self.playerInfo, 'faction', {requireIndex = false}) do
-		table.insert(factions, Faction.toName(Faction.read(faction)))
+		table.insert(factions, '[[:Category:' .. faction .. '|' .. faction .. ']]')
 	end
 
 	return self._addConcatText(mw.text.listToText(factions, ', ', ' and '))
@@ -504,7 +502,9 @@ end
 ---@return string?
 function PlayerIntroduction:_typeDisplay()
 	return self._addConcatText(self.playerInfo.type)
-		.. self._addConcatText(self.playerInfo.type ~= TYPE_PLAYER and self.playerInfo.role2, ' and ')
+		.. self._addConcatText(
+			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2,
+		' and ')
 end
 
 --- builds the team and role display
@@ -554,7 +554,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 				teamDisplay = teamDisplay .. ' worked'
 			end
 
-			teamDisplay = teamDisplay .. PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date)
+			teamDisplay = teamDisplay .. ' for' .. PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date)
 	end
 
 
