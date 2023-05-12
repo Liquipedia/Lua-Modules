@@ -1,8 +1,3 @@
---[[
-WARNING: https://liquipedia.net/commons/Module:PlayerTeamAuto uses this module
---> add a legacy entry point?!
-]]
-
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -45,6 +40,12 @@ end
 --- only for legacy support
 function PlayerIntroduction.main(frame)
 	return PlayerIntroduction.run(Arguments.getArgs(frame))
+end
+
+---@deprecated
+--- only legacy support for `Module:PlayerTeamAuto`
+function PlayerIntroduction._get_lpdbtransfer(player, queryType)
+	return PlayerIntroduction._readTransferData(player, queryType)
 end
 
 -- template entry point
@@ -111,7 +112,10 @@ function PlayerIntroduction:init(args)
 		return self
 	end
 
-	self:_readTransferData(args.transferquery)
+	-- can not use `:` here due to `Module:PlayerTeamAuto`
+	self.transferInfo = PlayerIntroduction._readTransferData(self.player, args.transferquery)
+
+	self:_adjustTransferData()
 
 	self:_roleAdjusts(args)
 
@@ -189,18 +193,18 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 	}
 end
 
-
+---@param player string
 ---@param queryType 'datapoint'?
----@return nil
-function PlayerIntroduction:_readTransferData(queryType)
-	self.transferInfo = {}
-
+---@return table
+function PlayerIntroduction._readTransferData(player, queryType)
 	if queryType == 'datapoint' then
-		self:_readTransferFromDataPoints()
-	else
-		self:_readTransferFromTransfers()
+		return PlayerIntroduction._readTransferFromDataPoints(player) or {}
 	end
 
+	return PlayerIntroduction._readTransferFromTransfers(player) or {}
+end
+
+function PlayerIntroduction:_adjustTransferData()
 	if (self.transferInfo.type or 'current') == 'current' then
 		-- use transfer role if same team as player page team input
 		if String.isNotEmpty(self.playerInfo.team) and self.playerInfo.team ~= self.transferInfo.team then
@@ -214,9 +218,11 @@ function PlayerIntroduction:_readTransferData(queryType)
 	end
 end
 
-function PlayerIntroduction:_readTransferFromDataPoints()
+---@param player string
+---@return table?
+function PlayerIntroduction._readTransferFromDataPoints(player)
 	local queryData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[pagename::' .. self.player .. ']] AND [[type::teamhistory]] AND '
+		conditions = '[[pagename::' .. player .. ']] AND [[type::teamhistory]] AND '
 			.. '[[extradata_joindate::>]] AND [[extradata_leavedate::>]]',
 		query = 'information, extradata',
 	})
@@ -232,14 +238,14 @@ function PlayerIntroduction:_readTransferFromDataPoints()
 		local extradata = queryData[1].extradata
 
 		if extradata.leavedate and extradata.leavedate ~= DEFAULT_DATAPOINT_LEAVE_DATE then
-			self.transferInfo = {
+			return {
 				date = extradata.leavedate,
 				team = queryData[1].information,
 				role = (extradata.role or ''):lower(),
 				type = TRANSFER_STATUS_FORMER,
 			}
 		elseif (extradata.role or ''):lower() == TRANSFER_STATUS_LOAN then
-			self.transferInfo = {
+			return {
 				date = os.time(),
 				team = queryData[1].information,
 				-- assuming previous team is main team if it's missing a leavedate
@@ -249,7 +255,7 @@ function PlayerIntroduction:_readTransferFromDataPoints()
 				type = TRANSFER_STATUS_LOAN,
 			}
 		else
-			self.transferInfo = {
+			return {
 				date = os.time(),
 				team = queryData[1].information,
 				role = (extradata.role or ''):lower(),
@@ -259,9 +265,11 @@ function PlayerIntroduction:_readTransferFromDataPoints()
 	end
 end
 
-function PlayerIntroduction:_readTransferFromTransfers()
+---@param player string
+---@return table?
+function PlayerIntroduction._readTransferFromTransfers(player)
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
-		conditions = '([[player::' .. self.player .. ']] OR [[player::' .. self.player:gsub('_', ' ') .. ']]) AND '
+		conditions = '([[player::' .. player .. ']] OR [[player::' .. player:gsub('_', ' ') .. ']]) AND '
 			.. '[[date::>1971-01-01]]',
 		order = 'date desc',
 		limit = 1,
@@ -272,7 +280,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 		queryData = queryData[1]
 		local extradata = queryData.extradata
 		if String.isEmpty(queryData.toteam) then
-			self.transferInfo = {
+			return {
 				date = queryData.date,
 				team = queryData.fromteam,
 				type = TRANSFER_STATUS_FORMER,
@@ -281,7 +289,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 			((queryData.role2):lower() == TRANSFER_STATUS_LOAN or (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN) then
 
 			if queryData.fromteam == queryData.toteam and (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN then
-				self.transferInfo = {
+				return {
 					date = os.time(),
 					team = extradata.toteamsec,
 					team2 = queryData.toteam,
@@ -289,7 +297,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 					type = TRANSFER_STATUS_LOAN,
 				}
 			elseif queryData.fromteam == extradata.toteamsec and (queryData.role2):lower() == TRANSFER_STATUS_LOAN then
-				self.transferInfo = {
+				return {
 					date = os.time(),
 					team = queryData.toteam,
 					team2 = extradata.toteamsec,
@@ -297,7 +305,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 					type = TRANSFER_STATUS_LOAN,
 				}
 			else
-				self.transferInfo = {
+				return {
 					date = os.time(),
 					team = queryData.toteam,
 					role = (queryData.role2):lower(),
@@ -305,7 +313,7 @@ function PlayerIntroduction:_readTransferFromTransfers()
 				}
 			end
 		else
-			self.transferInfo = {
+			return {
 				date = os.time(),
 				team = queryData.toteam,
 				role = (queryData.role2):lower(),
