@@ -7,10 +7,11 @@
 --
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local Variables = require('Module:Variables')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
@@ -71,8 +72,9 @@ function CustomSquad.run(frame)
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
-		row	:id{
+		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		row:status(squad.type)
+		row:id{
 				player.id,
 				flag = player.flag,
 				link = player.link,
@@ -99,11 +101,11 @@ function CustomSquad.run(frame)
 		end
 
 		squad:row(row:create(
-			Variables.varDefault('squad_name',
-			mw.title.getCurrentTitle().prefixedText) ..
+			mw.title.getCurrentTitle().prefixedText ..
 				'_' .. player.id .. '_' ..
 				ReferenceCleaner.clean(player.joindate)
 				.. (player.role and '_' .. player.role or '')
+				.. '_' .. squad.type
 		))
 
 		index = index + 1

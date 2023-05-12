@@ -11,7 +11,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -190,7 +189,7 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 	if varData then
 		return Json.parse(varData)
 	else
-		local matchRecords = mw.ext.LiquipediaDB.lpdb(
+		return mw.ext.LiquipediaDB.lpdb(
 			'match2',
 			{
 				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
@@ -198,10 +197,6 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 				limit = 5000,
 			}
 		)
-		for _, matchRecord in ipairs(matchRecords) do
-			MatchGroupWorkaround.applyPlayerBugWorkaround(matchRecord)
-		end
-		return matchRecords
 	end
 end
 
@@ -379,11 +374,15 @@ function MatchGroupUtil.matchFromRecord(record)
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
+		liquipediatier = record.liquipediatier,
+		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
@@ -392,6 +391,9 @@ function MatchGroupUtil.matchFromRecord(record)
 end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
+	if not data then
+		return {}
+	end
 	if data.type == 'bracket' then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {

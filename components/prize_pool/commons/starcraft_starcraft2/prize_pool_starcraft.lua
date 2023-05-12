@@ -33,8 +33,6 @@ local pageVars = PageVariableNamespace('PrizePool')
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
-local SCORE_STATUS = 'S'
-local WALKOVER_VS_STATUS = 'W'
 local SC2 = 'starcraft2'
 
 local _lpdb_stash = {}
@@ -91,28 +89,6 @@ function CustomPrizePool.run(frame)
 end
 
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
-	local lastStatuses = {
-		CustomPrizePool._getStatusFromScore(lpdbData.lastscore),
-		CustomPrizePool._getStatusFromScore(lpdbData.lastvsscore),
-	}
-	local extradata = {
-		featured = Variables.varDefault('featured') or 'false', -- to be replaced by lpdbData.publishertier
-		playernumber = Opponent.partySize(opponent.opponentData),
-		seriesnumber = _series_number,
-
-		 -- to be removed once poinst storage is standardized
-		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
-		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
-
-		 -- to be removed once usage is removed
-		lastStatuses = lastStatuses,
-		placeRange = {placement.placeStart, placement.placeEnd},
-		wofrom = lastStatuses[1] == WALKOVER_VS_STATUS or nil,
-		woto = lastStatuses[2] == WALKOVER_VS_STATUS or nil,
-	}
-
-	lpdbData.publishertier = Variables.varDefault('featured')
-
 	-- make these available for the stash further down
 	lpdbData.liquipediatier = _tier
 	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
@@ -127,33 +103,18 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	if type(lpdbData.opponentplayers) == 'table' then
-		lpdbData.opponentplayers = Opponent.toLpdbStruct(opponent.opponentData).opponentplayers
-		-- following 2 lines as legacy support, to be removed once consumers are adjusted
+		-- following 2 lines as legacy support, to be removed once it is clear they are not needed anymore
 		lpdbData.players = Table.copy(lpdbData.opponentplayers)
 		lpdbData.players.type = lpdbData.opponenttype
 	end
 
-	if lpdbData.lastvs then
-		local lastVs = opponent.additionalData.LASTVS
-		extradata.vsOpponent = Table.deepCopy(lastVs)
-		if lastVs.type == Opponent.team then
-			lpdbData.lastvs = Json.stringify{
-				type = lastVs.type,
-				name = lastVs.name
-			}
-		else
-			lastVs = Opponent.toLpdbStruct(lastVs) or {}
-			lpdbData.lastvs = Json.stringify(Table.merge(
-					lastVs.opponentplayers or {},
-					{type = lastVs.opponenttype}
-				))
-		end
-	end
+	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
+		seriesnumber = _series_number,
 
-	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, extradata)
-
-	-- remove the following line once the consumers have been updated
-	lpdbData.mode = CustomPrizePool._getMode(lpdbData.opponenttype, opponent.opponentData)
+		 -- to be removed once poinst storage is standardized
+		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
+		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
+	})
 
 	lpdbData.tournament = _tournament_name
 	lpdbData.series = _series
@@ -182,15 +143,15 @@ function CustomPrizePool._getMode(opponentType, opponent)
 	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
 end
 
-function CustomPrizePool._getStatusFromScore(score)
-	return Logic.isNumeric(score) and SCORE_STATUS or score
-end
-
 function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
-	local extradata = Json.parseIfString(lpdbEntry.extradata) or {}
+	local lastVs = Json.parseIfString(lpdbEntry.lastvsdata) or {}
+
+	if Table.isNotEmpty(lastVs) then
+		lastVs = Opponent.fromLpdbStruct(lastVs)
+	end
+
 	-- fix lastvs opponent stuff
-	if lpdbEntry.lastvs then
-		local lastVs = extradata.vsOpponent or {}
+	if Table.isNotEmpty(lastVs) then
 		if lastVs.type == Opponent.solo then
 			smwEntry['has last opponent page'] = lastVs.players[1].pageName
 			smwEntry['has last opponent'] = lastVs.players[1].displayName

@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local StarcraftRace = require('Module:Race/Starcraft')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
@@ -48,18 +48,18 @@ function StarcraftOpponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize((opponent or {}).type)
 
 	if partySize == 1 then
-		opponent.players[1].race = StarcraftRace.read(args.race)
+		opponent.players[1].race = Faction.read(args.race)
 
 	elseif partySize then
 		opponent.isArchon = Logic.readBool(args.isarchon)
 		if opponent.isArchon then
-			local archonRace = StarcraftRace.read(args.race)
+			local archonRace = Faction.read(args.race)
 			for _, player in ipairs(opponent.players) do
 				player.race = archonRace
 			end
 		else
 			for playerIx, player in ipairs(opponent.players) do
-				player.race = StarcraftRace.read(args['p' .. playerIx .. 'race'])
+				player.race = Faction.read(args['p' .. playerIx .. 'race'])
 			end
 		end
 	end
@@ -73,7 +73,7 @@ function StarcraftOpponent.fromMatch2Record(record)
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
-			player.race = StarcraftRace.read(playerRecord.extradata.faction) or StarcraftRace.defaultRace
+			player.race = Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction
 		end
 		opponent.isArchon = Logic.readBool((record.extradata or {}).isarchon)
 	end
@@ -129,9 +129,9 @@ function StarcraftOpponent.resolve(opponent, date, options)
 				local hasRace = String.isNotEmpty(player.race)
 				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
 				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
+					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
 				end
-				player.race = (hasRace or player.race ~= StarcraftRace.defaultRace) and player.race or nil
+				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)
 			end

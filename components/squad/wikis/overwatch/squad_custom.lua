@@ -8,12 +8,14 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local SquadAutoRefs = require('Module:SquadAuto/References')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 local HAS_NUMBER = false
@@ -73,7 +75,7 @@ function ExtendedSquadRow:position(args)
 	self.content:node(cell)
 
 	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -170,8 +172,9 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = ExtendedSquadRow(mw.getCurrentFrame(), player.role, player.number)
+	local row = ExtendedSquadRow()
 
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
@@ -202,6 +205,7 @@ function CustomSquad._playerRow(player, squadType)
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

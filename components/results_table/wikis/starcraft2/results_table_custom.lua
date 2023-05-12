@@ -14,9 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
@@ -26,7 +24,6 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local UNDEFINED_TIER = 'undefined'
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
@@ -35,9 +32,10 @@ local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local CustomResultsTable = {}
 
 -- Template entry point
-function CustomResultsTable.run(frame)
+function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
+	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
@@ -49,7 +47,6 @@ function CustomResultsTable.run(frame)
 	local resultsTable = ResultsTable(args)
 
 	-- overwrite functions
-	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
 	resultsTable.rowHighlight = CustomResultsTable.rowHighlight
 	resultsTable.processLegacyVsData = CustomResultsTable.processLegacyVsData
 
@@ -60,7 +57,9 @@ function CustomResultsTable.run(frame)
 	return buildTable
 end
 
-function CustomResultsTable.awards(args)
+function CustomResultsTable.awards(frame)
+	local args = Arguments.getArgs(frame)
+	args.useIndivPrize = true
 	args.data = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
 	if Logic.readBool(args.achievements) and Table.isEmpty(args.data) then
@@ -70,53 +69,15 @@ function CustomResultsTable.awards(args)
 	local awardsTable = AwardsTable(args)
 
 	-- overwrite functions
-	awardsTable.tierDisplay = CustomResultsTable.tierDisplay
 	awardsTable.rowHighlight = CustomResultsTable.rowHighlight
 
-	local sectionHeader = ''
-	if Logic.readBool(args.achievements) then
-		sectionHeader = '\n=====Notable Awards=====\n'
-	end
-
-	return sectionHeader .. tostring(awardsTable:create():build())
-end
-
-function CustomResultsTable:tierDisplay(placement)
-	local tierDisplay = Tier.text.tiers[placement.liquipediatier] or UNDEFINED_TIER
-
-	tierDisplay = Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	)
-
-	local tierTypeDisplay = Tier.text.typesShort[(placement.liquipediatiertype or ''):lower()]
-
-	local sortValue = placement.liquipediatier .. (tierTypeDisplay or '')
-
-	if not tierTypeDisplay then
-		return tierDisplay, sortValue
-	end
-
-	return tierDisplay .. ' (' .. tierTypeDisplay .. ')', sortValue
+	return awardsTable:create():build()
 end
 
 function CustomResultsTable:rowHighlight(placement)
 	if Logic.readBool(placement.publishertier) then
-		return 'sc2premier-highlighted'
+		return 'tournament-highlighted-bg'
 	end
-end
-
-function CustomResultsTable:processLegacyVsData(placement)
-	if Table.isEmpty(placement.lastvsdata) then
-		local opponent = (placement.extradata or {}).vsOpponent or {}
-		placement.lastvsdata = Table.merge(
-			Opponent.toLpdbStruct(opponent or {}),
-			{groupscore = placement.groupscore, score = placement.lastvsscore}
-		)
-	end
-
-	return placement
 end
 
 -- all kill rows are manual inputs of all kill chievements

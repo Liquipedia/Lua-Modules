@@ -19,7 +19,7 @@ function mw.allToString(...) end
 ---@nodiscard
 function mw.clone(value) end
 
----Returns the current frame object, typically the frame object from the most recent #invoke. 
+---Returns the current frame object, typically the frame object from the most recent #invoke.
 ---@return Frame
 ---@nodiscard
 function mw.getCurrentFrame() end
@@ -141,16 +141,16 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string
+---@param builder? Html|string|number
 ---@return self
 function mw.html:node(builder) end
 
 ---Appends an undetermined number of wikitext strings to the mw.html object. Note that this stops at the first nil item.
----@param ... string?
+---@param ... string|number|nil
 ---@return self
 function mw.html:wikitext(...) end
 
----Appends a newline to the mw.html object. 
+---Appends a newline to the mw.html object.
 ---@return self
 function mw.html:newline() end
 
@@ -163,7 +163,7 @@ function mw.html:tag(tagName, args) end
 
 ---Set an HTML attribute with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string
+---@param value string|number
 ---@return self
 ---@overload fun(self, param: {[string]: string})
 function mw.html:attr(name, value) end

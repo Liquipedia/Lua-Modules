@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -103,6 +104,8 @@ end
 
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
+	lpdbData.extradata.ismixteam = tostring(String.isNotEmpty(args.mixteam))
+	lpdbData.extradata.isnationalteam = tostring(String.isNotEmpty(args.nationalteam))
 
 	return lpdbData
 end

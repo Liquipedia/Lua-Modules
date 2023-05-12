@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
+local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -46,8 +47,10 @@ function LegacyPrizePool.run(dependency)
 
 	local newArgs = {}
 
-	-- disable import legacy prize pools
+	-- disable import in legacy prize pools
 	newArgs.import = false
+	-- disable syncPlayers in legacy prize pools
+	newArgs.syncPlayers = false
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
@@ -67,7 +70,7 @@ function LegacyPrizePool.run(dependency)
 	LegacyPrizePool.assignType(newArgs, header.points2, 'points2')
 	LegacyPrizePool.assignType(newArgs, header.points3, 'points3')
 
-	if header.indiv then
+	if header.indiv or (Logic.readBool(header.award) and not Logic.readBool(header.team)) then
 		newArgs.type = {type = Opponent.solo}
 		IS_SOLO = true
 	else
@@ -110,6 +113,10 @@ function LegacyPrizePool.run(dependency)
 		newArgs['qualifies' .. linkData.id .. 'name'] = linkData.name
 	end
 
+	if Logic.readBool(header.award) then
+		return CustomAwardPrizePool.run(newArgs)
+	end
+
 	return CustomPrizePool.run(newArgs)
 end
 
@@ -150,15 +157,17 @@ function LegacyPrizePool.sortQualifiers(args)
 end
 
 function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
-	if not slot.place then
+	if not slot.place and not slot.award then
 		return {}
 	end
 
 	local newData = {}
-	if SPECIAL_PLACES[slot.place:lower()] then
+	if slot.place and SPECIAL_PLACES[slot.place:lower()] then
 		newData[SPECIAL_PLACES[slot.place:lower()]] = true
-	else
+	elseif slot.place then
 		newData.place = slot.place
+	else
+		newData.award = slot.award
 	end
 
 	local baseCurrencyPrize = LegacyPrizePool.BASE_CURRENCY:lower() .. 'prize'
@@ -167,7 +176,7 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	newData[baseCurrencyPrize] = (slot[baseCurrencyPrize] and slot[baseCurrencyPrize] ~= '0') and slot[baseCurrencyPrize]
 		or nil
 
-	local opponentsInSlot = #slot
+	local opponentsInSlot = LegacyPrizePool.opponentsInSlot(slot)
 	local needsQualifiedFreetext = false
 	Table.iter.forEachPair(CACHED_DATA.inputToId, function(parameter, newParameter)
 		local input = slot[parameter]
@@ -209,19 +218,35 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 		newData = CUSTOM_HANDLER.customSlot(newData, CACHED_DATA, slot)
 	end
 
-	newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	if CUSTOM_HANDLER.overwriteMapOpponents then
+		slot.opponentsInSlot = opponentsInSlot
+		newData.opponents = CUSTOM_HANDLER.overwriteMapOpponents(slot, newData, mergeSlots)
+	else
+		newData.opponents = LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
+	end
 
 	if mergeSlots then
 		local newSlot = {
 			opponents = newData.opponents,
-			place = newData.place
+			place = newData.place,
+			award = newData.award,
 		}
 		for _, item in pairs(SPECIAL_PLACES) do
 			newSlot[item] = newData[item]
 		end
+
 		return newSlot
 	end
+
 	return newData
+end
+
+function LegacyPrizePool.opponentsInSlot(slot)
+	if CUSTOM_HANDLER.opponentsInSlot then
+		return CUSTOM_HANDLER.opponentsInSlot(slot)
+	end
+
+	return #slot
 end
 
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
@@ -263,18 +288,24 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 			[1] = slot[opponentIndex],
 			type = slot['literal' .. opponentIndex] and Opponent.literal or nil,
 			date = slot['date' .. opponentIndex],
-			link = slot['link' .. opponentIndex],
+			link = slot['link' .. opponentIndex] or slot['page' .. opponentIndex],
 			wdl = slot['wdl' .. opponentIndex],
 			flag = slot['flag' .. opponentIndex],
 			team = slot['team' .. opponentIndex],
 			lastvs = {
 				slot['lastvs' .. opponentIndex],
+				link = slot['lastvs' .. opponentIndex .. 'link'] or slot['lastvspage' .. opponentIndex],
 				flag = slot['lastvsflag' .. opponentIndex],
 			},
 			lastvsscore = (slot['lastscore' .. opponentIndex] or '') ..
 				'-' ..
 				(slot['lastvsscore' .. opponentIndex] or ''),
 		}
+
+		-- catch empty lastvs table to avoid storing tbd opponents in lastvsdata
+		if Table.isEmpty(opponentData.lastvs) then
+			opponentData.lastvs = nil
+		end
 
 		if not opponentData.link and IS_SOLO then
 			local splitPlayer = mw.text.split(opponentData[1], '|')

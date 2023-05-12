@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
+local RoleOf = require('Module:RoleOf')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
@@ -18,9 +18,10 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 
 	-- Automatic org people
-	team.args.coach = Template.expandTemplate(frame, 'Coach of')
-	team.args.manager = Template.expandTemplate(frame, 'Manager of')
-	team.args.captain = Template.expandTemplate(frame, 'Captain of')
+	team.args.coach = RoleOf.get{role = 'Coach'}
+	team.args.manager = RoleOf.get{role = 'Manager'}
+	team.args.captain = RoleOf.get{role = 'Captain'}
+
 
 	return team:createInfobox()
 end

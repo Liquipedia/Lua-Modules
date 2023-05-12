@@ -40,6 +40,7 @@ local _ROLES = {
 	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
 	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
+	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', isplayer = false},
 	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
@@ -77,7 +78,7 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB

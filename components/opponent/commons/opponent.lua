@@ -14,7 +14,8 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
+	or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
 --[[
 Structural type representation of an opponent.
@@ -251,6 +252,9 @@ function Opponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
+				if not player.team then
+					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
+				end
 			else
 				PlayerExt.populatePageName(player)
 			end

@@ -13,13 +13,11 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Faction = Lua.import('Module:Faction', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getBigIcon = function(_) end,
-}
 
 local html = mw.html
 
@@ -148,7 +146,7 @@ function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 
 	local archonRaceNode
 	if showRace and opponent.isArchon then
-		archonRaceNode = StarcraftPlayerDisplay.Race(opponent.players[1].race)
+		archonRaceNode = Faction.Icon{faction = opponent.players[1].race}
 	end
 
 	return html.create('span')
@@ -183,9 +181,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		return playerNodes[1]
 
 	elseif showRace and opponent.isArchon then
-		local raceIcon = DisplayUtil.removeLinkFromWikiLink(
-			RaceIcon.getBigIcon({opponent.players[1].race})
-		)
+		local raceIcon = Faction.Icon{size = 'large', faction = opponent.players[1].race}
 		return StarcraftOpponentDisplay.BlockArchon({
 			flip = props.flip,
 			playerNodes = playerNodes,
@@ -200,9 +196,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
-			local primaryIcon = DisplayUtil.removeLinkFromWikiLink(
-				RaceIcon.getBigIcon({primaryRace})
-			)
+			local primaryIcon = Faction.Icon{size = 'large', faction = primaryRace}
 			local secondaryIcon
 			if primaryRace ~= secondaryRace then
 				secondaryIcon = html.create('div')

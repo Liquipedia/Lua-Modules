@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local CurrencyData = mw.loadData('Module:Currency/Data')
+local Info = mw.loadData('Module:Info')
 local Logic = require('Module:Logic')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
@@ -20,6 +21,8 @@ local LANG = mw.getContentLanguage()
 local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
+local DEFAULT_ROUND_PRECISION = 2
+local DASH = '-'
 
 function Currency.template(frame)
 	local args = Arguments.getArgs(frame)
@@ -45,6 +48,10 @@ function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
 	options.symbol = Logic.emptyOr(options.symbol, true)
 	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
+
+	if options.dashIfZero and tonumber(prizeValue) == 0 then
+		return DASH
+	end
 
 	local currencyData = Currency.raw(currencyCode)
 
@@ -81,7 +88,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	if prizeValue then
 		if Logic.isNumeric(prizeValue) and options.formatValue then
-			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision)
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision, false)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
@@ -103,17 +110,20 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value, precision)
-	if not Logic.isNumeric(value) then
-		return 0
+function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
+	dashIfZero = Logic.nilOr(Logic.readBoolOrNil(dashIfZero), true)
+	if not Logic.isNumeric(value) or (tonumber(value) == 0 and not forceRoundPrecision) then
+		return dashIfZero and DASH or 0
 	end
-	precision = tonumber(precision) or 2
+	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
 
 	local roundedValue = Math.round{value, precision}
 	local integer, decimal = math.modf(roundedValue)
-	if decimal == 0 then
+
+	if precision <= 0 or decimal == 0 and not forceRoundPrecision then
 		return LANG:formatNum(integer)
 	end
+
 	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
 end
 

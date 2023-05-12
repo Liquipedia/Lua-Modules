@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -206,21 +206,12 @@ function matchFunctions.getLinks(match)
 	match.links = {}
 
 	-- Shift (formerly Octane)
-	local index = 1
-	match.shift1 = match.shift1 or match.shift or match.octane1 or match.octane
-	while true do
-		local key = 'shift' .. index
-		local slug = match[key] or match['octane' .. index]
-		if not slug then
-			break
-		end
-		match.links[key] = 'https://www.shiftrle.gg/matches/' .. slug
-		index = index + 1
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing
-	match.ballchasing1 = match.ballchasing1 or match.ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end
 
@@ -239,7 +230,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',

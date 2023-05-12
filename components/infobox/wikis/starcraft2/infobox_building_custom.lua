@@ -7,11 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
-local CleanRaceFullName = require('Module:CleanRace2')
+local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Hotkeys = require('Module:Hotkey')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -25,12 +24,13 @@ local CustomBuilding = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
-local _HP = '[[File:Icon_Hitpoints.png|link=]]'
-local _SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
-local _ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
+local ICON_GAS = mw.loadData('Module:Gas')
+local ICON_TIME = mw.loadData('Module:Buildtime')
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
+local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
 local _race
@@ -39,6 +39,9 @@ local _building_attributes = {}
 function CustomBuilding.run(frame)
 	local building = Building(frame)
 	_args = building.args
+
+	_args.game = Game.name{game = _args.game}
+
 	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
@@ -51,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Energy', content = {_args.energy}})
 	table.insert(widgets, Cell{name = 'Detection/Attack Range', content = {_args.detection_range}})
 
-	if _args.game ~= 'lotv' then
+	if _args.game ~= GAME_LOTV then
 		table.insert(widgets, Center{content = {
 			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
@@ -110,11 +113,11 @@ function CustomBuilding:createWidgetInjector()
 end
 
 function CustomBuilding:_defenseDisplay()
-	local display = _HP .. ' ' .. (_args.hp or 0)
+	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
-		display = display .. ' ' .. _SHIELDS .. ' ' .. _args.shield
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
 	end
-	display = display .. ' ' .. _ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
 
 	if _args.light then
 		table.insert(_building_attributes, 'Light')
@@ -138,10 +141,9 @@ function CustomBuilding:nameDisplay(args)
 end
 
 function CustomBuilding._getRace(race)
-	race = string.lower(race)
-	_race = CleanRace[race] or race or ''
-	local category = CleanRaceFullName[_race]
-	local display = RaceIcon.getBigIcon({'alt_' .. _race})
+	_race = Faction.read(race)
+	local category = Faction.toName(_race)
+	local display = Faction.Icon{size = 'large', faction = _race} or ''
 	if not category and _race ~= 'unknown' then
 		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
 			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
@@ -154,14 +156,14 @@ end
 
 function CustomBuilding:_getCostDisplay()
 	local minerals = _args.min or 0
-	minerals = _MINERALS .. '&nbsp;' .. minerals
+	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
 
 	local gas = _args.gas or 0
-	gas = (_GAS[_race] or _GAS['default']) .. '&nbsp;' .. gas
+	gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. gas
 
 	local buildtime = _args.buildtime or 0
 	if buildtime ~= 0 then
-		buildtime = '&nbsp;' .. (_TIME[_race] or _TIME['default']) .. '&nbsp;' .. buildtime
+		buildtime = '&nbsp;' .. (ICON_TIME[_race] or ICON_TIME['default']) .. '&nbsp;' .. buildtime
 	else
 		buildtime = ''
 	end

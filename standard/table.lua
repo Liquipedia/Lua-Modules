@@ -8,17 +8,10 @@
 
 local Table = {}
 
----@generic T
----@param tbl T[]
----@return T[]
+---@deprecated
+---Use Array.randomize
 function Table.randomize(tbl)
-	math.randomseed(os.time())
-
-	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-	end
-	return tbl
+	return require('Module:Array').randomize(tbl)
 end
 
 ---Get the size of a table
@@ -251,8 +244,6 @@ end
 --Example:
 --`Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)`
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
---
---The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
 ---@generic K, V, U, T
 ---@param xTable {[K] : V}
 ---@param f fun(key?: K, value?: V): U, T
@@ -523,9 +514,13 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
+If requireIndex is disabled, for the first entry, both `prefix` and `prefix1`
+are valid keys, with a preference for the latter.
 
 Example:
+```
 local args = {
+	p = {},
 	p1 = {},
 	p2 = {},
 	p3 = {},
@@ -535,14 +530,35 @@ local args = {
 for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
-
-will print out 'p1 p2 p3'
+```
+will print out `p1 p2 p3`
 ]]
-function Table.iter.pairsByPrefix(tbl, prefix)
+---@param tbl table
+---@param prefixes string|string[]
+---@param options? {requireIndex: boolean}
+---@return function
+function Table.iter.pairsByPrefix(tbl, prefixes, options)
+	options = options or {}
+
+	if type(prefixes) == 'string' then
+		prefixes = {prefixes}
+	end
+
+	local getByPrefixes = function(index)
+		for _, prefix in ipairs(prefixes) do
+			local key = prefix .. index
+			if tbl[key] then
+				return key, tbl[key]
+			end
+		end
+	end
+
 	local i = 1
 	return function()
-		local key = prefix .. i
-		local value = tbl[key]
+		local key, value = getByPrefixes(i)
+		if options.requireIndex == false and i == 1 and not value then
+			key, value = getByPrefixes('')
+		end
 		i = i + 1
 		if value then
 			return key, value, (i - 1)

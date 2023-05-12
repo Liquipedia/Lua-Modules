@@ -10,18 +10,18 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
-local Currency = require('Module:Currency')
+local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
@@ -40,22 +40,13 @@ local _league
 local _next
 local _previous
 
-local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
+local GREATER_EQUAL = '&#8805;'
+local PRIZE_POOL_ROUND_PRECISION = 2
 local TODAY = os.date('%Y-%m-%d', os.time())
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
 
-local GAME_WOL = 'wol'
-local GAME_HOTS = 'hots'
-local GAME_LOTV = 'lotv'
 local GAME_MOD = 'mod'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
-local GAMES = {
-	[GAME_WOL] = {'Wings of Liberty', 'WoL'},
-	[GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
-	[GAME_LOTV] = {'Legacy of the Void', 'LotV'},
-	[GAME_MOD] = {'mod', 'mod'}
-}
 local SICON = '[[File:Sicon.png|text-bottom|Code S|link=Code S]]'
 local AICON = '[[File:Aicon.png|text-bottom|Code A]]'
 local PICON = '[[File:PIcon.png|text-bottom|Premier League]]'
@@ -66,12 +57,15 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = league.args
 
+	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.name{game = _args.game}
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -93,14 +87,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Prize pool',
 				content = {CustomLeague:_createPrizepool()},
-			},
-		}
-	elseif id == 'liquipediatier' then
-		return {
-			Cell{
-				name = 'Liquipedia tier',
-				content = {CustomLeague:_createLiquipediaTierDisplay()},
-				classes = {Logic.readBool(_args.featured) and 'sc2premier-highlighted' or ''}
 			},
 		}
 	elseif id == 'chronology' then
@@ -172,141 +158,102 @@ function CustomLeague._mapsDisplay(prefix)
 end
 
 function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
-		return nil
+	if String.isEmpty(_args.prizepool) and String.isEmpty(_args.prizepoolusd) then
+		return
 	end
 
 	local localCurrency = _args.localcurrency
-	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
 
 	if localCurrency == 'text' then
-		return prizePool
+		return _args.prizepool
 	else
-		local display, hasText, hasPlus
-		if prizePoolUSD then
-			prizePoolUSD, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePoolUSD)
+		local prizePoolUSD = _args.prizepoolusd
+		local prizePool = _args.prizepool
+
+		if not localCurrency and not prizePoolUSD then
+			prizePoolUSD = prizePool
+			prizePool = nil
 		end
 
-		prizePool, hasText, hasPlus = CustomLeague:_cleanPrizeValue(prizePool, localCurrency, hasPlus, hasText)
+		local hasPlus
+		prizePoolUSD, hasPlus = CustomLeague:_removePlus(prizePoolUSD)
+		prizePool, hasPlus = CustomLeague:_removePlus(prizePool, hasPlus)
 
-		if not prizePoolUSD and localCurrency then
-			local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
-			prizePoolUSD = CustomLeague:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
-			if not prizePoolUSD then
-				error('Invalid local currency "' .. localCurrency .. '"')
-			end
-		end
-
-		local plusText = hasPlus and '+' or ''
-		if prizePoolUSD and prizePool then
-			display = Currency.display((localCurrency or ''):lower(), CustomLeague:_displayPrizeValue(prizePool, 2) .. plusText)
-				.. '<br>(≃ $' .. CustomLeague:_displayPrizeValue(prizePoolUSD) .. plusText .. ' ' .. ABBR_USD .. ')'
-		elseif prizePool or prizePoolUSD then
-			display = '$' .. CustomLeague:_displayPrizeValue(prizePool or prizePoolUSD, 2) .. plusText .. ' ' .. ABBR_USD
-		end
-		if hasText then
-			display = (display or _args.prizepool or '') ..
-				'[[Category:Pages with text set as prizepool in infobox league]]'
-		end
-
-		Variables.varDefine('usd prize', prizePoolUSD or prizePool)
-		Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
-		Variables.varDefine('local prize', prizePool)
-
-		return display
+		return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
+			prizepool = prizePool,
+			prizepoolusd = prizePoolUSD,
+			currency = localCurrency,
+			rate = _args.currency_rate,
+			date = _args.currency_date or Variables.varDefault('tournament_enddate'),
+			displayRoundPrecision = PRIZE_POOL_ROUND_PRECISION,
+		}
 	end
 end
 
---function for custom tier handling
-function CustomLeague._createLiquipediaTierDisplay()
-	local tier = _args.liquipediatier
-	local tierType = _args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
+function CustomLeague:_removePlus(inputValue, alreadyHasPlus)
+	if not inputValue then
+		return inputValue, alreadyHasPlus
 	end
 
-	local teamEventCategoryInfix = (String.isNotEmpty(_args.team_number) or String.isNotEmpty(_args.team1))
-		and 'Team ' or ''
-
-	local function buildTierText(tierString, tierMode)
-		local tierText = Tier.text[tierMode][tierString]
-		if not tierText then
-			tierMode = tierMode == TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				_league.warnings,
-				tierString .. ' is not a known Liquipedia ' .. tierMode
-					.. '[[Category:Pages with invalid ' .. tierMode .. ']]'
-			)
-			return ''
-		else
-			return tierText
-		end
+	local hasPlus = string.sub(inputValue, -1) == '+'
+	if hasPlus then
+		inputValue = string.sub(inputValue, 0, -1)
 	end
 
-	tier = buildTierText(tier, TIER_MODE_TIERS)
-
-	local tierLink = tier .. ' Tournaments'
-	local tierCategory = '[[Category:' .. tier .. ' ' .. teamEventCategoryInfix .. 'Tournaments]]'
-	local tierDisplay
-	if String.isNotEmpty(tierType) then
-		tierType = buildTierText(tierType:lower(), TIER_MODE_TYPES)
-		tierDisplay = tierType .. '&nbsp;(' .. tier .. ')'
-	else
-		tierDisplay = tier
-	end
-
-	return '[[' .. tierLink .. '|' .. tierDisplay .. ']]' .. tierCategory
+	return inputValue, hasPlus or alreadyHasPlus
 end
 
 function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	local patch = _args.patch or ''
-	local shouldUseAutoPatch = (_args.autopatch or '') ~= 'false'
+	local game = _args.game
 	local modName = _args.modname
 	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
-	local endPatch = _args.epatch
-	local startDate = _args.sdate
-	local endDate = _args.edate
 
-	if String.isNotEmpty(game) or String.isNotEmpty(patch) then
-		local gameVersion
-		if game == GAME_MOD then
-			gameVersion = modName or 'Mod'
-		elseif GAMES[game] then
-			gameVersion = '[[' .. GAMES[game][1] .. ']]' ..
-				'[[Category:' .. betaPrefix .. GAMES[game][2] .. ' Competitions]]'
-		else
-			gameVersion = '[[Category:' .. betaPrefix .. 'Competitions]]'
-		end
-
-		if game == GAME_LOTV and shouldUseAutoPatch then
-			if String.isEmpty(patch) then
-				patch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(startDate)}) or '')
-			end
-			if String.isEmpty(endPatch) then
-				endPatch = 'Patch ' .. (Autopatch._main({CustomLeague._retrievePatchDate(endDate)}) or '')
-			end
-		elseif String.isEmpty(endPatch) then
-			endPatch = patch
-		end
-
-		local patchDisplay = betaPrefix
-
-		if String.isNotEmpty(patch) then
-			patchDisplay = patchDisplay .. '<br/>[[' .. patch .. ']]'
-			if patch ~= endPatch then
-				patchDisplay = patchDisplay .. ' &ndash; [[' .. endPatch .. ']]'
-			end
-		end
-
-		--set patch variables
-		Variables.varDefine('patch', patch)
-		Variables.varDefine('epatch', endPatch)
-
-		return gameVersion .. patchDisplay
+	local gameVersion
+	if game == GAME_MOD then
+		gameVersion = modName or 'Mod'
+	else
+		gameVersion = '[[' .. game .. ']]'
 	end
+
+	local patchDisplay = betaPrefix
+	if _args.patch then
+		patchDisplay = patchDisplay .. '<br/>[[' .. _args.patch .. ']]'
+		if _args.patch ~= _args.epatch then
+			patchDisplay = patchDisplay .. ' &ndash; [[' .. _args.epatch .. ']]'
+		end
+	end
+
+	return gameVersion .. patchDisplay
+end
+
+function CustomLeague._setPatchData()
+	local patchPrefix = 'Patch '
+
+	if _args.patch and _args.epatch then
+		_args.patch = patchPrefix .. _args.patch
+		_args.epatch = patchPrefix .. _args.epatch
+
+		return
+	end
+
+	local startDate = Variables.varDefault('tournament_startdate', TODAY)
+	local endDate = Variables.varDefault('tournament_enddate', TODAY)
+
+	if _args.game == GAME_LOTV and Logic.nilOr(Logic.readBoolOrNil(_args.autopatch), true) then
+		_args.patch = _args.patch or Autopatch._main{CustomLeague._retrievePatchDate(startDate)}
+		_args.epatch = _args.epatch or Autopatch._main{CustomLeague._retrievePatchDate(endDate)}
+	end
+
+	if not _args.patch then
+		return
+	elseif not _args.epatch then
+		_args.epatch = _args.patch
+	end
+
+	_args.patch = patchPrefix .. _args.patch
+	_args.epatch = patchPrefix .. _args.epatch
+
+	return
 end
 
 function CustomLeague._retrievePatchDate(dateEntry)
@@ -392,66 +339,6 @@ function CustomLeague:_getServer()
 	return output
 end
 
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	local usdPrize
-	local currencyRate = Currency.getExchangeRate{
-		currency = currency,
-		date = exchangeDate,
-		setVariables = true,
-	}
-	if currencyRate then
-		usdPrize = currencyRate * localPrize
-	end
-
-	return usdPrize
-end
-
-function CustomLeague:_displayPrizeValue(value, numDigits)
-	if String.isEmpty(value) or value == 0 or value == '0' then
-		return '-'
-	end
-
-	numDigits = tonumber(numDigits or 0) or 0
-	local factor = 10^numDigits
-	value = math.floor(value * factor + 0.5) / factor
-
-	--split value into
-	--left = first digit
-	--num = all remaining digits before a possible '.'
-	--right = the '.' and all digits after it (unless they are all 0 or do not exist)
-	local left, num, right = string.match(value, '^([^%d]*%d)(%d*)(.-)$')
-	if right:len() > 0 then
-		local decimal = string.sub('0' .. right, 3)
-		right = '.' .. decimal .. string.rep('0', 2 - string.len(decimal))
-	end
-	return left .. (num:reverse():gsub('(%d%d%d)','%1,'):reverse()) .. right
-end
-
-function CustomLeague:_cleanPrizeValue(value, currency, oldHasPlus, oldHasText)
-	if String.isEmpty(value) then
-		return nil, oldHasText, nil
-	end
-
-	--remove white spaces, '&nbsp;' and ','
-	value = string.gsub(value, '%s', '')
-	value = string.gsub(value, '&nbsp;', '')
-	value = string.gsub(value, ',', '')
-	value = string.gsub(value, '%$', '')
-
-	--check if it has a '+' at the end
-	local hasPlus = string.match(value, '%+$')
-	if hasPlus then
-		value = value:gsub('%+$', '')
-		hasPlus = true
-	end
-
-	--check if additional non numbers are present
-	local hasText = string.match(value, '[^%.%d]')
-	value = tonumber(value)
-
-	return value, hasText or oldHasText, hasPlus or oldHasPlus
-end
-
 function CustomLeague._playerBreakDownEvent()
 	local playerBreakDown = {}
 	local codeS = tonumber(_args.code_s_number) or 0
@@ -495,20 +382,16 @@ function CustomLeague._playerRaceBreakDown()
 		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
 			playerBreakDown.display = {}
 			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'p'})
-					.. ' ' .. protossNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'p'} .. ' ' .. protossNumber)
 			end
 			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'t'})
-					.. ' ' .. terranNumbner)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 't'} .. ' ' .. terranNumbner)
 			end
 			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'z'})
-					.. ' ' .. zergNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'z'} .. ' ' .. zergNumber)
 			end
 			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'r'})
-					.. ' ' .. randomNumber)
+				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r'} .. ' ' .. randomNumber)
 			end
 		end
 	end
@@ -538,22 +421,18 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
-
-	--Legacy tier(type) vars
-	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype', ''))
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-
 	--override var to standardize its entries
-	Variables.varDefine('tournament_game', CustomLeague._getGameStorage(_args.game))
+	Variables.varDefine('tournament_game', _args.game)
+
+	--patch data
+	CustomLeague._setPatchData()
+	Variables.varDefine('patch', _args.patch)
+	Variables.varDefine('epatch', _args.epatch)
 
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', tostring(Logic.readBool(_args.featured)))
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number
 	if Logic.isNumeric(seriesNumber) then
@@ -602,7 +481,7 @@ end
 
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = CustomLeague._getGameStorage(_args.game)
+	lpdbData.game = _args.game
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
 	local status = _args.status
@@ -617,7 +496,7 @@ function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
-	lpdbData.publishertier = Variables.varDefault('featured')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
@@ -639,8 +518,18 @@ function CustomLeague:_getPageNameFromChronology(item)
 	return mw.text.split(item, '|')[1]
 end
 
-function CustomLeague._getGameStorage(gameInput)
-	return (GAMES[string.lower(gameInput or '')] or {})[1] or GAMES[GAME_WOL][1]
+function CustomLeague:getWikiCategories(args)
+	if args.game == GAME_MOD then
+		return {}
+	end
+
+	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local gameAbbr = Game.abbreviation{game = args.game}
+	return {betaPrefix .. gameAbbr .. ' Competitions'}
+end
+
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.featured)
 end
 
 return CustomLeague

@@ -42,13 +42,15 @@ function CustomPrizePool.run(frame)
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
-	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_SMW_storage')) then
+	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		prizePool:setConfig('storeSmw', false)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
 	HEADER_DATA.tournamentName = args['tournament name']
 	HEADER_DATA.resultName = args['custom-name']
+
+	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
 	if Logic.readBool(args.qualifier) then
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {

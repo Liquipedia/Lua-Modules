@@ -347,7 +347,7 @@ function MatchGroupCoordinates.computeRawCounts(bracket)
 			countsBySection[sectionIndex] = countsBySection[sectionIndex] + count
 
 			-- Loser of match drops down
-			if sectionIndex + 1 <= #bracket.sections and coordinates.semanticDepth ~= 0 then
+			if sectionIndex + 1 <= #bracket.sections and coordinates.semanticDepth ~= 0 and not bracketData.qualLose then
 				countsBySection[sectionIndex + 1] = countsBySection[sectionIndex + 1] - 1
 			end
 		end

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -14,7 +15,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Tier = require('Module:Tier') -- loadData?
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
@@ -28,10 +29,7 @@ local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEn
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
 
-local _TIER_MODE_TYPES = 'types'
-local _TIER_MODE_TIERS = 'tiers'
-local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -59,9 +57,14 @@ function League:createInfobox()
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
-	-- New format has |venue= and |venuelink= as different parameters.
+	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
 	-- This should be removed once there's been a bot run to change this.
-	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
+		-- Remove [[]] and split on `|`
+		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
+		args.venue = splitVenue[1]
+		args.venuename = splitVenue[2]
+	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
 		-- Remove [] and split on space
 		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
 		args.venuelink = splitVenue[1]
@@ -102,18 +105,23 @@ function League:createInfobox()
 				)
 			}
 		},
-		Builder{
-			builder = function()
-				local organizers = self:_createOrganizers(args)
-				local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
+		Customizable{
+			id = 'organizers',
+			children = {
+				Builder{
+					builder = function()
+						local organizers = self:_createOrganizers(args)
+						local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-				return {
-					Cell{
-						name = title,
-						content = organizers
-					}
-				}
-			end
+						return {
+							Cell{
+								name = title,
+								content = organizers
+							}
+						}
+					end
+				},
+			},
 		},
 		Customizable{
 			id = 'sponsors',
@@ -157,26 +165,22 @@ function League:createInfobox()
 				}
 			}
 		},
-		Cell{
+		Customizable{id = 'location', children = {Cell{
 			name = 'Location',
 			content = {
 				self:_createLocation(args)
 			}
-		},
+		}}},
 		Builder{
 			builder = function()
-				args.venue1 = args.venue1 or args.venue
-				args.venue1link = args.venue1link or args.venuelink
-				args.venue1desc = args.venue1desc or args.venuedesc
-
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
 					local description
 					if String.isNotEmpty(args[prefix .. 'desc']) then
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, args[prefix .. 'name'], args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -250,14 +254,7 @@ function League:createInfobox()
 	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if self:shouldStore(args) then
-		self.infobox:categories('Tournaments')
-		if not String.isEmpty(args.team_number) then
-			self.infobox:categories('Team Tournaments')
-		end
-		if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
-			self.infobox:categories('Individual Tournaments')
-		end
-		self.infobox:categories(unpack(self:getWikiCategories(args)))
+		self.infobox:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end
@@ -265,9 +262,55 @@ function League:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
 end
 
+function League:_getCategories(args)
+	local categories = {'Tournaments'}
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
+	end
+	Array.extendWith(categories, self:addParticipantTypeCategory(args))
+	Array.extendWith(categories, self:addTierCategories(args))
+
+	return Array.extend(categories, self:getWikiCategories(args))
+end
+
+function League:addParticipantTypeCategory(args)
+	local categories = {}
+	if not String.isEmpty(args.team_number) then
+		table.insert(categories, 'Team Tournaments')
+	end
+	if String.isNotEmpty(args.player_number) or String.isNotEmpty(args.individual) then
+		table.insert(categories, 'Individual Tournaments')
+	end
+
+	return categories
+end
+
+function League:addTierCategories(args)
+	local categories = {}
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+
+	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	local isValidTierTuple = Tier.isValid(tier, tierType)
+	table.insert(categories, tierCategory)
+	table.insert(categories, tierTypeCategory)
+
+	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(categories, 'Pages with invalid Tier')
+	end
+	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(categories, 'Pages with invalid Tiertype')
+	end
+
+	return categories
+end
+
 --- Allows for overriding this functionality
 function League:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
@@ -294,48 +337,11 @@ function League:appendLiquipediatierDisplay()
 	return ''
 end
 
-function League:_getTierText(tierString, tierMode)
-	if not Tier.text[tierMode] then -- allow legacy tier modules
-		return Tier.text[tierString]
-	else -- default case, i.e. tier module with intended format
-		return Tier.text[tierMode][tierString:lower()]
-	end
-end
-
---- Allows for overriding this functionality
 function League:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
+	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
 
-	local function buildTierString(tierString, tierMode)
-		local tierText = League:_getTierText(tierString, tierMode)
-		if not tierText then
-			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			if self:shouldStore(self.args) then
-				self.infobox:categories(tierText .. ' Tournaments')
-			end
-			local tierLink = tierText .. ' Tournaments'
-			if Tier.link and Tier.link[tierString] then
-				tierLink = Tier.link[tierString]
-			end
-
-			return '[[' .. tierLink .. '|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
+	if String.isEmpty(tierDisplay) then
+		return
 	end
 
 	return tierDisplay .. self.appendLiquipediatierDisplay(args)
@@ -356,6 +362,8 @@ function League:_createPrizepool(args)
 		currency = args.localcurrency,
 		rate = args.currency_rate,
 		date = date or Variables.varDefault('tournament_enddate'),
+		displayRoundPrecision = args.currencyDispPrecision,
+		varRoundPrecision = args.currencyVarPrecision
 	}
 end
 
@@ -367,19 +375,12 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
 	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
 
-	Variables.varDefine('tournament_liquipediatier', args.liquipediatier)
-	Variables.varDefine(
-		'tournament_liquipediatiertype',
-		Tier.text.types
-			and Tier.text.types[string.lower(args.liquipediatiertype or '')]
-			or args.liquipediatiertype
-	)
-	--[[ once tier modules all follow the new format we can simplify this again:
-	Variables.varDefine('tournament_liquipediatiertype', Tier.text.types[string.lower(args.liquipediatiertype or '')])
-	]]
+	local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
+	Variables.varDefine('tournament_liquipediatier', tier)
+	Variables.varDefine('tournament_liquipediatiertype', tierType)
 
 	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_status', args.status)
+	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -445,7 +446,7 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		status = args.status,
+		status = Variables.varDefault('tournament_status'),
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
 			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
@@ -491,35 +492,30 @@ function League:_createLocation(args)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
 	end
 
-	local index = 1
-	local content = ''
-	local current = args['country']
-	local currentLocation = args['city'] or args['location']
+	local display = {}
+	args.city1 = args.city1 or args.location1 or args.city or args.location
 
-	while not String.isEmpty(current) do
-		local nationality = Flags.getLocalisation(current)
+	for _, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			content = content .. '[[Category:Unrecognised Country|' .. current .. ']]'
+			self.infobox:categories('Unrecognised Country')
 
 		else
-			local countryName = Flags.CountryName(current)
-			local displayText = currentLocation or countryName
-			if displayText == '' then
-				displayText = current
+			local location = args['city' .. index] or args['location' .. index]
+			local countryName = Flags.CountryName(country)
+			local displayText = location or countryName
+			if String.isEmpty(displayText) then
+				displayText = country
 			end
 
 			if self:shouldStore(args) then
-				content = content .. '[[Category:' .. nationality .. ' Tournaments]]'
+				self.infobox:categories(nationality .. ' Tournaments')
 			end
-			content = content .. Flags.Icon{flag = current, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>'
+			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end
-
-		index = index + 1
-		current = args['country' .. index]
-		currentLocation = args['city' .. index] or args['location' .. index]
 	end
-	return content
+	return table.concat(display)
 end
 
 function League:_createSeries(options, series, abbreviation, icon, iconDark)
@@ -580,14 +576,14 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
-function League:_createLink(id, name, link, desc)
+function League:createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
 
 	local output
 
-	if Page.exists(id) then
+	if Page.exists(id) or id:find('^[Ww]ikipedia:') then
 		output = '[[' .. id .. '|'
 		if String.isEmpty(name) then
 			output = output .. id .. ']]'
@@ -616,23 +612,10 @@ function League:_createLink(id, name, link, desc)
 end
 
 function League:_createOrganizers(args)
-	local organizers = {
-		League:_createLink(
-			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-	}
+	local organizers = {}
 
-	local index = 2
-
-	while not String.isEmpty(args['organizer' .. index]) do
-		table.insert(
-			organizers,
-			League:_createLink(
-				args['organizer' .. index],
-				args['organizer' .. index .. '-name'],
-				args['organizer' .. index .. '-link'],
-				args['organizerref' .. index])
-		)
-		index = index + 1
+	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
+		table.insert(organizers, self:createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers
