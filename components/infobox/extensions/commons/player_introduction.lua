@@ -547,7 +547,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 	elseif String.isNotEmpty(transferInfo.team) and transferInfo.team ~= SKIP_ROLE
 		and transferInfo.type == TRANSFER_STATUS_FORMER then
 
-			teamDisplay = teamDisplay .. ' who last'
+			teamDisplay = ' who last'
 			if playerInfo.type == TYPE_PLAYER then
 				teamDisplay = teamDisplay .. ' played'
 			else
