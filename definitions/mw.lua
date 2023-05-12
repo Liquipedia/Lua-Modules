@@ -19,7 +19,7 @@ function mw.allToString(...) end
 ---@nodiscard
 function mw.clone(value) end
 
----Returns the current frame object, typically the frame object from the most recent #invoke. 
+---Returns the current frame object, typically the frame object from the most recent #invoke.
 ---@return Frame
 ---@nodiscard
 function mw.getCurrentFrame() end
@@ -150,7 +150,7 @@ function mw.html:node(builder) end
 ---@return self
 function mw.html:wikitext(...) end
 
----Appends a newline to the mw.html object. 
+---Appends a newline to the mw.html object.
 ---@return self
 function mw.html:newline() end
 
@@ -163,7 +163,7 @@ function mw.html:tag(tagName, args) end
 
 ---Set an HTML attribute with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string
+---@param value string|number
 ---@return self
 ---@overload fun(self, param: {[string]: string})
 function mw.html:attr(name, value) end

@@ -36,7 +36,7 @@ local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Categor
 local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
 local SquadRow = Class.new(
-	function(self, status, options)
+	function(self, options)
 		self.content = mw.html.create('tr'):addClass('Player')
 		self.options = options or {}
 

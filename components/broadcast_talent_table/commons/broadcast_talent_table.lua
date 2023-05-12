@@ -39,23 +39,24 @@ local RESULTS_SORT_ORDER = 'date desc'
 --- @class BroadcastTalentTable
 local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 
+---@class argsValues
+---@field broadcaster string?
+---@field aliases string?
+---@field showtiertype string|boolean|nil
+---@field year number|string|nil
+---@field sdate string?
+---@field edate string?
+---@field achievements string|boolean|nil
+---@field displayGameIcon string|boolean|nil
+---@field useTickerNames string|boolean|nil
+---@field limit string|number|nil
+---@field aboutAchievementsLink string|boolean|nil
+---@field onlyHighlightOnValue string?
+---@field displayPartnerLists string|boolean|nil
+
 --- Init function for BroadcastTalentTable
----@param args {
----		broadcaster: string?,
----		aliases: string?,
----		showtiertype: string|boolean|nil,
----		year: number|string|nil,
----		sdate: string?,
----		edate: string?,
----		achievements: string|boolean|nil,
----		displayGameIcon: string|boolean|nil,
----		useTickerNames: string|boolean|nil,
----		limit: string|number|nil,
----		aboutAchievementsLink: string|boolean|nil,
----		onlyHighlightOnValue: string?,
----		displayPartnerLists: string|boolean|nil,
----}
----@return string?
+---@param args argsValues
+---@return self
 function BroadcastTalentTable:init(args)
 	self:_readArgs(args)
 
