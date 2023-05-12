@@ -35,7 +35,7 @@ local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
 local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
-local DEFAULT_LIMIT= 5000
+local DEFAULT_LIMIT = 5000
 
 --- @class BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
