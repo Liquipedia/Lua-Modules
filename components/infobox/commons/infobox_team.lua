@@ -60,7 +60,7 @@ function Team:createInfobox()
 	-- Links
 	local links = Links.transform(args)
 
-  -- Earnings
+	-- Earnings
 	self.totalEarnings, self.yearlyEarnings = self:calculateEarnings(args)
 
 	-- Team Information
