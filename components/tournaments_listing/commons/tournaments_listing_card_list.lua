@@ -35,6 +35,7 @@ local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
 local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
+local DEFAULT_LIMIT= 5000
 
 --- @class BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
@@ -92,7 +93,7 @@ function BaseTournamentsListing:_query()
 		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
 			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
 		order = self.args.order,
-		limit = self.args.limit,
+		limit = self.args.limit or DEFAULT_LIMIT,
 		offset = self.config.offset,
 	})
 end
