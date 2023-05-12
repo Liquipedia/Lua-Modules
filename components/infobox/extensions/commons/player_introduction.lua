@@ -1,3 +1,8 @@
+--[[
+WARNING: https://liquipedia.net/commons/Module:PlayerTeamAuto uses this module
+--> add a legacy entry point?!
+]]
+
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -24,6 +29,7 @@ local TRANSFER_STATUS_LOAN = 'loan'
 local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_PLAYER = 'player'
 local SKIP_ROLE = 'skip'
+local INACTIVE_ROLE = 'inactive'
 local DEFAULT_DATE = '1970-01-01'
 
 --- @class PlayerIntroduction
@@ -79,7 +85,7 @@ end
 ---@field team string?,
 ---@field team2 string?,
 ---@field type string?,
----@field transferquery string?,
+---@field transferquery 'datapoint'?,
 ---@field convert_role boolean?,
 ---@field show_role boolean?,
 ---@field show_faction boolean?
@@ -320,7 +326,7 @@ function PlayerIntroduction:_roleAdjusts(args)
 	-- if you have a better name ...
 	local tempRole
 	if manualRoleInput ~= SKIP_ROLE and String.isNotEmpty(transferInfo.role) and
-		transferInfo.role ~= 'inactive' and transferInfo.role ~= 'loan' and transferInfo.role ~= 'substitute' then
+		transferInfo.role ~= INACTIVE_ROLE and transferInfo.role ~= 'loan' and transferInfo.role ~= 'substitute' then
 
 		tempRole = transferInfo.role
 	elseif manualRoleInput ~= SKIP_ROLE then
@@ -366,7 +372,7 @@ function PlayerIntroduction:create()
 			game = gameDisplay or '',
 			faction = factionDisplay or '',
 			type = typeDisplay or '',
-			team = self:_teamDisplay(),
+			team = self:_teamDisplay(isDeceased),
 			subText = self.playerInfo.subText or '',
 			freeText = self.playerInfo.freeText or '',
 		}
@@ -447,30 +453,17 @@ end
 --- builds the nationality display
 ---@return string?
 function PlayerIntroduction:_nationalityDisplay()
-	--TODO
-
-
-	--[=[
-		if playerInfo.nationality ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality ] then
-		playerInfo.nationality = playerInfo.nationality:gsub("^%l", string.upper)
-		local nationality = '[[:Category:' .. playerInfo.nationality .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality ] .. ']]'
-		if articleswitch ~= '' then
-			nationality = ' ' .. nationality
-		else
-			nationality = ' ' .. Article{ nationality }
-			articleswitch = 'true'
-		end
-		if playerInfo.nationality2 ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality2 ]then
-			playerInfo.nationality2 = playerInfo.nationality2:gsub("^%l", string.upper)
-			nationality = nationality .. '/[[:Category:' .. playerInfo.nationality2 .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality2 ] .. ']]'
-			if playerInfo.nationality3 ~= '' and Denonym.getAdjFromCountry[ playerInfo.nationality3 ]then
-				playerInfo.nationality3 = playerInfo.nationality3:gsub("^%l", string.upper)
-				nationality = nationality .. '/[[:Category:' .. playerInfo.nationality3 .. '|' .. Denonym.getAdjFromCountry[ playerInfo.nationality3 ] .. ']]'
-			end
-		end
-		output = output .. nationality
+	local nationalities = {}
+	for _, nationality in Table.iter.pairsByPrefix(self.playerInfo, 'nationality', {requireIndex = false}) do
+		table.insert(nationalities, '[[:Category:' .. nationality:gsub("^%l", string.upper)
+			.. '|' .. (Flags.getLocalisation(nationality) or '') .. ']]')
 	end
-	]=]
+
+	if Table.isEmpty(nationalities) then
+		return nil
+	end
+
+	return table.concat(nationalities, '/')
 end
 
 --- builds the game display
@@ -492,7 +485,7 @@ function PlayerIntroduction:_factionDisplay()
 
 
 	local factions = {}
-	for _, faction in Table.iter.pairsByPrefix(self.playerInfo, 'faction', '') do
+	for _, faction in Table.iter.pairsByPrefix(self.playerInfo, 'faction', {requireIndex = false}) do
 		table.insert(factions, Faction.toName(Faction.read(faction)))
 	end
 
@@ -507,75 +500,70 @@ function PlayerIntroduction:_typeDisplay()
 end
 
 --- builds the team and role display
+---@param isDeceased boolean
 ---@return string?
-function PlayerIntroduction:_teamDisplay()
-	--TODO
-
-	--[=[
-	local teamText
-	--[[playerInfo.team vs transferInfo.team
-	for r6:
-		playerInfo.team = manual input (via p._get_lpdbtransfer (only current) if automated)
-		transferInfo.team = p._get_lpdbtransfer (all)
-	for aoe:
-		playerInfo.team = manual input
-		transferInfo.team = p._get_lpdbtransfer (active and former)]]
-	--[[old version:
-		current = playerInfo.team
-		former = transferInfo.team]]
-	if playerInfo.team ~= '' or ((transferInfo.team or '') ~= '' and (transferInfo.team or '') ~= 'skip') then
-		if playerInfo.team ~= '' and playerInfo.deathdate == '1970-01-01' and playerInfo.status ~= 'passed away' then
-			teamText = ' who is currently'
-			if playerInfo.type == TYPE_PLAYER then
-				if (transferInfo.role or '') == 'inactive' and transferInfo.type == 'current' then
-					teamText = teamText .. ' on the inactive roster of'
-				elseif args.show_role and tempRole ~= '' then
-					if tempRole == 'streamer' or tempRole == 'content creator' then
-						teamText = teamText .. ' ' .. Article{ tempRole } .. ' for'
-					else
-						teamText = teamText .. ' playing as ' .. Article{ tempRole } .. ' for'
-					end
-				else
-					teamText = teamText .. ' playing for'
-				end
-			else
-				teamText = teamText .. ' working for'
-			end
-			if mw.ext.TeamTemplate.teamexists(playerInfo.team) then
-				local teamOutput = mw.ext.TeamTemplate.raw(playerInfo.team, transferInfo.date)
-				output = output .. teamText .. ' [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
-			else
-				output = output .. teamText .. ' [[' .. playerInfo.team .. ']]'
-			end
-			if transferInfo.type == 'loan' and playerInfo.team2 ~= '' then
-				output = output .. ' on loan from'
-				if mw.ext.TeamTemplate.teamexists(playerInfo.team2) then
-					local teamOutput = mw.ext.TeamTemplate.raw(playerInfo.team2, transferInfo.date)
-					output = output .. ' [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
-				else
-					output = output .. ' [[' .. playerInfo.team2 .. ']]'
-				end
-			end
-		elseif (transferInfo.team or '') ~= '' and transferInfo.team ~= 'skip' and transferInfo.type == 'former' then
-			teamText = ' who last'
-			if playerInfo.type == TYPE_PLAYER then
-				teamText = teamText .. ' played'
-			else
-				teamText = teamText .. ' worked'
-			end
-			if mw.ext.TeamTemplate.teamexists(transferInfo.team) then
-				local teamOutput = mw.ext.TeamTemplate.raw(transferInfo.team, transferInfo.date)
-				output = output .. teamText .. ' for [[' .. teamOutput.page .. '|' .. teamOutput.name .. ']]'
-			else
-				output = output .. teamText .. ' for [[' .. transferInfo.team .. ']]'
-			end
-		end
-		if args.show_role and playerInfo.type ~= TYPE_PLAYER and tempRole ~= '' then
-			output = output .. ' as ' .. Article{ tempRole }
-		end
+function PlayerIntroduction:_teamDisplay(isDeceased)
+	local playerInfo = self.playerInfo
+	local transferInfo = self.transferInfo
+	local tempRole = self.transferInfo.tempRole
+	if String.isEmpty(playerInfo.team) and (String.isEmpty(transferInfo.team) or transferInfo.team == SKIP_ROLE) then
+		return nil
 	end
-	]=]
 
+	local teamDisplay
+	if String.isNotEmpty(playerInfo.team) and not isDeceased then
+		teamDisplay = ' who is currently'
+
+		if playerInfo.type == TYPE_PLAYER then
+			if transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
+				teamDisplay = teamDisplay .. ' on the inactive roster of'
+			elseif self.options.showRole and tempRole then
+				if tempRole == 'streamer' or tempRole == 'content creator' then
+					teamDisplay = teamDisplay .. ' ' .. AnOrA.main{tempRole}
+				else
+					teamDisplay = teamDisplay .. ' playing as ' .. AnOrA.main{tempRole}
+				end
+				teamDisplay = teamDisplay .. ' for'
+			else
+				teamDisplay = teamDisplay .. ' playing for'
+			end
+		else
+			teamDisplay = teamDisplay .. ' working for'
+		end
+
+		teamDisplay = teamDisplay .. PlayerIntroduction._displayTeam(playerInfo.team, transferInfo.date)
+
+		if transferInfo.type == TRANSFER_STATUS_LOAN and String.isEmpty(playerInfo.team2) then
+			teamDisplay = teamDisplay .. ' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date)
+		end
+	elseif String.isNotEmpty(transferInfo.team) and transferInfo.team ~= SKIP_ROLE
+		and transferInfo.type == TRANSFER_STATUS_FORMER then
+
+			teamDisplay = teamDisplay .. ' who last'
+			if playerInfo.type == TYPE_PLAYER then
+				teamDisplay = teamDisplay .. ' played'
+			else
+				teamDisplay = teamDisplay .. ' worked'
+			end
+
+			teamDisplay = teamDisplay .. PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date)
+	end
+
+
+	if self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(tempRole) then
+		teamDisplay = teamDisplay .. ' as ' .. AnOrA.main{tempRole}
+	end
+
+	return teamDisplay
+end
+
+function PlayerIntroduction._displayTeam(team, date)
+	if mw.ext.TeamTemplate.teamexists(team) then
+		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
+	end
+
+	return ' [[' .. team .. ']]'
 end
 
 ---@param text string|false|nil
