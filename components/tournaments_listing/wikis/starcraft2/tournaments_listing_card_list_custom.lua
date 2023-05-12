@@ -23,7 +23,7 @@ local NON_QUALIFIER = '!Qualifier'
 
 function CustomTournamentsListing.run(args)
 	args = args or {}
-	
+
 	if Logic.readBool(args.byYear) then
 		args.byYear = nil
 		return CustomTournamentsListing.byYear(args)
