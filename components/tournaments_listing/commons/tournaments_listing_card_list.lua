@@ -363,7 +363,7 @@ function BaseTournamentsListing._organizerDisplay(tournamentData)
 
 	local organizerArray = {}
 	for _, organizer in Table.iter.pairsByPrefix(organizers, 'organizer') do
-		table.insert(organizerArray, organizer)
+		table.insert(organizerArray, organizer:gsub('_', ' '))
 	end
 
 	return mw.html.create()
