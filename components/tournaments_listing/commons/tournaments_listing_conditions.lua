@@ -86,7 +86,7 @@ function TournamentsListingConditions.base(args)
 	if args.organizer then
 		local organizerConditions = ConditionTree(BooleanOperator.any)
 		for _, organizer in mw.text.split(args.organizer, ',', true) do
-			organizer = mw.text.trim(organizer):gsub(' ', '_')
+			organizer = mw.text.trim(organizer)
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
 				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
