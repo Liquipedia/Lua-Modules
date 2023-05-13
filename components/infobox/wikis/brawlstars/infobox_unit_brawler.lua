@@ -78,10 +78,8 @@ function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomUnit:nameDisplay()
-	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), 'brawlername', {self.pagename}, self.pagename)
-
-	return _brawlerName
+function CustomUnit:nameDisplay(args)
+	return args.brawlername or args.name or self.pagename
 end
 
 function CustomUnit:setLpdbData(args)

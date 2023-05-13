@@ -133,7 +133,7 @@ end
 
 function CustomUnit:nameDisplay(args)
 	local raceIcon = CustomUnit._getRace(args.race or 'unknown')
-	local name = args.name or self.pagename
+	local name = args.name or self.pagename:gsub('_', ' ')
 
 	return raceIcon .. '&nbsp;' .. name
 end

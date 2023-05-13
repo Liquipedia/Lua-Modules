@@ -353,12 +353,12 @@ function CustomPlayer:calculateEarnings()
 end
 
 function CustomPlayer._getEarningsMedalsData(player)
-	local playerWithUnderScores = player:gsub(' ', '_')
+	local playerWithoutUnderScores = player:gsub('_', ' ')
 	local playerConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerConditions:add({
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithoutUnderScores),
 			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex), Comparator.eq, playerWithUnderScores),
 		})
 	end
 
