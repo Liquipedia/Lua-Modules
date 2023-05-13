@@ -95,7 +95,6 @@ function Person:createInfobox()
 		age = Person._createAgeCalculationErrorMessage(age)
 	end
 
-	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
 	if team and mw.ext.TeamTemplate.teamexists(team) then
 		self.team = mw.ext.TeamTemplate.raw(team)

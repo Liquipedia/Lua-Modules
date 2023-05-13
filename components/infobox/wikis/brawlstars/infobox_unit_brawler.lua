@@ -79,7 +79,9 @@ function CustomUnit:createWidgetInjector()
 end
 
 function CustomUnit:nameDisplay(args)
-	return args.brawlername or args.name or self.pagename:gsub('_', ' ')
+	_brawlerName = args.brawlername or args.name or self.pagename:gsub('_', ' ')
+
+	return _brawlerName
 end
 
 function CustomUnit:setLpdbData(args)

@@ -371,8 +371,8 @@ function CustomPlayer._getEarningsMedalsData(player)
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithoutUnderScores),
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, player),
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
