@@ -78,8 +78,8 @@ function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomUnit:nameDisplay(args)
-	_brawlerName = args.brawlername or args.name or self.pagename:gsub('_', ' ')
+function CustomUnit:nameDisplay()
+	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), 'brawlername', {self.pagename}, self.pagename)
 
 	return _brawlerName
 end

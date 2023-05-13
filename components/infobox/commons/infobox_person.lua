@@ -95,13 +95,6 @@ function Person:createInfobox()
 		age = Person._createAgeCalculationErrorMessage(age)
 	end
 
-	local team = args.teamlink or args.team
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		self.team = mw.ext.TeamTemplate.raw(team)
-	else
-		self.team = {}
-	end
-
 	local widgets = {
 		Header{
 			name = self:nameDisplay(args),
@@ -243,7 +236,13 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 
-	local team = self.team.page or args.teamlink or args.team
+	local teamLink, teamTemplate
+	local team = args.teamlink or args.team
+	if team and mw.ext.TeamTemplate.teamexists(team) then
+		local teamRaw = mw.ext.TeamTemplate.raw(team)
+		teamLink = teamRaw.page
+		teamTemplate = teamRaw.templatename
+	end
 
 	local lpdbData = {
 		id = args.id or mw.title.getCurrentTitle().prefixedText,
@@ -258,9 +257,9 @@ function Person:_setLpdbData(args, links, status, personType)
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
 		region = _region,
-		team = team,
-		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(team or ''):gsub(' ', '_'),
-		teamtemplate = self.team.templatename,
+		team = teamLink or team,
+		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
+		teamtemplate = teamTemplate,
 		status = status,
 		type = personType,
 		earnings = self.totalEarnings,

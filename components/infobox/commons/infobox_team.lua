@@ -62,9 +62,8 @@ function Team:createInfobox()
 	local links = Links.transform(args)
 
 	-- Team Information
-	local team = args.teamtemplate or self.pagename:gsub('_', ' ') or self.name
+	local team = args.teamtemplate or self.pagename
 	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
-	self.team = self.teamTemplate.page or self.pagename:gsub('_', ' ')
 
 	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
 	args.image = args.image or self.teamTemplate.image
@@ -119,7 +118,7 @@ function Team:createInfobox()
 					builder = function()
 						_defaultEarningsFunctionUsed = true
 						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
-							team = self.team,
+							team = self.pagename or self.name,
 							perYear = true,
 							queryHistorical = args.queryEarningsHistorical
 						}
