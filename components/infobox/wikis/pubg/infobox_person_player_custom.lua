@@ -115,7 +115,9 @@ end
 
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = self.pagename})
+		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {
+			team = self.team.page or _args.team
+		})
 	end
 end
 
