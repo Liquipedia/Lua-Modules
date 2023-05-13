@@ -193,20 +193,17 @@ function Series:createInfobox()
 			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
 			defunctfate = ReferenceCleaner.clean(args.defunctfate),
-			organizers = mw.ext.LiquipediaDB.lpdb_create_json({
-				organizer1 = args.organizer or args.organizer1,
-				organizer2 = args.organizer2,
-				organizer3 = args.organizer3,
-				organizer4 = args.organizer4,
-				organizer5 = args.organizer5,
-			}),
-			sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-				sponsor1 = args.sponsor1,
-				sponsor2 = args.sponsor2,
-				sponsor3 = args.sponsor3,
-				sponsor4 = args.sponsor4,
-				sponsor5 = args.sponsor5,
-			}),
+			organizers = mw.ext.LiquipediaDB.lpdb_create_json(
+				Table.mapValues(
+					Series:_getNamedTableofAllArgsForBase(args, 'organizer'),
+					function (organizer)
+						return mw.ext.TeamLiquidIntegration.resolve_redirect(organizer):gsub(' ', '_')
+					end
+				)
+			),
+			sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
+				Series:_getNamedTableofAllArgsForBase(args, 'sponsor')
+			),
 			links = mw.ext.LiquipediaDB.lpdb_create_json(
 				Links.makeFullLinksForTableItems(links or {})
 			),
@@ -275,6 +272,15 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	lpdbData.icondark = iconDark
 
 	return lpdbData
+end
+
+function Series:_getNamedTableofAllArgsForBase(args, base)
+	local basedArgs = self:getAllArgsForBase(args, base)
+	local namedArgs = {}
+	for key, item in pairs(basedArgs) do
+		namedArgs[base .. key] = item
+	end
+	return namedArgs
 end
 
 function Series:_createLocation(country, city)
