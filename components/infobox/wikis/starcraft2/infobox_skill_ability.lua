@@ -186,9 +186,7 @@ end
 function Ability:getCostDisplay()
 	local race = string.lower(_args.race or '')
 
-	local minerals = tonumber(_args.min or 0) or 0
-	---@diagnostic disable-next-line: cast-local-type
-	minerals = _MINERALS .. '&nbsp;' .. minerals
+	local minerals = _MINERALS .. '&nbsp;' .. (tonumber(_args.min or 0) or 0)
 
 	local gas = tonumber(_args.gas or 0) or 0
 	gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas
