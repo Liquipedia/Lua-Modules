@@ -681,6 +681,7 @@ function BasePrizePool:_currencyExchangeInfo()
 			exchangeDate = TODAY
 		end
 
+		---@diagnostic disable-next-line: param-type-mismatch
 		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
 
 		local wrapper = mw.html.create('small')
