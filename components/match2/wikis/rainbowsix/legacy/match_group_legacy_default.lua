@@ -96,6 +96,7 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 
 	--if bd.header starts with '!l'
 	if string.match(bd.header or '', '^!l') then
+		---@diagnostic disable-next-line: need-check-nil
 		lowerHeader[roundNum] = round.G
 	end
 

@@ -100,6 +100,7 @@ function MvpTable._buildConditions(args)
 		tournamentConditions = ConditionTree(BooleanOperator.any)
 		for _, tournament in pairs(args.tournaments) do
 			local page = mw.title.new(tournament)
+			assert(page, 'Invalid page name "' .. tournament .. '"')
 			tournamentConditions:add{
 				ConditionTree(BooleanOperator.all):add{
 					ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),

@@ -154,6 +154,7 @@ end
 
 function CustomUnit:_getCostDisplay()
 	local minerals = _args.min or 0
+	---@diagnostic disable-next-line: cast-local-type
 	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
 
 	local gas = _args.gas or 0

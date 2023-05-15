@@ -145,6 +145,7 @@ function Company:_getOrganizerPrizepools()
 		query = 'sum::prizepool'
 	})
 
+	---@diagnostic disable-next-line: cast-local-type
 	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
 
 	if prizemoney == nil or prizemoney == 0 then

@@ -179,6 +179,8 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)
 
 		if not opponentPlayers[opponentIx] then
+			--opponentIx can not be nil
+			---@diagnostic disable-next-line: need-check-nil
 			opponentPlayers[opponentIx] = {}
 		end
 		table.insert(opponentPlayers[opponentIx], player)

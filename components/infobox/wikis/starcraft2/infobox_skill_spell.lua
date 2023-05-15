@@ -116,8 +116,10 @@ function Spell:getResearchCost()
 
 	local minerals = tonumber(_args.min or 0) or 0
 	if minerals ~= 0 then
+		---@diagnostic disable-next-line: cast-local-type
 		minerals = _MINERALS .. '&nbsp;' .. minerals .. '&nbsp;'
 	else
+		---@diagnostic disable-next-line: cast-local-type
 		minerals = ''
 	end
 
@@ -125,6 +127,7 @@ function Spell:getResearchCost()
 	if gas ~= 0 then
 		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
 	else
+		---@diagnostic disable-next-line: cast-local-type
 		gas = ''
 	end
 
@@ -132,6 +135,7 @@ function Spell:getResearchCost()
 	if buildtime ~= 0 then
 		buildtime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
+		---@diagnostic disable-next-line: cast-local-type
 		buildtime = ''
 	end
 
@@ -231,6 +235,7 @@ end
 
 function Spell:getCostDisplay()
 	local energy = tonumber(_args.energy or 0) or 0
+	---@diagnostic disable-next-line: cast-local-type
 	energy = _ENERGY .. '&nbsp;' .. energy
 	return energy
 end

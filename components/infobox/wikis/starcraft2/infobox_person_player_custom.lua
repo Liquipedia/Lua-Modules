@@ -277,6 +277,7 @@ function CustomPlayer._getYearsActive(years)
 		if years[i] then
 			if (not tempYear) and (i ~= CURRENT_YEAR) then
 				if firstYear then
+					---@diagnostic disable-next-line: cast-local-type
 					firstYear = nil
 				else
 					yearsActive = yearsActive .. '<br/>'

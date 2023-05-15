@@ -136,6 +136,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
 
 			-- clean var of '+' suffix
+			---@diagnostic disable-next-line: cast-local-type
 			playerNumber = string.gsub(playerNumber, '%+', '')
 			--make playerNumber available for commons category check
 			_args.player_number = playerNumber

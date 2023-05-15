@@ -140,6 +140,7 @@ function CustomResultsTable._allKillMatch(args)
 	local mapIndex = 1
 	local validRound = true
 	while validRound do
+		---@diagnostic disable-next-line: cast-local-type
 		validRound = CustomResultsTable._allKillMapRow(args, 'm' .. mapIndex, match)
 		mapIndex = mapIndex + 1
 	end

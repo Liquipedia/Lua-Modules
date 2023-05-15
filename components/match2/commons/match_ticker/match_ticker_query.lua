@@ -19,6 +19,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+---@diagnostic disable-next-line: param-type-mismatch
 local _CURRENT_DATE_STAMP = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')))
 
 local _LIMIT_INCREASE = 20
@@ -175,6 +176,7 @@ function BaseConditions:dateConditions(queryArgs)
 
 		if Logic.readBool(queryArgs.ongoing) then
 			local secondsLive = 60 * 60 * MatchTickerQuery.maximumLiveHoursOfMatches
+			---@diagnostic disable-next-line: param-type-mismatch
 			local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')) - secondsLive)
 			dateConditions:add({ConditionNode(ColumnName('date'), Comparator.gt, timeStamp)})
 

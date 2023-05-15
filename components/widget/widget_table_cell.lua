@@ -32,7 +32,9 @@ end
 function TableCell:make()
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
+		---@diagnostic disable-next-line: assign-type-mismatch
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
+		---@diagnostic disable-next-line: assign-type-mismatch
 		['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil,
 	}
 

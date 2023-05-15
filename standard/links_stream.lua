@@ -154,6 +154,7 @@ function StreamKey:_fromLegacy(input)
 				-- If the input is longer than the platform, there's an index at the end
 				-- Eg. In "twitch2", the 2 would the index.
 				if #input > #platform then
+					---@diagnostic disable-next-line: cast-local-type
 					index = tonumber(input:sub(#platform + 1))
 				end
 				return platform, index

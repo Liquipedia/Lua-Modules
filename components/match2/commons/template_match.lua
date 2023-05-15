@@ -114,6 +114,8 @@ function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, appli
 		headerchild = true
 	end
 	match.bracketdata.bracketindex = applied
+	--id can not be nil
+	---@diagnostic disable-next-line: need-check-nil
 	matches[id] = match
 	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
 	local lowerHeaderchild = headerchild

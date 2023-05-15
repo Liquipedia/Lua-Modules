@@ -187,6 +187,7 @@ function Ability:getCostDisplay()
 	local race = string.lower(_args.race or '')
 
 	local minerals = tonumber(_args.min or 0) or 0
+	---@diagnostic disable-next-line: cast-local-type
 	minerals = _MINERALS .. '&nbsp;' .. minerals
 
 	local gas = tonumber(_args.gas or 0) or 0
@@ -196,12 +197,14 @@ function Ability:getCostDisplay()
 	if buildtime ~= 0 then
 		buildtime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
 	else
+	---@diagnostic disable-next-line: cast-local-type
 		buildtime = ''
 	end
 
 	local supply = _args.supply or _args.control or _args.psy or 0
 	supply = tonumber(supply) or 0
 	if supply == 0 then
+			---@diagnostic disable-next-line: cast-local-type
 		supply = ''
 	else
 		supply = '&nbsp;' .. (_SUPPLY[race] or _SUPPLY['default']) .. '&nbsp;' .. supply

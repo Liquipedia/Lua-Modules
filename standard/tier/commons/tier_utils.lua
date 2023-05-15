@@ -30,6 +30,8 @@ function Tier.toIdentifier(input)
 	end
 
 	return tonumber(input)
+		--input can not be nil
+		---@diagnostic disable-next-line: param-type-mismatch
 		or string.lower(input):gsub(' ', '')
 end
 

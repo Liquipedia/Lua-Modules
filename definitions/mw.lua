@@ -538,6 +538,7 @@ function mw.text.unstrip(s) end
 ---@field baseText string
 ---@field subpageText string
 ---@field canTalk string
+---@field fragment string?
 ---@field exists boolean
 ---@field file File
 ---@field fileExists boolean

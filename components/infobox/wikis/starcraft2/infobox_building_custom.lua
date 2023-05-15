@@ -156,6 +156,7 @@ end
 
 function CustomBuilding:_getCostDisplay()
 	local minerals = _args.min or 0
+	---@diagnostic disable-next-line: cast-local-type
 	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
 
 	local gas = _args.gas or 0
@@ -165,6 +166,7 @@ function CustomBuilding:_getCostDisplay()
 	if buildtime ~= 0 then
 		buildtime = '&nbsp;' .. (ICON_TIME[_race] or ICON_TIME['default']) .. '&nbsp;' .. buildtime
 	else
+	---@diagnostic disable-next-line: cast-local-type
 		buildtime = ''
 	end
 

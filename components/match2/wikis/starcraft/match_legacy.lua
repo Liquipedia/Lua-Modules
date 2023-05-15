@@ -67,6 +67,7 @@ function MatchLegacy._storeGames(match, match2, options)
 			for key, item in pairs(playerdata) do
 				local k = mw.text.split(key or '', '_')
 				local l = tonumber(k[2])
+				---@diagnostic disable-next-line: cast-local-type
 				k = tonumber(k[1])
 				game.extradata['opponent' .. k .. 'race'] = item.faction
 				local opp = match2.match2opponents[k] or {}
@@ -105,6 +106,7 @@ function MatchLegacy._storeGames(match, match2, options)
 			for key, item in pairs(playerdata) do
 				local k = mw.text.split(key or '', '_')
 				local l = tonumber(k[2])
+				---@diagnostic disable-next-line: cast-local-type
 				k = tonumber(k[1])
 				submatch.extradata['opponent' .. k .. 'race'] = item.faction
 				local opp = match2.match2opponents[k] or {}

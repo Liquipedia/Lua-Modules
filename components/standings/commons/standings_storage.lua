@@ -92,6 +92,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
+	---@diagnostic disable-next-line: cast-local-type
 	standingsIndex = tonumber(standingsIndex)
 
 	if not standingsIndex or not roundIndex or not slotIndex then

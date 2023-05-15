@@ -19,6 +19,7 @@ local SingleMatchDisplay = {propTypes = {}, types = {}}
 
 SingleMatchDisplay.configFromArgs = function(args)
 	return {
+		---@diagnostic disable-next-line: param-type-mismatch
 		width = tonumber(string.gsub(args.width or '', 'px', ''), nil),
 	}
 end

@@ -123,6 +123,7 @@ function StarcraftMatchSummary.Header(props)
 		if not flip then
 			opponentDisplay = Array.reverse(opponentDisplay)
 		end
+		---@diagnostic disable-next-line: undefined-field
 		Array.extendWith(display.nodes, opponentDisplay)
 
 		return display

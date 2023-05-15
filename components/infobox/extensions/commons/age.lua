@@ -117,6 +117,7 @@ end
 
 function Date:getLatestPossible()
 	return os.time({
+		---@diagnostic disable-next-line: assign-type-mismatch
 		year = self.year or _CURRENT_YEAR,
 		month = self.month or _MONTH_DECEMBER,
 		day = self.day or _DEFAULT_DAYS_IN_MONTH[self.month or _MONTH_DECEMBER],
