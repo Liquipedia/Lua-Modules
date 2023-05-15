@@ -282,7 +282,7 @@ function MatchSummary:resetBody(resetBody)
 end
 
 function MatchSummary:resetHeader(resetHeader)
-	self.resetHeader = resetHeader:create()
+	self.resetHeaderNode = resetHeader:create()
 		:addClass('brkts-popup-header-reset')
 	return self
 end
@@ -314,7 +314,7 @@ function MatchSummary:create()
 
 	if self.resetBodyElement then
 		self.root
-			:node(self.resetHeader or MatchSummary._fallbackResetHeader())
+			:node(self.resetHeaderNode or MatchSummary._fallbackResetHeader())
 			:node(Break():create())
 			:node(self.resetBodyElement)
 			:node(Break():create())
