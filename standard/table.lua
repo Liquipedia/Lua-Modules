@@ -8,17 +8,10 @@
 
 local Table = {}
 
----@generic T
----@param tbl T[]
----@return T[]
+---@deprecated
+---Use Array.randomize
 function Table.randomize(tbl)
-	math.randomseed(os.time())
-
-	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-	end
-	return tbl
+	return require('Module:Array').randomize(tbl)
 end
 
 ---Get the size of a table
@@ -251,8 +244,6 @@ end
 --Example:
 --`Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)`
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
---
---The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
 ---@generic K, V, U, T
 ---@param xTable {[K] : V}
 ---@param f fun(key?: K, value?: V): U, T

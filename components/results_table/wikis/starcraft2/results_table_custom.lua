@@ -35,6 +35,7 @@ local CustomResultsTable = {}
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
+	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
@@ -58,7 +59,7 @@ end
 
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
-
+	args.useIndivPrize = true
 	args.data = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
 	if Logic.readBool(args.achievements) and Table.isEmpty(args.data) then

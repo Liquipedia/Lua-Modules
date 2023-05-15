@@ -21,7 +21,13 @@ local Array = {}
 ---@param tbl T[]
 ---@return T[]
 function Array.randomize(tbl)
-	return Table.randomize(tbl)
+	math.randomseed(os.time())
+
+	for i = #tbl, 2, -1 do
+		local j = math.random(i)
+		tbl[i], tbl[j] = tbl[j], tbl[i]
+	end
+	return tbl
 end
 
 ---Return true if the input is a table in array format
