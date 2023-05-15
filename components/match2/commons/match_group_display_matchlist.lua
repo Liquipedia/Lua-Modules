@@ -26,8 +26,7 @@ MatchlistDisplay.configFromArgs = function(args)
 		attached = Logic.readBoolOrNil(args.attached),
 		collapsed = Logic.readBoolOrNil(args.collapsed),
 		collapsible = not Logic.readBoolOrNil(args.nocollapse),
-		---@diagnostic disable-next-line: param-type-mismatch
-		width = tonumber(string.gsub(args.width or '', 'px', ''), nil),
+		width = tonumber((string.gsub(args.width or '', 'px', ''))),
 	}
 end
 
