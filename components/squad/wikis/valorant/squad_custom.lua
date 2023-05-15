@@ -10,7 +10,6 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
 local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
@@ -123,6 +122,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
+	row:status(squadType)
 	row:id{
 		player.id,
 		flag = player.flag,
@@ -151,13 +151,11 @@ function CustomSquad._playerRow(player, squadType)
 	end
 
 	return row:create(
-		Variables.varDefault(
-			'squad_name',
-			mw.title.getCurrentTitle().prefixedText
-		)
+		mw.title.getCurrentTitle().prefixedText
 		.. '_' .. player.id .. '_'
 		.. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

@@ -1610,6 +1610,19 @@ return {
 				lightMode = 'League of Legends allmode.png',
 			},
 		},
+		['idol showdown'] = {
+			abbreviation = 'Idol Showdown',
+			name = 'Idol Showdown',
+			link = 'Idol Showdown',
+			logo = {
+				darkMode = 'Idol Showdown allmode.png',
+				lightMode = 'Idol Showdown allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Idol Showdown allmode.png',
+				lightMode = 'Idol Showdown allmode.png',
+			},
+		},
 	},
 	defaultGame = 'fighters',
 	defaultTeamLogo = 'Fighters default lightmode.png', ---@deprecated

@@ -71,7 +71,7 @@ function ExtendedSquadRow:position(args)
 	self.content:node(cell)
 
 	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -139,6 +139,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
@@ -166,6 +167,7 @@ function CustomSquad._playerRow(player, squadType)
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

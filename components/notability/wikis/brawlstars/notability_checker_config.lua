@@ -50,7 +50,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 10,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -82,7 +82,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 5,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -114,7 +114,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0,
+				points = 3,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -146,7 +146,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 0
+				points = 1
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,

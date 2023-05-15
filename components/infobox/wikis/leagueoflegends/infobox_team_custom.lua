@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -30,9 +31,10 @@ function CustomTeam.run(frame)
 	_args = _team.args
 
 	-- Automatic org people
-	team.args.coach = Template.expandTemplate(frame, 'Coach of')
-	team.args.manager = Template.expandTemplate(frame, 'Manager of')
-	team.args.captain = Template.expandTemplate(frame, 'Captain of')
+	team.args.coach = RoleOf.get{role = 'Coach'}
+	team.args.manager = RoleOf.get{role = 'Manager'}
+	team.args.captain = RoleOf.get{role = 'Captain'}
+
 
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
