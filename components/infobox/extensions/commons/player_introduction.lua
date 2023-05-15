@@ -89,8 +89,12 @@ end
 ---@field convert_role boolean?,
 ---@field show_role boolean?,
 ---@field show_faction boolean?
----@field formernameX string?,
----@field akaX string?,
+---@field formername1 string?,
+---@field formername2 string?,
+---@field formername3 string?,
+---@field aka1 string?,
+---@field aka2 string?,
+---@field aka3 string?,
 
 --- Init function for PlayerIntroduction
 ---@param args argsValues
@@ -160,7 +164,9 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		or {}
 
 	local function readNames(prefix)
-		return Array.extractValues(Table.filterByKey(args, function(key) return key:find('^' .. prefix .. '%d+$') end) or {})
+		return Array.extractValues(Table.filterByKey(args, function(key)
+			return key:find('^' .. prefix .. '%d+$') ~= nil
+		end) or {})
 	end
 
 	self.playerInfo = {
