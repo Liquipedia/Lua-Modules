@@ -110,8 +110,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		---@diagnostic disable-next-line: param-type-mismatch
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then

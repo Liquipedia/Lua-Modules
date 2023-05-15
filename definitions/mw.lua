@@ -294,7 +294,7 @@ function mw.language:formatNum(num, options) end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
----@param timestamp string?
+---@param timestamp string|osdate?
 ---@param localTime boolean?
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime) end
