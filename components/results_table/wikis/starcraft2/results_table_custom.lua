@@ -140,7 +140,6 @@ function CustomResultsTable._allKillMatch(args)
 	local mapIndex = 1
 	local validRound = true
 	while validRound do
-		---@diagnostic disable-next-line: cast-local-type
 		validRound = CustomResultsTable._allKillMapRow(args, 'm' .. mapIndex, match)
 		mapIndex = mapIndex + 1
 	end
@@ -167,7 +166,7 @@ end
 
 function CustomResultsTable._allKillMapRow(args, prefix, match)
 	if not (args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'win'] or args[prefix .. 'walkover'])then
-		return
+		return false
 	end
 
 	local opponentLeft = mw.html.create('div'):css('text-align', 'right')

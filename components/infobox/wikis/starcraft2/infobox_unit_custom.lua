@@ -153,9 +153,7 @@ function CustomUnit._getRace(race)
 end
 
 function CustomUnit:_getCostDisplay()
-	local minerals = _args.min or 0
-	---@diagnostic disable-next-line: cast-local-type
-	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
+	local minerals = ICON_MINERALS .. '&nbsp;' .. (_args.min or 0)
 
 	local gas = _args.gas or 0
 	gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. gas

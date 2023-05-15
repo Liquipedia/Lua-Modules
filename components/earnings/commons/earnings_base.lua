@@ -66,10 +66,9 @@ function Earnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
 	end
-	---@diagnostic disable-next-line: cast-local-type
-	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
+	local playerConditionString = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
-	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
+	return Earnings.calculate(playerConditionString, args.year, args.mode, args.perYear, nil, true)
 end
 
 ---
@@ -131,10 +130,9 @@ function Earnings.calculateForTeam(args)
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
 	end
-	---@diagnostic disable-next-line: cast-local-type
-	teamConditions = '(' .. table.concat(teamConditions, ' OR ') .. ')'
+	local teamConditionString = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 
-	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, queryTeams)
+	return Earnings.calculate(teamConditionString, args.year, args.mode, args.perYear, queryTeams)
 end
 
 ---
