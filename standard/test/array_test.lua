@@ -151,6 +151,10 @@ function suite:testExtractValues()
 	self:assertDeepEquals({1, 2, 3, 0}, Array.extractValues(a, Table.iter.spairs))
 	self:assertDeepEquals({0, 3, 2, 1}, Array.extractValues(a, Table.iter.spairs, customOrder1))
 	self:assertDeepEquals({0, 1, 2, 3}, Array.extractValues(a, Table.iter.spairs, customOrder2))
+
+	local extractedArray = Array.extractValues(a)
+	table.sort(extractedArray)
+	self:assertDeepEquals({0, 1, 2, 3}, extractedArray)
 end
 
 function suite:testExtractKeys()
@@ -162,6 +166,10 @@ function suite:testExtractKeys()
 	self:assertDeepEquals({'i', 'j', 'k', 'z'}, Array.extractKeys(a, Table.iter.spairs))
 	self:assertDeepEquals({'z', 'k', 'j', 'i'}, Array.extractKeys(a, Table.iter.spairs, customOrder1))
 	self:assertDeepEquals({'z', 'i', 'j', 'k'}, Array.extractKeys(a, Table.iter.spairs, customOrder2))
+
+	local extractedKeys = Array.extractKeys(a)
+	table.sort(extractedKeys)
+	self:assertDeepEquals({'i', 'j', 'k', 'z'}, extractedKeys)
 end
 
 return suite
