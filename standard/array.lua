@@ -31,7 +31,7 @@ function Array.randomize(tbl)
 end
 
 ---Return true if the input is a table in array format
----@param tbl any[]
+---@param tbl any
 ---@return boolean
 function Array.isArray(tbl)
 	return type(tbl) == 'table' and Table.size(tbl) == #tbl
