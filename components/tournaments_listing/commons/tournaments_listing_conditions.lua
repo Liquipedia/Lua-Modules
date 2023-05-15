@@ -97,7 +97,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.region then
 		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in mw.text.split(args.region, ',', true) do
+		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
 			region = mw.text.trim(region)
 			regionConditions:add{
 				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
