@@ -180,9 +180,9 @@ function mw.html:addClass(class) end
 
 ---Set a CSS property with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string
+---@param value string|number|nil
 ---@return self
----@overload fun(self, param: {[string]: string})
+---@overload fun(self, param: {[string]: string|number|nil})
 function mw.html:css(name, value) end
 
 ---Add some raw css to the node's style attribute. If a nil parameter is passed, this is a no-op.
