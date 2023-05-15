@@ -16,18 +16,24 @@ local Table = require('Module:Table')
 --
 local Array = {}
 
+---Modify an array in-place by shuffling its contents.
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.randomize(tbl)
 	return Table.randomize(tbl)
 end
 
 ---Return true if the input is a table in array format
----@param tbl any
+---@param tbl any[]
 ---@return boolean
 function Array.isArray(tbl)
 	return type(tbl) == 'table' and Table.size(tbl) == #tbl
 end
 
 -- Creates a copy of an array with the same elements.
+---@param tbl any[]
+---@return any[]
 function Array.copy(tbl)
 	local copy = {}
 	for _, element in ipairs(tbl) do
@@ -39,11 +45,15 @@ end
 --[[
 Returns a subarray given by its indexes.
 
-Examples
-Array.sub({3, 5, 7, 11}, 2) -- returns {5, 7, 11}
-Array.sub({3, 5, 7, 11}, 2, 3) -- returns {5, 7}
-Array.sub({3, 5, 7, 11}, -2, -1) -- returns {7, 11}
+Examples:
+Array.sub({3, 5, 7, 11}, 2) = {5, 7, 11};
+Array.sub({3, 5, 7, 11}, 2, 3) = {5, 7};
+Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
 ]]
+---@param tbl any[]
+---@param startIndex integer
+---@param endIndex integer
+---@return any[]
 function Array.sub(tbl, startIndex, endIndex)
 	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
 	if not endIndex then endIndex = #tbl end
@@ -56,7 +66,7 @@ function Array.sub(tbl, startIndex, endIndex)
 	return subArray
 end
 
----@comment Applies a function to each element in an array and places the results in a new array.
+---Applies a function to each element in an array and places the results in a new array.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V,  index?: integer): T
@@ -335,7 +345,7 @@ function Array.range(from, to)
 end
 
 
----@comment Extracts keys from a given table into an array. An order can be supplied via an iterator.
+---Extracts keys from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
 ---@param iterator function?
@@ -350,7 +360,7 @@ function Array.extractKeys(tbl, iterator, ...)
     return array
 end
 
----@comment Extracts values from a given table into an array. An order can be supplied via an iterator.
+---Extracts values from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
 ---@param iterator function?
