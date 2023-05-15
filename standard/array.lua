@@ -86,6 +86,9 @@ Example:
 Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
 ]]
+---@param tbl any[]
+---@param predicate fun(element: any, index: integer): boolean
+---@return any[]
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
 	for index, element in ipairs(tbl) do
