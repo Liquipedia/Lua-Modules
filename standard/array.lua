@@ -93,7 +93,7 @@ Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
 ]]
 ---@param tbl any[]
----@param predicate fun(element: any, index: integer): boolean
+---@param predicate fun(element?: any, index?: integer): boolean
 ---@return any[]
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
@@ -105,9 +105,9 @@ function Array.filter(tbl, predicate)
 	return filteredArray
 end
 
---[[
-Flattens an array of arrays into an array.
-]]
+---Flattens an array of arrays into an array.
+---@param tbl any[]
+---@return any[]
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
@@ -128,9 +128,10 @@ function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
 
---[[
-Whether all elements in an array satisfy a predicate.
-]]
+---Determnines whether all elements in an array satisfy a predicate.
+---@param tbl any[]
+---@param predicate fun(element: any): boolean
+---@return boolean
 function Array.all(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if not predicate(element) then
@@ -140,9 +141,10 @@ function Array.all(tbl, predicate)
 	return true
 end
 
---[[
-Whether any elements in an array satisfies a predicate.
-]]
+---Determnines whether any elements in an array satisfies a predicate.
+---@param tbl any[]
+---@param predicate fun(element: any): boolean
+---@return boolean
 function Array.any(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if predicate(element) then
@@ -152,10 +154,10 @@ function Array.any(tbl, predicate)
 	return false
 end
 
---[[
-Finds the first element in an array satisfying a predicate. Returs nil if no
-element satisfies the predicate.
-]]
+---Finds the first element in an array satisfying a predicate. Returs nil if no element satisfies the predicate.
+---@param tbl any[]
+---@param predicate fun(element?: any, index?: integer): boolean
+---@return any?
 function Array.find(tbl, predicate)
 	for index, element in ipairs(tbl) do
 		if predicate(element, index) then
@@ -177,6 +179,10 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 -- returns {{2}, {3, 7, 11}, {5, 13}},
 -- {1 = {5, 13}, 2 = {2}, 3 = {3, 7, 11}}
 ]]
+---@param tbl any[]
+---@param funct fun(xValue: any): any?
+---@return any[][]
+---@return table<any, any[]>
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
@@ -196,7 +202,10 @@ function Array.groupBy(tbl, funct)
 	return groups, groupsByKey
 end
 
--- Lexicographically compare two arrays.
+---Lexicographically compare two arrays.
+---@param tblX any[]
+---@param tblY any[]
+---@return boolean
 function Array.lexicalCompare(tblX, tblY)
 	for index = 1, math.min(#tblX, #tblY) do
 		if tblX[index] < tblY[index] then
@@ -208,6 +217,12 @@ function Array.lexicalCompare(tblX, tblY)
 	return #tblX < #tblY
 end
 
+---Lexicographically compare 2 values.
+---If they are arrays (tables) compare them via `Array.lexicalCompare`.
+---Else compare them as directly values.
+---@param y1 any[]|any
+---@param y2 any[]|any
+---@return boolean
 function Array.lexicalCompareIfTable(y1, y2)
 	if type(y1) == 'table' and type(y2) == 'table' then
 		return Array.lexicalCompare(y1, y2)
@@ -242,21 +257,29 @@ Array.sortBy({
 -- }
 
 ]]
+---@param tbl any[]
+---@param funct function
+---@param compare function
+---@return any[]
 function Array.sortBy(tbl, funct, compare)
 	local copy = Table.copy(tbl)
 	Array.sortInPlaceBy(copy, funct, compare)
 	return copy
 end
 
---[[
-Like Array.sortBy, except that it sorts in place. Mutates the first argument.
-]]
+---Sorts an array by transforming its elements via a function and comparing the transformed elements.
+---Similar to `Array.sortBy` but sorts in place, i.e. mutates the first argument.
+---@param tbl any[]
+---@param funct function
+---@param compare function
 function Array.sortInPlaceBy(tbl, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 	table.sort(tbl, function(x1, x2) return compare(funct(x1), funct(x2)) end)
 end
 
 -- Reverses the order of elements in an array.
+---@param tbl any[]
+---@return any[]
 function Array.reverse(tbl)
 	local reversedArray = {}
 	for index = #tbl, 1, -1 do
@@ -272,13 +295,17 @@ Example:
 Array.append({2, 3}, 5, 7, 11)
 -- returns {2, 3, 5, 7, 11}
 ]]
+---@param tbl any[]
+---@param ... any
+---@return any[]
 function Array.append(tbl, ...)
 	return Array.appendWith(Array.copy(tbl), ...)
 end
 
---[[
-Adds elements to the end of an array. The array is mutated in the process.
-]]
+---Adds elements to the end of an array. The array is mutated in the process.
+---@param tbl any[]
+---@param ... any
+---@return any[]
 function Array.appendWith(tbl, ...)
 	local elements = Table.pack(...)
 	for index = 1, elements.n do
@@ -300,6 +327,9 @@ Array.extend({2, 3}, {5, 7, 11}, {13})
 Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
 ]]
+---@param tbl any[]
+---@param ... any[]
+---@return any[]
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
 end
@@ -308,6 +338,9 @@ end
 Adds elements from one or more arrays to the end of a target array. The target
 array is mutated in the process.
 ]]
+---@param tbl any[]
+---@param ... any[]
+---@return any[]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
@@ -329,6 +362,8 @@ Example:
 Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 -- returns {1, 4, 9, 16}
 ]]
+---@param funct fun(index: integer): any?
+---@return any[]
 function Array.mapIndexes(funct)
 	local arr = {}
 	for index = 1, math.huge do
@@ -342,9 +377,10 @@ function Array.mapIndexes(funct)
 	return arr
 end
 
---[[
-Returns the array {from, from + 1, from + 2, ..., to}.
-]]
+---Returns the array {from, from + 1, from + 2, ..., to}.
+---@param from integer
+---@param to integer
+---@return any[]
 function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
@@ -363,6 +399,8 @@ end
 function Array.extractKeys(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
+	--the ... parameter is redundant for pairs but might be needed for other iterators
+	---@diagnostic disable-next-line: redundant-parameter
 	for key, _ in iterator(tbl, ...) do
         table.insert(array, key)
     end
@@ -378,6 +416,8 @@ end
 function Array.extractValues(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
+	--the ... parameter is redundant for pairs but might be needed for other iterators
+	---@diagnostic disable-next-line: redundant-parameter
 	for _, item in iterator(tbl, ...) do
         table.insert(array, item)
     end
@@ -392,6 +432,8 @@ Example:
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
 ]]
+---@param elements any[]
+---@param funct fun(element?: any, index?: integer)
 function Array.forEach(elements, funct)
 	for index, element in ipairs(elements) do
 		funct(element, index)
@@ -411,6 +453,10 @@ local function pow(x, y) return x ^ y end
 Array.reduce({2, 3, 5}, pow)
 -- Returns 32768
 ]]
+---@param array any[]
+---@param operator fun(aggregate: any, arrayValue: any): any
+---@param initialValue any
+---@return any?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then
@@ -425,10 +471,11 @@ function Array.reduce(array, operator, initialValue)
 	return aggregate
 end
 
---[[
-Computes the maximum element in an array according to a scoring function. Returns
-nil if the array is empty.
-]]
+---Computes the maximum element in an array according to a scoring function. Returns nil if the array is empty.
+---@param array any[]
+---@param funct fun(item: any): number
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -443,17 +490,19 @@ function Array.maxBy(array, funct, compare)
 	return max
 end
 
---[[
-Computes the maximum element in an array. Returns nil if the array is empty.
-]]
+---Computes the maximum element in an array. Returns nil if the array is empty.
+---@param array number[]
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.max(array, compare)
 	return Array.maxBy(array, function(x) return x end, compare)
 end
 
---[[
-Computes the minimum element in an array according to a scoring function. Returns
-nil if the array is empty.
-]]
+---Computes the minimum element in an array according to a scoring function. Returns nil if the array is empty.
+---@param array any[]
+---@param funct fun(item: any): number
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -468,9 +517,10 @@ function Array.minBy(array, funct, compare)
 	return min
 end
 
---[[
-Computes the minimum element in an array. Returns nil if the array is empty.
-]]
+---Computes the minimum element in an array. Returns nil if the array is empty.
+---@param array number[]
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.min(array, compare)
 	return Array.minBy(array, function(x) return x end, compare)
 end
