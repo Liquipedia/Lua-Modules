@@ -440,7 +440,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 		if Table.isEmpty(queryData) then
 			return {qualified = {Opponent.tbd(Opponent.team)}}
 		end
-		return {qualified = queryData}
+		return {qualified = Array.map(queryData, Opponent.fromLpdbStruct)}
 	end
 
 	for _, item in ipairs(queryData) do
