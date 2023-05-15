@@ -28,10 +28,9 @@ function Tier.toIdentifier(input)
 	if String.isEmpty(input) then
 		return
 	end
+	---@cast input -nil
 
 	return tonumber(input)
-		--input can not be nil
-		---@diagnostic disable-next-line: param-type-mismatch
 		or string.lower(input):gsub(' ', '')
 end
 

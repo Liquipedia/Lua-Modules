@@ -44,9 +44,8 @@ function Game.toIdentifier(args)
 	elseif String.isEmpty(gameInput) then
 		return
 	end
+	---@cast gameInput -nil
 
-	--gameInput can not be nil due to above nil check
-	---@diagnostic disable-next-line: need-check-nil
 	gameInput = gameInput:lower()
 
 	return Game.getIdentifierByAbbreviation()[gameInput]
@@ -155,9 +154,8 @@ function Game.isDefaultTeamLogo(args)
 	if String.isEmpty(logo) then
 		return false
 	end
+	---@cast logo -nil
 
-	--logo can not be nil due to above nil check
-	---@diagnostic disable-next-line: need-check-nil
 	logo = logo:gsub('_', ' ')
 
 	if String.isEmpty(args.game) then

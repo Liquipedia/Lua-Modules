@@ -188,9 +188,8 @@ end
 ---@param query string?
 ---@return table
 function mockLpdb._applyQuery(data, query)
-	if String.isNotEmpty(query) then
-		--query can not be nil due to above line
-		---@diagnostic disable-next-line: param-type-mismatch
+	if String.isNotEmpty() then
+		---@cast query -nil
 		local fields = Array.map(mw.text.split(query, ','), String.trim)
 
 		return Array.map(data, function(entry)

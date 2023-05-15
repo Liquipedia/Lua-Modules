@@ -93,11 +93,11 @@ function String.convertWikiListToHtmlList(str, delimiter)
 	if String.isEmpty(str) then
 		return ''
 	end
+	---@cast str -nil
 	if String.isEmpty(delimiter) then
 		delimiter = '*'
 	end
 	--str can not be nil due to above nil check
-	---@diagnostic disable-next-line: param-type-mismatch
 	local strArray = mw.text.split(str, delimiter)
 	local list = mw.html.create('ul')
 	for _, item in ipairs(strArray) do

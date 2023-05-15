@@ -108,14 +108,13 @@ function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, appli
 		return matches, applied
 	end
 	id = TemplateMatch._getTrueID(id)
+	---@cast id -nil
 	local match = matches[id]
 	if not Logic.isEmpty(match.bracketdata.header) and headerchild ~= true then
 		applied = applied + 1
 		headerchild = true
 	end
 	match.bracketdata.bracketindex = applied
-	--id can not be nil
-	---@diagnostic disable-next-line: need-check-nil
 	matches[id] = match
 	matches, applied = TemplateMatch._recursiveSetBracketIndex(matches, match.bracketdata.toupper, headerchild, applied)
 	local lowerHeaderchild = headerchild

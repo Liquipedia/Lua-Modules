@@ -979,10 +979,9 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	local opponentRaces, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
-		--opponentIndex can not be nil
-		---@diagnostic disable-next-line: need-check-nil
+		-- opponentIx can not be nil due to the format of the participants keys
+		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
-		---@diagnostic disable-next-line: need-check-nil
 		playerNameArray[opponentIndex] = participantData.player
 	end
 
