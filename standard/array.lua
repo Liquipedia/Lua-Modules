@@ -56,10 +56,11 @@ Array.sub({3, 5, 7, 11}, 2) = {5, 7, 11};
 Array.sub({3, 5, 7, 11}, 2, 3) = {5, 7};
 Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
 ]]
----@param tbl any[]
+---@generic T
+---@param tbl T[]
 ---@param startIndex integer
 ---@param endIndex integer?
----@return any[]
+---@return T[]
 function Array.sub(tbl, startIndex, endIndex)
 	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
 	if not endIndex then endIndex = #tbl end
@@ -92,9 +93,10 @@ Example:
 Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
 ]]
----@param tbl any[]
----@param predicate fun(element?: any, index?: integer): boolean
----@return any[]
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element?: T, index?: integer): boolean
+---@return T[]
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
 	for index, element in ipairs(tbl) do
@@ -129,8 +131,9 @@ function Array.flatMap(tbl, funct)
 end
 
 ---Determnines whether all elements in an array satisfy a predicate.
----@param tbl any[]
----@param predicate fun(element: any): boolean
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element: T): boolean
 ---@return boolean
 function Array.all(tbl, predicate)
 	for _, element in ipairs(tbl) do
@@ -142,8 +145,9 @@ function Array.all(tbl, predicate)
 end
 
 ---Determnines whether any elements in an array satisfies a predicate.
----@param tbl any[]
----@param predicate fun(element: any): boolean
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element: T): boolean
 ---@return boolean
 function Array.any(tbl, predicate)
 	for _, element in ipairs(tbl) do
@@ -155,9 +159,10 @@ function Array.any(tbl, predicate)
 end
 
 ---Finds the first element in an array satisfying a predicate. Returs nil if no element satisfies the predicate.
----@param tbl any[]
----@param predicate fun(element?: any, index?: integer): boolean
----@return any?
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element?: T, index?: integer): boolean
+---@return T?
 function Array.find(tbl, predicate)
 	for index, element in ipairs(tbl) do
 		if predicate(element, index) then
@@ -179,10 +184,11 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 -- returns {{2}, {3, 7, 11}, {5, 13}},
 -- {1 = {5, 13}, 2 = {2}, 3 = {3, 7, 11}}
 ]]
----@param tbl any[]
----@param funct fun(xValue: any): any?
----@return any[][]
----@return table<any, any[]>
+---@generic T, K
+---@param tbl T[]
+---@param funct fun(xValue: T): K?
+---@return T[][]
+---@return table<K, T[]>
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
@@ -257,10 +263,11 @@ Array.sortBy({
 -- }
 
 ]]
----@param tbl any[]
----@param funct function
----@param compare function
----@return any[]
+---@generic T, V
+---@param tbl T[]
+---@param funct fun(element: T): V
+---@param compare? fun(a: V, b: V): boolean
+---@return T[]
 function Array.sortBy(tbl, funct, compare)
 	local copy = Table.copy(tbl)
 	Array.sortInPlaceBy(copy, funct, compare)
@@ -269,17 +276,19 @@ end
 
 ---Sorts an array by transforming its elements via a function and comparing the transformed elements.
 ---Similar to `Array.sortBy` but sorts in place, i.e. mutates the first argument.
----@param tbl any[]
----@param funct function
----@param compare function
+---@generic T, V
+---@param tbl T[]
+---@param funct fun(element: T): V
+---@param compare? fun(a: V, b: V): boolean
 function Array.sortInPlaceBy(tbl, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 	table.sort(tbl, function(x1, x2) return compare(funct(x1), funct(x2)) end)
 end
 
 -- Reverses the order of elements in an array.
----@param tbl any[]
----@return any[]
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.reverse(tbl)
 	local reversedArray = {}
 	for index = #tbl, 1, -1 do
