@@ -22,9 +22,6 @@ local Cell = Widgets.Cell
 
 local Spell = Class.new()
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
 local _ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
 
 local CustomInjector = Class.new(Injector)
@@ -108,7 +105,6 @@ function Spell:createWidgetInjector()
 end
 
 function Spell:getResearchCost()
-	local display
 	if String.isEmpty(_args.from) then
 		return nil
 	end

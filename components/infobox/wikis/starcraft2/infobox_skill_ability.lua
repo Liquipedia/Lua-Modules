@@ -22,11 +22,6 @@ local Cell = Widgets.Cell
 
 local Ability = Class.new()
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
-local _SUPPLY = mw.loadData('Module:Supply')
-
 local CustomInjector = Class.new(Injector)
 
 local _args

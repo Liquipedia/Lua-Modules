@@ -7,7 +7,6 @@
 --
 
 local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local CostDisplay = {}

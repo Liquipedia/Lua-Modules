@@ -26,10 +26,6 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local ICON_GAS = mw.loadData('Module:Gas')
-local ICON_TIME = mw.loadData('Module:Buildtime')
-local ICON_SUPPLY = mw.loadData('Module:Supply')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
