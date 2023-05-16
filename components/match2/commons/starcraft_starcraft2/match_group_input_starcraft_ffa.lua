@@ -181,14 +181,13 @@ function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, nosc
 		--determine MATCH winner, resulttype and walkover
 		if walkover then
 			if Logic.isNumeric(walkover) then
-				---@diagnostic disable-next-line: cast-local-type
-				walkover = tonumber(walkover)
-				if walkover == opponentIndex then
+				local numericWalkover = tonumber(walkover)
+				if numericWalkover == opponentIndex then
 					match.winner = opponentIndex
 					match.walkover = 'L'
 					opponent.status = 'W'
 					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
-				elseif walkover == 0 then
+				elseif numericWalkover == 0 then
 					match.winner = 0
 					match.walkover = 'L'
 					opponent.status = 'L'

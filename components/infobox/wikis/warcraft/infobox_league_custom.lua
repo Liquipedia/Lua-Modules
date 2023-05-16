@@ -125,6 +125,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
+		---@type number|string
 		local playerNumber = playerRaceBreakDown.playerNumber or _args.player_number
 		if playerNumber or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
@@ -136,7 +137,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
 
 			-- clean var of '+' suffix
-			---@diagnostic disable-next-line: cast-local-type
 			playerNumber = string.gsub(playerNumber, '%+', '')
 			--make playerNumber available for commons category check
 			_args.player_number = playerNumber

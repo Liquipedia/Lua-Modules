@@ -251,13 +251,12 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			--as > 2 opponents is only possible in ffa
 			if String.isNotEmpty(walkover) then
 				if Logic.isNumeric(walkover) then
-					---@diagnostic disable-next-line: cast-local-type
-					walkover = tonumber(walkover)
-					if walkover == opponentIndex then
+					local numericWalkover = tonumber(walkover)
+					if numericWalkover == opponentIndex then
 						match.winner = opponentIndex
 						match.walkover = 'L'
 						opponent.status = 'W'
-					elseif walkover == 0 then
+					elseif numericWalkover == 0 then
 						match.winner = 0
 						match.walkover = 'L'
 						opponent.status = 'L'
