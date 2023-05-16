@@ -44,7 +44,7 @@ end
 ---@deprecated
 --- only legacy support for `Module:PlayerTeamAuto`
 function PlayerIntroduction._get_lpdbtransfer(player, queryType)
-	return PlayerIntroduction._readTransferData(player, queryType)
+	return PlayerIntroduction._readTransferData(player, queryType == 'datapoint')
 end
 
 -- template entry point
@@ -85,7 +85,7 @@ end
 ---@field team string?,
 ---@field team2 string?,
 ---@field type string?,
----@field transferquery 'datapoint'?,
+---@field transferquery string?,
 ---@field convert_role boolean?,
 ---@field show_role boolean?,
 ---@field show_faction boolean?
@@ -116,7 +116,7 @@ function PlayerIntroduction:init(args)
 	end
 
 	-- can not use `:` here due to `Module:PlayerTeamAuto`
-	self.transferInfo = PlayerIntroduction._readTransferData(self.player, args.transferquery)
+	self.transferInfo = PlayerIntroduction._readTransferData(self.player, args.transferquery == 'datapoint')
 
 	self:_adjustTransferData()
 
@@ -199,10 +199,10 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 end
 
 ---@param player string
----@param queryType 'datapoint'?
+---@param queryFromDataPoint boolean
 ---@return table
-function PlayerIntroduction._readTransferData(player, queryType)
-	if queryType == 'datapoint' then
+function PlayerIntroduction._readTransferData(player, queryFromDataPoint)
+	if queryFromDataPoint then
 		return PlayerIntroduction._readTransferFromDataPoints(player) or {}
 	end
 
