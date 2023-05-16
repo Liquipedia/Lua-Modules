@@ -38,6 +38,9 @@ function Array.isArray(tbl)
 end
 
 -- Creates a copy of an array with the same elements.
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.copy(tbl)
 	local copy = {}
 	for _, element in ipairs(tbl) do
@@ -49,11 +52,16 @@ end
 --[[
 Returns a subarray given by its indexes.
 
-Examples
-Array.sub({3, 5, 7, 11}, 2) -- returns {5, 7, 11}
-Array.sub({3, 5, 7, 11}, 2, 3) -- returns {5, 7}
-Array.sub({3, 5, 7, 11}, -2, -1) -- returns {7, 11}
+Examples:
+Array.sub({3, 5, 7, 11}, 2) = {5, 7, 11};
+Array.sub({3, 5, 7, 11}, 2, 3) = {5, 7};
+Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
 ]]
+---@generic T
+---@param tbl T[]
+---@param startIndex integer
+---@param endIndex integer?
+---@return T[]
 function Array.sub(tbl, startIndex, endIndex)
 	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
 	if not endIndex then endIndex = #tbl end
@@ -66,7 +74,7 @@ function Array.sub(tbl, startIndex, endIndex)
 	return subArray
 end
 
----@comment Applies a function to each element in an array and places the results in a new array.
+---Applies a function to each element in an array and places the results in a new array.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T
@@ -86,6 +94,10 @@ Example:
 Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 -- returns {1, 3}
 ]]
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element?: T, index?: integer): boolean
+---@return T[]
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
 	for index, element in ipairs(tbl) do
@@ -96,9 +108,10 @@ function Array.filter(tbl, predicate)
 	return filteredArray
 end
 
---[[
-Flattens an array of arrays into an array.
-]]
+---Flattens an array of arrays into an array.
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
@@ -119,9 +132,11 @@ function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
 
---[[
-Whether all elements in an array satisfy a predicate.
-]]
+---Determnines whether all elements in an array satisfy a predicate.
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element: T): boolean
+---@return boolean
 function Array.all(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if not predicate(element) then
@@ -131,9 +146,11 @@ function Array.all(tbl, predicate)
 	return true
 end
 
---[[
-Whether any elements in an array satisfies a predicate.
-]]
+---Determnines whether any elements in an array satisfies a predicate.
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element: T): boolean
+---@return boolean
 function Array.any(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if predicate(element) then
@@ -143,10 +160,11 @@ function Array.any(tbl, predicate)
 	return false
 end
 
---[[
-Finds the first element in an array satisfying a predicate. Returs nil if no
-element satisfies the predicate.
-]]
+---Finds the first element in an array satisfying a predicate. Returs nil if no element satisfies the predicate.
+---@generic T
+---@param tbl T[]
+---@param predicate fun(element?: T, index?: integer): boolean
+---@return T?
 function Array.find(tbl, predicate)
 	for index, element in ipairs(tbl) do
 		if predicate(element, index) then
@@ -168,6 +186,11 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 -- returns {{2}, {3, 7, 11}, {5, 13}},
 -- {1 = {5, 13}, 2 = {2}, 3 = {3, 7, 11}}
 ]]
+---@generic T, K
+---@param tbl T[]
+---@param funct fun(xValue: T): K?
+---@return T[][]
+---@return table<K, T[]>
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
@@ -187,7 +210,11 @@ function Array.groupBy(tbl, funct)
 	return groups, groupsByKey
 end
 
--- Lexicographically compare two arrays.
+---Lexicographically compare two arrays.
+---@generic T
+---@param tblX T[]
+---@param tblY T[]
+---@return boolean
 function Array.lexicalCompare(tblX, tblY)
 	for index = 1, math.min(#tblX, #tblY) do
 		if tblX[index] < tblY[index] then
@@ -199,6 +226,13 @@ function Array.lexicalCompare(tblX, tblY)
 	return #tblX < #tblY
 end
 
+---Lexicographically compare 2 values.
+---If they are arrays (tables) compare them via `Array.lexicalCompare`.
+---Else compare them as directly values.
+---@generic T
+---@param y1 T[]|T
+---@param y2 T[]|T
+---@return boolean
 function Array.lexicalCompareIfTable(y1, y2)
 	if type(y1) == 'table' and type(y2) == 'table' then
 		return Array.lexicalCompare(y1, y2)
@@ -233,21 +267,32 @@ Array.sortBy({
 -- }
 
 ]]
+---@generic T, V
+---@param tbl T[]
+---@param funct fun(element: T): V
+---@param compare? fun(a: V, b: V): boolean
+---@return T[]
 function Array.sortBy(tbl, funct, compare)
 	local copy = Table.copy(tbl)
 	Array.sortInPlaceBy(copy, funct, compare)
 	return copy
 end
 
---[[
-Like Array.sortBy, except that it sorts in place. Mutates the first argument.
-]]
+---Sorts an array by transforming its elements via a function and comparing the transformed elements.
+---Similar to `Array.sortBy` but sorts in place, i.e. mutates the first argument.
+---@generic T, V
+---@param tbl T[]
+---@param funct fun(element: T): V
+---@param compare? fun(a: V, b: V): boolean
 function Array.sortInPlaceBy(tbl, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 	table.sort(tbl, function(x1, x2) return compare(funct(x1), funct(x2)) end)
 end
 
 -- Reverses the order of elements in an array.
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.reverse(tbl)
 	local reversedArray = {}
 	for index = #tbl, 1, -1 do
@@ -263,13 +308,19 @@ Example:
 Array.append({2, 3}, 5, 7, 11)
 -- returns {2, 3, 5, 7, 11}
 ]]
+---@generic T
+---@param tbl T[]
+---@param ... any
+---@return any[]
 function Array.append(tbl, ...)
 	return Array.appendWith(Array.copy(tbl), ...)
 end
 
---[[
-Adds elements to the end of an array. The array is mutated in the process.
-]]
+---Adds elements to the end of an array. The array is mutated in the process.
+---@generic T
+---@param tbl T[]
+---@param ... any
+---@return any[]
 function Array.appendWith(tbl, ...)
 	local elements = Table.pack(...)
 	for index = 1, elements.n do
@@ -291,6 +342,10 @@ Array.extend({2, 3}, {5, 7, 11}, {13})
 Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
 ]]
+---@generic T
+---@param tbl T[]
+---@param ... T[]
+---@return T[]
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
 end
@@ -299,6 +354,10 @@ end
 Adds elements from one or more arrays to the end of a target array. The target
 array is mutated in the process.
 ]]
+---@generic T
+---@param tbl T[]
+---@param ... T[]
+---@return T[]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
@@ -320,6 +379,9 @@ Example:
 Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 -- returns {1, 4, 9, 16}
 ]]
+---@generic T
+---@param funct fun(index: integer): T?
+---@return T[]
 function Array.mapIndexes(funct)
 	local arr = {}
 	for index = 1, math.huge do
@@ -333,9 +395,10 @@ function Array.mapIndexes(funct)
 	return arr
 end
 
---[[
-Returns the array {from, from + 1, from + 2, ..., to}.
-]]
+---Returns the array {from, from + 1, from + 2, ..., to}.
+---@param from integer
+---@param to integer
+---@return integer[]
 function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
@@ -344,35 +407,34 @@ function Array.range(from, to)
 	return elements
 end
 
-
----@comment Extracts keys from a given table into an array. An order can be supplied via an iterator.
+---Extracts keys from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param iterator function?
+---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return K[]
 function Array.extractKeys(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
 	for key, _ in iterator(tbl, ...) do
-        table.insert(array, key)
-    end
-    return array
+		table.insert(array, key)
+	end
+	return array
 end
 
----@comment Extracts values from a given table into an array. An order can be supplied via an iterator.
+---Extracts values from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param iterator function?
+---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return V[]
 function Array.extractValues(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
 	for _, item in iterator(tbl, ...) do
-        table.insert(array, item)
-    end
-    return array
+		table.insert(array, item)
+	end
+	return array
 end
 
 --[[
@@ -383,6 +445,9 @@ Example:
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
 ]]
+---@generic T
+---@param elements T[]
+---@param funct fun(element?: T, index?: integer)
 function Array.forEach(elements, funct)
 	for index, element in ipairs(elements) do
 		funct(element, index)
@@ -402,6 +467,11 @@ local function pow(x, y) return x ^ y end
 Array.reduce({2, 3, 5}, pow)
 -- Returns 32768
 ]]
+---@generic T
+---@param array T[]
+---@param operator fun(aggregate: T, arrayValue: T): T
+---@param initialValue T?
+---@return T?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then
@@ -416,10 +486,12 @@ function Array.reduce(array, operator, initialValue)
 	return aggregate
 end
 
---[[
-Computes the maximum element in an array according to a scoring function. Returns
-nil if the array is empty.
-]]
+---Computes the maximum element in an array according to a scoring function. Returns nil if the array is empty.
+---@generic T
+---@param array T[]
+---@param funct fun(item: T): number
+---@param compare? fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -434,17 +506,20 @@ function Array.maxBy(array, funct, compare)
 	return max
 end
 
---[[
-Computes the maximum element in an array. Returns nil if the array is empty.
-]]
+---Computes the maximum element in an array. Returns nil if the array is empty.
+---@param array number[]
+---@param compare? fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.max(array, compare)
 	return Array.maxBy(array, function(x) return x end, compare)
 end
 
---[[
-Computes the minimum element in an array according to a scoring function. Returns
-nil if the array is empty.
-]]
+---Computes the minimum element in an array according to a scoring function. Returns nil if the array is empty.
+---@generic T
+---@param array T[]
+---@param funct fun(item: T): number
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -459,9 +534,10 @@ function Array.minBy(array, funct, compare)
 	return min
 end
 
---[[
-Computes the minimum element in an array. Returns nil if the array is empty.
-]]
+---Computes the minimum element in an array. Returns nil if the array is empty.
+---@param array number[]
+---@param compare fun(maxScore: number, score: number): boolean
+---@return number?
 function Array.min(array, compare)
 	return Array.minBy(array, function(x) return x end, compare)
 end
