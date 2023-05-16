@@ -344,20 +344,35 @@ function Array.range(from, to)
 	return elements
 end
 
-function Array.extractKeys(tbl)
-	local keys = {}
-	for key, _ in pairs(tbl) do
-		table.insert(keys, key)
-	end
-	return keys
+
+---@comment Extracts keys from a given table into an array. An order can be supplied via an iterator.
+---@generic K, V
+---@param tbl {[K]: V}
+---@param iterator function?
+---@param ... any
+---@return K[]
+function Array.extractKeys(tbl, iterator, ...)
+	iterator = iterator or pairs
+	local array = {}
+	for key, _ in iterator(tbl, ...) do
+        table.insert(array, key)
+    end
+    return array
 end
 
-function Array.extractValues(tbl)
-	local values = {}
-	for _, value in pairs(tbl) do
-		table.insert(values, value)
-	end
-	return values
+---@comment Extracts values from a given table into an array. An order can be supplied via an iterator.
+---@generic K, V
+---@param tbl {[K]: V}
+---@param iterator function?
+---@param ... any
+---@return V[]
+function Array.extractValues(tbl, iterator, ...)
+	iterator = iterator or pairs
+	local array = {}
+	for _, item in iterator(tbl, ...) do
+        table.insert(array, item)
+    end
+    return array
 end
 
 --[[

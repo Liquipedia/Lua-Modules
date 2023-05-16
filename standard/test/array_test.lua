@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local Array = Lua.import('Module:Array', {requireDevIfEnabled = true})
@@ -139,6 +140,36 @@ function suite:testReduce()
 	local function pow(x, y) return x ^ y end
 	self:assertDeepEquals(32768, Array.reduce({2, 3, 5}, pow))
 	self:assertDeepEquals(1, Array.reduce({2, 3, 5}, pow, 1))
+end
+
+function suite:testExtractValues()
+	local a = {i = 1, j = 2, k = 3, z = 0}
+
+	local customOrder1 = function(_, key1, key2) return key1 > key2 end
+	local customOrder2 = function(tbl, key1, key2) return tbl[key1] < tbl[key2] end
+
+	self:assertDeepEquals({1, 2, 3, 0}, Array.extractValues(a, Table.iter.spairs))
+	self:assertDeepEquals({0, 3, 2, 1}, Array.extractValues(a, Table.iter.spairs, customOrder1))
+	self:assertDeepEquals({0, 1, 2, 3}, Array.extractValues(a, Table.iter.spairs, customOrder2))
+
+	local extractedArray = Array.extractValues(a)
+	table.sort(extractedArray)
+	self:assertDeepEquals({0, 1, 2, 3}, extractedArray)
+end
+
+function suite:testExtractKeys()
+	local a = {k = 3, i = 1, z = 0, j = 2}
+
+	local customOrder1 = function(_, key1, key2) return key1 > key2 end
+	local customOrder2 = function(tbl, key1, key2) return tbl[key1] < tbl[key2] end
+
+	self:assertDeepEquals({'i', 'j', 'k', 'z'}, Array.extractKeys(a, Table.iter.spairs))
+	self:assertDeepEquals({'z', 'k', 'j', 'i'}, Array.extractKeys(a, Table.iter.spairs, customOrder1))
+	self:assertDeepEquals({'z', 'i', 'j', 'k'}, Array.extractKeys(a, Table.iter.spairs, customOrder2))
+
+	local extractedKeys = Array.extractKeys(a)
+	table.sort(extractedKeys)
+	self:assertDeepEquals({'i', 'j', 'k', 'z'}, extractedKeys)
 end
 
 return suite
