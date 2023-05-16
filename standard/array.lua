@@ -389,7 +389,6 @@ function Array.range(from, to)
 	return elements
 end
 
-
 ---Extracts keys from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
@@ -402,9 +401,9 @@ function Array.extractKeys(tbl, iterator, ...)
 	--the ... parameter is redundant for pairs but might be needed for other iterators
 	---@diagnostic disable-next-line: redundant-parameter
 	for key, _ in iterator(tbl, ...) do
-        table.insert(array, key)
-    end
-    return array
+		table.insert(array, key)
+	end
+	return array
 end
 
 ---Extracts values from a given table into an array. An order can be supplied via an iterator.
@@ -419,9 +418,9 @@ function Array.extractValues(tbl, iterator, ...)
 	--the ... parameter is redundant for pairs but might be needed for other iterators
 	---@diagnostic disable-next-line: redundant-parameter
 	for _, item in iterator(tbl, ...) do
-        table.insert(array, item)
-    end
-    return array
+		table.insert(array, item)
+	end
+	return array
 end
 
 --[[
