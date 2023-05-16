@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
@@ -20,11 +21,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local Ability = Class.new()
-
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
-local _SUPPLY = mw.loadData('Module:Supply')
 
 local CustomInjector = Class.new(Injector)
 
@@ -64,8 +60,15 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Cost',
-				content = {Ability:getCostDisplay()}
-
+				content = {CostDisplay.run{
+					faction = _args.race,
+					minerals = _args.min,
+					mineralsForced = true,
+					gas = _args.gas,
+					gasForced = true,
+					buildTime = _args.buildtime,
+					supply = _args.supply or _args.control or _args.psy,
+				}}
 			}
 		}
 	elseif id == 'hotkey' then
@@ -181,33 +184,6 @@ function Ability:getHotkeys()
 	end
 
 	return display
-end
-
-function Ability:getCostDisplay()
-	local race = string.lower(_args.race or '')
-
-	local minerals = _MINERALS .. '&nbsp;' .. (tonumber(_args.min) or 0)
-
-	local gas = tonumber(_args.gas or 0) or 0
-	gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas
-
-	local buildtimeValue = tonumber(_args.buildtime or 0) or 0
-	local buildTime
-	if buildtimeValue ~= 0 then
-		buildTime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtimeValue
-	else
-		buildTime = ''
-	end
-
-	local supplyValue = tonumber(_args.supply or _args.control or _args.psy) or 0
-	local supply
-	if supplyValue == 0 then
-		supply = ''
-	else
-		supply = '&nbsp;' .. (_SUPPLY[race] or _SUPPLY['default']) .. '&nbsp;' .. supplyValue
-	end
-
-	return minerals .. '&nbsp;' .. gas .. buildTime .. supply
 end
 
 return Ability

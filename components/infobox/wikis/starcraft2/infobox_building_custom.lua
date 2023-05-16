@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
@@ -24,9 +25,6 @@ local CustomBuilding = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local ICON_GAS = mw.loadData('Module:Gas')
-local ICON_TIME = mw.loadData('Module:Buildtime')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
@@ -68,7 +66,14 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CustomBuilding:_getCostDisplay()}},
+			Cell{name = 'Cost', content = {CostDisplay.run{
+				faction = _race,
+				minerals = _args.min,
+				mineralsForced = true,
+				gas = _args.gas,
+				gasForced = true,
+				buildTime = _args.buildtime,
+			}}},
 		}
 	elseif id == 'requirements' then
 		return {
@@ -152,22 +157,6 @@ function CustomBuilding._getRace(race)
 	end
 
 	return display .. (category or '')
-end
-
-function CustomBuilding:_getCostDisplay()
-	local minerals = ICON_MINERALS .. '&nbsp;' .. (tonumber(_args.min) or 0)
-
-	local gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. (tonumber(_args.gas) or 0)
-
-	local buildtimeValue = _args.buildtime or 0
-	local buildTime
-	if buildtimeValue ~= 0 then
-		buildTime = '&nbsp;' .. (ICON_TIME[_race] or ICON_TIME['default']) .. '&nbsp;' .. buildtimeValue
-	else
-		buildTime = ''
-	end
-
-	return minerals .. '&nbsp;' .. gas .. buildTime
 end
 
 function CustomBuilding:_getHotkeys()
