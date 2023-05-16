@@ -28,6 +28,7 @@ function Tier.toIdentifier(input)
 	if String.isEmpty(input) then
 		return
 	end
+	---@cast input -nil
 
 	return tonumber(input)
 		or string.lower(input):gsub(' ', '')

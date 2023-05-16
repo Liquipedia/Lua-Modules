@@ -337,7 +337,7 @@ function MatchesTable._parseDateTime(str)
 		= str:match("(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$")
 
 	-- Adjust time based on server timezone offset from UTC
-	local offset = os.time(os.date("*t")) - os.time(os.date("!*t"))
+	local offset = os.time(os.date("*t") --[[@as osdate]]) - os.time(os.date("!*t") --[[@as osdate]])
 	-- create time - this will take our UTC timestamp and put it into localtime without converting
 	local localTime = os.time{
 		year = year,

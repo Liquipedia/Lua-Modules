@@ -35,17 +35,17 @@ function CustomSquad.header(self)
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
-	headerRow		:node(makeHeader('ID'))
-					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
+	headerRow:node(makeHeader('ID'))
+		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
 	if HAS_NUMBER then
-		headerRow	:node(makeHeader('Number'))
+		headerRow:node(makeHeader('Number'))
 	end
-	headerRow		:node(makeHeader('Name'))
-					:node(makeHeader('Position'))
-					:node(makeHeader('Join Date'))
+	headerRow:node(makeHeader('Name'))
+		:node(makeHeader('Position'))
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_FORMER then
-		headerRow	:node(makeHeader('Leave Date'))
-					:node(makeHeader('New Team'))
+		headerRow:node(makeHeader('Leave Date'))
+			:node(makeHeader('New Team'))
 	elseif self.type == Squad.TYPE_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end

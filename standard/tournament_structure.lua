@@ -71,6 +71,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 			or FULL_PAGENAME
 		local redirectedPage = mw.title.new(TournamentStructure._resolveRedirect(pageName))
 		redirectedPage.fragment = stageName or ''
+		assert(redirectedPage, 'Invalid page name "' .. pageName .. '"')
 		return redirectedPage.fullText
 	end
 
@@ -380,6 +381,7 @@ end
 ---@return string?, string, string?
 function TournamentStructure._splitPageName(pageName)
 	local title = mw.title.new(pageName)
+	assert(title, 'Invalid pagename "' .. pageName .. '"')
 	return String.nilIfEmpty(title.nsText), title.text, String.nilIfEmpty(title.fragment)
 end
 

@@ -32,22 +32,22 @@ function CustomSquad.header(self)
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
-	headerRow	:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader('Position'))
-			:node(makeHeader('Join Date'))
+	headerRow:node(makeHeader('ID'))
+		:node(makeHeader())
+		:node(makeHeader('Name'))
+		:node(makeHeader('Position'))
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE then
-		headerRow	:node(makeHeader('Inactive Date'))
-				:node(makeHeader('Active Team'))
+		headerRow:node(makeHeader('Inactive Date'))
+			:node(makeHeader('Active Team'))
 	end
 	if self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow	:node(makeHeader('Inactive Date'))
-				:node(makeHeader('Last Active Team'))
+		headerRow:node(makeHeader('Inactive Date'))
+			:node(makeHeader('Last Active Team'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow	:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
+		headerRow:node(makeHeader('Leave Date'))
+			:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -111,14 +111,14 @@ function CustomSquad.run(frame)
 		local row = ExtendedSquadRow()
 		row:status(squad.type)
 		row:id{
-				player.id,
-				flag = player.flag,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-				teamrole = player.teamrole,
-			}
+			player.id,
+			flag = player.flag,
+			link = player.link,
+			captain = player.captain,
+			role = player.role,
+			team = player.team,
+			teamrole = player.teamrole,
+		}
 			:name{name = player.name}
 			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')

@@ -73,7 +73,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 	round.G = round.G + 1
 
 	if string.match(bd.header or '', '^!l') then
-		LowerHeader[roundNum] = round.G
+		LowerHeader[roundNum or ''] = round.G
 	end
 
 	-- opponents

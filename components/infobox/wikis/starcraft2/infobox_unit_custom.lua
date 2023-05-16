@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
@@ -25,10 +26,6 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local ICON_GAS = mw.loadData('Module:Gas')
-local ICON_TIME = mw.loadData('Module:Buildtime')
-local ICON_SUPPLY = mw.loadData('Module:Supply')
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
@@ -82,7 +79,15 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' and not String.isEmpty(_args.min) then
 		return {
-			Cell{name = 'Cost', content = {CustomUnit:_getCostDisplay()}},
+			Cell{name = 'Cost', content = {CostDisplay.run{
+				faction = _args.race,
+				minerals = _args.min,
+				mineralsForced = true,
+				gas = _args.gas,
+				gasForced = true,
+				buildTime = _args.buildtime,
+				supply = _args.supply or _args.control or _args.psy,
+			}}},
 		}
 	elseif id == 'requirements' then
 		return {
@@ -150,30 +155,6 @@ function CustomUnit._getRace(race)
 	end
 
 	return display .. (category or '')
-end
-
-function CustomUnit:_getCostDisplay()
-	local minerals = _args.min or 0
-	minerals = ICON_MINERALS .. '&nbsp;' .. minerals
-
-	local gas = _args.gas or 0
-	gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. gas
-
-	local buildtime = _args.buildtime
-	if not String.isEmpty(buildtime) then
-		buildtime = '&nbsp;' .. (ICON_TIME[_race] or ICON_TIME['default']) .. '&nbsp;' .. buildtime
-	else
-		buildtime = ''
-	end
-
-	local supply = _args.supply or _args.psy or _args.control
-	if not String.isEmpty(supply) then
-		supply = '&nbsp;' .. (ICON_SUPPLY[_race] or ICON_SUPPLY['default']) .. '&nbsp;' .. supply
-	else
-		supply = ''
-	end
-
-	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
 end
 
 function CustomUnit:_getHotkeys()

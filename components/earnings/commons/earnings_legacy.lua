@@ -65,10 +65,9 @@ function CustomEarnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[players_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
 	end
 
-	---@diagnostic disable-next-line: cast-local-type
-	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
+	local playerConditionString = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
-	return CustomEarnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
+	return CustomEarnings.calculate(playerConditionString, args.year, args.mode, args.perYear, nil, true)
 end
 
 ---
