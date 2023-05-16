@@ -155,11 +155,9 @@ function CustomBuilding._getRace(race)
 end
 
 function CustomBuilding:_getCostDisplay()
-	local mineralValue = _args.min or 0
-	local minerals = ICON_MINERALS .. '&nbsp;' .. mineralValue
+	local minerals = ICON_MINERALS .. '&nbsp;' .. (tonumber(_args.min) or 0)
 
-	local gas = _args.gas or 0
-	gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. gas
+	local gas = (ICON_GAS[_race] or ICON_GAS['default']) .. '&nbsp;' .. (tonumber(_args.gas) or 0)
 
 	local buildtimeValue = _args.buildtime or 0
 	local buildTime

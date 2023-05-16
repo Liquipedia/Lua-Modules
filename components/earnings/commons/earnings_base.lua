@@ -151,7 +151,6 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	local sumUp = function(placement)
 		local value = Earnings._determineValue(placement, aliases, isPlayerQuery)
 		if perYear then
-			---@type integer?
 			local year = tonumber(string.sub(placement.date, 1, 4))
 			---@cast year -nil
 			earningsByYear[year] = (earningsByYear[year] or 0) + value

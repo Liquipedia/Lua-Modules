@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 
 --- @class LpdbInjector
---- @field adjust function
 local Injector = Class.new()
 
 function Injector:adjust(lpdbData, ...)

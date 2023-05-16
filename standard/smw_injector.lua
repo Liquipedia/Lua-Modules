@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 
 --- @class SmwInjector
---- @field adjust function
 local Injector = Class.new()
 
 function Injector:adjust(smwData, ...)
