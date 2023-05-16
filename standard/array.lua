@@ -38,8 +38,9 @@ function Array.isArray(tbl)
 end
 
 -- Creates a copy of an array with the same elements.
----@param tbl any[]
----@return any[]
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.copy(tbl)
 	local copy = {}
 	for _, element in ipairs(tbl) do
@@ -108,8 +109,9 @@ function Array.filter(tbl, predicate)
 end
 
 ---Flattens an array of arrays into an array.
----@param tbl any[]
----@return any[]
+---@generic T
+---@param tbl T[]
+---@return T[]
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
@@ -209,8 +211,9 @@ function Array.groupBy(tbl, funct)
 end
 
 ---Lexicographically compare two arrays.
----@param tblX any[]
----@param tblY any[]
+---@generic T
+---@param tblX T[]
+---@param tblY T[]
 ---@return boolean
 function Array.lexicalCompare(tblX, tblY)
 	for index = 1, math.min(#tblX, #tblY) do
@@ -226,8 +229,9 @@ end
 ---Lexicographically compare 2 values.
 ---If they are arrays (tables) compare them via `Array.lexicalCompare`.
 ---Else compare them as directly values.
----@param y1 any[]|any
----@param y2 any[]|any
+---@generic T
+---@param y1 T[]|T
+---@param y2 T[]|T
 ---@return boolean
 function Array.lexicalCompareIfTable(y1, y2)
 	if type(y1) == 'table' and type(y2) == 'table' then
@@ -304,17 +308,19 @@ Example:
 Array.append({2, 3}, 5, 7, 11)
 -- returns {2, 3, 5, 7, 11}
 ]]
----@param tbl any[]
+---@generic T
+---@param tbl T[]
 ---@param ... any
----@return any[]
+---@return T[]
 function Array.append(tbl, ...)
 	return Array.appendWith(Array.copy(tbl), ...)
 end
 
 ---Adds elements to the end of an array. The array is mutated in the process.
----@param tbl any[]
+---@generic T
+---@param tbl T[]
 ---@param ... any
----@return any[]
+---@return T[]
 function Array.appendWith(tbl, ...)
 	local elements = Table.pack(...)
 	for index = 1, elements.n do
@@ -336,9 +342,10 @@ Array.extend({2, 3}, {5, 7, 11}, {13})
 Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
 ]]
----@param tbl any[]
----@param ... any[]
----@return any[]
+---@generic T
+---@param tbl T[]
+---@param ... T[]
+---@return T[]
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
 end
@@ -347,7 +354,8 @@ end
 Adds elements from one or more arrays to the end of a target array. The target
 array is mutated in the process.
 ]]
----@param tbl any[]
+---@generic T
+---@param tbl T[]
 ---@param ... any[]
 ---@return any[]
 function Array.extendWith(tbl, ...)
@@ -371,8 +379,9 @@ Example:
 Array.mapIndexes(function(x) return x < 5 and x * x or nil end)
 -- returns {1, 4, 9, 16}
 ]]
----@param funct fun(index: integer): any?
----@return any[]
+---@generic T
+---@param funct fun(index: integer): T?
+---@return T[]
 function Array.mapIndexes(funct)
 	local arr = {}
 	for index = 1, math.huge do
@@ -389,7 +398,7 @@ end
 ---Returns the array {from, from + 1, from + 2, ..., to}.
 ---@param from integer
 ---@param to integer
----@return any[]
+---@return integer[]
 function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
@@ -436,8 +445,9 @@ Example:
 Array.forEach({4, 6, 8}, mw.log)
 -- Prints 4 1 6 2 8 3
 ]]
----@param elements any[]
----@param funct fun(element?: any, index?: integer)
+---@generic T
+---@param elements T[]
+---@param funct fun(element?: T, index?: integer)
 function Array.forEach(elements, funct)
 	for index, element in ipairs(elements) do
 		funct(element, index)
@@ -457,10 +467,11 @@ local function pow(x, y) return x ^ y end
 Array.reduce({2, 3, 5}, pow)
 -- Returns 32768
 ]]
----@param array any[]
----@param operator fun(aggregate: any, arrayValue: any): any
----@param initialValue any
----@return any?
+---@generic T
+---@param array T[]
+---@param operator fun(aggregate: T, arrayValue: T): T
+---@param initialValue T
+---@return T?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then
@@ -476,8 +487,9 @@ function Array.reduce(array, operator, initialValue)
 end
 
 ---Computes the maximum element in an array according to a scoring function. Returns nil if the array is empty.
----@param array any[]
----@param funct fun(item: any): number
+---@generic T
+---@param array T[]
+---@param funct fun(item: T): number
 ---@param compare fun(maxScore: number, score: number): boolean
 ---@return number?
 function Array.maxBy(array, funct, compare)
@@ -503,8 +515,9 @@ function Array.max(array, compare)
 end
 
 ---Computes the minimum element in an array according to a scoring function. Returns nil if the array is empty.
----@param array any[]
----@param funct fun(item: any): number
+---@generic T
+---@param array T[]
+---@param funct fun(item: T): number
 ---@param compare fun(maxScore: number, score: number): boolean
 ---@return number?
 function Array.minBy(array, funct, compare)
