@@ -311,7 +311,7 @@ Array.append({2, 3}, 5, 7, 11)
 ---@generic T
 ---@param tbl T[]
 ---@param ... any
----@return T[]
+---@return any[]
 function Array.append(tbl, ...)
 	return Array.appendWith(Array.copy(tbl), ...)
 end
@@ -320,7 +320,7 @@ end
 ---@generic T
 ---@param tbl T[]
 ---@param ... any
----@return T[]
+---@return any[]
 function Array.appendWith(tbl, ...)
 	local elements = Table.pack(...)
 	for index = 1, elements.n do
@@ -356,8 +356,8 @@ array is mutated in the process.
 ]]
 ---@generic T
 ---@param tbl T[]
----@param ... any[]
----@return any[]
+---@param ... T[]
+---@return T[]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
 	for index = 1, arrays.n do
@@ -470,7 +470,7 @@ Array.reduce({2, 3, 5}, pow)
 ---@generic T
 ---@param array T[]
 ---@param operator fun(aggregate: T, arrayValue: T): T
----@param initialValue T
+---@param initialValue T?
 ---@return T?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
