@@ -7,7 +7,7 @@
 --
 
 return {
-    prefixes = {
-        steam = {'https://steamcommunity.com/'},
-    },
+	prefixes = {
+		steam = {'https://steamcommunity.com/'},
+	},
 }
