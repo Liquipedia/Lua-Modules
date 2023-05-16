@@ -63,7 +63,10 @@ function TournamentsListingConditions.base(args)
 	end
 
 	if args.series then
-		conditions:add{ConditionNode(ColumnName('series'), Comparator.eq, args.series)}
+		conditions:add{ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('series'), Comparator.eq, args.series),
+			ConditionNode(ColumnName('extradata_series2'), Comparator.eq, args.series)
+		}}
 	end
 
 	if args.location then
