@@ -65,10 +65,9 @@ function MatchLegacy._storeGames(match, match2, options)
 			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is "2_1"
 			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
 			for key, item in pairs(playerdata) do
-				local k = mw.text.split(key or '', '_')
-				local l = tonumber(k[2])
-				---@diagnostic disable-next-line: cast-local-type
-				k = tonumber(k[1])
+				local keyArray = mw.text.split(key or '', '_')
+				local l = tonumber(keyArray[2])
+				local k = tonumber(keyArray[1])
 				game.extradata['opponent' .. k .. 'race'] = item.faction
 				local opp = match2.match2opponents[k] or {}
 				local pl = opp.match2players or {}
@@ -104,10 +103,9 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.extradata = {}
 			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
 			for key, item in pairs(playerdata) do
-				local k = mw.text.split(key or '', '_')
-				local l = tonumber(k[2])
-				---@diagnostic disable-next-line: cast-local-type
-				k = tonumber(k[1])
+				local keyArray = mw.text.split(key or '', '_')
+				local l = tonumber(keyArray[2])
+				local k = tonumber(keyArray[1])
 				submatch.extradata['opponent' .. k .. 'race'] = item.faction
 				local opp = match2.match2opponents[k] or {}
 				local pl = opp.match2players or {}
