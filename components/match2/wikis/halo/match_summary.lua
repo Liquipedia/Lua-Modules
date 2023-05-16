@@ -109,7 +109,7 @@ function CustomMatchSummary.getByMatchId(args)
 		local buildQueryFormLink = function(form, template, arguments)
 			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
 				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-				    .. '&_run'
+					.. '&_run'
 			))
 		end
 
@@ -121,7 +121,7 @@ function CustomMatchSummary.getByMatchId(args)
 			['[fromdate][day]'] = '01',
 			['[fromdate][month]'] = '01',
 			['[fromdate][year]'] = string.sub(match.date,1,4)
-	    }
+		}
 
 		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end

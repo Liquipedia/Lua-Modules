@@ -54,7 +54,7 @@ function BroadcasterCard.create(frame)
 		if args.b2 then
 			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
 		end
-		title = table.concat(positions, '/')  .. ':'
+		title = table.concat(positions, '/') .. ':'
 	end
 
 	-- Html for header
