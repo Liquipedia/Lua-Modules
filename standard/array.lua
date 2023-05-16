@@ -490,7 +490,7 @@ end
 ---@generic T
 ---@param array T[]
 ---@param funct fun(item: T): number
----@param compare fun(maxScore: number, score: number): boolean
+---@param compare? fun(maxScore: number, score: number): boolean
 ---@return number?
 function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
@@ -508,7 +508,7 @@ end
 
 ---Computes the maximum element in an array. Returns nil if the array is empty.
 ---@param array number[]
----@param compare fun(maxScore: number, score: number): boolean
+---@param compare? fun(maxScore: number, score: number): boolean
 ---@return number?
 function Array.max(array, compare)
 	return Array.maxBy(array, function(x) return x end, compare)
