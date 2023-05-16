@@ -93,6 +93,7 @@ function String.convertWikiListToHtmlList(str, delimiter)
 	if String.isEmpty(str) then
 		return ''
 	end
+	---@cast str -nil
 	if String.isEmpty(delimiter) then
 		delimiter = '*'
 	end

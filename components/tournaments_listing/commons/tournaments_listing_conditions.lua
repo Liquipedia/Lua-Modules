@@ -85,7 +85,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.organizer then
 		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in mw.text.split(args.organizer, ',', true) do
+		for _, organizer in ipairs(mw.text.split(args.organizer, ',', true)) do
 			organizer = mw.text.trim(organizer)
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
@@ -97,7 +97,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.region then
 		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in mw.text.split(args.region, ',', true) do
+		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
 			region = mw.text.trim(region)
 			regionConditions:add{
 				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),

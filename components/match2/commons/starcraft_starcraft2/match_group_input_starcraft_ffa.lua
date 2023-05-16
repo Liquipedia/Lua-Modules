@@ -171,23 +171,23 @@ Match Winner, Walkover, Placement, Resulttype, Status functions
 
 ]]--
 function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, noscore)
-	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or _BESTOF_DUMMY
+	local bestof = tonumber(match.firstto) or tonumber(match.bestof) or _BESTOF_DUMMY
 	match.bestof = bestof
-	local walkover = match.walkover or ''
+	local walkover = match.walkover
 	local IndScore = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
 		--determine opponent scores, status
 		--determine MATCH winner, resulttype and walkover
-		if walkover ~= '' then
+		if walkover then
 			if Logic.isNumeric(walkover) then
-				walkover = tonumber(walkover)
-				if walkover == opponentIndex then
+				local numericWalkover = tonumber(walkover)
+				if numericWalkover == opponentIndex then
 					match.winner = opponentIndex
 					match.walkover = 'L'
 					opponent.status = 'W'
 					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
-				elseif walkover == 0 then
+				elseif numericWalkover == 0 then
 					match.winner = 0
 					match.walkover = 'L'
 					opponent.status = 'L'

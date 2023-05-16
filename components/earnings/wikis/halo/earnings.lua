@@ -15,15 +15,15 @@ CustomEarnings.defaultNumberOfPlayersInTeam = 4
 
 -- Legacy entry points
 function CustomEarnings.calc_player(input)
-    local args = input.args
+	local args = input.args
 
-    return CustomEarnings.calculateForPlayer(args)
+	return CustomEarnings.calculateForPlayer(args)
 end
 
 function CustomEarnings.calc_team(input)
-    local args = input.args
+	local args = input.args
 
-    return CustomEarnings.calculateForTeam(args)
+	return CustomEarnings.calculateForTeam(args)
 end
 
 return Class.export(CustomEarnings)

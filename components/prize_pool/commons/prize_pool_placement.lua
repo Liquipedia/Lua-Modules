@@ -36,6 +36,10 @@ local _tbd_index = 0
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
 --- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
+--- @field parseOpponents function
+--- @field getPrizeRewardForOpponent function
+--- @field parent PrizePool
+--- @field args table
 local Placement = Class.new(BasePlacement)
 
 Placement.specialStatuses = {

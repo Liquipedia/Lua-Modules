@@ -1,4 +1,3 @@
-
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -20,7 +19,7 @@ function suite:testRow()
 	LpdbMock.setUp()
 
 	local row = SquadRow()
-	row	:id{'Baz', 'se'}
+	row:id{'Baz', 'se'}
 		:name{'Foo Bar'}
 		:role{}
 		:date('2022-01-01', 'Join Date:&nbsp;', 'joindate')
@@ -46,7 +45,7 @@ function suite:testRow()
 		'<span class="team-template-image-icon team-template-lightmode">' ..
 		'[[File:Flag of Sweden 4 by 3.png|100x50px|middle|Team Sweden|link=Team Sweden]]</span>' ..
 		'<span class="team-template-image-icon team-template-darkmode">' ..
-		'[[File:Flag of Sweden 4 by 3.png|100x50px|middle|Team Sweden|link=Team Sweden]]</span> '..
+		'[[File:Flag of Sweden 4 by 3.png|100x50px|middle|Team Sweden|link=Team Sweden]]</span> ' ..
 		'<span class="team-template-text">[[Team Sweden|Team Sweden]]</span></span></td></tr>',
 		tostring(createdRow)
 	)
@@ -60,7 +59,7 @@ function suite:testHeader()
 	self:assertEquals(
 		'<div class="table-responsive" style="margin-bottom:10px;padding-bottom:0px">' ..
 		'<table class="wikitable wikitable-striped roster-card">' ..
-		'<tr><th class="large-only" colspan="1">Active Squad</th>'..
+		'<tr><th class="large-only" colspan="1">Active Squad</th>' ..
 		'<th class="large-only roster-title-row2-border" colspan="10">Active Squad</th></tr>' ..
 		'<tr class="HeaderRow"><th class="divCell">ID</th><th></th><th class="divCell">Name</th><th>' ..
 		'</th><th class="divCell">Join Date</th></tr>' ..

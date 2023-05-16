@@ -27,13 +27,13 @@ function CustomSquad.run(frame)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id({
-				player.id,
-				flag = player.flag,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-			})
+			player.id,
+			flag = player.flag,
+			link = player.link,
+			captain = player.captain,
+			role = player.role,
+			team = player.team,
+		})
 			:name({name = player.name})
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')

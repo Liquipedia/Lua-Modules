@@ -181,7 +181,7 @@ function BaseTournamentsListing:_header()
 
 	header
 		:tag('div'):addClass('gridCell'):wikitext('Date'):done()
-		:tag('div'):addClass('gridCell'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
+		:tag('div'):addClass('gridCell Prize'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
 		:tag('div'):addClass('gridCell'):wikitext('Location'):done()
 		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make('P#', 'Number of Participants'))
 
@@ -440,7 +440,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 		if Table.isEmpty(queryData) then
 			return {qualified = {Opponent.tbd(Opponent.team)}}
 		end
-		return {qualified = queryData}
+		return {qualified = Array.map(queryData, Opponent.fromLpdbStruct)}
 	end
 
 	for _, item in ipairs(queryData) do

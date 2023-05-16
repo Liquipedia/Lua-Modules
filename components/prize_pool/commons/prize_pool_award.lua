@@ -21,6 +21,8 @@ local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class AwardPrizePool
+--- @field options table
+--- @field _lpdbInjector LpdbInjector?
 local AwardPrizePool = Class.new(BasePrizePool)
 
 function AwardPrizePool:readPlacements(args)

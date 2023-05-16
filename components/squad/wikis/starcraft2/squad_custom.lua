@@ -42,19 +42,18 @@ function CustomSquad.run(frame)
 
 	local index = 1
 	while args['p' .. index] or args[index] do
-
 		local player = Json.parseIfString(args['p' .. index] or args[index])
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id({
-				player.id,
-				flag = player.flag,
-				race = Faction.read(player.race),
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-			})
+			player.id,
+			flag = player.flag,
+			race = Faction.read(player.race),
+			link = player.link,
+			captain = player.captain,
+			role = player.role,
+			team = player.team,
+		})
 			:name({name = player.name})
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')

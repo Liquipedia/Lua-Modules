@@ -60,11 +60,11 @@ function CustomSquad.run(frame)
 
 	squad:header()
 
-	local players = Array.mapIndexes(function (index)
+	local players = Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
 
-	Array.forEach(players, function (player)
+	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
 
 		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race

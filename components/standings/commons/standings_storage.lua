@@ -92,9 +92,9 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
-	standingsIndex = tonumber(standingsIndex)
+	local standingsIndexNumber = tonumber(standingsIndex)
 
-	if not standingsIndex or not roundIndex or not slotIndex then
+	if not standingsIndexNumber or not roundIndex or not slotIndex then
 		return
 	end
 
@@ -107,7 +107,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local lpdbEntry = {
 		parent = Variables.varDefault('tournament_parent', ''),
-		standingsindex = standingsIndex,
+		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
 		definitestatus = entry.definitestatus or entry.bg,
 		currentstatus = entry.currentstatus or entry.pbg,
@@ -127,7 +127,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
 	mw.ext.LiquipediaDB.lpdb_standingsentry(
-		'standing_' .. standingsIndex .. '_' .. roundIndex .. '_' .. slotIndex,
+		'standing_' .. standingsIndexNumber .. '_' .. roundIndex .. '_' .. slotIndex,
 		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
 	)
 end

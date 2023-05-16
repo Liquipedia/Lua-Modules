@@ -123,7 +123,7 @@ function StarcraftMatchSummary.Header(props)
 		if not flip then
 			opponentDisplay = Array.reverse(opponentDisplay)
 		end
-		Array.extendWith(display.nodes, opponentDisplay)
+		Array.forEach(opponentDisplay, function(opponentNode) display:node(opponentNode) end)
 
 		return display
 	end
