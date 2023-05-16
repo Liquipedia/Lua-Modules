@@ -19,7 +19,7 @@ local SingleMatchDisplay = {propTypes = {}, types = {}}
 
 SingleMatchDisplay.configFromArgs = function(args)
 	return {
-		width = tonumber(string.gsub(args.width or '', 'px', ''), nil),
+		width = tonumber((string.gsub(args.width or '', 'px', ''))),
 	}
 end
 

@@ -166,7 +166,7 @@ end
 
 function CustomResultsTable._allKillMapRow(args, prefix, match)
 	if not (args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'win'] or args[prefix .. 'walkover'])then
-		return
+		return false
 	end
 
 	local opponentLeft = mw.html.create('div'):css('text-align', 'right')

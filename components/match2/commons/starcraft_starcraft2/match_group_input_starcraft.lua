@@ -110,7 +110,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
@@ -251,12 +251,12 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			--as > 2 opponents is only possible in ffa
 			if String.isNotEmpty(walkover) then
 				if Logic.isNumeric(walkover) then
-					walkover = tonumber(walkover)
-					if walkover == opponentIndex then
+					local numericWalkover = tonumber(walkover)
+					if numericWalkover == opponentIndex then
 						match.winner = opponentIndex
 						match.walkover = 'L'
 						opponent.status = 'W'
-					elseif walkover == 0 then
+					elseif numericWalkover == 0 then
 						match.winner = 0
 						match.walkover = 'L'
 						opponent.status = 'L'
@@ -977,6 +977,8 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	local opponentRaces, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
+		-- opponentIx can not be nil due to the format of the participants keys
+		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
 	end

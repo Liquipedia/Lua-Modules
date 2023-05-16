@@ -114,28 +114,31 @@ function Spell:getResearchCost()
 
 	local race = string.lower(_args.race or '')
 
-	local minerals = tonumber(_args.min or 0) or 0
-	if minerals ~= 0 then
-		minerals = _MINERALS .. '&nbsp;' .. minerals .. '&nbsp;'
+	local mineralValue = tonumber(_args.min or 0) or 0
+	local minerals
+	if mineralValue ~= 0 then
+		minerals = _MINERALS .. '&nbsp;' .. mineralValue .. '&nbsp;'
 	else
 		minerals = ''
 	end
 
-	local gas = tonumber(_args.gas or 0) or 0
-	if gas ~= 0 then
-		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
+	local gasValue = tonumber(_args.gas or 0) or 0
+	local gas
+	if gasValue ~= 0 then
+		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gasValue .. '&nbsp;'
 	else
 		gas = ''
 	end
 
-	local buildtime = tonumber(_args.buildtime or 0) or 0
-	if buildtime ~= 0 then
-		buildtime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
+	local buildtimeValue = tonumber(_args.buildtime or 0) or 0
+	local buildTime
+	if buildtimeValue ~= 0 then
+		buildTime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtimeValue
 	else
-		buildtime = ''
+		buildTime = ''
 	end
 
-	display = minerals .. gas .. buildtime
+	display = minerals .. gas .. buildTime
 	if display == '' then
 		return nil
 	else
@@ -231,8 +234,7 @@ end
 
 function Spell:getCostDisplay()
 	local energy = tonumber(_args.energy or 0) or 0
-	energy = _ENERGY .. '&nbsp;' .. energy
-	return energy
+	return _ENERGY .. '&nbsp;' .. energy
 end
 
 return Spell

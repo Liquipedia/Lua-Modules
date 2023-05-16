@@ -66,9 +66,9 @@ function Earnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. player .. ']]')
 		table.insert(playerConditions, '[[opponentplayers_' .. prefix .. playerIndex .. '::' .. playerAsPageName .. ']]')
 	end
-	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
+	local playerConditionString = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
-	return Earnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
+	return Earnings.calculate(playerConditionString, args.year, args.mode, args.perYear, nil, true)
 end
 
 ---
@@ -130,9 +130,9 @@ function Earnings.calculateForTeam(args)
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
 	end
-	teamConditions = '(' .. table.concat(teamConditions, ' OR ') .. ')'
+	local teamConditionString = '(' .. table.concat(teamConditions, ' OR ') .. ')'
 
-	return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, queryTeams)
+	return Earnings.calculate(teamConditionString, args.year, args.mode, args.perYear, queryTeams)
 end
 
 ---
@@ -152,6 +152,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 		local value = Earnings._determineValue(placement, aliases, isPlayerQuery)
 		if perYear then
 			local year = tonumber(string.sub(placement.date, 1, 4))
+			---@cast year -nil
 			earningsByYear[year] = (earningsByYear[year] or 0) + value
 		end
 

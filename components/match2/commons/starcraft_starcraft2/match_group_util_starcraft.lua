@@ -174,6 +174,8 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	for key, participant in pairs(game.participants) do
 		local opponentIx, matchPlayerIx = key:match('(%d+)_(%d+)')
 		opponentIx = tonumber(opponentIx)
+		-- opponentIx can not be nil due to the format of the participants keys
+		---@cast opponentIx -nil
 		matchPlayerIx = tonumber(matchPlayerIx)
 
 		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)

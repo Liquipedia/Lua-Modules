@@ -186,28 +186,28 @@ end
 function Ability:getCostDisplay()
 	local race = string.lower(_args.race or '')
 
-	local minerals = tonumber(_args.min or 0) or 0
-	minerals = _MINERALS .. '&nbsp;' .. minerals
+	local minerals = _MINERALS .. '&nbsp;' .. (tonumber(_args.min) or 0)
 
 	local gas = tonumber(_args.gas or 0) or 0
 	gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas
 
-	local buildtime = tonumber(_args.buildtime or 0) or 0
-	if buildtime ~= 0 then
-		buildtime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
+	local buildtimeValue = tonumber(_args.buildtime or 0) or 0
+	local buildTime
+	if buildtimeValue ~= 0 then
+		buildTime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtimeValue
 	else
-		buildtime = ''
+		buildTime = ''
 	end
 
-	local supply = _args.supply or _args.control or _args.psy or 0
-	supply = tonumber(supply) or 0
-	if supply == 0 then
+	local supplyValue = tonumber(_args.supply or _args.control or _args.psy) or 0
+	local supply
+	if supplyValue == 0 then
 		supply = ''
 	else
-		supply = '&nbsp;' .. (_SUPPLY[race] or _SUPPLY['default']) .. '&nbsp;' .. supply
+		supply = '&nbsp;' .. (_SUPPLY[race] or _SUPPLY['default']) .. '&nbsp;' .. supplyValue
 	end
 
-	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
+	return minerals .. '&nbsp;' .. gas .. buildTime .. supply
 end
 
 return Ability
