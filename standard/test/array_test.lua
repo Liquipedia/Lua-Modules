@@ -116,7 +116,7 @@ function suite:testExtendWith()
 end
 
 function suite:testMapIndexes()
-	local a = {p1 = 'Abc', p2 = 'cd',  p3 = 'cake'}
+	local a = {p1 = 'Abc', p2 = 'cd', p3 = 'cake'}
 	self:assertDeepEquals({'p1Abc', 'p2cd'}, Array.mapIndexes(function(x)
 		local prefix = 'p'.. x
 		return a[prefix] ~= 'cake' and (prefix .. a[prefix]) or nil
