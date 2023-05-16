@@ -145,7 +145,7 @@ function Context:find(variableName)
 	while context do
 		local path = Table.mapValues(mw.text.split(variableName, TABLE_SPLIT_CHAR, true), toNumberIfNumeric)
 		local key = Table.extract(path, #path)
-		local tbl =  Table.getByPathOrNil(context.model, path)
+		local tbl = Table.getByPathOrNil(context.model, path)
 		if tbl and tbl[key] then
 			return tbl[key]
 		end

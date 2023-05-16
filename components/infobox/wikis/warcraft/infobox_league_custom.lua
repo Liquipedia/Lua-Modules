@@ -51,9 +51,9 @@ local GAMES = {
 }
 
 local MODES = {
-	team = {tier = 'Team', store = 'team', category =  'Team'},
-	['2v2'] = {tier = ' 2v2', store = '2v2', category =  '2v2'},
-	default = {store = '1v1', category =  'Individual'},
+	team = {tier = 'Team', store = 'team', category = 'Team'},
+	['2v2'] = {tier = ' 2v2', store = '2v2', category = '2v2'},
+	default = {store = '1v1', category = 'Individual'},
 }
 
 local TIER_1 = 1

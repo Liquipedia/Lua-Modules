@@ -142,7 +142,7 @@ end
 -- @mode - (optional) the mode to calculate earnings for
 -- @perYear - (optional) query all earnings per year and return the values in a lua table
 -- @aliases - players/teams to determine earnings for
--- @isPlayerQuery  boolean - if this is a player query or not
+-- @isPlayerQuery boolean - if this is a player query or not
 function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
 	conditions = Earnings._buildConditions(conditions, queryYear, mode)
 
