@@ -58,7 +58,7 @@ Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
 ]]
 ---@param tbl any[]
 ---@param startIndex integer
----@param endIndex integer
+---@param endIndex integer?
 ---@return any[]
 function Array.sub(tbl, startIndex, endIndex)
 	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
