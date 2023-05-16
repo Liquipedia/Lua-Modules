@@ -401,14 +401,12 @@ end
 ---Extracts keys from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param iterator function?
+---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return K[]
 function Array.extractKeys(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
-	--the ... parameter is redundant for pairs but might be needed for other iterators
-	---@diagnostic disable-next-line: redundant-parameter
 	for key, _ in iterator(tbl, ...) do
 		table.insert(array, key)
 	end
@@ -418,14 +416,12 @@ end
 ---Extracts values from a given table into an array. An order can be supplied via an iterator.
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param iterator function?
+---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return V[]
 function Array.extractValues(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
-	--the ... parameter is redundant for pairs but might be needed for other iterators
-	---@diagnostic disable-next-line: redundant-parameter
 	for _, item in iterator(tbl, ...) do
 		table.insert(array, item)
 	end
