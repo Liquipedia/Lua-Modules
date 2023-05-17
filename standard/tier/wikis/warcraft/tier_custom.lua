@@ -23,10 +23,18 @@ local MODE_ADJUSTS = {
 	default = '',
 }
 
+--- Parses queryData to be processable for other Tier functions
+---@param queryData table
+---@return string?, string?, {mode: string?}
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {mode = queryData.mode}
 end
 
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
+---@return string?
 function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier._raw(tier, tierType)
 
@@ -56,6 +64,10 @@ function TierCustom.display(tier, tierType, options)
 		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
 end
 
+--- Builds the display for a given tierData/tierTypeData table
+---@param data table
+---@param options {short: boolean, link: boolean|string, mode: string?}
+---@return string
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
@@ -68,8 +80,11 @@ function Tier.displaySingle(data, options)
 	return display
 end
 
+---@param link string
+---@param mode string?
+---@return string
 function TierCustom.adjustLink(link, mode)
-	return link:gsub('Tournaments', (MODE_ADJUSTS[mode] or MODE_ADJUSTS.default) .. 'Tournaments')
+	return (link:gsub('Tournaments', (MODE_ADJUSTS[mode] or MODE_ADJUSTS.default) .. 'Tournaments'))
 end
 
 return TierCustom
