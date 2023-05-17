@@ -54,6 +54,23 @@ local _TYPE_TO_TITLE = {
 	'Completed',
 }
 
+---@class tournamentsSummaryTableArgs
+---@field limit number|string|nil
+---@field upcoming boolean?
+---@field ongoing boolean?
+---@field recent boolean?
+---@field sort string?
+---@field order string?
+---@field reverseDisplay boolean?
+---@field title string?
+---@field disableLIS boolean?
+---@field completedOffset number?
+---@field upcomingOffset number?
+---@field tiers string?
+---@field tierTypeExcluded string?
+
+---@param args tournamentsSummaryTableArgs
+---@return Html
 function TournamentsSummaryTable.run(args)
 	args = args or {}
 
@@ -71,9 +88,15 @@ function TournamentsSummaryTable.run(args)
 	end
 
 	local title = mw.language.getContentLanguage():ucfirst(args.title or _TYPE_TO_TITLE[type])
+<<<<<<< HEAD
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
 	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
 	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
+=======
+	local limit = tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
+	local sort = args.sort or 'start'
+	local order = args.order or 'asc'
+>>>>>>> fef01746 (Add annotations to tournaments_summary_table.lua)
 
 	local data = TournamentsSummaryTable._getTournaments(type, sort, order, limit)
 
@@ -90,6 +113,7 @@ function TournamentsSummaryTable.run(args)
 	return wrapper
 end
 
+---@param args tournamentsSummaryTableArgs
 function TournamentsSummaryTable._parseArgsToSettings(args)
 	TournamentsSummaryTable.upcomingOffset = tonumber(args.upcomingOffset) or TournamentsSummaryTable.upcomingOffset
 
@@ -111,6 +135,11 @@ function TournamentsSummaryTable._parseArgsToSettings(args)
 		or TournamentsSummaryTable.tierTypeExcluded
 end
 
+---@param conditionType 1|2|3
+---@param sort string
+---@param order string
+---@param limit number
+---@return table[]
 function TournamentsSummaryTable._getTournaments(conditionType, sort, order, limit)
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'pagename, name, tickername, icon, icondark, startdate, enddate, series',
@@ -126,6 +155,8 @@ function TournamentsSummaryTable._getTournaments(conditionType, sort, order, lim
 	return {}
 end
 
+---@param type 1|2|3
+---@return string
 function TournamentsSummaryTable._buildConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(TournamentsSummaryTable._tierConditions())
@@ -137,6 +168,7 @@ function TournamentsSummaryTable._buildConditions(type)
 	return conditions:toString()
 end
 
+---@return ConditionTree
 function TournamentsSummaryTable._tierConditions()
 	local conditions = ConditionTree(BooleanOperator.any)
 	for _, tier in pairs(TournamentsSummaryTable.tiers) do
@@ -146,6 +178,7 @@ function TournamentsSummaryTable._tierConditions()
 	return conditions
 end
 
+---@return ConditionTree|{}
 function TournamentsSummaryTable._tierTypeConditions()
 	if Table.isEmpty(TournamentsSummaryTable.tierTypeExcluded) then
 		return {}
@@ -159,6 +192,7 @@ function TournamentsSummaryTable._tierTypeConditions()
 	return conditions
 end
 
+---@return ConditionTree|{}
 function TournamentsSummaryTable._statusConditions()
 	if Table.isEmpty(TournamentsSummaryTable.statusExcluded) then
 		return {}
@@ -172,6 +206,8 @@ function TournamentsSummaryTable._statusConditions()
 	return conditions
 end
 
+---@param type 1|2|3
+---@return ConditionTree
 function TournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
 
@@ -218,6 +254,9 @@ function TournamentsSummaryTable.additionalConditions(type)
 	return {}
 end
 
+---@param eventInformation table
+---@param type 1|2|3
+---@return string
 function TournamentsSummaryTable.row(eventInformation, type)
 	if type == TournamentsSummaryTable.upcomingType then
 		Variables.varDefine('upcoming_' .. eventInformation.pagename, 1)
@@ -271,6 +310,8 @@ function TournamentsSummaryTable.row(eventInformation, type)
 	return table.concat(rowComponents, ' | ')
 end
 
+---@param dateString string
+---@return string|osdate
 function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 	-- fallback
@@ -292,6 +333,8 @@ function TournamentsSummaryTable._dateDisplay(dateString)
 	return os.date('%b %d', date)
 end
 
+---@param series string
+---@return boolean
 function TournamentsSummaryTable._lisTemplateExists(series)
 	local lis = Template.safeExpand(
 		mw.getCurrentFrame(),
@@ -302,6 +345,8 @@ function TournamentsSummaryTable._lisTemplateExists(series)
 end
 
 -- thin wrapper for adding manual upcoming rows (for adding events with unknown dates)
+---@param args table
+---@return string
 function TournamentsSummaryTable.manualUpcomingRow(args)
 	args = args or {}
 
