@@ -16,14 +16,15 @@ local Class = require('Module:Class')
 
 local Flags = {}
 
--- Returns a flag
---[[
-supported args are:
-flag		- country name, flag code, or alias of the Flag
-shouldLink	- boolean that decides if the flag should link or not
-		--> set this to true for the flag to link to the according category
-		--> else the flag will not link
-]]--
+---@class flagIconArgs
+---@field flag string? country name, flag code, or alias of the Flag
+---@field shouldLink boolean? decides if the flag should link or not
+
+---Returns a flag
+---@param args flagIconArgs?
+---@param flagName string?
+---@return string
+---@overload fun(args: string): string
 function Flags.Icon(args, flagName)
 	local shouldLink
 	if type(args) == 'string' then
@@ -37,6 +38,7 @@ function Flags.Icon(args, flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
+	---@cast flagName -nil
 	shouldLink = Logic.readBool(shouldLink)
 
 	local flagKey = Flags._convertToKey(flagName)
@@ -65,15 +67,18 @@ function Flags.Icon(args, flagName)
 end
 
 -- Returns the localisation/country-adjective of a country or region
--- @country	- country name, flag code, or alias of the Flag
+-- If an invalid country is specified the 2nd return value will return a warning display incl. tracking category
 -- examples:
 -- Flags.getLocalisation('de') = German
 -- Flags.getLocalisation('Germany') = German
 -- Flags.getLocalisation('deu') = German
+---@param country string? country name, flag code, or alias of the Flag
+---@return string?, string?
 function Flags.getLocalisation(country)
 	if String.isEmpty(country) then
 		return
 	end
+	---@cast country -nil
 
 	-- clean the entered value
 	local countryKey = Flags._convertToKey(country)
@@ -91,11 +96,13 @@ function Flags.getLocalisation(country)
 			'|' .. country .. ']]"[[Category:Pages with unknown countries]]'
 end
 
--- supported args are:
--- @country	- country name, flag code, or alias of the Flag
--- @hideError	- boolean that decides if there should be a displayed error
--- if no entry is found but a country input was made
--- @simpleError	- boolean that decides if displayed error should be simple or detailed
+---@class flagLocalisationArgs
+---@field country string? country name, flag code, or alias of the Flag
+---@field hideError boolean? decides if there should be a displayed error
+---@field simpleError boolean? decides if displayed error should be simple or detailed
+
+---@param args flagLocalisationArgs
+---@return string?
 function Flags.localisationTemplate(args)
 	args = args or {}
 	local display, error = Flags.getLocalisation(args.country)
@@ -111,26 +118,41 @@ function Flags.localisationTemplate(args)
 	return error
 end
 
+---@class flagLanguageArgs
+---@field flag string? country name, flag code, or alias of the Flag
+---@field language string? language name
+---@field shouldLink boolean? decides if the flag should link or not
+
+---Returns a flag display indicating the language
+---@param args flagLanguageArgs?
+---@param langName string?
+---@return string
+---@overload fun(args: string): string
 function Flags.languageIcon(args, langName)
 	if type(args) == 'string' then
 		langName = args
 		args = {}
 	elseif String.isEmpty(langName) then
+		---@cast args -nil
 		langName = args.language or args.flag
 	end
 	if String.isEmpty(langName) then
 		return ''
 	end
+	---@cast langName -nil
 	langName = Flags._convertToLangKey(langName)
 
-	return Flags.Icon(args, langName)
+	return Flags.Icon(args --[[@as flagIconArgs]], langName)
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
+---@param flagName string?
+---@return string
 function Flags.CountryName(flagName)
 	if String.isEmpty(flagName) then
 		return ''
 	end
+	---@cast flagName -nil
 
 	local flagKey = Flags._convertToKey(flagName)
 
@@ -150,10 +172,14 @@ alpha3 - returns the lowercase ISO 3166-1 alpha-3 flag code
 
 default is alpha2
 ]]--
+---@param flagName string?
+---@param format 'alpha3'|any
+---@return string
 function Flags.CountryCode(flagName, format)
 	if String.isEmpty(flagName) then
 		return ''
 	end
+	---@cast flagName -nil
 
 	local flagKey = Flags._convertToKey(flagName)
 
@@ -199,6 +225,8 @@ Flags.readKey('Antigua and Barbuda') -- returns 'antiguaandbarbuda'
 Flags.readKey('Czech Republic') -- returns 'czechia'
 Flags.readKey('Czechoslovakia') -- returns nil
 ]]
+---@param flagName string
+---@return string?
 function Flags._convertToKey(flagName)
 	flagName = flagName:gsub(' ', ''):lower()
 
@@ -208,6 +236,8 @@ function Flags._convertToKey(flagName)
 		or (MasterData.data[flagName] and flagName)
 end
 
+---@param langName string
+---@return string?
 function Flags._convertToLangKey(langName)
 	return MasterData.languageTwoLetter[langName]
 		or MasterData.languageThreeLetter[langName]
