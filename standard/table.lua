@@ -435,7 +435,7 @@ end
 
 ---@param tbl table
 ---@param path any[]
----@return any
+---@return any?
 function Table.getByPath(tbl, path)
 	for _, fieldName in ipairs(path) do
 		tbl = tbl[fieldName]
@@ -485,7 +485,7 @@ end
 ---Returns the entries of a table as an array of key value pairs. The ordering of the array is not specified.
 ---@generic K, V
 ---@param tbl {[K]: V}
----@return {key: K, value: V}[]
+---@return {[1]: K, [2]: V}[]
 function Table.entries(tbl)
 	local entries = {}
 	for key, value in pairs(tbl) do
@@ -592,18 +592,20 @@ function Table.iter.pairsByPrefix(tbl, prefixes, options)
 	end
 end
 
+---@deprecated Use Array.forEach
 ---@generic V
 ---@param tbl V[]
----@param lambda fun(item: V): any
+---@param lambda fun(item: V)
 function Table.iter.forEach(tbl, lambda)
 	for _, item in ipairs(tbl) do
 		lambda(item)
 	end
 end
 
+---@deprecated Use Array.forEach
 ---@generic V
 ---@param tbl V[]
----@param lambda fun(inde: integer, item: V): any
+---@param lambda fun(index: integer, item: V)
 function Table.iter.forEachIndexed(tbl, lambda)
 	for index, item in ipairs(tbl) do
 		lambda(index, item)
@@ -612,7 +614,7 @@ end
 
 ---@generic K, V
 ---@param tbl {[K]: V}
----@param lambda fun(key: K, val: V): any
+---@param lambda fun(key: K, val: V?)
 function Table.iter.forEachPair(tbl, lambda)
 	for key, val in pairs(tbl) do
 		lambda(key, val)
