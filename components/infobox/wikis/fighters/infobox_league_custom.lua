@@ -222,7 +222,7 @@ function CustomLeague:_createPrizepool()
 
 	local localCurrency = _args.localcurrency
 	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
+	local prizePool = _args.prizepool --[[@as number|string|nil]]
 
 	local display
 	if prizePoolUSD then
