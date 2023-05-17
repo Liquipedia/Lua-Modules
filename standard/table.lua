@@ -436,16 +436,6 @@ end
 ---@param tbl table
 ---@param path any[]
 ---@return any?
-function Table.getByPath(tbl, path)
-	for _, fieldName in ipairs(path) do
-		tbl = tbl[fieldName]
-	end
-	return tbl
-end
-
----@param tbl table
----@param path any[]
----@return any?
 function Table.getByPathOrNil(tbl, path)
 	for _, fieldName in ipairs(path) do
 		if type(tbl) ~= 'table' then
