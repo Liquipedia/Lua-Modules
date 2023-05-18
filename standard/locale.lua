@@ -28,6 +28,8 @@ function Locale.formatLocation(args)
 	return formattedLocation
 end
 
+---@param args table
+---@return table
 function Locale.formatLocations(args)
 	local LOCATION_KEYS = {
 		'venue${index}',
