@@ -31,7 +31,7 @@ end
 
 ---@param a number
 ---@param b number
----@return number
+---@return number|'nan'
 function Operator.div(a, b)
 	return a / b
 end
