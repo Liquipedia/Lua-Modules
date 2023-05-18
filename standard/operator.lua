@@ -8,26 +8,43 @@
 
 local Operator = {}
 
+---@param a number
+---@param b number
+---@return number
 function Operator.add(a, b)
 	return a + b
 end
 
+---@param a number
+---@param b number
+---@return number
 function Operator.sub(a, b)
 	return a - b
 end
 
+---@param a number
+---@param b number
+---@return number
 function Operator.mul(a, b)
 	return a * b
 end
 
+---@param a number
+---@param b number
+---@return number
 function Operator.div(a, b)
 	return a / b
 end
 
+---@param a number
+---@param b number
+---@return number
 function Operator.pow(a, b)
 	return math.pow(a, b)
 end
 
+---@param item string|number
+---@return fun(tbl: table): any
 function Operator.property(item)
 	if string.find(item, '%.') then
 		error('Pathing not yet supported in property')
@@ -37,6 +54,9 @@ function Operator.property(item)
 	end
 end
 
+---@param funcName function
+---@param ... any
+---@return fun(obj: any): any
 function Operator.method(funcName, ...)
 	local args = {...}
 	return function(obj)
