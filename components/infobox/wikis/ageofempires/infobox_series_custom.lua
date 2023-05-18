@@ -42,12 +42,12 @@ end
 
 function CustomSeries._getSeriesPrizepools(seriesName)
 	local pagename = mw.title.getCurrentTitle().text:gsub('%s', '_')
-	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[series::' .. seriesName .. ']] OR [[seriespage::' .. pagename .. ']]',
 		query = 'sum::prizepool'
 	})
 
-	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
 
 	if prizemoney == nil or prizemoney == 0 then
 		return nil
