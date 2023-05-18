@@ -56,15 +56,11 @@ end
 ---@param link string?
 ---@return string?
 function page.makeExternalLink(display, link)
-	if String.isEmpty(link) then
+	if String.isEmpty(display) or String.isEmpty(link) then
 		return nil
 	end
-	local output = '[' .. link
-	if not String.isEmpty(display) then
-		output = output .. ' ' .. display
-	end
 
-	return output .. ']'
+	return '[' .. link .. ' ' .. display .. ']'
 end
 
 return Class.export(page)
