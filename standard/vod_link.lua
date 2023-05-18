@@ -11,6 +11,8 @@ local Logic = require('Module:Logic')
 
 local VodLink = {}
 
+---@param args {vod: string, source: string?, gamenum: integer?, novod: boolean?, htext: string?}
+---@return Html
 function VodLink.display(args)
 	args = args or {}
 
