@@ -35,7 +35,6 @@ function page.makeInternalLink(options, display, customLink)
 	elseif String.isEmpty(customLink) then
 		customLink = display
 	end
-	---@cast customLink -nil
 
 	if (options or {}).onlyIfExists == true and (not page.exists(customLink)) then
 		return nil
