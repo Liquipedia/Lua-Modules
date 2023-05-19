@@ -114,11 +114,6 @@ function BaseTournamentsListing:_buildConditions()
 	return conditions
 end
 
----@return {}
-function BaseTournamentsListing:additionalConditions()
-	return {}
-end
-
 ---@return Html?
 function BaseTournamentsListing:build()
 	if not self.data then
@@ -502,8 +497,6 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 
 	return placements
 end
-
-function BaseTournamentsListing:_buildPlacementConditions(tournamentData) end
 
 ---@param number number|string|nil
 ---@return Html|string
