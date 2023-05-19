@@ -69,10 +69,13 @@ function BroadcastTalentTable:init(args)
 end
 
 -- template entry point
+---@param frame Frame
+---@return Html
 function BroadcastTalentTable.run(frame)
 	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
 
+---@param args table
 function BroadcastTalentTable:_readArgs(args)
 	local isAchievementsTable = Logic.readBool(args.achievements)
 
@@ -98,6 +101,7 @@ function BroadcastTalentTable:_readArgs(args)
 	table.insert(self.aliases, self.broadcaster)
 end
 
+---@return string?
 function BroadcastTalentTable:_getBroadcaster()
 	local title = mw.title.getCurrentTitle()
 
@@ -108,6 +112,7 @@ function BroadcastTalentTable:_getBroadcaster()
 	return title.baseText
 end
 
+---@return table[]?
 function BroadcastTalentTable:_fetchTournaments()
 	local args = self.args
 
@@ -174,6 +179,7 @@ function BroadcastTalentTable:_fetchTournaments()
 end
 
 --- Creates the display
+---@return Html?
 function BroadcastTalentTable:create()
 	if not self.tournaments then
 		return
@@ -205,6 +211,7 @@ function BroadcastTalentTable:create()
 		:node(display)
 end
 
+---@return Html
 function BroadcastTalentTable:_header()
 	local header = mw.html.create('tr')
 		:tag('th'):wikitext('Date'):css('width', '120px'):done()
@@ -221,11 +228,15 @@ function BroadcastTalentTable:_header()
 	return header:tag('th'):wikitext('Partner List'):css('width', '160px'):done()
 end
 
+---@param seperatorTitle string|number
+---@return Html
 function BroadcastTalentTable._seperator(seperatorTitle)
 	return mw.html.create('tr'):addClass('sortbottom'):css('font-weight', 'bold')
 		:tag('td'):attr('colspan', 42):wikitext(seperatorTitle):done()
 end
 
+---@param tournament table
+---@return Html
 function BroadcastTalentTable:_row(tournament)
 	local row = mw.html.create('tr')
 
@@ -265,6 +276,8 @@ function BroadcastTalentTable:_row(tournament)
 	return row:tag('td'):node(self:_partnerList(tournament)):done()
 end
 
+---@param tournament table
+---@return table
 function BroadcastTalentTable._fetchTournamentData(tournament)
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. tournament.parent .. ']]',
@@ -281,6 +294,8 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 	return Table.merge(queryData[1], tournament)
 end
 
+---@param tournament table
+---@return string
 function BroadcastTalentTable:_tournamentDisplayName(tournament)
 	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
 	local extradata = tournament.extradata or {}
@@ -300,6 +315,8 @@ function BroadcastTalentTable:_tournamentDisplayName(tournament)
 	return displayName .. ' - Showmatch'
 end
 
+---@param tournament table
+---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	-- `tournament.extradata` is not the extradata of the tournament but of the broadcaster (they got merged together)
 	if Logic.readBool((tournament.extradata or {}).showmatch) then
@@ -314,6 +331,8 @@ function BroadcastTalentTable:_tierDisplay(tournament)
 	return Tier.display(tier, tierType, options)
 end
 
+---@param tournament table
+---@return Html|string
 function BroadcastTalentTable:_partnerList(tournament)
 	local partners = self:_getPartners(tournament)
 
@@ -336,6 +355,8 @@ function BroadcastTalentTable:_partnerList(tournament)
 		:tag('div'):addClass('NavContent broadcast-talent-partner-list'):node(list):done()
 end
 
+---@param tournament table
+---@return table
 function BroadcastTalentTable:_getPartners(tournament)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -370,12 +391,15 @@ function BroadcastTalentTable:_getPartners(tournament)
 	})
 end
 
+---@param partners table
+---@return {id: string, page: string, flag: string}[]
 function BroadcastTalentTable._removeDuplicatePartners(partners)
 	local uniquePartners = Table.map(partners, function(_, partner) return partner.page, partner end)
 
 	return Array.extractValues(uniquePartners)
 end
 
+---@return Html
 function BroadcastTalentTable:_footer()
 	local footer = mw.html.create('small')
 		:tag('span')
