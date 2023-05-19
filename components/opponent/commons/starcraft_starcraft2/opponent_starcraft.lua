@@ -37,12 +37,40 @@ StarcraftOpponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
+---@class StarcraftStandardPlayer
+---@field displayName string?
+---@field flag string?
+---@field pageName string?
+---@field team string?
+---@field race string?
+
+---@class StarcraftStandardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players StarcraftStandardPlayer[]
+---@field score number?
+---@field score2 number?
+---@field status string?
+---@field status2 string?
+---@field template string?
+---@field type string
+---@field isArchon boolean
+---@field isSpecialArchon boolean?
+---@field team string?
+---@field extradata table
+
 --[[
 Not supported:
 
 Legacy TeamOpponent ({{TeamOpponent|players=...}})
 TeamOpponent without team template ({{TeamOpponent|name=...|short=...}})
 ]]
+---@param args table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize((opponent or {}).type)
@@ -67,6 +95,8 @@ function StarcraftOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param record table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromMatch2Record(record)
 	local opponent = Opponent.fromMatch2Record(record)
 
@@ -81,6 +111,8 @@ function StarcraftOpponent.fromMatch2Record(record)
 	return opponent
 end
 
+---@param opponent StarcraftStandardOpponent
+---@return table?
 function StarcraftOpponent.toLpdbStruct(opponent)
 	local storageStruct = Opponent.toLpdbStruct(opponent)
 
@@ -98,6 +130,8 @@ function StarcraftOpponent.toLpdbStruct(opponent)
 	return storageStruct
 end
 
+---@param storageStruct table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
@@ -119,6 +153,10 @@ party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
+---@param opponent StarcraftStandardOpponent
+---@param date string|number|osdate|nil
+---@param options {syncPlayer: boolean?}
+---@return StarcraftStandardOpponent
 function StarcraftOpponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
