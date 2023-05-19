@@ -81,7 +81,7 @@ end
 ---@field year number? the year to calculate earnings for
 ---@field mode string? the mode to calculate earnings for
 ---@field queryHistorical boolean? fetch the pageNames from the subTemplates of the entered team template
----@field noRedirect boolean? team redirects get not resolved before query (only available if queryHistorical is not used)
+---@field noRedirect boolean? team redirects get not resolved before query (only available if queryHistorical not used)
 ---@field prefix string? the prefix under which the players are stored in the placements
 ---@field playerPositionLimit integer? the number for how many params the query should look in LPDB
 ---@field perYear boolean? query all earnings per year and return the values in a lua table
