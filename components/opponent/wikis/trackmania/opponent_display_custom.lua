@@ -21,6 +21,26 @@ local ZERO_SCORE = 0
 
 OpponentDisplayCustom.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry)
 
+---@class TrackmaniaStandardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players standardPlayer[]
+---@field score number?
+---@field score2 number?
+---@field score3 number?
+---@field status string?
+---@field status2 string?
+---@field status3 string?
+---@field template string?
+---@field type string
+---@field team string?
+---@field extradata table?
+
+---@param opponent TrackmaniaStandardOpponent
 function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
@@ -49,6 +69,9 @@ function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	end
 end
 
+---@param opponent TrackmaniaStandardOpponent
+---@param scoreIndex integer|string
+---@return number|string
 function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	scoreIndex = scoreIndex or ''
 	local status = opponent['status' .. scoreIndex] or opponent.extradata['status' .. scoreIndex] or ''

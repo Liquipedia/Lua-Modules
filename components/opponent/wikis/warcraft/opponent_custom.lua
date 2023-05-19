@@ -33,6 +33,34 @@ CustomOpponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
+---@class WarcraftStandardPlayer
+---@field displayName string?
+---@field flag string?
+---@field pageName string?
+---@field team string?
+---@field race string?
+
+---@class WarcraftStandardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players WarcraftStandardPlayer[]
+---@field score number?
+---@field score2 number?
+---@field status string?
+---@field status2 string?
+---@field template string?
+---@field type string
+---@field isArchon boolean
+---@field isSpecialArchon boolean?
+---@field team string?
+---@field extradata table
+
+---@param args table
+---@return WarcraftStandardOpponent?
 function CustomOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize((opponent or {}).type)
@@ -48,6 +76,8 @@ function CustomOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param record table
+---@return WarcraftStandardOpponent?
 function CustomOpponent.fromMatch2Record(record)
 	local opponent = Opponent.fromMatch2Record(record)
 
@@ -61,6 +91,8 @@ function CustomOpponent.fromMatch2Record(record)
 	return opponent
 end
 
+---@param opponent WarcraftStandardOpponent
+---@return table?
 function CustomOpponent.toLpdbStruct(opponent)
 	local storageStruct = Opponent.toLpdbStruct(opponent)
 
@@ -73,6 +105,8 @@ function CustomOpponent.toLpdbStruct(opponent)
 	return storageStruct
 end
 
+---@param storageStruct table
+---@return WarcraftStandardOpponent?
 function CustomOpponent.fromLpdbStruct(storageStruct)
 	local opponent = Opponent.fromLpdbStruct(storageStruct)
 
@@ -85,6 +119,10 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 	return opponent
 end
 
+---@param opponent WarcraftStandardOpponent
+---@param date string|number|osdate|nil
+---@param options {syncPlayer: boolean?}
+---@return WarcraftStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then

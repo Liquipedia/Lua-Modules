@@ -107,6 +107,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field status2 string?
 ---@field template string?
 ---@field type string
+---@field team string?
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',

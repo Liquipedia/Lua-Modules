@@ -43,7 +43,6 @@ StarcraftOpponentDisplay.propTypes.InlineOpponent = {
 ---@field teamStyle teamStyle
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
----comment
 ---@param props StarcraftInlineOpponentProps
 ---@return Html|string|nil
 function StarcraftOpponentDisplay.InlineOpponent(props)
