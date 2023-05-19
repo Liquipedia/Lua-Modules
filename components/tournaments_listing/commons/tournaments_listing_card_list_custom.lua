@@ -14,6 +14,8 @@ local TournamentsListing = Lua.import('Module:TournamentsListing/CardList', {req
 
 local CustomTournamentsListing = Class.new()
 
+---@param frame Frame
+---@return Html?
 function CustomTournamentsListing.run(frame)
 	local tournamentsListing = TournamentsListing(Arguments.getArgs(frame))
 
