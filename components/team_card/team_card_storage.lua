@@ -18,6 +18,10 @@ local Variables = require('Module:Variables')
 
 local TeamCardStorage = {}
 
+---@param args table
+---@param teamObject {teamtemplate: string?, lpdb: string?, team2: string?, team3: string?}
+---@param players table
+---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	local team, teamTemplateName
 
@@ -29,6 +33,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 			team = teamObject.lpdb
 		end
 	end
+	---@cast team -nil
 
 	local lpdbPrefix = args.lpdb_prefix or args.smw_prefix
 		or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
@@ -58,6 +63,11 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 end
 
 -- Adds basic lpdb fields
+---@param lpdbData table
+---@param team string
+---@param args table
+---@param lpdbPrefix string
+---@return table
 function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix)
 	-- Name must match prize pool insertion
 	lpdbData.objectName = TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
@@ -96,6 +106,9 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
+---@param team string
+---@param lpdbPrefix string
+---@return string
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then
