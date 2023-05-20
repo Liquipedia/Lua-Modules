@@ -139,6 +139,7 @@ local PREFIXES = {
 		player = 'https://siege.gg/players/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
+	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
