@@ -75,6 +75,7 @@ local _PRIORITY_GROUPS = {
 		'royaleapi',
 		'siege-gg',
 		'sk',
+		'smashboards',
 		'sostronk',
 		'start-gg',
 		'stratz',
