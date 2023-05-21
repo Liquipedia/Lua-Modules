@@ -31,6 +31,9 @@ local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = 
 
 local CustomPortalPlayers = {}
 
+---Entry Point. Builds the player portal
+---@param frame Frame
+---@return Html
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -81,7 +84,7 @@ function CustomPortalPlayers:row(player, showLocalizedName, isPlayer)
 		:wikitext(' ' .. player.name)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
-	row:tag('td'):node(CustomPortalPlayers._getMainCharIcon(player))
+	row:tag('td'):node(CustomPortalPlayers._getMainCharIcons(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
 	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
@@ -106,7 +109,10 @@ function CustomPortalPlayers:row(player, showLocalizedName, isPlayer)
 	return row
 end
 
-function CustomPortalPlayers._getMainCharIcon(player)
+---Builds the main cahracter display
+---@param player table
+---@return Html?
+function CustomPortalPlayers._getMainCharIcons(player)
 	if String.isEmpty(player.extradata.maingame) then
 		return
 	end
