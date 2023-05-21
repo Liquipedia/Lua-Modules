@@ -45,7 +45,7 @@ function PortalPlayers.run(args)
 
 		wrapper
 			:node(PortalPlayers.buildCountryTable(playerData.players, flag, args.playerType or 'Players'))
-			:node(PortalPlayers.buildCountryTable(playerData.nonPlayers))
+			:node(PortalPlayers.buildCountryTable(playerData.nonPlayers, flag))
 	end
 
 	return wrapper
@@ -108,8 +108,7 @@ end
 ---@players table[]
 ---@return {[string]: {players: table[], nonPlayers: table[]}}
 function PortalPlayers._groupPlayerData(players)
-	local groupedByCountry
-	_, groupedByCountry = Array.groupBy(players, function(player) return player.nationality end)
+	local _, groupedByCountry = Array.groupBy(players, function(player) return player.nationality end)
 
 	return Table.map(groupedByCountry, function(country, countryPlayerData)
 		local groupedData
@@ -136,7 +135,7 @@ function PortalPlayers.buildCountryTable(playerData, flag, playerType)
 
 	local tbl = mw.html.create('table')
 		:addClass('wikitable collapsible smwtable')
-		:addClass(String.isNotEmpty(playerType) and 'collapsed' or nil)
+		:addClass(String.isEmpty(playerType) and 'collapsed' or nil)
 		:css('width', '720px')
 		:css('text-align', 'left')
 		:node(PortalPlayers.header(flag, playerType))
@@ -163,7 +162,7 @@ function PortalPlayers.header(flag, playerType)
 			:css('padding-left', '1em')
 			:wikitext(flag .. ' ' .. (playerType or NON_PLAYER_HEADER))
 			:done()
-		
+
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
 		:tag('th'):css('width', '175px'):wikitext(' Real Name'):done()
@@ -188,7 +187,7 @@ function PortalPlayers.row(flag, player, isPlayer)
 	row:tag('td'):wikitext(' ' .. player.name)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(frame, player.team) or ''
+	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
 	if role and String.isEmpty(teamText) then
 		teamText = role
 	elseif role then
