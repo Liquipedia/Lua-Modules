@@ -46,7 +46,7 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@return Html
 function PortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
-	return PortalPlayers:init(args):create()
+	return PortalPlayers(args):create()
 end
 
 ---Init function for PortalPlayers
