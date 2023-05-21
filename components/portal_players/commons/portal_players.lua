@@ -7,7 +7,6 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
@@ -40,14 +39,6 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@field game string?
 ---@field queryOnlyByRegion boolean?
 ---@field showLocalizedName boolean?
-
----Entry Point. Builds the player portal
----@param frame Frame
----@return Html
-function PortalPlayers.run(frame)
-	local args = Arguments.getArgs(frame)
-	return PortalPlayers(args):create()
-end
 
 ---Init function for PortalPlayers
 ---@param args portalPlayerArgs
@@ -178,7 +169,7 @@ function PortalPlayers:buildCountryTable(playerData, flag, playerType)
 		:addClass(String.isEmpty(playerType) and 'collapsed' or nil)
 		:css('width', '720px')
 		:css('text-align', 'left')
-		:node(PortalPlayers.header(flag, playerType))
+		:node(self:header(flag, playerType))
 
 	local isPlayer = String.isNotEmpty(playerType)
 
@@ -193,7 +184,7 @@ end
 ---@param flag string
 ---@param playerType string?
 ---@return Html
-function PortalPlayers.header(flag, playerType)
+function PortalPlayers:header(flag, playerType)
 	local teamText = String.isNotEmpty(playerType) and ' Team' or ' Team and Role'
 
 	local header = mw.html.create('tr')
@@ -231,7 +222,7 @@ function PortalPlayers:row(player, isPlayer)
 	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
 	if role and String.isEmpty(teamText) then
 		teamText = role
-	elseif role then
+	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
 	end
 	row:tag('td'):wikitext(' ' .. teamText)
