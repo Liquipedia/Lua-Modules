@@ -121,7 +121,8 @@ function PortalPlayers._getCountries(regionsInput, countriesInput, gameCondition
 		end
 	end
 
-	local conditionString = Table.isNotEmpty(regionConditions) and ('(' .. table.concat(regionConditions, ' OR ') .. ')') or ''
+	local conditionString = Table.isNotEmpty(regionConditions)
+		and ('(' .. table.concat(regionConditions, ' OR ') .. ')') or ''
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'nationality',
