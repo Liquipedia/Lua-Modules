@@ -37,7 +37,7 @@ local PortalPlayers = {}
 function PortalPlayers.run(args)
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
-	for country, playerData in Table.iter.spairs(PortalPlayers._getPlayers(args)) do
+	for country, playerData in Table.iter.spairs(PortalPlayers.getPlayers(args)) do
 		local flag = Flags.Icon({flag = country, shouldLink = true})
 
 		wrapper:tag('h3')
@@ -57,7 +57,7 @@ end
 ---Retrieves the "player" data
 ---@param args {region: string?, countries: string?, queryOnlyByRegion: boolean?, playerType: string?, query: string?}
 ---@return {[string]: {players: table[], nonPlayers: table[]}}
-function PortalPlayers._getPlayers(args)
+function PortalPlayers.getPlayers(args)
 	local countries, regionConditions = PortalPlayers._getCountries(args.region, args.countries)
 
 	local conditions
