@@ -94,10 +94,16 @@ function PortalPlayers:_getPlayers()
 
 	local conditionString = Table.isNotEmpty(conditions) and ('(' .. table.concat(conditions, ' OR ') .. ')') or ''
 
+	if String.isNotEmpty(conditionString) and String.isNotEmpty(gameConditions) then
+		conditionString = conditionString .. ' AND ' .. gameConditions
+	elseif String.isNotEmpty(gameConditions) then
+		conditionString = gameConditions
+	end
+
 	local players = mw.ext.LiquipediaDB.lpdb('player', {
-		query = 'pagename, id, name, team, status, type, extradata, links, nationality, localizedname',
+		query = 'pagename, id, name, team, status, type, extradata, links, nationality, localizedname, birthdate, deathdate',
 		order = 'id asc',
-		conditions = table.concat({conditionString, gameConditions}, ' AND '),
+		conditions = conditionString,
 		limit = 5000,
 	})
 
@@ -124,11 +130,17 @@ function PortalPlayers._getCountries(regionsInput, countriesInput, gameCondition
 	local conditionString = Table.isNotEmpty(regionConditions)
 		and ('(' .. table.concat(regionConditions, ' OR ') .. ')') or ''
 
+	if String.isNotEmpty(conditionString) and String.isNotEmpty(gameConditions) then
+		conditionString = conditionString .. ' AND ' .. gameConditions
+	elseif String.isNotEmpty(gameConditions) then
+		conditionString = gameConditions
+	end
+
 	local queryData = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'nationality',
 		groupby = 'nationality asc',
 		order = 'nationality asc',
-		conditions = table.concat({conditionString, gameConditions}, ' AND '),
+		conditions = conditionString,
 		limit = 5000,
 	})
 
