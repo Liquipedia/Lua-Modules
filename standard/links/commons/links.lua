@@ -322,7 +322,7 @@ end
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
 function Links.removeAppendedNumber(key)
-	return string.gsub(key, '%d$', '')
+	return (string.gsub(key, '%d$', ''))
 end
 
 ---Builds the icon for a given link
