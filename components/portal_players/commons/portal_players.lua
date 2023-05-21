@@ -231,9 +231,9 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(' ' .. player.name)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
-	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
+	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
-	if role and String.isEmpty(teamText) then
+	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
