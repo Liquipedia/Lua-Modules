@@ -17,9 +17,13 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local NONBREAKING_SPACE = '&nbsp;'
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
-	.. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')
+	.. ' & ' .. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')
 local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
@@ -143,7 +147,7 @@ function PortalPlayers.buildCountryTable(playerData, flag, playerType)
 	local isPlayer = String.isNotEmpty(playerType)
 
 	for _, player in ipairs(playerData) do
-		tbl:node(PortalPlayers.row(flag, player, isPlayer))
+		tbl:node(PortalPlayers.row(player, isPlayer))
 	end
 
 	return tbl
@@ -175,15 +179,14 @@ function PortalPlayers.header(flag, playerType)
 end
 
 ---Builds a table row
----@param flag string
 ---@param player table
 ---@param isPlayer boolean
 ---@return Html
-function PortalPlayers.row(flag, player, isPlayer)
+function PortalPlayers.row(player, isPlayer)
 	local row = mw.html.create('tr')
 		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
 
-	row:tag('td'):wikitext(' ' .. flag .. NONBREAKING_SPACE .. Page.makeInternalLink({}, player.id, player.pagename))
+	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
 	row:tag('td'):wikitext(' ' .. player.name)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
@@ -207,6 +210,24 @@ function PortalPlayers.row(flag, player, isPlayer)
 		:wikitext(table.concat(links))
 
 	return row
+end
+
+---Converts the queried data int a readable format by OpponnetDisplay
+---Overwritable on a per wiki basis
+---@param player table
+---@return {type: string, players = {[string]: string?}[]}
+function PortalPlayers.toOpponent(player)
+	mw.logObject()
+	return {
+		type = Opponent.solo,
+		players = {{
+			pageName = player.pagename,
+			displayName = player.id,
+			flag = player.nationality,
+			-- this little line makes >= 3 customs obsolete
+			race = (player.extradata or {}).faction,
+		}},
+	}
 end
 
 return Class.export(PortalPlayers)
