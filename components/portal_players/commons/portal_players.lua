@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Links = require('Module:Links')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -117,9 +116,10 @@ function PortalPlayers._groupPlayerData(players)
 	return Table.map(groupedByCountry, function(country, countryPlayerData)
 		local groupedData
 		_, groupedData = Array.groupBy(countryPlayerData, function(player)
+			local extradata = player.extradata or {}
 			return Logic.nilOr(
-				Logic.readBoolOrNil((player.extradata or {}).isplayer),
-				(player.type or ''):lower() == 'player'
+				Logic.readBoolOrNil(extradata.isplayer),
+				(player.type or ''):lower() == 'player' or (extradata.role or ''):lower() == 'player'
 			) and 'players' or 'nonPlayers'
 		end)
 
