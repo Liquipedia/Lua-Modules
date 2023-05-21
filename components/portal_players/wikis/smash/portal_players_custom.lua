@@ -9,7 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Links = require('Module:Links/dev')
+local Links = require('Module:Links')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -114,7 +114,7 @@ function CustomPortalPlayers._getMainCharIcon(player)
 	local activeGame = player.extradata.maingame
 
 	if String.isEmpty(player.extradata['main' .. activeGame]) then
-		mw.log(player.pagename, 'main' .. activegame)
+		mw.log(player.pagename, 'main' .. activeGame)
 		return
 	end
 
