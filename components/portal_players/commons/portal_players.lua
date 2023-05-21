@@ -178,7 +178,7 @@ function PortalPlayers.header(flag, showLocalizedName, playerType)
 
 	local header = mw.html.create('tr')
 		:tag('th')
-			:attr('colspan','4')
+			:attr('colspan', 4)
 			:css('padding-left', '1em')
 			:wikitext(flag .. ' ' .. (playerType or NON_PLAYER_HEADER))
 			:done()
