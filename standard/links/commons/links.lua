@@ -330,7 +330,8 @@ end
 ---@param size number?
 ---@return string
 function Links.makeIcon(key, size)
-	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key) .. (size and (' lp-icon-' .. size) or '') .. '></i>'
+	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
+		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
 
 return Class.export(Links, {frameOnly = true})
