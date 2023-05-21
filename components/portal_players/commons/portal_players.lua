@@ -7,11 +7,12 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
-local Links = require('Module:Links')
+local Links = require('Module:Links/dev')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -29,7 +30,8 @@ local BACKGROUND_CLASSES = {
 	banned = 'cinnabar-bg',
 }
 
-local PortalPlayers = {}
+--- @class PortalPlayers
+local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 
 ---@class portalPlayerArgs
 ---@field region string?
@@ -40,14 +42,29 @@ local PortalPlayers = {}
 ---@field showLocalizedName boolean?
 
 ---Entry Point. Builds the player portal
----@param args portalPlayerArgs
+---@param frame Frame
 ---@return Html
-function PortalPlayers.run(args)
+function PortalPlayers.run(frame)
+	local args = Arguments.getArgs(frame)
+	return PortalPlayers:init(args):create()
+end
+
+---Init function for PortalPlayers
+---@param args portalPlayerArgs
+---@return self
+function PortalPlayers:init(args)
+	self.args = args
+	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
+
+	return self
+end
+
+---Create function for PortalPlayers
+---@return Html
+function PortalPlayers:create()
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
-	local showLocalizedName = Logic.readBool(args.showLocalizedName)
-
-	for country, playerData in Table.iter.spairs(PortalPlayers._getPlayers(args)) do
+	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
 		local flag = Flags.Icon({flag = country, shouldLink = true})
 
 		wrapper:tag('h3')
@@ -57,27 +74,26 @@ function PortalPlayers.run(args)
 				:wikitext(flag .. NONBREAKING_SPACE .. country)
 
 		wrapper
-			:node(PortalPlayers.buildCountryTable(playerData.players, flag, showLocalizedName, args.playerType or 'Players'))
-			:node(PortalPlayers.buildCountryTable(playerData.nonPlayers, flag, showLocalizedName))
+			:node(self:buildCountryTable(playerData.players, flag, self.args.playerType or 'Players'))
+			:node(self:buildCountryTable(playerData.nonPlayers, flag))
 	end
 
 	return wrapper
 end
 
 ---Retrieves the "player" data
----@param args portalPlayerArgs
 ---@return {[string]: {players: table[], nonPlayers: table[]}}
-function PortalPlayers._getPlayers(args)
-	local games = String.isNotEmpty(args.game) and
-		Array.map(Array.map(mw.text.split(args.game, ',', true), String.trim), function (game)
+function PortalPlayers:_getPlayers()
+	local games = String.isNotEmpty(self.args.game) and
+		Array.map(Array.map(mw.text.split(self.args.game, ',', true), String.trim), function (game)
 			return '[[extradata_maingame::' .. game .. ']]'
 		end)
 	local gameConditions = games and ('(' .. table.concat(games, ' OR ') .. ')') or ''
 
-	local countries, regionConditions = PortalPlayers._getCountries(args.region, args.countries, gameConditions)
+	local countries, regionConditions = PortalPlayers._getCountries(self.args.region, self.args.countries, gameConditions)
 
 	local conditions
-	if Logic.readBool(args.queryOnlyByRegion) then
+	if Logic.readBool(self.args.queryOnlyByRegion) then
 		conditions = regionConditions
 	else
 		conditions = Array.map(countries, function (country)
@@ -85,10 +101,12 @@ function PortalPlayers._getPlayers(args)
 		end) or {}
 	end
 
+	local conditionString = Table.isNotEmpty(conditions) and ('(' .. table.concat(conditions, ' OR ') .. ')') or ''
+
 	local players = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'pagename, id, name, team, status, type, extradata, links, nationality, localizedname',
 		order = 'id asc',
-		conditions = '(' .. table.concat(conditions, ' OR ') .. gameConditions,
+		conditions = table.concat({conditionString, gameConditions}, ' AND '),
 		limit = 5000,
 	})
 
@@ -112,11 +130,13 @@ function PortalPlayers._getCountries(regionsInput, countriesInput, gameCondition
 		end
 	end
 
+	local conditionString = Table.isNotEmpty(regionConditions) and ('(' .. table.concat(regionConditions, ' OR ') .. ')') or ''
+
 	local queryData = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'nationality',
 		groupby = 'nationality asc',
 		order = 'nationality asc',
-		conditions = '(' .. table.concat(regionConditions, ' OR ') .. ')' .. gameConditions,
+		conditions = table.concat({conditionString, gameConditions}, ' AND '),
 		limit = 5000,
 	})
 
@@ -148,7 +168,7 @@ end
 ---@param flag string
 ---@param playerType string?
 ---@return Html?
-function PortalPlayers.buildCountryTable(playerData, flag, showLocalizedName, playerType)
+function PortalPlayers:buildCountryTable(playerData, flag, playerType)
 	if Table.isEmpty(playerData) then
 		return nil
 	end
@@ -163,7 +183,7 @@ function PortalPlayers.buildCountryTable(playerData, flag, showLocalizedName, pl
 	local isPlayer = String.isNotEmpty(playerType)
 
 	for _, player in ipairs(playerData) do
-		tbl:node(PortalPlayers.row(player, isPlayer))
+		tbl:node(self:row(player, isPlayer))
 	end
 
 	return tbl
@@ -173,7 +193,7 @@ end
 ---@param flag string
 ---@param playerType string?
 ---@return Html
-function PortalPlayers.header(flag, showLocalizedName, playerType)
+function PortalPlayers.header(flag, playerType)
 	local teamText = String.isNotEmpty(playerType) and ' Team' or ' Team and Role'
 
 	local header = mw.html.create('tr')
@@ -198,14 +218,14 @@ end
 ---@param player table
 ---@param isPlayer boolean
 ---@return Html
-function PortalPlayers.row(player, showLocalizedName, isPlayer)
+function PortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')
 		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
 
 	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
 	row:tag('td')
 		:wikitext(' ' .. player.name)
-		:wikitext(showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
+		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
 	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
@@ -247,4 +267,4 @@ function PortalPlayers.toOpponent(player)
 	}
 end
 
-return Class.export(PortalPlayers)
+return PortalPlayers
