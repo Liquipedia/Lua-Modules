@@ -46,10 +46,6 @@ function CustomResultsTable.results(frame)
 
 	local resultsTable = ResultsTable(args)
 
-	-- overwrite functions
-	resultsTable.rowHighlight = CustomResultsTable.rowHighlight
-	resultsTable.processLegacyVsData = CustomResultsTable.processLegacyVsData
-
 	local buildTable = resultsTable:create():build()
 
 	CustomResultsTable._storeAllKill()
@@ -57,6 +53,7 @@ function CustomResultsTable.results(frame)
 	return buildTable
 end
 
+-- Template entry point for awards
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
 	args.useIndivPrize = true
@@ -66,18 +63,7 @@ function CustomResultsTable.awards(frame)
 		return
 	end
 
-	local awardsTable = AwardsTable(args)
-
-	-- overwrite functions
-	awardsTable.rowHighlight = CustomResultsTable.rowHighlight
-
-	return awardsTable:create():build()
-end
-
-function CustomResultsTable:rowHighlight(placement)
-	if Logic.readBool(placement.publishertier) then
-		return 'tournament-highlighted-bg'
-	end
+	return AwardsTable(args):create():build()
 end
 
 -- all kill rows are manual inputs of all kill chievements
