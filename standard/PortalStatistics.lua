@@ -854,7 +854,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 				)
 			end
 			if placement == '1' and item.liquipediatiertype == 'Showmatch' then
-				data[opponent]['showWins'] = data[opponent]['showWins'] + 1
+				data[opponent].showWins = data[opponent].showWins + 1
 			elseif item.liquipediatiertype ~= 'Showmatch' then
 				data[opponent][placement] = data[opponent][placement] + 1
 			end
