@@ -1056,9 +1056,9 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 		end
 	end
 
-	config['yAxis'] = {type = 'value', name = 'Earnings ($USD)'}
-	config['xAxis'] = {type = 'category', name = config.catLabel, data = categoryNames}
-	config['customLegend'] = config['customLegend'] or seriesNames
+	config.yAxis = {type = 'value', name = 'Earnings ($USD)'}
+	config.xAxis = {type = 'category', name = config.catLabel, data = categoryNames}
+	config.customLegend = config.customLegend or seriesNames
 
 	return StatisticsPortal._drawChart(config, chartData)
 end
