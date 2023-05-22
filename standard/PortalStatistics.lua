@@ -622,7 +622,7 @@ function StatisticsPortal.earningsTable(args)
 
 	local opponentPlacements = StatisticsPortal._cacheOpponentPlacementData(args)
 
-	local table = mw.html.create('table')
+	local tbl = mw.html.create('table')
 		:addClass('wikitable wikitable-striped wikitable-bordered sortable')
 		:css('margin-left', '0px')
 		:css('margin-right', 'auto')
