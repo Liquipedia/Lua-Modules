@@ -845,11 +845,11 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, ['showWins'] = 0, ['sWinData'] = {}}
 			end
 			if placement == '1' and item.liquipediatier == '1' and item.liquipediatiertype ~= 'Showmatch' then
-				table.insert(data[opponent]['sWinData'], {
-						['icon'] = item.icon,
-						['icondark'] = item.icondark,
-						['pagename'] = item.pagename,
-						['shortname'] = item.shortname
+				table.insert(data[opponent].sWinData, {
+						icon = item.icon,
+						icondark = item.icondark,
+						pagename = item.pagename,
+						shortname = item.shortname
 					}
 				)
 			end
