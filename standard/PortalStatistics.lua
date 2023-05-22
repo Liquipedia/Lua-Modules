@@ -647,7 +647,7 @@ function StatisticsPortal.earningsTable(args)
 		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
-	return mw.html.create('div'):node(table)
+	return mw.html.create('div'):node(tbl)
 end
 
 
