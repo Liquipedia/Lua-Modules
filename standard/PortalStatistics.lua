@@ -387,7 +387,6 @@ Section: Prizepool Breakdown
 ]]--
 
 function StatisticsPortal.prizepoolBreakdown(args)
-
 	args = args or {}
 	args.showAverage = Logic.readBoolOrNil(args.showAverage)
 	args.startYear = tonumber(args.startYear) or Info.startYear
