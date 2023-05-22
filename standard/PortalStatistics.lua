@@ -511,7 +511,6 @@ end
 
 
 function StatisticsPortal.pieChartBreakdown(args)
-
 	args = args or {}
 	args.hideKey = Logic.readBoolOrNil(args.hideKey)
 	args.detailedKey = Logic.readBoolOrNil(args.detailedKey)
