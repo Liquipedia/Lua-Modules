@@ -292,7 +292,6 @@ end
 
 
 function StatisticsPortal._coverageTournamentTableRow(args, parameters)
-
 	local resultsRow = mw.html.create('tr')
 	local tagtype = 'td'
 	local runningTally = 0
