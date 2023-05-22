@@ -20,6 +20,8 @@ local INVALID_TIER_SORT = 'ZZ'
 local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
+---@param args table
+---@return Html
 function CustomResultsTable.results(args)
 	local resultsTable = ResultsTable(args)
 
@@ -29,6 +31,8 @@ function CustomResultsTable.results(args)
 end
 
 -- Template entry point for awards tables
+---@param args table
+---@return Html
 function CustomResultsTable.awards(args)
 	local awardsTable = AwardsTable(args)
 
@@ -37,6 +41,10 @@ function CustomResultsTable.awards(args)
 	return awardsTable:create():build()
 end
 
+---CS tier display overwrite for results, achievements and awards tables
+---@param placement table
+---@return string
+---@return string
 function CustomResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
 	options.link = true
