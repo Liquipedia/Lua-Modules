@@ -701,7 +701,7 @@ function StatisticsPortal.playerAgeTable(args)
 		local yearAge = math.floor(os.difftime(TIMESTAMP, birthdate)/(24 * 3600 * 365.25))
 		local dayAge = Math._round(Math._mod(math.floor(os.difftime(TIMESTAMP, birthdate)/(24 * 3600)), 365.25), 0)
 
-		table:tag('tr')
+		tbl:tag('tr')
 			:tag('td'):
 				node(OpponentDisplay.BlockOpponent{
 						opponent = StatisticsPortal._toOpponent(player),
