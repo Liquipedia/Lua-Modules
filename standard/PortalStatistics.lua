@@ -909,11 +909,11 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 	local row = mw.html.create('tr')
 		:css('line-height', '25px')
 		:css('text-align', 'center')
-		:tag('td'):wikitext(opponentIndex)
-		:tag('td'):css('text-align', 'left'):node(opponentDisplay)
-		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements['sWinData'] or {}))
-		:tag('td'):wikitext(placements['1'] or '0')
-		:tag('td'):wikitext(placements['2'] or '0')
+		:tag('td'):wikitext(opponentIndex):done()
+		:tag('td'):css('text-align', 'left'):node(opponentDisplay):done()
+		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements['sWinData'] or {})):done()
+		:tag('td'):wikitext(placements['1'] or '0'):done()
+		:tag('td'):wikitext(placements['2'] or '0'):done()
 		:tag('td'):wikitext(placements['3'] or '0')
 
 	if Logic.readBool(args.displayShowMatches) then
