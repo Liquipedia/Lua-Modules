@@ -454,7 +454,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			headerRow:tag('th')
 				:wikitext(StatisticsPortal._returnCustomYearText(prevYear, yearValue))
 			resultsRow:tag('td')
-				:wikitext('$' .. Currency.formatMoney(prizepoolSum or 0))
+				:wikitext((prizepoolSum ~= 0 and '$' or '') .. Currency.formatMoney(prizepoolSum or 0))
 			prizepoolSum = 0
 			prevYear = yearValue + 1
 			colIndex = colIndex + 1
