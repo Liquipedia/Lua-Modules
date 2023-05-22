@@ -608,7 +608,7 @@ function StatisticsPortal.earningsTable(args)
 		end
 	end
 
-	local opponentData = {}
+	local opponentData
 
 	if args.opponentType == Opponent.team then
 		opponentData = StatisticsPortal._getTeams(5000, nil, nil, nil)
@@ -1107,7 +1107,7 @@ end
 function StatisticsPortal._returnCustomYears(args)
 
 	args.startYear = tonumber(args.startYear) or Info.startYear
-	local yearTable = {}
+	local yearTable
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
 
 	if String.isNotEmpty(args.customYears) then
@@ -1128,7 +1128,7 @@ end
 
 
 function StatisticsPortal._addArrays(arrays)
-  	return Array.map(arrays[1], function(_, index)
+	return Array.map(arrays[1], function(_, index)
 		return Array.reduce(Array.map(arrays, Operator.property(index)), Operator.add)
 	end)
 end
