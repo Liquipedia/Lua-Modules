@@ -55,6 +55,9 @@ local INVALID_TIER_SORT = 'ZZ'
 --- @class BaseResultsTable
 local BaseResultsTable = Class.new(function(self, ...) self:init(...) end)
 
+---Init function of the BaseResultsTable
+---@param args table
+---@return self
 function BaseResultsTable:init(args)
 	self.args = args
 
@@ -65,6 +68,8 @@ function BaseResultsTable:init(args)
 	return self
 end
 
+---Reads the configs of the results, achievements, awards table
+---@return table
 function BaseResultsTable:readConfig()
 	local args = self.args
 
@@ -101,6 +106,8 @@ function BaseResultsTable:readConfig()
 	return config
 end
 
+---Determines the opponent (player coach team) if not entered
+---@return string
 function BaseResultsTable:_getOpponent()
 	if Namespace.isMain() then
 		return mw.title.getCurrentTitle().baseText
@@ -112,6 +119,8 @@ function BaseResultsTable:_getOpponent()
 	return mw.title.getCurrentTitle().subpageText
 end
 
+---Determines the queryType
+---@return `SOLO_TYPE`|`TEAM_TYPE`|`COACH_TYPE`
 function BaseResultsTable:getQueryType()
 	local args = self.args
 
@@ -125,6 +134,8 @@ function BaseResultsTable:getQueryType()
 	error('Invalid querytype "' .. (args.querytype or '') .. '"')
 end
 
+---Creates the results, achievements, awards table
+---@return self
 function BaseResultsTable:create()
 	local data = self.args.data or self:queryData()
 
@@ -155,6 +166,8 @@ function BaseResultsTable:create()
 	return self
 end
 
+---Fetches data from Lpdb
+---@return table[]
 function BaseResultsTable:queryData()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = self.config.limit,
@@ -170,6 +183,8 @@ function BaseResultsTable:queryData()
 	return data
 end
 
+---Builds the conditions for the results, achievements, awards table
+---@return string
 function BaseResultsTable:buildConditions()
 	if self.args.customConditions then
 		return self.args.customConditions
@@ -184,6 +199,8 @@ function BaseResultsTable:buildConditions()
 	return conditions
 end
 
+---Builds the base conditions for the results, achievements, awards table
+---@return string
 function BaseResultsTable:buildBaseConditions()
 	local args = self.args
 
@@ -228,6 +245,8 @@ function BaseResultsTable:buildBaseConditions()
 	return conditions:toString()
 end
 
+---Builds Lpdb conditions for the given opponent
+---@return table?
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
 
@@ -239,6 +258,8 @@ function BaseResultsTable:buildOpponentConditions()
 end
 
 -- todo: adjust once #1802 is done
+---Builds Lpdb conditions for the non team opponent case
+---@return table
 function BaseResultsTable:buildNonTeamOpponentConditions()
 	local config = self.config
 	local opponentConditions = ConditionTree(BooleanOperator.any)
@@ -280,6 +301,8 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 	return opponentConditions
 end
 
+---Builds Lpdb conditions for a team
+---@return table
 function BaseResultsTable:buildTeamOpponentConditions()
 	local config = self.config
 
@@ -301,6 +324,9 @@ function BaseResultsTable:buildTeamOpponentConditions()
 		}
 end
 
+---Fetches the team templates for a given team
+---@param opponent string
+---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
 	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
@@ -313,6 +339,9 @@ function BaseResultsTable._getOpponentTemplates(opponent)
 	return opponentTeamTemplates and Array.extractValues(opponentTeamTemplates) or {opponentTemplate}
 end
 
+---Builds Lpdb conditions for players on a given team
+---@param opponentTeamTemplates string[]
+---@return table
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	local config = self.config
 
@@ -333,6 +362,8 @@ function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTempl
 	}
 end
 
+---Builds the results/achievements/awards table
+---@return Html
 function BaseResultsTable:build()
 	local displayTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
@@ -365,6 +396,9 @@ function BaseResultsTable:build()
 		:node(displayTable)
 end
 
+---comment
+---@param placementData table
+---@return Html[]
 function BaseResultsTable:_buildRows(placementData)
 	local rows = {}
 
@@ -382,6 +416,9 @@ function BaseResultsTable:_buildRows(placementData)
 end
 
 -- overwritable
+---Applies the row highlight
+---@param placement table
+---@return string?
 function BaseResultsTable:rowHighlight(placement)
 	if HighlightConditions.tournament(placement, self.config) then
 		return 'tournament-highlighted-bg'
@@ -389,6 +426,9 @@ function BaseResultsTable:rowHighlight(placement)
 end
 
 -- overwritable
+---Builds the tier display
+---@param placement table
+---@return string?, string?
 function BaseResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
 	options.link = true
@@ -402,6 +442,10 @@ function BaseResultsTable:tierDisplay(placement)
 end
 
 -- overwritable
+---Builds the opponent display
+---@param data table
+---@param options table?
+---@return Html?
 function BaseResultsTable:opponentDisplay(data, options)
 	options = options or {}
 
@@ -445,6 +489,10 @@ function BaseResultsTable:opponentDisplay(data, options)
 	return teamDisplay
 end
 
+---Checks if additional text should be displayed below the team icon
+---@param rawTeamTemplate table
+---@param isNotLastVs boolean?
+---@return boolean?
 function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLastVs)
 	local config = self.config
 
@@ -455,6 +503,11 @@ function BaseResultsTable:shouldDisplayAdditionalText(rawTeamTemplate, isNotLast
 	)
 end
 
+---Builds team icon display with text below it
+---@param teamDisplay Html
+---@param rawTeamTemplate table
+---@param flip boolean?
+---@return Html
 function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, flip)
 	return mw.html.create()
 		:node(teamDisplay)
@@ -471,14 +524,20 @@ function BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, 
 		)
 end
 
+---Builds the tournament display name
+---@param placement table
+---@return string
 function BaseResultsTable.tournamentDisplayName(placement)
 	if String.isNotEmpty(placement.tournament) then
 		return placement.tournament
 	end
 
-	return placement.pagename:gsub('_', ' ')
+	return (placement.pagename:gsub('_', ' '))
 end
 
+---Converts the lastvsdata to display components
+---@param placement table
+---@return string, Html?, string?
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
@@ -500,6 +559,7 @@ function BaseResultsTable:buildHeader()
 	error('Function "buildHeader" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end
 
+---@param placement table
 function BaseResultsTable:buildRow(placement)
 	error('Function "buildRow" needs to be set via the module that requires "Module:BaseResultsTable/Base"')
 end

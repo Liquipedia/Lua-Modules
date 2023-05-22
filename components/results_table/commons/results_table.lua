@@ -23,6 +23,8 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 --- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
 
+---Builds the Header of the results/achievements table
+---@return Html
 function ResultsTable:buildHeader()
 	local header = mw.html.create('tr')
 		:tag('th'):css('width', '100px'):wikitext('Date'):done()
@@ -50,6 +52,9 @@ function ResultsTable:buildHeader()
 	return header
 end
 
+---Builds a placement row of the results/achievements table
+---@param placement table
+---@return Html
 function ResultsTable:buildRow(placement)
 	local placementCell = mw.html.create('td')
 	Placement._placement{parent = placementCell, placement = placement.placement}
