@@ -590,7 +590,6 @@ end
 
 
 function StatisticsPortal.earningsTable(args)
-
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
