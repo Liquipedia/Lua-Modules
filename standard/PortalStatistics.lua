@@ -632,7 +632,6 @@ function StatisticsPortal.earningsTable(args)
 	table:node(StatisticsPortal._earningsTableHeader(args))
 
 	for opponentIndex, opponent in ipairs(opponentData) do
-		local placements = {}
 		local opponentDisplay
 		local earnings = earningsFunction(opponent)
 
@@ -648,7 +647,7 @@ function StatisticsPortal.earningsTable(args)
 				opponent = StatisticsPortal._toOpponent(opponent),
 			}
 		end
-		placements = opponentPlacements[opponent['pagename']] or {}
+		local placements = opponentPlacements[opponent['pagename']] or {}
 		table:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
