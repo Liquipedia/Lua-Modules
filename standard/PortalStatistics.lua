@@ -693,7 +693,7 @@ function StatisticsPortal.playerAgeTable(args)
 		:css('margin-right','auto')
 
 	tbl:tag('tr')
-		:tag('th'):wikitext('ID'):addClass('unsortable')
+		:tag('th'):wikitext('ID'):addClass('unsortable'):done()
 		:tag('th'):wikitext('Age')
 
 	for _, player in ipairs(playerData) do
