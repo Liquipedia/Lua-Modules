@@ -235,9 +235,11 @@ function BroadcastTalentTable:_row(tournament)
 		row:addClass('tournament-highlighted-bg')
 	end
 
+	local tierDisplay, tierSortValue = self:_tierDisplay(tournament)
+
 	row
 		:tag('td'):wikitext(tournament.date):done()
-		:tag('td'):wikitext(self:_tierDisplay(tournament)):done()
+		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
 
 	if self.args.displayGameIcon then
 		row:tag('td'):node(Game.icon{game = tournament.game})
@@ -303,7 +305,7 @@ end
 function BroadcastTalentTable:_tierDisplay(tournament)
 	-- `tournament.extradata` is not the extradata of the tournament but of the broadcaster (they got merged together)
 	if Logic.readBool((tournament.extradata or {}).showmatch) then
-		return 'Showmatch'
+		return 'Showmatch', 'B1'
 	end
 
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
@@ -311,7 +313,7 @@ function BroadcastTalentTable:_tierDisplay(tournament)
 	options.shortIfBoth = true
 	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
 
-	return Tier.display(tier, tierType, options)
+	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 function BroadcastTalentTable:_partnerList(tournament)
