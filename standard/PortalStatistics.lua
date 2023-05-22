@@ -743,7 +743,6 @@ end
 
 
 function StatisticsPortal._cacheModeEarningsData(config)
-
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
 		:add{ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01')}
