@@ -797,7 +797,6 @@ end
 
 
 function StatisticsPortal._cacheOpponentPlacementData(args)
-
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
