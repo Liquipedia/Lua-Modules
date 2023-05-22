@@ -1072,7 +1072,6 @@ function StatisticsPortal._chartConfig(args, params)
 		variable = params.variable or nil,
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
-
 		customLegend = String.isNotEmpty(args.customLegend) and
 			Array.map(mw.text.split(args.customLegend, ','), String.trim) or args.customInputs,
 		customInputs = args.customInputs,
