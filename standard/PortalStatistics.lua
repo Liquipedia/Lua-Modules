@@ -76,7 +76,6 @@ function StatisticsPortal.gameEarningsChart(args)
 
 	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
-	mw.logObject(config.customLegend)
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
@@ -103,7 +102,6 @@ function StatisticsPortal.modeEarningsChart(args)
 
 	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
-	mw.logObject(config.customLegend)
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
