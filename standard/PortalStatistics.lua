@@ -30,10 +30,13 @@ local PieChart = require('Module:Tournaments breakdown pie chart/dev')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local DATE = os.date('%F')
+local DAY_SECONDS = 24 * 3600
+local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE)
 local DEFAULT_ALLOWED_PLACES = '1,2,3,1-2,2-3,2-4,3-4'
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
+local SHOWMATCH = 'Showmatch'
 local MODES = Array.map(mw.text.split('solo, team, other', ','), String.trim)
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value['name']
@@ -501,7 +504,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool'] / Count.totalTournaments()))
+			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool'] / Count.totalTournaments() or 1))
 			:css('font-weight','bold')
 	end
 
@@ -566,8 +569,8 @@ function StatisticsPortal.pieChartBreakdown(args)
 		:css('text-align','center')
 		:css('font-weight','bold')
 
-	summaryTable:tag('th')
-		:wikitext('Total prize money awarded')
+	summaryTable:tag('tr')
+		:tag('th'):wikitext('Total prize money awarded')
 
 	summaryTable:tag('tr')
 		:tag('td')
@@ -645,7 +648,7 @@ function StatisticsPortal.earningsTable(args)
 		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
-	return mw.html.create('div'):node(tbl)
+	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
 end
 
 
@@ -663,8 +666,8 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '1970-01-01')}
-		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, '1970-01-01')}
+		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, EPOCH_DATE)}
+		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, EPOCH_DATE)}
 		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings)}
 
 	if Logic.readBool(args.isActive) then
@@ -693,8 +696,8 @@ function StatisticsPortal.playerAgeTable(args)
 
 	for _, player in ipairs(playerData) do
 		local birthdate =  DateExt.readTimestamp(player.birthdate)
-		local yearAge = math.floor(os.difftime(TIMESTAMP, birthdate)/(24 * 3600 * 365.25))
-		local dayAge = Math._round(Math._mod(math.floor(os.difftime(TIMESTAMP, birthdate)/(24 * 3600)), 365.25), 0)
+		local yearAge = math.floor(os.difftime(TIMESTAMP, birthdate)/(DAY_SECONDS * 365.25))
+		local dayAge = Math._round(Math._mod(math.floor(os.difftime(TIMESTAMP, birthdate)/DAY_SECONDS), 365.25), 0)
 
 		tbl:tag('tr')
 			:tag('td'):
@@ -707,7 +710,7 @@ function StatisticsPortal.playerAgeTable(args)
 				:wikitext(yearAge..' years, '..dayAge..' days')
 	end
 
-	return mw.html.create('div'):node(tbl)
+	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
 end
 
 
@@ -745,7 +748,7 @@ end
 function StatisticsPortal._cacheModeEarningsData(config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
-		:add{ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01')}
+		:add{ConditionNode(ColumnName('date'), Comparator.neq, EPOCH_DATE)}
 		:add{ConditionNode(ColumnName('date'), Comparator.lt, DATE)}
 
 	if String.isNotEmpty(config.startYear) then
@@ -842,7 +845,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 			if not data[opponent] then
 				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
-			if placement == '1' and item.liquipediatier == '1' and item.liquipediatiertype ~= 'Showmatch' then
+			if placement == '1' and item.liquipediatier == '1' and item.liquipediatiertype ~= SHOWMATCH then
 				table.insert(data[opponent].sWinData, {
 						icon = item.icon,
 						icondark = item.icondark,
@@ -851,9 +854,9 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 					}
 				)
 			end
-			if placement == '1' and item.liquipediatiertype == 'Showmatch' then
+			if placement == '1' and item.liquipediatiertype == SHOWMATCH then
 				data[opponent].showWins = data[opponent].showWins + 1
-			elseif item.liquipediatiertype ~= 'Showmatch' then
+			elseif item.liquipediatiertype ~= SHOWMATCH then
 				data[opponent][placement] = data[opponent][placement] + 1
 			end
 		end
