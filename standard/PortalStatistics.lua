@@ -917,7 +917,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		:tag('td'):wikitext(placements['3'] or '0')
 
 	if Logic.readBool(args.displayShowMatches) then
-		row:tag('td'):wikitext(placements['showWins'] or '0')
+		row:tag('td'):wikitext(placements.showWins or '0')
 	end
 
 	row:tag('td')
