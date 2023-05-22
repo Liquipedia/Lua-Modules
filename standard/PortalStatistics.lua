@@ -879,7 +879,6 @@ Section: Display Functions
 
 
 function StatisticsPortal._earningsTableHeader(args)
-
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
 	local row = mw.html.create('tr')
