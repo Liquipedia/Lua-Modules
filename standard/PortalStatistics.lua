@@ -504,7 +504,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool'] / Count.totalTournaments() or 1))
+			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool'] / (Count.totalTournaments() or 1)))
 			:css('font-weight','bold')
 	end
 
