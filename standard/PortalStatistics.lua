@@ -702,7 +702,7 @@ function StatisticsPortal.playerAgeTable(args)
 						opponent = StatisticsPortal._toOpponent(player),
 						showPlayerTeam  = true,
 					}
-				)
+				):done()
 			:tag('td')
 				:wikitext(yearAge..' years, '..dayAge..' days')
 	end
