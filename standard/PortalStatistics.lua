@@ -34,8 +34,8 @@ local TIMESTAMP = DateExt.readTimestamp(DATE)
 local DEFAULT_ALLOWED_PLACES = '1,2,3,1-2,2-3,2-4,3-4'
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
-local LIST_OF_MODES = 'solo, team, other'
-local LIST_OF_GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
+local MODES = Array.map(mw.text.split('solo, team, other', ','), String.trim)
+local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value['name']
 end)
 
@@ -51,8 +51,6 @@ Section: Chart Entry Functions
 function StatisticsPortal.gameEarningsChart(args)
 
 	args = args or {}
-	args.customInputs = String.isNotEmpty(args.customInputs) and
-		Array.map(mw.text.split(args.customInputs, ','), String.trim) or LIST_OF_GAMES
 
 	local processFunction = function(tablePlace, item, config)
 		local earnings
@@ -68,9 +66,10 @@ function StatisticsPortal.gameEarningsChart(args)
 		variable = 'game',
 		processFunction = processFunction,
 		catLabel = 'Year',
+		defaultInputs = GAMES,
 	}
 
-	local config = StatisticsPortal._chartConfig(args, params)
+	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
 
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
@@ -79,7 +78,6 @@ end
 function StatisticsPortal.modeEarningsChart(args)
 
 	args = args or {}
-	args.customInputs = Array.map(mw.text.split(args.customInputs or LIST_OF_MODES, ','), String.trim)
 
 	local processFunction = function(tablePlace, item, config)
 		local earnings
@@ -95,9 +93,10 @@ function StatisticsPortal.modeEarningsChart(args)
 		variable = 'opponenttype',
 		processFunction = processFunction,
 		catLabel = 'Year',
+		defaultInputs = MODES,
 	}
 
-	local config = StatisticsPortal._chartConfig(args, params)
+	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
 
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
@@ -116,7 +115,7 @@ function StatisticsPortal.topEarningsChart(args)
 		flipAxes = true,
 	}
 
-	local config = StatisticsPortal._chartConfig(args, params)
+	local config = StatisticsPortal._getChartConfig(args, params)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
 	local topEarningsList
@@ -202,7 +201,7 @@ function StatisticsPortal.coverageMatchTable(args)
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = (type(args.customGames) == 'table' and args.customGames)
 		or (String.isNotEmpty(args.customGames) and Array.map(mw.text.split(args.customGames, ','), String.trim))
-		or LIST_OF_GAMES
+		or GAMES
 
 	local matchTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -265,7 +264,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = String.isNotEmpty(args.customGames) and
-		Array.map(mw.text.split(args.customGames, ','), String.trim) or LIST_OF_GAMES
+		Array.map(mw.text.split(args.customGames, ','), String.trim) or GAMES
 	args.customTiers = String.isNotEmpty(args.customTiers) and
 		Array.map(mw.text.split(args.customTiers, ','), function(item)
 			return tonumber(String.trim(item))
