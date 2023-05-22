@@ -113,14 +113,15 @@ end
 ---Retrieves the country list.
 ---@param regionsInput string?
 ---@param countriesInput string?
----@return string[]
+---@return string[], string[]
 function PortalPlayers._getCountries(regionsInput, countriesInput, gameConditions)
 	local regionConditions = String.isNotEmpty(regionsInput) and
-		Array.map(Array.map(mw.text.split(regionsInput, ',', true), String.trim), function (region)
+		Array.map(Array.map(mw.text.split(regionsInput --[[@as string]], ',', true), String.trim), function (region)
 			return '[[region::' .. region .. ']]'
 		end) or {}
 
 	if String.isNotEmpty(countriesInput) then
+		---@cast countriesInput -nil
 		local countries = Array.map(mw.text.split(countriesInput, ',', true), String.trim)
 		if Table.isNotEmpty(countries) then
 			return countries, regionConditions
@@ -176,6 +177,7 @@ function PortalPlayers:buildCountryTable(playerData, flag, playerType)
 	if Table.isEmpty(playerData) then
 		return nil
 	end
+	---@cast playerData -nil
 
 	local tbl = mw.html.create('table')
 		:addClass('wikitable collapsible smwtable')
@@ -257,7 +259,7 @@ end
 ---Converts the queried data int a readable format by OpponnetDisplay
 ---Overwritable on a per wiki basis
 ---@param player table
----@return {type: string, players = {[string]: string?}[]}
+---@return {type: string, players: {[string]: string?}[]}
 function PortalPlayers.toOpponent(player)
 	return {
 		type = Opponent.solo,
