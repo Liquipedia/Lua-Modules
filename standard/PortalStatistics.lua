@@ -260,7 +260,6 @@ end
 
 
 function StatisticsPortal.coverageTournamentTable(args)
-
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = String.isNotEmpty(args.customGames) and
