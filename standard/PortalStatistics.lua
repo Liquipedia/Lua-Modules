@@ -1065,7 +1065,6 @@ end
 
 
 function StatisticsPortal._chartConfig(args, params)
-
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
 
 	return {
