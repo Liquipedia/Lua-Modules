@@ -628,7 +628,7 @@ function StatisticsPortal.earningsTable(args)
 		:css('margin-right', 'auto')
 		:css('width', '100%')
 
-	table:node(StatisticsPortal._earningsTableHeader(args))
+	tbl:node(StatisticsPortal._earningsTableHeader(args))
 
 	for opponentIndex, opponent in ipairs(opponentData) do
 		local opponentDisplay
