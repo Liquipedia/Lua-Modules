@@ -295,7 +295,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	local tagtype = 'td'
 	local runningTally = 0
 
-	if Logic.readBool(args.multiGame) and parameters['game'] == nil then
+	if Logic.readBool(args.multiGame) and parameters.game == nil then
 		tagtype = 'th'
 		resultsRow:tag(tagtype):wikitext('Total')
 	elseif Logic.readBool(args.multiGame) and parameters.game then
