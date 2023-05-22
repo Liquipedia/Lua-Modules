@@ -1044,6 +1044,7 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 		if config.removeEmptySeries == true and Array.all(seriesData[seriesIndex], function(value)
 			return value == 0
 		end) then
+			mw.logObject(series .. ' is empty)
 		else
 			table.insert(chartData, {
 					['name'] = series,
