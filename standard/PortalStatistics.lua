@@ -37,9 +37,11 @@ local DEFAULT_ALLOWED_PLACES = '1,2,3,1-2,2-3,2-4,3-4'
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
 local SHOWMATCH = 'Showmatch'
-local MODES = Array.map(mw.text.split('solo, team, other', ','), String.trim)
+local STIER = '1'
+local FIRST = '1'
+local MODES = Array.map(mw.text.split('solo, team, other', ',', true), String.trim)
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
-	return value['name']
+	return value.name
 end)
 
 
@@ -74,7 +76,7 @@ function StatisticsPortal.gameEarningsChart(args)
 
 	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
-
+	mw.logObject(config.customLegend)
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
@@ -101,7 +103,7 @@ function StatisticsPortal.modeEarningsChart(args)
 
 	local config = StatisticsPortal._getChartConfig(args, params)
 	local yearSeriesData = StatisticsPortal._cacheModeEarningsData(config)
-
+	mw.logObject(config.customLegend)
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
@@ -147,7 +149,7 @@ function StatisticsPortal.topEarningsChart(args)
 		end)
 
 	local opponentNames = Array.map(Array.reverse(topEarningsList), function(opponent)
-				return config.opponentType == Opponent.team and opponent['name'] or opponent['id']
+				return config.opponentType == Opponent.team and opponent.name or opponent.id
 			end)
 
 	if Logic.readBool(config.yearBreakdown) then
@@ -155,14 +157,14 @@ function StatisticsPortal.topEarningsChart(args)
 	else
 		local chartData = {}
 		chartData[1] = {
-			['name'] = 'Total Earnings',
-			['type'] = 'bar',
-			['data'] = StatisticsPortal._addArrays(yearSeriesData),
+			name = 'Total Earnings',
+			type = 'bar',
+			data = StatisticsPortal._addArrays(yearSeriesData),
 		}
 
-		config['yAxis'] = {type = 'value', name = 'Earnings ($USD)'}
-		config['xAxis'] = {type = 'category', name = config.catLabel, data = opponentNames}
-		config['customLegend'] = config['customLegend'] or config.customInputs
+		config.yAxis = {type = 'value', name = 'Earnings ($USD)'}
+		config.xAxis = {type = 'category', name = config.catLabel, data = opponentNames}
+		config.customLegend = config.customLegend or config.customInputs
 		return StatisticsPortal._drawChart(config, chartData)
 	end
 end
@@ -203,7 +205,7 @@ function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = (type(args.customGames) == 'table' and args.customGames)
-		or (String.isNotEmpty(args.customGames) and Array.map(mw.text.split(args.customGames, ','), String.trim))
+		or (String.isNotEmpty(args.customGames) and Array.map(mw.text.split(args.customGames, ',', true), String.trim))
 		or GAMES
 
 	local matchTable = mw.html.create('table')
@@ -241,13 +243,13 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local resultsRow = mw.html.create('tr')
 	local tagtype = 'td'
 
-	if Logic.readBool(args.multiGame) and parameters['game'] == nil then
+	if Logic.readBool(args.multiGame) and parameters.game == nil then
 		tagtype = 'th'
 		resultsRow:tag(tagtype)
 			:wikitext('Total')
-	elseif Logic.readBool(args.multiGame) and parameters['game'] ~= nil then
+	elseif Logic.readBool(args.multiGame) and parameters.game ~= nil then
 		resultsRow:tag(tagtype)
-			:wikitext(parameters['game'])
+			:wikitext(parameters.game)
 	end
 
 	resultsRow:tag(tagtype)
@@ -266,9 +268,9 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = String.isNotEmpty(args.customGames) and
-		Array.map(mw.text.split(args.customGames, ','), String.trim) or GAMES
+		Array.map(mw.text.split(args.customGames, ',', true), String.trim) or GAMES
 	args.customTiers = String.isNotEmpty(args.customTiers) and
-		Array.map(mw.text.split(args.customTiers, ','), function(item)
+		Array.map(mw.text.split(args.customTiers, ',', true), function(item)
 			return tonumber(String.trim(item))
 		end)
 
@@ -326,7 +328,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	end
 
 	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',')) do
+		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
 			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
 			if tierTypeData then
 				resultsRow:tag(tagtype)
@@ -359,7 +361,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 				return value == headerIndex
 			end) then
 				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(headerValue, {['link'] = true,}))
+					:wikitext(Tier.displaySingle(headerValue, {link = true,}))
 			end
 		end
 	end
@@ -370,11 +372,11 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 	end
 
 	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',')) do
+		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
 			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
 			if tierTypeData then
 				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(tierTypeData, {['link'] = true, ['short'] = true,}))
+					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true,}))
 			end
 		end
 	end
@@ -447,7 +449,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			}
 		)
 
-		prizepoolSum = prizepoolSum + tonumber(data[1]['sum_prizepool'] or 0)
+		prizepoolSum = prizepoolSum + tonumber(data[1].sum_prizepool or 0)
 
 		if Array.any(Array.extractValues(yearTable), function(value) return value == yearValue end) then
 			headerRow:tag('th')
@@ -495,7 +497,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	headerRow:tag('th')
 		:wikitext('Total')
 	resultsRow:tag('td')
-		:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool']))
+		:wikitext('$' .. Currency.formatMoney(totalPrizePool[1].sum_prizepool))
 		:css('font-weight','bold')
 
 	if Logic.readBool(args.showAverage) then
@@ -504,7 +506,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1]['sum_prizepool'] / (Count.totalTournaments() or 1)))
+			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1].sum_prizepool / (Count.totalTournaments() or 1)))
 			:css('font-weight','bold')
 	end
 
@@ -574,7 +576,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	summaryTable:tag('tr')
 		:tag('td')
-		:wikitext('$' .. Currency.formatMoney(data[1]['sum_prizepool'] or 0))
+		:wikitext('$' .. Currency.formatMoney(data[1].sum_prizepool or 0))
 		:attr('data-sort-type', 'currency')
 		:css('font-weight','bold')
 
@@ -593,7 +595,7 @@ function StatisticsPortal.earningsTable(args)
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBoolOrNil(args.displayShowMatches)
-	args.allowedPlacements = Array.map(mw.text.split(args.allowedPlacements or DEFAULT_ALLOWED_PLACES, ','),
+	args.allowedPlacements = Array.map(mw.text.split(args.allowedPlacements or DEFAULT_ALLOWED_PLACES, ',', true),
 		String.trim
 	)
 
@@ -644,7 +646,7 @@ function StatisticsPortal.earningsTable(args)
 				opponent = StatisticsPortal._toOpponent(opponent),
 			}
 		end
-		local placements = opponentPlacements[opponent['pagename']] or {}
+		local placements = opponentPlacements[opponent.pagename] or {}
 		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
@@ -845,16 +847,16 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 			if not data[opponent] then
 				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
-			if placement == '1' and item.liquipediatier == '1' and item.liquipediatiertype ~= SHOWMATCH then
+			if placement == FIRST and item.liquipediatier == STIER and item.liquipediatiertype ~= SHOWMATCH then
 				table.insert(data[opponent].sWinData, {
 						icon = item.icon,
-						icondark = item.icondark,
+						iconDark = item.icondark,
 						pagename = item.pagename,
 						shortname = item.shortname
 					}
 				)
 			end
-			if placement == '1' and item.liquipediatiertype == SHOWMATCH then
+			if placement == FIRST and item.liquipediatiertype == SHOWMATCH then
 				data[opponent].showWins = data[opponent].showWins + 1
 			elseif item.liquipediatiertype ~= SHOWMATCH then
 				data[opponent][placement] = data[opponent][placement] + 1
@@ -882,16 +884,16 @@ function StatisticsPortal._earningsTableHeader(args)
 		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable'):done()
 		:tag('th'):wikitext(Medal['1']):done()
 		:tag('th'):wikitext(Medal['2']):done()
-		:tag('th'):wikitext(Medal['3'])
+		:tag('th'):wikitext(Medal['3']):done()
 
 	if Logic.readBool(args.displayShowMatches) then
-		row:tag('th'):wikitext('Show<br>Match')
+		row:tag('th'):wikitext('Show<br>Match'):done()
 	end
 
 	row:tag('th')
 		:tag('abbr')
 		:attr('title', 'Total earnings across all games')
-		:wikitext('Earnings')
+		:wikitext('Earnings'):done()
 
 	return row
 end
@@ -903,18 +905,18 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		:css('text-align', 'center')
 		:tag('td'):wikitext(opponentIndex):done()
 		:tag('td'):css('text-align', 'left'):node(opponentDisplay):done()
-		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements['sWinData'] or {})):done()
+		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements.sWinData or {})):done()
 		:tag('td'):wikitext(placements['1'] or '0'):done()
 		:tag('td'):wikitext(placements['2'] or '0'):done()
-		:tag('td'):wikitext(placements['3'] or '0')
+		:tag('td'):wikitext(placements['3'] or '0'):done()
 
 	if Logic.readBool(args.displayShowMatches) then
-		row:tag('td'):wikitext(placements.showWins or '0')
+		row:tag('td'):wikitext(placements.showWins or '0'):done()
 	end
 
 	row:tag('td')
 		:css('text-align', 'right')
-		:wikitext('$' .. Currency.formatMoney(earnings))
+		:wikitext('$' .. Currency.formatMoney(earnings)):done()
 
 	return row
 end
@@ -925,11 +927,11 @@ function StatisticsPortal._achievementsDisplay(data)
 	if data and type(data[1]) == 'table' then
 		for _, item in ipairs(data) do
 			item.icon = string.gsub(item.icon, 'File:', '')
-			item.icondark = string.gsub(item.icondark or '', 'File:', '')
+			item.iconDark = string.gsub(item.iconDark or '', 'File:', '')
 			item.icon = String.isNotEmpty(item.icon) and item.icon or 'Gold.png'  --'InfoboxIcon Tournament.png'
 			output = output .. LeagueIcon.display{
 				icon = item.icon,
-				iconDark = item.icondark,
+				iconDark = item.iconDark,
 				link = item.pagename,
 				name = item.shortname,
 				options = { noTemplate = true },
@@ -998,37 +1000,7 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 	end
 
 	if config.removeEmptyCategories == true then
-		local startsEmpty = true
-		local lastNotEmpty = 1
-
-		local isEmptyCategory = Array.map(Array.map(categoryNames, function(_, catIndex)
-				local truthValue = Array.all(Array.map(seriesData, function(_, index)
-					return seriesData[index][catIndex] end), function(value)
-						return value == 0
-					end)
-				if truthValue == false then
-					lastNotEmpty = catIndex
-				end
-				return truthValue
-			end),
-		function(value, index)
-			if index > lastNotEmpty then
-				return false
-			elseif startsEmpty == true and value == true then
-				return false
-			else
-				startsEmpty = false
-				return true
-			end
-		end)
-
-		categoryNames = Array.filter(categoryNames, function(_, catIndex)
-				return Logic.readBool(isEmptyCategory[catIndex]) end)
-
-		seriesData = Array.map(seriesData, function(_, index)
-				return Array.filter(seriesData[index], function(_, catIndex)
-						return Logic.readBool(isEmptyCategory[catIndex]) end)
-			end)
+		categoryNames, seriesData = StatisticsPortal._removeCategories(categoryNames, seriesData)
 	end
 
 	for seriesIndex, series in pairs(seriesNames) do
@@ -1056,24 +1028,67 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 end
 
 
-function StatisticsPortal._chartConfig(args, params)
+function StatisticsPortal._removeCategories(categoryNames, seriesData)
+	local startsEmpty = true
+	local lastNotEmpty = 1
+
+	local isEmptyCategory = Array.map(Array.map(categoryNames, function(_, catIndex)
+			local truthValue = Array.all(Array.map(seriesData, function(_, index)
+				return seriesData[index][catIndex] end), function(value)
+					return value == 0
+				end)
+			if truthValue == false then
+				lastNotEmpty = catIndex
+			end
+			return truthValue
+		end),
+	function(value, index)
+		if index > lastNotEmpty then
+			return false
+		elseif startsEmpty == true and value == true then
+			return false
+		else
+			startsEmpty = false
+			return true
+		end
+	end)
+
+	categoryNames = Array.filter(categoryNames, function(_, catIndex)
+			return Logic.readBool(isEmptyCategory[catIndex]) end)
+
+	seriesData = Array.map(seriesData, function(_, index)
+			return Array.filter(seriesData[index], function(_, catIndex)
+					return Logic.readBool(isEmptyCategory[catIndex]) end)
+		end)
+	return categoryNames, seriesData
+end
+
+
+function StatisticsPortal._getChartConfig(args, params)
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
+	local customInputs = args.customInputs or params.defaultInputs
+	local opponentName
+	if isForTeam then
+		opponentName = args.team
+	else
+		opponentName = args.player
+	end
 
 	return {
 		processFunction = params.processFunction or nil,
 		variable = params.variable or nil,
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
+		customInputs = customInputs,
 		customLegend = String.isNotEmpty(args.customLegend) and
-			Array.map(mw.text.split(args.customLegend, ','), String.trim) or args.customInputs,
-		customInputs = args.customInputs,
+			Array.map(mw.text.split(args.customLegend, ',', true), String.trim) or customInputs,
 		customYears = args.customYears,
 		startYear = args.startYear or Info.startYear,
 		yearBreakdown = Logic.readBoolOrNil(args.yearBreakdown),
 		removeEmptyCategories = Logic.readBool(args.removeEmptyCategories) or false,
 		removeEmptySeries = Logic.readBool(args.removeEmptySeries) or false,
 		isForTeam = isForTeam,
-		opponentName = isForTeam and args.team or args.player,
+		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
 		height = tonumber(args.height) or 400,
 		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - tonumber(args.startYear or Info.startYear))),
