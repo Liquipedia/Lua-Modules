@@ -813,7 +813,6 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 	end
 
 	conditions:add{placementConditions}
-	mw.logObject(conditions:toString())
 	local data = {}
 
 	local queryParameters = {
