@@ -1104,7 +1104,6 @@ end
 
 
 function StatisticsPortal._returnCustomYears(args)
-
 	args.startYear = tonumber(args.startYear) or Info.startYear
 	local yearTable
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
