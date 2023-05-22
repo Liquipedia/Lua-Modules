@@ -298,8 +298,8 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	if Logic.readBool(args.multiGame) and parameters['game'] == nil then
 		tagtype = 'th'
 		resultsRow:tag(tagtype):wikitext('Total')
-	elseif Logic.readBool(args.multiGame) and parameters['game'] ~= nil then
-		resultsRow:tag(tagtype):wikitext(parameters['game'])
+	elseif Logic.readBool(args.multiGame) and parameters.game then
+		resultsRow:tag(tagtype):wikitext(parameters.game)
 	end
 
 	for rowIndex, rowValue in Tier.iterate('tiers') do
