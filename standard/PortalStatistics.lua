@@ -818,8 +818,8 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 
 	local queryParameters = {
 		query = 'pagename, shortname, icon, icondark, '
-				.. 'liquipediatier, liquipediatiertype, placement, '
-				.. 'opponentplayers, opponentname, opponenttype',
+			.. 'liquipediatier, liquipediatiertype, placement, '
+			.. 'opponentplayers, opponentname, opponenttype',
 		conditions = conditions:toString(),
 		limit = 1000,
 	}
