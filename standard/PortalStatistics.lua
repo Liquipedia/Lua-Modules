@@ -646,7 +646,7 @@ function StatisticsPortal.earningsTable(args)
 			}
 		end
 		local placements = opponentPlacements[opponent['pagename']] or {}
-		table:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
+		tbl:node(StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay))
 	end
 
 	return mw.html.create('div'):node(table)
