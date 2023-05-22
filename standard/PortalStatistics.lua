@@ -884,11 +884,11 @@ function StatisticsPortal._earningsTableHeader(args)
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
 	local row = mw.html.create('tr')
-		:tag('th'):wikitext('#'):addClass('unsortable')
-		:tag('th'):wikitext(columnText):addClass('unsortable')
-		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable')
-		:tag('th'):wikitext(Medal['1'])
-		:tag('th'):wikitext(Medal['2'])
+		:tag('th'):wikitext('#'):addClass('unsortable'):done()
+		:tag('th'):wikitext(columnText):addClass('unsortable'):done()
+		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable'):done()
+		:tag('th'):wikitext(Medal['1']):done()
+		:tag('th'):wikitext(Medal['2']):done()
 		:tag('th'):wikitext(Medal['3'])
 
 	if Logic.readBool(args.displayShowMatches) then
