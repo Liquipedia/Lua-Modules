@@ -842,7 +842,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 		local placement = string.sub(item.placement, 1, 1)
 		for _, opponent in pairs(returnOpponent(item) or {}) do
 			if not data[opponent] then
-				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, ['showWins'] = 0, ['sWinData'] = {}}
+				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
 			if placement == '1' and item.liquipediatier == '1' and item.liquipediatiertype ~= 'Showmatch' then
 				table.insert(data[opponent].sWinData, {
