@@ -1046,11 +1046,11 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			mw.logObject(series .. ' is empty')
 		else
 			table.insert(chartData, {
-					['name'] = series,
-					['type'] = 'bar',
-					['stack'] = 'total',
-					['data'] = seriesData[seriesIndex],
-					['emphasis'] = {['focus'] = 'series'},
+					name = series,
+					type = 'bar',
+					stack = 'total',
+					data = seriesData[seriesIndex],
+					emphasis = {focus = 'series'},
 				}
 			)
 		end
