@@ -687,7 +687,7 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order, nil)
 
-	local table = mw.html.create('table')
+	local tbl = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
 		:css('margin-left','0px')
 		:css('margin-right','auto')
