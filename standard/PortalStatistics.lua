@@ -709,7 +709,7 @@ function StatisticsPortal.playerAgeTable(args)
 				:wikitext(yearAge..' years, '..dayAge..' days')
 	end
 
-	return mw.html.create('div'):node(table)
+	return mw.html.create('div'):node(tbl)
 end
 
 
