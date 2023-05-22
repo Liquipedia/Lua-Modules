@@ -464,7 +464,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			colIndex = 1
 			wrapper:tag('span'):wikitext('<br>')
 
-			local prizepoolTable = wrapper:tag('table')
+			prizepoolTable = wrapper:tag('table')
 				:addClass('wikitable wikitable-striped')
 				:css('width','100%')
 				:css('text-align','center')
