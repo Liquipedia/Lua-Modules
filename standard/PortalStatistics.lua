@@ -904,7 +904,6 @@ end
 
 
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
-
 	local row = mw.html.create('tr')
 		:css('line-height', '25px')
 		:css('text-align', 'center')
