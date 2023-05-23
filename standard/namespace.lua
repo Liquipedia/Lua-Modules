@@ -14,6 +14,7 @@ local Table = require('Module:Table')
 local Namespace = {}
 
 ---Determines if the page this module is invoked on is in main space
+---829 (ModuleTalk) is treated as main space for ScribuntoUnit to work properly
 ---@return boolean
 function Namespace.isMain()
 	return mw.title.getCurrentTitle():inNamespace(0) or mw.title.getCurrentTitle():inNamespace(829)
