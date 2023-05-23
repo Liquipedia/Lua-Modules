@@ -12,6 +12,7 @@ local Logic = {}
 ---@param val1 table|string|nil
 ---@param val2 table|string|nil
 ---@param default any
+---@return string|table|any|nil
 function Logic.emptyOr(val1, val2, default)
 	if not Logic.isEmpty(val1) then
 		return val1
@@ -64,8 +65,8 @@ function Logic.isNotEmpty(val)
 	end
 end
 
----Reads a boolean string/number representation to a boolean
----@param val string|number|nil
+---Check if the input is a representation of a boolean
+---@param val string|number|boolean|nil
 ---@return boolean
 function Logic.readBool(val)
 	return val == 'true' or val == 't' or val == 'yes' or val == 'y' or val == true or val == '1' or val == 1
@@ -73,7 +74,7 @@ end
 
 ---Reads a boolean string/number representation to a boolean.
 ---If the supplied value is nil will return nil
----@param val string|number|nil
+---@param val string|number|boolean|nil
 ---@return boolean?
 function Logic.readBoolOrNil(val)
 	if Logic.readBool(val) then
