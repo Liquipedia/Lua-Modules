@@ -339,7 +339,6 @@ end
 
 
 function StatisticsPortal._coverageTournamentTableHeader(args)
-
 	local headerRow = mw.html.create('tr')
 
 	if Logic.readBool(args.multiGame) then
