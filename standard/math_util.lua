@@ -16,7 +16,7 @@ MathUtil.ilog2(8) -- Returns 3
 MathUtil.ilog2(24) -- Returns 4
 ]]
 ---@param x number
----@return number|'nan'
+---@return integer
 function MathUtil.ilog2(x)
 	return math.floor(math.log(x) / math.log(2))
 end
