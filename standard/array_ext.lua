@@ -25,7 +25,7 @@ ArrayExt.findIndex({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 ]]
 ---@generic V
 ---@param array V[]
----@param pred fun(elem: V, ix: integer): boolean
+---@param pred fun(elem: V, ix: integer?): boolean
 ---@return integer
 function ArrayExt.findIndex(array, pred)
 	for ix, elem in ipairs(array) do
