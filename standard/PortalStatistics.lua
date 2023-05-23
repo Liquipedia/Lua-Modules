@@ -171,7 +171,6 @@ Section: Coverage Breakdown
 
 
 function StatisticsPortal.coverageStatistics(args)
-
 	args = args or {}
 	args.alignSide = Logic.readBoolOrNil(args.alignSide)
 
