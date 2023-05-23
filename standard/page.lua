@@ -30,7 +30,7 @@ end
 ---@param display string?
 ---@param customLink string?
 ---@return string?
----@overload fun(options: string, display: string): string?
+---@overload fun(display: string?, customLink: string?): string?
 function page.makeInternalLink(options, display, customLink)
 	-- if no options are passed along (e.g. if the module is invoked from wiki code)
 	-- we need to shift the vars around to account for that
