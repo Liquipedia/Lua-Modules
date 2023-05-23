@@ -14,7 +14,7 @@ local Template = {}
 
 ---@param frame Frame
 ---@param title string
----@param args table
+---@param args table?
 ---@param defaultTemplate any?
 ---@return string
 ---@overload fun(frame: Frame, title: string, args: table?, defaultTemplate: any): any|string
@@ -30,7 +30,7 @@ end
 
 ---@param frame Frame
 ---@param title string
----@param args table
+---@param args table?
 ---@return string?
 function Template.expandTemplate(frame, title, args)
 	return frame:expandTemplate{title = title, args = args}
