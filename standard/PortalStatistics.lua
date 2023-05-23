@@ -601,9 +601,9 @@ function StatisticsPortal.earningsTable(args)
 	local opponentData
 
 	if args.opponentType == Opponent.team then
-		opponentData = StatisticsPortal._getTeams(5000, nil, nil, nil)
+		opponentData = StatisticsPortal._getTeams(5000)
 	elseif args.opponentType == Opponent.solo then
-		opponentData = StatisticsPortal._getPlayers(5000, nil, nil, nil)
+		opponentData = StatisticsPortal._getPlayers(5000)
 	else
 		mw.log(args.opponentType .. ' is not a valid opponent type. Choose either \'solo\' or \'team\'.')
 		return
