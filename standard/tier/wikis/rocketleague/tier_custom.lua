@@ -17,7 +17,7 @@ local TierCustom = Table.copy(Tier)
 local NON_BREAKING_SPACE = '&nbsp;'
 
 function TierCustom.display(tier, tierType, options)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
 
