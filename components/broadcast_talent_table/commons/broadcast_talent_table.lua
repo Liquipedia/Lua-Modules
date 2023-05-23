@@ -37,7 +37,8 @@ local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local RESULTS_SORT_ORDER = 'date desc'
 
---- @class BroadcastTalentTable
+---@class BroadcastTalentTable
+---@operator call:BroadcastTalentTable
 local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 
 ---@class argsValues
@@ -70,7 +71,7 @@ end
 
 -- template entry point
 ---@param frame Frame
----@return Html
+---@return Html?
 function BroadcastTalentTable.run(frame)
 	return BroadcastTalentTable(Arguments.getArgs(frame)):create()
 end
