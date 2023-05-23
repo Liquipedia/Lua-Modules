@@ -194,7 +194,7 @@ end
 -- Processes retrieved data
 -- overwritable function via /Custom
 ---@param queryData table[]
----@return table
+---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
 	local mvpList = {}
