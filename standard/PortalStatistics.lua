@@ -195,7 +195,6 @@ end
 
 
 function StatisticsPortal.coverageMatchTable(args)
-
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
 	args.customGames = (type(args.customGames) == 'table' and args.customGames)
