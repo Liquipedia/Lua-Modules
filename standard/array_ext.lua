@@ -73,7 +73,7 @@ ArrayExt.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
 ---@generic V, T
 ---@param array V[]
 ---@param f fun(elem: V): T
----@param equals fun(key: T, currentKey: T): boolean
+---@param equals? fun(key: T, currentKey: T): boolean
 ---@return V[][]
 function ArrayExt.groupAdjacentBy(array, f, equals)
 	equals = equals or Logic.deepEquals
