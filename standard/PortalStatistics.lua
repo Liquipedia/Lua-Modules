@@ -1072,7 +1072,7 @@ function StatisticsPortal._getChartConfig(args, params)
 	end
 
 	return {
-		processFunction = params.processFunction or nil,
+		processFunction = params.processFunction,
 		variable = params.variable or nil,
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
