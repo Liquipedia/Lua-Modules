@@ -30,7 +30,6 @@ local PieChart = require('Module:Tournaments breakdown pie chart/dev')
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local DATE = os.date('%F')
-local DAY_SECONDS = 24 * 3600
 local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE)
 local DEFAULT_ALLOWED_PLACES = '1,2,3,1-2,2-3,2-4,3-4'
@@ -1117,8 +1116,8 @@ end
 
 
 function StatisticsPortal._returnCustomYearText(prevYear, yearValue)
-	return (prevYear == yearValue) and tostring(yearValue) or
-		'\'' .. (string.sub(tostring(prevYear), 3, 4) .. '-' .. string.sub(tostring(yearValue), 3, 4))
+	return (prevYear == yearValue) and yearValue or
+		'\'' .. (string.sub(prevYear, 3, 4) .. '-' .. string.sub(yearValue, 3, 4))
 end
 
 
