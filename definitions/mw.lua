@@ -68,7 +68,7 @@ mw.frame = {}
 function mw.frame:callParserFunction(name, args) end
 
 ---This is transclusion. As in transclusion, if the passed title does not contain a namespace prefix it will be assumed to be in the Template: namespace.
----@param params {title: string, args: table}
+---@param params {title: string, args: table?}
 ---@return string
 function mw.frame:expandTemplate(params) end
 
