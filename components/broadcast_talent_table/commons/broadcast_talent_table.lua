@@ -38,7 +38,7 @@ local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
 local RESULTS_SORT_ORDER = 'date desc'
 
 ---@class BroadcastTalentTable
----@operator call:BroadcastTalentTable
+---@operator call():BroadcastTalentTable
 local BroadcastTalentTable = Class.new(function(self, ...) self:init(...) end)
 
 ---@class argsValues
