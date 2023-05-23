@@ -237,7 +237,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 		tagtype = 'th'
 		resultsRow:tag(tagtype)
 			:wikitext('Total')
-	elseif Logic.readBool(args.multiGame) and parameters.game ~= nil then
+	elseif Logic.readBool(args.multiGame) then
 		resultsRow:tag(tagtype)
 			:wikitext(parameters.game)
 	end
