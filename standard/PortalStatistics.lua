@@ -216,7 +216,7 @@ function StatisticsPortal.coverageMatchTable(args)
 	end
 
 	matchHeader
-		:tag('th'):wikitext(args.matchesTitle or 'Matches')
+		:tag('th'):wikitext(args.matchesTitle or 'Matches'):done()
 		:tag('th'):wikitext(args.gamesTitle or 'Games')
 
 	if Logic.readBool(args.multiGame) then
