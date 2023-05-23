@@ -675,7 +675,7 @@ function StatisticsPortal.playerAgeTable(args)
 		conditions:add{typeConditions}
 	end
 
-	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order, nil)
+	local playerData = StatisticsPortal._getPlayers(args.limit, conditions:toString(), args.order)
 
 	local tbl = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
