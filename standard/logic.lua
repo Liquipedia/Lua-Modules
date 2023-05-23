@@ -8,7 +8,7 @@
 
 local Logic = {}
 
----Returns val 1 if it isn't empty else returns val2 if that isn't empty, else returns default
+---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
 ---@param val1 table|string|nil
 ---@param val2 table|string|nil
 ---@param default any
