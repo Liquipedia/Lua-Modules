@@ -184,6 +184,7 @@ function Ordinal.ordinal(frame)
 	return Ordinal._ordinal(args[1], nil, Logic.readBool(args['sup']))
 end
 
+---@deprecated
 ---@param value string|number|nil
 ---@param superScript boolean?
 ---@return string?
