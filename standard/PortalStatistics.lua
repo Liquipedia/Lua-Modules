@@ -105,7 +105,6 @@ end
 
 
 function StatisticsPortal.topEarningsChart(args)
-
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
 
