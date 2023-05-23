@@ -23,11 +23,11 @@ function suite:testToIdentifier()
 end
 
 function suite:testRaw()
-	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw(1)})
-	self:assertDeepEquals({TierData.tiers[1], TierData.tierTypes.misc}, {Tier._raw('1', 'misc')})
-	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw('1', 'bera')})
-	self:assertDeepEquals({}, {Tier._raw('bera')})
-	self:assertDeepEquals({}, {Tier._raw('sedrvo', 'ergbv')})
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier.raw(1)})
+	self:assertDeepEquals({TierData.tiers[1], TierData.tierTypes.misc}, {Tier.raw('1', 'misc')})
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier.raw('1', 'bera')})
+	self:assertDeepEquals({}, {Tier.raw('bera')})
+	self:assertDeepEquals({}, {Tier.raw('sedrvo', 'ergbv')})
 end
 
 function suite:testIsValid()
