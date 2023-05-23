@@ -906,7 +906,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 
 	row:tag('td')
 		:css('text-align', 'right')
-		:wikitext('$' .. Currency.formatMoney(earnings)):done()
+		:wikitext('$' .. Currency.formatMoney(earnings))
 
 	return row
 end
