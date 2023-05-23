@@ -877,7 +877,7 @@ function StatisticsPortal._earningsTableHeader(args)
 		:tag('th'):wikitext(Medal['3']):done()
 
 	if Logic.readBool(args.displayShowMatches) then
-		row:tag('th'):wikitext('Show<br>Match'):done()
+		row:tag('th'):wikitext('Show<br>Match')
 	end
 
 	row:tag('th')
