@@ -175,6 +175,7 @@ function Ordinal.suffix(value, options)
 end
 
 --Legacy entry points
+---@deprecated
 ---@param frame Frame
 ---@return string?
 function Ordinal.ordinal(frame)
