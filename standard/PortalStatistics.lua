@@ -232,7 +232,6 @@ end
 
 
 function StatisticsPortal._coverageMatchTableRow(args, parameters)
-
 	local resultsRow = mw.html.create('tr')
 	local tagtype = 'td'
 
