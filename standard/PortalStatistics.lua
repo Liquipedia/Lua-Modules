@@ -79,7 +79,6 @@ function StatisticsPortal.gameEarningsChart(args)
 end
 
 function StatisticsPortal.modeEarningsChart(args)
-
 	args = args or {}
 
 	local processFunction = function(tablePlace, item, config)
