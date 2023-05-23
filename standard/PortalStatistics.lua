@@ -881,7 +881,7 @@ function StatisticsPortal._earningsTableHeader(args)
 	row:tag('th')
 		:tag('abbr')
 		:attr('title', 'Total earnings across all games')
-		:wikitext('Earnings'):done()
+		:wikitext('Earnings')
 
 	return row
 end
