@@ -322,7 +322,8 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
 			if tierTypeData then
 				resultsRow:tag(tagtype)
-					:wikitext(LANG:formatNum(Count.tournaments(Table.merge({liquipediatiertype = LANG:ucfirst(tierTypeValue)}, parameters))))
+					:wikitext(LANG:formatNum(Count.tournaments(Table.merge(
+						{liquipediatiertype = LANG:ucfirst(tierTypeValue)}, parameters))))
 					:css('text-align','right')
 			end
 		end
