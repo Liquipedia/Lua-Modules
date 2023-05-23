@@ -186,7 +186,7 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	return totalEarnings, earningsByYear
 end
 
----Appends query conditions depending on year and mode
+---Creates query conditions depending on year and mode
 ---@param conditions string
 ---@param year number?
 ---@param mode string?
