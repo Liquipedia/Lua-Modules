@@ -109,8 +109,6 @@ function StatisticsPortal.topEarningsChart(args)
 	args.limit = tonumber(args.limit) or 10
 
 	local params = {
-		variable = nil,
-		processFunction = nil,
 		catLabel = Logic.readBool(args.isForTeam) and 'Teams' or 'Players',
 		flipAxes = true,
 	}
