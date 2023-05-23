@@ -230,22 +230,17 @@ end
 
 function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local resultsRow = mw.html.create('tr')
-	local tagtype = 'td'
+	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
 
-	if Logic.readBool(args.multiGame) and not parameters.game then
-		tagtype = 'th'
-		resultsRow:tag(tagtype)
-			:wikitext('Total')
-	elseif Logic.readBool(args.multiGame) then
-		resultsRow:tag(tagtype)
-			:wikitext(parameters.game)
+	if Logic.readBool(args.multiGame) then
+		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
 	end
 
-	resultsRow:tag(tagtype)
+	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.matches(parameters)))
 		:css('text-align','right')
 
-	resultsRow:tag(tagtype)
+	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.games(parameters)))
 		:css('text-align','right')
 
@@ -286,14 +281,11 @@ end
 
 function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	local resultsRow = mw.html.create('tr')
-	local tagtype = 'td'
+	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
 	local runningTally = 0
 
-	if Logic.readBool(args.multiGame) and parameters.game == nil then
-		tagtype = 'th'
-		resultsRow:tag(tagtype):wikitext('Total')
-	elseif Logic.readBool(args.multiGame) and parameters.game then
-		resultsRow:tag(tagtype):wikitext(parameters.game)
+	if Logic.readBool(args.multiGame) then
+		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
 	end
 
 	for rowIndex, rowValue in Tier.iterate('tiers') do
@@ -303,7 +295,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			end) then
 				local tournamentCount = Count.tournaments(Table.merge({liquipediatier = rowIndex}, parameters))
 				runningTally = runningTally + tournamentCount
-				resultsRow:tag(tagtype)
+				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(tournamentCount))
 					:css('text-align','right')
 			end
@@ -311,7 +303,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	end
 
 	if String.isNotEmpty(args.showOther) then
-		resultsRow:tag(tagtype)
+		resultsRow:tag(tagType)
 			:wikitext(LANG:formatNum(Count.totalTournaments(parameters) - runningTally))
 			:css('text-align','right')
 	end
@@ -320,7 +312,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
 			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
 			if tierTypeData then
-				resultsRow:tag(tagtype)
+				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(Count.tournaments(Table.merge(
 						{liquipediatiertype = LANG:ucfirst(tierTypeValue)}, parameters))))
 					:css('text-align','right')
@@ -328,7 +320,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		end
 	end
 
-	resultsRow:tag(tagtype)
+	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.totalTournaments(parameters)))
 		:css('text-align','right')
 
@@ -862,6 +854,17 @@ end
 --[[
 Section: Display Functions
 ]]--
+
+
+function StatisticsPortal._returnGameCell(args, parameters, tagType)
+	local gameCell = mw.html.create(tagType)
+	if Logic.readBool(args.multiGame) and not parameters.game then
+		gameCell:wikitext('Total')
+	elseif Logic.readBool(args.multiGame) then
+		gameCell:wikitext(parameters.game)
+	end
+	return gameCell
+end
 
 
 function StatisticsPortal._earningsTableHeader(args)
