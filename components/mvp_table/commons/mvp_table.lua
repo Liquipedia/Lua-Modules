@@ -139,7 +139,7 @@ end
 
 ---Builds the main header of the MvpTable
 ---@param args mvpTableParsedArgs
----@return nil
+---@return Html?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
 		return nil
