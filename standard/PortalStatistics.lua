@@ -54,7 +54,6 @@ Section: Chart Entry Functions
 
 
 function StatisticsPortal.gameEarningsChart(args)
-
 	args = args or {}
 
 	local processFunction = function(tablePlace, item, config)
