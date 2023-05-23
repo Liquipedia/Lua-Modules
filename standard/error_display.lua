@@ -27,7 +27,7 @@ ErrorDisplay.propTypes.Box = {
 	text = 'string',
 }
 
----@param props {hasDetails: boolean, loggedInOnly: boolean, text: string}
+---@param props {hasDetails: boolean?, loggedInOnly: boolean?, text: string}
 ---@return Html
 function ErrorDisplay.Box(props)
 	local div = mw.html.create('div'):addClass('navigation-not-searchable ambox-wrapper')
