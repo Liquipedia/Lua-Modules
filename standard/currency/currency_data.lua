@@ -295,6 +295,15 @@ return {
 			text = '$',
 		},
 	},
+	hnl = {
+		code = 'HNL',
+		name = 'Honduran lempira',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'L',
+		},
+	},
 	hrk = {
 		code = 'HRK',
 		name = 'Croatian kuna',
