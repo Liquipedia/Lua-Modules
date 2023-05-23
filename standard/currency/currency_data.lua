@@ -844,6 +844,15 @@ return {
 			text = '₩',
 		},
 	},
+	xof = {
+		code = 'XOF',
+		name = 'CFA franc',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'F.CFA',
+		},
+	},
 	zar = {
 		code = 'ZAR',
 		name = 'South African Rand',
