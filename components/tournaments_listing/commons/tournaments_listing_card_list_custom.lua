@@ -14,11 +14,12 @@ local TournamentsListing = Lua.import('Module:TournamentsListing/CardList', {req
 
 local CustomTournamentsListing = Class.new()
 
+---@param frame Frame
+---@return Html?
 function CustomTournamentsListing.run(frame)
 	local tournamentsListing = TournamentsListing(Arguments.getArgs(frame))
 
-	-- you can overwrite certain functions here:
-	-- tournamentsListing.addConditions = CustomTournamentsListing.addConditions
+	-- you can overwrite certain functions here
 
 	return tournamentsListing:create():build()
 end
