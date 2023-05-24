@@ -13,13 +13,19 @@ local Array = require('Module:Array')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
+---@class _ConditionNode
 local _ConditionNode = Class.new()
+
+---@enum lpdbBooleanOperator
+---| '"AND"'
+---| '"OR"'
 
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
----@class ConditionTree
+---@class ConditionTree:_ConditionNode
+---@operator call: fun(booleanOperator: lpdbBooleanOperator)
 ---@field _nodes ConditionNode[]
----@field booleanOperator 'AND'|'OR'
+---@field booleanOperator lpdbBooleanOperator
 local ConditionTree = Class.new(_ConditionNode,
 	function(self, booleanOperator)
 		self.booleanOperator = booleanOperator
@@ -58,10 +64,17 @@ function ConditionTree:toString()
 
 end
 
+---@enum lpdbComparator
+---| '"::"' # equals
+---| '"::!"' # not equals
+---| '"::>"' # greater than
+---| '"::<"' # less than
+
 ---A condition in a ConditionTree
----@class ConditionNode
+---@class ConditionNode:_ConditionNode
+---@operator call: fun(name: ColumnName, comparator: lpdbComparator, value: string|number)
 ---@field name ColumnName
----@field comparator '::'|'::!'|'::>'|'::<'
+---@field comparator lpdbComparator
 ---@field value string|number
 ---@field is_a function
 local ConditionNode = Class.new(_ConditionNode,
@@ -102,6 +115,7 @@ local BooleanOperator = {
 
 ---Represents a column name in LPDB, including an optional super key
 ---@class ColumnName
+---@operator call: fun(name: string, superName: string?)
 ---@field name string
 ---@field superName string?
 local ColumnName = Class.new(
