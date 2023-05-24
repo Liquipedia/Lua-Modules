@@ -113,8 +113,8 @@ local BooleanOperator = {
 ---@field superName string?
 local ColumnName = Class.new(
 
-	-- @param name: name of the column in LPDB
-	-- @param superName (optional): The key that the `name` exists in, e.g. if we
+	--- @param name string name of the column in LPDB
+	--- @param superName string? The key that the `name` exists in, e.g. if we
 	-- want `extradata_player`, the `superName` would be 'extradata', while
 	-- the `name` would be 'player'
 	function(self, name, superName)
