@@ -1341,6 +1341,11 @@ local data = {
 		localised = 'Arabian',
 		name = 'Arabia',
 	},
+	['arabstates'] = {
+		flag = 'File:Arab league hd.png',
+		localised = 'Arabic',
+		name = 'Arab States',
+	},
 	['asia'] = {
 		flag = 'File:Asia flag hd.png',
 		localised = 'Asian',
@@ -1405,6 +1410,11 @@ local data = {
 		flag = 'File:Middle east flag hd.png',
 		localised = 'Middle Eastern',
 		name = 'Middle East',
+	},
+	['mena'] = {
+		flag = 'File:Arab league hd.png',
+		localised = 'MENA',
+		name = 'MENA',
 	},
 	['nordiccountries'] = {
 		flag = 'File:Nordic hd.png',
@@ -2100,6 +2110,7 @@ local aliases = {
 	['macedonia'] = 'northmacedonia',
 	['makedonia'] = 'northmacedonia',
 	['micronesia'] = 'federatedstatesofmicronesia',
+	['middleeastnorthafrica'] = 'mena',
 	['republic of macedonia'] = 'northmacedonia',
 	['scandinavia'] = 'nordiccountries',
 	['saintmartin'] = 'saintmartin(frenchpart)',
