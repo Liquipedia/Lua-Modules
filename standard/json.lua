@@ -31,8 +31,7 @@ end
 ---If the parse fails it returns an empty table.
 ---Second return value boolean indicates a failed parse.
 ---@param obj string
----@return table, false
----@overload fun(obj: string): {}, true
+---@return table, boolean
 function Json.parse(obj)
 	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
@@ -63,7 +62,7 @@ end
 ---
 ---Example: JsonExt.parseIfTable('{"a" = 3}') = {a = 3}
 ---@param any string
----@return table
+---@return table?
 ---@overload fun(any: any): nil
 function Json.parseIfTable(any)
 	if type(any) == 'string' then

@@ -76,7 +76,7 @@ end
 
 ---Runs a function inside a scope where the specified flags are set.
 ---@generic V
----@param flags? {string: boolean}
+---@param flags? {[string]: boolean}
 ---@param f fun(): V
 ---@return V|error
 function FeatureFlag.with(flags, f)

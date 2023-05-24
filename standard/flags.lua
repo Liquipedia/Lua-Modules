@@ -133,7 +133,7 @@ function Flags.languageIcon(args, langName)
 		langName = args
 		args = {}
 	elseif String.isEmpty(langName) then
-		---@cast args -nil
+		args = args or {}
 		langName = args.language or args.flag
 	end
 	if String.isEmpty(langName) then
@@ -173,7 +173,7 @@ alpha3 - returns the lowercase ISO 3166-1 alpha-3 flag code
 default is alpha2
 ]]--
 ---@param flagName string?
----@param format 'alpha3'|any
+---@param format 'alpha3'|'alpha2'|nil
 ---@return string
 function Flags.CountryCode(flagName, format)
 	if String.isEmpty(flagName) then
