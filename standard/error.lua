@@ -48,7 +48,7 @@ error.noStack: Disables the stack trace
 
 ]]
 ---@class Error
----@operator call(fun(any: string|table|nil|any)):Error
+---@operator call(string|table|nil|any):Error
 ---@field message string?
 local Error = Class.new(function(self, any)
 	-- Normalize the various ways an error can be thrown
