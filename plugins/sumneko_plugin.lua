@@ -42,9 +42,11 @@ end
 
 -- luacheck: push ignore
 -- setting non-standard global variable 'OnSetText' (but it's mandatory)
+---@diagnostic disable-next-line: global-element, incomplete-signature-doc, missing-global-doc
 function OnSetText(uri, text)
 -- luacheck: pop ignore
 	if text:sub(1, 3) ~= '---' then
+		---@diagnostic disable-next-line: missing-global-doc, incomplete-signature-doc
 		return nil
 	end
 
@@ -52,5 +54,6 @@ function OnSetText(uri, text)
 
 	liquipedia.annotate(text, diffs)
 
+	---@diagnostic disable-next-line: incomplete-signature-doc, missing-global-doc
 	return diffs
 end
