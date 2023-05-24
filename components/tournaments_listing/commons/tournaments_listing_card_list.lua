@@ -38,8 +38,10 @@ local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
 local DEFAULT_LIMIT = 5000
 
 --- @class BaseTournamentsListing
+--- @operator call(...): BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
 
+---@param args table
 ---@return self
 function BaseTournamentsListing:init(args)
 	self.args = args
