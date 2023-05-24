@@ -146,7 +146,7 @@ function BaseResultsTable:create()
 	end)
 
 	-- Set the header
-	Table.iter.forEach(splitData, function(dataSet)
+	Array.forEach(splitData, function(dataSet)
 		dataSet.header = dataSet[1].date:sub(1,4)
 	end)
 

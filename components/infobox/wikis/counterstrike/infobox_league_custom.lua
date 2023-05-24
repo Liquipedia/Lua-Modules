@@ -329,7 +329,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
 	lpdbData.extradata.shortname2 = args.shortname2
 
-	Table.iter.forEach(CustomLeague.getRestrictions(_args.restrictions),
+	Array.forEach(CustomLeague.getRestrictions(_args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	return lpdbData
