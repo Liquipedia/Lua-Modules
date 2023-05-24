@@ -18,10 +18,18 @@ local NON_BREAKING_SPACE = '&nbsp;'
 
 local TierCustom = Table.copy(Tier)
 
+--- Parses queryData to be processable for other Tier functions
+---@param queryData table
+---@return string?, string?, {game: string?}
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {game = queryData.game}
 end
 
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
+---@return string?
 function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
@@ -51,6 +59,10 @@ function TierCustom.display(tier, tierType, options)
 		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
 end
 
+--- Builds the display for a given tierData/tierTypeData table
+---@param data table
+---@param options {short: boolean?, link: boolean|string|nil, game: string?}
+---@return string
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
@@ -63,6 +75,9 @@ function Tier.displaySingle(data, options)
 	return display
 end
 
+---@param link string
+---@param game string?
+---@return string
 function TierCustom.adjustLink(link, game)
 	return String.isNotEmpty(game) and (game .. '/' .. link) or link
 end
