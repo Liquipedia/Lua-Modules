@@ -17,10 +17,6 @@ local Condition = {}
 ---@field is_a function
 local _ConditionNode = Class.new()
 
----@enum lpdbBooleanOperator
----| '"AND"'
----| '"OR"'
-
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
 ---@class ConditionTree:_ConditionNode
@@ -65,12 +61,6 @@ function ConditionTree:toString()
 
 end
 
----@enum lpdbComparator
----| '"::"' # equals
----| '"::!"' # not equals
----| '"::>"' # greater than
----| '"::<"' # less than
-
 ---A condition in a ConditionTree
 ---@class ConditionNode:_ConditionNode
 ---@operator call( fun(name: ColumnName, comparator: lpdbComparator, value: string|number)): ConditionNode
@@ -98,6 +88,7 @@ function ConditionNode:toString()
 	)
 end
 
+---@enum lpdbComparator
 local Comparator = {
 	equals = '::',
 	notEquals = '::!',
@@ -109,6 +100,7 @@ Comparator.neq = Comparator.notEquals
 Comparator.gt = Comparator.greaterThan
 Comparator.lt = Comparator.lessThan
 
+---@enum lpdbBooleanOperator
 local BooleanOperator = {
 	all = 'AND',
 	any = 'OR',
