@@ -10,7 +10,13 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 
+---@class WidgetCellInput
+---@field content (string|number|table)[]
+---@field classes string[]
+---@field css {[string]: string|number}[]
+
 ---@class WidgetTableCell
+---@operator call(WidgetCellInput): WidgetTableCell
 ---@field content (string|number|table)[]
 ---@field classes string[]
 ---@field css {[string]: string|number}[]

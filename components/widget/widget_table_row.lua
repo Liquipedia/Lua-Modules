@@ -11,7 +11,8 @@ local Widget = require('Module:Infobox/Widget')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableRow
----@field cells (WidgetTableCell|nil)[]
+---@operator call({cells: WidgetTableCell[], classes: string[], css: {[string]: string|number|nil}[]}): WidgetTableRow
+---@field cells WidgetTableCell[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}[]
 ---@field injector function?

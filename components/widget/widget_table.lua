@@ -11,8 +11,15 @@ local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
+---@class WidgetTableInput
+---@field rows WidgetTableRow[]
+---@field classes string[]
+---@field css {[string]: string|number|nil}[]
+---@field columns integer?
+
 ---@class WidgetTable
----@field rows (WidgetTableRow|nil)[]
+---@operator call(WidgetTableInput):WidgetTable
+---@field rows WidgetTableRow[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}[]
 ---@field columns integer?
