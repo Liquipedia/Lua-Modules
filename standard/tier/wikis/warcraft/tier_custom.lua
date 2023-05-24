@@ -66,7 +66,7 @@ end
 
 --- Builds the display for a given tierData/tierTypeData table
 ---@param data table
----@param options {short: boolean, link: boolean|string, mode: string?}
+---@param options {short: boolean?, link: boolean|string|nil, mode: string?}
 ---@return string
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
