@@ -12,9 +12,9 @@ local Widget = require('Module:Infobox/Widget')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableInput
----@field rows WidgetTableRow[]
----@field classes string[]
----@field css {[string]: string|number|nil}[]
+---@field rows WidgetTableRow[]?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}[]?
 ---@field columns integer?
 
 ---@class WidgetTable

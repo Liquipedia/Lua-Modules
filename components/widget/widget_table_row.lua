@@ -10,8 +10,13 @@ local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
+---@class WidgetTableRowInput
+---@field cells WidgetTableCell[]?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}[]?
+
 ---@class WidgetTableRow
----@operator call({cells: WidgetTableCell[], classes: string[], css: {[string]: string|number|nil}[]}): WidgetTableRow
+---@operator call(WidgetTableRowInput): WidgetTableRow
 ---@field cells WidgetTableCell[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}[]
