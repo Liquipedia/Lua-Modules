@@ -876,7 +876,7 @@ function StatisticsPortal._earningsTableHeader(args)
 		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable'):done()
 		:tag('th'):wikitext(Medal['1']):done()
 		:tag('th'):wikitext(Medal['2']):done()
-		:tag('th'):wikitext(Medal['3'])
+		:tag('th'):wikitext(Medal['3']):done()
 
 	if Logic.readBool(args.displayShowMatches) then
 		row:tag('th'):wikitext('Show<br>Match')
@@ -900,7 +900,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 		:tag('td'):wikitext(StatisticsPortal._achievementsDisplay(placements.sWinData or {})):done()
 		:tag('td'):wikitext(placements['1'] or '0'):done()
 		:tag('td'):wikitext(placements['2'] or '0'):done()
-		:tag('td'):wikitext(placements['3'] or '0')
+		:tag('td'):wikitext(placements['3'] or '0'):done()
 
 	if Logic.readBool(args.displayShowMatches) then
 		row:tag('td'):wikitext(placements.showWins or '0')
