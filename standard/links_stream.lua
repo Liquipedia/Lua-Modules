@@ -110,6 +110,7 @@ end
 -- Contains the triplet that makes up a stream key
 -- [platform, languageCode, index]
 ---@class StreamKey
+---@operator call(...): StreamKey
 ---@field platform string
 ---@field languageCode string
 ---@field index integer
