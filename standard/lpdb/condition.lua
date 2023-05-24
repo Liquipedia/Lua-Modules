@@ -30,7 +30,7 @@ local ConditionTree = Class.new(_ConditionNode,
 	end
 )
 
----@param node _ConditionNode|ConditionNode[]
+---@param node _ConditionNode|_ConditionNode[]
 ---@return self
 function ConditionTree:add(node)
 	if not node then
