@@ -24,6 +24,11 @@ local _PAGENAME = mw.title.getCurrentTitle().text
 
 local MvpTable = {}
 
+---Entry point for MvpTable.
+---Fetches mvpData for a given set of matchGroupIds or tournaments.
+---Displays the fetched data as a table.
+---@param args table
+---@return Html|string
 function MvpTable.run(args)
 	args = MvpTable._parseArgs(args)
 	local conditions = MvpTable._buildConditions(args)
@@ -57,6 +62,17 @@ function MvpTable.run(args)
 	return output
 end
 
+---@class mvpTableParsedArgs
+---@field cutafter number
+---@field margin number
+---@field points boolean
+---@field title string?
+---@field matchGroupIds string[]
+---@field tournaments string[]
+
+---Parses the entered arguments to a table that can be used better further down the line
+---@param args table
+---@return mvpTableParsedArgs
 function MvpTable._parseArgs(args)
 	local parsedArgs = {
 		cutafter = tonumber(args.cutafter) or 5,
@@ -86,6 +102,9 @@ function MvpTable._parseArgs(args)
 	return parsedArgs
 end
 
+---Builds the query conditions
+---@param args mvpTableParsedArgs
+---@return string
 function MvpTable._buildConditions(args)
 	local matchGroupIDConditions
 	if Table.isNotEmpty(args.matchGroupIds) then
@@ -100,6 +119,7 @@ function MvpTable._buildConditions(args)
 		tournamentConditions = ConditionTree(BooleanOperator.any)
 		for _, tournament in pairs(args.tournaments) do
 			local page = mw.title.new(tournament)
+			assert(page, 'Invalid page name "' .. tournament .. '"')
 			tournamentConditions:add{
 				ConditionTree(BooleanOperator.all):add{
 					ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),
@@ -117,6 +137,9 @@ function MvpTable._buildConditions(args)
 	return conditions:toString()
 end
 
+---Builds the main header of the MvpTable
+---@param args mvpTableParsedArgs
+---@return Html?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
 		return nil
@@ -128,6 +151,9 @@ function MvpTable._mainHeader(args)
 		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
 end
 
+---Builds the sub header of the MvpTable
+---@param args mvpTableParsedArgs
+---@return Html
 function MvpTable._subHeader(args)
 	local header = mw.html.create('tr')
 		:tag('th'):wikitext('Player'):done()
@@ -140,6 +166,10 @@ function MvpTable._subHeader(args)
 	return header:done()
 end
 
+---Builds the display for a mvp row
+---@param item table
+---@param args mvpTableParsedArgs
+---@return Html
 function MvpTable._row(item, args)
 	local playerCell = mw.html.create('td')
 		:css('text-align', 'left')
@@ -160,7 +190,11 @@ function MvpTable._row(item, args)
 	return row:done()
 end
 
+---
+-- Processes retrieved data
 -- overwritable function via /Custom
+---@param queryData table[]
+---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
 	local mvpList = {}
@@ -192,7 +226,13 @@ function MvpTable.processData(queryData)
 	return mvpList
 end
 
+---
+-- Function to sort mvps
 -- exported so it can be used in /Custom
+---@param tbl table
+---@param a string
+---@param b string
+---@return boolean
 function MvpTable.sortFunction(tbl, a, b)
 	return tbl[a].mvp > tbl[b].mvp or
 		tbl[a].mvp == tbl[b].mvp and tbl[a].name < tbl[b].name

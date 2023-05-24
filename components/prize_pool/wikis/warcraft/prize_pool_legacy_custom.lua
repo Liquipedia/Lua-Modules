@@ -158,8 +158,7 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 
 	local opponentPrefix = 'team' .. opponentIndex
 	for playerIndex = 1, Opponent.partySize(_cache.opponentType) do
-		local nameInput = slot[opponentPrefix .. 'p' .. playerIndex] or TBD
-		nameInput = mw.text.split(nameInput, '|')
+		local nameInput = mw.text.split(slot[opponentPrefix .. 'p' .. playerIndex] or TBD, '|')
 
 		opponentData['p' .. playerIndex] = nameInput[#nameInput]
 		opponentData['p' .. playerIndex .. 'link'] = slot[opponentPrefix .. 'p' .. playerIndex .. 'link'] or nameInput[1]

@@ -25,6 +25,19 @@ return {
 				lightMode = 'Arena of ValorLogo.png',
 			},
 		},
+		aovas = {
+			abbreviation = 'AoV/HoK ASIAD',
+			name = 'Honor of Kings (Asian Games Version)',
+			link = 'Honor of Kings (Asian Games Version)',
+			logo = {
+				darkMode = 'Honor of Kings Icon.png',
+				lightMode = 'Honor of Kings Icon.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Honor of Kings 2018-12-24 Logo.png',
+				lightMode = 'Honor of Kings 2018-12-24 Logo.png',
+			},
+		},
 		hok = {
 			abbreviation = 'HoK',
 			name = 'Honor of Kings',

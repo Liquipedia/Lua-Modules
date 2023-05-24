@@ -24,6 +24,7 @@ local VodLink = require('Module:VodLink')
 
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom', {requireDevIfEnabled = true})
 local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
@@ -73,17 +74,20 @@ end)
 local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
 local TEAMS = Array.range(1, 2)
+local AVAILABLE_FOR_TIERS = {1, 2, 3}
 
-local BIG_MATCH_START_TIME = 1682892000 -- May 1st 2023 midnight
+local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 function BigMatch.isEnabledFor(match)
-	return tonumber(match.liquipediatier) == 1 and (match.timestamp == 0 or match.timestamp > BIG_MATCH_START_TIME)
+	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
+			and (match.timestamp == 0 or match.timestamp > BIG_MATCH_START_TIME)
 end
 
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 
 	args = BigMatch._contextualEnrichment(args)
+	HiddenDataBox.run(args) -- Set wiki variables used by match2
 
 	local model = BigMatch._match2Director(args)
 
@@ -174,7 +178,10 @@ function BigMatch.run(frame)
 		end), ' ')
 	end
 	model.heroIcon = function(self)
-		local champion = type(self) == 'table' and self.champion or self
+		local champion = self
+		if type(self) == 'table' then
+			champion = self.champion
+		end
 		return HeroIcon._getImage{champion, date = model.date}
 	end
 
@@ -182,7 +189,7 @@ function BigMatch.run(frame)
 end
 
 function BigMatch._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add)
+	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
 function BigMatch._abbreviateNumber(number)
@@ -198,7 +205,7 @@ function BigMatch._contextualEnrichment(args)
 	local tournamentData = BigMatch._fetchTournamentInfo(args.tournamentlink)
 
 	args.patch = args.patch or tournamentData.patch
-	args.tournament =  args.tournament or tournamentData.name
+	args.tournament = args.tournament or tournamentData.name
 	args.parent = args.tournamentlink or tournamentData.pagename
 
 	return args
@@ -239,30 +246,26 @@ function BigMatch._match2Director(args)
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)) or nil
 
+		-- Break down the picks and bans into per team, per type, in order.
+		Array.sortInPlaceBy(map.championVeto, Operator.property('vetoNumber'))
+
+		local _, vetoesByType = Array.groupBy(map.championVeto, Operator.property('type'))
+		local _, bansPerTeam = Array.groupBy(vetoesByType.ban or {}, Operator.property('team'))
+
 		Array.forEach(TEAMS, function(teamIdx)
 			local team = map['team' .. teamIdx]
 
 			map['team' .. teamIdx .. 'side'] = team.color
+			team.players = team.players or {}
 
 			-- Sort players based on role
 			Array.sortInPlaceBy(team.players, function (player)
 				return ROLE_ORDER[player.role]
 			end)
+
+			team.ban = Array.map(bansPerTeam[teamIdx], Operator.property('champion'))
+			team.pick = Array.map(team.players, Operator.property('champion'))
 		end)
-
-		-- Break down the picks and bans into per team, per type, in order.
-		Array.sortInPlaceBy(map.championVeto, Operator.property('vetoNumber'))
-
-		local _, vetoesByTeam = Array.groupBy(map.championVeto, Operator.property('team'))
-
-		-- TODO: have picks sorted on role, bans sorted on number
-		Table.mergeInto(map, prefixWithKey(Array.map(vetoesByTeam, function (team)
-			return Table.mapValues(Table.groupBy(team, function(_, veto)
-				return veto.type
-			end), function (vetoType)
-				return Array.extractValues(Table.mapValues(vetoType, Operator.property('champion')))
-			end)
-		end), 't'))
 
 		return map
 	end)

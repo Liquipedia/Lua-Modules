@@ -51,9 +51,9 @@ local GAMES = {
 }
 
 local MODES = {
-	team = {tier = 'Team', store = 'team', category =  'Team'},
-	['2v2'] = {tier = ' 2v2', store = '2v2', category =  '2v2'},
-	default = {store = '1v1', category =  'Individual'},
+	team = {tier = 'Team', store = 'team', category = 'Team'},
+	['2v2'] = {tier = ' 2v2', store = '2v2', category = '2v2'},
+	default = {store = '1v1', category = 'Individual'},
 }
 
 local TIER_1 = 1
@@ -125,6 +125,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--player breakdown
 		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
+		---@type number|string
 		local playerNumber = playerRaceBreakDown.playerNumber or _args.player_number
 		if playerNumber or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})

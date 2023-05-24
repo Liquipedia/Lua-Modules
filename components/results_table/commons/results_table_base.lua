@@ -80,6 +80,7 @@ function BaseResultsTable:readConfig()
 		resultsSubPage = args.resultsSubPage or DEFAULT_RESULTS_SUB_PAGE,
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
+		useIndivPrize = Logic.readBool(args.useIndivPrize),
 		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
 	}
 

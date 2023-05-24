@@ -25,6 +25,9 @@ local TableCell = require('Module:Widget/Table/Cell')
 local TableRow = require('Module:Widget/Table/Row')
 
 --- @class PrizePool
+--- @field options table
+--- @field _smwInjector SmwInjector?
+--- @field _lpdbInjector LpdbInjector?
 local PrizePool = Class.new(BasePrizePool)
 
 local tournamentVars = PageVariableNamespace('Tournament')

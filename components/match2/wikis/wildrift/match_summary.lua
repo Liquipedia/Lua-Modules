@@ -141,7 +141,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add Match MVP(s)
 	local mvpData = match.extradata.mvp
-	if mvpData and mvpData.players and mvpData.players[1]  then
+	if mvpData and mvpData.players and mvpData.players[1] then
 		local mvp = MatchSummary.Mvp()
 		for _, player in ipairs(mvpData.players) do
 			mvp:addPlayer(player)

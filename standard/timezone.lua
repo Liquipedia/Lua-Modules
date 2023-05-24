@@ -15,10 +15,13 @@ local OUTPUT_FORMAT = '<abbr data-tz="${tzDataLong}" title="${tzTitle} (UTC${tzD
 
 local Timezone = {}
 
+---@param timezone string?
+---@return {name: string, offset: {[1]: integer, [2]: integer}, abbr: string}?
 function Timezone.getTimezoneData(timezone)
 	if String.isEmpty(timezone) then
 		return
 	end
+	---@cast timezone -nil
 
 	local timezoneData = TimezoneData[timezone:upper()]
 	if not timezoneData then
@@ -33,6 +36,8 @@ function Timezone.getTimezoneData(timezone)
 	return timezoneData
 end
 
+---@param timezone string?
+---@return string?
 function Timezone.getTimezoneString(timezone)
 	local timezoneData = Timezone.getTimezoneData(timezone)
 	if not timezoneData then
@@ -53,6 +58,8 @@ function Timezone.getTimezoneString(timezone)
 	})
 end
 
+---@param timezone string?
+---@return integer?
 function Timezone.getOffset(timezone)
 	local timezoneData = Timezone.getTimezoneData(timezone)
 	if not timezoneData then

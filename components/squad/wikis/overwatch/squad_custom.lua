@@ -35,17 +35,17 @@ function CustomSquad.header(self)
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
-	headerRow		:node(makeHeader('ID'))
-					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
+	headerRow:node(makeHeader('ID'))
+		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
 	if HAS_NUMBER then
-		headerRow	:node(makeHeader('Number'))
+		headerRow:node(makeHeader('Number'))
 	end
-	headerRow		:node(makeHeader('Name'))
-					:node(makeHeader('Position'))
-					:node(makeHeader('Join Date'))
+	headerRow:node(makeHeader('Name'))
+		:node(makeHeader('Position'))
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_FORMER then
-		headerRow	:node(makeHeader('Leave Date'))
-					:node(makeHeader('New Team'))
+		headerRow:node(makeHeader('Leave Date'))
+			:node(makeHeader('New Team'))
 	elseif self.type == Squad.TYPE_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
@@ -75,7 +75,7 @@ function ExtendedSquadRow:position(args)
 	self.content:node(cell)
 
 	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -174,6 +174,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
@@ -204,6 +205,7 @@ function CustomSquad._playerRow(player, squadType)
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

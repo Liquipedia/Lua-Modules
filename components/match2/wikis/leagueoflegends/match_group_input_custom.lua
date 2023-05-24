@@ -47,7 +47,7 @@ local _NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t'))
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -215,7 +215,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local lastPlacement = _NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score or '') or ''
+			local score = tonumber(opp.score)
 			counter = counter + 1
 			if counter == 1 and (winner or '') == '' then
 				if finished then
@@ -227,7 +227,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
 				lastPlacement = counter
-				lastScore = score
+				lastScore = score or _NO_SCORE
 			end
 		end
 	end
@@ -578,24 +578,25 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
-		local team = 't' .. opponentIndex
+		local teamShort = 't' .. opponentIndex
+		local team = 'team' .. opponentIndex
 		if not map[team] then
 			local picks, bans = {}, {}
 			for playerIndex = 1, _MAX_NUM_PLAYERS do
-				table.insert(picks, map[team .. 'c' .. playerIndex])
+				table.insert(picks, map[teamShort .. 'c' .. playerIndex])
 			end
 
-			for _, ban in Table.iter.pairsByPrefix(map, team .. 'b') do
+			for _, ban in Table.iter.pairsByPrefix(map, teamShort .. 'b') do
 				table.insert(bans, ban)
 			end
-			map['t' .. opponentIndex] = {pick = picks, ban = bans}
+			map[team] = {pick = picks, ban = bans}
 		end
 
 		Array.forEach(map[team].pick, function (hero, idx)
-			heroData['team' .. opponentIndex .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
+			heroData[team .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
 		end)
 		Array.forEach(map[team].ban, function (hero, idx)
-			heroData['team' .. opponentIndex .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
+			heroData[team .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
 		end)
 	end
 

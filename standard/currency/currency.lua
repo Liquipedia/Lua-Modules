@@ -24,6 +24,8 @@ local USD_TEMPLATE_ALIAS = '1'
 local DEFAULT_ROUND_PRECISION = 2
 local DASH = '-'
 
+---@param frame Frame
+---@return string
 function Currency.template(frame)
 	local args = Arguments.getArgs(frame)
 	local currencyCode = args.currency or args[1]
@@ -44,6 +46,19 @@ function Currency.template(frame)
 	return display
 end
 
+---@class currencyDisplayOptions
+---@field abbreviation boolean?
+---@field dashIfZero boolean?
+---@field forceRoundPrecision boolean?
+---@field formatPrecision integer?
+---@field formatValue boolean?
+---@field setVariables boolean?
+---@field symbol boolean?
+
+---@param currencyCode string
+---@param prizeValue string|number|nil
+---@param options currencyDisplayOptions?
+---@return string?
 function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
 	options.symbol = Logic.emptyOr(options.symbol, true)
@@ -88,7 +103,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	if prizeValue then
 		if Logic.isNumeric(prizeValue) and options.formatValue then
-			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision)
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision, false)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
@@ -102,6 +117,8 @@ function Currency.display(currencyCode, prizeValue, options)
 	return prizeDisplay
 end
 
+---@param currencyCode string
+---@return {code: string, name: string, symbol: {hasSpace: boolean?, isAfter: boolean?, text: string}}?
 function Currency.raw(currencyCode)
 	if String.isEmpty(currencyCode) then
 		return nil
@@ -110,6 +127,11 @@ function Currency.raw(currencyCode)
 	return CurrencyData[currencyCode:lower()]
 end
 
+---@param value string|number|nil
+---@param precision integer?
+---@param forceRoundPrecision boolean?
+---@param dashIfZero boolean?
+---@return string|number
 function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
 	dashIfZero = Logic.nilOr(Logic.readBoolOrNil(dashIfZero), true)
 	if not Logic.isNumeric(value) or (tonumber(value) == 0 and not forceRoundPrecision) then
@@ -127,6 +149,8 @@ function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
 	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
 end
 
+---@param props {currency: string, currencyRate: string|number|nil, date: string?, setVariables: boolean?}
+---@return number?
 function Currency.getExchangeRate(props)
 	if not props then
 		error('No props passed to "Currency.getExchangeRate"')

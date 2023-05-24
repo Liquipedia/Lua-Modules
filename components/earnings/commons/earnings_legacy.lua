@@ -21,12 +21,8 @@ local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base', {requir
 
 ---
 -- Entry point for players and individuals
--- @player - the player/individual for whom the earnings shall be calculated
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @noRedirect - (optional) player redirects get not resolved before query
--- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
--- @perYear - (optional) query all earnings per year and return the values in a lua table
+---@param args playerEarningsArgs
+---@return number, {[integer]: number?}?
 function CustomEarnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -65,25 +61,25 @@ function CustomEarnings.calculateForPlayer(args)
 		table.insert(playerConditions, '[[players_p' .. playerIndex .. '::' .. playerAsPageName .. ']]')
 	end
 
-	playerConditions = '(' .. table.concat(playerConditions, ' OR ') .. ')'
+	local playerConditionString = '(' .. table.concat(playerConditions, ' OR ') .. ')'
 
-	return CustomEarnings.calculate(playerConditions, args.year, args.mode, args.perYear, nil, true)
+	return CustomEarnings.calculate(playerConditionString, args.year, args.mode, args.perYear, nil, true)
 end
 
 ---
 -- Calculates earnings for this participant in a certain mode
--- @participantCondition - the condition to find the player/team
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @perYear - (optional) query all earnings per year and return the values in a lua table
--- @aliases - players/teams to determine earnings for
+---@param conditions string the condition to find the player/team
+---@param queryYear number? the year to calculate earnings for
+---@param mode string? the mode to calculate earnings for
+---@param perYear boolean? query all earnings per year and return the values in a lua table
+---@return number, {[integer]: number?}?
 function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
 	conditions = CustomEarnings._buildConditions(conditions, queryYear, mode)
 
 	local sums = {}
 	local totalEarnings = 0
 	local sumUp = function(placement)
-		local value = CustomEarnings._determineValue(placement, aliases, isPlayerQuery)
+		local value = CustomEarnings._determineValue(placement)
 		if perYear then
 			local year = string.sub(placement.date, 1, 4)
 			if not sums[year] then
@@ -113,6 +109,9 @@ function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases,
 	return MathUtils._round(totalEarnings), totalEarningsByYear
 end
 
+---Determines the prize value earned from a placement
+---@param placement table
+---@return number
 function CustomEarnings._determineValue(placement)
 	local indivPrize = tonumber(placement.individualprizemoney) or 0
 	if indivPrize > 0 then

@@ -93,7 +93,7 @@ return {
 	defaultGame = 'csgo',
 	defaultTeamLogo = {
 		csgo = 'CSGO default lightmode.png',
-		cso= 'CS Online default lightmode.png',
+		cso = 'CS Online default lightmode.png',
 		css = 'CS default lightmode.png',
 		cs16 = 'CS default lightmode.png',
 		cscz = 'CS default lightmode.png',

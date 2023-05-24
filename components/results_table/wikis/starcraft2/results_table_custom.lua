@@ -35,6 +35,7 @@ local CustomResultsTable = {}
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
+	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
@@ -58,7 +59,7 @@ end
 
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
-
+	args.useIndivPrize = true
 	args.data = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
 	if Logic.readBool(args.achievements) and Table.isEmpty(args.data) then
@@ -165,7 +166,7 @@ end
 
 function CustomResultsTable._allKillMapRow(args, prefix, match)
 	if not (args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'win'] or args[prefix .. 'walkover'])then
-		return
+		return false
 	end
 
 	local opponentLeft = mw.html.create('div'):css('text-align', 'right')
