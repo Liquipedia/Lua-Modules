@@ -20,7 +20,7 @@ local _ConditionNode = Class.new()
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
 ---@class ConditionTree:_ConditionNode
----@operator call(fun(booleanOperator: lpdbBooleanOperator)): ConditionTree
+---@operator call(...): ConditionTree
 ---@field _nodes ConditionNode[]
 ---@field booleanOperator lpdbBooleanOperator
 local ConditionTree = Class.new(_ConditionNode,
@@ -63,7 +63,7 @@ end
 
 ---A condition in a ConditionTree
 ---@class ConditionNode:_ConditionNode
----@operator call( fun(name: ColumnName, comparator: lpdbComparator, value: string|number)): ConditionNode
+---@operator call(...): ConditionNode
 ---@field name ColumnName
 ---@field comparator lpdbComparator
 ---@field value string|number
@@ -108,7 +108,7 @@ local BooleanOperator = {
 
 ---Represents a column name in LPDB, including an optional super key
 ---@class ColumnName
----@operator call(fun(name: string, superName: string?)): ColumnName
+---@operator call(...): ColumnName
 ---@field name string
 ---@field superName string?
 local ColumnName = Class.new(
