@@ -19,7 +19,7 @@ local Variables = require('Module:Variables')
 local TeamCardStorage = {}
 
 ---@param args table
----@param teamObject {teamtemplate: string?, lpdb: string?, team2: string?, team3: string?}
+---@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?}
 ---@param players table
 ---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
@@ -33,7 +33,6 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 			team = teamObject.lpdb
 		end
 	end
-	---@cast team -nil
 
 	local lpdbPrefix = args.lpdb_prefix or args.smw_prefix
 		or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
