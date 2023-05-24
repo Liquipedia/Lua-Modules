@@ -1336,6 +1336,11 @@ local data = {
 		localised = 'African',
 		name = 'Africa',
 	},
+	['arabia'] = {
+		flag = 'File:ccc hd.png',
+		localised = 'Arabian',
+		name = 'Arabia',
+	},
 	['asia'] = {
 		flag = 'File:Asia flag hd.png',
 		localised = 'Asian',
@@ -1370,11 +1375,6 @@ local data = {
 		flag = 'File:East asia flag hd.png',
 		localised = 'East Asian',
 		name = 'East Asia',
-	},
-	['gulfcooperationcouncil'] = {
-		flag = 'File:Gcc hd.png',
-		localised = 'GCC',
-		name = 'GCC',
 	},
 	['iberia'] = {
 		flag = 'File:EsPt hd.png',
@@ -2068,6 +2068,7 @@ local aliases = {
 	-- Other
 	['america'] = 'unitedstates',
 	['americas'] = 'northamerica',
+	['arabianpeninsula'] = 'arabia',
 	['asiapacific'] = 'asia-pacific',
 	['apac'] = 'asia-pacific',
 	['bonaire'] = 'bonaire,sinteustatiusandsaba',
@@ -2084,6 +2085,7 @@ local aliases = {
 	['czech'] = 'czechia',
 	['czechrepublic'] = 'czechia',
 	['europe'] = 'europeanunion',
+	['gcc'] = 'arabia',
 	['greatbritain'] = 'unitedkingdom',
 	['britain'] = 'unitedkingdom',
 	['holland'] = 'netherlands',
