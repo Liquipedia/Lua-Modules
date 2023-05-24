@@ -252,6 +252,8 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdsospa = 'tlpd-sospa',
 }
 
+---@param links {[string]: string}
+---@return {[string]: string}
 function Links.transform(links)
 	local function iterateLinks(tbl, aliases)
 		local index = 1
@@ -294,6 +296,10 @@ function Links.transform(links)
 	return transformedLinks
 end
 
+---@param platform string
+---@param id string?
+---@param variant string?
+---@return string
 function Links.makeFullLink(platform, id, variant)
 	if id == nil or id == '' then
 		return ''
@@ -313,6 +319,9 @@ function Links.makeFullLink(platform, id, variant)
 	return prefix .. id .. suffix
 end
 
+---@param links {[string]: string}
+---@param variant string?
+---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
 		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
@@ -322,6 +331,8 @@ end
 
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
+---@param key string
+---@return string
 function Links.removeAppendedNumber(key)
 	return (string.gsub(key, '%d$', ''))
 end
