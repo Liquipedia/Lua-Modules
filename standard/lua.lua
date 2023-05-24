@@ -200,7 +200,7 @@ Lua.autoInvokeEntryPoints(JayModule, 'Module:JayModule')
 ]]
 ---@param module table
 ---@param baseModuleName string
----@param fnNames string[]
+---@param fnNames string[]?
 function Lua.autoInvokeEntryPoints(module, baseModuleName, fnNames)
 	fnNames = fnNames or Lua.getDefaultEntryPoints(module)
 
