@@ -16,6 +16,11 @@ local TierCustom = Table.copy(Tier)
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
+---@return string?
 function TierCustom.display(tier, tierType, options)
 	local tierData, tierTypeData = Tier._raw(tier, tierType)
 
@@ -45,6 +50,8 @@ function TierCustom.display(tier, tierType, options)
 		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
 end
 
+---@param tierType2 string?
+---@return string
 function TierCustom.appendTierType2(tierType2)
 	if String.isEmpty(tierType2) then
 		return ''
