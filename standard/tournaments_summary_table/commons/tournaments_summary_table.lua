@@ -43,10 +43,17 @@ TournamentsSummaryTable.statusExcluded = {'canceled', 'cancelled', 'postponed'}
 TournamentsSummaryTable.disableLIS = false
 TournamentsSummaryTable.defaultLimit = 7
 
+---@enum conditionTypes
+local conditionTypes = {
+	upcoming = 1,
+	ongoing = 2,
+	recent = 3,
+}
+
 -- possibly needed in /Custom
-TournamentsSummaryTable.upcomingType = 1
-TournamentsSummaryTable.ongoingType = 2
-TournamentsSummaryTable.recentType = 3
+TournamentsSummaryTable.upcomingType = conditionTypes.upcoming
+TournamentsSummaryTable.ongoingType = conditionTypes.ongoing
+TournamentsSummaryTable.recentType = conditionTypes.recent
 
 local _TYPE_TO_TITLE = {
 	'Upcoming',
@@ -135,7 +142,7 @@ function TournamentsSummaryTable._parseArgsToSettings(args)
 		or TournamentsSummaryTable.tierTypeExcluded
 end
 
----@param conditionType 1|2|3
+---@param conditionType conditionTypes
 ---@param sort string
 ---@param order string
 ---@param limit number
@@ -155,7 +162,7 @@ function TournamentsSummaryTable._getTournaments(conditionType, sort, order, lim
 	return {}
 end
 
----@param type 1|2|3
+---@param type conditionTypes
 ---@return string
 function TournamentsSummaryTable._buildConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
@@ -206,7 +213,7 @@ function TournamentsSummaryTable._statusConditions()
 	return conditions
 end
 
----@param type 1|2|3
+---@param type conditionTypes
 ---@return ConditionTree
 function TournamentsSummaryTable.dateConditions(type)
 	local conditions = ConditionTree(BooleanOperator.all)
@@ -255,7 +262,7 @@ function TournamentsSummaryTable.additionalConditions(type)
 end
 
 ---@param eventInformation table
----@param type 1|2|3
+---@param type conditionTypes
 ---@return string
 function TournamentsSummaryTable.row(eventInformation, type)
 	if type == TournamentsSummaryTable.upcomingType then
@@ -311,7 +318,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 end
 
 ---@param dateString string
----@return string|osdate
+---@return string
 function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 	-- fallback
@@ -330,7 +337,7 @@ function TournamentsSummaryTable._dateDisplay(dateString)
 	local date = os.time{year=year, month=month, day=day, hour=0}
 
 	-- return date display
-	return os.date('%b %d', date)
+	return os.date('%b %d', date) --[[@as string]]
 end
 
 ---@param series string
