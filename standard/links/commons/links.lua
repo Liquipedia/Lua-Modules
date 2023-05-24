@@ -333,7 +333,7 @@ end
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
 ---@param key string
 ---@return string
-function Links._removeAppendedNumber(key)
+function Links.removeAppendedNumber(key)
 	return (string.gsub(key, '%d$', ''))
 end
 
