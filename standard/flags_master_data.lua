@@ -1381,11 +1381,6 @@ local data = {
 		localised = 'East Asian',
 		name = 'East Asia',
 	},
-	['gulfcooperationcouncil'] = {
-		flag = 'File:Gcc hd.png',
-		localised = 'GCC',
-		name = 'GCC',
-	},
 	['iberia'] = {
 		flag = 'File:EsPt hd.png',
 		localised = 'Iberian',
@@ -2101,6 +2096,7 @@ local aliases = {
 	['czechrepublic'] = 'czechia',
 	['europe'] = 'europeanunion',
 	['gcc'] = 'arabia',
+	['gulfcooperationcouncil'] = 'arabia',
 	['greatbritain'] = 'unitedkingdom',
 	['britain'] = 'unitedkingdom',
 	['holland'] = 'netherlands',
