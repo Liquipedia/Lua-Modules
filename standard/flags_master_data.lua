@@ -1343,7 +1343,7 @@ local data = {
 	},
 	['arabstates'] = {
 		flag = 'File:Arab league hd.png',
-		localised = 'Arabic',
+		localised = 'Arab',
 		name = 'Arab States',
 	},
 	['asia'] = {
