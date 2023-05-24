@@ -13,13 +13,13 @@ local Array = require('Module:Array')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
----@class _ConditionNode
+---@class AbstractConditionNode
 ---@field is_a function
 local _ConditionNode = Class.new()
 
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
----@class ConditionTree:_ConditionNode
+---@class ConditionTree:AbstractConditionNode
 ---@operator call(...): ConditionTree
 ---@field _nodes ConditionNode[]
 ---@field booleanOperator lpdbBooleanOperator
@@ -30,7 +30,7 @@ local ConditionTree = Class.new(_ConditionNode,
 	end
 )
 
----@param node _ConditionNode|_ConditionNode[]
+---@param node AbstractConditionNode|AbstractConditionNode[]
 ---@return self
 function ConditionTree:add(node)
 	if not node then
@@ -62,7 +62,7 @@ function ConditionTree:toString()
 end
 
 ---A condition in a ConditionTree
----@class ConditionNode:_ConditionNode
+---@class ConditionNode:AbstractConditionNode
 ---@operator call(...): ConditionNode
 ---@field name ColumnName
 ---@field comparator lpdbComparator
