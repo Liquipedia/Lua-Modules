@@ -14,6 +14,7 @@ local Condition = {}
 
 -- Abstract class, node of the conditions tree
 ---@class _ConditionNode
+---@field is_a function
 local _ConditionNode = Class.new()
 
 ---@enum lpdbBooleanOperator
@@ -33,7 +34,7 @@ local ConditionTree = Class.new(_ConditionNode,
 	end
 )
 
----@param node ConditionNode|ConditionNode[]
+---@param node _ConditionNode|ConditionNode[]
 ---@return self
 function ConditionTree:add(node)
 	if not node then
