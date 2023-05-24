@@ -139,6 +139,7 @@ local PREFIXES = {
 		player = 'https://siege.gg/players/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
+	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
@@ -233,6 +234,24 @@ local ALIASES = {
 	zhanqitv = {'zhanqi'},
 }
 
+local ICON_KEYS_TO_RENAME = {
+	['bilibili-stream'] = 'bilibili',
+	daumcafe = 'cafe-daum',
+	['esea-d'] = 'esea-league',
+	['faceit-c'] = 'faceit',
+	['faceit-c2'] = 'faceit',
+	['faceit-hub'] = 'faceit',
+	['faceit-org'] = 'faceit',
+	matcherinolink = 'matcherino',
+	playlist = 'music',
+	privsteam = 'steam',
+	pubsteam = 'steam',
+	steamalternative = 'steam',
+	tlpdint = 'tlpd',
+	tlpdkr = 'tlpd-wol-korea',
+	tlpdsospa = 'tlpd-sospa',
+}
+
 ---@param links {[string]: string}
 ---@return {[string]: string}
 function Links.transform(links)
@@ -305,7 +324,7 @@ end
 ---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links._removeAppendedNumber(key), item, variant)
+		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
 	end
 	return links
 end
@@ -316,6 +335,15 @@ end
 ---@return string
 function Links._removeAppendedNumber(key)
 	return (string.gsub(key, '%d$', ''))
+end
+
+---Builds the icon for a given link
+---@param key string
+---@param size number?
+---@return string
+function Links.makeIcon(key, size)
+	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
+		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
 
 return Class.export(Links, {frameOnly = true})
