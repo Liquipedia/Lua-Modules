@@ -36,16 +36,25 @@ StarcraftMatchSummary
 ]]
 local Opponent = {types = {}}
 
-Opponent.team = 'team'
-Opponent.solo = 'solo'
-Opponent.duo = 'duo'
-Opponent.trio = 'trio'
-Opponent.quad = 'quad'
-Opponent.literal = 'literal'
+---@enum OpponentType
+local OpponentTypes = {
+	team = 'team',
+	solo = 'solo',
+	duo = 'duo',
+	trio = 'trio',
+	quad = 'quad',
+	literal = 'literal',
+}
+
+Opponent.team = OpponentTypes.team
+Opponent.solo = OpponentTypes.solo
+Opponent.duo = OpponentTypes.duo
+Opponent.trio = OpponentTypes.trio
+Opponent.quad = OpponentTypes.quad
+Opponent.literal = OpponentTypes.literal
 
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
 Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
----@alias OpponentType `Opponent.solo`|`Opponent.duo`|`Opponent.trio`|`Opponent.quad`|`Opponent.literal`|`Opponent.team`
 
 Opponent.partySizes = {
 	solo = 1,
@@ -261,7 +270,7 @@ using data stored in page variables if present.
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
 ---@param opponent standardOpponent
----@param date string|number|osdate|nil
+---@param date string|number|nil
 ---@param options {syncPlayer: boolean?}
 ---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
@@ -394,7 +403,7 @@ end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
 ---@param opponent standardOpponent
----@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table}
+---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function Opponent.toLpdbStruct(opponent)
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),

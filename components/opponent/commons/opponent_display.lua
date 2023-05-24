@@ -28,6 +28,7 @@ OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'br
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class BracketOpponentEntry
+---@operator call(...): BracketOpponentEntry
 ---@field content Html
 ---@field root Html
 OpponentDisplay.BracketOpponentEntry = Class.new(
@@ -182,7 +183,7 @@ OpponentDisplay.propTypes.BlockOpponent = {
 ---@class BlockOpponentProps
 ---@field flip boolean?
 ---@field opponent standardOpponent
----@field overflow ('ellipsis'|'wrap'|'hidden')?
+---@field overflow OverflowModes?
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field showPlayerTeam boolean?
