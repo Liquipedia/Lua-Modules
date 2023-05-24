@@ -334,7 +334,8 @@ namespace.
 ]]
 MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[namespace::130]] AND [[match2bracketid::'.. bracketId .. ']]'
+		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
+		limit = 5000,
 	})
 end)
 

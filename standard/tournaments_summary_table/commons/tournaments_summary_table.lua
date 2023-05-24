@@ -72,8 +72,8 @@ function TournamentsSummaryTable.run(args)
 
 	local title = mw.language.getContentLanguage():ucfirst(args.title or _TYPE_TO_TITLE[type])
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
-	local sort = args.sort or 'start'
-	local order = args.order or 'asc'
+	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
+	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
 
 	local data = TournamentsSummaryTable._getTournaments(type, sort, order, limit)
 

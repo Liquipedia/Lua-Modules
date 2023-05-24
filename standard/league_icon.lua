@@ -13,18 +13,30 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 local _FILLER = '<span class="league-icon-small-image">[[File:Logo filler event.png|link=]]</span>'
-local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY
-	= '[[Category:Pages with only icondark]]'
+local NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY = '[[Category:Pages with only icondark]]'
+
+---@class LeagueIconDisplayArgs
+---@field icon string?
+---@field iconDark string?
+---@field link string?
+---@field name string?
+---@field date string?
+---@field series string?
+---@field abbreviation string?
+---@field size number?
+---@field options {noTemplate: boolean, noLink: boolean}?
 
 ---display an image in the fashion of LeagueIconSmall templates
 --i.e. it displays the icon in dark/light mode (depending on reader mode)
 --in a span with customizable link, hooverDisplay
 --
 --can try to retrieve the icon(s) from existing LeagueIconSmall templates
+---@param args LeagueIconDisplayArgs
+---@return string
 function LeagueIcon.display(args)
 	local options = args.options or {}
 
-	local size = tonumber(args.size or '') or 50
+	local size = tonumber(args.size) or 50
 	local iconDark = args.iconDark
 	local icon = args.icon
 	local trackingCategory = ''
@@ -50,10 +62,12 @@ function LeagueIcon.display(args)
 		trackingCategory = NO_ICON_BUT_ICONDARK_TRACKING_CATEGORY
 		icon = iconDark
 	end
+	---@cast icon -nil
 
 	if String.isEmpty(iconDark) then
 		iconDark = icon
 	end
+	---@cast iconDark -nil
 
 	local link
 	if Logic.readBool(options.noLink) then
@@ -64,6 +78,12 @@ function LeagueIcon.display(args)
 	return LeagueIcon._make(icon, iconDark, link, args.name, size) .. trackingCategory
 end
 
+---@param icon string
+---@param iconDark string
+---@param link string
+---@param name string
+---@param size number
+---@return string
 function LeagueIcon._make(icon, iconDark, link, name, size)
 	--remove "File:" prefix from icons due to legacy reasons
 	--this should be removed once all wikis use the standardized infobox league
@@ -87,11 +107,9 @@ function LeagueIcon._make(icon, iconDark, link, name, size)
 	return tostring(lightSpan) .. tostring(darkSpan)
 end
 
---retrieve icon and iconDark from LeagueIconSmall templates
---entry params:
---icon = icon for light mode
---iconDark = icon for dark mode
---stringOfExpandedTemplate = expanded LeagueIconSmall template as string
+---Retrieve icon and iconDark from LeagueIconSmall templates
+---@param args {icon: string?, iconDark: string?, stringOfExpandedTemplate: string?}
+---@return string, string, string
 function LeagueIcon.getIconFromTemplate(args)
 	args = args or {}
 	local trackingCategory = ''
@@ -101,15 +119,15 @@ function LeagueIcon.getIconFromTemplate(args)
 
 	--if LeagueIconSmall template exists retrieve the icons from it
 	if String.isEmpty(icon) and String.isEmpty(iconDark) and stringOfExpandedTemplate then
-		stringOfExpandedTemplate = mw.text.split(stringOfExpandedTemplate, 'File:')
+		local stringOfExpandedTemplateArray = mw.text.split(stringOfExpandedTemplate, 'File:')
 
 		--extract series icon from template:LeagueIconSmall
-		icon = mw.text.split(stringOfExpandedTemplate[2] or '', '|')
-		icon = icon[1]
+		local iconArray = mw.text.split(stringOfExpandedTemplateArray[2] or '', '|')
+		icon = iconArray[1]
 		--when Template:LeagueIconSmall has a darkmode icon retrieve that from the template too
 		if String.isEmpty(iconDark) then
-			iconDark = mw.text.split(stringOfExpandedTemplate[3] or '', '|')
-			iconDark = iconDark[1]
+			local iconDarkArray = mw.text.split(stringOfExpandedTemplateArray[3] or '', '|')
+			iconDark = iconDarkArray[1]
 		end
 	elseif String.isEmpty(icon) then
 		if String.isNotEmpty(iconDark) then
@@ -117,14 +135,18 @@ function LeagueIcon.getIconFromTemplate(args)
 		end
 		icon = iconDark or ''
 	end
+	---@cast icon -nil
 
 	if String.isEmpty(iconDark) then
 		iconDark = icon
 	end
+	---@cast iconDark -nil
 
 	return icon, iconDark, trackingCategory
 end
 
+---@param args {series: string?, abbreviation: string?, date: string?}
+---@return string?
 function LeagueIcon.getTemplate(args)
 	args = args or {}
 	local series = args.series
@@ -133,6 +155,7 @@ function LeagueIcon.getTemplate(args)
 	local frame = mw.getCurrentFrame()
 	local stringOfExpandedTemplate = 'false'
 	if not String.isEmpty(series) then
+		---@cast series -nil
 		stringOfExpandedTemplate = Template.safeExpand(
 			frame,
 			'LeagueIconSmall/' .. string.lower(series),
@@ -142,6 +165,7 @@ function LeagueIcon.getTemplate(args)
 	end
 	--if LeagueIconSmall template doesn't exist for the series try the abbreviation
 	if stringOfExpandedTemplate == 'false' and not String.isEmpty(abbreviation) then
+		---@cast abbreviation -nil
 		stringOfExpandedTemplate = Template.safeExpand(
 			frame,
 			'LeagueIconSmall/' .. string.lower(abbreviation),
@@ -155,8 +179,17 @@ function LeagueIcon.getTemplate(args)
 	return stringOfExpandedTemplate
 end
 
+---@class LeagueIconGenerateArgs
+---@field icon string
+---@field iconDark string?
+---@field link string?
+---@field name string?
+---@field series string?
+
 --generate copy paste code for new LeagueIconSmall templates
 --to be used with a form
+---@param args LeagueIconGenerateArgs
+---@return string
 function LeagueIcon.generate(args)
 	local link = args.link or args.series
 	if String.isEmpty(link) then
@@ -191,6 +224,8 @@ end
 
 --generate copy paste code for new historical LeagueIconSmall templates
 --to be used with a form
+---@param args table
+---@return string
 function LeagueIcon.generateHistorical(args)
 	local title = args.title or args.series
 	if String.isEmpty(title) then
@@ -241,6 +276,8 @@ function LeagueIcon.generateHistorical(args)
 		) .. '</pre>' .. LeagueIcon._buildLinkToTemplate(args)
 end
 
+---@param args {templateName: string?, wiki: string?}
+---@return string
 function LeagueIcon._buildLinkToTemplate(args)
 	if String.isEmpty(args.templateName) or String.isEmpty(args.wiki) then
 		return ''

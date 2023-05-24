@@ -17,6 +17,8 @@ local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData') or
 
 local noEntryFoundCategory = '[[Category:Pages using unsupported region values]]'
 
+---@param args {region: string?, country: string?, onlyDisplay: boolean?, onlyRegion: boolean?}
+---@return string|table
 function Region.run(args)
 	args = args or {}
 	local region = args.region
@@ -32,6 +34,7 @@ function Region.run(args)
 			return ''
 		end
 	end
+	---@cast region -nil
 
 	--resolve aliases for the region
 	region = string.lower(region)
