@@ -26,10 +26,18 @@ local _SEPERATORS = {
 	['&nbsp;'] = '&nbsp;'
 }
 
+---Creates a keyboard-button-like hotkey display
+---@param hotkey string|number|nil
+---@return string
 function Hotkeys.hotkey(hotkey)
 	return tostring(mw.html.create('span'):addClass('hotkey-key'):wikitext(hotkey or ''))
 end
 
+---Creates a keyboard-button-like hotkey display of 2 hotkeys
+---@param hotkey1 string|number|nil
+---@param hotkey2 string|number|nil
+---@param seperator string?
+---@return string
 function Hotkeys.hotkey2(hotkey1, hotkey2, seperator)
 	hotkey1 = Hotkeys.hotkey(hotkey1)
 	hotkey2 = Hotkeys.hotkey(hotkey2)
