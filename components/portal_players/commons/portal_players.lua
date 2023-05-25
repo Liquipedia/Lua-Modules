@@ -155,7 +155,7 @@ end
 ---@param players table[]
 ---@return {[string]: {players: table[], nonPlayers: table[]}}
 function PortalPlayers._groupPlayerData(players)
-	local _, groupedByCountry = Array.groupBy(players, function(player) return player.nationality end)
+	local _, groupedByCountry = Array.groupBy(players, function(player) return player.nationality --[[@as string]] end)
 
 	return Table.map(groupedByCountry, function(country, countryPlayerData)
 		local groupedData
@@ -166,7 +166,7 @@ function PortalPlayers._groupPlayerData(players)
 				(player.type or ''):lower() == 'player' or (extradata.role or ''):lower() == 'player'
 			) and 'players' or 'nonPlayers'
 		end)
-
+		---@cast groupedData {players: table[], nonPlayers: table[]}
 		return country, groupedData
 	end)
 end
