@@ -40,15 +40,6 @@ function BasicInfobox:createWidgetInjector()
 end
 
 --- Allows for overriding this functionality
----Adds custom cells to an infobox
----@param infobox Infobox
----@param args table
----@return Infobox
-function BasicInfobox:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
 ---@return nil
 function BasicInfobox:createBottomContent()
