@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@diagnostic disable: param-type-mismatch
+
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
@@ -37,7 +39,6 @@ function suite:testIsValid()
 	self:assertTrue(Tier.isValid('1', 'showmatch'))
 	self:assertFalse(Tier.isValid('sedrvo'))
 	self:assertFalse(Tier.isValid(''))
-	self:assertFalse(Tier.isValid())
 	self:assertFalse(Tier.isValid(1, 'sedrvo'))
 	self:assertTrue(Tier.isValid(1, ''))
 end

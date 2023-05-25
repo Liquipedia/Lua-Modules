@@ -164,7 +164,7 @@ end
 --- overwritable on a per wiki basis if adjustments are needed
 ---@param data table
 ---@param options {short: boolean, link: boolean|string}
----@return string
+---@return string?
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
