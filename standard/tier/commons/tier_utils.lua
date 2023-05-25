@@ -163,15 +163,18 @@ end
 --- Builds the display for a given tierData/tierTypeData table
 --- overwritable on a per wiki basis if adjustments are needed
 ---@param data table
----@param options {short: boolean, link: boolean|string}
+---@param options {short: boolean?, link: boolean|string|nil}
 ---@return string?
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, data.link)
-	elseif Logic.readBoolOrNil(options.link) == nil and String.isNotEmpty(options.link) then
-		return Page.makeInternalLink({}, display, options.link)
+	elseif Logic.readBoolOrNil(options.link) == nil then
+		local link = options.link --[[@as string?]]
+		if String.isNotEmpty(link) then
+			return Page.makeInternalLink({}, display, link)
+		end
 	end
 
 	return display
