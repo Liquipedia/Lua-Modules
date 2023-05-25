@@ -22,7 +22,7 @@ local Customizable = Widgets.Customizable
 ---@class MapInfobox:BasicInfobox
 local Map = Class.new(BasicInfobox)
 
----comment
+---Entry point of map infobox
 ---@param frame Frame
 ---@return Html
 function Map.run(frame)
@@ -30,7 +30,7 @@ function Map.run(frame)
 	return map:createInfobox()
 end
 
----@return Html?
+---@return Html
 function Map:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
