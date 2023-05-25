@@ -41,7 +41,7 @@ end
 
 --- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
----@return nil
+---@return string?
 function BasicInfobox:createBottomContent()
 	return nil
 end
@@ -59,7 +59,7 @@ end
 ---@generic K, V
 ---@param args {[K]: V}
 ---@param base string
----@param options {makeLink: boolean?}
+---@param options {makeLink: boolean?}?
 ---@return V[]
 function BasicInfobox:getAllArgsForBase(args, base, options)
 	options = options or {}
