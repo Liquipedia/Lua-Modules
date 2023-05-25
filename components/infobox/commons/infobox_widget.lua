@@ -13,7 +13,7 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabl
 
 ---@class Widget
 ---@operator call(): Widget
----@field public injector function?
+---@field public injector WidgetInjector?
 local Widget = Class.new()
 
 local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
