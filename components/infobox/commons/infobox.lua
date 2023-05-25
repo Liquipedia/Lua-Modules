@@ -51,7 +51,7 @@ function Infobox:categories(...)
 end
 
 ---Sets the widgetInjector
----@param injector any
+---@param injector WidgetInjector?
 ---@return self
 function Infobox:widgetInjector(injector)
 	self.injector = injector
