@@ -41,35 +41,38 @@ function TierCustom.display(tier, tierType, options)
 	tierDisplayOptions.game = options.game
 
 	if not tierTypeData then
-		return Tier.displaySingle(tierData, tierDisplayOptions)
+		return TierCustom.displaySingle(tierData, tierDisplayOptions)
 	end
 
 	local tierTypeDisplayOptions = Tier._displayOptions(options, 'tierType')
 	tierTypeDisplayOptions.game = options.game
 
 	if options.onlyTierTypeIfBoth then
-		return Tier.displaySingle(tierTypeData, tierTypeDisplayOptions)
+		return TierCustom.displaySingle(tierTypeData, tierTypeDisplayOptions)
 	end
 
 	if options.shortIfBoth then
 		options.short = true
 	end
 
-	return Tier.displaySingle(tierTypeData, tierDisplayOptions)
-		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
+	return TierCustom.displaySingle(tierTypeData, tierDisplayOptions)
+		.. NON_BREAKING_SPACE .. '(' .. TierCustom.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
 end
 
 --- Builds the display for a given tierData/tierTypeData table
 ---@param data table
 ---@param options {short: boolean?, link: boolean|string|nil, game: string?}
----@return string
-function Tier.displaySingle(data, options)
+---@return string?
+function TierCustom.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, TierCustom.adjustLink(data.link, options.game))
-	elseif String.isNotEmpty(options.link) then
-		return Page.makeInternalLink({}, display, options.link)
+	elseif Logic.readBoolOrNil(options.link) == nil then
+		local link = options.link --[[@as string?]]
+		if String.isNotEmpty(link) then
+			return Page.makeInternalLink({}, display, link)
+		end
 	end
 
 	return display
