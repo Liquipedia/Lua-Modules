@@ -186,6 +186,7 @@ end
 
 ---@deprecated
 ---@param value string|number|nil
+---@param _ nil
 ---@param superScript boolean?
 ---@return string?
 function Ordinal._ordinal(value, _, superScript)

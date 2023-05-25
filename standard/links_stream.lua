@@ -125,6 +125,7 @@ local StreamKey = StreamLinks.StreamKey
 ---@param tbl StreamKey
 ---@overload fun(tbl: string, languageCode: string, index: integer): StreamKey
 ---@overload fun(tbl: string): StreamKey
+---@diagnostic disable-next-line: incomplete-signature-doc
 function StreamKey:new(tbl, languageCode, index)
 	local platform
 	-- Input is another StreamKey - Make a copy
