@@ -15,7 +15,7 @@ local Widget = require('Module:Infobox/Widget')
 ---@field classes string[]?
 ---@field css {[string]: string|number}[]?
 
----@class WidgetTableCell
+---@class WidgetTableCell:Widget
 ---@operator call(WidgetCellInput): WidgetTableCell
 ---@field content (string|number|table|Html)[]
 ---@field classes string[]
