@@ -34,7 +34,7 @@ local BasicInfobox = Class.new(
 )
 
 ---Creates an empty WidgetInjector
----@return nil
+---@return WidgetInjector?
 function BasicInfobox:createWidgetInjector()
 	return nil
 end
