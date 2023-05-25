@@ -14,14 +14,14 @@ local Injector = Class.new()
 ---Parses the widgets
 ---@param id string
 ---@param widgets Widget[]
----@return Widget[]
+---@return Widget[]?
 function Injector:parse(id, widgets)
 	return widgets
 end
 
 ---Adds custom cells
 ---@param widgets Widget[]
----@return Widget[]
+---@return Widget[]?
 function Injector:addCustomCells(widgets)
 	return {}
 end
