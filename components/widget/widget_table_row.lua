@@ -15,12 +15,11 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}[]?
 
----@class WidgetTableRow
+---@class WidgetTableRow:Widget
 ---@operator call(WidgetTableRowInput): WidgetTableRow
 ---@field cells WidgetTableCell[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}[]
----@field injector function?
 local TableRow = Class.new(
 	Widget,
 	function(self, input)

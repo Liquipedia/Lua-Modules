@@ -17,13 +17,12 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 ---@field css {[string]: string|number|nil}[]?
 ---@field columns integer?
 
----@class WidgetTable
+---@class WidgetTable:Widget
 ---@operator call(WidgetTableInput):WidgetTable
 ---@field rows WidgetTableRow[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}[]
 ---@field columns integer?
----@field injector function?
 local Table = Class.new(
 	Widget,
 	function(self, input)
