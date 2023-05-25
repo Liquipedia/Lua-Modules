@@ -24,7 +24,7 @@ local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages
 local DEFAULT_TIER_TYPE = 'general'
 
 ---Entry point
----@param args table
+---@param args table?
 ---@return string
 function HiddenDataBox.run(args)
 	args = args or {}
