@@ -30,6 +30,7 @@ local BACKGROUND_CLASSES = {
 }
 
 --- @class PortalPlayers
+---@operator call(table): PortalPlayers
 local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 
 ---@class portalPlayerArgs
@@ -113,6 +114,7 @@ end
 ---Retrieves the country list.
 ---@param regionsInput string?
 ---@param countriesInput string?
+---@param gameConditions string?
 ---@return string[], string[]
 function PortalPlayers._getCountries(regionsInput, countriesInput, gameConditions)
 	local regionConditions = String.isNotEmpty(regionsInput) and
@@ -134,6 +136,7 @@ function PortalPlayers._getCountries(regionsInput, countriesInput, gameCondition
 	if String.isNotEmpty(conditionString) and String.isNotEmpty(gameConditions) then
 		conditionString = conditionString .. ' AND ' .. gameConditions
 	elseif String.isNotEmpty(gameConditions) then
+		---@cast gameConditions -nil
 		conditionString = gameConditions
 	end
 
@@ -149,7 +152,7 @@ function PortalPlayers._getCountries(regionsInput, countriesInput, gameCondition
 end
 
 ---Groups the "player" data by country and wether they are players or not
----@players table[]
+---@param players table[]
 ---@return {[string]: {players: table[], nonPlayers: table[]}}
 function PortalPlayers._groupPlayerData(players)
 	local _, groupedByCountry = Array.groupBy(players, function(player) return player.nationality end)
