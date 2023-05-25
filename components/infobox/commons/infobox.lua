@@ -14,11 +14,11 @@ local Variables = require('Module:Variables')
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
 
 ---@class Infobox
----@field frame Frame
----@field root Html
----@field adbox Html
----@field content Html
----@field injector WidgetInjector
+---@field frame Frame?
+---@field root Html?
+---@field adbox Html?
+---@field content Html?
+---@field injector WidgetInjector?
 local Infobox = Class.new()
 
 --- Inits the Infobox instance
