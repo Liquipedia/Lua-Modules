@@ -413,7 +413,7 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	elseif city and region then
 		display = Flags.Icon{flag = region} .. NONBREAKING_SPACE
 	elseif region then
-		return Region.run{region = region, onlyDisplay = true}
+		return Region.run{region = region, onlyDisplay = true} --[[@as string]]
 	end
 
 	return String.nilIfEmpty(display .. (city or Flags.CountryName(country)))
