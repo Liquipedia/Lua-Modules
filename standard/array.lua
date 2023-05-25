@@ -343,8 +343,8 @@ Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
 ]]
 ---@generic T
----@param tbl T[]
----@param ... T[]
+---@param tbl T[]|T
+---@param ... T[]|T
 ---@return T[]
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
@@ -356,7 +356,7 @@ array is mutated in the process.
 ]]
 ---@generic T
 ---@param tbl T[]
----@param ... T[]
+---@param ... T[]|T
 ---@return T[]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
