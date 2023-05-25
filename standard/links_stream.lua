@@ -122,9 +122,11 @@ StreamLinks.StreamKey = Class.new(
 )
 local StreamKey = StreamLinks.StreamKey
 
----@param tbl StreamKey
----@overload fun(tbl: string, languageCode: string, index: integer): StreamKey
----@overload fun(tbl: string): StreamKey
+---@param tbl string
+---@param languageCode string
+---@param index integer
+---@overload fun(self, tbl: StreamKey): StreamKey
+---@overload fun(self, tbl: string): StreamKey
 function StreamKey:new(tbl, languageCode, index)
 	local platform
 	-- Input is another StreamKey - Make a copy
