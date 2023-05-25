@@ -20,6 +20,8 @@ local NON_TIER_TYPE_INPUT = 'none'
 
 local TournamentsListingConditions = {}
 
+---@param args table
+---@return string
 function TournamentsListingConditions.base(args)
 	local startDate = args.startdate or args.sdate
 	local endDate = args.enddate or args.edate
@@ -131,6 +133,9 @@ function TournamentsListingConditions.base(args)
 	return conditions:toString()
 end
 
+---@param tournamentData table
+---@param config table
+---@return string
 function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{

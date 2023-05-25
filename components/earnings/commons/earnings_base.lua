@@ -24,15 +24,19 @@ local Earnings = {}
 -- customizable in /Custom
 Earnings.defaultNumberOfStoredPlayersPerMatch = 10
 
+---@class playerEarningsArgs
+---@field player string the player/individual for whom the earnings shall be calculated
+---@field year number? the year to calculate earnings for
+---@field mode string? the mode to calculate earnings for
+---@field noRedirect boolean? player redirects get not resolved before query
+---@field prefix string? the prefix under which the players are stored in the placements
+---@field playerPositionLimit integer? the number for how many params the query should look in LPDB
+---@field perYear boolean? query all earnings per year and return the values in a lua table
+
 ---
 -- Entry point for players and individuals
--- @player - the player/individual for whom the earnings shall be calculated
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @noRedirect - (optional) player redirects get not resolved before query
--- @prefix - (optional) the prefix under which the players are stored in the placements
--- @playerPositionLimit - (optional) the number for how many params the query should look in LPDB
--- @perYear - (optional) query all earnings per year and return the values in a lua table
+---@param args playerEarningsArgs
+---@return number, {[integer]: number?}?
 function Earnings.calculateForPlayer(args)
 	args = args or {}
 	local player = args.player
@@ -71,17 +75,22 @@ function Earnings.calculateForPlayer(args)
 	return Earnings.calculate(playerConditionString, args.year, args.mode, args.perYear, nil, true)
 end
 
+---@class teamEarningsArgs
+---@field team string the team (either pageName or team template) for which the earnings shall be calculated
+---@field teams string[]? list of teams
+---@field year number? the year to calculate earnings for
+---@field mode string? the mode to calculate earnings for
+---@field queryHistorical boolean? fetch the pageNames from the subTemplates of the entered team template
+---@field noRedirect boolean? team redirects get not resolved before query (only available if queryHistorical not used)
+---@field prefix string? the prefix under which the players are stored in the placements
+---@field playerPositionLimit integer? the number for how many params the query should look in LPDB
+---@field perYear boolean? query all earnings per year and return the values in a lua table
+---@field doNotIncludePlayerEarnings boolean? boolean to indicate that player earnings should be ignored
+
 ---
 -- Entry point for teams
--- @team - the team (either pageName or team template) for which the earnings shall be calculated
--- @teams - list of teams
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @queryHistorical - (optional) fetch the pageNames from the subTemplates of the entered team template
--- @noRedirect - (optional) team redirects get not resolved before query (only available if queryHistorical is not used)
--- @perYear - (optional) query all earnings per year and return the values in a lua table
--- @playerPositionLimit - (optional) the number for how many players the query should look in LPDB
--- @doNotIncludePlayerEarnings - (optional) boolean to indicate that player earnings should be ignored
+---@param args teamEarningsArgs
+---@return number, {[integer]: number?}?
 function Earnings.calculateForTeam(args)
 	args = args or {}
 	local teams = args.teams or {}
@@ -121,11 +130,11 @@ function Earnings.calculateForTeam(args)
 			.. ']])'
 	end
 
-	local teamConditions = {formatParticipant('opponentname')}
-
 	if Logic.readBool(args.doNotIncludePlayerEarnings) then
-		return Earnings.calculate(teamConditions, args.year, args.mode, args.perYear, queryTeams)
+		return Earnings.calculate(formatParticipant('opponentname'), args.year, args.mode, args.perYear, queryTeams)
 	end
+
+	local teamConditions = {formatParticipant('opponentname')}
 
 	for playerIndex = 1, playerPositionLimit do
 		table.insert(teamConditions, formatParticipant('opponentplayers_p' .. playerIndex .. 'team'))
@@ -137,12 +146,13 @@ end
 
 ---
 -- Calculates earnings for this participant in a certain mode
--- @participantCondition - the condition to find the player/team
--- @year - (optional) the year to calculate earnings for
--- @mode - (optional) the mode to calculate earnings for
--- @perYear - (optional) query all earnings per year and return the values in a lua table
--- @aliases - players/teams to determine earnings for
--- @isPlayerQuery boolean - if this is a player query or not
+---@param conditions string the condition to find the player/team
+---@param queryYear number? the year to calculate earnings for
+---@param mode string? the mode to calculate earnings for
+---@param perYear boolean? query all earnings per year and return the values in a lua table
+---@param aliases string[]? players/teams to determine earnings for
+---@param isPlayerQuery true? if this is a player query or not
+---@return number, {[integer]: number?}?
 function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
 	conditions = Earnings._buildConditions(conditions, queryYear, mode)
 
@@ -176,6 +186,11 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	return totalEarnings, earningsByYear
 end
 
+---Creates query conditions depending on year and mode
+---@param conditions string
+---@param year number?
+---@param mode string?
+---@return string
 function Earnings._buildConditions(conditions, year, mode)
 	conditions = '[[date::!' .. DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if String.isNotEmpty(year) then
@@ -189,6 +204,12 @@ function Earnings._buildConditions(conditions, year, mode)
 	return conditions
 end
 
+---Determines the prize value earned from a placement
+---@param placement table
+---@param aliases string[]
+---@param isPlayerQuery boolean?
+---@return number
+---@overload fun(placement: table, aliases: nil, isPlayerQuery: true): number
 function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	local indivPrize = tonumber(placement.individualprizemoney)
 
