@@ -95,15 +95,9 @@ function TournamentsSummaryTable.run(args)
 	end
 
 	local title = mw.language.getContentLanguage():ucfirst(args.title or _TYPE_TO_TITLE[type])
-<<<<<<< HEAD
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
 	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
 	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
-=======
-	local limit = tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
-	local sort = args.sort or 'start'
-	local order = args.order or 'asc'
->>>>>>> fef01746 (Add annotations to tournaments_summary_table.lua)
 
 	local data = TournamentsSummaryTable._getTournaments(type, sort, order, limit)
 
