@@ -68,11 +68,11 @@ end
 
 --- Returns completed infobox
 ---@param widgets Widget[]
----@return Html?
+---@return Html
 function Infobox:build(widgets)
 	for _, widget in ipairs(widgets) do
 		if widget == nil or widget['is_a'] == nil then
-			return error('Infobox:build can only accept Widgets')
+			error('Infobox:build can only accept Widgets')
 		end
 		widget:setContext({injector = self.injector})
 
