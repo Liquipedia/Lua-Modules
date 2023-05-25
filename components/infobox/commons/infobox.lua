@@ -25,7 +25,7 @@ local Infobox = Class.new()
 ---@param frame Frame
 ---@param gameName string
 ---@param forceDarkMode boolean?
----@return Infobox
+---@return self
 function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
@@ -44,7 +44,7 @@ end
 
 ---Adds categories
 ---@param ... string?
----@return Infobox
+---@return self
 function Infobox:categories(...)
 	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
 	return self
@@ -52,7 +52,7 @@ end
 
 ---Sets the widgetInjector
 ---@param injector any
----@return Infobox
+---@return self
 function Infobox:widgetInjector(injector)
 	self.injector = injector
 	return self
@@ -60,7 +60,7 @@ end
 
 ---Adds a custom widgets to the bottom of the infobox
 ---@param wikitext string|number|Html|nil
----@return Infobox
+---@return self
 function Infobox:bottom(wikitext)
 	self.bottomContent = wikitext
 	return self
