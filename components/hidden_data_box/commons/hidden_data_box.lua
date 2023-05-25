@@ -114,7 +114,7 @@ end
 ---@param valueFromArgs string|number|nil
 ---@param valueFromQuery string|number|nil
 function HiddenDataBox.checkAndAssign(variableName, valueFromArgs, valueFromQuery)
-	if String.isNotEmpty(valueFromArgs) then
+	if Logic.isNotEmpty(valueFromArgs) then
 		Variables.varDefine(variableName, valueFromArgs)
 	elseif String.isEmpty(Variables.varDefault(variableName)) then
 		Variables.varDefine(variableName, valueFromQuery or '')
