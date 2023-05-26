@@ -20,6 +20,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
 	.. ' & ' .. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')
@@ -48,6 +49,7 @@ function PortalPlayers:init(args)
 	self.args = args
 	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
 	self.queryOnlyByRegion = Logic.readBool(args.queryOnlyByRegion)
+	self.playerType = args.playerType or DEFAULT_PLAYER_TYPE
 
 	return self
 end
@@ -67,8 +69,15 @@ function PortalPlayers:create()
 				:wikitext(flag .. NONBREAKING_SPACE .. country)
 
 		wrapper
-			:node(self:buildCountryTable(playerData.players, flag, self.args.playerType or 'Players'))
-			:node(self:buildCountryTable(playerData.nonPlayers, flag))
+			:node(self:buildCountryTable{
+				players = playerData.players,
+				flag = flag,
+				isPlayer = true,
+			})
+			:node(self:buildCountryTable{
+				players = playerData.nonPlayers,
+				flag = flag,
+			})
 	end
 
 	return wrapper
@@ -173,24 +182,23 @@ function PortalPlayers._groupPlayerData(players)
 end
 
 ---Builds the table display for a given set of players
----@param playerData table[]?
----@param flag string
----@param playerType string?
+---@param args {players: table[]?, flag: string, isPlayer: boolean?}
 ---@return Html?
-function PortalPlayers:buildCountryTable(playerData, flag, playerType)
+function PortalPlayers:buildCountryTable(args)
+	local playerData = Table.extract(args, 'players')
 	if Table.isEmpty(playerData) then
 		return nil
 	end
 	---@cast playerData -nil
 
+	local isPlayer = args.isPlayer
+
 	local tbl = mw.html.create('table')
 		:addClass('wikitable collapsible smwtable')
-		:addClass(String.isEmpty(playerType) and 'collapsed' or nil)
+		:addClass(not isPlayer and 'collapsed' or nil)
 		:css('width', '720px')
 		:css('text-align', 'left')
-		:node(self:header(flag, playerType))
-
-	local isPlayer = String.isNotEmpty(playerType)
+		:node(self:header(args))
 
 	for _, player in ipairs(playerData) do
 		tbl:node(self:row(player, isPlayer))
@@ -200,17 +208,16 @@ function PortalPlayers:buildCountryTable(playerData, flag, playerType)
 end
 
 ---Builds the header for the table
----@param flag string
----@param playerType string?
+---@param args {flag: string, isPlayer: boolean?}
 ---@return Html
-function PortalPlayers:header(flag, playerType)
-	local teamText = String.isNotEmpty(playerType) and ' Team' or ' Team and Role'
+function PortalPlayers:header(args)
+	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
 	local header = mw.html.create('tr')
 		:tag('th')
 			:attr('colspan', 4)
 			:css('padding-left', '1em')
-			:wikitext(flag .. ' ' .. (playerType or NON_PLAYER_HEADER))
+			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
 			:done()
 
 	local subHeader = mw.html.create('tr')
