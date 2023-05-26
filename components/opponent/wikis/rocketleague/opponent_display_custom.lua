@@ -17,23 +17,9 @@ local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry, function(self) end)
 
----@class RocketLeagueStandardOpponent
----@field advanceBg string?
----@field advances boolean?
----@field icon string?
----@field name string?
----@field placement number?
----@field placement2 number?
----@field players standardPlayer[]
----@field score number?
----@field score2 number?
+---@class RocketLeagueStandardOpponent:standardOpponent
 ---@field score3 number?
----@field status string?
----@field status2 string?
 ---@field status3 string?
----@field template string?
----@field type string
----@field team string?
 ---@field extradata table?
 
 ---@param opponent RocketLeagueStandardOpponent

@@ -33,37 +33,24 @@ CustomOpponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
----@class WarcraftStandardPlayer
----@field displayName string?
----@field flag string?
----@field pageName string?
----@field team string?
+---@class WarcraftStandardPlayer:standardPlayer
 ---@field race string?
 
----@class WarcraftStandardOpponent
----@field advanceBg string?
----@field advances boolean?
----@field icon string?
----@field name string?
----@field placement number?
----@field placement2 number?
+---@class WarcraftStandardOpponent:standardOpponent
 ---@field players WarcraftStandardPlayer[]
----@field score number?
----@field score2 number?
----@field status string?
----@field status2 string?
----@field template string?
----@field type string
 ---@field isArchon boolean
 ---@field isSpecialArchon boolean?
----@field team string?
 ---@field extradata table
 
 ---@param args table
 ---@return WarcraftStandardOpponent?
 function CustomOpponent.readOpponentArgs(args)
-	local opponent = Opponent.readOpponentArgs(args)
+	local opponent = Opponent.readOpponentArgs(args) --[[@as WarcraftStandardOpponent?]]
 	local partySize = Opponent.partySize((opponent or {}).type)
+
+	if not opponent then
+		return nil
+	end
 
 	if partySize == 1 then
 		opponent.players[1].race = Faction.read(args.race)
@@ -79,7 +66,11 @@ end
 ---@param record table
 ---@return WarcraftStandardOpponent?
 function CustomOpponent.fromMatch2Record(record)
-	local opponent = Opponent.fromMatch2Record(record)
+	local opponent = Opponent.fromMatch2Record(record) --[[@as WarcraftStandardOpponent?]]
+
+	if not opponent then
+		return nil
+	end
 
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
@@ -108,7 +99,11 @@ end
 ---@param storageStruct table
 ---@return WarcraftStandardOpponent?
 function CustomOpponent.fromLpdbStruct(storageStruct)
-	local opponent = Opponent.fromLpdbStruct(storageStruct)
+	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as WarcraftStandardOpponent?]]
+
+	if not opponent then
+		return nil
+	end
 
 	if Opponent.partySize(storageStruct.opponenttype) then
 		for playerIndex, player in pairs(opponent.players) do
@@ -120,13 +115,13 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 end
 
 ---@param opponent WarcraftStandardOpponent
----@param date string|number|osdate|nil
+---@param date string|number|nil
 ---@param options {syncPlayer: boolean?}
 ---@return WarcraftStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
-		return Opponent.resolve(opponent, date, options)
+		return Opponent.resolve(opponent --[[@as standardOpponent]], date, options) --[[@as WarcraftStandardOpponent]]
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
