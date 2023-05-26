@@ -270,7 +270,7 @@ end
 ---Converts the queried data int a readable format by OpponnetDisplay
 ---Overwritable on a per wiki basis
 ---@param player table
----@return StandardOpponent
+---@return standardOpponent
 function PortalPlayers.toOpponent(player)
 	return Opponent.readOpponentArgs(Table.merge(player.extradata, {
 		type = Opponent.solo,
