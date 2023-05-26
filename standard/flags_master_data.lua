@@ -1337,7 +1337,7 @@ local data = {
 		name = 'Africa',
 	},
 	['arabia'] = {
-		flag = 'File:ccc hd.png',
+		flag = 'File:gcc hd.png',
 		localised = 'Arabian',
 		name = 'Arabia',
 	},
