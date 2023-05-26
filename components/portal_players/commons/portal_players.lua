@@ -39,8 +39,8 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@field countries string?
 ---@field playerType string?
 ---@field game string?
----@field queryOnlyByRegion boolean?
----@field showLocalizedName boolean?
+---@field queryOnlyByRegion boolean
+---@field showLocalizedName boolean
 
 ---Init function for PortalPlayers
 ---@param args portalPlayerArgs
