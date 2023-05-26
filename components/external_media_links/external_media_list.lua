@@ -179,6 +179,7 @@ function MediaList._groupByYear(data)
 end
 
 ---Sort function to sort External Media Links within a year
+---@param _ table?
 ---@param key1 string
 ---@param key2 string
 ---@return boolean
