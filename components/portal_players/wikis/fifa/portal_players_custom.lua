@@ -46,6 +46,7 @@ end
 
 ---Builds the header for the table
 ---@param flag string
+---@param showLocalizedName boolean
 ---@param playerType string?
 ---@return Html
 function CustomPortalPlayers:header(flag, showLocalizedName, playerType)
@@ -72,6 +73,7 @@ end
 
 ---Builds a table row
 ---@param player table
+---@param showLocalizedName boolean
 ---@param isPlayer boolean
 ---@return Html
 function CustomPortalPlayers:row(player, showLocalizedName, isPlayer)
