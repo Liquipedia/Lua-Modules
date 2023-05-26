@@ -122,7 +122,7 @@ function CustomPortalPlayers._getMainCharIcons(player)
 	local activeGame = player.extradata.maingame
 
 	if String.isEmpty(player.extradata['main' .. activeGame]) then
-		mw.log(player.pagename, 'main' .. activeGame)
+		mw.log('Missing "main' .. activeGame .. '" in extradata on player page ' .. player.pagename)
 		return
 	end
 
