@@ -47,6 +47,7 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 function PortalPlayers:init(args)
 	self.args = args
 	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
+	self.queryOnlyByRegion = Logic.readBool(args.queryOnlyByRegion)
 
 	return self
 end
@@ -85,7 +86,7 @@ function PortalPlayers:_getPlayers()
 	local countries, regionConditions = PortalPlayers._getCountries(self.args.region, self.args.countries, gameConditions)
 
 	local conditions
-	if Logic.readBool(self.args.queryOnlyByRegion) then
+	if self.queryOnlyByRegion then
 		conditions = regionConditions
 	else
 		conditions = Array.map(countries, function (country)
@@ -262,18 +263,14 @@ end
 ---Converts the queried data int a readable format by OpponnetDisplay
 ---Overwritable on a per wiki basis
 ---@param player table
----@return {type: string, players: {[string]: string?}[]}
+---@return standardOpponent
 function PortalPlayers.toOpponent(player)
-	return {
+	return Opponent.readOpponentArgs(Table.merge(player.extradata, {
 		type = Opponent.solo,
-		players = {{
-			pageName = player.pagename,
-			displayName = player.id,
-			flag = player.nationality,
-			-- this little line makes >= 3 customs obsolete
-			race = (player.extradata or {}).faction,
-		}},
-	}
+		link = player.pagename,
+		name = player.id,
+		flag = player.nationality,
+	}))
 end
 
 return PortalPlayers
