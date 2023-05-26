@@ -75,7 +75,7 @@ function PortalPlayers:create()
 end
 
 ---Retrieves the "player" data
----@return {[string]: {players: table[], nonPlayers: table[]}}
+---@return {[string]: {players: table[]?, nonPlayers: table[]?}}
 function PortalPlayers:_getPlayers()
 	local games = String.isNotEmpty(self.args.game) and
 		Array.map(Array.map(mw.text.split(self.args.game, ',', true), String.trim), function (game)
@@ -154,11 +154,11 @@ end
 
 ---Groups the "player" data by country and wether they are players or not
 ---@param players table[]
----@return {[string]: {players: table[], nonPlayers: table[]}}
+---@return {[string]: {players: table[]?, nonPlayers: table[]?}}
 function PortalPlayers._groupPlayerData(players)
 	local _, groupedByCountry = Array.groupBy(players, function(player) return player.nationality --[[@as string]] end)
 
-	return Table.map(groupedByCountry, function(country, countryPlayerData)
+	return Table.mapValues(groupedByCountry, function(countryPlayerData)
 		local groupedData
 		_, groupedData = Array.groupBy(countryPlayerData, function(player)
 			local extradata = player.extradata or {}
@@ -168,7 +168,7 @@ function PortalPlayers._groupPlayerData(players)
 			) and 'players' or 'nonPlayers'
 		end)
 		---@cast groupedData {players: table[], nonPlayers: table[]}
-		return country, groupedData
+		return groupedData
 	end)
 end
 
@@ -263,7 +263,7 @@ end
 ---Converts the queried data int a readable format by OpponnetDisplay
 ---Overwritable on a per wiki basis
 ---@param player table
----@return standardOpponent
+---@return StandardOpponent
 function PortalPlayers.toOpponent(player)
 	return Opponent.readOpponentArgs(Table.merge(player.extradata, {
 		type = Opponent.solo,
