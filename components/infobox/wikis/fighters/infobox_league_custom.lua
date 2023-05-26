@@ -215,8 +215,8 @@ function CustomLeague.getIconFromSeries(page)
 end
 
 function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
+	if Logic.isEmpty(_args.prizepool) and
+		Logic.isEmpty(_args.prizepoolusd) then
 		return nil
 	end
 

@@ -482,12 +482,12 @@ end
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
-	if String.isNotEmpty(lastVs.groupscore) then
+	if Logic.isNotEmpty(lastVs.groupscore) then
 		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
 	local score = ''
-	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+	if Logic.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
 		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
 	end
 

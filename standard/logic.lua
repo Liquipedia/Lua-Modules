@@ -44,7 +44,7 @@ function Logic.nilOr(...)
 end
 
 ---Checks if a given object (table|string|nil) is empty
----@param val table|string|nil
+---@param val table|string|number|nil
 ---@return boolean
 function Logic.isEmpty(val)
 	if type(val) == 'table' then
@@ -55,7 +55,7 @@ function Logic.isEmpty(val)
 end
 
 ---Checks if a given object (table|string|nil) is not empty
----@param val table|string|nil
+---@param val table|string|number|nil
 ---@return boolean
 function Logic.isNotEmpty(val)
 	if type(val) == 'table' then

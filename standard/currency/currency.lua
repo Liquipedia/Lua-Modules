@@ -38,7 +38,7 @@ function Currency.template(frame)
 	-- fallback handling like in the old template
 	if not display then
 		display = (currencyCode or '?')
-			.. (String.isNotEmpty(prizeValue) and (NON_BREAKING_SPACE .. prizeValue) or '')
+			.. (Logic.isNotEmpty(prizeValue) and (NON_BREAKING_SPACE .. prizeValue) or '')
 		Variables.varDefine('noncurrency', 'true')
 		Variables.varDefine('localcurrencysymbol', NON_BREAKING_SPACE)
 	end
@@ -168,7 +168,7 @@ function Currency.getExchangeRate(props)
 		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, currency, USD:upper(), props.date)
 	end
 
-	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
+	if setVariables and currencyRate and Logic.isNotEmpty(currencyRate) then
 		Variables.varDefine('exchangerate_' .. currency, currencyRate)
 	end
 

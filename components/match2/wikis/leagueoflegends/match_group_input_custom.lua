@@ -190,7 +190,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	-- set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if not Logic.isEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -455,7 +455,7 @@ end
 
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
-	if String.isNotEmpty(match.winner) then
+	if Logic.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 

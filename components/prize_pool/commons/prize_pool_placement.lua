@@ -135,7 +135,7 @@ Placement.additionalData = {
 			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
-				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
+				if Logic.isEmpty(rawScore) and Logic.isNotEmpty(rawScores[index + 1]) then
 					rawScores[index + 1] = '-' .. rawScores[index + 1]
 				else
 					table.insert(scores, rawScore)

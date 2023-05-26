@@ -28,7 +28,7 @@ local DEFAULT_NEGATIVE_SIGN_TEXT = 'negative'
 ---@return string?
 function Ordinal.written(valueInput, options)
 	local value = valueInput
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return
 	end
 	---@cast value -nil
@@ -141,7 +141,7 @@ end
 ---@param options {superScript: boolean?}
 ---@return string?
 function Ordinal.suffix(value, options)
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return
 	end
 	---@cast value -nil

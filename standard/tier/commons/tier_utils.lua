@@ -25,7 +25,7 @@ local Tier = {}
 ---@param input string|integer|nil
 ---@return string|integer|nil
 function Tier.toIdentifier(input)
-	if String.isEmpty(input) then
+	if Logic.isEmpty(input) then
 		return
 	end
 	---@cast input -nil

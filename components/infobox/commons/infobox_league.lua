@@ -295,7 +295,7 @@ function League:addTierCategories(args)
 	table.insert(categories, tierCategory)
 	table.insert(categories, tierTypeCategory)
 
-	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
+	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end

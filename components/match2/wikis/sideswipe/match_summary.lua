@@ -95,7 +95,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 
-	if String.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
+	if Logic.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
 		return scoreBoardNode
 			:node(mw.html.create('span')
 				:css('line-height', '1.1')
@@ -293,13 +293,13 @@ function CustomMatchSummary._createGame(game)
 	end
 
 	if
-		String.isNotEmpty(extradata.t1goals)
-		or String.isNotEmpty(extradata.t2goals)
-		or String.isNotEmpty(game.comment)
+		Logic.isNotEmpty(extradata.t1goals)
+		or Logic.isNotEmpty(extradata.t2goals)
+		or Logic.isNotEmpty(game.comment)
 	then
 		row:addElement(MatchSummary.Break():create())
 	end
-	if String.isNotEmpty(extradata.t1goals) then
+	if Logic.isNotEmpty(extradata.t1goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))
 	end
 	if String.isNotEmpty(game.comment) then
@@ -309,7 +309,7 @@ function CustomMatchSummary._createGame(game)
 			:node(game.comment)
 		)
 	end
-	if String.isNotEmpty(extradata.t2goals) then
+	if Logic.isNotEmpty(extradata.t2goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 

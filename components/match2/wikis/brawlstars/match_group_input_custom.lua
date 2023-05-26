@@ -221,7 +221,7 @@ function matchFunctions.getOpponents(args)
 		for _, opponent in pairs(opponents) do
 			if
 				String.isEmpty(opponent.status)
-				and String.isEmpty(opponent.score)
+				and Logic.isEmpty(opponent.score)
 			then
 				opponent.score = 0
 				opponent.status = 'S'
