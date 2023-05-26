@@ -271,7 +271,7 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 ]]
 ---@param opponent standardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}
+---@param options {syncPlayer: boolean?}?
 ---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
 	options = options or {}

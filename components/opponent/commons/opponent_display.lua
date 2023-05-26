@@ -130,7 +130,6 @@ OpponentDisplay.propTypes.InlineOpponent = {
 ---@field teamStyle teamStyle
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
----comment
 ---@param props InlineOpponentProps
 ---@return Html|string|nil
 function OpponentDisplay.InlineOpponent(props)
