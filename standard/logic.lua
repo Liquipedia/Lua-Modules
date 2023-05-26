@@ -9,8 +9,8 @@
 local Logic = {}
 
 ---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
----@param val1 table|string|nil
----@param val2 table|string|nil
+---@param val1 table|string|boolean|nil
+---@param val2 table|string|boolean|nil
 ---@param default any
 ---@return string|table|any|nil
 function Logic.emptyOr(val1, val2, default)
