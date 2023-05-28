@@ -28,15 +28,16 @@ local ColumnName = Condition.ColumnName
 local Count = require('Module:Count/dev')
 local PieChart = require('Module:Tournaments breakdown pie chart/dev')
 
+local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local DATE = os.date('%F')
 local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE)
-local DEFAULT_ALLOWED_PLACES = '1,2,3,1-2,2-3,2-4,3-4'
+local DEFAULT_ALLOWED_PLACES = Array.map(mw.text.split('1,2,3,1-2,2-3,2-4,3-4', ',', true), String.trim)
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
 local SHOWMATCH = 'Showmatch'
-local STIER = '1'
+local TIER1 = '1'
 local FIRST = '1'
 local MODES = Array.map(mw.text.split('solo, team, other', ',', true), String.trim)
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
@@ -55,19 +56,9 @@ Section: Chart Entry Functions
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
 
-	local processFunction = function(tablePlace, item, config)
-		local earnings
-		if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
-			earnings = config.isForTeam and item.prizemoney or item.individualprizemoney
-		else
-			earnings = item.prizemoney
-		end
-		return tablePlace + Math._round(earnings or 0, DEFAULT_ROUND_PRECISION)
-	end
-
 	local params = {
 		variable = 'game',
-		processFunction = processFunction,
+		processFunction = StatisticsPortal._defaultProcessFunction,
 		catLabel = 'Year',
 		defaultInputs = GAMES,
 	}
@@ -80,19 +71,9 @@ end
 function StatisticsPortal.modeEarningsChart(args)
 	args = args or {}
 
-	local processFunction = function(tablePlace, item, config)
-		local earnings
-		if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
-			earnings = config.isForTeam and item.prizemoney or item.individualprizemoney
-		else
-			earnings = item.prizemoney
-		end
-		return tablePlace + Math._round(earnings or 0, DEFAULT_ROUND_PRECISION)
-	end
-
 	local params = {
 		variable = 'opponenttype',
-		processFunction = processFunction,
+		processFunction = StatisticsPortal._defaultProcessFunction,
 		catLabel = 'Year',
 		defaultInputs = MODES,
 	}
@@ -129,9 +110,6 @@ function StatisticsPortal.topEarningsChart(args)
 			conditions:toString(),
 			'sum::earnings desc',
 			'earnings asc')
-	else
-		mw.log(config.opponentType .. ' is not a valid opponent type. Choose either \'solo\' or \'team\'.')
-		return
 	end
 
 	local yearSeriesData = Array.map(Array.range(config.startYear, CURRENT_YEAR), function(year)
@@ -172,11 +150,11 @@ function StatisticsPortal.coverageStatistics(args)
 	args.alignSide = Logic.readBoolOrNil(args.alignSide)
 
 	local wrapper = mw.html.create('div')
-	local TournamentTable = wrapper:tag('div')
+	local tournamentTable = wrapper:tag('div')
 	local matchTable = wrapper:tag('div')
 
 	if args.alignSide then
-		TournamentTable
+		tournamentTable
 			:addClass('template-box')
 			:css('padding-right','2em')
 		matchTable
@@ -184,7 +162,7 @@ function StatisticsPortal.coverageStatistics(args)
 			:css('padding-right','2em')
 	end
 
-	TournamentTable:node(StatisticsPortal.coverageTournamentTable(args))
+	tournamentTable:node(StatisticsPortal.coverageTournamentTable(args))
 	matchTable:node(StatisticsPortal.coverageMatchTable(args))
 
 	return wrapper
@@ -193,10 +171,9 @@ end
 
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
-	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
+	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = (type(args.customGames) == 'table' and args.customGames)
-		or (String.isNotEmpty(args.customGames) and Array.map(mw.text.split(args.customGames, ',', true), String.trim))
-		or GAMES
+		or StatisticsPortal._splitOrDefault(args.customGames, GAMES)
 
 	local matchTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -251,12 +228,9 @@ end
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
-	args.customGames = String.isNotEmpty(args.customGames) and
-		Array.map(mw.text.split(args.customGames, ',', true), String.trim) or GAMES
-	args.customTiers = String.isNotEmpty(args.customTiers) and
-		Array.map(mw.text.split(args.customTiers, ',', true), function(item)
-			return tonumber(String.trim(item))
-		end)
+	args.customGames = StatisticsPortal._splitOrDefault(args.customGames, GAMES)
+	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers)
+	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
 
 	local tournamentTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -436,7 +410,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			headerRow:tag('th')
 				:wikitext(StatisticsPortal._returnCustomYearText(prevYear, yearValue))
 			resultsRow:tag('td')
-				:wikitext((prizepoolSum ~= 0 and '$' or '') .. Currency.formatMoney(prizepoolSum or 0))
+				:wikitext(Currency.display('USD', prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS))
 			prizepoolSum = 0
 			prevYear = yearValue + 1
 			colIndex = colIndex + 1
@@ -467,18 +441,18 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		},
 	}
 
-	local totalPrizePool = mw.ext.LiquipediaDB.lpdb('tournament', {
+	local totalData = mw.ext.LiquipediaDB.lpdb('tournament', {
 			query = 'sum::prizepool',
 			limit = 5000,
 			conditions = conditions:toString(),
 			order = 'sortdate desc',
 		}
 	)
-
+	local totalPrizePool = (tonumber(totalData[1].sum_prizepool or 0))
 	headerRow:tag('th')
 		:wikitext('Total')
 	resultsRow:tag('td')
-		:wikitext('$' .. Currency.formatMoney(totalPrizePool[1].sum_prizepool))
+		:wikitext(Currency.display('USD', totalPrizePool, CURRENCY_FORMAT_OPTIONS))
 		:css('font-weight','bold')
 
 	if Logic.readBool(args.showAverage) then
@@ -487,7 +461,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext('$' .. Currency.formatMoney(totalPrizePool[1].sum_prizepool / (Count.totalTournaments() or 1)))
+			:wikitext(Currency.display('USD', totalPrizePool / (Count.totalTournaments() or 1), CURRENCY_FORMAT_OPTIONS))
 			:css('font-weight','bold')
 	end
 
@@ -557,7 +531,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	summaryTable:tag('tr')
 		:tag('td')
-		:wikitext('$' .. Currency.formatMoney(data[1].sum_prizepool or 0))
+		:wikitext(Currency.display('USD', data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS))
 		:attr('data-sort-type', 'currency')
 		:css('font-weight','bold')
 
@@ -576,9 +550,7 @@ function StatisticsPortal.earningsTable(args)
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBoolOrNil(args.displayShowMatches)
-	args.allowedPlacements = Array.map(mw.text.split(args.allowedPlacements or DEFAULT_ALLOWED_PLACES, ',', true),
-		String.trim
-	)
+	args.allowedPlacements = StatisticsPortal._splitOrDefault(args.allowedPlacements, DEFAULT_ALLOWED_PLACES)
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
@@ -594,9 +566,6 @@ function StatisticsPortal.earningsTable(args)
 		opponentData = StatisticsPortal._getTeams(5000)
 	elseif args.opponentType == Opponent.solo then
 		opponentData = StatisticsPortal._getPlayers(5000)
-	else
-		mw.log(args.opponentType .. ' is not a valid opponent type. Choose either \'solo\' or \'team\'.')
-		return
 	end
 
 	table.sort(opponentData, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
@@ -683,12 +652,11 @@ function StatisticsPortal.playerAgeTable(args)
 		local dayAge = age.yday
 
 		tbl:tag('tr')
-			:tag('td'):
-				node(OpponentDisplay.BlockOpponent{
+			:tag('td')
+				:node(OpponentDisplay.BlockOpponent{
 					opponent = StatisticsPortal._toOpponent(player),
 					showPlayerTeam  = true,
-					}
-				):done()
+				}):done()
 			:tag('td')
 				:wikitext(yearAge..' years, '..dayAge..' days')
 	end
@@ -808,11 +776,11 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 		limit = 1000,
 	}
 
-	local function returnOpponent(item)
+	local function makeOpponentTable(item)
 		local opponentNames = {}
 		if args.opponentType == Opponent.solo then
-			for playerIndex = 1,10 do
-				local name = string.gsub(item.opponentplayers['p' .. playerIndex] or '', ' ', '_')
+			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers, 'p') do
+				local name = string.gsub(playerName or '', ' ', '_')
 				table.insert(opponentNames, name)
 			end
 		elseif args.opponentType == Opponent.team and item.opponenttype == Opponent.team then
@@ -824,11 +792,11 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 
 	local processData = function(item)
 		local placement = string.sub(item.placement, 1, 1)
-		for _, opponent in pairs(returnOpponent(item) or {}) do
+		for _, opponent in pairs(makeOpponentTable(item) or {}) do
 			if not data[opponent] then
 				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
-			if placement == FIRST and item.liquipediatier == STIER and item.liquipediatiertype ~= SHOWMATCH then
+			if placement == FIRST and item.liquipediatier == TIER1 and item.liquipediatiertype ~= SHOWMATCH then
 				table.insert(data[opponent].sWinData, {
 						icon = item.icon,
 						iconDark = item.icondark,
@@ -908,7 +876,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 
 	row:tag('td')
 		:css('text-align', 'right')
-		:wikitext('$' .. Currency.formatMoney(earnings))
+		:wikitext(Currency.display('USD', earnings, CURRENCY_FORMAT_OPTIONS))
 
 	return row
 end
@@ -1037,7 +1005,7 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	function(value, index)
 		if index > lastNotEmpty then
 			return false
-		elseif startsEmpty == true and value == true then
+		elseif startsEmpty and value == true then
 			return false
 		else
 			startsEmpty = false
@@ -1072,11 +1040,10 @@ function StatisticsPortal._getChartConfig(args, params)
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
 		customInputs = customInputs,
-		customLegend = String.isNotEmpty(args.customLegend) and
-			Array.map(mw.text.split(args.customLegend, ',', true), String.trim) or customInputs,
+		customLegend = StatisticsPortal._splitOrDefault(args.customLegend, customInputs),
 		customYears = args.customYears,
 		startYear = args.startYear or Info.startYear,
-		yearBreakdown = Logic.readBoolOrNil(args.yearBreakdown),
+		yearBreakdown = Logic.readBool(args.yearBreakdown),
 		removeEmptyCategories = Logic.readBool(args.removeEmptyCategories),
 		removeEmptySeries = Logic.readBool(args.removeEmptySeries),
 		isForTeam = isForTeam,
@@ -1085,6 +1052,16 @@ function StatisticsPortal._getChartConfig(args, params)
 		height = tonumber(args.height) or 400,
 		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - tonumber(args.startYear or Info.startYear))),
 	}
+end
+
+function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
+	local earnings
+	if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
+		earnings = config.isForTeam and item.prizemoney or item.individualprizemoney
+	else
+		earnings = item.prizemoney
+	end
+	return tablePlace + Math._round(earnings or 0, DEFAULT_ROUND_PRECISION)
 end
 
 
@@ -1101,15 +1078,20 @@ function StatisticsPortal._toOpponent(player)
 end
 
 
+function StatisticsPortal._splitOrDefault(input, default)
+	if String.isEmpty(input) then
+		return default
+	end
+	return Array.map(mw.text.split(input, ',', true), String.trim)
+end
+
+
 function StatisticsPortal._returnCustomYears(args)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 	local yearTable
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
-
 	if String.isNotEmpty(args.customYears) then
-		yearTable = Array.map(mw.text.split(args.customYears, ',', true), function(item)
-			return tonumber(String.trim(item))
-		end)
+		yearTable = Array.map(StatisticsPortal._splitOrDefault(args.customYears), function(tier) return tonumber(tier) end)
 		table.insert(yearTable, CURRENT_YEAR)
 		return yearTable, defaultYearTable
 	else
