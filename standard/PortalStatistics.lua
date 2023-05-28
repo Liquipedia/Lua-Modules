@@ -1029,7 +1029,7 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 				return seriesData[index][catIndex] end), function(value)
 					return value == 0
 				end)
-			if truthValue == false then
+			if not truthValue then
 				lastNotEmpty = catIndex
 			end
 			return truthValue
