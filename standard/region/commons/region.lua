@@ -24,10 +24,8 @@ local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
 function Region.run(args)
 	args = args or {}
 
-	local shouldOnlyReturnDisplay = Logic.readBool(args.onlyDisplay)
-
 	if Logic.readBool(args.onlyRegion) then
-		return regionValues.region
+		return Region.name(args)
 	elseif Logic.readBool(args.onlyDisplay) then
 		return Region.display(args)
 	end
@@ -79,7 +77,7 @@ function Region._raw(args)
 	---@cast region -nil
 
 	--resolve aliases for the region
-	local region = string.lower(region)
+	local region = string.lower(regionInput)
 	region = REGION_DATA.aliases[region] or region
 
 	return Table.merge(REGION_DATA[region] or {}, {input = regionInput})
