@@ -142,7 +142,7 @@ function StatisticsPortal.topEarningsChart(args)
 
 	local opponentNames = Array.map(Array.reverse(topEarningsList), function(opponent)
 				return config.opponentType == Opponent.team and opponent.name or opponent.id
-			end)
+	end)
 
 	if Logic.readBool(config.yearBreakdown) then
 		return StatisticsPortal._buildChartData(config, yearSeriesData, opponentNames)
