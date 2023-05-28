@@ -129,7 +129,6 @@ function TournamentsListingConditions.base(args)
 		end
 		conditions:add{tierTypeConditions}
 	end
-	
 	args.excludeTiertype1 = args.excludeTiertype1 or args.excludeTiertype
 	if args.excludeTiertype1 then
 		local excludeTiertypeConditions = ConditionTree(BooleanOperator.all)
