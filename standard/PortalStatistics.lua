@@ -136,7 +136,7 @@ function StatisticsPortal.topEarningsChart(args)
 
 	local yearSeriesData = Array.map(Array.range(config.startYear, CURRENT_YEAR), function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
-					return teamData.extradata['earningsin'..year] or 0
+			return teamData.extradata['earningsin'..year] or 0
 				end)
 		end)
 
