@@ -467,11 +467,11 @@ local function pow(x, y) return x ^ y end
 Array.reduce({2, 3, 5}, pow)
 -- Returns 32768
 ]]
----@generic T
+---@generic T, V
 ---@param array T[]
----@param operator fun(aggregate: T, arrayValue: T): T
----@param initialValue T?
----@return T?
+---@param operator fun(aggregate: V, arrayValue: T): V
+---@param initialValue V?
+---@return V?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then

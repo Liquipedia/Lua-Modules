@@ -25,6 +25,7 @@ function suite:testCopy()
 	local a, b, c = {1, 2, 3}, {}, {{5}}
 	self:assertDeepEquals(a, Array.copy(a))
 	self:assertFalse(Array.copy(b) == b)
+	---@diagnostic disable-next-line: undefined-field
 	self:assertTrue(Array.copy(c).a == c.a)
 end
 

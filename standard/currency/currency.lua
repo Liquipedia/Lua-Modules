@@ -55,7 +55,7 @@ end
 ---@field setVariables boolean?
 ---@field symbol boolean?
 
----@param currencyCode string
+---@param currencyCode string?
 ---@param prizeValue string|number|nil
 ---@param options currencyDisplayOptions?
 ---@return string?
@@ -117,7 +117,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	return prizeDisplay
 end
 
----@param currencyCode string
+---@param currencyCode string?
 ---@return {code: string, name: string, symbol: {hasSpace: boolean?, isAfter: boolean?, text: string}}?
 function Currency.raw(currencyCode)
 	if String.isEmpty(currencyCode) then
