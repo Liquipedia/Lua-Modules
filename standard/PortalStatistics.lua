@@ -686,7 +686,7 @@ function StatisticsPortal.playerAgeTable(args)
 			:tag('td'):
 				node(OpponentDisplay.BlockOpponent{
 						opponent = StatisticsPortal._toOpponent(player),
-						showPlayerTeam  = true,
+					showPlayerTeam  = true,
 					}
 				):done()
 			:tag('td')
