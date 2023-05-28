@@ -138,7 +138,7 @@ function StatisticsPortal.topEarningsChart(args)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
 			return teamData.extradata['earningsin'..year] or 0
 		end)
-		end)
+	end)
 
 	local opponentNames = Array.map(Array.reverse(topEarningsList), function(opponent)
 		return config.opponentType == Opponent.team and opponent.name or opponent.id
