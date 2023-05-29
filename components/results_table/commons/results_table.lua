@@ -87,9 +87,9 @@ function ResultsTable:buildRow(placement)
 		self.config.queryType ~= Opponent.team or
 		Table.isNotEmpty(self.config.aliases) then
 
-		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
+		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
-			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
+			{teamForSolo = not self.config.playerResultsOfTeam}
 		))
 	end
 
