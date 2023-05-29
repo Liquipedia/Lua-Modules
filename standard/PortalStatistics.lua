@@ -1047,7 +1047,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		removeEmptyCategories = Logic.readBool(args.removeEmptyCategories),
 		removeEmptySeries = Logic.readBool(args.removeEmptySeries),
 		chartType = args.chartType or 'bar',
-		stackType = args.stackType or nil,
+		stackType = args.stackType,
 		isForTeam = isForTeam,
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
