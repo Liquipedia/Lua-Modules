@@ -89,7 +89,7 @@ function ResultsTable:buildRow(placement)
 
 		row:tag('td'):css('text-align', self.config.hideResult and 'left' or 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
-			{teamForSolo = not self.config.playerResultsOfTeam}
+			{teamForSolo = not self.config.playerResultsOfTeam, flip = not self.config.hideResult}
 		))
 	end
 
