@@ -369,7 +369,7 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 				return {
 					displayname = player.displayName,
 					flag = player.flag,
-					name = player.pageName,
+					name = player.pageName and player.pageName:gsub(' ', '_') or nil,
 				}
 			end)
 	end
