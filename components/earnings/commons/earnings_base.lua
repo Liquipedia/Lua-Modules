@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:Math')
-local String = require('Module:StringUtils')
+local String = require('Module:StringUtils/dev')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
@@ -114,14 +114,12 @@ function Earnings.calculateForTeam(args)
 				return 0
 			end
 
-			Array.extendWith(queryTeams, historicalNames)
+			Array.extendWith(queryTeams, Array.map(historicalNames, String.upperCaseFirst))
 		end
 	elseif not Logic.readBool(args.noRedirect) then
-		for index, team in pairs(teams) do
-			queryTeams[index] = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
-		end
+		queryTeams = Array.map(teams, mw.ext.TeamLiquidIntegration.resolve_redirect)
 	else
-		queryTeams = teams
+		queryTeams = Array.map(teams, String.upperCaseFirst)
 	end
 
 	local formatParticipant = function(lpdbField)
