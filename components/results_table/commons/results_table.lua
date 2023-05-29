@@ -29,6 +29,10 @@ function ResultsTable:buildHeader()
 		:tag('th'):css('min-width', '80px'):wikitext('Place'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
 
+	if self.config.showType then
+		header:tag('th'):css('min-width', '50px'):wikitext('Type')
+	end
+
 	if self.config.displayGameIcons then
 		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
 	end
@@ -62,6 +66,10 @@ function ResultsTable:buildRow(placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
+
+	if self.config.showType then
+		row:tag('td'):wikitext(placement.type)
+	end
 
 	if self.config.displayGameIcons then
 		row:tag('td'):node(Game.icon{game = placement.game})

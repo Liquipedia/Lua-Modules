@@ -69,6 +69,7 @@ function BaseResultsTable:readConfig()
 	local args = self.args
 
 	local config = {
+		showType = Logic.readBool(args.showType),
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
