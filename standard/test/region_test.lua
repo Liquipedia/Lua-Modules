@@ -25,7 +25,6 @@ end
 
 function suite:testDisplay()
 	local euFlag = Flags.Icon({flag = 'eu', shouldLink = true})
-	local samFlag = Flags.Icon({flag = 'sam', shouldLink = true})
 	self:assertEquals(euFlag .. '&nbsp;Europe', Region.display{region = 'Europe'})
 	self:assertEquals('[[File:unasur.png]]&nbsp;South America', Region.display{region = 'sam'})
 	self:assertEquals(euFlag .. '&nbsp;Europe', Region.display{region = 'eu'})

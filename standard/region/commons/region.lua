@@ -34,7 +34,7 @@ function Region.run(args)
 end
 
 ---Retrieves the name of a region as well as the display for it.
----@param args {region: string?, country: string?}
+---@param args {region: string?, country: string?}?
 ---@return {display: string, region: string?}
 function Region.runNew(args)
 	local regionValues = Region._raw(args)
@@ -46,21 +46,21 @@ function Region.runNew(args)
 end
 
 ---Builds the display for a region.
----@param args {region: string?, country: string?}
+---@param args {region: string?, country: string?}?
 ---@return string
 function Region.display(args)
 	return Region._toDisplay(Region._raw(args)) or ''
 end
 
 ---Retrieves the name for a region.
----@param args {region: string?, country: string?}
+---@param args {region: string?, country: string?}?
 ---@return string
 function Region.name(args)
 	return Region._raw(args).region or ''
 end
 
 ---Fetches the (raw) data for a region
----@param args {region: string?, country: string?}
+---@param args {region: string?, country: string?}?
 ---@return {region: string?, flag: string?, file: string?, input: string?}
 function Region._raw(args)
 	args = args or {}
@@ -74,7 +74,7 @@ function Region._raw(args)
 			return {}
 		end
 	end
-	---@cast region -nil
+	---@cast regionInput -nil
 
 	--resolve aliases for the region
 	local region = string.lower(regionInput)
