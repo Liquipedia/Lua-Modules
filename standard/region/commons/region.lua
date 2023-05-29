@@ -49,7 +49,7 @@ end
 ---@param args {region: string?, country: string?}
 ---@return string
 function Region.display(args)
-	return Region._toDisplay(Region._raw(args))
+	return Region._toDisplay(Region._raw(args)) or ''
 end
 
 ---Retrieves the name for a region.
@@ -85,10 +85,10 @@ end
 
 ---Builds the display of a region from its (raw) data
 ---@param regionValues {region: string?, flag: string?, file: string?, input: string?}
----@return string
+---@return string?
 function Region._toDisplay(regionValues)
 	if Table.isEmpty(regionValues) then
-		return ''
+		return
 	end
 
 	local display = ''
