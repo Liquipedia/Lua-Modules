@@ -35,7 +35,7 @@ end
 
 ---Retrieves the name of a region as well as the display for it.
 ---@param args {region: string?, country: string?}?
----@return {display: string, region: string?}
+---@return {display: string?, region: string?}
 function Region.runNew(args)
 	local regionValues = Region._raw(args)
 
