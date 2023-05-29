@@ -132,10 +132,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
 	end
 
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
-	end
+	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
 
 	return lpdbData
 end

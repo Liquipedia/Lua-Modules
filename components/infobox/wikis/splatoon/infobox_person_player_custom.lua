@@ -13,6 +13,7 @@ local WeaponNames = mw.loadData('Module:WeaponNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
@@ -107,10 +108,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		lpdbData.extradata['signatureWeapon' .. weaponIndex] = WeaponNames[weapon:lower()]
 	end
 
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
-	end
+	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
 
 	return lpdbData
 end
