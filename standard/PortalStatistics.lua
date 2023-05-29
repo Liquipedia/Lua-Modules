@@ -971,8 +971,8 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 		else
 			table.insert(chartData, {
 					name = series,
-					type = 'bar',
-					stack = 'total',
+					type = config.chartType,
+					stack = config.stackType,
 					data = seriesData[seriesIndex],
 					emphasis = {focus = 'series'},
 				}
@@ -1026,7 +1026,7 @@ end
 
 function StatisticsPortal._getChartConfig(args, params)
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
-	local customInputs = args.customInputs or params.defaultInputs
+	local customInputs = StatisticsPortal._splitOrDefault(args.customInputs, params.defaultInputs)
 	local opponentName
 	if isForTeam then
 		opponentName = args.team
@@ -1046,6 +1046,8 @@ function StatisticsPortal._getChartConfig(args, params)
 		yearBreakdown = Logic.readBool(args.yearBreakdown),
 		removeEmptyCategories = Logic.readBool(args.removeEmptyCategories),
 		removeEmptySeries = Logic.readBool(args.removeEmptySeries),
+		chartType = args.chartType or 'bar',
+		stackType = args.stackType or nil,
 		isForTeam = isForTeam,
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
