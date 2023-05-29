@@ -296,7 +296,21 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 
 	queryData[1].tournamentExtradata = queryData[1].extradata
 
-	return Table.merge(queryData[1], tournament)
+	local tournamentData = Table.merge(queryData[1], tournament)
+
+	local extradata = tournamentData.extradata or {}
+	if Logic.readBool(extradata.showmatch) then
+		if String.isNotEmpty(extradata.liquipediatier) then
+			tournamentData.liquipediatier = extradata.liquipediatier
+		end
+		if String.isNotEmpty(extradata.liquipediatiertype) then
+			tournamentData.liquipediatiertype = extradata.liquipediatiertype
+		else
+			tournamentData.liquipediatiertype = 'Showmatch'
+		end
+	end
+
+	return tournamentData
 end
 
 ---@param tournament table
@@ -323,20 +337,8 @@ end
 ---@param tournament table
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
-	-- this is not the extradata of the tournament but of the broadcaster (they got merged together)
-	local extradata = tournament.extradata or {}
-	if Logic.readBool(extradata.showmatch) then
-		if String.isNotEmpty(extradata.liquipediatier) then
-			tournament.liquipediatier = extradata.liquipediatier
-		end
-		if String.isNotEmpty(extradata.liquipediatiertype) then
-			tournament.liquipediatiertype = extradata.liquipediatiertype
-		else
-			tournament.liquipediatiertype = 'Showmatch'
-		end
-	end
-
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
+
 	options.link = true
 	options.shortIfBoth = true
 	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
