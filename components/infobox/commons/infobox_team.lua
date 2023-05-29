@@ -62,7 +62,7 @@ function Team:createInfobox()
 	local links = Links.transform(args)
 
 	-- Team Information
-	local team = args.teamtemplate or self.pagename:gsub('_', ' ') or self.name
+	local team = args.teamtemplate or self.pagename:gsub('_', ' ')
 	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
 	self.team = self.teamTemplate.page or self.pagename:gsub('_', ' ')
 
