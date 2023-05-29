@@ -70,4 +70,10 @@ function suite:testInterpolate()
 	self:assertEquals('I\'m 40 years old', String.interpolate('I\'m ${age} years old', {age = 40}))
 end
 
+function suite:testUpperCaseFirst()
+	self:assertEquals('Top', String.upperCaseFirst('top'))
+	-- test with special char `ü` (string.upper could not catch it)
+	self:assertEquals('Übung', String.upperCaseFirst('übung'))
+end
+
 return suite
