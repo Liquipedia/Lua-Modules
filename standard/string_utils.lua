@@ -126,4 +126,11 @@ function String.interpolate(s, tbl)
 	)
 end
 
+---Upercases the first char of a string
+---@param str string
+---@return string
+function String.upperCaseFirst(str)
+	return mw.getContentLanguage():ucfirst(str)
+end
+
 return String
