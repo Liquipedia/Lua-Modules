@@ -384,11 +384,10 @@ function Person:calculateEarnings(args)
 end
 
 function Person:_createRegion(region, country)
-	region = Region.run({region = region, country = country})
-	if type(region) == 'table' then
-		_region = region.region
-		return region.display
-	end
+	local regionData = Region.run({region = region, country = country})
+	_region = regionData.region
+
+	return regionData.display
 end
 
 function Person:_createLocations(args, personType)
