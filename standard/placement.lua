@@ -121,7 +121,7 @@ end
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
 		function(place)
-			return Ordinal._ordinal(place)
+			return Ordinal.toOrdinal(place)
 		end
 	)
 end
