@@ -305,9 +305,9 @@ function Placement:_displayPlace()
 		end
 	end
 
-	local start = Ordinal._ordinal(self.placeStart)
+	local start = Ordinal.toOrdinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+		return start .. DASH .. Ordinal.toOrdinal(self.placeEnd)
 	end
 
 	return start

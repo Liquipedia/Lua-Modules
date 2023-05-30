@@ -69,6 +69,7 @@ function BaseResultsTable:readConfig()
 	local args = self.args
 
 	local config = {
+		showType = Logic.readBool(args.showType),
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
@@ -410,12 +411,16 @@ function BaseResultsTable:opponentDisplay(data, options)
 			opponent = Opponent.tbd(),
 			flip = options.flip,
 		}
-	elseif self.config.displayDefaultLogoAsIs or
-		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
-
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data),
 			flip = options.flip,
+		}
+	elseif self.config.displayDefaultLogoAsIs then
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = options.flip,
+			teamStyle = 'icon',
 		}
 	end
 

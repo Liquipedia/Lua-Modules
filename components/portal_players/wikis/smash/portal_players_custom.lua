@@ -46,18 +46,16 @@ function CustomPortalPlayers.run(frame)
 end
 
 ---Builds the header for the table
----@param flag string
----@param showLocalizedName boolean
----@param playerType string?
+---@param args {flag: string, isPlayer: boolean?}
 ---@return Html
-function CustomPortalPlayers:header(flag, showLocalizedName, playerType)
-	local teamText = String.isNotEmpty(playerType) and ' Team' or ' Team and Role'
+function CustomPortalPlayers:header(args)
+	local teamText = args.isPlayer and ' Team' or ' Team and Role'
 
 	local header = mw.html.create('tr')
 		:tag('th')
 			:attr('colspan', 5)
 			:css('padding-left', '1em')
-			:wikitext(flag .. ' ' .. (playerType or NON_PLAYER_HEADER))
+			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
 			:done()
 
 	local subHeader = mw.html.create('tr')
@@ -74,10 +72,9 @@ end
 
 ---Builds a table row
 ---@param player table
----@param showLocalizedName boolean
 ---@param isPlayer boolean
 ---@return Html
-function CustomPortalPlayers:row(player, showLocalizedName, isPlayer)
+function CustomPortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')
 		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
 
@@ -88,9 +85,9 @@ function CustomPortalPlayers:row(player, showLocalizedName, isPlayer)
 
 	row:tag('td'):node(CustomPortalPlayers._getMainCharIcons(player))
 
-	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '')
+	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
 	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
-	if role and String.isEmpty(teamText) then
+	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'

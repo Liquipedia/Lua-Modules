@@ -129,6 +129,16 @@ function TournamentsListingConditions.base(args)
 		end
 		conditions:add{tierTypeConditions}
 	end
+	args.excludeTiertype1 = args.excludeTiertype1 or args.excludeTiertype
+	if args.excludeTiertype1 then
+		local excludeTiertypeConditions = ConditionTree(BooleanOperator.all)
+		for _, tier in Table.iter.pairsByPrefix(args, 'excludeTiertype') do
+			excludeTiertypeConditions:add{
+				ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tier == NON_TIER_TYPE_INPUT and '' or tier)
+			}
+		end
+		conditions:add{excludeTiertypeConditions}
+	end
 
 	return conditions:toString()
 end
