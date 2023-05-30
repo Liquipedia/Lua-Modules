@@ -35,6 +35,7 @@ local CustomPortalPlayers = {}
 ---@return Html
 function CustomPortalPlayers.run(frame)
 	local args = Arguments.getArgs(frame)
+	args.width = '1100px'
 
 	local portalPlayers = PortalPlayers(args)
 
@@ -60,7 +61,7 @@ function CustomPortalPlayers:header(args)
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
 		:tag('th'):css('width', '175px'):wikitext(' Real Name'):done()
-		:tag('th'):css('width', '450px'):wikitext(' Age'):done()
+		:tag('th'):css('width', '175px'):wikitext(' Age'):done()
 		:tag('th'):css('width', '250px'):wikitext(teamText):done()
 		:tag('th'):css('width', '120px'):wikitext(' Links'):done()
 
