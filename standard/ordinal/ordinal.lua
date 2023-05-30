@@ -24,7 +24,7 @@ local DEFAULT_NEGATIVE_SIGN_TEXT = 'negative'
 ---@field concatWithAnd boolean?
 
 ---@param valueInput string|number|nil
----@param options ordinalWrittenOptions
+---@param options ordinalWrittenOptions?
 ---@return string?
 function Ordinal.written(valueInput, options)
 	local value = valueInput
@@ -174,29 +174,35 @@ function Ordinal.suffix(value, options)
 	return suffix
 end
 
---Legacy entry points
----@deprecated
+---Builds the ordinal display of a given value
+---@param value string|number|nil
+---@param options {superScript: boolean?}?
+---@return string?
+function Ordinal.toOrdinal(value, options)
+	if Logic.isEmpty(value) then
+		return
+	end
+
+	return value .. (Ordinal.suffix(value, options) or '')
+end
+
+---Wiki entry point for `Ordinal.toOrdinal`
 ---@param frame Frame
 ---@return string?
 function Ordinal.ordinal(frame)
 	local args = Arguments.getArgs(frame)
 
-	return Ordinal._ordinal(args[1], nil, Logic.readBool(args['sup']))
+	return Ordinal.toOrdinal(args[1], {superScript = Logic.readBool(args['sup'])})
 end
 
+--Legacy entry point
 ---@deprecated
 ---@param value string|number|nil
 ---@param _ nil
 ---@param superScript boolean?
 ---@return string?
 function Ordinal._ordinal(value, _, superScript)
-	if Logic.isEmpty(value) then
-		return
-	end
-
-	return value .. (Ordinal.suffix(value, {
-		superScript = superScript,
-	}) or '')
+	return Ordinal.toOrdinal(value, {superScript = superScript})
 end
 
 return Ordinal
