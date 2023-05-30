@@ -147,7 +147,7 @@ Section: Coverage Breakdown
 
 function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
-	args.alignSide = Logic.readBoolOrNil(args.alignSide)
+	args.alignSide = Logic.readBool(args.alignSide)
 
 	local wrapper = mw.html.create('div')
 	local tournamentTable = wrapper:tag('div')
@@ -227,7 +227,7 @@ end
 
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
-	args.multiGame = Logic.readBoolOrNil(args.multiGame) or false
+	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = StatisticsPortal._splitOrDefault(args.customGames, GAMES)
 	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
@@ -348,7 +348,7 @@ Section: Prizepool Breakdown
 
 function StatisticsPortal.prizepoolBreakdown(args)
 	args = args or {}
-	args.showAverage = Logic.readBoolOrNil(args.showAverage)
+	args.showAverage = Logic.readBool(args.showAverage)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
@@ -471,8 +471,8 @@ end
 
 function StatisticsPortal.pieChartBreakdown(args)
 	args = args or {}
-	args.hideKey = Logic.readBoolOrNil(args.hideKey)
-	args.detailedKey = Logic.readBoolOrNil(args.detailedKey)
+	args.hideKey = Logic.readBool(args.hideKey)
+	args.detailedKey = Logic.readBool(args.detailedKey)
 
 	local wrapper = mw.html.create('div')
 
@@ -549,7 +549,7 @@ function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
-	args.displayShowMatches = Logic.readBoolOrNil(args.displayShowMatches)
+	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
 	args.allowedPlacements = StatisticsPortal._splitOrDefault(args.allowedPlacements, DEFAULT_ALLOWED_PLACES)
 
 	local earningsFunction = function (a)
