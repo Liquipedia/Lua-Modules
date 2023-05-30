@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:Math')
-local String = require('Module:StringUtils/dev')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
