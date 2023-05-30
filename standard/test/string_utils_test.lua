@@ -72,7 +72,7 @@ end
 
 function suite:testUpperCaseFirst()
 	self:assertEquals('Top', String.upperCaseFirst('top'))
-	-- test with special char `ü` (string.upper could not catch it)
+	-- test with non-ascii character (string.upper only works on ascii characters)
 	self:assertEquals('Übung', String.upperCaseFirst('übung'))
 end
 
