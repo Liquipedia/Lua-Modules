@@ -196,7 +196,7 @@ function PortalPlayers:buildCountryTable(args)
 	local tbl = mw.html.create('table')
 		:addClass('wikitable collapsible smwtable')
 		:addClass(not isPlayer and 'collapsed' or nil)
-		:css('width', '720px')
+		:css('width', args.width or '720px')
 		:css('text-align', 'left')
 		:node(self:header(args))
 
