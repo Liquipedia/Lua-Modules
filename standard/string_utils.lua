@@ -126,7 +126,7 @@ function String.interpolate(s, tbl)
 	)
 end
 
----Upercases the first char of a string
+---Uppercase the first letter of a string
 ---@param str string
 ---@return string
 function String.upperCaseFirst(str)
