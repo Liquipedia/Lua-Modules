@@ -9,7 +9,6 @@
 local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -19,25 +18,10 @@ local COUNTRY_TO_REGION_DATA = Lua.loadDataIfExists('Module:Region/CountryData')
 
 local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
 
----@deprecated
----@param args {region: string?, country: string?, onlyDisplay: boolean?, onlyRegion: boolean?}
----@return string|table
-function Region.run(args)
-	args = args or {}
-
-	if Logic.readBool(args.onlyRegion) then
-		return Region.name(args)
-	elseif Logic.readBool(args.onlyDisplay) then
-		return Region.display(args)
-	end
-
-	return Region.runNew(args)
-end
-
 ---Retrieves the name of a region as well as the display for it.
 ---@param args {region: string?, country: string?}?
 ---@return {display: string?, region: string?}
-function Region.runNew(args)
+function Region.run(args)
 	local regionValues = Region._raw(args)
 
 	return {
