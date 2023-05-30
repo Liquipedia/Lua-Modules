@@ -19,6 +19,7 @@ local COUNTRY_TO_REGION_DATA = Lua.loadDataIfExists('Module:Region/CountryData')
 
 local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
 
+---@deprecated
 ---@param args {region: string?, country: string?, onlyDisplay: boolean?, onlyRegion: boolean?}
 ---@return string|table
 function Region.run(args)
