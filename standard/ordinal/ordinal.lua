@@ -24,7 +24,7 @@ local DEFAULT_NEGATIVE_SIGN_TEXT = 'negative'
 ---@field concatWithAnd boolean?
 
 ---@param valueInput string|number|nil
----@param options ordinalWrittenOptions
+---@param options ordinalWrittenOptions?
 ---@return string?
 function Ordinal.written(valueInput, options)
 	local value = valueInput

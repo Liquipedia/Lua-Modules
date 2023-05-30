@@ -32,6 +32,7 @@ end
 ---Second return value boolean indicates a failed parse.
 ---@param obj string
 ---@return table, boolean
+---@overload fun(obj: any): {}, true
 function Json.parse(obj)
 	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
