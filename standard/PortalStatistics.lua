@@ -26,7 +26,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local Count = require('Module:Count/dev')
-local PieChart = require('Module:Tournaments breakdown pie chart/dev')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y'))
@@ -40,13 +39,13 @@ local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
 local MODES = {'solo', 'team', 'other'}
+local TYPES = {'Online', 'Offline'}
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value.name
 end)
 
 
 local StatisticsPortal = {}
-
 
 --[[
 Section: Chart Entry Functions
@@ -354,14 +353,6 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
 	local rowLimit = Math._round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2, 0)
 
-	local baseConditions = function () return ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.gt, '0')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-	end
-
 	local wrapper = mw.html.create('div')
 
 	local prizepoolTable = wrapper:tag('table')
@@ -381,7 +372,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local colIndex = 1
 
 	for _, yearValue in pairs(defaultYearTable) do
-		local conditions = baseConditions()
+		local conditions =  StatisticsPortal._returnBaseConditions()
 
 		if args.game then
 			conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
@@ -430,7 +421,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		end
 	end
 
-	local conditions = baseConditions()
+	local conditions = StatisticsPortal._returnBaseConditions()
 
 	if args.game then
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
@@ -471,16 +462,48 @@ end
 
 function StatisticsPortal.pieChartBreakdown(args)
 	args = args or {}
+	args.height = args.height or 300
+	args.width = args.width or 400
 	args.hideKey = Logic.readBool(args.hideKey)
 	args.detailedKey = Logic.readBool(args.detailedKey)
+	args.multiGame = Logic.readBool(args.multiGame)
+	args.multiMode = Logic.readBool(args.multiMode)
 
 	local wrapper = mw.html.create('div')
 
 	wrapper:node(mw.html.create('div')
 		:addClass('template-box')
-		:css('padding-right','1em')
-		:node(PieChart.create({year = args.year, game = args.game}))
+		:css('padding-right','5em')
+		:css('width', args.width)
+		:css('font-size', '85%')
+		:css('text-align', 'center')
+		:wikitext('Tournament Type')
+		:node(StatisticsPortal._getPieChartData(args, 'type', 'Mixed', TYPES))
 	)
+
+	if args.multiGame then
+		wrapper:node(mw.html.create('div')
+			:addClass('template-box')
+			:css('padding-right','5em')
+			:css('width', args.width)
+			:css('font-size', '85%')
+			:css('text-align', 'center')
+			:wikitext('Game Breakdown')
+			:node(StatisticsPortal._getPieChartData(args, 'game', 'Other', StatisticsPortal._splitOrDefault(args.customGames, GAMES)))
+		)
+	end
+
+	if args.multiMode then
+		wrapper:node(mw.html.create('div')
+			:addClass('template-box')
+			:css('padding-right','5em')
+			:css('width', args.width)
+			:css('font-size', '85%')
+			:css('text-align', 'center')
+			:wikitext('Mode Breakdown')
+			:node(StatisticsPortal._getPieChartData(args, 'mode', 'Other', StatisticsPortal._splitOrDefault(args.customModes, {'Team'})))
+		)
+	end
 
 	if Logic.readBool(args.hideKey) then
 		return wrapper
@@ -489,18 +512,13 @@ function StatisticsPortal.pieChartBreakdown(args)
 	if Logic.readBool(args.detailedKey) then
 		wrapper:node(mw.html.create('div')
 			:addClass('template-box')
-			:css('padding-left','5em')
+			--:css('padding-left','5em')
 			:node(StatisticsPortal.prizepoolBreakdown(args))
 		)
 		return wrapper
 	end
 
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
-		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.gt, '0')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
+	local conditions = StatisticsPortal._returnBaseConditions()
 
 	if args.year then
 		conditions:add{ConditionTree(BooleanOperator.all):add{
@@ -697,6 +715,63 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
 	})
 
 	return data
+end
+
+
+function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
+	args = args or {}
+	table.insert(groupValues, defaultValue)
+	defaultValue = string.lower(defaultValue or '')
+
+	local prizes = {}
+	for _, value in Table.iter.spairs(groupValues) do
+		prizes[value:lower()] = {name = value, value = 0}
+	end
+
+	local LPDBConditions = StatisticsPortal._returnBaseConditions()
+	LPDBConditions:add{ConditionNode(ColumnName('namespace'), Comparator.eq, 0)}
+
+	if args.year then
+		LPDBConditions:add{ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year)}
+	else
+		LPDBConditions:add{ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE)}
+	end
+
+	if args.game then
+		LPDBConditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+	end
+
+	local function parseTournament(data)
+		local normValue = string.lower(data[groupBy] or '')
+		if prizes[normValue] then
+			prizes[normValue].value = prizes[normValue].value + data.prizepool
+		else
+			prizes[defaultValue].value = prizes[defaultValue].value + data.prizepool
+		end
+	end
+
+	--Querying data
+	local queryParameters = {
+		conditions = LPDBConditions:toString(),
+		query = 'prizepool, '.. groupBy,
+	}
+
+	--Querying data
+	Lpdb.executeMassQuery('tournament', queryParameters, parseTournament)
+
+	Array.forEach(Array.extractValues(prizes), function(prize)
+		prize.value = math.floor(prize.value + 0.5)
+	end)
+
+	if prizes[defaultValue].value == 0 then
+		Table.extract(prizes, defaultValue)
+	end
+
+	local chartData = Array.map(Array.extractValues(groupValues), function(value)
+		return prizes[value:lower()]
+	end)
+
+  	return StatisticsPortal._drawPieChart(args, chartData)
 end
 
 
@@ -926,9 +1001,31 @@ function StatisticsPortal._drawChart(config, chartData)
 end
 
 
+function StatisticsPortal._drawPieChart(args, chartData)
+	return mw.html.create('div')
+		:addClass('table-responsive')
+		:node(mw.ext.Charts.piechart{
+			size = {
+				height = args.height,
+				width = args.width
+			},
+			data = chartData
+		}
+	)
+end
+
+
 --[[
 Section: Utility Functions
 ]]--
+function StatisticsPortal._returnBaseConditions()
+	return ConditionTree(BooleanOperator.all)
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
+		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
+		:add{ConditionNode(ColumnName('prizepool'), Comparator.gt, '0')}
+end
 
 
 function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategories, transpose)
