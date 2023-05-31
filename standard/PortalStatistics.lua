@@ -39,7 +39,7 @@ local LANG = mw.getContentLanguage()
 local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
-local MODES = Array.map(mw.text.split('solo, team, other', ',', true), String.trim)
+local MODES = {'solo', 'team', 'other'}
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value.name
 end)
