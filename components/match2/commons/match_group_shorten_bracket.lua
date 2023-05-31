@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
