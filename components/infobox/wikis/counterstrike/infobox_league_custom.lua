@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Tier = require('Module:Tier/Custom')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
