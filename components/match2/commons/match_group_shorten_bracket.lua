@@ -27,10 +27,12 @@ local _bracket_datas_by_id
 function ShortenBracket.fetchAndAdjustMatches(props)
 	local shortTemplate = 'Bracket/' .. string.gsub(props.shortTemplate, '^[bB]racket/', '')
 	local matches = MatchGroupUtil.fetchMatchRecords(props.bracketId)
-	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, props.bracketId)
+	assert(#matches ~= 0, 'No data found for bracketId=' .. props.bracketId)
 
 	assert(matches[1].match2bracketdata.type == 'bracket',
 		'The data found for id "' .. props.bracketId .. '" is not a bracket')
+
+	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, props.bracketId)
 
 	return ShortenBracket._processMatches(
 		matches,
@@ -69,6 +71,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId
 
 			-- nil some stuff before merge
 			match.match2bracketdata.loweredges = nil
+			match.match2bracketdata.skipround = nil
 
 			match.match2bracketdata = Table.merge(match.match2bracketdata, _bracket_datas_by_id[newMatchId], {
 				header = match.match2bracketdata.header
@@ -83,6 +86,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId
 
 	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
 
+	-- store as wiki var so it can be retrieved by the display function
 	Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(newMatches))
 
 	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
