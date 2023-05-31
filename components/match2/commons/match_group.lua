@@ -83,16 +83,15 @@ function MatchGroup.MatchGroupById(args)
 	local matches
 
 	if args.shortTemplate then
-		matches = ShortenBracket.fetchAndAdjustMatches{
+		matches, args, bracketId = ShortenBracket.fetchAndAdjustMatches{
 			bracketId = bracketId,
 			shortTemplate = args.shortTemplate,
 			args = args,
 		}
 	else
 		matches = MatchGroupUtil.fetchMatches(bracketId)
+		assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 	end
-
-	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 
 	local matchGroupType = matches[1].bracketData.type
 
