@@ -32,14 +32,18 @@ function ShortenBracket.fetchAndAdjustMatches(props)
 	assert(matches[1].match2bracketdata.type == 'bracket',
 		'The data found for id "' .. props.bracketId .. '" is not a bracket')
 
-	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, props.bracketId)
+	local shortenedBracketIndex = (tonumber(Variables.varDefault('shortenedBracketIndex')) or 0) + 1
+	Variables.varDefine('shortenedBracketIndex', shortenedBracketIndex)
+	local newBracketId = shortenedBracketIndex .. props.bracketId
+
+	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, newBracketId)
 
 	return ShortenBracket._processMatches(
 		matches,
 		string.len(props.bracketId),
 		ShortenBracket._getSkipRoundValue(shortTemplate, props.bracketId, matches[1]),
-		props.bracketId
-	)
+		newBracketId
+	), Table.merge(props.args, {newBracketId, id = newBracketId}), newBracketId
 end
 
 function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch)
@@ -49,7 +53,7 @@ function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch)
 	return oldRoundCount - newRoundCount
 end
 
-function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId)
+function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId)
 	local newMatches = {}
 
 	for _, match in ipairs(matches) do
@@ -67,9 +71,9 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId
 
 			assert(_bracket_datas_by_id[newMatchId], 'bracket <--> short bracket missmatch: ' .. newMatchId)
 
-			match.match2id = string.sub(match.match2id, 1, idLength + 1) .. newMatchId
+			match.match2id = newBracketId .. '_' .. newMatchId
 
-			-- nil some stuff before merge
+			-- nil some stuff before merge since it doesn't get nil-ed in merge
 			match.match2bracketdata.loweredges = nil
 			match.match2bracketdata.skipround = nil
 
@@ -80,6 +84,8 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId
 			-- have to do this after the merge so that correct `match.match2bracketdata.lowerMatchIds` is available
 			match.match2bracketdata.loweredges = ShortenBracket._calculateLowerEdges(match)
 
+			match.match2bracketid = newBracketId
+
 			table.insert(newMatches, match)
 		end
 	end
@@ -87,9 +93,9 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, bracketId
 	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
 
 	-- store as wiki var so it can be retrieved by the display function
-	Variables.varDefine('match2bracket_' .. bracketId, Json.stringify(newMatches))
+	Variables.varDefine('match2bracket_' .. newBracketId, Json.stringify(newMatches))
 
-	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
+	return MatchGroupUtil.fetchMatchGroup(newBracketId).matches
 end
 
 function ShortenBracket._calculateLowerEdges(match)
