@@ -513,7 +513,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			},
 		}
 	end
-	
+
 	if args.game then
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
 	end
