@@ -478,7 +478,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 		:css('font-size', '85%')
 		:css('text-align', 'center')
 		:wikitext('Tournament Type')
-		:node(StatisticsPortal._getPieChartData(args, 'type', 'Mixed', TYPES))
+		:node(StatisticsPortal._getPieChartData(
+			args, 'type', 'Mixed', TYPES
+		))
 	)
 
 	if args.multiGame then
@@ -489,7 +491,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 			:css('font-size', '85%')
 			:css('text-align', 'center')
 			:wikitext('Game Breakdown')
-			:node(StatisticsPortal._getPieChartData(args, 'game', 'Other', StatisticsPortal._splitOrDefault(args.customGames, GAMES)))
+			:node(StatisticsPortal._getPieChartData(
+				args, 'game', 'Other', StatisticsPortal._splitOrDefault(args.customGames, GAMES)
+			))
 		)
 	end
 
@@ -501,7 +505,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 			:css('font-size', '85%')
 			:css('text-align', 'center')
 			:wikitext('Mode Breakdown')
-			:node(StatisticsPortal._getPieChartData(args, 'mode', 'Other', StatisticsPortal._splitOrDefault(args.customModes, {'Team'})))
+			:node(StatisticsPortal._getPieChartData(
+				args, 'mode', 'Other', StatisticsPortal._splitOrDefault(args.customModes, {'Team'})
+			))
 		)
 	end
 
@@ -771,7 +777,7 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 		return prizes[value:lower()]
 	end)
 
-  	return StatisticsPortal._drawPieChart(args, chartData)
+	return StatisticsPortal._drawPieChart(args, chartData)
 end
 
 
