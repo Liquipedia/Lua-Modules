@@ -513,6 +513,10 @@ function StatisticsPortal.pieChartBreakdown(args)
 			},
 		}
 	end
+	
+	if args.game then
+		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+	end
 
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'sum::prizepool',
