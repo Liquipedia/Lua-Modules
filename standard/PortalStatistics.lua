@@ -651,9 +651,9 @@ function StatisticsPortal.playerAgeTable(args)
 
 	for _, player in ipairs(playerData) do
 		local birthdate =  DateExt.readTimestamp(player.birthdate)
-		local age = os.date('*t', os.difftime(TIMESTAMP, (birthdate - DateExt.readTimestamp(EPOCH_DATE))))
-		local yearAge = age.year
-		local dayAge = age.yday
+		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
+		local yearAge = age.year - 1970
+		local dayAge = age.yday - 1
 
 		tbl:tag('tr')
 			:tag('td')
