@@ -42,6 +42,7 @@ local COACH_PREFIX = 'c'
 local SOLO_TYPE = 'solo'
 local TEAM_TYPE = 'team'
 local COACH_TYPE = 'coach'
+---@enum validResultsTableQueryTypes
 local VALID_QUERY_TYPES = {
 	SOLO_TYPE,
 	TEAM_TYPE,
@@ -121,7 +122,7 @@ function BaseResultsTable:_getOpponent()
 end
 
 ---Determines the queryType
----@return `SOLO_TYPE`|`TEAM_TYPE`|`COACH_TYPE`
+---@return validResultsTableQueryTypes
 function BaseResultsTable:getQueryType()
 	local args = self.args
 
