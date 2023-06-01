@@ -68,6 +68,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 
 		-- keep reset/3rd place match, i.e. last round
 		if not round then
+			match.match2id = newBracketId .. '_' .. matchId
 			table.insert(newMatches, match)
 
 		-- valid match we want to keep
