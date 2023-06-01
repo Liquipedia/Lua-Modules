@@ -142,7 +142,7 @@ function Count._baseConditions(args, isTournament)
 	return conditions
 end
 
-function Count.returnTierConditions(args, lpdbConditions)
+function Count._tierConditions(args, lpdbConditions)
 	args.liquipediatier = args.liquipediatier or args.tier
 
 	if args.liquipediatier then
