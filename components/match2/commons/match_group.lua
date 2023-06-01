@@ -76,22 +76,22 @@ end
 -- Displays a matchlist or bracket specified by ID.
 function MatchGroup.MatchGroupById(args)
 	local bracketId = args.id or args[1]
-	args.id = bracketId
-	args[1] = bracketId
 	assert(bracketId, 'Missing bracket ID')
 
 	local matches
 
 	if args.shortTemplate then
-		matches, args, bracketId = ShortenBracket.fetchAndAdjustMatches{
+		bracketId = ShortenBracket.adjustMatchesAndBracketId{
 			bracketId = bracketId,
 			shortTemplate = args.shortTemplate,
-			args = args,
 		}
-	else
-		matches = MatchGroupUtil.fetchMatches(bracketId)
-		assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 	end
+
+	args.id = bracketId
+	args[1] = bracketId
+
+	matches = MatchGroupUtil.fetchMatches(bracketId)
+	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 
 	local matchGroupType = matches[1].bracketData.type
 
