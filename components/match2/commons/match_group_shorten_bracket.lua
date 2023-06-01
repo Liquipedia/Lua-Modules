@@ -24,7 +24,7 @@ local _bracket_datas_by_id
 --- Fetches and adjusts matches so they can be displayed in the shortened format
 ---@param props {bracketId: string, shortTemplate: string, args: table}
 ---@return table
-function ShortenBracket.fetchAndAdjustMatches(props)
+function ShortenBracket.adjustMatchesAndBracketId(props)
 	local shortTemplate = 'Bracket/' .. string.gsub(props.shortTemplate, '^[bB]racket/', '')
 	local matches = MatchGroupUtil.fetchMatchRecords(props.bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. props.bracketId)
@@ -38,12 +38,19 @@ function ShortenBracket.fetchAndAdjustMatches(props)
 
 	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, newBracketId)
 
-	return ShortenBracket._processMatches(
+	local newMatches = ShortenBracket._processMatches(
 		matches,
 		string.len(props.bracketId),
 		ShortenBracket._getSkipRoundValue(shortTemplate, props.bracketId, matches[1]),
 		newBracketId
-	), Table.merge(props.args, {newBracketId, id = newBracketId}), newBracketId
+	)
+
+	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
+
+	-- store as wiki var so it can be retrieved by the display function
+	Variables.varDefine('match2bracket_' .. newBracketId, Json.stringify(newMatches))
+
+	return newBracketId
 end
 
 function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch)
@@ -90,12 +97,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 		end
 	end
 
-	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
-
-	-- store as wiki var so it can be retrieved by the display function
-	Variables.varDefine('match2bracket_' .. newBracketId, Json.stringify(newMatches))
-
-	return MatchGroupUtil.fetchMatchGroup(newBracketId).matches
+	return newMatches
 end
 
 function ShortenBracket._calculateLowerEdges(match)
