@@ -56,7 +56,7 @@ end
 
 ---@param funcName string|number
 ---@param ... any
----@return fun(obj: any): any
+---@return fun(obj: any, ...): any
 function Operator.method(funcName, ...)
 	local args = {...}
 	return function(obj)
