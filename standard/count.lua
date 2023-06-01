@@ -96,7 +96,7 @@ Condition Functions
 ]]--
 
 
-function Count.returnBaseConditions(args, isTournament)
+function Count._baseConditions(args, isTournament)
 	args.sdate = args.sdate or args.startdate
 	args.edate = args.edate or args.enddate
 
