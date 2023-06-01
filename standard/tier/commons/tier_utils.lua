@@ -38,7 +38,7 @@ end
 ---@param tier integer
 ---@param tierType string?
 ---@return table?, table?
-function Tier._raw(tier, tierType)
+function Tier.raw(tier, tierType)
 	return (TierData.tiers or {})[Tier.toIdentifier(tier)],
 		(TierData.tierTypes or {})[Tier.toIdentifier(tierType)]
 end
@@ -48,7 +48,7 @@ end
 ---@param tierType string?
 ---@return boolean
 function Tier.isValid(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return false end
 
@@ -64,7 +64,7 @@ end
 ---@param tierType string?
 ---@return integer?, string|integer|nil
 function Tier.toValue(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).value, (tierTypeData or {}).value
 end
@@ -74,7 +74,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toName(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).name, (tierTypeData or {}).name
 end
@@ -84,7 +84,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toShortName(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).short, (tierTypeData or {}).short
 end
@@ -94,7 +94,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toCategory(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).category, (tierTypeData or {}).category
 end
@@ -104,7 +104,7 @@ end
 ---@param tierType string?
 ---@return string
 function Tier.toSortValue(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).sort .. ((tierTypeData or {}).sort or '')
 end
@@ -126,7 +126,7 @@ end
 ---@param options table?
 ---@return string?
 function Tier.display(tier, tierType, options)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
 
