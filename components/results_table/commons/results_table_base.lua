@@ -69,6 +69,7 @@ function BaseResultsTable:readConfig()
 	local args = self.args
 
 	local config = {
+		showType = Logic.readBool(args.showType),
 		order = args.order or DEFAULT_VALUES.order,
 		hideResult = Logic.readBool(args.hideresult),
 		resolveOpponent = Logic.readBool(args.resolve or DEFAULT_VALUES.resolveOpponent),
@@ -146,7 +147,7 @@ function BaseResultsTable:create()
 	end)
 
 	-- Set the header
-	Table.iter.forEach(splitData, function(dataSet)
+	Array.forEach(splitData, function(dataSet)
 		dataSet.header = dataSet[1].date:sub(1,4)
 	end)
 
@@ -410,12 +411,16 @@ function BaseResultsTable:opponentDisplay(data, options)
 			opponent = Opponent.tbd(),
 			flip = options.flip,
 		}
-	elseif self.config.displayDefaultLogoAsIs or
-		data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
-
+	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
 			opponent = Opponent.fromLpdbStruct(data),
 			flip = options.flip,
+		}
+	elseif self.config.displayDefaultLogoAsIs then
+		return OpponentDisplay.BlockOpponent{
+			opponent = Opponent.fromLpdbStruct(data),
+			flip = options.flip,
+			teamStyle = 'icon',
 		}
 	end
 
@@ -482,12 +487,12 @@ end
 function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
-	if String.isNotEmpty(lastVs.groupscore) then
+	if Logic.isNotEmpty(lastVs.groupscore) then
 		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
 	end
 
 	local score = ''
-	if String.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
+	if Logic.isNotEmpty(placement.lastscore) or String.isNotEmpty(lastVs.score) then
 		score = (placement.lastscore or '-') .. SCORE_CONCAT .. (lastVs.score or '-')
 	end
 

@@ -17,6 +17,8 @@ local Variables = require('Module:Variables')
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
+---@param args table
+---@return string
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.liquipediatier = Tier.toNumber(args.liquipediatier)
@@ -25,6 +27,8 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
+---@param args table
+---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))

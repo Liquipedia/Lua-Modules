@@ -343,8 +343,8 @@ Array.extend({2, 3}, 5, 7, nil, {11, 13})
 -- returns {2, 3, 5, 7, 11, 13}
 ]]
 ---@generic T
----@param tbl T[]
----@param ... T[]
+---@param tbl T[]|T
+---@param ... T[]|T
 ---@return T[]
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
@@ -356,7 +356,7 @@ array is mutated in the process.
 ]]
 ---@generic T
 ---@param tbl T[]
----@param ... T[]
+---@param ... T[]|T
 ---@return T[]
 function Array.extendWith(tbl, ...)
 	local arrays = Table.pack(...)
@@ -467,11 +467,11 @@ local function pow(x, y) return x ^ y end
 Array.reduce({2, 3, 5}, pow)
 -- Returns 32768
 ]]
----@generic T
+---@generic T, V
 ---@param array T[]
----@param operator fun(aggregate: T, arrayValue: T): T
----@param initialValue T?
----@return T?
+---@param operator fun(aggregate: V, arrayValue: T): V
+---@param initialValue V?
+---@return V?
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then

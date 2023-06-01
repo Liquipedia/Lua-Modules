@@ -11,15 +11,21 @@ local Table = require('Module:Table')
 
 local ErrorExt = {}
 
+---@param error error
 function ErrorExt.log(error)
 	mw.log(ErrorExt.makeFullDetails(error))
 	mw.log()
 end
 
+---@param tbl table
+---@return table
+---@overload fun(tbl: any): {}
 local function tableOrEmpty(tbl)
 	return type(tbl) == 'table' and tbl or {}
 end
 
+---@param error error
+---@return string
 function ErrorExt.makeFullDetails(error)
 	local parts = Array.extend(
 		error.header,
@@ -30,10 +36,10 @@ function ErrorExt.makeFullDetails(error)
 	return table.concat(parts, '\n')
 end
 
---[[
-Builds a string for fields not covered by the other functions in this module.
-Returns nil if there are no extra fields.
-]]
+---Builds a string for fields not covered by the other functions in this module.
+---Returns nil if there are no extra fields.
+---@param error error
+---@return string?
 function ErrorExt.printExtraProps(error)
 	local extraProps = Table.copy(error)
 	extraProps.message = nil
@@ -51,6 +57,8 @@ function ErrorExt.printExtraProps(error)
 	end
 end
 
+---@param error error
+---@return string
 function ErrorExt.makeFullStackTrace(error)
 	local parts = Array.extend(
 		error.stacks,

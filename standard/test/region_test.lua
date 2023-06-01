@@ -14,19 +14,23 @@ local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local suite = ScribuntoUnit:new()
 
-function suite:testEmptyInput()
-	self:assertEquals('', Region.run{})
-	self:assertEquals('', Region.run{region = ''})
-	self:assertEquals('', Region.run{country = ''})
+function suite:testName()
+	self:assertEquals('', Region.name{region = ''})
+	self:assertEquals('', Region.name{})
+	self:assertEquals('', Region.name())
+	self:assertEquals('Europe', Region.name{region = 'Europe'})
+	self:assertEquals('South America', Region.name{region = 'sam'})
+	self:assertEquals('Europe', Region.name{region = 'eu'})
 end
 
-function suite:testBasicResolving()
-	self:assertEquals('Europe', Region.run{region = 'Europe', onlyRegion = true})
-	self:assertEquals('South America', Region.run{region = 'sam', onlyRegion = true})
-	self:assertEquals('Europe', Region.run{region = 'eu', onlyRegion = true})
+function suite:testDisplay()
+	local euFlag = Flags.Icon({flag = 'eu', shouldLink = true})
+	self:assertEquals(euFlag .. '&nbsp;Europe', Region.display{region = 'Europe'})
+	self:assertEquals('[[File:unasur.png]]&nbsp;South America', Region.display{region = 'sam'})
+	self:assertEquals(euFlag .. '&nbsp;Europe', Region.display{region = 'eu'})
 end
 
-function suite:testFullOutput()
+function suite:testRun()
 	local euFlag = Flags.Icon({flag = 'eu', shouldLink = true})
 	self:assertDeepEquals({display = euFlag .. '&nbsp;Europe', region = 'Europe'}, Region.run{region = 'Europe'})
 	self:assertDeepEquals(
@@ -36,6 +40,9 @@ function suite:testFullOutput()
 		},
 		Region.run{region = 'South America'}
 	)
+	self:assertDeepEquals({}, Region.run{})
+	self:assertDeepEquals({}, Region.run{region = ''})
+	self:assertDeepEquals({}, Region.run{country = ''})
 end
 
 return suite

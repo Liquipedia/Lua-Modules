@@ -36,12 +36,22 @@ StarcraftMatchSummary
 ]]
 local Opponent = {types = {}}
 
-Opponent.team = 'team'
-Opponent.solo = 'solo'
-Opponent.duo = 'duo'
-Opponent.trio = 'trio'
-Opponent.quad = 'quad'
-Opponent.literal = 'literal'
+---@enum OpponentType
+local OpponentTypes = {
+	team = 'team',
+	solo = 'solo',
+	duo = 'duo',
+	trio = 'trio',
+	quad = 'quad',
+	literal = 'literal',
+}
+
+Opponent.team = OpponentTypes.team
+Opponent.solo = OpponentTypes.solo
+Opponent.duo = OpponentTypes.duo
+Opponent.trio = OpponentTypes.trio
+Opponent.quad = OpponentTypes.quad
+Opponent.literal = OpponentTypes.literal
 
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
 Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
@@ -81,22 +91,25 @@ Opponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
+---Checks if the provided opponent type is a party type
+---@param type OpponentType
+---@return boolean
 function Opponent.typeIsParty(type)
 	return Opponent.partySizes[type] ~= nil
 end
 
---[[
-Returns the player count for a party type, or nil otherwise.
-
-Opponent.partySize(Opponent.duo) == 2
-]]
+---Returns the player count for a party type, or nil otherwise.
+---
+---example: Opponent.partySize(Opponent.duo) == 2
+---@param type OpponentType
+---@return integer?
 function Opponent.partySize(type)
 	return Opponent.partySizes[type]
 end
 
---[[
-Creates a blank literal opponent, or a blank opponent of the specified type
-]]
+---Creates a blank literal opponent, or a blank opponent of the specified type
+---@param type OpponentType
+---@return standardOpponent
 function Opponent.blank(type)
 	if type == Opponent.team then
 		return {type = type, template = 'tbd'}
@@ -113,9 +126,9 @@ function Opponent.blank(type)
 	end
 end
 
---[[
-Creates a blank TBD opponent, or a TBD opponent of the specified type
-]]
+---Creates a blank TBD opponent, or a TBD opponent of the specified type
+---@param type OpponentType
+---@return standardOpponent
 function Opponent.tbd(type)
 	if type == Opponent.team then
 		return {type = type, template = 'tbd'}
@@ -132,9 +145,9 @@ function Opponent.tbd(type)
 	end
 end
 
---[[
-Whether an opponent is TBD
-]]
+---Checks whether an opponent is TBD
+---@param opponent standardOpponent
+---@return boolean
 function Opponent.isTbd(opponent)
 	if opponent.type == Opponent.team then
 		return opponent.template == 'tbd'
@@ -151,28 +164,36 @@ function Opponent.isTbd(opponent)
 	end
 end
 
+---Checks if a player is a TBD player
+---@param player standardPlayer
+---@return boolean
 function Opponent.playerIsTbd(player)
 	return String.isEmpty(player.displayName) or player.displayName:upper() == 'TBD'
 end
 
+---Checks if a provided string is an opponent type
+---@param type string
+---@return boolean
 function Opponent.isType(type)
 	return Table.includes(Opponent.types, type)
 end
 
+---Reads an opponent type.
+---If an invalid entry is given returns nil.
+---@param type string
+---@return OpponentType?
 function Opponent.readType(type)
 	return Table.includes(Opponent.types, type) and type or nil
 end
 
---[[
-Asserts that an arbitary value is a valid representation of an opponent
-]]
+---Asserts that an arbitary value is a valid representation of an opponent
+---@param opponent any
 function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
---[[
-Coerces an arbitary table into an opponent
-]]
+---Coerces an arbitary table into an opponent
+---@param opponent table
 function Opponent.coerce(opponent)
 	assert(type(opponent) == 'table')
 
@@ -207,6 +228,8 @@ Example:
 
 Opponent.toMode(Opponent.duo, Opponent.duo) == '2_2'
 ]]
+---@param ... OpponentType
+---@return string
 function Opponent.toMode(...)
 	local modeParts = Array.map(arg, function(opponentType)
 		return Opponent.partySize(opponentType) or opponentType
@@ -223,6 +246,8 @@ Example:
 
 Opponent.toLegacyMode(Opponent.duo, Opponent.duo) == '2v2'
 ]]
+---@param ... OpponentType
+---@return string
 function Opponent.toLegacyMode(...)
 	local modeParts = Array.map(arg, function(opponentType)
 		return Opponent.partySize(opponentType) or opponentType
@@ -244,6 +269,10 @@ using data stored in page variables if present.
 
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
+---@param opponent standardOpponent
+---@param date string|number|nil
+---@param options {syncPlayer: boolean?}?
+---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
@@ -272,6 +301,8 @@ match2opponent.name field.
 
 Returns nil if the team template does not exist.
 ]]
+---@param opponent standardOpponent
+---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
 		return TeamTemplate.getPageName(opponent.template)
@@ -295,6 +326,8 @@ Template:LiteralOpponent, and etc.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
+---@param args table
+---@return standardOpponent?
 function Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize(args.type)
 
@@ -342,6 +375,8 @@ unsuccessful.
 Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
+---@param record table
+---@return standardOpponent?
 function Opponent.fromMatch2Record(record)
 	if record.type == Opponent.team then
 		return {type = Opponent.team, template = record.template}
@@ -366,9 +401,9 @@ function Opponent.fromMatch2Record(record)
 	end
 end
 
---[[
-Reads an opponent struct and builds a standings/placement lpdb struct from it
-]]
+---Reads an opponent struct and builds a standings/placement lpdb struct from it
+---@param opponent standardOpponent
+---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
 function Opponent.toLpdbStruct(opponent)
 	local storageStruct = {
 		opponentname = Opponent.toName(opponent),
@@ -395,9 +430,9 @@ function Opponent.toLpdbStruct(opponent)
 	return storageStruct
 end
 
---[[
-Reads a standings or placement lpdb structure and builds an opponent struct from it
-]]
+---Reads a standings or placement lpdb structure and builds an opponent struct from it
+---@param storageStruct table
+---@return standardOpponent?
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then

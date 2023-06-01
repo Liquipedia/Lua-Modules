@@ -25,6 +25,17 @@ CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentD
 	showRace = 'boolean?',
 })
 
+---@class WarcraftInlineOpponentProps
+---@field flip boolean?
+---@field opponent WarcraftStandardOpponent
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showRace boolean?
+---@field dq boolean?
+---@field teamStyle teamStyle
+
+---@param props WarcraftInlineOpponentProps
+---@return Html|string|nil
 function CustomOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
@@ -42,6 +53,20 @@ CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDi
 	playerClass = 'string?',
 })
 
+---@class WarcraftBlockOpponentProps
+---@field flip boolean?
+---@field opponent StarcraftStandardOpponent
+---@field overflow ('ellipsis'|'wrap'|'hidden')?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field playerClass string?
+---@field teamStyle teamStyle?
+---@field showRace boolean?
+
+---@param props WarcraftBlockOpponentProps
+---@return Html
 function CustomOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
@@ -59,6 +84,8 @@ function CustomOpponentDisplay.BlockOpponent(props)
 	return OpponentDisplay.BlockOpponent(props)
 end
 
+---@param props WarcraftInlineOpponentProps
+---@return Html
 function CustomOpponentDisplay.InlinePlayers(props)
 	local showRace = props.showRace ~= false
 	local opponent = props.opponent
@@ -75,6 +102,8 @@ function CustomOpponentDisplay.InlinePlayers(props)
 		:node(table.concat(playerTexts, ' / '))
 end
 
+---@param props WarcraftBlockOpponentProps
+---@return Html
 function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false

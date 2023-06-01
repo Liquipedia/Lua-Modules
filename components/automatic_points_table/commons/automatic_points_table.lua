@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
 local TableDisplay = require('Module:AutomaticPointsTable/Display')
@@ -71,7 +72,7 @@ end
 
 function AutomaticPointsTable:storeLPDB(pointsData)
 	local date = os.date()
-	Table.iter.forEachIndexed(pointsData, function(index, teamPointsData)
+	Array.forEach(pointsData, function(teamPointsData)
 		local team = teamPointsData.team
 		local teamName = string.lower(team.aliases[#team.aliases])
 		local lpdbName = self.parsedInput.lpdbName
@@ -202,8 +203,8 @@ function AutomaticPointsTable:generateReverseAliases(teams, tournaments)
 	local shouldResolveRedirect = self.parsedInput.shouldResolveRedirect
 	for tournamentIndex = 1, #tournaments do
 		reverseAliases[tournamentIndex] = {}
-		Table.iter.forEachIndexed(teams,
-			function(index, team)
+		Array.forEach(teams,
+			function(team, index)
 				local alias
 				if shouldResolveRedirect then
 					alias = mw.ext.TeamLiquidIntegration.resolve_redirect(team.aliases[tournamentIndex])
@@ -230,8 +231,8 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 	local tree = ConditionTree(BooleanOperator.any)
 	local columnName = ColumnName('tournament')
 	local tournamentIndices = {}
-	Table.iter.forEachIndexed(tournaments,
-		function(index, t)
+	Array.forEach(tournaments,
+		function(t, index)
 			tree:add(ConditionNode(columnName, Comparator.eq, t.name))
 			tournamentIndices[t.name] = index
 			t.placements = {}
@@ -242,7 +243,7 @@ function AutomaticPointsTable:queryPlacements(teams, tournaments)
 	queryParams.conditions = conditions
 	local allQueryResult = mw.ext.LiquipediaDB.lpdb('placement', queryParams)
 
-	Table.iter.forEach(allQueryResult,
+	Array.forEach(allQueryResult,
 		function(result)
 			local tournamentIndex = tournamentIndices[result.tournament]
 			local tournament = tournaments[tournamentIndex]

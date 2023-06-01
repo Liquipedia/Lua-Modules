@@ -215,14 +215,14 @@ function CustomLeague.getIconFromSeries(page)
 end
 
 function CustomLeague:_createPrizepool()
-	if String.isEmpty(_args.prizepool) and
-		String.isEmpty(_args.prizepoolusd) then
+	if Logic.isEmpty(_args.prizepool) and
+		Logic.isEmpty(_args.prizepoolusd) then
 		return nil
 	end
 
 	local localCurrency = _args.localcurrency
 	local prizePoolUSD = _args.prizepoolusd
-	local prizePool = _args.prizepool
+	local prizePool = _args.prizepool --[[@as number|string|nil]]
 
 	local display
 	if prizePoolUSD then

@@ -10,15 +10,29 @@ local Json = {}
 
 local Arguments = require('Module:Arguments')
 
+---Json-stringifies all arguments from a supplied frame.
+---@param frame Frame
+---@return string
 function Json.fromArgs(frame)
 	local args = Arguments.getArgs(frame)
 	return Json.stringify(args)
 end
 
+---Json-stringifies a given table.
+---@param obj table
+---@param pretty boolean?
+---@return string
 function Json.stringify(obj, pretty)
 	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
 end
 
+
+---Parses a given JSON encoded table to its table representation.
+---If the parse fails it returns an empty table.
+---Second return value boolean indicates a failed parse.
+---@param obj string
+---@return table, boolean
+---@overload fun(obj: any): {}, true
 function Json.parse(obj)
 	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
@@ -32,6 +46,10 @@ function Json.parse(obj)
 	end
 end
 
+---Parses a given object if it is a string. Else it returns the given object.
+---@param obj string
+---@return table, boolean
+---@overload fun(obj: any): any
 function Json.parseIfString(obj)
 	if type(obj) == 'string' then
 		return Json.parse(obj)
@@ -40,15 +58,13 @@ function Json.parseIfString(obj)
 	end
 end
 
---[[
-Attempts to parse a JSON encoded table. Returns nil if unsuccessful.
-
-Example:
-
-JsonExt.parseIfTable('{"a" = 3}')
--- Returns {a = 3}
-
-]]
+---Attempts to parse a JSON encoded table. Returns nil if unsuccessful.
+---Checks if the given string starts with `'{'` or `'['`
+---
+---Example: JsonExt.parseIfTable('{"a" = 3}') = {a = 3}
+---@param any string
+---@return table?
+---@overload fun(any: any): nil
 function Json.parseIfTable(any)
 	if type(any) == 'string' then
 		local firstChar = any:sub(1, 1)
