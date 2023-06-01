@@ -110,42 +110,33 @@ function Count.returnBaseConditions(args, isTournament)
 		conditions:add{ConditionNode(ColumnName('type'), Comparator.eq, args.type:lower())}
 	end
 
+	local startDateKey, endDateKey, sortDateKey
 	if isTournament then
-		if args.sdate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('startdate'), Comparator.gt, args.sdate),
-				ConditionNode(ColumnName('startdate'), Comparator.eq, args.sdate)
-				},
-			}
-		end
-		if args.edate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('enddate'), Comparator.lt, args.edate),
-				ConditionNode(ColumnName('enddate'), Comparator.eq, args.edate)
-				},
-			}
-		end
-		if args.year then
-			conditions:add{ConditionNode(ColumnName('sortdate_year'), Comparator.eq, args.year)}
-		end
+		startDateKey = 'startdate'
+		endDateKey= 'enddate'
+		sortDateKey= 'sortdate'
 	else
-		if args.sdate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('date'), Comparator.gt, args.sdate),
-				ConditionNode(ColumnName('date'), Comparator.eq, args.sdate)
-				},
-			}
-		end
-		if args.edate then
-			conditions:add{ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('date'), Comparator.lt, args.edate),
-				ConditionNode(ColumnName('date'), Comparator.eq, args.edate)
-				},
-			}
-		end
-		if args.year then
-			conditions:add{ConditionNode(ColumnName('date_year'), Comparator.eq, args.year)}
-		end
+		startDateKey = 'date'
+		endDateKey = 'date'
+		sortDateKey= 'date'
+	end
+
+	if args.sdate then
+		conditions:add{ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName(startDateKey), Comparator.gt, args.sdate),
+			ConditionNode(ColumnName(startDateKey), Comparator.eq, args.sdate)
+			},
+		}
+	end
+	if args.edate then
+		conditions:add{ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName(endDateKey), Comparator.lt, args.edate),
+			ConditionNode(ColumnName(endDateKey), Comparator.eq, args.edate)
+			},
+		}
+	end
+	if args.year then
+		conditions:add{ConditionNode(ColumnName(sortDateKey .. '_year'), Comparator.eq, args.year)}
 	end
 
 	return conditions
