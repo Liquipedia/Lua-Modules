@@ -67,7 +67,6 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 		local matchId = string.sub(match.match2id, idLength + 2)
 		local round = tonumber(string.sub(matchId, 2, 3))
 
-
 		-- keep reset/3rd place match, i.e. last round
 		if not round then
 			table.insert(newMatches, match)
@@ -76,7 +75,8 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 		elseif round > skipRounds then
 			local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
-			assert(_bracket_datas_by_id[newMatchId], 'bracket <--> short bracket missmatch: ' .. newMatchId)
+			assert(_bracket_datas_by_id[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
+				.. newMatchId .. ' (calculated from ' .. matchId .. ')')
 
 			match.match2id = newBracketId .. '_' .. newMatchId
 
