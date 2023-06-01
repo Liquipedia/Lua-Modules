@@ -251,9 +251,11 @@ function BroadcastTalentTable:_row(tournament)
 		row:addClass('tournament-highlighted-bg')
 	end
 
+	local tierDisplay, tierSortValue = self:_tierDisplay(tournament)
+
 	row
 		:tag('td'):wikitext(tournament.date):done()
-		:tag('td'):wikitext(self:_tierDisplay(tournament)):done()
+		:tag('td'):wikitext(tierDisplay):attr('data-sort-value', tierSortValue):done()
 
 	if self.args.displayGameIcon then
 		row:tag('td'):node(Game.icon{game = tournament.game})
@@ -343,7 +345,7 @@ function BroadcastTalentTable:_tierDisplay(tournament)
 	options.shortIfBoth = true
 	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
 
-	return Tier.display(tier, tierType, options)
+	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
 ---@param tournament table
