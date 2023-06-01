@@ -341,7 +341,7 @@ end
 
 ---Builds Lpdb conditions for players on a given team
 ---@param opponentTeamTemplates string[]
----@return table
+---@return ConditionTree
 function BaseResultsTable:buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	local config = self.config
 
