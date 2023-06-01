@@ -14,12 +14,14 @@ local Game = require('Module:Game')
 local HighlightConditions = require('Module:HighlightConditions')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
+
+local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -155,10 +157,12 @@ function BroadcastTalentTable:_fetchTournaments()
 	local tournaments = {}
 	local pageNames = {}
 	for _, tournament in pairs(queryData) do
-		if not pageNames[tournament.pagename] then
+		if not pageNames[tournament.pagename] or Logic.readBool(tournament.extradata.showmatch) then
 			tournament.positions = {tournament.position}
 			table.insert(tournaments, tournament)
-			pageNames[tournament.pagename] = tournament
+			if not Logic.readBool(tournament.extradata.showmatch) then
+				pageNames[tournament.pagename] = tournament
+			end
 		else
 			table.insert(pageNames[tournament.pagename].positions, tournament.position)
 		end
@@ -281,7 +285,7 @@ end
 ---@return table
 function BroadcastTalentTable._fetchTournamentData(tournament)
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. tournament.parent .. ']]',
+		conditions = '[[pagename::' .. tournament.parent .. ']] OR [[pagename::' .. tournament.pagename .. ']]',
 		query = 'name, tickername, icon, icondark, series, game, '
 			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
 	})
@@ -292,7 +296,21 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 
 	queryData[1].tournamentExtradata = queryData[1].extradata
 
-	return Table.merge(queryData[1], tournament)
+	local tournamentData = Table.merge(queryData[1], tournament)
+
+	local extradata = tournamentData.extradata or {}
+	if Logic.readBool(extradata.showmatch) then
+		if String.isNotEmpty(extradata.liquipediatier) then
+			tournamentData.liquipediatier = extradata.liquipediatier
+		end
+		if String.isNotEmpty(extradata.liquipediatiertype) then
+			tournamentData.liquipediatiertype = extradata.liquipediatiertype
+		else
+			tournamentData.liquipediatiertype = 'Showmatch'
+		end
+	end
+
+	return tournamentData
 end
 
 ---@param tournament table
@@ -319,12 +337,8 @@ end
 ---@param tournament table
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
-	-- `tournament.extradata` is not the extradata of the tournament but of the broadcaster (they got merged together)
-	if Logic.readBool((tournament.extradata or {}).showmatch) then
-		return 'Showmatch'
-	end
-
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
+
 	options.link = true
 	options.shortIfBoth = true
 	options.onlyTierTypeIfBoth = self.args.showTierType and tournament.liquipediatiertype ~= DEFAULT_TIERTYPE
