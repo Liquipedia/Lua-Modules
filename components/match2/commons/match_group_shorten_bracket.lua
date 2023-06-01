@@ -19,8 +19,6 @@ local ShortenBracket = {}
 
 local FIRST_MATCH_KEY = 'R01-M001'
 
-local _bracket_datas_by_id
-
 --- Fetches and adjusts matches so they can be displayed in the shortened format
 ---@param props {bracketId: string, shortTemplate: string, args: table}
 ---@return table
@@ -36,13 +34,14 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 	Variables.varDefine('shortenedBracketIndex', shortenedBracketIndex)
 	local newBracketId = shortenedBracketIndex .. props.bracketId
 
-	_bracket_datas_by_id = MatchGroupInput._fetchBracketDatas(shortTemplate, newBracketId)
+	local bracketDatasById = MatchGroupInput._fetchBracketDatas(shortTemplate, newBracketId)
 
 	local newMatches = ShortenBracket._processMatches(
 		matches,
 		string.len(props.bracketId),
-		ShortenBracket._getSkipRoundValue(shortTemplate, props.bracketId, matches[1]),
-		newBracketId
+		ShortenBracket._getSkipRoundValue(shortTemplate, props.bracketId, matches[1], bracketDatasById),
+		newBracketId,
+		bracketDatasById
 	)
 
 	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
@@ -53,14 +52,14 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 	return newBracketId
 end
 
-function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch)
-	local newRoundCount = _bracket_datas_by_id[FIRST_MATCH_KEY].coordinates.roundCount
+function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch, bracketDatasById)
+	local newRoundCount = bracketDatasById[FIRST_MATCH_KEY].coordinates.roundCount
 	local oldRoundCount = firstMatch.match2bracketdata.coordinates.roundCount
 
 	return oldRoundCount - newRoundCount
 end
 
-function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId)
+function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId, bracketDatasById)
 	local newMatches = {}
 
 	for _, match in ipairs(matches) do
@@ -75,7 +74,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 		elseif round > skipRounds then
 			local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
-			assert(_bracket_datas_by_id[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
+			assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
 				.. newMatchId .. ' (calculated from ' .. matchId .. ')')
 
 			match.match2id = newBracketId .. '_' .. newMatchId
@@ -84,7 +83,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 			match.match2bracketdata.loweredges = nil
 			match.match2bracketdata.skipround = nil
 
-			match.match2bracketdata = Table.merge(match.match2bracketdata, _bracket_datas_by_id[newMatchId], {
+			match.match2bracketdata = Table.merge(match.match2bracketdata, bracketDatasById[newMatchId], {
 				header = match.match2bracketdata.header
 			})
 
