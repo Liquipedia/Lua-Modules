@@ -78,8 +78,6 @@ function MatchGroup.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	assert(bracketId, 'Missing bracket ID')
 
-	local matches
-
 	if args.shortTemplate then
 		bracketId = ShortenBracket.adjustMatchesAndBracketId{
 			bracketId = bracketId,
@@ -90,7 +88,7 @@ function MatchGroup.MatchGroupById(args)
 	args.id = bracketId
 	args[1] = bracketId
 
-	matches = MatchGroupUtil.fetchMatches(bracketId)
+	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 
 	local matchGroupType = matches[1].bracketData.type
