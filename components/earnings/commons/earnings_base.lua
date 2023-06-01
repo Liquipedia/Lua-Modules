@@ -114,14 +114,12 @@ function Earnings.calculateForTeam(args)
 				return 0
 			end
 
-			Array.extendWith(queryTeams, historicalNames)
+			Array.extendWith(queryTeams, Array.map(historicalNames, String.upperCaseFirst))
 		end
 	elseif not Logic.readBool(args.noRedirect) then
-		for index, team in pairs(teams) do
-			queryTeams[index] = mw.ext.TeamLiquidIntegration.resolve_redirect(team)
-		end
+		queryTeams = Array.map(teams, mw.ext.TeamLiquidIntegration.resolve_redirect)
 	else
-		queryTeams = teams
+		queryTeams = Array.map(teams, String.upperCaseFirst)
 	end
 
 	local formatParticipant = function(lpdbField)
