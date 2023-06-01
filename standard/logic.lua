@@ -8,6 +8,11 @@
 
 local Logic = {}
 
+---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
+---@param val1 table|string|boolean|nil
+---@param val2 table|string|boolean|nil
+---@param default any
+---@return string|table|any|nil
 function Logic.emptyOr(val1, val2, default)
 	if not Logic.isEmpty(val1) then
 		return val1
@@ -18,6 +23,9 @@ function Logic.emptyOr(val1, val2, default)
 	end
 end
 
+---Returns the first non nil value
+---@param ... any?
+---@return any?
 function Logic.nilOr(...)
 	local args = require('Module:Table').pack(...)
 	for i = 1, args.n do
@@ -35,6 +43,9 @@ function Logic.nilOr(...)
 	return nil
 end
 
+---Checks if a given object (table|string|nil) is empty
+---@param val table|string|number|nil
+---@return boolean
 function Logic.isEmpty(val)
 	if type(val) == 'table' then
 		return require('Module:Table').isEmpty(val)
@@ -43,6 +54,9 @@ function Logic.isEmpty(val)
 	end
 end
 
+---Checks if a given object (table|string|nil) is not empty
+---@param val table|string|number|nil
+---@return boolean
 function Logic.isNotEmpty(val)
 	if type(val) == 'table' then
 		return require('Module:Table').isNotEmpty(val)
@@ -51,10 +65,17 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---Check if the input is a representation of a boolean
+---@param val string|number|boolean|nil
+---@return boolean
 function Logic.readBool(val)
 	return val == 'true' or val == 't' or val == 'yes' or val == 'y' or val == true or val == '1' or val == 1
 end
 
+---Reads a boolean string/number representation to a boolean.
+---If the supplied value is nil will return nil
+---@param val string|number|boolean|nil
+---@return boolean?
 function Logic.readBoolOrNil(val)
 	if Logic.readBool(val) then
 		return true
@@ -65,6 +86,9 @@ function Logic.readBoolOrNil(val)
 	end
 end
 
+---Throws an error if the supplied value is nil
+---@param val any?
+---@return any
 function Logic.nilThrows(val)
 	if val == nil then
 		error('Unexpected nil', 2)
@@ -72,6 +96,11 @@ function Logic.nilThrows(val)
 	return val
 end
 
+---Trys to execute a function.
+---If it fails executes a catch function
+---@param try function
+---@param catch function
+---@return any?
 function Logic.tryCatch(try, catch)
 	local ran, result = pcall(try)
 	if not ran then
@@ -81,17 +110,23 @@ function Logic.tryCatch(try, catch)
 	end
 end
 
+---@param f function
+---@return any?
 function Logic.try(f)
 	return require('Module:ResultOrError').try(f)
 end
 
+---Checks if a provided value is numeric
+---@param val number|string|nil
+---@return boolean
 function Logic.isNumeric(val)
 	return tonumber(val) ~= nil
 end
 
---[[
-Determines whether two values are equal. Table values are compared recursively.
-]]
+---Determines whether two values are equal. Table values are compared recursively.
+---@param x any
+---@param y any
+---@return boolean
 function Logic.deepEquals(x, y)
 	if x == y then
 		return true

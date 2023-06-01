@@ -31,6 +31,10 @@ function ResultsTable:buildHeader()
 		:tag('th'):css('min-width', '80px'):wikitext('Place'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
 
+	if self.config.showType then
+		header:tag('th'):css('min-width', '50px'):wikitext('Type')
+	end
+
 	if self.config.displayGameIcons then
 		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
 	end
@@ -68,6 +72,10 @@ function ResultsTable:buildRow(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
 
+	if self.config.showType then
+		row:tag('td'):wikitext(placement.type)
+	end
+
 	if self.config.displayGameIcons then
 		row:tag('td'):node(Game.icon{game = placement.game})
 	end
@@ -92,9 +100,10 @@ function ResultsTable:buildRow(placement)
 		self.config.queryType ~= Opponent.team or
 		Table.isNotEmpty(self.config.aliases) then
 
-		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
-			placement,
-			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
+		row:tag('td'):css('text-align', self.config.hideResult and 'left' or 'right')
+			:attr('data-sort-value', placement.opponentname)
+			:node(self:opponentDisplay(placement,
+			{teamForSolo = not self.config.playerResultsOfTeam, flip = not self.config.hideResult}
 		))
 	end
 

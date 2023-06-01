@@ -27,6 +27,8 @@ ErrorDisplay.propTypes.Box = {
 	text = 'string',
 }
 
+---@param props {hasDetails: boolean?, loggedInOnly: boolean?, text: string}
+---@return Html
 function ErrorDisplay.Box(props)
 	local div = mw.html.create('div'):addClass('navigation-not-searchable ambox-wrapper')
 		:addClass('ambox wiki-bordercolor-dark wiki-backgroundcolor-light')
@@ -44,6 +46,8 @@ function ErrorDisplay.Box(props)
 	return div:node(tbl)
 end
 
+---@param error error
+---@return Html
 function ErrorDisplay.ErrorBox(error)
 	return ErrorDisplay.Box({
 		hasDetails = error.stacks ~= nil,
@@ -51,9 +55,9 @@ function ErrorDisplay.ErrorBox(error)
 	})
 end
 
---[[
-Shows the message and stack trace of a lua error. Suitable for use in a popup.
-]]
+---Shows the message and stack trace of a lua error. Suitable for use in a popup.
+---@param error error
+---@return Html
 function ErrorDisplay.ErrorDetails(error)
 	local errorDetailsNode = mw.html.create('div'):addClass('error-details')
 

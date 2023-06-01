@@ -42,6 +42,10 @@ example:
 
 	return foundMatchIds
 ]==]
+---@param tableName string
+---@param queryParameters table
+---@param itemChecker fun(item: table): boolean?
+---@param limit number?
 function Lpdb.executeMassQuery(tableName, queryParameters, itemChecker, limit)
 	queryParameters.offset = queryParameters.offset or 0
 	queryParameters.limit = queryParameters.limit or _MAXIMUM_QUERY_LIMIT

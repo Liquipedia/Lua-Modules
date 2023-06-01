@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -114,7 +113,7 @@ end
 ---@param type string
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

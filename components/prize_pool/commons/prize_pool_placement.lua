@@ -135,7 +135,7 @@ Placement.additionalData = {
 			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
-				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
+				if Logic.isEmpty(rawScore) and Logic.isNotEmpty(rawScores[index + 1]) then
 					rawScores[index + 1] = '-' .. rawScores[index + 1]
 				else
 					table.insert(scores, rawScore)
@@ -305,9 +305,9 @@ function Placement:_displayPlace()
 		end
 	end
 
-	local start = Ordinal._ordinal(self.placeStart)
+	local start = Ordinal.toOrdinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+		return start .. DASH .. Ordinal.toOrdinal(self.placeEnd)
 	end
 
 	return start

@@ -184,7 +184,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	-- set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if not Logic.isEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -211,7 +211,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and String.isEmpty(winner) then
+			if counter == 1 and Logic.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
@@ -467,7 +467,7 @@ end
 
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
-	if String.isNotEmpty(match.winner) then
+	if Logic.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
