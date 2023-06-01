@@ -21,13 +21,13 @@ local Medal = require('Module:Medal')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local LANG = mw.language.new('en')
 local NONBREAKING_SPACE = '&nbsp;'
@@ -451,8 +451,11 @@ end
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
 
+	local conditions = Conditions.placeConditions(tournamentData, self.config)
+		.. (self.args.additionalPlaceConditions or '')
+
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = Conditions.placeConditions(tournamentData, self.config),
+		conditions = conditions,
 		query = 'opponentname, opponenttype, opponenttemplate, opponentplayers, placement, extradata',
 		order = 'placement asc',
 		limit = 50,
