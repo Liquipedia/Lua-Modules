@@ -15,7 +15,7 @@ local Count = {}
 function Count.games(args)
 	args = args or {}
 
-	local lpdbConditions = Count.returnBaseConditions(args)
+	local lpdbConditions = Count._baseConditions(args)
 
 	return Count._query('game', 'objectname', lpdbConditions)
 end
@@ -23,8 +23,8 @@ end
 function Count.matches(args)
 	args = args or {}
 
-	local lpdbConditions = Count.returnBaseConditions(args)
-	lpdbConditions = Count.returnTierConditions(args, lpdbConditions)
+	local lpdbConditions = Count._baseConditions(args)
+	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
 	return Count._query('match', 'objectname', lpdbConditions)
 end
@@ -32,8 +32,8 @@ end
 function Count.tournaments(args)
 	args = args or {}
 
-	local lpdbConditions = Count.returnBaseConditions(args, true)
-	lpdbConditions = Count.returnTierConditions(args, lpdbConditions)
+	local lpdbConditions = Count._baseConditions(args, true)
+	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
 	return Count._query('tournament', 'objectname', lpdbConditions)
 end
@@ -41,7 +41,7 @@ end
 function Count.placements(args)
 	args = args or {}
 
-	local lpdbConditions = Count.returnBaseConditions(args)
+	local lpdbConditions = Count._baseConditions(args)
 	local player = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player) or ''
 
 	if String.isNotEmpty(args.tier) then
