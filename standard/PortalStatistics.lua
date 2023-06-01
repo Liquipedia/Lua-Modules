@@ -283,7 +283,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	if String.isNotEmpty(args.showTierTypes) then
 		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
-			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
+			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(Count.tournaments(Table.merge(
@@ -327,7 +327,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 
 	if String.isNotEmpty(args.showTierTypes) then
 		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
-			local _, tierTypeData = Tier._raw(nil, tierTypeValue)
+			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				headerRow:tag('th')
 					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true,}))
