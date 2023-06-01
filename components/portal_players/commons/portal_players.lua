@@ -39,6 +39,7 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@field countries string?
 ---@field playerType string?
 ---@field game string?
+---@field width string?
 ---@field queryOnlyByRegion boolean
 ---@field showLocalizedName boolean
 
@@ -50,6 +51,7 @@ function PortalPlayers:init(args)
 	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
 	self.queryOnlyByRegion = Logic.readBool(args.queryOnlyByRegion)
 	self.playerType = args.playerType or DEFAULT_PLAYER_TYPE
+	self.width = args.width or '720px'
 
 	return self
 end
@@ -196,7 +198,7 @@ function PortalPlayers:buildCountryTable(args)
 	local tbl = mw.html.create('table')
 		:addClass('wikitable collapsible smwtable')
 		:addClass(not isPlayer and 'collapsed' or nil)
-		:css('width', args.width or '720px')
+		:css('width', self.width)
 		:css('text-align', 'left')
 		:node(self:header(args))
 
