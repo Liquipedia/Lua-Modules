@@ -54,7 +54,7 @@ function Operator.property(item)
 	end
 end
 
----@param funcName function
+---@param funcName string|number
 ---@param ... any
 ---@return fun(obj: any): any
 function Operator.method(funcName, ...)
