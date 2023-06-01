@@ -39,14 +39,11 @@ local DEFAULT_VALUES = {
 }
 local PLAYER_PREFIX = 'p'
 local COACH_PREFIX = 'c'
-local SOLO_TYPE = 'solo'
-local TEAM_TYPE = 'team'
-local COACH_TYPE = 'coach'
 ---@enum validResultsTableQueryTypes
-local VALID_QUERY_TYPES = {
-	SOLO_TYPE,
-	TEAM_TYPE,
-	COACH_TYPE,
+local QUERY_TYPES = {
+	solo = 'solo',
+	team = 'team',
+	coach = 'coach',
 }
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local DEFAULT_RESULTS_SUB_PAGE = 'Results'
@@ -98,10 +95,10 @@ function BaseResultsTable:readConfig()
 		(config.onlyAchievements and DEFAULT_VALUES.achievementsLimit or DEFAULT_VALUES.resultsLimit)
 
 	config.playerLimit =
-		(config.queryType == SOLO_TYPE and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
+		(config.queryType == QUERY_TYPES.solo and (tonumber(args.playerLimit) or DEFAULT_VALUES.playerLimit))
 		or tonumber(args.coachLimit) or DEFAULT_VALUES.coachLimit
 
-	if config.queryType == TEAM_TYPE and Table.isNotEmpty(config.aliases) then
+	if config.queryType == QUERY_TYPES.team and Table.isNotEmpty(config.aliases) then
 		config.nonAliasTeamTemplates = BaseResultsTable._getOpponentTemplates(config.opponent)
 	end
 
@@ -128,7 +125,7 @@ function BaseResultsTable:getQueryType()
 
 	if args.querytype then
 		local queryType = args.querytype:lower()
-		if Table.includes(VALID_QUERY_TYPES, queryType) then
+		if Table.includes(QUERY_TYPES, queryType) then
 			return queryType
 		end
 	end
@@ -252,9 +249,9 @@ end
 function BaseResultsTable:buildOpponentConditions()
 	local config = self.config
 
-	if config.queryType == SOLO_TYPE or config.queryType == COACH_TYPE then
+	if config.queryType == QUERY_TYPES.solo or config.queryType == QUERY_TYPES.coach then
 		return self:buildNonTeamOpponentConditions()
-	elseif config.queryType == TEAM_TYPE then
+	elseif config.queryType == QUERY_TYPES.team then
 		return self:buildTeamOpponentConditions()
 	end
 end
@@ -276,7 +273,7 @@ function BaseResultsTable:buildNonTeamOpponentConditions()
 		local opponentWithUnderscore = opponent:gsub(' ', '_')
 
 		local prefix
-		if config.queryType == SOLO_TYPE then
+		if config.queryType == QUERY_TYPES.solo then
 			prefix = PLAYER_PREFIX
 			opponentConditions:add{
 				ConditionTree(BooleanOperator.all):add{

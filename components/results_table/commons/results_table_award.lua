@@ -45,6 +45,7 @@ function AwardsTable:buildHeader()
 end
 
 ---Builds a row of the award table
+---@param placement table
 ---@return Html
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
