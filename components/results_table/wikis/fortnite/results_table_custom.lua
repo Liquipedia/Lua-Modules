@@ -60,7 +60,7 @@ function CustomResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata
 
 	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage') --[[@as string]]
 	end
 
 	-- return empty strings for non group scores since it is a BattleRoyale wiki
