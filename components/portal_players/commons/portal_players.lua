@@ -185,7 +185,7 @@ end
 ---@param args {players: table[]?, flag: string, isPlayer: boolean?}
 ---@return Html?
 function PortalPlayers:buildCountryTable(args)
-	local playerData = Table.extract(args, 'players')
+	local playerData = Table.extract(args, 'players') --[[@as table?]]
 	if Table.isEmpty(playerData) then
 		return nil
 	end
@@ -233,7 +233,7 @@ end
 
 ---Builds a table row
 ---@param player table
----@param isPlayer boolean
+---@param isPlayer boolean?
 ---@return Html
 function PortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')

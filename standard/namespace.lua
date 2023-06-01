@@ -32,14 +32,14 @@ function Namespace.idFromName(name)
 end
 
 ---Fetches the namespace name for a given namespace id (number)
----@param id integer?
+---@param id integer|string|nil
 ---@return string?
 function Namespace.nameFromId(id)
 	return (mw.site.namespaces[tonumber(id)] or {}).name
 end
 
 ---Builds the namespace prefix for a given namespace id (number)
----@param id integer?
+---@param id integer|string|nil
 ---@return string?
 function Namespace.prefixFromId(id)
 	local name = Namespace.nameFromId(id)

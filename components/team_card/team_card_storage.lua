@@ -106,7 +106,7 @@ end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
 ---@param team string
----@param lpdbPrefix string
+---@param lpdbPrefix string?
 ---@return string
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	local storageName = (team == 'TBD' and 'participant') or 'ranking'

@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@diagnostic disable: duplicate-set-field
+---the overwrites are intended ...
+
 -- Legacy version for smash, brawhalla and fighters as they are not on standardized prize pools yet
 -- they do not have team events (and no teamCard usage) hence only overwrite the player function
 
@@ -72,6 +75,8 @@ end
 ---@param queryYear number? the year to calculate earnings for
 ---@param mode string? the mode to calculate earnings for
 ---@param perYear boolean? query all earnings per year and return the values in a lua table
+---@param aliases nil
+---@param isPlayerQuery nil
 ---@return number, {[integer]: number?}?
 function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases, isPlayerQuery)
 	conditions = CustomEarnings._buildConditions(conditions, queryYear, mode)
