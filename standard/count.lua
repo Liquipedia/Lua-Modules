@@ -91,7 +91,7 @@ function Count._query(queryType, queryField, lpdbConditions)
 end
 
 
---[[ 
+--[[
 Condition Functions
 ]]--
 
