@@ -25,7 +25,7 @@ function suite:testCopy()
 	local a, b, c = {1, 2, 3}, {}, {{5}}
 	self:assertDeepEquals(a, Array.copy(a))
 	self:assertFalse(Array.copy(b) == b)
-	self:assertTrue(Array.copy(c).a == c.a)
+	self:assertTrue(Array.copy(c)[1] == c[1])
 end
 
 function suite:testSub()

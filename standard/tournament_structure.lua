@@ -85,6 +85,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 	end
 end
 
+---@return {matchGroupIds: {}, pageNames: {[1]: string}}
 function TournamentStructure.currentPageSpec()
 	return {
 		matchGroupIds = {},

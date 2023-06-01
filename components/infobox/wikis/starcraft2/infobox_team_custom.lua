@@ -249,7 +249,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add{

@@ -13,6 +13,7 @@
 ]]
 
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Class = require('Module:Class')
 
@@ -23,11 +24,11 @@ function LegacyBracketMatchSummary.convert(args)
 		return
 	end
 	local index = 1
-	while not String.isEmpty(args['map' .. index]) or not String.isEmpty(args['map' .. index .. 'win']) do
+	while not String.isEmpty(args['map' .. index]) or not Logic.isEmpty(args['map' .. index .. 'win']) do
 		local prefix = 'map' .. index
 		local score1
 		local score2
-		if not String.isEmpty(args[prefix..'score']) then
+		if not Logic.isEmpty(args[prefix..'score']) then
 			score1 = mw.text.split(args[prefix..'score'], '-')[1]
 			score2 = mw.text.split(args[prefix..'score'], '-')[2]
 		end
@@ -40,7 +41,7 @@ function LegacyBracketMatchSummary.convert(args)
 		args['map' .. index .. 'score2'] = mw.text.trim(score2 or '')
 		args['map' .. index .. 'score'] = nil
 		args['map' .. index .. 'finished'] = (args[prefix ..'win'] == 'skip' and 'skip') or
-											(not String.isEmpty(args[prefix ..'win']) and 'true') or 'false'
+											(not Logic.isEmpty(args[prefix ..'win']) and 'true') or 'false'
 		args['map' .. index .. 'win'] = nil
 		index = index + 1
 	end

@@ -6,10 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Config = require('Module:NotabilityChecker/config')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Array = require('Module:Array')
 local Table = require('Module:Table')
 
 local NotabilityChecker = {}
@@ -135,7 +136,7 @@ function NotabilityChecker._calculateWeight(placementData)
 	local weights = {}
 
 	for _, placement in pairs(placementData) do
-		if not String.isEmpty(placement.placement) then
+		if not Logic.isEmpty(placement.placement) then
 			if NotabilityChecker.LOGGING then
 				mw.log('Tournament: ' .. placement.tournament)
 			end
@@ -176,7 +177,7 @@ function NotabilityChecker.calculateTournament(tier, tierType, placement, date, 
 end
 
 function NotabilityChecker._calculateWeightForTournament(tier, tierType, placement, dateLoss, notabilityMod, mode)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 
@@ -219,7 +220,7 @@ function NotabilityChecker._calculateWeightForTournament(tier, tierType, placeme
 end
 
 function NotabilityChecker._preparePlacement(placement)
-	if String.isEmpty(placement) then
+	if Logic.isEmpty(placement) then
 		return nil
 	end
 
@@ -251,7 +252,7 @@ function NotabilityChecker._parseTier(tier, tierType)
 end
 
 function NotabilityChecker._parseNotabilityMod(notabilityMod)
-	if String.isEmpty(notabilityMod) or notabilityMod == 0 then
+	if Logic.isEmpty(notabilityMod) or notabilityMod == 0 then
 		return 1
 	end
 

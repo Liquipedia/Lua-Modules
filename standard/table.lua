@@ -25,7 +25,7 @@ function Table.size(tbl)
 	return i
 end
 
----@param tbl any[]
+---@param tbl table
 ---@param value any
 ---@return boolean
 function Table.includes(tbl, value)

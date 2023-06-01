@@ -20,6 +20,8 @@ local NON_TIER_TYPE_INPUT = 'none'
 
 local TournamentsListingConditions = {}
 
+---@param args table
+---@return string
 function TournamentsListingConditions.base(args)
 	local startDate = args.startdate or args.sdate
 	local endDate = args.enddate or args.edate
@@ -127,10 +129,23 @@ function TournamentsListingConditions.base(args)
 		end
 		conditions:add{tierTypeConditions}
 	end
+	args.excludeTiertype1 = args.excludeTiertype1 or args.excludeTiertype
+	if args.excludeTiertype1 then
+		local excludeTiertypeConditions = ConditionTree(BooleanOperator.all)
+		for _, tier in Table.iter.pairsByPrefix(args, 'excludeTiertype') do
+			excludeTiertypeConditions:add{
+				ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tier == NON_TIER_TYPE_INPUT and '' or tier)
+			}
+		end
+		conditions:add{excludeTiertypeConditions}
+	end
 
 	return conditions:toString()
 end
 
+---@param tournamentData table
+---@param config table
+---@return string
 function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{

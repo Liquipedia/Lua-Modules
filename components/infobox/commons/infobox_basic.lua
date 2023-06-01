@@ -15,6 +15,13 @@ local Table = require('Module:Table')
 local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
 
+---@class BasicInfobox
+---@operator call(Frame): BasicInfobox
+---@field args table
+---@field pagename string
+---@field name string
+---@field wiki string
+---@field infobox Infobox
 local BasicInfobox = Class.new(
 	function(self, frame)
 		self.args = Arguments.getArgs(frame)
@@ -26,26 +33,34 @@ local BasicInfobox = Class.new(
 	end
 )
 
+---Creates an empty WidgetInjector
+---@return WidgetInjector?
 function BasicInfobox:createWidgetInjector()
 	return nil
 end
 
 --- Allows for overriding this functionality
-function BasicInfobox:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
+---Add bottom content below the infobox, e.g. matchtickers
+---@return string?
 function BasicInfobox:createBottomContent()
 	return nil
 end
 
 --- Allows for overriding this functionality
+---Set wikispecific categories
+---@param args table
+---@return table
 function BasicInfobox:getWikiCategories(args)
 	return {}
 end
 
 --- Allows for using this for customCells
+---Fetches all arguments from the args table for a given base
+---@generic K, V
+---@param args {[K]: V}
+---@param base string
+---@param options {makeLink: boolean?}?
+---@return V[]
 function BasicInfobox:getAllArgsForBase(args, base, options)
 	options = options or {}
 
