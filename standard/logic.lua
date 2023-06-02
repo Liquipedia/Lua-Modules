@@ -9,10 +9,11 @@
 local Logic = {}
 
 ---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
----@param val1 table|string|boolean|nil
----@param val2 table|string|boolean|nil
----@param default any
----@return string|table|any|nil
+---@generic A, B, C
+---@param val1 A?
+---@param val2 B?
+---@param default C?
+---@return A|B|C|nil
 function Logic.emptyOr(val1, val2, default)
 	if not Logic.isEmpty(val1) then
 		return val1
@@ -44,8 +45,9 @@ function Logic.nilOr(...)
 end
 
 ---Checks if a given object (table|string|nil) is empty
----@param val table|string|number|nil
+---@param val table|string|nil
 ---@return boolean
+---@overload fun(val: any):false
 function Logic.isEmpty(val)
 	if type(val) == 'table' then
 		return require('Module:Table').isEmpty(val)
@@ -55,8 +57,9 @@ function Logic.isEmpty(val)
 end
 
 ---Checks if a given object (table|string|nil) is not empty
----@param val table|string|number|nil
+---@param val table|string|nil
 ---@return boolean
+---@overload fun(val: any):true
 function Logic.isNotEmpty(val)
 	if type(val) == 'table' then
 		return require('Module:Table').isNotEmpty(val)
