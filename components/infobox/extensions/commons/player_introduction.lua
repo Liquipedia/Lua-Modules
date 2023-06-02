@@ -26,33 +26,45 @@ local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
 local DEFAULT_DATE = '1970-01-01'
 
---- @class PlayerIntroduction
+---@class PlayerIntroduction
+---@operator call(table): PlayerIntroduction
 local PlayerIntroduction = Class.new(function(self, ...) self:init(...) end)
 
 ---@deprecated
 --- only for legacy support
+---@param args table
+---@return string
 function PlayerIntroduction._main(args)
 	return PlayerIntroduction.run(args)
 end
 
 ---@deprecated
 --- only for legacy support
+---@param frame Frame
+---@return string
 function PlayerIntroduction.main(frame)
 	return PlayerIntroduction.run(Arguments.getArgs(frame))
 end
 
 ---@deprecated
 --- only legacy support for `Module:PlayerTeamAuto`
+---@param player string
+---@param queryType string?
+---@return table
 function PlayerIntroduction._get_lpdbtransfer(player, queryType)
 	return PlayerIntroduction._readTransferData(player, queryType == 'datapoint')
 end
 
 -- template entry point
+---@param frame Frame
+---@return string
 function PlayerIntroduction.templatePlayerIntroduction(frame)
 	return PlayerIntroduction.run(Arguments.getArgs(frame))
 end
 
 -- module entry point
+---@param args table
+---@return string
 function PlayerIntroduction.run(args)
 	return PlayerIntroduction(args):create()
 end
