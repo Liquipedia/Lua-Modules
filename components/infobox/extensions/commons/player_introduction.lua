@@ -521,14 +521,20 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 	local isCurrentTense = String.isNotEmpty(playerInfo.team) and not isDeceased
 
+	local shouldDisplayTeam2 = isCurrentTense
+		and transferInfo.type == TRANSFER_STATUS_LOAN
+		and String.isNotEmpty(playerInfo.team2)
+
+	local hasAppendedRoleDisplay = self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(role)
+
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
 		playedOrWorked = self:_playedOrWorked(isCurrentTense),
 		team = PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date),
-		team2 = isCurrentTense and transferInfo.type == TRANSFER_STATUS_LOAN and String.isEmpty(playerInfo.team2)
-			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date)) or '',
-		roleDisplay = self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(role)
-			and (' as ' .. AnOrA.main{role}) or ''
+		team2 = shouldDisplayTeam2
+			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
+			or '',
+		roleDisplay = hasAppendedRoleDisplay and (' as ' .. AnOrA.main{role}) or ''
 	})
 
 end
