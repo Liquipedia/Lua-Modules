@@ -69,7 +69,7 @@ function PlayerIntroduction.run(args)
 	return PlayerIntroduction(args):create()
 end
 
----@class argsValues
+---@class playerIntroArgsValues
 ---@field [1] string?,
 ---@field player string?,
 ---@field playerInfo string?,
@@ -109,7 +109,7 @@ end
 ---@field aka3 string?,
 
 --- Init function for PlayerIntroduction
----@param args argsValues
+---@param args playerIntroArgsValues
 ---@return self
 function PlayerIntroduction:init(args)
 	self.player = mw.ext.TeamLiquidIntegration.resolve_redirect(
@@ -156,7 +156,7 @@ function PlayerIntroduction:_playerQuery()
 	return {}
 end
 
----@param args argsValues
+---@param args playerIntroArgsValues
 ---@param playerInfo table
 ---@return nil
 function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
@@ -340,7 +340,7 @@ function PlayerIntroduction._readTransferFromTransfers(player)
 	end
 end
 
----@param args argsValues
+---@param args playerIntroArgsValues
 ---@return nil
 function PlayerIntroduction:_roleAdjusts(args)
 	local roleAdjust = Logic.readBool(args.convert_role) and mw.loadData('Module:PlayerIntroduction/role') or {}
