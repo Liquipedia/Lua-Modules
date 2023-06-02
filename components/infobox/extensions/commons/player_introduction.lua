@@ -519,51 +519,35 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 		return nil
 	end
 
-	local teamDisplay
-	if String.isNotEmpty(playerInfo.team) and not isDeceased then
-		teamDisplay = ' who is currently'
+	local isCurrentTense = String.isNotEmpty(playerInfo.team) and not isDeceased
 
-		if playerInfo.type == TYPE_PLAYER then
-			if transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
-				teamDisplay = teamDisplay .. ' on the inactive roster of'
-			elseif self.options.showRole and role then
-				if role == 'streamer' or role == 'content creator' then
-					teamDisplay = teamDisplay .. ' ' .. AnOrA.main{role}
-				else
-					teamDisplay = teamDisplay .. ' playing as ' .. AnOrA.main{role}
-				end
-				teamDisplay = teamDisplay .. ' for'
-			else
-				teamDisplay = teamDisplay .. ' playing for'
-			end
-		else
-			teamDisplay = teamDisplay .. ' working for'
-		end
+	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
+		tense = isCurrentTense and 'who is currently' or 'who last',
+		playedOrWorked = playerInfo.type ~= TYPE_PLAYER
+			and (isCurrentTense and 'working for' or 'worked for')
+			or (not isCurrentTense and 'played for') or self:_playedOrWorked(),
+		team = PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date),
+		team2 = isCurrentTense and transferInfo.type == TRANSFER_STATUS_LOAN and String.isEmpty(playerInfo.team2)
+			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date)) or '',
+		roleDisplay = self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(role)
+			and (' as ' .. AnOrA.main{role}) or ''
+	})
 
-		teamDisplay = teamDisplay .. PlayerIntroduction._displayTeam(playerInfo.team, transferInfo.date)
+end
 
-		if transferInfo.type == TRANSFER_STATUS_LOAN and String.isEmpty(playerInfo.team2) then
-			teamDisplay = teamDisplay .. ' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date)
-		end
-	elseif String.isNotEmpty(transferInfo.team) and transferInfo.team ~= SKIP_ROLE
-		and transferInfo.type == TRANSFER_STATUS_FORMER then
+function PlayerIntroduction:_playedOrWorked()
+	local transferInfo = self.transferInfo
+	local role = self.transferInfo.standardizedRole
 
-			teamDisplay = ' who last'
-			if playerInfo.type == TYPE_PLAYER then
-				teamDisplay = teamDisplay .. ' played'
-			else
-				teamDisplay = teamDisplay .. ' worked'
-			end
-
-			teamDisplay = teamDisplay .. ' for' .. PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date)
+	if transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
+		return 'on the inactive roster of'
+	elseif self.options.showRole and role == 'streamer' or role == 'content creator' then
+		return AnOrA.main{role} .. ' for'
+	elseif self.options.showRole and role then
+		return 'playing as ' .. AnOrA.main{role} .. ' for'
 	end
 
-
-	if self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(role) then
-		teamDisplay = teamDisplay .. ' as ' .. AnOrA.main{role}
-	end
-
-	return teamDisplay
+	return ' playing for'
 end
 
 function PlayerIntroduction._displayTeam(team, date)
