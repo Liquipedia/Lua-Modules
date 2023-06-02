@@ -149,16 +149,13 @@ function PlayerIntroduction:_playerQuery()
 			.. 'birthdate, deathdate, status, extradata, teampagename',
 	})
 
-	if type(queryData[1]) == 'table' then
-		return queryData[1]
-	end
+	assert(type(queryData) == 'table', queryData)
 
-	return {}
+	return queryData[1] or {}
 end
 
 ---@param args playerIntroArgsValues
 ---@param playerInfo table
----@return nil
 function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 	playerInfo.extradata = playerInfo.extradata or {}
 
@@ -244,41 +241,41 @@ function PlayerIntroduction._readTransferFromDataPoints(player)
 		query = 'information, extradata',
 	})
 
-	if type(queryData) == 'table' then
-		table.sort(queryData, function (dataPoint1, dataPoint2)
-			local extradata1 = dataPoint1.extradata
-			local extradata2 = dataPoint2.extradata
-			return extradata1.leavedate > extradata2.leavedate
-				or extradata1.leavedate == extradata2.leavedate and extradata1.teamcount > extradata2.teamcount
-		end)
+	assert(type(queryData[1]) == 'table', queryData)
 
-		local extradata = queryData[1].extradata
+	table.sort(queryData, function (dataPoint1, dataPoint2)
+		local extradata1 = dataPoint1.extradata
+		local extradata2 = dataPoint2.extradata
+		return extradata1.leavedate > extradata2.leavedate
+			or extradata1.leavedate == extradata2.leavedate and extradata1.teamcount > extradata2.teamcount
+	end)
 
-		if extradata.leavedate and extradata.leavedate ~= DEFAULT_DATAPOINT_LEAVE_DATE then
-			return {
-				date = extradata.leavedate,
-				team = queryData[1].information,
-				role = (extradata.role or ''):lower(),
-				type = TRANSFER_STATUS_FORMER,
-			}
-		elseif (extradata.role or ''):lower() == TRANSFER_STATUS_LOAN then
-			return {
-				date = os.time(),
-				team = queryData[1].information,
-				-- assuming previous team is main team if it's missing a leavedate
-				team2 = queryData[2] and queryData[2].extradata.leavedate == DEFAULT_DATAPOINT_LEAVE_DATE
-					and queryData[2].information or nil,
-				role = (extradata.role or ''):lower(),
-				type = TRANSFER_STATUS_LOAN,
-			}
-		else
-			return {
-				date = os.time(),
-				team = queryData[1].information,
-				role = (extradata.role or ''):lower(),
-				type = TRANSFER_STATUS_CURRENT,
-			}
-		end
+	local extradata = queryData[1].extradata
+
+	if extradata.leavedate and extradata.leavedate ~= DEFAULT_DATAPOINT_LEAVE_DATE then
+		return {
+			date = extradata.leavedate,
+			team = queryData[1].information,
+			role = (extradata.role or ''):lower(),
+			type = TRANSFER_STATUS_FORMER,
+		}
+	elseif (extradata.role or ''):lower() == TRANSFER_STATUS_LOAN then
+		return {
+			date = os.time(),
+			team = queryData[1].information,
+			-- assuming previous team is main team if it's missing a leavedate
+			team2 = queryData[2] and queryData[2].extradata.leavedate == DEFAULT_DATAPOINT_LEAVE_DATE
+				and queryData[2].information or nil,
+			role = (extradata.role or ''):lower(),
+			type = TRANSFER_STATUS_LOAN,
+		}
+	else
+		return {
+			date = os.time(),
+			team = queryData[1].information,
+			role = (extradata.role or ''):lower(),
+			type = TRANSFER_STATUS_CURRENT,
+		}
 	end
 end
 
@@ -293,42 +290,35 @@ function PlayerIntroduction._readTransferFromTransfers(player)
 		query = 'fromteam, toteam, role2, date, extradata'
 	})
 
-	if type(queryData[1]) == 'table' then
-		queryData = queryData[1]
-		local extradata = queryData.extradata
-		if String.isEmpty(queryData.toteam) then
-			return {
-				date = queryData.date,
-				team = queryData.fromteam,
-				type = TRANSFER_STATUS_FORMER,
-			}
-		elseif String.isNotEmpty(extradata.toteamsec) and
-			((queryData.role2):lower() == TRANSFER_STATUS_LOAN or (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN) then
+	assert(type(queryData[1]) == 'table', queryData)
 
-			if queryData.fromteam == queryData.toteam and (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN then
-				return {
-					date = os.time(),
-					team = extradata.toteamsec,
-					team2 = queryData.toteam,
-					role = (extradata.role2):lower(),
-					type = TRANSFER_STATUS_LOAN,
-				}
-			elseif queryData.fromteam == extradata.toteamsec and (queryData.role2):lower() == TRANSFER_STATUS_LOAN then
-				return {
-					date = os.time(),
-					team = queryData.toteam,
-					team2 = extradata.toteamsec,
-					role = (queryData.role2):lower(),
-					type = TRANSFER_STATUS_LOAN,
-				}
-			else
-				return {
-					date = os.time(),
-					team = queryData.toteam,
-					role = (queryData.role2):lower(),
-					type = TRANSFER_STATUS_CURRENT,
-				}
-			end
+	queryData = queryData[1]
+	local extradata = queryData.extradata
+	if String.isEmpty(queryData.toteam) then
+		return {
+			date = queryData.date,
+			team = queryData.fromteam,
+			type = TRANSFER_STATUS_FORMER,
+		}
+	elseif String.isNotEmpty(extradata.toteamsec) and
+		((queryData.role2):lower() == TRANSFER_STATUS_LOAN or (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN) then
+
+		if queryData.fromteam == queryData.toteam and (extradata.role2sec):lower() == TRANSFER_STATUS_LOAN then
+			return {
+				date = os.time(),
+				team = extradata.toteamsec,
+				team2 = queryData.toteam,
+				role = (extradata.role2):lower(),
+				type = TRANSFER_STATUS_LOAN,
+			}
+		elseif queryData.fromteam == extradata.toteamsec and (queryData.role2):lower() == TRANSFER_STATUS_LOAN then
+			return {
+				date = os.time(),
+				team = queryData.toteam,
+				team2 = extradata.toteamsec,
+				role = (queryData.role2):lower(),
+				type = TRANSFER_STATUS_LOAN,
+			}
 		else
 			return {
 				date = os.time(),
@@ -337,11 +327,17 @@ function PlayerIntroduction._readTransferFromTransfers(player)
 				type = TRANSFER_STATUS_CURRENT,
 			}
 		end
+	else
+		return {
+			date = os.time(),
+			team = queryData.toteam,
+			role = (queryData.role2):lower(),
+			type = TRANSFER_STATUS_CURRENT,
+		}
 	end
 end
 
 ---@param args playerIntroArgsValues
----@return nil
 function PlayerIntroduction:_roleAdjusts(args)
 	local roleAdjust = Logic.readBool(args.convert_role) and mw.loadData('Module:PlayerIntroduction/role') or {}
 
@@ -411,17 +407,7 @@ function PlayerIntroduction:_nameDisplay()
 
 	local nameDisplay = self._addConcatText(self.playerInfo.firstName, nil, true)
 		.. nameQuotes .. '<b>' .. self.playerInfo.id .. '</b>' .. nameQuotes
-
-	if String.isNotEmpty(self.playerInfo.idAudio) or String.isNotEmpty(self.playerInfo.idIPA) then
-		nameDisplay = nameDisplay .. '(' .. self._addConcatText(self.playerInfo.idIPA, ', ')
-			.. (String.isNotEmpty(self.playerInfo.idAudio)
-				-- TODO: convert the template to a module
-				and Template.safeExpand(mw.getCurrentFrame(), 'Audio', {self.playerInfo.idAudio, 'listen', help = 'no'})
-				or '')
-			.. ')'
-	end
-
-	nameDisplay = nameDisplay .. self._addConcatText(self.playerInfo.lastName)
+		.. self._addConcatText(self.playerInfo.lastName)
 
 	if Table.isNotEmpty(self.playerInfo.formerlyKnownAs) then
 		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as')
@@ -592,18 +578,19 @@ function PlayerIntroduction._displayTeam(team, date)
 	return ' [[' .. team .. ']]'
 end
 
----@param text string|false|nil
----@param concatDelimiter string?
+---@param text string|nil
+---@param delimiter string?
+---@param suffix boolean?
 ---@return string
-function PlayerIntroduction._addConcatText(text, concatDelimiter, concatAfter)
+function PlayerIntroduction._addConcatText(text, delimiter, suffix)
 	if not text then
 		return ''
 	end
 
-	concatDelimiter = concatDelimiter or ' '
+	delimiter = delimiter or ' '
 
-	return concatAfter and (text .. concatDelimiter)
-		or (concatDelimiter .. text)
+	return suffix and (text .. delimiter)
+		or (delimiter .. text)
 end
 
 return PlayerIntroduction
