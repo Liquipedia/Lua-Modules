@@ -344,24 +344,23 @@ function PlayerIntroduction:_roleAdjusts(args)
 	local manualRoleInput = args.role
 	local transferInfo = self.transferInfo
 
-	-- if you have a better name ...
-	local tempRole
+	local role
 	if manualRoleInput ~= SKIP_ROLE and String.isNotEmpty(transferInfo.role) and
 		transferInfo.role ~= INACTIVE_ROLE and transferInfo.role ~= 'loan' and transferInfo.role ~= 'substitute' then
 
-		tempRole = transferInfo.role
+		role = transferInfo.role
 	elseif manualRoleInput ~= SKIP_ROLE then
-		tempRole = self.playerInfo.role
+		role = self.playerInfo.role
 	end
 
-	tempRole = roleAdjust[tempRole] or tempRole
+	role = roleAdjust[role] or role
 
 	if transferInfo.role == 'substitute' then
-		tempRole = 'substitute ' .. tempRole
+		role = 'substitute ' .. role
 	end
 
 	-- if you have a better name ...
-	self.transferInfo.tempRole = tempRole
+	self.transferInfo.role = role
 end
 
 --- builds the display
@@ -466,7 +465,7 @@ end
 function PlayerIntroduction:_nationalityDisplay()
 	local nationalities = {}
 	for _, nationality in Table.iter.pairsByPrefix(self.playerInfo, 'nationality', {requireIndex = false}) do
-		table.insert(nationalities, '[[:Category:' .. nationality:gsub("^%l", string.upper)
+		table.insert(nationalities, '[[:Category:' .. nationality
 				.. '|' .. (Flags.getLocalisation(nationality) or '') .. ']]')
 	end
 
@@ -507,7 +506,7 @@ end
 function PlayerIntroduction:_typeDisplay()
 	return self._addConcatText(self.playerInfo.type)
 		.. self._addConcatText(
-			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2,
+			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2 or nil,
 		' and ')
 end
 
@@ -517,7 +516,7 @@ end
 function PlayerIntroduction:_teamDisplay(isDeceased)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
-	local tempRole = self.transferInfo.tempRole
+	local role = self.transferInfo.role
 	if String.isEmpty(playerInfo.team) and (String.isEmpty(transferInfo.team) or transferInfo.team == SKIP_ROLE) then
 		return nil
 	end
@@ -529,11 +528,11 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 		if playerInfo.type == TYPE_PLAYER then
 			if transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
 				teamDisplay = teamDisplay .. ' on the inactive roster of'
-			elseif self.options.showRole and tempRole then
-				if tempRole == 'streamer' or tempRole == 'content creator' then
-					teamDisplay = teamDisplay .. ' ' .. AnOrA.main{tempRole}
+			elseif self.options.showRole and role then
+				if role == 'streamer' or role == 'content creator' then
+					teamDisplay = teamDisplay .. ' ' .. AnOrA.main{role}
 				else
-					teamDisplay = teamDisplay .. ' playing as ' .. AnOrA.main{tempRole}
+					teamDisplay = teamDisplay .. ' playing as ' .. AnOrA.main{role}
 				end
 				teamDisplay = teamDisplay .. ' for'
 			else
@@ -562,8 +561,8 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 	end
 
 
-	if self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(tempRole) then
-		teamDisplay = teamDisplay .. ' as ' .. AnOrA.main{tempRole}
+	if self.options.showRole and playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(role) then
+		teamDisplay = teamDisplay .. ' as ' .. AnOrA.main{role}
 	end
 
 	return teamDisplay
