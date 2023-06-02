@@ -157,6 +157,7 @@ function BroadcastTalentTable:_fetchTournaments()
 	local tournaments = {}
 	local pageNames = {}
 	for _, tournament in pairs(queryData) do
+		tournament.extradata = tournament.extradata or {}
 		if not pageNames[tournament.pagename] or Logic.readBool(tournament.extradata.showmatch) then
 			tournament.positions = {tournament.position}
 			table.insert(tournaments, tournament)
