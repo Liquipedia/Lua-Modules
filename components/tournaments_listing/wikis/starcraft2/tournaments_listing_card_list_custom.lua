@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Info = require('Module:Info')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList', {requireDevIfEnabled = true})
@@ -20,8 +21,15 @@ local DEFAULT_END_YEAR = tonumber(os.date('%Y'))
 local ALLOWED_PLACES = '1,2,1-2,2-3,1-3,1-4,1-5,1-6,1-7,1-8,W,L'
 local NON_QUALIFIER = '!Qualifier'
 
+---@param args table
+---@return Html?
 function CustomTournamentsListing.run(args)
 	args = args or {}
+
+	if Logic.readBool(args.byYear) then
+		args.byYear = nil
+		return CustomTournamentsListing.byYear(args)
+	end
 
 	args.game = args.game
 		and Game.name{game = args.game, useDefault = false}
@@ -35,6 +43,8 @@ function CustomTournamentsListing.run(args)
 	return tournamentsListing:create():build()
 end
 
+---@param args table
+---@return Html?
 function CustomTournamentsListing.byYear(args)
 	args = args or {}
 

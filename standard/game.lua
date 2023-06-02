@@ -44,6 +44,7 @@ function Game.toIdentifier(args)
 	elseif String.isEmpty(gameInput) then
 		return
 	end
+	---@cast gameInput -nil
 
 	gameInput = gameInput:lower()
 
@@ -153,6 +154,7 @@ function Game.isDefaultTeamLogo(args)
 	if String.isEmpty(logo) then
 		return false
 	end
+	---@cast logo -nil
 
 	logo = logo:gsub('_', ' ')
 

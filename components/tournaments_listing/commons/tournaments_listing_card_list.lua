@@ -21,13 +21,13 @@ local Medal = require('Module:Medal')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local LANG = mw.language.new('en')
 local NONBREAKING_SPACE = '&nbsp;'
@@ -35,10 +35,14 @@ local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
 local CANCELLED = 'cancelled'
 local DEFAULT_ALLOWED_PLACES = '1,2,1-2,2-3,W,L'
+local DEFAULT_LIMIT = 5000
 
 --- @class BaseTournamentsListing
+--- @operator call(...): BaseTournamentsListing
 local BaseTournamentsListing = Class.new(function(self, ...) self:init(...) end)
 
+---@param args table
+---@return self
 function BaseTournamentsListing:init(args)
 	self.args = args
 
@@ -71,12 +75,14 @@ function BaseTournamentsListing:readConfig()
 	}
 end
 
+---@return string[]
 function BaseTournamentsListing:_allowedPlacements()
 	local placeConditions = self.args.placeConditions or DEFAULT_ALLOWED_PLACES
 
 	return Array.map(mw.text.split(placeConditions, ','), String.trim)
 end
 
+---@return self
 function BaseTournamentsListing:create()
 	local data = self.args.data or self:_query()
 	if Table.isNotEmpty(data) then
@@ -86,17 +92,19 @@ function BaseTournamentsListing:create()
 	return self
 end
 
+---@return table
 function BaseTournamentsListing:_query()
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = self:_buildConditions(),
 		query = 'pagename, name, icon, icondark, organizers, startdate, enddate, status, locations, series, '
 			.. 'prizepool, participantsnumber, game, liquipediatier, liquipediatiertype, extradata, publishertier, type',
 		order = self.args.order,
-		limit = self.args.limit,
+		limit = self.args.limit or DEFAULT_LIMIT,
 		offset = self.config.offset,
 	})
 end
 
+---@return string
 function BaseTournamentsListing:_buildConditions()
 
 	local conditions = Conditions.base(self.args)
@@ -108,10 +116,7 @@ function BaseTournamentsListing:_buildConditions()
 	return conditions
 end
 
-function BaseTournamentsListing:additionalConditions()
-	return {}
-end
-
+---@return Html?
 function BaseTournamentsListing:build()
 	if not self.data then
 		return
@@ -152,6 +157,7 @@ function BaseTournamentsListing:build()
 	return self.display
 end
 
+---@return Html
 function BaseTournamentsListing:_header()
 	local config = self.config
 
@@ -180,7 +186,7 @@ function BaseTournamentsListing:_header()
 
 	header
 		:tag('div'):addClass('gridCell'):wikitext('Date'):done()
-		:tag('div'):addClass('gridCell'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
+		:tag('div'):addClass('gridCell Prize'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
 		:tag('div'):addClass('gridCell'):wikitext('Location'):done()
 		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make('P#', 'Number of Participants'))
 
@@ -195,6 +201,7 @@ function BaseTournamentsListing:_header()
 	return header
 end
 
+---@param tournamentData table
 function BaseTournamentsListing:_row(tournamentData)
 	local config = self.config
 
@@ -329,6 +336,8 @@ function BaseTournamentsListing:_row(tournamentData)
 	self.display:node(row)
 end
 
+---@param opponents table[]
+---@return Html
 function BaseTournamentsListing:_buildParticipantsSpan(opponents)
 	local participantsSpan = mw.html.create('span')
 		:addClass('Participants')
@@ -339,7 +348,7 @@ function BaseTournamentsListing:_buildParticipantsSpan(opponents)
 	return participantsSpan
 end
 
-
+---@param prize number
 function BaseTournamentsListing:_calculateRank(prize)
 
 	if prize == self.cachedData.prize then
@@ -354,6 +363,8 @@ function BaseTournamentsListing:_calculateRank(prize)
 	}
 end
 
+---@param tournamentData table
+---@return Html
 function BaseTournamentsListing._organizerDisplay(tournamentData)
 	local organizers = Logic.emptyOr(tournamentData.organizers) or {}
 	if type(organizers) == 'string' then
@@ -369,6 +380,9 @@ function BaseTournamentsListing._organizerDisplay(tournamentData)
 		:wikitext(table.concat(organizerArray, ', '))
 end
 
+---@param locationData table
+---@param tournamentType string?
+---@return string?
 function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	local locations = Array.mapIndexes(function(locationIndex)
 		return BaseTournamentsListing._displayLocation(locationData, locationIndex)
@@ -385,6 +399,9 @@ function BaseTournamentsListing._displayLocations(locationData, tournamentType)
 	return table.concat(locations)
 end
 
+---@param locationData table
+---@param locationIndex integer
+---@return string?
 function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	local display = ''
 	local region = locationData['region' .. locationIndex]
@@ -396,19 +413,23 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 	elseif city and region then
 		display = Flags.Icon{flag = region} .. NONBREAKING_SPACE
 	elseif region then
-		return Region.run{region = region, onlyDisplay = true}
+		return Region.display{region = region}
 	end
 
 	return String.nilIfEmpty(display .. (city or Flags.CountryName(country)))
 end
 
+---@param startDate string
+---@param endDate string
+---@param status string?
+---@return string
 function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	if status == POSTPONED or status == DELAYED then
 		return 'Postponed'
 	end
 
 	if startDate == endDate then
-		return LANG:formatDate('M j, Y', startDate)
+		return LANG:formatDate('M j, Y', startDate) --[[@as string]]
 	end
 
 	local startYear, startMonth = startDate:match('(%d+)-(%d+)-%d+')
@@ -425,11 +446,16 @@ function BaseTournamentsListing._dateDisplay(startDate, endDate, status)
 	return LANG:formatDate('M j', startDate) .. ' - ' .. LANG:formatDate('M j, Y', endDate)
 end
 
+---@param tournamentData table
+---@return {qualified: table[]?, [1]: table[]?, [2]: table[]?}
 function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	local placements = {}
 
+	local conditions = Conditions.placeConditions(tournamentData, self.config)
+		.. (self.args.additionalPlaceConditions or '')
+
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = Conditions.placeConditions(tournamentData, self.config),
+		conditions = conditions,
 		query = 'opponentname, opponenttype, opponenttemplate, opponentplayers, placement, extradata',
 		order = 'placement asc',
 		limit = 50,
@@ -439,7 +465,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 		if Table.isEmpty(queryData) then
 			return {qualified = {Opponent.tbd(Opponent.team)}}
 		end
-		return {qualified = queryData}
+		return {qualified = Array.map(queryData, Opponent.fromLpdbStruct)}
 	end
 
 	for _, item in ipairs(queryData) do
@@ -477,8 +503,8 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 	return placements
 end
 
-function BaseTournamentsListing:_buildPlacementConditions(tournamentData)end
-
+---@param number number|string|nil
+---@return Html|string
 function BaseTournamentsListing.participantsNumber(number)
 	number = tonumber(number)
 	if not number or number <= 0 then
@@ -491,12 +517,16 @@ function BaseTournamentsListing.participantsNumber(number)
 end
 
 -- overwritable in case wikis want several highlight options
+---@param tournamentData table
+---@return string?
 function BaseTournamentsListing:getHighlightClass(tournamentData)
 	return HighlightConditions.tournament(tournamentData, self.config)
 		and 'tournament-highlighted-bg'
 		or nil
 end
 
+---@param tournamentData table
+---@return Html
 function BaseTournamentsListing:displayTier(tournamentData)
 	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
 	options.link = true

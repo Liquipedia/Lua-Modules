@@ -43,10 +43,9 @@ end
 
 function CustomTeam:_createRegion(region, location)
 	region = Region.run({region = region, country = Team:getStandardLocationValue(location)})
-	if type(region) == 'table' then
-		_region = region.region
-		return region.display
-	end
+	_region = region.region
+
+	return region.display
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)

@@ -20,10 +20,13 @@ local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
+--- @field parent BasePrizePool
+--- @field count integer
+--- @field opponents table
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
 --- @param args table Input information
---- @param parent PrizePool The PrizePool this BasePlacement is part of
+--- @param parent BasePrizePool The PrizePool this BasePlacement is part of
 function BasePlacement:init(args, parent)
 	self.args = Table.deepCopy(args)
 	self.parent = parent

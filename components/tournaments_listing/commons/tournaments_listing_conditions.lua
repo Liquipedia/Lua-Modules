@@ -20,6 +20,8 @@ local NON_TIER_TYPE_INPUT = 'none'
 
 local TournamentsListingConditions = {}
 
+---@param args table
+---@return string
 function TournamentsListingConditions.base(args)
 	local startDate = args.startdate or args.sdate
 	local endDate = args.enddate or args.edate
@@ -63,7 +65,10 @@ function TournamentsListingConditions.base(args)
 	end
 
 	if args.series then
-		conditions:add{ConditionNode(ColumnName('series'), Comparator.eq, args.series)}
+		conditions:add{ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('series'), Comparator.eq, args.series),
+			ConditionNode(ColumnName('extradata_series2'), Comparator.eq, args.series)
+		}}
 	end
 
 	if args.location then
@@ -85,7 +90,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.organizer then
 		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in mw.text.split(args.organizer, ',', true) do
+		for _, organizer in ipairs(mw.text.split(args.organizer, ',', true)) do
 			organizer = mw.text.trim(organizer)
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
@@ -97,7 +102,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.region then
 		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in mw.text.split(args.region, ',', true) do
+		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
 			region = mw.text.trim(region)
 			regionConditions:add{
 				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
@@ -124,10 +129,23 @@ function TournamentsListingConditions.base(args)
 		end
 		conditions:add{tierTypeConditions}
 	end
+	args.excludeTiertype1 = args.excludeTiertype1 or args.excludeTiertype
+	if args.excludeTiertype1 then
+		local excludeTiertypeConditions = ConditionTree(BooleanOperator.all)
+		for _, tier in Table.iter.pairsByPrefix(args, 'excludeTiertype') do
+			excludeTiertypeConditions:add{
+				ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tier == NON_TIER_TYPE_INPUT and '' or tier)
+			}
+		end
+		conditions:add{excludeTiertypeConditions}
+	end
 
 	return conditions:toString()
 end
 
+---@param tournamentData table
+---@param config table
+---@return string
 function TournamentsListingConditions.placeConditions(tournamentData, config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{

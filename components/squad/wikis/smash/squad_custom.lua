@@ -49,7 +49,7 @@ function ExtendedSquadRow:mains(args)
 	local cell = mw.html.create('td')
 	cell:css('text-align', 'center')
 
-	Array.forEach(args.mains, function (main)
+	Array.forEach(args.mains, function(main)
 		cell:wikitext(Characters.GetIconAndName{main, game = args.game, large = true})
 	end)
 	self.content:node(cell)
@@ -68,16 +68,16 @@ function CustomSquad.run(frame)
 	local args = squad.args
 	local tableGame = args.game
 
-	local players = Array.mapIndexes(function (index)
+	local players = Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
 
-	Array.forEach(players, function (player)
+	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
 
 		local game = player.game and mw.text.split(player.game:lower(), ',')[1] or tableGame
 		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game, returnType = 'lua'}
-				or player.mains
+			or player.mains
 
 		row:status(squad.type)
 		row:id{
@@ -101,8 +101,6 @@ function CustomSquad.run(frame)
 		elseif squad.type == Squad.TYPE_INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
-
-		row:setExtradata{status = squad.type}
 
 		squad:row(row:create(
 			mw.title.getCurrentTitle().prefixedText

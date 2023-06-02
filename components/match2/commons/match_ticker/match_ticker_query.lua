@@ -19,7 +19,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _CURRENT_DATE_STAMP = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')))
+local _CURRENT_DATE_STAMP = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdate]]))
 
 local _LIMIT_INCREASE = 20
 local _DEFAULT_LIMIT = 20
@@ -175,7 +175,7 @@ function BaseConditions:dateConditions(queryArgs)
 
 		if Logic.readBool(queryArgs.ongoing) then
 			local secondsLive = 60 * 60 * MatchTickerQuery.maximumLiveHoursOfMatches
-			local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')) - secondsLive)
+			local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdate]]) - secondsLive)
 			dateConditions:add({ConditionNode(ColumnName('date'), Comparator.gt, timeStamp)})
 
 			if not Logic.readBool(queryArgs.upcoming) then

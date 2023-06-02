@@ -24,6 +24,8 @@ local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages
 local DEFAULT_TIER_TYPE = 'general'
 
 ---Entry point
+---@param args table?
+---@return string
 function HiddenDataBox.run(args)
 	args = args or {}
 	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
@@ -98,19 +100,30 @@ function HiddenDataBox.run(args)
 	return WarningBox.displayAll(warnings)
 end
 
+---Cleans date input
+---@param primaryDate string?
+---@param secondaryDate string?
+---@return string?
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
 	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-			String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+		String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
 end
 
+---Assigns the wiki Variables according to given input, wiki variable and queryResults
+---@param variableName string
+---@param valueFromArgs string|number|nil
+---@param valueFromQuery string|number|nil
 function HiddenDataBox.checkAndAssign(variableName, valueFromArgs, valueFromQuery)
-	if String.isNotEmpty(valueFromArgs) then
+	if Logic.isNotEmpty(valueFromArgs) then
 		Variables.varDefine(variableName, valueFromArgs)
 	elseif String.isEmpty(Variables.varDefault(variableName)) then
 		Variables.varDefine(variableName, valueFromQuery or '')
 	end
 end
 
+---Fetches participant information from the parent page
+---@param parent string
+---@return {[string]: {[string]: string}}
 function HiddenDataBox._fetchParticipants(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']]',
@@ -130,10 +143,16 @@ function HiddenDataBox._fetchParticipants(parent)
 end
 
 -- overridable so that wikis can add custom vars
+---@param args table
+---@param queryResult table
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
 -- overridable so that wikis can add custom vars
+---@param participant string
+---@param participantResolved string
+---@param key string
+---@param value string|number
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
@@ -141,6 +160,10 @@ function HiddenDataBox.setWikiVariableForParticipantKey(participant, participant
 	end
 end
 
+---Validates the provided tier, tierType pair
+---@param tier string|number|nil
+---@param tierType string?
+---@return string|number|nil, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 

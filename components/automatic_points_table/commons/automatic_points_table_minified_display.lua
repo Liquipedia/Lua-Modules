@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Table = require('Module:Table')
 
 local PointsDivTable = Class.new(
 	function(self, pointsData, tournaments, positionBackgrounds, limit)
@@ -66,7 +66,7 @@ function PointsDivTable:create()
 	self:row(headerRow)
 
 	local limit = self.limit
-	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
+	Array.forEach(self.pointsData, function(teamPointsData, index)
 		if index > limit then return end
 		local positionBackground = self.positionBackgrounds[index]
 		self:row(TableRow(teamPointsData, self.tournaments, positionBackground))
@@ -155,7 +155,7 @@ function TableHeaderRow:create()
 		text = 'Points',
 		width = '50px'
 	}}
-	Table.iter.forEach(headers, function(h) self:headerCell(h) end)
+	Array.forEach(headers, function(h) self:headerCell(h) end)
 
 	for _, cell in pairs(self.cells) do
 		self.root:node(cell)

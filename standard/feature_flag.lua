@@ -39,10 +39,10 @@ local FeatureFlag = {}
 
 local cachedFlags = {}
 
---[[
-Retrieves the boolean value of a feature flag. If the flag has not been
-previously set, this returns the configured default value of the flag.
-]]
+---Retrieves the boolean value of a feature flag. If the flag has not been
+---previously set, this returns the configured default value of the flag.
+---@param flag string
+---@return boolean
 function FeatureFlag.get(flag)
 	if cachedFlags[flag] == nil then
 		cachedFlags[flag] = FeatureFlag._get(flag)
@@ -50,6 +50,8 @@ function FeatureFlag.get(flag)
 	return cachedFlags[flag]
 end
 
+---@param flag string
+---@return boolean
 function FeatureFlag._get(flag)
 	local config = FeatureFlag.getConfig(flag)
 	return Logic.nilOr(
@@ -59,10 +61,9 @@ function FeatureFlag._get(flag)
 	)
 end
 
---[[
-Sets the value of a feature flag. If value is nil, then this resets the value
-to the configured default.
-]]
+---Sets the value of a feature flag. If value is nil, then this resets the value to the configured default.
+---@param flag string
+---@param value boolean?
 function FeatureFlag.set(flag, value)
 	FeatureFlag.getConfig(flag)
 	if value ~= nil then
@@ -73,13 +74,16 @@ function FeatureFlag.set(flag, value)
 	cachedFlags[flag] = nil
 end
 
---[[
-Runs a function inside a scope where the specified flags are set.
-]]
+---Runs a function inside a scope where the specified flags are set.
+---@generic V
+---@param flags? {[string]: boolean}
+---@param f fun(): V
+---@return V|error
 function FeatureFlag.with(flags, f)
 	if Table.isEmpty(flags) then
 		return f()
 	end
+	---@cast flags -nil
 
 	-- Remember previous flags
 	local oldFlags = Table.map(flags, function(flag, value)
@@ -102,6 +106,8 @@ function FeatureFlag.with(flags, f)
 		:get()
 end
 
+---@param flag string
+---@return {defaultValue: boolean}
 function FeatureFlag.getConfig(flag)
 	local config = FeatureFlagConfig[flag]
 	if not config then

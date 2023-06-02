@@ -21,6 +21,8 @@ local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
 
 --- @class AwardPrizePool
+--- @field options table
+--- @field _lpdbInjector LpdbInjector?
 local AwardPrizePool = Class.new(BasePrizePool)
 
 function AwardPrizePool:readPlacements(args)
@@ -61,8 +63,9 @@ function AwardPrizePool:applyCutAfter(placement, row)
 	end
 end
 
-function AwardPrizePool:applyToggleExpand(placement, rows)
-	if (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
+function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
+	if placement ~= nil
+		and (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
 		and placement.currentTotalNumberOfParticipants >= self.options.cutafter
 		and placement ~= self.placements[#self.placements] then
 

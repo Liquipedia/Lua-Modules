@@ -15,6 +15,10 @@ local WantToHelpList = {}
 
 local DEFAULT_LIMIT = 3
 
+---Builds the Want to help display.
+---Usage e.g. on main page
+---@param frame Frame
+---@return string
 function WantToHelpList.get(frame)
 	local args = Arguments.getArgs(frame)
 	local limit = tonumber(args.limit) or DEFAULT_LIMIT
@@ -34,6 +38,8 @@ function WantToHelpList.get(frame)
 	return table.concat(listItems)
 end
 
+---Fetches "Todo" datapoints
+---@return table
 function WantToHelpList._getTodos()
 	return mw.ext.LiquipediaDB.lpdb('datapoint', {
 		limit = 5000,

@@ -278,7 +278,7 @@ function HiddenInfoboxLeague._getPrizePool()
 end
 
 function HiddenInfoboxLeague._cleanPrizeValue(value)
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return nil
 	end
 
