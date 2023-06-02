@@ -45,9 +45,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	local sixInvitePoints = Array.filter(placement.parent.prizes, function (prize)
-		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == 'SI' then
-			return true
-		end
+		return prize.type == PRIZE_TYPE_POINTS and prize.data.title == 'SI'
 	end)[1]
 
 	if sixInvitePoints then
