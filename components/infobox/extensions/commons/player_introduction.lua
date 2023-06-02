@@ -523,9 +523,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
-		playedOrWorked = playerInfo.type ~= TYPE_PLAYER
-			and (isCurrentTense and 'working for' or 'worked for')
-			or (not isCurrentTense and 'played for') or self:_playedOrWorked(),
+		playedOrWorked = self:_playedOrWorked(isCurrentTense),
 		team = PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date),
 		team2 = isCurrentTense and transferInfo.type == TRANSFER_STATUS_LOAN and String.isEmpty(playerInfo.team2)
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date)) or '',
@@ -535,11 +533,18 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 end
 
-function PlayerIntroduction:_playedOrWorked()
+function PlayerIntroduction:_playedOrWorked(isCurrentTense)
+	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
 	local role = self.transferInfo.standardizedRole
 
-	if transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
+	if playerInfo.type ~= TYPE_PLAYER and isCurrentTense then
+		return 'working for'
+	elseif playerInfo.type ~= TYPE_PLAYER then
+		return 'worked for'
+	elseif not isCurrentTense then
+		return 'played for'
+	elseif transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
 		return 'on the inactive roster of'
 	elseif self.options.showRole and role == 'streamer' or role == 'content creator' then
 		return AnOrA.main{role} .. ' for'
