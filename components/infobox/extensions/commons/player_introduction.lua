@@ -14,7 +14,6 @@ local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 
 local SHOULD_QUERY_KEYWORD = 'query'
 local DEFAULT_DATAPOINT_LEAVE_DATE = '2999-01-01'
