@@ -341,6 +341,14 @@ end
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
+	if not tier then
+		--on sc2 sometimes there are broadcaster cards on series pages
+		--for those the additional tournament data is stored in extradata
+		--including tier and tier type
+		tier, tierType, options = Tier.parseFromQueryData(tournament.extradata)
+	end
+
+	assert(tier, 'Broadcaster event with unset or invalid liquipedia tier: ' .. tournament.pagename)
 
 	options.link = true
 	options.shortIfBoth = true
