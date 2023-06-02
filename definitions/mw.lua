@@ -163,7 +163,7 @@ function mw.html:tag(tagName, args) end
 
 ---Set an HTML attribute with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string|number
+---@param value string|number|nil
 ---@return self
 ---@overload fun(self, param: {[string]: string})
 function mw.html:attr(name, value) end

@@ -18,6 +18,8 @@ local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEna
 
 local AwardsTable = Class.new(BaseResultsTable)
 
+---Builds the Header of the award table
+---@return Html
 function AwardsTable:buildHeader()
 	local header = mw.html.create('tr')
 		:tag('th'):css('width', '100px'):wikitext('Date'):done()
@@ -42,6 +44,9 @@ function AwardsTable:buildHeader()
 	return header
 end
 
+---Builds a row of the award table
+---@param placement table
+---@return Html
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
