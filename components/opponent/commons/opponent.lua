@@ -56,6 +56,7 @@ Opponent.literal = OpponentTypes.literal
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
 Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
 
+---@enum PartySize
 Opponent.partySizes = {
 	solo = 1,
 	duo = 2,
@@ -92,7 +93,7 @@ Opponent.types.Opponent = TypeUtil.union(
 )
 
 ---Checks if the provided opponent type is a party type
----@param type OpponentType
+---@param type OpponentType?
 ---@return boolean
 function Opponent.typeIsParty(type)
 	return Opponent.partySizes[type] ~= nil
@@ -101,23 +102,24 @@ end
 ---Returns the player count for a party type, or nil otherwise.
 ---
 ---example: Opponent.partySize(Opponent.duo) == 2
----@param type OpponentType
----@return integer?
+---@param type OpponentType?
+---@return PartySize?
 function Opponent.partySize(type)
 	return Opponent.partySizes[type]
 end
 
 ---Creates a blank literal opponent, or a blank opponent of the specified type
----@param type OpponentType
+---@param type OpponentType?
 ---@return standardOpponent
 function Opponent.blank(type)
 	if type == Opponent.team then
 		return {type = type, template = 'tbd'}
 	elseif Opponent.typeIsParty(type) then
+		local partySize = Opponent.partySize(type) --[[@as integer]]
 		return {
 			type = type,
 			players = Array.map(
-				Array.range(1, Opponent.partySize(type)),
+				Array.range(1, partySize),
 				function(_) return {displayName = ''} end
 			),
 		}
@@ -127,16 +129,17 @@ function Opponent.blank(type)
 end
 
 ---Creates a blank TBD opponent, or a TBD opponent of the specified type
----@param type OpponentType
+---@param type OpponentType?
 ---@return standardOpponent
 function Opponent.tbd(type)
 	if type == Opponent.team then
 		return {type = type, template = 'tbd'}
 	elseif Opponent.typeIsParty(type) then
+		local partySize = Opponent.partySize(type) --[[@as integer]]
 		return {
 			type = type,
 			players = Array.map(
-				Array.range(1, Opponent.partySize(type)),
+				Array.range(1, partySize),
 				function(_) return {displayName = 'TBD'} end
 			),
 		}
