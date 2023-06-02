@@ -359,8 +359,7 @@ function PlayerIntroduction:_roleAdjusts(args)
 		role = 'substitute ' .. role
 	end
 
-	-- if you have a better name ...
-	self.transferInfo.role = role
+	self.transferInfo.standardizedRole = role
 end
 
 --- builds the display
@@ -516,7 +515,7 @@ end
 function PlayerIntroduction:_teamDisplay(isDeceased)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
-	local role = self.transferInfo.role
+	local role = self.transferInfo.standardizedRole
 	if String.isEmpty(playerInfo.team) and (String.isEmpty(transferInfo.team) or transferInfo.team == SKIP_ROLE) then
 		return nil
 	end
