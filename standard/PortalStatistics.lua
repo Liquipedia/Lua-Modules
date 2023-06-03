@@ -518,7 +518,6 @@ function StatisticsPortal.pieChartBreakdown(args)
 	if Logic.readBool(args.detailedKey) then
 		wrapper:node(mw.html.create('div')
 			:addClass('template-box')
-			--:css('padding-left','5em')
 			:node(StatisticsPortal.prizepoolBreakdown(args))
 		)
 		return wrapper
