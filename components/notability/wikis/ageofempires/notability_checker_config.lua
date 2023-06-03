@@ -16,8 +16,9 @@ Config.TIER_TYPE_GENERAL = 'general'
 Config.TIER_TYPE_QUALIFIER = 'qualifier'
 Config.TIER_TYPE_WEEKLY = 'weekly'
 Config.TIER_TYPE_MONTHLY = 'monthly'
-Config.TIER_TYPE_SHOW_MATCH = 'showmatch'
-Config.TIER_TYPE_MISC = 'misc'
+Config.TIER_TYPE_SHOWMATCH = 'showmatch'
+Config.TIER_TYPE_FFA = 'ffa'
+Config.TIER_TYPE_CHARITY = 'charity'
 
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
@@ -43,8 +44,7 @@ Config.NOTABILITY_THRESHOLD_NOTABLE = 1600
 -- quickly decrease the point rewards as the placement gets lower
 Config.EXTRA_DROP_OFF_TYPES = {
 	Config.TIER_TYPE_QUALIFIER,
-	Config.TIER_TYPE_SHOW_MATCH,
-	Config.TIER_TYPE_MISC,
+	Config.TIER_TYPE_SHOWMATCH,
 }
 
 -- Weights used for tournaments
@@ -64,11 +64,7 @@ Config.weights = {
 				points = 1000,
 			},
 			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 500,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
+				name = Config.TIER_TYPE_SHOWMATCH,
 				points = 500,
 			},
 			{
@@ -96,11 +92,7 @@ Config.weights = {
 				points = 400,
 			},
 			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 200,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
+				name = Config.TIER_TYPE_SHOWMATCH,
 				points = 200,
 			},
 			{
@@ -128,11 +120,7 @@ Config.weights = {
 				points = 200,
 			},
 			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 100,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
+				name = Config.TIER_TYPE_SHOWMATCH,
 				points = 100,
 			},
 			{
@@ -160,11 +148,7 @@ Config.weights = {
 				points = 100,
 			},
 			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 50,
-			},
-			{
-				name = Config.TIER_TYPE_MISC,
+				name = Config.TIER_TYPE_SHOWMATCH,
 				points = 50,
 			},
 			{
@@ -178,18 +162,38 @@ Config.weights = {
 		},
 	},
 	{
-		tier = 9,
+		tier = -1,
 		options = {
 			dateLossIgnored = true,
 		},
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 100,
+				points = 0,
 			},
 			{
-				name = Config.TIER_TYPE_SHOW_MATCH,
-				points = 100,
+				name = Config.TIER_TYPE_QUALIFIER,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_SHOWMATCH,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_MONTHLY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_WEEKLY,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_FFA,
+				points = 0,
+			},
+			{
+				name = Config.TIER_TYPE_CHARITY,
+				points = 0,
 			},
 		},
 	},
