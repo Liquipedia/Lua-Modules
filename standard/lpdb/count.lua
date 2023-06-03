@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
+local Team = require('Module:Team')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -25,7 +27,7 @@ function Count.games(args)
 
 	local lpdbConditions = Count._baseConditions(args)
 
-	return Count._query('game', 'objectname', lpdbConditions)
+	return Count._query('game', lpdbConditions)
 end
 
 function Count.matches(args)
@@ -34,7 +36,7 @@ function Count.matches(args)
 	local lpdbConditions = Count._baseConditions(args)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('match', 'objectname', lpdbConditions)
+	return Count._query('match', lpdbConditions)
 end
 
 function Count.tournaments(args)
@@ -43,22 +45,23 @@ function Count.tournaments(args)
 	local lpdbConditions = Count._baseConditions(args, true)
 	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	return Count._query('tournament', 'objectname', lpdbConditions)
+	return Count._query('tournament', lpdbConditions)
 end
 
 function Count.placements(args)
 	args = args or {}
 
 	local lpdbConditions = Count._baseConditions(args)
-	local player = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player) or ''
+	lpdbConditions = Count._tierConditions(args, lpdbConditions)
 
-	if String.isNotEmpty(args.tier) then
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, args.tier)}
+	if not Logic.readBool(args.includeShowmatch) then
+		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Showmatch')}
 	end
 
-	lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Showmatch')}
-	lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier')}
-	lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
+	if not Logic.readBool(args.includeQualifier) then
+		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier')}
+		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
+	end
 
 	if Logic.readBool(args.noEmptyPrizePool) then
 		lpdbConditions:add{ConditionNode(ColumnName('prizemoney'), Comparator.neq, '')}
@@ -66,36 +69,45 @@ function Count.placements(args)
 	end
 
 	if String.isNotEmpty(args.player) then
+		local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player)
 		local teamConditions = ConditionTree(BooleanOperator.any)
 		for index = 1, 10 do
 			teamConditions:add{
-				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, player)}
+				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent),
+				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent:gsub(' ', '_'))
+			}
 		end
 		lpdbConditions:add{teamConditions}
 	end
 
+	if String.isNotEmpty(args.team) then
+		local opponent = Team.queryRaw(args.team).page
+		lpdbConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent)}
+	end
+
 	if String.isNotEmpty(args.placement) then
 		local placementConditions = ConditionTree(BooleanOperator.any)
-		for _, placmentValue in pairs(mw.text.split(args.placement, ',', true)) do
-			placementConditions:add{
-				ConditionNode(ColumnName('placement'), Comparator.eq, placmentValue)}
-		end
+		Array.map(Array.map(mw.text.split(args.placement, ',', true), String.trim),
+		function(placementValue)
+			return placementConditions:add{
+				ConditionNode(ColumnName('placement'), Comparator.eq, placementValue)}
+			end)
 		lpdbConditions:add{placementConditions}
 	end
 
-	return Count._query('placement', 'placement', lpdbConditions)
+	return Count._query('placement', lpdbConditions)
 end
 
 
 
-function Count._query(queryType, queryField, lpdbConditions)
+function Count._query(queryType, lpdbConditions)
 
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
 		conditions = lpdbConditions:toString(),
-		query = 'count::' .. queryField,
+		query = 'count::objectname',
 	})
 
-	return tonumber(data[1]['count_' .. queryField])
+	return tonumber(data[1]['count_objectname'])
 end
 
 
@@ -136,6 +148,7 @@ function Count._baseConditions(args, isTournament)
 			},
 		}
 	end
+
 	if args.edate then
 		conditions:add{ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName(endDateKey), Comparator.lt, args.edate),
@@ -143,6 +156,7 @@ function Count._baseConditions(args, isTournament)
 			},
 		}
 	end
+
 	if args.year then
 		conditions:add{ConditionNode(ColumnName(sortDateKey .. '_year'), Comparator.eq, args.year)}
 	end
@@ -155,14 +169,14 @@ function Count._tierConditions(args, lpdbConditions)
 
 	if args.liquipediatier then
 		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, args.liquipediatier)}
-	else
-		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.gt, '')}
 	end
+
 	if args.publishertier then
 		lpdbConditions:add{ConditionNode(ColumnName('publishertier'), Comparator.eq, args.publishertier)}
 		lpdbConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.neq, 'Qualifier')}
 		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
 	end
+
 	if args.liquipediatiertype then
 		lpdbConditions:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, args.liquipediatiertype)}
 	end
