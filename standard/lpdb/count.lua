@@ -70,6 +70,7 @@ function Count.placements(args)
 
 	if String.isNotEmpty(args.player) then
 		local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player)
+		local opponentWithUnderscores = opponent:gsub(' ', '_')
 		local teamConditions = ConditionTree(BooleanOperator.any)
 		for index = 1, 10 do
 			teamConditions:add{
