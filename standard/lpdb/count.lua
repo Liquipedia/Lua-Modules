@@ -22,6 +22,10 @@ local ColumnName = Condition.ColumnName
 local Count = {}
 
 
+---@deprecated `lpdb_game` is deprecated
+---Counts the amount of games played on a wiki
+---@param args table
+---@return integer?
 function Count.games(args)
 	args = args or {}
 
@@ -30,6 +34,11 @@ function Count.games(args)
 	return Count._query('game', lpdbConditions)
 end
 
+
+---@deprecated `lpdb_match` is deprecated
+---Counts the amount of matches played on a wiki
+---@param args table
+---@return integer?
 function Count.matches(args)
 	args = args or {}
 
@@ -39,6 +48,10 @@ function Count.matches(args)
 	return Count._query('match', lpdbConditions)
 end
 
+
+---Counts the amount of tournaments played on a wiki
+---@param args table
+---@return integer?
 function Count.tournaments(args)
 	args = args or {}
 
@@ -48,6 +61,10 @@ function Count.tournaments(args)
 	return Count._query('tournament', lpdbConditions)
 end
 
+
+---Counts the amount of placements for a specified opponent on a wiki
+---@param args table
+---@return integer?
 function Count.placements(args)
 	args = args or {}
 
@@ -71,19 +88,24 @@ function Count.placements(args)
 	if String.isNotEmpty(args.player) then
 		local opponent = mw.ext.TeamLiquidIntegration.resolve_redirect(args.player)
 		local opponentWithUnderscores = opponent:gsub(' ', '_')
-		local teamConditions = ConditionTree(BooleanOperator.any)
+		local opponentConditions = ConditionTree(BooleanOperator.any)
 		for index = 1, 10 do
-			teamConditions:add{
+			opponentConditions:add{
 				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent),
 				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponentWithUnderscores)
 			}
 		end
-		lpdbConditions:add{teamConditions}
-	end
+		lpdbConditions:add{opponentConditions}
 
-	if String.isNotEmpty(args.team) then
-		local opponent = Team.queryRaw(args.team).page
-		lpdbConditions:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, opponent)}
+	elseif String.isNotEmpty(args.team) then
+		local opponentConditions = ConditionTree(BooleanOperator.any)
+		Array.map(Count._getOpponentTemplates(args.team),
+		function(templateValue)
+			return opponentConditions:add{
+				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue)}
+			end
+		)
+		lpdbConditions:add{opponentConditions}
 	end
 
 	if String.isNotEmpty(args.placement) then
@@ -99,8 +121,10 @@ function Count.placements(args)
 	return Count._query('placement', lpdbConditions)
 end
 
-
-
+---Counts the number of placements for a specified opponent on a wiki
+---@param queryType string
+---@param lpdbConditions ConditionTree
+---@return integer? 
 function Count._query(queryType, lpdbConditions)
 
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
@@ -116,7 +140,26 @@ end
 Condition Functions
 ]]--
 
+---Retrieve all team templates for team argument parameter
+---@generic T
+---@param opponent string
+---@return T[]? 
+function Count._getOpponentTemplates(opponent)
+	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+	if not opponentTemplate then
+		error('Missing team template for team: ' .. opponent)
+	end
 
+	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
+
+	return opponentTeamTemplates and Array.extractValues(opponentTeamTemplates) or {opponentTemplate}
+end
+
+---Returns the base query conditions based on input args
+---@param args table
+---@param isTournament boolean?
+---@return ConditionTree
 function Count._baseConditions(args, isTournament)
 	args.sdate = args.sdate or args.startdate
 	args.edate = args.edate or args.enddate
@@ -165,6 +208,10 @@ function Count._baseConditions(args, isTournament)
 	return conditions
 end
 
+---Returns the query conditions related to tier based on input args
+---@param args table
+---@param lpdbConditions ConditionTree
+---@return ConditionTree
 function Count._tierConditions(args, lpdbConditions)
 	args.liquipediatier = args.liquipediatier or args.tier
 
