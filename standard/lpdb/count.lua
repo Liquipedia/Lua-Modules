@@ -75,7 +75,7 @@ function Count.placements(args)
 		for index = 1, 10 do
 			teamConditions:add{
 				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent),
-				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponent:gsub(' ', '_'))
+				ConditionNode(ColumnName('opponentplayers_p' .. index), Comparator.eq, opponentWithUnderscores)
 			}
 		end
 		lpdbConditions:add{teamConditions}
