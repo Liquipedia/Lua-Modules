@@ -124,7 +124,7 @@ end
 ---Counts the number of placements for a specified opponent on a wiki
 ---@param queryType string
 ---@param lpdbConditions ConditionTree
----@return integer? 
+---@return integer?
 function Count._query(queryType, lpdbConditions)
 
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
@@ -143,7 +143,7 @@ Condition Functions
 ---Retrieve all team templates for team argument parameter
 ---@generic T
 ---@param opponent string
----@return T[]? 
+---@return T[]?
 function Count._getOpponentTemplates(opponent)
 	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
