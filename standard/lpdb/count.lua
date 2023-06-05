@@ -140,9 +140,8 @@ Condition Functions
 ]]--
 
 ---Retrieve all team templates for team argument parameter
----@generic T
 ---@param opponent string
----@return T[]?
+---@return string[]
 function Count._getOpponentTemplates(opponent)
 	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
