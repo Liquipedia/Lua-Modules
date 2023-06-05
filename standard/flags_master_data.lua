@@ -1461,6 +1461,11 @@ local data = {
 		localised = 'Southeast Asian',
 		name = 'Southeast Asia',
 	},
+	['subsaharanafrica'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Sub-Saharan',
+		name = 'Sub-Saharan Africa',
+	},
 	['westasia'] = {
 		flag = 'File:Space filler flag.png',
 		localised = 'West Asian',
