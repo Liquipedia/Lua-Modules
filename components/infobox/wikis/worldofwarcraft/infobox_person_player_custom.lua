@@ -38,8 +38,6 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
-	_args.achievements = Template.safeExpand(mw.getCurrentFrame(), 'Player achievements', {player.pagename})
-
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getWikiCategories = CustomPlayer.getWikiCategories
