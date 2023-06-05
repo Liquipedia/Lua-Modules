@@ -9,7 +9,10 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
+
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Team = require('Module:Team')
 
 local Condition = require('Module:Condition')
@@ -21,9 +24,48 @@ local ColumnName = Condition.ColumnName
 
 local Count = {}
 
+---Counts the number of matches played on a wiki - querying lpdb_match2
+---@param args table
+---@return integer?
+function Count.match2(args)
+	args = args or {}
+
+	local lpdbConditions = Count._baseConditions(args)
+	lpdbConditions = Count._tierConditions(args, lpdbConditions)
+
+	return Count._query('match2', lpdbConditions)
+end
+
+---Counts the number of games played on a wiki - querying lpdb_match2
+---@param args table
+---@return integer?
+function Count.match2games(args)
+	args = args or {}
+
+	local data = {}
+
+	local lpdbConditions = Count._baseConditions(args)
+
+	local queryParameters = {
+		query = 'match2games',
+		conditions = lpdbConditions:toString(),
+		limit = 1000,
+	}
+
+	local processFunction = function(item)
+		if item.match2games then
+			table.insert(data, item.match2games)
+		end
+	end
+
+	Lpdb.executeMassQuery('match2', queryParameters, processFunction)
+
+	return Table.size(Array.flatten(data))
+end
+
 
 ---@deprecated `lpdb_game` is deprecated
----Counts the amount of games played on a wiki
+---Counts the number of games played on a wiki
 ---@param args table
 ---@return integer?
 function Count.games(args)
@@ -36,7 +78,7 @@ end
 
 
 ---@deprecated `lpdb_match` is deprecated
----Counts the amount of matches played on a wiki
+---Counts the number of matches played on a wiki
 ---@param args table
 ---@return integer?
 function Count.matches(args)
@@ -49,7 +91,7 @@ function Count.matches(args)
 end
 
 
----Counts the amount of tournaments played on a wiki
+---Counts the number of tournaments played on a wiki
 ---@param args table
 ---@return integer?
 function Count.tournaments(args)
@@ -62,7 +104,7 @@ function Count.tournaments(args)
 end
 
 
----Counts the amount of placements for a specified opponent on a wiki
+---Counts the number of placements for a specified opponent on a wiki
 ---@param args table
 ---@return integer?
 function Count.placements(args)
@@ -99,10 +141,12 @@ function Count.placements(args)
 
 	elseif String.isNotEmpty(args.team) then
 		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.map(Count._getOpponentTemplates(args.team),
+		Array.map(Count._getOpponentNames(args.team),
 		function(templateValue)
 			return opponentConditions:add{
-				ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, templateValue)}
+				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
+				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
+			}
 			end
 		)
 		lpdbConditions:add{opponentConditions}
@@ -121,7 +165,8 @@ function Count.placements(args)
 	return Count._query('placement', lpdbConditions)
 end
 
----Counts the number of placements for a specified opponent on a wiki
+
+---Returns the counted number based on the type of query
 ---@param queryType string
 ---@param lpdbConditions ConditionTree
 ---@return integer?
@@ -139,20 +184,15 @@ end
 Condition Functions
 ]]--
 
+
 ---Retrieve all team templates for team argument parameter
 ---@param opponent string
 ---@return string[]
-function Count._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. opponent)
-	end
-
-	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
-
-	return opponentTeamTemplates and Array.extractValues(opponentTeamTemplates) or {opponentTemplate}
+function Count._getOpponentNames(opponent)
+	local opponentNames = Team.queryHistoricalNames(opponent) or {}
+	return Array.extractValues(opponentNames)
 end
+
 
 ---Returns the base query conditions based on input args
 ---@param args table
