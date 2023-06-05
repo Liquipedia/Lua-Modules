@@ -126,7 +126,6 @@ end
 ---@param lpdbConditions ConditionTree
 ---@return integer?
 function Count._query(queryType, lpdbConditions)
-
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
 		conditions = lpdbConditions:toString(),
 		query = 'count::objectname',
