@@ -86,10 +86,10 @@ function DateExt.getContextualDate()
 end
 
 --- Fetches contextualDate on a tournament page with fallback to now.
----@return string|osdate
+---@return string
 function DateExt.getContextualDateOrNow()
 	return DateExt.getContextualDate()
-		or os.date('%F')
+		or os.date('%F') --[[@as string]]
 end
 
 return DateExt
