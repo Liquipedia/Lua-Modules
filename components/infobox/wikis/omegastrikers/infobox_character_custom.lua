@@ -62,7 +62,6 @@ function CustomInjector:addCustomCells(widgets)
 		content = {_args.legendtype}
 	})
 
-
 	table.insert(widgets, Cell{
 		name = 'Primary',
 		content = {'[[File:' .. _args.name .. ' - Primary.png|20px]] ' .. _args.primary}
