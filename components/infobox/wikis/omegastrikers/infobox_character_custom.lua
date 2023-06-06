@@ -41,7 +41,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	table.insert(widgets, Cell{
 		name = 'Cost',
-		content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. _args.strikercredits .. 
+		content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. _args.strikercredits ..
 				'  [[File:Omega Strikers Ody Points.png|20px]] ' .. _args.odypoints}
 	})
 
