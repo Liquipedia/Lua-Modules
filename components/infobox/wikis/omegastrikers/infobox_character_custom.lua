@@ -24,7 +24,6 @@ local _args
 function CustomCharacter.run(frame)
 	local character = Character(frame)
 	_args = character.args
-	character.addToLpdb = CustomCharacter.addToLpdb
 	character.createWidgetInjector = CustomCharacter.createWidgetInjector
 	return character:createInfobox()
 end
@@ -73,11 +72,6 @@ function CustomInjector:addCustomCells(widgets)
 	})
 
 	return widgets
-end
-
-function CustomCharacter:addToLpdb(lpdbData)
-	lpdbData.extradata.class = _args.legendtype
-	return lpdbData
 end
 
 return CustomCharacter
