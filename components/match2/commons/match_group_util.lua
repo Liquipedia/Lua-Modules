@@ -81,6 +81,11 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 	MatchGroupUtil.types.BracketBracketData
 )
 
+---@class standardPlayer
+---@field displayName string?
+---@field flag string?
+---@field pageName string?
+---@field team string?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -88,6 +93,21 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 	team = 'string?',
 })
 
+---@class standardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players standardPlayer[]
+---@field score number?
+---@field score2 number?
+---@field status string?
+---@field status2 string?
+---@field template string?
+---@field type string
+---@field team string?
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -104,6 +124,11 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	type = 'string',
 })
 
+---@class GameOpponent
+---@field name string?
+---@field players standardPlayer[]
+---@field template string?
+---@field type string
 MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
@@ -150,6 +175,11 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	winner = 'number?',
 })
 
+---@class standardTeamProps
+---@field bracketName string
+---@field displayName string
+---@field pageName string?
+---@field shortName string
 MatchGroupUtil.types.Team = TypeUtil.struct({
 	bracketName = 'string',
 	displayName = 'string',

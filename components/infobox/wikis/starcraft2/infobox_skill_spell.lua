@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
@@ -21,9 +22,6 @@ local Cell = Widgets.Cell
 
 local Spell = Class.new()
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
 local _ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
 
 local CustomInjector = Class.new(Injector)
@@ -107,40 +105,16 @@ function Spell:createWidgetInjector()
 end
 
 function Spell:getResearchCost()
-	local display
 	if String.isEmpty(_args.from) then
 		return nil
 	end
 
-	local race = string.lower(_args.race or '')
-
-	local minerals = tonumber(_args.min or 0) or 0
-	if minerals ~= 0 then
-		minerals = _MINERALS .. '&nbsp;' .. minerals .. '&nbsp;'
-	else
-		minerals = ''
-	end
-
-	local gas = tonumber(_args.gas or 0) or 0
-	if gas ~= 0 then
-		gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas .. '&nbsp;'
-	else
-		gas = ''
-	end
-
-	local buildtime = tonumber(_args.buildtime or 0) or 0
-	if buildtime ~= 0 then
-		buildtime = (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
-	else
-		buildtime = ''
-	end
-
-	display = minerals .. gas .. buildtime
-	if display == '' then
-		return nil
-	else
-		return display
-	end
+	return CostDisplay.run{
+		faction = _args.race,
+		minerals = _args.min,
+		gas = _args.gas,
+		buildTime = _args.buildtime,
+	}
 end
 
 function Spell:getResearchFrom()
@@ -231,8 +205,7 @@ end
 
 function Spell:getCostDisplay()
 	local energy = tonumber(_args.energy or 0) or 0
-	energy = _ENERGY .. '&nbsp;' .. energy
-	return energy
+	return _ENERGY .. '&nbsp;' .. energy
 end
 
 return Spell

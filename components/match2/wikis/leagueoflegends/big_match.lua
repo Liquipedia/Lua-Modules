@@ -205,7 +205,7 @@ function BigMatch._contextualEnrichment(args)
 	local tournamentData = BigMatch._fetchTournamentInfo(args.tournamentlink)
 
 	args.patch = args.patch or tournamentData.patch
-	args.tournament =  args.tournament or tournamentData.name
+	args.tournament = args.tournament or tournamentData.name
 	args.parent = args.tournamentlink or tournamentData.pagename
 
 	return args

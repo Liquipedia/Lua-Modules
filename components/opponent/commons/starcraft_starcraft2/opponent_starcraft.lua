@@ -37,15 +37,30 @@ StarcraftOpponent.types.Opponent = TypeUtil.union(
 	Opponent.types.LiteralOpponent
 )
 
+---@class StarcraftStandardPlayer:standardPlayer
+---@field race string?
+
+---@class StarcraftStandardOpponent:standardOpponent
+---@field players StarcraftStandardPlayer[]
+---@field isArchon boolean
+---@field isSpecialArchon boolean?
+---@field extradata table
+
 --[[
 Not supported:
 
 Legacy TeamOpponent ({{TeamOpponent|players=...}})
 TeamOpponent without team template ({{TeamOpponent|name=...|short=...}})
 ]]
+---@param args table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.readOpponentArgs(args)
-	local opponent = Opponent.readOpponentArgs(args)
+	local opponent = Opponent.readOpponentArgs(args) --[[@as StarcraftStandardOpponent?]]
 	local partySize = Opponent.partySize((opponent or {}).type)
+
+	if not opponent then
+		return nil
+	end
 
 	if partySize == 1 then
 		opponent.players[1].race = Faction.read(args.race)
@@ -67,8 +82,14 @@ function StarcraftOpponent.readOpponentArgs(args)
 	return opponent
 end
 
+---@param record table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromMatch2Record(record)
-	local opponent = Opponent.fromMatch2Record(record)
+	local opponent = Opponent.fromMatch2Record(record) --[[@as StarcraftStandardOpponent?]]
+
+	if not opponent then
+		return nil
+	end
 
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
@@ -81,6 +102,8 @@ function StarcraftOpponent.fromMatch2Record(record)
 	return opponent
 end
 
+---@param opponent StarcraftStandardOpponent
+---@return table?
 function StarcraftOpponent.toLpdbStruct(opponent)
 	local storageStruct = Opponent.toLpdbStruct(opponent)
 
@@ -98,8 +121,14 @@ function StarcraftOpponent.toLpdbStruct(opponent)
 	return storageStruct
 end
 
+---@param storageStruct table
+---@return StarcraftStandardOpponent?
 function StarcraftOpponent.fromLpdbStruct(storageStruct)
-	local opponent = Opponent.fromLpdbStruct(storageStruct)
+	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as StarcraftStandardOpponent?]]
+
+	if not opponent then
+		return nil
+	end
 
 	if Opponent.partySize(storageStruct.opponenttype) then
 		opponent.isArchon = storageStruct.opponentplayers.isArchon
@@ -119,6 +148,10 @@ party opponents, this fills in players' pageNames using their displayNames,
 using data stored in page variables if present.
 options.syncPlayer: Whether to fetch player information from variables or LPDB. Disabled by default.
 ]]
+---@param opponent StarcraftStandardOpponent
+---@param date string|number|osdate|nil
+---@param options {syncPlayer: boolean?}
+---@return StarcraftStandardOpponent
 function StarcraftOpponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
@@ -127,7 +160,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
-				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
+				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])})
 				if not player.team then
 					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
 				end

@@ -20,6 +20,8 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 local CustomResultsTable = {}
 
 -- Template entry point
+---@param args table
+---@return Html
 function CustomResultsTable.results(args)
 	local resultsTable = ResultsTable(args)
 
@@ -30,10 +32,15 @@ function CustomResultsTable.results(args)
 	return resultsTable:create():build()
 end
 
+---@param args table
+---@return Html
 function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end
 
+---Adjusts the lastvsdata handling for fortnite
+---@param placement table
+---@return table
 function CustomResultsTable:processLegacyVsData(placement)
 	if Table.isEmpty(placement.lastvsdata) then
 		local opponent = (placement.extradata or {}).vsOpponent or {}
@@ -46,11 +53,14 @@ function CustomResultsTable:processLegacyVsData(placement)
 	return placement
 end
 
+---Adjusts the lastvs display for fortnite
+---@param placement table
+---@return string, string
 function CustomResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata
 
 	if String.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, Abbreviation.make('Grp S.', 'Group Stage') --[[@as string]]
 	end
 
 	-- return empty strings for non group scores since it is a BattleRoyale wiki

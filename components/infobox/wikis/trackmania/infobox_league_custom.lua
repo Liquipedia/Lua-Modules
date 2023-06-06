@@ -102,9 +102,9 @@ end
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_mode',
 		Logic.emptyOr(
-		    args.mode,
-		    (String.isNotEmpty(args.team_number) and 'team' or nil),
-		    'solo'
+			args.mode,
+			(String.isNotEmpty(args.team_number) and 'team' or nil),
+			'solo'
 		)
 	)
 

@@ -22,6 +22,10 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 --- @class AwardPlacement
 --- An AwardPlacement is a set of opponents who all share the same award in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
+--- @field args table
+--- @field parent AwardPrizePool
+--- @field parseOpponents function
+--- @field getPrizeRewardForOpponent function
 local AwardPlacement = Class.new(BasePlacement)
 
 --- @param award string Award of this slot/placement

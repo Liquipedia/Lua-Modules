@@ -110,7 +110,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
@@ -249,14 +249,14 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 			--determine MATCH winner, resulttype and walkover
 			--the following ignores the possibility of > 2 opponents
 			--as > 2 opponents is only possible in ffa
-			if String.isNotEmpty(walkover) then
+			if Logic.isNotEmpty(walkover) then
 				if Logic.isNumeric(walkover) then
-					walkover = tonumber(walkover)
-					if walkover == opponentIndex then
+					local numericWalkover = tonumber(walkover)
+					if numericWalkover == opponentIndex then
 						match.winner = opponentIndex
 						match.walkover = 'L'
 						opponent.status = 'W'
-					elseif walkover == 0 then
+					elseif numericWalkover == 0 then
 						match.winner = 0
 						match.walkover = 'L'
 						opponent.status = 'L'
@@ -305,7 +305,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 
 			if Logic.readBool(match.cancelled) then
 				match.finished = true
-				if String.isEmpty(match.resulttype) and String.isEmpty(opponent.score) then
+				if String.isEmpty(match.resulttype) and Logic.isEmpty(opponent.score) then
 					match.resulttype = 'np'
 					opponent.score = opponent.score or -1
 				end
@@ -338,7 +338,7 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 end
 
 function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
-	if Logic.readBool(match.finished) and String.isEmpty(match.winner) then
+	if Logic.readBool(match.finished) and Logic.isEmpty(match.winner) then
 		local scores = Array.mapIndexes(function(opponentIndex)
 			local opponent = match['opponent' .. opponentIndex]
 			if not opponent then
@@ -449,8 +449,8 @@ function StarcraftMatchGroupInput._opponentInput(match)
 		end
 
 		-- Fix legacy winner
-		if String.isNotEmpty(opponent.win) then
-			if String.isEmpty(match.winner) then
+		if Logic.isNotEmpty(opponent.win) then
+			if Logic.isEmpty(match.winner) then
 				match.winner = tostring(opponentIndex)
 			else
 				match.winner = '0'
@@ -807,10 +807,10 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, 2)
 
 	-- set sumscore to 0 if it isn't a number
-	if String.isEmpty(match.opponent1.sumscore) then
+	if Logic.isEmpty(match.opponent1.sumscore) then
 		match.opponent1.sumscore = 0
 	end
-	if String.isEmpty(match.opponent2.sumscore) then
+	if Logic.isEmpty(match.opponent2.sumscore) then
 		match.opponent2.sumscore = 0
 	end
 
@@ -871,7 +871,7 @@ function StarcraftMatchGroupInput._mapWinnerProcessing(map)
 		end
 	else
 		local winnerInput = tonumber(map.winner)
-		if String.isNotEmpty(map.walkover) then
+		if Logic.isNotEmpty(map.walkover) then
 			local walkoverInput = tonumber(map.walkover)
 			if walkoverInput == 1 then
 				map.winner = 1
@@ -977,6 +977,8 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	local opponentRaces, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
+		-- opponentIx can not be nil due to the format of the participants keys
+		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
 	end

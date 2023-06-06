@@ -29,16 +29,16 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader()) -- "Role"
-			:node(makeHeader('Join Date'))
+		:node(makeHeader())
+		:node(makeHeader('Name'))
+		:node(makeHeader()) -- "Role"
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
+			:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -75,14 +75,14 @@ function CustomSquad.run(frame)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id{
-				player.id,
-				flag = player.flag,
-				link = player.link,
-				captain = player.captain or player.igl,
-				role = player.role,
-				team = player.team,
-				teamrole = player.teamrole,
-			}
+			player.id,
+			flag = player.flag,
+			link = player.link,
+			captain = player.captain or player.igl,
+			role = player.role,
+			team = player.team,
+			teamrole = player.teamrole,
+		}
 			:name{name = player.name}
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
@@ -102,10 +102,10 @@ function CustomSquad.run(frame)
 
 		squad:row(row:create(
 			mw.title.getCurrentTitle().prefixedText ..
-				'_' .. player.id .. '_' ..
-				ReferenceCleaner.clean(player.joindate)
-				.. (player.role and '_' .. player.role or '')
-				.. '_' .. squad.type
+			'_' .. player.id .. '_' ..
+			ReferenceCleaner.clean(player.joindate)
+			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 
 		index = index + 1

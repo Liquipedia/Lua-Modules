@@ -132,7 +132,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 
 	lpdbData.extradata.playerearnings = _team.totalEarningsWhileOnTeam
-	for year, playerEarningsOfYear  in pairs(_team.earningsWhileOnTeam or {}) do
+	for year, playerEarningsOfYear in pairs(_team.earningsWhileOnTeam or {}) do
 		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
 	end
 
@@ -235,7 +235,6 @@ function CustomTeam:getEarningsAndMedalsData(team)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add{

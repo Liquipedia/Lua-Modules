@@ -17,6 +17,12 @@ local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry, function(self) end)
 
+---@class RocketLeagueStandardOpponent:standardOpponent
+---@field score3 number?
+---@field status3 string?
+---@field extradata table?
+
+---@param opponent RocketLeagueStandardOpponent
 function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
@@ -53,6 +59,7 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	end
 end
 
+---@param opponent RocketLeagueStandardOpponent
 function CustomOpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
 	local playerNode = OpponentDisplay.BlockPlayers({
 		opponent = opponent,
@@ -62,9 +69,9 @@ function CustomOpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
 	self.content:node(playerNode)
 end
 
---[[
-Displays the second score or status of the opponent, as a string.
-]]
+---Displays the second score or status of the opponent, as a string.
+---@param opponent RocketLeagueStandardOpponent
+---@return number|string
 function CustomOpponentDisplay.InlineScore2(opponent)
 	local score2 = opponent.extradata.score2
 	if opponent.status2 == 'S' then
@@ -78,9 +85,9 @@ function CustomOpponentDisplay.InlineScore2(opponent)
 	end
 end
 
---[[
-Displays the third score or status of the opponent, as a string.
-]]
+---Displays the third score or status of the opponent, as a string.
+---@param opponent RocketLeagueStandardOpponent
+---@return number|string
 function CustomOpponentDisplay.InlineScore3(opponent)
 	local score3 = opponent.extradata.score3
 	if opponent.status3 == 'S' then

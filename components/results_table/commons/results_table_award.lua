@@ -18,12 +18,20 @@ local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEna
 
 local AwardsTable = Class.new(BaseResultsTable)
 
+---Builds the Header of the award table
+---@return Html
 function AwardsTable:buildHeader()
 	local header = mw.html.create('tr')
 		:tag('th'):css('width', '100px'):wikitext('Date'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
+
+	if self.config.showType then
+		header:tag('th'):css('min-width', '50px'):wikitext('Type')
+	end
+
+	header
 		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
-		:tag('th'):css('min-width', '225px'):wikitext('Award'):done()
+		:tag('th'):css('min-width', '225px'):wikitext('Award')
 
 	if self.config.queryType ~= Opponent.team then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
@@ -36,6 +44,9 @@ function AwardsTable:buildHeader()
 	return header
 end
 
+---Builds a row of the award table
+---@param placement table
+---@return Html
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
@@ -44,6 +55,10 @@ function AwardsTable:buildRow(placement)
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
+
+	if self.config.showType then
+		row:tag('td'):wikitext(placement.type)
+	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 

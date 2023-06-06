@@ -11,6 +11,9 @@ local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
+---@class Widget
+---@operator call(): Widget
+---@field public injector WidgetInjector?
 local Widget = Class.new()
 
 local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
@@ -18,6 +21,9 @@ local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-wh
 					'${errorMessage}' ..
 					'</span>[[Category:Pages with script errors]]'
 
+---Asserts the existence of a value and copies it
+---@param value string
+---@return string?
 function Widget:assertExistsAndCopy(value)
 	if value == nil or value == '' then
 		return error('Tried to set a nil value to a mandatory property')
@@ -47,6 +53,9 @@ function Widget:tryMake()
 	return output
 end
 
+---Sets the context of a widget
+---@param context table
+---@return nil
 function Widget:setContext(context)
 	self.context = context
 	if context.injector ~= nil and

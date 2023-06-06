@@ -23,11 +23,11 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	local players = Array.mapIndexes(function (index)
+	local players = Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
 
-	Array.forEach(players, function (player)
+	Array.forEach(players, function(player)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id{

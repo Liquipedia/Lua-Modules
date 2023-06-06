@@ -77,10 +77,10 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Dota TV Ticket',
 		content = {args.dotatv}
 	})
-	if args.points then
+	if Logic.isNumeric(args.points) then
 		table.insert(widgets, Cell{
 			name = 'Pro Circuit Points',
-			content = {mw.language.new('en'):formatNum(tonumber(args.points))}
+			content = {mw.language.new('en'):formatNum(tonumber(args.points) --[[@as number]])}
 		})
 	end
 	return widgets

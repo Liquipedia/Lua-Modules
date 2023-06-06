@@ -109,7 +109,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 
 	lpdbData.extradata.playerearnings = _team.totalEarningsWhileOnTeam
-	for year, playerEarningsOfYear  in pairs(_team.earningsWhileOnTeam or {}) do
+	for year, playerEarningsOfYear in pairs(_team.earningsWhileOnTeam or {}) do
 		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
 	end
 

@@ -37,7 +37,7 @@ return {
 				lightMode = 'Tetris 1989 NTSC default allmode.png',
 			},
 		},
-		['classic ntsc']  = {
+		['classic ntsc'] = {
 			abbreviation = 'NES NTSC',
 			name = 'NES (1989) NTSC',
 			link = 'Tetris (NES 1989 NTSC)',
@@ -50,7 +50,7 @@ return {
 				lightMode = 'Tetris 1989 NTSC default allmode.png',
 			},
 		},
-		['classic pal']  = {
+		['classic pal'] = {
 			abbreviation = 'NES PAL',
 			name = 'NES (1989) PAL',
 			link = 'Tetris (NES 1989 PAL)',
@@ -63,7 +63,7 @@ return {
 				lightMode = 'Tetris 1989 PAL default allmode.png',
 			},
 		},
-		['classic das']  = {
+		['classic das'] = {
 			abbreviation = 'NES DAS',
 			name = 'NES (1989) DAS',
 			link = 'Tetris (NES 1989 DAS)',
@@ -76,7 +76,7 @@ return {
 				lightMode = 'Tetris 1989 DAS default allmode.png',
 			},
 		},
-		te  = {
+		te = {
 			abbreviation = 'TE',
 			name = 'Tetris Effect',
 			link = 'Tetris Effect',
@@ -89,7 +89,7 @@ return {
 				lightMode = 'Tetris Effect default lightmode.png',
 			},
 		},
-		tec  = {
+		tec = {
 			abbreviation = 'TE:C',
 			name = 'Tetris Effect: Connected',
 			link = 'Tetris Effect: Connected',
@@ -102,7 +102,7 @@ return {
 				lightMode = 'Tetris Effect default lightmode.png',
 			},
 		},
-		jstris  = {
+		jstris = {
 			abbreviation = 'Jstris',
 			name = 'Jstris',
 			link = 'Jstris',
@@ -115,7 +115,7 @@ return {
 				lightMode = 'Jstris default allmode.png',
 			},
 		},
-		wwc  = {
+		wwc = {
 			abbreviation = 'WWC',
 			name = 'Worldwide Combos',
 			link = 'Worldwide Combos',
@@ -128,7 +128,7 @@ return {
 				lightMode = 'Worldwide Combos default allmode.png',
 			},
 		},
-		super  = {
+		super = {
 			abbreviation = 'Super',
 			name = 'Super Tetris',
 			link = 'Super Tetris',
@@ -141,7 +141,7 @@ return {
 				lightMode = 'Super Tetris default allmode.png',
 			},
 		},
-		attack  = {
+		attack = {
 			abbreviation = 'Attack',
 			name = 'Attack',
 			link = 'Tetris Attack',
@@ -154,7 +154,7 @@ return {
 				lightMode = 'Tetris Attack default allmode.png',
 			},
 		},
-		plus  = {
+		plus = {
 			abbreviation = 'Plus',
 			name = 'Plus',
 			link = 'Tetris Plus',
@@ -167,7 +167,7 @@ return {
 				lightMode = 'Tetris Plus default allmode.png',
 			},
 		},
-		['plus 2']  = {
+		['plus 2'] = {
 			abbreviation = 'Plus 2',
 			name = 'Plus 2',
 			link = 'Tetris Plus 2',
@@ -180,7 +180,7 @@ return {
 				lightMode = 'Tetris Plus 2 default allmode.png',
 			},
 		},
-		tgm  = {
+		tgm = {
 			abbreviation = 'TGM',
 			name = 'The Grand Master',
 			link = 'The Grand Master',
@@ -193,7 +193,7 @@ return {
 				lightMode = 'Tetris The Grand Master default allmode.png',
 			},
 		},
-		['tgm2']  = {
+		['tgm2'] = {
 			abbreviation = 'TGM 2',
 			name = 'The Grand Master 2',
 			link = 'The Grand Master 2',
@@ -206,7 +206,7 @@ return {
 				lightMode = 'Tetris The Grand Master 2 default allmode.png',
 			},
 		},
-		['tgm3']  = {
+		['tgm3'] = {
 			abbreviation = 'TGM 3',
 			name = 'The Grand Master 3',
 			link = 'The Grand Master 3',
@@ -219,7 +219,7 @@ return {
 				lightMode = 'Tetris The Grand Master 3 default allmode.png',
 			},
 		},
-		['tetrio']  = {
+		['tetrio'] = {
 			abbreviation = 'TETR.IO',
 			name = 'TETR.IO',
 			link = 'TETR.IO',
@@ -232,7 +232,7 @@ return {
 				lightMode = 'TETR.IO default allmode.png',
 			},
 		},
-		nuketris  = {
+		nuketris = {
 			abbreviation = 'Nuketris',
 			name = 'Nuketris',
 			link = 'Nuketris',
@@ -245,7 +245,7 @@ return {
 				lightMode = 'Nuketris default lightmode.png',
 			},
 		},
-		['tetris 2']  = {
+		['tetris 2'] = {
 			abbreviation = 'T2',
 			name = 'Tetris 2',
 			link = 'Tetris 2',
@@ -258,7 +258,7 @@ return {
 				lightMode = 'Tetris 2 default allmode.png',
 			},
 		},
-		['ppt1']  = {
+		['ppt1'] = {
 			abbreviation = 'PPT',
 			name = 'Puyo Puyo Tetris',
 			link = 'Puyo Puyo Tetris',
@@ -271,7 +271,7 @@ return {
 				lightMode = 'Puyo Puyo Tetris default allmode.png',
 			},
 		},
-		['ppt2']  = {
+		['ppt2'] = {
 			abbreviation = 'PPT2',
 			name = 'Puyo Puyo Tetris 2',
 			link = 'Puyo Puyo Tetris 2',
@@ -284,7 +284,7 @@ return {
 				lightMode = 'Puyo Puyo Tetris 2 default allmode.png',
 			},
 		},
-		['t99']  = {
+		['t99'] = {
 			abbreviation = 'T99',
 			name = 'Tetris 99',
 			link = 'Tetris 99',
@@ -297,7 +297,7 @@ return {
 				lightMode = 'Tetris 99 default allmode.png',
 			},
 		},
-		ds  = {
+		ds = {
 			abbreviation = 'DS',
 			name = 'Tetris DS',
 			link = 'Tetris DS',
@@ -310,7 +310,7 @@ return {
 				lightMode = 'Tetris DS default allmode.png',
 			},
 		},
-		['64']  = {
+		['64'] = {
 			abbreviation = '64',
 			name = '64 (1998)',
 			link = 'Tetris 64 (1998)',
@@ -323,7 +323,7 @@ return {
 				lightMode = 'Tetris 64 default allmode.png',
 			},
 		},
-		tnt  = {
+		tnt = {
 			abbreviation = 'TNT',
 			name = 'The New Tetris',
 			link = 'The New Tetris',
@@ -336,7 +336,7 @@ return {
 				lightMode = 'The New Tetris default allmode.png',
 			},
 		},
-		['tetris & dr.mario']  = {
+		['tetris & dr.mario'] = {
 			abbreviation = 'Dr.Mario',
 			name = 'Tetris & Dr.Mario',
 			link = 'Tetris & Dr.Mario',
@@ -349,7 +349,7 @@ return {
 				lightMode = 'Tetris Dr.Mario default allmode.png',
 			},
 		},
-		nullpomino  = {
+		nullpomino = {
 			abbreviation = 'NPM',
 			name = 'NullpoMino',
 			link = 'NullpoMino',
@@ -362,7 +362,7 @@ return {
 				lightMode = 'NullpoMino default allmode.png',
 			},
 		},
-		blockbox  = {
+		blockbox = {
 			abbreviation = 'BB',
 			name = 'Blockbox',
 			link = 'Blockbox',
@@ -375,7 +375,7 @@ return {
 				lightMode = 'Blockbox default allmode.png',
 			},
 		},
-		['tetris friends']  = {
+		['tetris friends'] = {
 			abbreviation = 'TF',
 			name = 'Tetris Friends',
 			link = 'Tetris Friends',
@@ -388,7 +388,7 @@ return {
 				lightMode = 'Tetris Friends default allmode.png',
 			},
 		},
-		['tetris online japan']  = {
+		['tetris online japan'] = {
 			abbreviation = 'TOJ',
 			name = 'Tetris Online Japan',
 			link = 'Tetris Online Japan',
@@ -401,7 +401,7 @@ return {
 				lightMode = 'Tetris Online Japan default allmode.png',
 			},
 		},
-		['tetris online poland']  = {
+		['tetris online poland'] = {
 			abbreviation = 'TOP',
 			name = 'Tetris Online Poland',
 			link = 'Tetris Online Poland',
@@ -414,7 +414,7 @@ return {
 				lightMode = 'Tetris Online Poland default allmode.png',
 			},
 		},
-		['cultris 2']  = {
+		['cultris 2'] = {
 			abbreviation = 'C2',
 			name = 'Cultris 2',
 			link = 'Cultris 2',
@@ -427,7 +427,7 @@ return {
 				lightMode = 'Cultris default allmode.png',
 			},
 		},
-		['tetrinet 2']  = {
+		['tetrinet 2'] = {
 			abbreviation = 'Tnet2',
 			name = 'TetriNET 2',
 			link = 'TetriNET 2',

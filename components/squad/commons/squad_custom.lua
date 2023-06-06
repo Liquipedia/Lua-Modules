@@ -24,11 +24,11 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	local players = Array.mapIndexes(function (index)
+	local players = Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
 
-	Array.forEach(players, function (player)
+	Array.forEach(players, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
 	end)
 
@@ -47,7 +47,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 	squad:title():header()
 
-	Array.forEach(playerList, function (player)
+	Array.forEach(playerList, function(player)
 		--Get Reference(s)
 		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
 		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -99,8 +99,6 @@ function CustomSquad._playerRow(player, squadType)
 	elseif squadType == Squad.TYPE_INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
-
-	row:setExtradata{status = squadType}
 
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)

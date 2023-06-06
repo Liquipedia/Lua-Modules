@@ -26,8 +26,8 @@ function HighlightConditions.tournament(data, options)
 	return Logic.nilOr(
 		Logic.readBoolOrNil(data.publishertier),
 		String.isNotEmpty(data.extradata.publisherpremier)
-			or (String.isNotEmpty(data.extradata.valvepremier) and data.publishertier ~= 'Minor')
-	)
+			or (Logic.readBool(data.extradata.valvepremier) and data.publishertier ~= 'Minor')
+	) --[[@as boolean]]
 end
 
 return HighlightConditions
