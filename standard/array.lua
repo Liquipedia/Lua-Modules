@@ -552,6 +552,10 @@ Example:
 Array.findIndex({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 -- returns 3
 ]]
+---@generic V
+---@param array V[]
+---@param pred fun(elem: V, ix: integer?): boolean
+---@return integer
 function Array.findIndex(array, pred)
 	for ix, elem in ipairs(array) do
 		if pred(elem, ix) then
@@ -570,6 +574,9 @@ Example:
 Array.uniqueElement({4, 4, 4})
 -- Returns 4
 ]]
+---@generic V
+---@param elems V[]
+---@return V?
 function Array.uniqueElement(elems)
 	local uniqueElem
 	for i, elem in ipairs(elems) do
@@ -592,6 +599,11 @@ Example:
 Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
 -- returns {{2}, {3, 5, 7}, {14, 16}}
 ]]
+---@generic V, T
+---@param array V[]
+---@param f fun(elem: V): T
+---@param equals? fun(key: T, currentKey: T): boolean
+---@return V[][]
 function Array.groupAdjacentBy(array, f, equals)
 	equals = equals or Logic.deepEquals
 
@@ -617,6 +629,9 @@ Example:
 Array.distinct({4, 5, 4, 3})
 -- Returns {4, 5, 3}
 ]]
+---@generic V
+---@param elements V[]
+---@return V[]
 function Array.distinct(elements)
 	local elementCache = {}
 	local distinctElements = {}
