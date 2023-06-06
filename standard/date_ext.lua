@@ -79,7 +79,7 @@ function DateExt.toYmdInUtc(dateOrTimestamp)
 end
 
 --- Fetches contextualDate on a tournament page.
----@return string
+---@return string?
 function DateExt.getContextualDate()
 	return Variables.varDefault('tournament_enddate')
 		or Variables.varDefault('tournament_startdate')
@@ -89,7 +89,7 @@ end
 ---@return string
 function DateExt.getContextualDateOrNow()
 	return DateExt.getContextualDate()
-		or os.date('%F')
+		or os.date('%F') --[[@as string]]
 end
 
 return DateExt
