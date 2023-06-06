@@ -302,15 +302,11 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 	local tournamentData = Table.merge(queryData[1], tournament)
 
 	local extradata = tournamentData.extradata or {}
-	if Logic.readBool(extradata.showmatch) then
-		if String.isNotEmpty(extradata.liquipediatier) then
-			tournamentData.liquipediatier = extradata.liquipediatier
-		end
-		if String.isNotEmpty(extradata.liquipediatiertype) then
-			tournamentData.liquipediatiertype = extradata.liquipediatiertype
-		else
-			tournamentData.liquipediatiertype = 'Showmatch'
-		end
+	if String.isNotEmpty(extradata.liquipediatier) then
+		tournamentData.liquipediatier = extradata.liquipediatier
+	end
+	if String.isNotEmpty(extradata.liquipediatiertype) then
+		tournamentData.liquipediatiertype = extradata.liquipediatiertype
 	end
 
 	return tournamentData
@@ -341,13 +337,6 @@ end
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	if not tier then
-		--on sc2 sometimes there are broadcaster cards on series pages
-		--for those the additional tournament data is stored in extradata
-		--including tier and tier type
-		tier, tierType, options = Tier.parseFromQueryData(tournament.extradata)
-	end
-
 	assert(tier, 'Broadcaster event with unset or invalid liquipedia tier: ' .. tournament.pagename)
 
 	options.link = true
