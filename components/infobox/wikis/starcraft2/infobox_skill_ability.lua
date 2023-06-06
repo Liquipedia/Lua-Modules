@@ -7,7 +7,8 @@
 --
 
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace2')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
+local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -21,11 +22,6 @@ local Cell = Widgets.Cell
 
 local Ability = Class.new()
 
-local _MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _GAS = mw.loadData('Module:Gas')
-local _TIME = mw.loadData('Module:Buildtime')
-local _SUPPLY = mw.loadData('Module:Supply')
-
 local CustomInjector = Class.new(Injector)
 
 local _args
@@ -35,7 +31,7 @@ function Ability.run(frame)
 	ability.createWidgetInjector = Ability.createWidgetInjector
 	ability.getCategories = Ability.getCategories
 	_args = ability.args
-	return ability:createInfobox(frame)
+	return ability:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -64,8 +60,15 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Cost',
-				content = {Ability:getCostDisplay()}
-
+				content = {CostDisplay.run{
+					faction = _args.race,
+					minerals = _args.min,
+					mineralsForced = true,
+					gas = _args.gas,
+					gasForced = true,
+					buildTime = _args.buildtime,
+					supply = _args.supply or _args.control or _args.psy,
+				}}
 			}
 		}
 	elseif id == 'hotkey' then
@@ -121,8 +124,7 @@ end
 
 function Ability:getCategories()
 	local categories = { 'Abilities' }
-	local race = string.lower(_args.race or '')
-	race = CleanRace[race]
+	local race = Faction.toName(Faction.read(_args.race))
 	if race then
 		table.insert(categories, race .. ' Abilities')
 	end
@@ -182,33 +184,6 @@ function Ability:getHotkeys()
 	end
 
 	return display
-end
-
-function Ability:getCostDisplay()
-	local race = string.lower(_args.race or '')
-
-	local minerals = tonumber(_args.min or 0) or 0
-	minerals = _MINERALS .. '&nbsp;' .. minerals
-
-	local gas = tonumber(_args.gas or 0) or 0
-	gas = (_GAS[race] or _GAS['default']) .. '&nbsp;' .. gas
-
-	local buildtime = tonumber(_args.buildtime or 0) or 0
-	if buildtime ~= 0 then
-		buildtime = '&nbsp;' .. (_TIME[race] or _TIME['default']) .. '&nbsp;' .. buildtime
-	else
-		buildtime = ''
-	end
-
-	local supply = _args.supply or _args.control or _args.psy or 0
-	supply = tonumber(supply) or 0
-	if supply == 0 then
-		supply = ''
-	else
-		supply = '&nbsp;' .. (_SUPPLY[race] or _SUPPLY['default']) .. '&nbsp;' .. supply
-	end
-
-	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
 end
 
 return Ability

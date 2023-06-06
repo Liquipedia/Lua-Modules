@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -101,7 +100,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
 		:catch(function(message)
-			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
+			if String.endsWith(message, 'does not exist') then
 				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
@@ -335,7 +334,8 @@ namespace.
 ]]
 MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[namespace::130]] AND [[match2bracketid::'.. bracketId .. ']]'
+		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
+		limit = 5000,
 	})
 end)
 

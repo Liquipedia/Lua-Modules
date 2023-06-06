@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
@@ -40,9 +40,9 @@ function CustomSeries.run(frame)
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()

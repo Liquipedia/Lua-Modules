@@ -73,7 +73,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -121,7 +121,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_game', _game or _args.game)
 	Variables.varDefine('tournament_publishertier', _args['pubgpremier'])
 	--Legacy Vars:

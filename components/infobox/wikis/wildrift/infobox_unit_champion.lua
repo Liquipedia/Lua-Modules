@@ -46,7 +46,7 @@ function CustomChampion.run(frame)
 	unit.setLpdbData = CustomChampion.setLpdbData
 	unit.createWidgetInjector = CustomChampion.createWidgetInjector
 
-	return unit:createInfobox(frame)
+	return unit:createInfobox()
 end
 
 function CustomInjector:addCustomCells()

@@ -21,8 +21,9 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
 
-local _ROLES = {
+local ROLES = {
 	-- Players
 	['dps'] = {category = 'DPS Players', variable = 'DPS', isplayer = true},
 	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
@@ -42,9 +43,9 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 }
-_ROLES['assistant coach'] = _ROLES.coach
+ROLES['assistant coach'] = ROLES.coach
 
-local _SIZE_HERO = '25x25px'
+local SIZE_HERO = '25x25px'
 local MAX_NUMBER_OF_SIGNATURE_HEROES = 3
 
 local CustomPlayer = Class.new()
@@ -64,7 +65,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomPlayer:createWidgetInjector()
@@ -80,10 +81,10 @@ function CustomInjector:parse(id, widgets)
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		if _args.nationalteams then
+			table.insert(widgets, 1, Center{content = {_args.nationalteams}})
+		end
+		table.insert(widgets, Cell{name = 'Retired', content = {_args.retired}})
 	end
 	return widgets
 end
@@ -92,7 +93,7 @@ function CustomInjector:addCustomCells(widgets)
 	-- Signature Heroes
 	local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
 		function(hero)
-			return HeroIcon.getImage{hero, size = _SIZE_HERO}
+			return HeroIcon.getImage{hero, size = SIZE_HERO}
 		end
 	)
 	heroIcons = Array.sub(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
@@ -144,7 +145,7 @@ function CustomPlayer._createRole(key, role)
 		return nil
 	end
 
-	local roleData = _ROLES[role:lower()]
+	local roleData = ROLES[role:lower()]
 	if not roleData then
 		return nil
 	end
@@ -163,7 +164,7 @@ function CustomPlayer:defineCustomPageVariables(args)
 	-- isplayer needed for SMW
 	local roleData
 	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+		roleData = ROLES[args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then

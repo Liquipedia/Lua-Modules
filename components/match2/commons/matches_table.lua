@@ -15,7 +15,6 @@ local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Lua = require('Module:Lua')
-local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
 -- overridable if wikis have custom modules
@@ -212,10 +211,6 @@ function MatchesTable._row(match)
 		row:node(roundCell)
 	end
 
-	-- workaround for a lpdb bug
-	-- remove when it is fixed
-	MatchGroupWorkaround.applyPlayerBugWorkaround(match)
-
 	row:node(
 		MatchesTable._buildOpponent(
 			match.match2opponents[1],
@@ -342,7 +337,7 @@ function MatchesTable._parseDateTime(str)
 		= str:match("(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$")
 
 	-- Adjust time based on server timezone offset from UTC
-	local offset = os.time(os.date("*t")) - os.time(os.date("!*t"))
+	local offset = os.time(os.date("*t") --[[@as osdate]]) - os.time(os.date("!*t") --[[@as osdate]])
 	-- create time - this will take our UTC timestamp and put it into localtime without converting
 	local localTime = os.time{
 		year = year,

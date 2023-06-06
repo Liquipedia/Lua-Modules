@@ -97,6 +97,15 @@ return {
 			text = 'R$',
 		},
 	},
+	btn = {
+		code = 'BTN',
+		name = 'Bhutanese ngultrum',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'Nu',
+		},
+	},
 	byn = {
 		code = 'BYN',
 		name = 'Belarusian Ruble',
@@ -286,6 +295,15 @@ return {
 			text = '$',
 		},
 	},
+	hnl = {
+		code = 'HNL',
+		name = 'Honduran lempira',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'L',
+		},
+	},
 	hrk = {
 		code = 'HRK',
 		name = 'Croatian kuna',
@@ -373,7 +391,7 @@ return {
 		symbol = {
 			hasSpace = true,
 			isAfter = true,
-			text = 'С̲',
+			text = '<u>С</u>',
 		},
 	},
 	khr = {
@@ -833,6 +851,15 @@ return {
 			hasSpace = false,
 			isAfter = false,
 			text = '₩',
+		},
+	},
+	xof = {
+		code = 'XOF',
+		name = 'CFA franc',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'F.CFA',
 		},
 	},
 	zar = {

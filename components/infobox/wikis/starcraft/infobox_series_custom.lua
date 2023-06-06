@@ -11,6 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Class = require('Module:Class')
@@ -39,7 +40,7 @@ function CustomSeries.run(frame)
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
 function CustomSeries:createWidgetInjector()
@@ -106,14 +107,15 @@ function CustomSeries._addCustomVariables()
 		Logic.readBool(_args.disable_lpdb) or
 		Logic.readBool(_args.disable_storage)
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or mw.title.getCurrentTitle().text
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
-		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
+		local tier, tierType = Tier.toValue(_args.liquipediatier, _args.liquipediatiertype)
+		Variables.varDefine('tournament_liquipediatier', tier or '')
+		Variables.varDefine('tournament_liquipediatiertype', tierType or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')

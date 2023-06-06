@@ -6,16 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = mw.loadData('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
@@ -84,6 +87,19 @@ local VALVE_TIERS = {
 	['rmr event'] = {meta = 'Regional Major Rankings evnt', name = 'RMR Event', link = 'Regional Major Rankings'},
 }
 
+local RESTRICTIONS = {
+	['female'] = {
+		name = 'Female Players Only',
+		link = 'Female Tournaments',
+		data = 'female',
+	},
+	['academy'] = {
+		name = 'Academy Teams Only',
+		link = 'Academy Tournaments',
+		data = 'academy',
+	}
+}
+
 local _DATE_TBA = 'tba'
 
 local _TIER_VALVE_MAJOR = 'major'
@@ -91,14 +107,17 @@ local _TIER_VALVE_MAJOR = 'major'
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
+local PRIZE_POOL_ROUND_PRECISION = 2
+
 local _args
 
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	_args['publisherdescription'] = 'metadesc-valve'
-	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.publisherdescription = 'metadesc-valve'
+	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
+	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -108,13 +127,11 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:shouldStore(args)
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function CustomLeague:createWidgetInjector()
@@ -129,6 +146,10 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Players',
 		content = {_args.player_number}
+	})
+	table.insert(widgets, Cell{
+		name = 'Restrictions',
+		content = CustomLeague.createRestrictionsCell(_args.restrictions)
 	})
 
 	return widgets
@@ -148,13 +169,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
-	elseif id == 'prizepool' then
-		return {
-			Cell{
-				name = 'Prize Pool',
-				content = {CustomLeague:_createPrizepool(_args)}
-			},
-		}
 	elseif id == 'liquipediatier' then
 		table.insert(
 			widgets,
@@ -217,6 +231,10 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 
+	if String.isNotEmpty(args.restrictions) then
+		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
+				function(res) return res.link end))
+	end
 	return categories
 end
 
@@ -234,45 +252,6 @@ function CustomLeague:appendLiquipediatierDisplay()
 
 	if Logic.readBool(_args.cstrikemajor) then
 		content = content .. ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
-	end
-
-	return content
-end
-
-function CustomLeague:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
-		return nil
-	end
-
-	local content
-	local prizepool = args.prizepool
-	local prizepoolInUsd = args.prizepoolusd
-	local localCurrency = args.localcurrency
-
-	if String.isEmpty(prizepool) then
-		content = '$' .. (prizepoolInUsd) .. ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD')
-	else
-		if String.isNotEmpty(localCurrency) then
-			content = Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Local currency',
-				{localCurrency:lower(), prizepool = prizepool}
-			)
-			Variables.varDefine('prizepoollocal', content)
-		else
-			content = prizepool
-		end
-
-		if String.isNotEmpty(prizepoolInUsd) then
-			content = content .. '<br>(≃ $' .. prizepoolInUsd .. ' ' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Abbr/USD') .. ')'
-		end
-	end
-
-	if String.isNotEmpty(prizepoolInUsd) then
-		Variables.varDefine('tournament_prizepoolusd', prizepoolInUsd:gsub(',', ''):gsub('$', ''))
-	else
-		Variables.varDefine('tournament_prizepoolusd', 0)
 	end
 
 	return content
@@ -301,7 +280,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	end
 
 	-- Legacy tier vars
-	Variables.varDefine('tournament_tier', Tier.text.tiers[args.liquipediatier]) -- Stores as X-tier, not the integer
+	local tierName = Tier.toName(args.liquipediatier)
+	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
 	Variables.varDefine('raw_sdate', args.sdate or args.date)
@@ -322,6 +302,15 @@ function CustomLeague:defineCustomPageVariables(args)
 		args.series == 'Danish Pro League' or
 		args.series == 'Swedish Pro League') and 'true' or 'false')
 
+	-- Prize Pool vars
+	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
+		local currency = string.upper(args.localcurrency)
+		local prize = InfoboxPrizePool._cleanValue(args.prizepool)
+		Variables.varDefine('prizepoollocal', Currency.display(currency, prize, {
+					formatValue = true,
+					formatPrecision = PRIZE_POOL_ROUND_PRECISION
+				}))
+	end
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
@@ -338,6 +327,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.startdate_raw = Variables.varDefault('raw_sdate', '')
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
 	lpdbData.extradata.shortname2 = args.shortname2
+
+	Array.forEach(CustomLeague.getRestrictions(_args.restrictions),
+		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	return lpdbData
 end
@@ -365,6 +357,24 @@ end
 
 function CustomLeague.getGame()
 	return _args.game and GAMES[_args.game] or nil
+end
+
+function CustomLeague.getRestrictions(restrictions)
+	if String.isEmpty(restrictions) then
+		return {}
+	end
+
+	return Array.map(mw.text.split(restrictions, ','),
+		function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+end
+
+function CustomLeague.createRestrictionsCell(restrictions)
+	local restrictionData = CustomLeague.getRestrictions(restrictions)
+	if #restrictionData == 0 then
+		return {}
+	end
+
+	return Array.map(restrictionData, function(res) return League:createLink(res.link, res.name) end)
 end
 
 function CustomLeague:_createEslProTierCell(eslProTier)

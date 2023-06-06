@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
-local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
+local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -38,6 +38,7 @@ local GSL_STYLE_SCORES = {
 local BYE_OPPONENT_NAME = 'bye'
 
 local _parent
+local _last_vs_group_cache = {}
 
 local Import = {}
 
@@ -63,19 +64,40 @@ function Import._getConfig(args, placements)
 
 	return {
 		importLimit = Import._importLimit(args.importLimit, placements),
-		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
-			or TournamentUtil.currentPageSpec(),
-		groupElimStatuses = Table.mapValues(
+		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
+			or TournamentStructure.currentPageSpec(),
+		groupElimStatuses = Array.map(
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			mw.text.trim
+			String.trim
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
+		stageImportLimits = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)importLimit$')) end,
+			function(key) return tonumber(args[key]) end,
+			true
+		),
+		stageImportWinners = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)importWinners$')) end,
+			function(key) return Logic.readBoolOrNil(args[key]) end,
+			true
+		),
+		stageGroupElimStatuses = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
+			function(key) return Array.map(
+				mw.text.split(args[key], ','),
+				String.trim
+			) end,
+			true
+		),
 	}
 end
 
 function Import._enableImport(importInput)
-	local date = TournamentUtil.getContextualDateOrNow()
+	local date = DateExt.getContextualDateOrNow()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
 		date >= AUTOMATION_START_DATE
@@ -94,13 +116,18 @@ end
 
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
-	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
+	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
+
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
-		return Import._computeStagePlacementEntries(stage, {
-					isFinalStage = reverseStageIndex == 1,
-					groupElimStatuses = Import.config.groupElimStatuses
-				})
-	end))
+				local stageIndex = #stages + 1 - reverseStageIndex
+				return Import._computeStagePlacementEntries(stage, {
+						importWinners = Import.config.stageImportWinners[stageIndex] or
+							(Import.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
+						groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or
+							Import.config.groupElimStatuses,
+						importLimit = Import.config.stageImportLimits[stageIndex] or 0,
+					})
+			end))
 
 	-- Apply importLimit if set
 	if Import.config.importLimit then
@@ -120,7 +147,7 @@ end
 -- tournament stage. The placements are ordered from high placement to low.
 function Import._computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
-		return TournamentUtil.isGroupTable(matchGroup)
+		return TournamentStructure.isGroupTable(matchGroup)
 			and Import._computeGroupTablePlacementEntries(matchGroup, options)
 			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
@@ -129,6 +156,11 @@ function Import._computeStagePlacementEntries(stage, options)
 			groupPlacementEntries,
 			function(placementEntries) return #placementEntries end
 		)) or 0
+
+	maxPlacementCount = options.importLimit > 0
+		and math.min(maxPlacementCount, options.importLimit)
+		or maxPlacementCount
+
 	return Array.map(Array.range(1, maxPlacementCount), function(placementIndex)
 		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
@@ -143,7 +175,7 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local placementIndexes = {}
 
 	for _, record in ipairs(standingRecords) do
-		if options.isFinalStage or Table.includes(options.groupElimStatuses, record.currentstatus) then
+		if options.importWinners or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
 				date = record.extradata.enddate and DateExt.toYmdInUtc(record.extradata.enddate),
 				hasDraw = record.hasDraw,
@@ -256,8 +288,7 @@ function Import._makeEntryFromMatch(placementEntry, match)
 end
 
 -- Computes the placements of a LPDB bracket
--- @options.isFinalStage: If on the last stage, then include placements for
--- winners of final matches.
+-- @options.importWinners: Whether to include placements for non-eliminated opponents.
 function Import._computeBracketPlacementGroups(bracket, options)
 	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
 	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
@@ -268,7 +299,7 @@ function Import._computeBracketPlacementGroups(bracket, options)
 		-- Winners and losers of grand finals
 		if coordinates.semanticDepth == 0 then
 			return Array.append({},
-				options.isFinalStage and {1, coordinates.sectionIndex, 1} or nil,
+				options.importWinners and {1, coordinates.sectionIndex, 1} or nil,
 				{1, coordinates.sectionIndex, 2}
 			)
 
@@ -287,7 +318,7 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			local groupKeys = {}
 
 			-- Winners of root matches
-			if coordinates.depth == 0 and options.isFinalStage then
+			if coordinates.depth == 0 and options.importWinners then
 				table.insert(groupKeys, {0, coordinates.sectionIndex, 1})
 				-- in case of qualLose also Loser of root match if not lower bracket (lower bracket gets handled below)
 				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
@@ -382,23 +413,22 @@ function Import._emptyPlacement(priorPlacement, placementSize)
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
 	return Placement(
-		{placeStart = placeStart, placeEnd = placeEnd},
-		_parent,
-		priorPlacement.placeEnd or 0
-	)
+		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
+		_parent
+	):create(priorPlacement.placeEnd or 0)
 end
 
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import._mergeEntry(
+		placement.opponents[opponentIndex] = Import._removeEpochZeroDate(Import._mergeEntry(
 			opponent,
-			Table.mergeInto(placement:_parseOpponents{{}}[1], placement.opponents[opponentIndex]),
+			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
-		)
+		))
 	end
 
 	assert(
-		#placement.opponents <= 1 + placement.placeEnd - placement.placeStart,
+		#placement.opponents <= placement.count,
 		'Import: Too many opponents returned from query for placement range '
 			.. placement:_displayPlace():gsub('&#045;', '-')
 	)
@@ -461,7 +491,7 @@ function Import._entryToOpponent(lpdbEntry, placement)
 
 	local lastVs = Import._checkIfParsed(additionalData.lastVs or Import._removeTbdIdentifiers(lpdbEntry.vsOpponent))
 
-	return placement:_parseOpponents{{
+	return placement:parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
 		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
@@ -513,18 +543,40 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 		table.insert(matchConditions, '[[match2id::' .. matchId .. ']]')
 	end
 
-	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
-		order = 'date desc',
-		query = 'date, match2opponents, winner',
-		limit = 1
-	})
+	local conditions = table.concat(matchConditions, ' OR ')
 
-	if not type(matchData) == 'table' or not matchData[1] then
+	if conditions ~= _last_vs_group_cache.conditions then
+		_last_vs_group_cache.conditions = conditions
+		Import._lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = conditions,
+			order = 'date desc, match2id desc',
+			query = 'date, match2opponents, winner',
+			limit = 1000,
+		}))
+	end
+
+	local matchData = _last_vs_group_cache.data[opponentName]
+
+	if not matchData then
 		return {}
 	end
 
-	return Import._makeAdditionalDataFromMatch(opponentName, matchData[1])
+	return Import._makeAdditionalDataFromMatch(opponentName, matchData)
+end
+
+function Import._lastVsMatchesDataToCache(queryData)
+	local byOpponent = {}
+
+	for _, match in ipairs(queryData) do
+		for _, opponent in pairs(match.match2opponents) do
+			local name = opponent.name
+			if not byOpponent[name] then
+				byOpponent[name] = match
+			end
+		end
+	end
+
+	_last_vs_group_cache.data = byOpponent
 end
 
 function Import._makeAdditionalDataFromMatch(opponentName, match)
@@ -550,6 +602,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		score = score,
 		vsScore = vsScore,
 	}
+end
+
+function Import._removeEpochZeroDate(entry)
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.epochZero and entry.date
+		or nil
+
+	return entry
 end
 
 return Import

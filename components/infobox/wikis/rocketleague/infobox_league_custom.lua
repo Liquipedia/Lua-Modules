@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
+local Tier = require('Module:Tier/Custom')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
 
@@ -33,6 +33,7 @@ local _GAME_ROCKET_LEAGUE = 'rl'
 local _GAME_SARPBC = 'sarpbc'
 
 local _TIER_1 = 1
+local MISC_TIER = -1
 local _H2H_TIER_THRESHOLD = 5
 
 local _PSYONIX = 'Psyonix'
@@ -48,7 +49,7 @@ function CustomLeague.run(frame)
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -111,34 +112,17 @@ function CustomLeague:addCustomCells(infobox, args)
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
-	local content = ''
+	local tierDisplay = Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype,
+		{link = true, tierType2 = args.liquipediatiertype2}
+	)
 
-	local tier = args.liquipediatier
-	local type = args.liquipediatiertype
-	local type2 = args.liquipediatiertype2
-
-	if String.isEmpty(tier) then
-		return nil
+	if String.isEmpty(tierDisplay) then
+		return
 	end
 
-	local tierDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. tier)
-
-	if not String.isEmpty(type) then
-		local typeDisplay = Template.safeExpand(mw.getCurrentFrame(), 'TierDisplay/' .. type)
-		content = content .. '[[' .. typeDisplay .. ' Tournaments|' .. type .. ']]'
-
-		if not String.isEmpty(type2) then
-			content = content .. ' ' .. type2
-		end
-
-		content = content .. ' ([[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']])'
-	else
-		content = content .. '[[' .. tierDisplay .. ' Tournaments|' .. tierDisplay .. ']]'
-	end
-
-	content = content .. '[[Category:' .. tierDisplay .. ' Tournaments]]'
-
-	return content
+	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
@@ -196,7 +180,10 @@ end
 function CustomLeague.parseShowHeadToHead(args)
 	return Logic.emptyOr(
 		args.showh2h,
-		tostring((tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD)
+		tostring(
+			(tonumber(args.liquipediatier) or _H2H_TIER_THRESHOLD) < _H2H_TIER_THRESHOLD
+			and args.liquipediatier ~= MISC_TIER
+		)
 	)
 end
 

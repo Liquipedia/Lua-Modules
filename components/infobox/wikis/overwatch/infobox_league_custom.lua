@@ -46,7 +46,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -107,7 +107,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.blizzardtier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = args.liquipediatiertype
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 

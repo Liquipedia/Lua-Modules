@@ -113,16 +113,23 @@ function MatchLegacy.convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
 			if opponent.type == Opponent.team then
-				if mw.ext.TeamTemplate.teamexists(opponent.template) then
+				if String.isEmpty(opponent.template) then
+					match[prefix] = 'TBD'
+				elseif mw.ext.TeamTemplate.teamexists(opponent.template) then
 					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 				else
 					match[prefix] = opponent.template
 				end
 			else
-				if TextSanitizer.stripHTML(opponent.name) ~= opponent.name then
+				if String.isEmpty(opponent.name) or (TextSanitizer.stripHTML(opponent.name) ~= opponent.name)
+					or String.contains(opponent.name, 'winner') or String.contains(opponent.name, 'loser')
+				then
 					match[prefix] = 'TBD'
 				else
 					match[prefix] = opponent.name
+				end
+				if opponent.name == 'BYE' then
+					match.resulttype = 'l'
 				end
 			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
@@ -155,10 +162,14 @@ function MatchLegacy.convertParameters(match2)
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == Opponent.solo then
-			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
-			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			match[prefix .. 'flag'] = player.flag
+			if String.isEmpty(opponent.name) then
+				match[prefix] = 'TBD'
+			else
+				local player = opponentmatch2players[1] or {}
+				match[prefix] = player.name
+				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				match[prefix .. 'flag'] = player.flag
+			end
 		end
 	end
 

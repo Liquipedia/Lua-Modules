@@ -13,6 +13,7 @@ local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -28,7 +29,6 @@ local Center = Widgets.Center
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 local _SIZE_HERO = '25x25px'
 
 local CustomPlayer = Class.new()
@@ -41,28 +41,33 @@ local _player
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_player = player
-	_args = player.args
+
+	if String.isEmpty(player.args.team) then
+		player.args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+
+	if String.isEmpty(player.args.team2) then
+		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	_args = player.args
+
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
 			iconModule = 'Module:PositionIcon/data',
 			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
@@ -127,10 +132,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
 	end
 
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
-	end
+	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
 
 	return lpdbData
 end

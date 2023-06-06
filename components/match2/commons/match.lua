@@ -32,7 +32,6 @@ function Match.storeFromArgs(frame)
 end
 
 function Match.toEncodedJson(frame)
-	FeatureFlag.set('combined_opponent_input', true)
 	local args = Arguments.getArgs(frame)
 	return Match._toEncodedJson(args)
 end
@@ -275,7 +274,7 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
 		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
 			return mw.ext.LiquipediaDB.lpdb_match2player(
-				matchRecord.match2id .. '_m2o_' .. opponentIndex .. '_m2p_' .. playerIndex,
+				matchRecord.match2id .. '_m2o_' .. opponentIndex .. '_m2p_' .. string.format('%02d', playerIndex),
 				player
 			)
 		end)

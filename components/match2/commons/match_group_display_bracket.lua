@@ -21,10 +21,13 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local html = mw.html
-local _NON_BREAKING_SPACE = '&nbsp;'
+local NON_BREAKING_SPACE = '&nbsp;'
+local OPPONENT_HEIGHT_PADDING = 4
 
 local BracketDisplay = {propTypes = {}, types = {}}
 
@@ -109,7 +112,8 @@ function BracketDisplay.Bracket(props)
 		matchMargin = propsConfig.matchMargin or math.floor(defaultConfig.opponentHeight / 4),
 		matchWidth = propsConfig.matchWidth or defaultConfig.matchWidth,
 		matchWidthMobile = propsConfig.matchWidthMobile or defaultConfig.matchWidthMobile,
-		opponentHeight = propsConfig.opponentHeight or defaultConfig.opponentHeight,
+		opponentHeight = propsConfig.opponentHeight
+			or BracketDisplay.computeBracketOpponentHeight(props.bracket.matchesById, defaultConfig.opponentHeight),
 		qualifiedHeader = propsConfig.qualifiedHeader or defaultConfig.qualifiedHeader,
 		roundHorizontalMargin = propsConfig.roundHorizontalMargin or defaultConfig.roundHorizontalMargin,
 		scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
@@ -144,6 +148,25 @@ function BracketDisplay.Bracket(props)
 
 	return html.create('div'):addClass('brkts-bracket-wrapper')
 		:node(bracketNode)
+end
+
+function BracketDisplay.computeBracketOpponentHeight(matchesById, defaultOpponentHeight)
+	local maxHeight = defaultOpponentHeight
+
+	for _, match in pairs(matchesById) do
+		for _, opponent in ipairs(match.opponents) do
+			maxHeight = math.max(maxHeight, BracketDisplay._computeOpponentHeight(opponent.type, defaultOpponentHeight))
+		end
+	end
+
+	return maxHeight
+end
+
+function BracketDisplay._computeOpponentHeight(opponentType, defaultOpponentHeight)
+	local numberOfRows = Opponent.partySize(opponentType) or 1
+
+	-- remove padding then multipy it by player rows and after that add padding once
+	return numberOfRows * (defaultOpponentHeight - OPPONENT_HEIGHT_PADDING) + OPPONENT_HEIGHT_PADDING
 end
 
 BracketDisplay.types.Layout = TypeUtil.struct({
@@ -381,7 +404,7 @@ function BracketDisplay.MatchHeader(props)
 
 	local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
 		:addClass(--do not display the header if it is "&nbsp;"
-			options[1] == _NON_BREAKING_SPACE
+			options[1] == NON_BREAKING_SPACE
 			and 'brkts-header-nodisplay' or ''
 		)
 		:css('height', props.height .. 'px')

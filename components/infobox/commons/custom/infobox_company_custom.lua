@@ -14,7 +14,7 @@ local CustomCompany = {}
 
 function CustomCompany.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 return CustomCompany

@@ -27,7 +27,7 @@ function CustomCompany.run(frame)
 
 	company.createWidgetInjector = CustomCompany.createWidgetInjector
 
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

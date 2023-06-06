@@ -29,7 +29,7 @@ function CustomMap.run(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.addToLpdb = CustomMap.addToLpdb
 	_args = customMap.args
-	return customMap:createInfobox(frame)
+	return customMap:createInfobox()
 end
 
 function CustomMap:createWidgetInjector()
@@ -40,7 +40,7 @@ function CustomInjector:addCustomCells(widgets)
 	local gameModes = CustomMap._getGameMode()
 	table.insert(widgets, Cell{
 		name = #gameModes == 1 and 'Game Mode' or 'Game Modes',
-        content = gameModes,
+		content = gameModes,
 	})
 	table.insert(widgets, Cell{
 		name = 'Checkpoints',

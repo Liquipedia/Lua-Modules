@@ -6,75 +6,73 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
-local getArgs = require('Module:Arguments').getArgs
+local Table = require('Module:Table')
 
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
 
+---@class BasicInfobox
+---@operator call(Frame): BasicInfobox
+---@field args table
+---@field pagename string
+---@field name string
+---@field wiki string
+---@field infobox Infobox
 local BasicInfobox = Class.new(
 	function(self, frame)
-		self.args = getArgs(frame)
+		self.args = Arguments.getArgs(frame)
 		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
+		self.wiki = self.args.wiki or Info.wikiName
 
-		if self.args.wiki == nil then
-			return error('Please provide a wiki!')
-		end
-
-		self.infobox = Infobox:create(frame, self.args.wiki, Logic.readBool(self.args.darkmodeforced))
+		self.infobox = Infobox:create(frame, self.wiki, Logic.readBool(self.args.darkmodeforced))
 	end
 )
 
+---Creates an empty WidgetInjector
+---@return WidgetInjector?
 function BasicInfobox:createWidgetInjector()
 	return nil
 end
 
 --- Allows for overriding this functionality
-function BasicInfobox:addCustomCells(infobox, args)
-	return infobox
-end
-
---- Allows for overriding this functionality
+---Add bottom content below the infobox, e.g. matchtickers
+---@return string?
 function BasicInfobox:createBottomContent()
 	return nil
 end
 
 --- Allows for overriding this functionality
+---Set wikispecific categories
+---@param args table
+---@return table
 function BasicInfobox:getWikiCategories(args)
 	return {}
 end
 
 --- Allows for using this for customCells
+---Fetches all arguments from the args table for a given base
+---@generic K, V
+---@param args {[K]: V}
+---@param base string
+---@param options {makeLink: boolean?}?
+---@return V[]
 function BasicInfobox:getAllArgsForBase(args, base, options)
-	local foundArgs = {}
-	if String.isEmpty(args[base]) and String.isEmpty(args[base .. '1']) then
-		return foundArgs
-	end
-
 	options = options or {}
+
 	local makeLink = Logic.readBool(options.makeLink)
+	local foundArgs = {}
 
-	local baseArg = args[base] or args[base .. '1']
-	if makeLink then
-		local link = args[base .. 'link'] or args[base .. '1link'] or baseArg
-		baseArg = '[[' .. link
-			.. '|' .. baseArg .. ']]'
-	end
-
-	table.insert(foundArgs, baseArg)
-	local index = 2
-
-	while not String.isEmpty(args[base .. index]) do
-		local indexedbase = args[base .. index]
+	for key, value in Table.iter.pairsByPrefix(args, base, {requireIndex = false}) do
 		if makeLink then
-			indexedbase = '[[' .. (args[base .. index .. 'link'] or indexedbase)
-				.. '|' .. indexedbase .. ']]'
+			local link = args[key .. 'link'] or value
+			value = '[[' .. link .. '|' .. value .. ']]'
 		end
-		table.insert(foundArgs, indexedbase)
-		index = index + 1
+		table.insert(foundArgs, value)
 	end
 
 	return foundArgs

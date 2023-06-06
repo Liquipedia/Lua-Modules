@@ -33,7 +33,7 @@ local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 function Company.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
 function Company:createInfobox()
@@ -135,7 +135,7 @@ function Company:_createLocation(location)
 end
 
 function Company:_getOrganizerPrizepools()
-	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =
 			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
 			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
@@ -145,7 +145,7 @@ function Company:_getOrganizerPrizepools()
 		query = 'sum::prizepool'
 	})
 
-	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
 
 	if prizemoney == nil or prizemoney == 0 then
 		return nil

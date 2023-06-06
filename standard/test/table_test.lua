@@ -152,4 +152,67 @@ function suite:testFilterByKey()
 	self:assertDeepEquals({a1a = 1, a3a = 3, a4a = 4,}, Table.filterByKey(a, predicate2))
 end
 
+function suite:testPairsByPrefix()
+	local args = {
+		p = 'a',
+		plink = 'b',
+		f1 = 'a2',
+		f1link = 'b2',
+		p2 = 'c',
+		p2link = 'd',
+		p3 = 'e',
+		p3link = 'f',
+		foo = {},
+		p10 = {},
+	}
+
+	local cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p') do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(0, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, {'p', 'f'}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+		if cnt == 1 then
+			self:assertEquals('f1', prefix)
+		else
+			self:assertEquals('p' .. cnt, prefix)
+		end
+	end
+	self:assertEquals(3, cnt)
+
+	args.p1, args.p1link = args.p, args.plink
+	args.p, args.plink = nil, nil
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p') do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
+end
+
 return suite

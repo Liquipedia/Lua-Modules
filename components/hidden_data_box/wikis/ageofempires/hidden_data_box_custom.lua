@@ -6,27 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 
 local CustomHiddenDataBox = {}
 
-local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
-
+---@param args table
+---@return string
 function CustomHiddenDataBox.run(args)
+	args = args or {}
+	args.liquipediatier = Tier.toNumber(args.liquipediatier)
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	BasicHiddenDataBox.validateTier = CustomHiddenDataBox.validateTier
 	return BasicHiddenDataBox.run(args)
 end
 
+---@param args table
+---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	queryResult.extradata = queryResult.extradata or {}
 
@@ -52,33 +52,17 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 	--gamemode
 	BasicHiddenDataBox.checkAndAssign('tournament_gamemode', args.gamemode, queryResult.gamemode)
-end
 
-function CustomHiddenDataBox.validateTier(tierString, tierMode)
-	if String.isEmpty(tierString) then
-		return nil, nil
-	end
-	local warning
-	local tierValue = tierString
-	-- tier should be a number defining a tier
-	if tierMode == TIER_MODE_TIERS and not Logic.isNumeric(tierValue) then
-		tierValue = Tier.number[tierValue:lower()] or tierValue
-	end
-	local cleanedTierValue = Tier.text[tierMode][(tierValue):lower()]
-	if not cleanedTierValue then
-		cleanedTierValue = tierString
-		warning = String.interpolate(
-			INVALID_TIER_WARNING,
-			{
-				tierString = tierString,
-				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
-			}
-		)
-	end
+	--maps
+	Variables.varDefine('tournament_maps', queryResult.maps)
 
-	tierValue = (tierMode == TIER_MODE_TYPES and cleanedTierValue) or tierValue
-
-	return tierValue, warning
+	-- legacy variables, to be removed with match2
+	local maps, failure = Json.parse(queryResult.maps)
+	if not failure then
+		for _, map in ipairs(maps) do
+			Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
+		end
+	end
 end
 
 return Class.export(CustomHiddenDataBox)

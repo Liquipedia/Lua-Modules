@@ -6,13 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local RaceColor = Lua.loadDataIfExists('Module:RaceColorClass') or {}
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
@@ -29,27 +29,8 @@ function StarcraftBracketDisplay.BracketContainer(props)
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			OpponentEntry = StarcraftBracketDisplay.OpponentEntry,
 			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
-			opponentHeight = StarcraftBracketDisplay.computeBracketOpponentHeight(bracket.matchesById),
 		})
 	})
-end
-
-local defaultOpponentHeights = {
-	solo = 17 + 6,
-	duo = 2 * 17 + 6 + 4,
-	trio = 3 * 17 + 6,
-	quad = 4 * 17 + 6,
-	team = 17 + 6,
-	literal = 17 + 6,
-}
-function StarcraftBracketDisplay.computeBracketOpponentHeight(matchesById)
-	local maxHeight = 10
-	for _, match in pairs(matchesById) do
-		for _, opponent in ipairs(match.opponents) do
-			maxHeight = math.max(maxHeight, defaultOpponentHeights[opponent.type] or 0)
-		end
-	end
-	return maxHeight
 end
 
 function StarcraftBracketDisplay.OpponentEntry(props)
@@ -68,7 +49,7 @@ function StarcraftBracketDisplay.OpponentEntry(props)
 		or opponent.advances
 
 	local leftNode = html.create('div'):addClass('brkts-opponent-entry-left')
-		:addClass(showRaceBackground and RaceColor[opponent.players[1].race] or nil)
+		:addClass(showRaceBackground and Faction.bgClass(opponent.players[1].race) or nil)
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
 	if opponent.type == 'team' then

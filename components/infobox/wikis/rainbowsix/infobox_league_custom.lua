@@ -10,7 +10,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -27,7 +26,7 @@ local _league
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
-local _DEFAULT_TIERTYPE = 'General'
+local DEFAULT_TIERTYPE = 'General'
 local _DEFAULT_PLATFORM = 'PC'
 local _PLATFORM_ALIAS = {
 	console = 'Console',
@@ -60,17 +59,12 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
-	-- Temp solution until a commons solution is made
-	if _args.liquipediatier == 'Misc' then
-		_args.liquipediatier = '-1'
-	end
-
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -135,7 +129,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.liquipediatiertype = Tier.text.types[string.lower(args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)
@@ -164,10 +157,8 @@ end
 
 function CustomLeague:defineCustomPageVariables()
 	-- Variables with different handling compared to commons
-	Variables.varDefine(
-		'tournament_liquipediatiertype',
-		Tier.text.types[string.lower(_args.liquipediatiertype or '')] or _DEFAULT_TIERTYPE
-	)
+	Variables.varDefine('tournament_liquipediatiertype',
+		Variables.varDefault('tournament_liquipediatiertype', DEFAULT_TIERTYPE))
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')

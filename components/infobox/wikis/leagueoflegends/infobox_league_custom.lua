@@ -38,7 +38,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -54,6 +54,10 @@ function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Players',
 		content = {args.participants_number}
+	})
+	table.insert(widgets, Cell{
+		name = 'Version',
+		content = {CustomLeague:_createPatchCell(args)}
 	})
 	return widgets
 end
@@ -102,6 +106,18 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
+end
+
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local displayText = '[[Patch ' .. args.patch .. ']]'
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [[Patch ' .. args.epatch .. ']]'
+	end
+	return displayText
 end
 
 return CustomLeague

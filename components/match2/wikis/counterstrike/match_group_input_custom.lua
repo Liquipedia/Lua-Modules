@@ -41,7 +41,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getLinks(match)
@@ -518,7 +518,7 @@ function matchFunctions.getOpponents(match)
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time(os.date('!*t'))
+			local currentUnixTime = os.time( --[[@as osdate]])
 			local lang = mw.getContentLanguage()
 			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 			local threshold = match.dateexact and 30800 or 86400

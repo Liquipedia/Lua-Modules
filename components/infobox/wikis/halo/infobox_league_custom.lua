@@ -42,7 +42,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -74,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 --store maps
-function League:addToLpdb(lpdbData, args)
+function CustomLeague:addToLpdb(lpdbData, args)
 	local maps = {}
 	local index = 1
 	while not String.isEmpty(args['map' .. index]) do
@@ -107,7 +107,7 @@ function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function League:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables()
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end

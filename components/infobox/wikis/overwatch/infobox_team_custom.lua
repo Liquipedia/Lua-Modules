@@ -24,7 +24,7 @@ function CustomTeam.run(frame)
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createBottomContent()
@@ -42,9 +42,7 @@ end
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
-	lpdbData.extradata = {
-		owl = String.isNotEmpty(args.owl),
-	}
+	lpdbData.extradata.competesin = string.upper(args.league or '')
 
 	return lpdbData
 end
@@ -52,8 +50,8 @@ end
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	if String.isNotEmpty(args.owl) then
-		table.insert(categories, 'Overwatch League Teams')
+	if String.isNotEmpty(args.league) then
+		table.insert(categories, string.upper(args.league) .. ' Teams')
 	end
 
 	return categories

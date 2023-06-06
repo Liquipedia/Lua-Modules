@@ -37,7 +37,6 @@ local PLACEMENT_CLASSES = {
 	['129'] = 'placement-darkgrey',
 	['q'] = 'placement-win',
 	['w'] = 'placement-win',
-	['d'] = 'placement-draw',
 	['l'] = 'placement-lose',
 	['dq'] = 'placement-lose',
 	['dnp'] = 'placement-dnp',
@@ -68,7 +67,6 @@ local prizepoolClasses = {
 	'background-color-fourth-place',
 	w = 'bg-win',
 	q = 'bg-win',
-	d = 'bg-draw',
 	l = 'bg-lose',
 	dq = 'bg-dq',
 }
@@ -84,9 +82,7 @@ function Placement.raw(placement)
 	raw.placement = mw.text.split(string.lower(placement or ''), '-', true)
 
 	-- Identify appropriate background class
-	if raw.placement[1] == '3' and raw.placement[2] then
-		raw.backgroundClass = PLACEMENT_CLASSES['d']
-	elseif PLACEMENT_CLASSES[raw.placement[1]] then
+	if PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
 	elseif Logic.isNumeric(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
 		raw.backgroundClass = PLACEMENT_CLASSES['17']
@@ -125,7 +121,7 @@ end
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
 		function(place)
-			return Ordinal._ordinal(place)
+			return Ordinal.toOrdinal(place)
 		end
 	)
 end

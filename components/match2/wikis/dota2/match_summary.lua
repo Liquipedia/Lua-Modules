@@ -44,8 +44,8 @@ local _AUTO_LINKS = {
 	{
 		icon = 'File:STRATZ_icon_lightmode.svg',
 		iconDark = 'File:STRATZ_icon_darkmode.svg',
-		url = 'https://stratz.com/en-us/match/',
-		name = 'Stratz'
+		url = 'https://stratz.com/matches/',
+		name = 'STRATZ'
 	},
 }
 

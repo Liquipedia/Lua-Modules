@@ -123,16 +123,19 @@ function Header:_createInfoboxButtons()
 
 	local buttons = mw.html.create('span')
 	buttons:addClass('infobox-buttons')
+
+	-- Quick edit link
 	buttons:node(
 		mw.text.nowiki('[') .. '[' .. mw.site.server ..
 		tostring(mw.uri.localUrl( mw.title.getCurrentTitle().prefixedText, 'action=edit&section=0' )) ..
 		' e]' .. mw.text.nowiki(']')
 	)
-	buttons:node(
-		mw.text.nowiki('[') ..
-		'[[' .. moduleTitle ..
-		'|h]]' .. mw.text.nowiki(']')
-	)
+
+	-- Quick help link (links to template)
+	if not mw.title.new(moduleTitle).exists then
+		moduleTitle = 'lpcommons:'.. moduleTitle
+	end
+	buttons:node(mw.text.nowiki('[') .. '[[' .. moduleTitle ..'|h]]' .. mw.text.nowiki(']'))
 
 	return buttons
 end

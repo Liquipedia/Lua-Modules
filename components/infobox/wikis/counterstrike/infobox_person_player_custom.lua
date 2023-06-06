@@ -70,8 +70,11 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = player.args.team_history
-	player.args.steamalternative = player.args.steam
-	player.args.steam = nil
+
+	for steamKey, steamInput, steamIndex in Table.iter.pairsByPrefix(player.args, 'steam', {requireIndex = false}) do
+		player.args['steamalternative' .. steamIndex] = steamInput
+		player.args[steamKey] = nil
+	end
 
 	player.args.informationType = player.args.informationType or 'Player'
 
@@ -83,7 +86,7 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -96,7 +99,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
 			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
-
 	elseif id == 'role' then
 		local role = CustomPlayer._createRole('role', _args.role)
 		local role2 = CustomPlayer._createRole('role2', _args.role2)
@@ -104,6 +106,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
 		}
+	elseif id == 'region' then
+		return {}
 	end
 
 	return widgets
@@ -237,11 +241,11 @@ function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.coach then
-			return { store = 'Staff', category = 'Coache' }
+			return { store = 'Coach', category = 'Coache' }
 		elseif roleData.management then
 			return { store = 'Staff', category = 'Manager' }
 		elseif roleData.talent then
-			return { store = '', category = 'Talent' }
+			return { store = 'Talent', category = 'Talent' }
 		end
 	end
 	return { store = 'Player', category = 'Player' }

@@ -10,7 +10,6 @@ local CustomMatchGroupInput = {}
 
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -38,7 +37,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -155,6 +154,11 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+function matchFunctions.isFeatured(match)
+	return tonumber(match.liquipediatier) == 1
+		or tonumber(match.liquipediatier) == 2
+end
+
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
@@ -175,7 +179,10 @@ function matchFunctions.getExtraData(match)
 
 	match.extradata = {
 		showh2h = showh2h,
+		isfeatured = matchFunctions.isFeatured(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
 end
@@ -192,7 +199,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
@@ -324,7 +331,7 @@ function matchFunctions.getOpponents(match)
 	local autoFinished = Logic.readBool(Logic.emptyOr(match.autofinished, true))
 	-- see if match should actually be finished if score is set
 	if isScoreSet and autoFinished and not Logic.readBool(match.finished) then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
@@ -370,12 +377,11 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local overtimes = Array.extractValues(Table.mapValues(mw.text.split(map.overtime or '', ','), tonumber))
 
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		overtime = Table.isNotEmpty(overtimes) and Json.stringify(overtimes) or nil
+		overtime = Logic.readBool(map.overtime)
 	}
 	return map
 end
@@ -404,8 +410,7 @@ function mapFunctions.getScoresAndWinner(map)
 			break
 		end
 	end
-	local isFinished = Logic.readBool(map.finished)
-	if isFinished and not Logic.isEmpty(indexedScores) then
+	if not Logic.isEmpty(indexedScores) then
 		map.winner = mapFunctions.getWinner(indexedScores)
 	end
 

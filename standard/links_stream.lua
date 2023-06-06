@@ -12,7 +12,6 @@ Module containing utility functions for streaming platforms.
 local StreamLinks = {}
 
 local Class = require('Module:Class')
-local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -49,10 +48,9 @@ StreamLinks.streamPlatformLookupNames = {
 	twitch2 = 'twitch',
 }
 
---[[
-Extracts the streaming platform args from an argument table for use in
-Module:Countdown.
-]]
+---Extracts the streaming platform args from an argument table for use in Module:Countdown.
+---@param args {[string]: string}
+---@return table
 function StreamLinks.readCountdownStreams(args)
 	local stream = {}
 	for _, platformName in ipairs(StreamLinks.countdownPlatformNames) do
@@ -61,23 +59,26 @@ function StreamLinks.readCountdownStreams(args)
 	return stream
 end
 
---[[
-Resolves the value of a stream given the platform
-]]
+---Resolves the value of a stream given the platform
+---@param platformName string
+---@param streamValue string
+---@return string
 function StreamLinks.resolve(platformName, streamValue)
 	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
 
-	return string.gsub(streamLink, 'Special:Stream/' .. platformName, '')
+	return (string.gsub(streamLink, 'Special:Stream/' .. platformName, ''))
 end
 
 --[[
 Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
 Uses variable fallbacks and resolves stream redirects.
 ]]
+---@param forwardedInputArgs {[string]: string|{[string]: string}}
+---@return table
 function StreamLinks.processStreams(forwardedInputArgs)
 	local streams = {}
 	if type(forwardedInputArgs.stream) == 'table' then
-		streams = forwardedInputArgs.stream
+		streams = forwardedInputArgs.stream --[[@as {[string]: string}]]
 		forwardedInputArgs.stream = nil
 	end
 
@@ -96,11 +97,9 @@ function StreamLinks.processStreams(forwardedInputArgs)
 				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
 			end
 
-			if FeatureFlag.get('new_stream_format') then
-				local key = StreamLinks.StreamKey(platformName):toString()
-				streams[key] = streamValue
-			end
-			streams[platformName] = streamValue
+			local key = StreamLinks.StreamKey(platformName):toString()
+			streams[key] = streamValue
+			streams[platformName] = streamValue -- Legacy
 		end
 	end
 
@@ -110,6 +109,12 @@ end
 --- StreamKey Class
 -- Contains the triplet that makes up a stream key
 -- [platform, languageCode, index]
+---@class StreamKey
+---@operator call(...): StreamKey
+---@field platform string
+---@field languageCode string
+---@field index integer
+---@field is_a function
 StreamLinks.StreamKey = Class.new(
 	function (self, ...)
 		self:new(...)
@@ -117,6 +122,11 @@ StreamLinks.StreamKey = Class.new(
 )
 local StreamKey = StreamLinks.StreamKey
 
+---@param tbl string
+---@param languageCode string
+---@param index integer
+---@overload fun(self, tbl: StreamKey): StreamKey
+---@overload fun(self, tbl: string): StreamKey
 function StreamKey:new(tbl, languageCode, index)
 	local platform
 	-- Input is another StreamKey - Make a copy
@@ -139,13 +149,15 @@ function StreamKey:new(tbl, languageCode, index)
 		end
 	end
 
-	self.platform = platform
-	self.languageCode = languageCode
-	self.index = tonumber(index)
+	self.platform = platform --[[@as string]]
+	self.languageCode = languageCode --[[@as string]]
+	self.index = tonumber(index) --[[@as integer]]
 	self:_isValid()
 	self.languageCode = self.languageCode:lower()
 end
 
+---@param input string
+---@return string?, integer?
 function StreamKey:_fromLegacy(input)
 	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
 		-- The intersection of values in countdownPlatformNames and keys in streamPlatformLookupNames
@@ -157,7 +169,7 @@ function StreamKey:_fromLegacy(input)
 				-- If the input is longer than the platform, there's an index at the end
 				-- Eg. In "twitch2", the 2 would the index.
 				if #input > #platform then
-					index = tonumber(input:sub(#platform + 1))
+					index = tonumber(input:sub(#platform + 1)) --[[@as integer]]
 				end
 				return platform, index
 			end
@@ -184,6 +196,9 @@ function StreamKey:_isValid()
 	return true
 end
 
+---@param value StreamKey
+---@return true
+---@overload fun(value: any): false
 function StreamKey._isStreamKey(value)
 	if type(value) == 'table' and type(value.is_a) == 'function' and value:is_a(StreamKey) then
 		return true

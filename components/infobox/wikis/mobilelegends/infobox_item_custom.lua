@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local ItemIcon = require('Module:ItemIcon')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -49,7 +50,7 @@ function CustomItem.run(frame)
 	item.getWikiCategories = CustomItem.getWikiCategories
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
-	return item:createInfobox(frame)
+	return item:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -253,7 +254,7 @@ function CustomItem._movementSpeedDisplay()
 	local display
 	if String.isNotEmpty(_args.movespeed) then
 		display = _args.movespeed
-	elseif String.isNotEmpty(tonumber(_args.movespeedmult or '')) then
+	elseif Logic.isNumeric(_args.movespeedmult) then
 		display = (tonumber(_args.movespeedmult) + 100) .. '%'
 	end
 	if String.isNotEmpty(display) then

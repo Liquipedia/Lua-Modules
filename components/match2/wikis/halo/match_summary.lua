@@ -38,7 +38,11 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
-	headtohead = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
+	headtohead = {
+		icon = 'File:Match_Info_Halo_H2H.png',
+		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
+		text = 'Head-to-head statistics'
+	},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
@@ -105,7 +109,7 @@ function CustomMatchSummary.getByMatchId(args)
 		local buildQueryFormLink = function(form, template, arguments)
 			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
 				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-				    .. '&_run'
+					.. '&_run'
 			))
 		end
 
@@ -117,7 +121,7 @@ function CustomMatchSummary.getByMatchId(args)
 			['[fromdate][day]'] = '01',
 			['[fromdate][month]'] = '01',
 			['[fromdate][year]'] = string.sub(match.date,1,4)
-	    }
+		}
 
 		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end

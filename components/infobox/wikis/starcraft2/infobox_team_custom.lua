@@ -8,6 +8,7 @@
 
 local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
@@ -15,7 +16,6 @@ local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Participant')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -61,7 +61,7 @@ function CustomTeam.run(frame)
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -138,7 +138,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 
 	lpdbData.extradata.playerearnings = _team.totalEarningsWhileOnTeam
-	for year, playerEarningsOfYear  in pairs(_team.earningsWhileOnTeam or {}) do
+	for year, playerEarningsOfYear in pairs(_team.earningsWhileOnTeam or {}) do
 		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
 	end
 
@@ -184,16 +184,16 @@ function CustomTeam.playerBreakDown(args)
 		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
 			playerBreakDown.display = {}
 			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'p'} .. ' ' .. protossnumber
 			end
 			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 't'} .. ' ' .. terrannumbner
 			end
 			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'z'} .. ' ' .. zergnumber
 			end
 			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
+				playerBreakDown.display[#playerBreakDown.display + 1] = Faction.Icon{faction = 'r'} .. ' ' .. randomnumber
 			end
 		end
 	end
@@ -249,7 +249,6 @@ function CustomTeam.getEarningsAndMedalsData(team)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
-		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add{
