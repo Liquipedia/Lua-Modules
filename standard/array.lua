@@ -211,6 +211,39 @@ function Array.groupBy(tbl, funct)
 	return groups, groupsByKey
 end
 
+--[[
+Groups adjacent elements of an array based on applying a transformation to the
+elements. The function returns an array of groups.
+
+The optional equals parameter specifies the equality relation of the
+transformed elements.
+
+Example:
+Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
+-- returns {{2}, {3, 5, 7}, {14, 16}}
+]]
+---@generic V, T
+---@param array V[]
+---@param f fun(elem: V): T
+---@param equals? fun(key: T, currentKey: T): boolean
+---@return V[][]
+function Array.groupAdjacentBy(array, f, equals)
+	equals = equals or Logic.deepEquals
+
+	local groups = {}
+	local currentKey
+	for index, elem in ipairs(array) do
+		local key = f(elem)
+		if index == 1 or not equals(key, currentKey) then
+			currentKey = key
+			table.insert(groups, {})
+		end
+		table.insert(groups[#groups], elem)
+	end
+
+	return groups
+end
+
 ---Lexicographically compare two arrays.
 ---@generic T
 ---@param tblX T[]
@@ -586,39 +619,6 @@ function Array.uniqueElement(elems)
 		uniqueElem = elem
 	end
 	return uniqueElem
-end
-
---[[
-Groups adjacent elements of an array based on applying a transformation to the
-elements. The function returns an array of groups.
-
-The optional equals parameter specifies the equality relation of the
-transformed elements.
-
-Example:
-Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
--- returns {{2}, {3, 5, 7}, {14, 16}}
-]]
----@generic V, T
----@param array V[]
----@param f fun(elem: V): T
----@param equals? fun(key: T, currentKey: T): boolean
----@return V[][]
-function Array.groupAdjacentBy(array, f, equals)
-	equals = equals or Logic.deepEquals
-
-	local groups = {}
-	local currentKey
-	for index, elem in ipairs(array) do
-		local key = f(elem)
-		if index == 1 or not equals(key, currentKey) then
-			currentKey = key
-			table.insert(groups, {})
-		end
-		table.insert(groups[#groups], elem)
-	end
-
-	return groups
 end
 
 --[[
