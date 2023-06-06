@@ -1336,6 +1336,16 @@ local data = {
 		localised = 'African',
 		name = 'Africa',
 	},
+	['arabia'] = {
+		flag = 'File:gcc hd.png',
+		localised = 'Arabian',
+		name = 'Arabia',
+	},
+	['arabstates'] = {
+		flag = 'File:Arab league hd.png',
+		localised = 'Arab',
+		name = 'Arab States',
+	},
 	['asia'] = {
 		flag = 'File:Asia flag hd.png',
 		localised = 'Asian',
@@ -1391,10 +1401,20 @@ local data = {
 		localised = 'Latin America South',
 		name = 'Latin America South',
 	},
+	['levant'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Levantine',
+		name = 'Levant',
+	},
 	['middleeast'] = {
 		flag = 'File:Middle east flag hd.png',
 		localised = 'Middle Eastern',
 		name = 'Middle East',
+	},
+	['mena'] = {
+		flag = 'File:Arab league hd.png',
+		localised = 'MENA',
+		name = 'MENA',
 	},
 	['nordiccountries'] = {
 		flag = 'File:Nordic hd.png',
@@ -1441,6 +1461,16 @@ local data = {
 		localised = 'Southeast Asian',
 		name = 'Southeast Asia',
 	},
+	['subsaharanafrica'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'Sub-Saharan',
+		name = 'Sub-Saharan Africa',
+	},
+	['westasia'] = {
+		flag = 'File:Space filler flag.png',
+		localised = 'West Asian',
+		name = 'West Asia',
+	},
 	['world'] = {
 		flag = 'File:World hd.png',
 		localised = 'Global',
@@ -1471,6 +1501,11 @@ local data = {
 		flag = 'File:RuBy hd.png',
 		localised = '',
 		name = 'Russian Speaking',
+	},
+	['arabicspeaking'] = {
+		flag = 'File:Arab league hd.png',
+		localised = '',
+		name = 'Arabic Speaking',
 	},
 	['non-representing'] = {
 		flag = 'File:non hd.png',
@@ -2048,6 +2083,7 @@ local aliases = {
 	-- Other
 	['america'] = 'unitedstates',
 	['americas'] = 'northamerica',
+	['arabianpeninsula'] = 'arabia',
 	['asiapacific'] = 'asia-pacific',
 	['apac'] = 'asia-pacific',
 	['bonaire'] = 'bonaire,sinteustatiusandsaba',
@@ -2064,6 +2100,8 @@ local aliases = {
 	['czech'] = 'czechia',
 	['czechrepublic'] = 'czechia',
 	['europe'] = 'europeanunion',
+	['gcc'] = 'arabia',
+	['gulfcooperationcouncil'] = 'arabia',
 	['greatbritain'] = 'unitedkingdom',
 	['britain'] = 'unitedkingdom',
 	['holland'] = 'netherlands',
@@ -2078,6 +2116,7 @@ local aliases = {
 	['macedonia'] = 'northmacedonia',
 	['makedonia'] = 'northmacedonia',
 	['micronesia'] = 'federatedstatesofmicronesia',
+	['middleeastnorthafrica'] = 'mena',
 	['republic of macedonia'] = 'northmacedonia',
 	['scandinavia'] = 'nordiccountries',
 	['saintmartin'] = 'saintmartin(frenchpart)',
@@ -2120,10 +2159,12 @@ local aliases = {
 	['esmx'] = 'spanishspeaking',
 	['ptbr'] = 'portuguesespeaking',
 	['ruby'] = 'russianspeaking',
+	['arab'] = 'arabicspeaking',
 
 	--language flag aliases
 	['engspeaking'] = 'englishspeaking',
 	['gerspeaking'] = 'germanspeaking',
+	['araspeaking'] = 'arabicspeaking',
 
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
@@ -2156,6 +2197,7 @@ local languageThreeLetter = {
 	['spa'] = 'spanishspeaking',
 	['por'] = 'portuguesespeaking',
 	['rus'] = 'russianspeaking',
+	['ara'] = 'arabicspeaking',
 }
 
 -- This table includes

@@ -11,7 +11,7 @@ return {
 	wikiName = 'overwatch',
 	name = 'Overwatch',
 	games = {
-		ow = {
+		overwatch = {
 			abbreviation = 'OW',
 			name = 'Overwatch',
 			link = 'Overwatch',
@@ -24,7 +24,7 @@ return {
 				lightMode = 'Overwatch default lightmode.png',
 			},
 		},
-		ow2 = {
+		overwatch2 = {
 			abbreviation = 'OW2',
 			name = 'Overwatch 2',
 			link = 'Overwatch 2',
@@ -38,7 +38,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'ow2',
+	defaultGame = 'overwatch2',
 	defaultTeamLogo = 'Overwatch Logo lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Overwatch Logo darkmode.png', ---@deprecated
 }

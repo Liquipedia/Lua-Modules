@@ -13,7 +13,6 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -44,6 +43,7 @@ local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
 local NON_BREAKING_SPACE = '&nbsp;'
 local BASE_CURRENCY = 'USD'
+local EXCHANGE_SUMMARY_PRECISION = 5
 
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
@@ -112,7 +112,7 @@ BasePrizePool.config = {
 		end
 	},
 	syncPlayers = {
-		default = false,
+		default = true,
 		read = function(args)
 			return Logic.readBoolOrNil(args.syncPlayers)
 		end
@@ -229,23 +229,20 @@ BasePrizePool.prizeTypes = {
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
 			local link = mw.ext.TeamLiquidIntegration.resolve_redirect(input):gsub(' ', '_')
-			local data = {link = link}
 
 			-- Automatically retrieve information from the Tournament
-			local tournamentData = BasePrizePool._getTournamentInfo(link)
-			if tournamentData then
-				data.title = tournamentData.tickername
-				data.icon = tournamentData.icon
-				data.iconDark = tournamentData.icondark
-			end
-
-			-- Manual inputs
+			local tournamentData = BasePrizePool._getTournamentInfo(link) or {}
 			local prefix = 'qualifies' .. index
-			data.title = context[prefix .. 'name'] or data.title
-			data.icon = data.icon or context[prefix .. 'icon']
-			data.iconDark = data.iconDark or context[prefix .. 'icondark']
-
-			return data
+			return {
+				link = link,
+				title = context[prefix .. 'name'] or Logic.emptyOr(
+					tournamentData.tickername,
+					tournamentData.name,
+					(tournamentData.pagename or link):gsub('_', ' '):gsub('/', ' ')
+				),
+				icon = tournamentData.icon or context[prefix .. 'icon'],
+				iconDark = tournamentData.icondark or context[prefix .. 'icondark']
+			}
 		end,
 		headerDisplay = function (data)
 			return TableCell{content = {'Qualifies To'}}
@@ -484,10 +481,25 @@ function BasePrizePool._comparePrizes(x, y)
 	return sortX == sortY and x.index < y.index or sortX < sortY
 end
 
+function BasePrizePool:_shouldDisplayPrizeSummary()
+	-- if prizeSummary is disabled do not show it
+	if not self.options.prizeSummary then
+		return false
+	end
+
+	local baseMoney = tonumber(Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower()))
+	-- if we have currency conversion (i.e. entered `localcurrency`) or entered usd values display it
+	-- if we have baseMoney being not 0 display it
+	-- if we have unset baseMoney display it (usually TBA/TBD case)
+	if self.options.showBaseCurrency or baseMoney ~= 0 then
+		return true
+	end
+end
+
 function BasePrizePool:build(isAward)
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
-	if self.options.prizeSummary then
+	if self:_shouldDisplayPrizeSummary() then
 		wrapper:wikitext(self:_getPrizeSummaryText())
 	end
 
@@ -545,9 +557,12 @@ end
 
 function BasePrizePool:_buildRows()
 	local rows = {}
+	local previousPlacement = nil
 
 	for _, placement in ipairs(self.placements) do
 		local previousOpponent = {}
+
+		self:applyToggleExpand(previousPlacement, placement, rows)
 
 		local row = TableRow{}
 		row:addClass(placement:getBackground())
@@ -609,7 +624,7 @@ function BasePrizePool:_buildRows()
 
 		table.insert(rows, row)
 
-		self:applyToggleExpand(placement, rows)
+		previousPlacement = placement
 	end
 
 	return rows
@@ -623,7 +638,7 @@ function BasePrizePool:applyCutAfter(placement, row)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
-function BasePrizePool:applyToggleExpand(placement, row)
+function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
@@ -634,13 +649,13 @@ end
 function BasePrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
-	local baseMoneyRaw = Variables.varDefault('tournament_prizepool_' .. BASE_CURRENCY:lower(), tba)
+	local baseMoneyRaw = Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
 
 	local displayText = {baseMoneyDisplay}
 
 	if tournamentCurrency and tournamentCurrency:upper() ~= BASE_CURRENCY then
-		local localMoneyRaw = Variables.varDefault('tournament_prizepool_local', tba)
+		local localMoneyRaw = Variables.varDefault('tournament_prizepoollocal', tba)
 		local localMoneyDisplay = Currency.display(tournamentCurrency, localMoneyRaw, {formatValue = true})
 
 		table.insert(displayText, 1, localMoneyDisplay)
@@ -686,14 +701,12 @@ function BasePrizePool:_currencyExchangeInfo()
 end
 
 function BasePrizePool._CurrencyConvertionText(prize)
-	local exchangeRate = Math.round{
-		BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
-			prize.data, 1, BasePrizePool._getTournamentDate()
-		)
-		,5
-	}
+	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
+		prize.data, 1, BasePrizePool._getTournamentDate()
+	)
 
-	return Currency.display(prize.data.currency, 1) .. ' ≃ ' .. Currency.display(BASE_CURRENCY, exchangeRate)
+	return Currency.display(prize.data.currency, 1) .. ' ≃ ' ..
+		Currency.display(BASE_CURRENCY, exchangeRate, {formatValue = true, formatPrecision = EXCHANGE_SUMMARY_PRECISION})
 end
 
 --- Returns true if this PrizePool has a Base Currency money reward.
@@ -743,7 +756,7 @@ end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
 function BasePrizePool._getTournamentDate()
-	return Variables.varDefaultMulti('tournament_enddate', 'tournament_edate', 'edate', TODAY)
+	return Variables.varDefault('tournament_enddate', TODAY)
 end
 
 function BasePrizePool:storeData()
@@ -755,11 +768,12 @@ function BasePrizePool:storeData()
 		parent = Variables.varDefault('tournament_parent'),
 		series = Variables.varDefault('tournament_series'),
 		shortname = Variables.varDefault('tournament_tickername'),
-		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_sdate', 'sdate', ''),
+		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
 		type = Variables.varDefault('tournament_type'),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		publishertier = Variables.varDefault('tournament_publishertier'),
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
@@ -789,6 +803,8 @@ function BasePrizePool:storeData()
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
 		end
+
+		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
 	end
 
 	if Table.isNotEmpty(smwTournamentStash) then

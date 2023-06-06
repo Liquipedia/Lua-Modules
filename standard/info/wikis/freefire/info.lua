@@ -26,6 +26,7 @@ return {
 		},
 	},
 	defaultGame = 'freefire',
+	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Freefire Default Logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Freefire Default Logo.png', ---@deprecated
 }

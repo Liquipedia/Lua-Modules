@@ -210,7 +210,7 @@ function CustomPlayer._getRoleType(roles)
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.region = Region.run{country=_args.country, onlyRegion=true}
+	lpdbData.region = Region.name{country = _args.country}
 
 	lpdbData.extradata.role = _args.roleList[1]
 	lpdbData.extradata.role2 = _args.roleList[2]
@@ -333,7 +333,7 @@ function CustomPlayer._calculateDateThreshold(thresholdConfig)
 	for key, value in pairs(thresholdConfig) do
 		dateThreshold[key] = dateThreshold[key] - value
 	end
-	return os.date('!%F', os.time(dateThreshold))
+	return os.date('!%F', os.time(dateThreshold --[[@as osdate]]))
 end
 
 function CustomPlayer._queryGames()

@@ -14,9 +14,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
@@ -26,7 +24,6 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local UNDEFINED_TIER = 'undefined'
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]'
 local DEFAULT_EVENT_ICON = ''
 local TBD = 'TBD'
@@ -35,9 +32,12 @@ local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local CustomResultsTable = {}
 
 -- Template entry point
+---@param frame Frame
+---@return Html?
 function CustomResultsTable.results(frame)
 	local args = Arguments.getArgs(frame)
 	args.playerLimit = MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS
+	args.useIndivPrize = true
 
 	if Logic.readBool(args.awards) then
 		return CustomResultsTable.awards(args)
@@ -48,11 +48,6 @@ function CustomResultsTable.results(frame)
 
 	local resultsTable = ResultsTable(args)
 
-	-- overwrite functions
-	resultsTable.tierDisplay = CustomResultsTable.tierDisplay
-	resultsTable.rowHighlight = CustomResultsTable.rowHighlight
-	resultsTable.processLegacyVsData = CustomResultsTable.processLegacyVsData
-
 	local buildTable = resultsTable:create():build()
 
 	CustomResultsTable._storeAllKill()
@@ -60,48 +55,19 @@ function CustomResultsTable.results(frame)
 	return buildTable
 end
 
+-- Template entry point for awards
+---@param frame Frame
+---@return Html?
 function CustomResultsTable.awards(frame)
 	local args = Arguments.getArgs(frame)
-
+	args.useIndivPrize = true
 	args.data = Json.parseIfTable(Variables.varDefault('awardAchievements'))
 
 	if Logic.readBool(args.achievements) and Table.isEmpty(args.data) then
 		return
 	end
 
-	local awardsTable = AwardsTable(args)
-
-	-- overwrite functions
-	awardsTable.tierDisplay = CustomResultsTable.tierDisplay
-	awardsTable.rowHighlight = CustomResultsTable.rowHighlight
-
-	return awardsTable:create():build()
-end
-
-function CustomResultsTable:tierDisplay(placement)
-	local tierDisplay = Tier.text.tiers[placement.liquipediatier] or UNDEFINED_TIER
-
-	tierDisplay = Page.makeInternalLink(
-		{},
-		tierDisplay,
-		tierDisplay .. ' Tournaments'
-	)
-
-	local tierTypeDisplay = Tier.text.typesShort[(placement.liquipediatiertype or ''):lower()]
-
-	local sortValue = placement.liquipediatier .. (tierTypeDisplay or '')
-
-	if not tierTypeDisplay then
-		return tierDisplay, sortValue
-	end
-
-	return tierDisplay .. ' (' .. tierTypeDisplay .. ')', sortValue
-end
-
-function CustomResultsTable:rowHighlight(placement)
-	if Logic.readBool(placement.publishertier) then
-		return 'tournament-highlighted-bg'
-	end
+	return AwardsTable(args):create():build()
 end
 
 -- all kill rows are manual inputs of all kill chievements
@@ -109,6 +75,8 @@ end
 -- or until he has defeated all players of the opponent (possibly with revive of opponent players)
 -- an all kill achievement is if a player single handedly defeats a team in an all-kill format
 -- the input here is basically to display a very brief information about the match where the all kill was achieved
+---@param frame Frame
+---@return Html
 function CustomResultsTable.allKillRow(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -145,6 +113,9 @@ function CustomResultsTable.allKillRow(frame)
 		:node(row)
 end
 
+---Adds an all kill match to the custom row
+---@param args table
+---@return Html
 function CustomResultsTable._allKillMatch(args)
 	local teamName = args.team or TBD
 
@@ -176,7 +147,8 @@ function CustomResultsTable._allKillMatch(args)
 	return match:create()
 end
 
-function CustomResultsTable._storeAllKill(args)
+---Stores the number of all kill achievements into a data point
+function CustomResultsTable._storeAllKill()
 	local numberOfAllKills = tonumber(Variables.varDefault('allKills')) or 0
 	if not Namespace.isMain() or numberOfAllKills == 0 then
 		return
@@ -188,9 +160,14 @@ function CustomResultsTable._storeAllKill(args)
 	})
 end
 
+---Builds a map row for the all kill match
+---@param args table
+---@param prefix string
+---@param match any
+---@return boolean
 function CustomResultsTable._allKillMapRow(args, prefix, match)
 	if not (args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'win'] or args[prefix .. 'walkover'])then
-		return
+		return false
 	end
 
 	local opponentLeft = mw.html.create('div'):css('text-align', 'right')
@@ -225,6 +202,11 @@ function CustomResultsTable._allKillMapRow(args, prefix, match)
 	return true
 end
 
+---Builds the opponent display for inside an all kill achievement
+---@param args table
+---@param prefix string
+---@param side number
+---@return Html
 function CustomResultsTable._opponentDisplay(args, prefix, side)
 	local players = {CustomResultsTable._buildPlayerStruct(args, prefix .. 'p' .. side)}
 
@@ -249,6 +231,10 @@ function CustomResultsTable._opponentDisplay(args, prefix, side)
 	}
 end
 
+---Builds a player struct from given args
+---@param args table
+---@param prefix string
+---@return table
 function CustomResultsTable._buildPlayerStruct(args, prefix)
 	local displayName = args[prefix] or TBD
 	return {
@@ -259,6 +245,9 @@ function CustomResultsTable._buildPlayerStruct(args, prefix)
 	}
 end
 
+---Determines the opponent type based on a given number of players
+---@param numberOfPlayers integer
+---@return string?
 function CustomResultsTable._getOpponentType(numberOfPlayers)
 	for opponentType, playerNumber in pairs(Opponent.partySizes) do
 		if playerNumber == numberOfPlayers then

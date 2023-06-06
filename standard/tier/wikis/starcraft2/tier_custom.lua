@@ -31,7 +31,7 @@ end
 ---@param options table?
 ---@return string?
 function TierCustom.display(tier, tierType, options)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
 
@@ -55,7 +55,7 @@ function TierCustom.display(tier, tierType, options)
 
 	if Logic.readBool(link) and tierData.link then
 		return Page.makeInternalLink({}, display, tierData.link)
-	elseif String.isNotEmpty(link) then
+	elseif Logic.readBoolOrNil(link) == nil and String.isNotEmpty(link) then
 		return Page.makeInternalLink({}, display, link)
 	end
 

@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 local TierData = mw.loadData('Module:Tier/Data')
 
 local NON_BREAKING_SPACE = '&nbsp;'
+local DEFAULT_TIER_TYPE = 'General'
 
 local Tier = {}
 
@@ -24,9 +25,10 @@ local Tier = {}
 ---@param input string|integer|nil
 ---@return string|integer|nil
 function Tier.toIdentifier(input)
-	if String.isEmpty(input) then
+	if Logic.isEmpty(input) then
 		return
 	end
+	---@cast input -nil
 
 	return tonumber(input)
 		or string.lower(input):gsub(' ', '')
@@ -36,7 +38,7 @@ end
 ---@param tier integer
 ---@param tierType string?
 ---@return table?, table?
-function Tier._raw(tier, tierType)
+function Tier.raw(tier, tierType)
 	return (TierData.tiers or {})[Tier.toIdentifier(tier)],
 		(TierData.tierTypes or {})[Tier.toIdentifier(tierType)]
 end
@@ -46,7 +48,7 @@ end
 ---@param tierType string?
 ---@return boolean
 function Tier.isValid(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return false end
 
@@ -62,7 +64,7 @@ end
 ---@param tierType string?
 ---@return integer?, string|integer|nil
 function Tier.toValue(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).value, (tierTypeData or {}).value
 end
@@ -72,7 +74,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toName(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).name, (tierTypeData or {}).name
 end
@@ -82,7 +84,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toShortName(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).short, (tierTypeData or {}).short
 end
@@ -92,7 +94,7 @@ end
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toCategory(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).category, (tierTypeData or {}).category
 end
@@ -102,7 +104,7 @@ end
 ---@param tierType string?
 ---@return string
 function Tier.toSortValue(tier, tierType)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	return (tierData or {}).sort .. ((tierTypeData or {}).sort or '')
 end
@@ -112,7 +114,10 @@ end
 ---@param queryData table
 ---@return string?, string?, table
 function Tier.parseFromQueryData(queryData)
-	return queryData.liquipediatier, queryData.liquipediatiertype, {}
+	local tierType = queryData.liquipediatiertype
+	tierType = tierType ~= DEFAULT_TIER_TYPE and tierType or nil
+
+	return queryData.liquipediatier, tierType, {}
 end
 
 --- Builds the display for a given (tier, tierType) tuple
@@ -121,7 +126,7 @@ end
 ---@param options table?
 ---@return string?
 function Tier.display(tier, tierType, options)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
 
@@ -158,15 +163,18 @@ end
 --- Builds the display for a given tierData/tierTypeData table
 --- overwritable on a per wiki basis if adjustments are needed
 ---@param data table
----@param options {short: boolean, link: boolean|string}
----@return string
+---@param options {short: boolean?, link: boolean|string|nil}
+---@return string?
 function Tier.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, data.link)
-	elseif String.isNotEmpty(options.link) then
-		return Page.makeInternalLink({}, display, options.link)
+	elseif Logic.readBoolOrNil(options.link) == nil then
+		local link = options.link --[[@as string?]]
+		if String.isNotEmpty(link) then
+			return Page.makeInternalLink({}, display, link)
+		end
 	end
 
 	return display
@@ -195,8 +203,8 @@ end)
 ---@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
-		or Tier.legacyNumbers[string.lower(tier or ''):gsub(' ', '')]
-		or Tier.legacyShortNumbers[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
+		or Tier.legacyShortNumbers()[string.lower(tier or ''):gsub(' ', '')]
 end
 
 return Tier

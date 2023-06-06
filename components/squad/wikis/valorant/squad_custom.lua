@@ -10,7 +10,6 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
 local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
@@ -32,16 +31,16 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader()) -- "Role"
-			:node(makeHeader('Join Date'))
+		:node(makeHeader())
+		:node(makeHeader('Name'))
+		:node(makeHeader()) -- "Role"
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
+			:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -123,6 +122,7 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
+	row:status(squadType)
 	row:id{
 		player.id,
 		flag = player.flag,
@@ -151,13 +151,11 @@ function CustomSquad._playerRow(player, squadType)
 	end
 
 	return row:create(
-		Variables.varDefault(
-			'squad_name',
-			mw.title.getCurrentTitle().prefixedText
-		)
+		mw.title.getCurrentTitle().prefixedText
 		.. '_' .. player.id .. '_'
 		.. ReferenceCleaner.clean(player.joindate)
 		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

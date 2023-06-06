@@ -25,6 +25,9 @@ local TableCell = require('Module:Widget/Table/Cell')
 local TableRow = require('Module:Widget/Table/Row')
 
 --- @class PrizePool
+--- @field options table
+--- @field _smwInjector SmwInjector?
+--- @field _lpdbInjector LpdbInjector?
 local PrizePool = Class.new(BasePrizePool)
 
 local tournamentVars = PageVariableNamespace('Tournament')
@@ -71,10 +74,13 @@ function PrizePool:applyCutAfter(placement, row)
 	end
 end
 
-function PrizePool:applyToggleExpand(placement, rows)
-	if placement.placeStart <= self.options.cutafter
+function PrizePool:applyToggleExpand(placement, nextPlacement, rows)
+	if placement ~= nil
+		and placement.placeStart <= self.options.cutafter
 		and placement.placeEnd >= self.options.cutafter
-		and placement ~= self.placements[#self.placements] then
+		and placement ~= self.placements[#self.placements]
+		and nextPlacement.placeStart ~= placement.placeStart
+		and nextPlacement.placeEnd ~= placement.placeEnd then
 
 		table.insert(rows, self:_toggleExpand(placement.placeEnd + 1, self.placements[#self.placements].placeEnd))
 	end

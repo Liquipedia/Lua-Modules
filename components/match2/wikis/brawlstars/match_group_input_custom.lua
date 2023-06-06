@@ -221,7 +221,7 @@ function matchFunctions.getOpponents(args)
 		for _, opponent in pairs(opponents) do
 			if
 				String.isEmpty(opponent.status)
-				and String.isEmpty(opponent.score)
+				and Logic.isEmpty(opponent.score)
 			then
 				opponent.score = 0
 				opponent.status = 'S'
@@ -231,7 +231,7 @@ function matchFunctions.getOpponents(args)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400

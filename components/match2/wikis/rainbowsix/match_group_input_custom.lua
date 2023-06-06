@@ -28,7 +28,7 @@ local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t'))
+local NOW = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -354,7 +354,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
@@ -416,7 +416,7 @@ function matchFunctions.getMVP(match)
 	if not match.mvp then return nil end
 
 	-- Split & trim the input
-	local players = Table.mapValues(mw.text.split(match.mvp, ','),mw.text.trim)
+	local players = Array.map(mw.text.split(match.mvp, ','), String.trim)
 
 	return {players = players, points = match.mvppoints or 1}
 end

@@ -25,6 +25,10 @@ local MAXIMUM_VALUES = {
 local DEFAULT_LANGUAGE = 'en'
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---Main function for External Media Links.
+---Calls storage and display (if not disabled).
+---@param args table
+---@return Html?
 function ExternalMediaLink.run(args)
 	ExternalMediaLink._fallBackArgs(args)
 
@@ -42,6 +46,8 @@ function ExternalMediaLink.run(args)
 	return ExternalMediaLink._display(args)
 end
 
+---Applies fallback and alias args
+---@param args table
 function ExternalMediaLink._fallBackArgs(args)
 	args.by_link1 = args.by_link1 or args.by_link
 	args.by1 = args.by1 or args.by
@@ -53,6 +59,8 @@ function ExternalMediaLink._fallBackArgs(args)
 	end
 end
 
+---Stores an External Media Link to Lpdb
+---@param args table
 function ExternalMediaLink._store(args)
 	local lpdbData = {
 		date = args.date,
@@ -65,13 +73,13 @@ function ExternalMediaLink._store(args)
 	}
 
 	local authors = {}
-	for authorIndex, author in Table.iter.pairsByPrefix(args, 'by') do
+	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
 		authors['author' .. authorIndex] =
 			mw.ext.TeamLiquidIntegration.resolve_redirect(args['by_link' .. authorIndex] or author)
 		authors['author' .. authorIndex .. 'dn'] = author
 	end
 	-- set a maximum for authors due to the same being used in queries
-	assert(Table.size(authors) <= MAXIMUM_VALUES.authors,
+	assert(Table.size(authors) <= 2 * MAXIMUM_VALUES.authors,
 		'Maximum Value of authors (' .. MAXIMUM_VALUES.authors .. ') exceeded')
 	lpdbData.authors = mw.ext.LiquipediaDB.lpdb_create_json(authors)
 
@@ -84,7 +92,7 @@ function ExternalMediaLink._store(args)
 	}
 
 	local orgs = {}
-	for orgIndex, org in Table.iter.pairsByPrefix(args, 'subject_organization') do
+	for _, org, orgIndex in Table.iter.pairsByPrefix(args, 'subject_organization') do
 		orgs['subject_organization' .. orgIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(org)
 	end
 	-- set a maximum for orgs due to the same being used in queries
@@ -92,7 +100,7 @@ function ExternalMediaLink._store(args)
 		'Maximum Value of organisations subjects (' .. MAXIMUM_VALUES.organisations .. ') exceeded')
 
 	local subjects = {}
-	for subjectIndex, subject in Table.iter.pairsByPrefix(args, 'subject') do
+	for _, subject, subjectIndex in Table.iter.pairsByPrefix(args, 'subject') do
 		subjects['subject' .. subjectIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(subject)
 	end
 	-- set a maximum for subjects due to the same being used in queries
@@ -104,6 +112,9 @@ function ExternalMediaLink._store(args)
 	mw.ext.LiquipediaDB.lpdb_externalmedialink(ExternalMediaLink._objectName(args), lpdbData)
 end
 
+---Builds the object name for an External Media Link
+---@param args table
+---@return string
 function ExternalMediaLink._objectName(args)
 	local objectName = 'ExternalMediaLink'
 
@@ -114,6 +125,9 @@ function ExternalMediaLink._objectName(args)
 	return objectName .. '_' .. (args.date or '')
 end
 
+---Builds the display for an External Media Link
+---@param args table
+---@return Html
 function ExternalMediaLink._display(args)
 	local display = mw.html.create()
 
@@ -137,11 +151,11 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.trans_title then
-		display:wikitext(NON_BREAKING_SPACE .. Page.makeExternalLink(args.trans_title, args.trans_title))
+		display:wikitext(NON_BREAKING_SPACE .. '[' .. args.trans_title .. ']')
 	end
 
 	local authors = {}
-	for authorIndex, author in Table.iter.pairsByPrefix(args, 'by') do
+	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
 		table.insert(authors, Page.makeInternalLink({}, author, args['by_link' .. authorIndex]))
 	end
 	if Table.isNotEmpty(authors) then
@@ -173,6 +187,9 @@ function ExternalMediaLink._display(args)
 	return display
 end
 
+---Builds the event display for an External Media Link
+---@param args table
+---@return string
 function ExternalMediaLink._displayEvent(args)
 	local prefix = NON_BREAKING_SPACE .. 'at' .. NON_BREAKING_SPACE
 
@@ -183,6 +200,9 @@ function ExternalMediaLink._displayEvent(args)
 	return prefix .. Page.makeInternalLink({}, args.event, args['event-link'])
 end
 
+---Builds the translation display for an External Media Link
+---@param args table
+---@return string
 function ExternalMediaLink._displayTranslation(args)
 	local translation = NON_BREAKING_SPACE .. '(trans. '
 		.. Flags.Icon({flag = args.translation, shouldLink = false})
@@ -194,6 +214,9 @@ function ExternalMediaLink._displayTranslation(args)
 	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. args.translator .. ')'
 end
 
+---Wrapper function for External Media Link display in the Data namespace
+---@param args table
+---@return Html
 function ExternalMediaLink.wrapper(args)
 	local wrapperInfoDisplay = mw.html.create('table')
 		:attr('border', 0)
@@ -257,6 +280,9 @@ function ExternalMediaLink.wrapper(args)
 		:node(wrapperInfoDisplay)
 end
 
+---Remove whitespace from the beginning and end of a string. Returns nil if empty string remains.
+---@param value string
+---@return string?
 function ExternalMediaLink._cleanValue(value)
 	return String.nilIfEmpty(mw.text.trim(value))
 end

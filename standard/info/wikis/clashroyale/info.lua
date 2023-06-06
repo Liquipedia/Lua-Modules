@@ -28,5 +28,4 @@ return {
 	defaultGame = 'cr',
 	defaultTeamLogo = 'Clash Royale.png', ---@deprecated
 	defaultTeamLogoDark = 'Clash Royale.png', ---@deprecated
-	opponentLibrary = 'Opponent/Custom',
 }

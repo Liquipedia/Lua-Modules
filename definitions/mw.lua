@@ -19,7 +19,7 @@ function mw.allToString(...) end
 ---@nodiscard
 function mw.clone(value) end
 
----Returns the current frame object, typically the frame object from the most recent #invoke. 
+---Returns the current frame object, typically the frame object from the most recent #invoke.
 ---@return Frame
 ---@nodiscard
 function mw.getCurrentFrame() end
@@ -68,7 +68,7 @@ mw.frame = {}
 function mw.frame:callParserFunction(name, args) end
 
 ---This is transclusion. As in transclusion, if the passed title does not contain a namespace prefix it will be assumed to be in the Template: namespace.
----@param params {title: string, args: table}
+---@param params {title: string, args: table?}
 ---@return string
 function mw.frame:expandTemplate(params) end
 
@@ -141,16 +141,16 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string
+---@param builder? Html|string|number
 ---@return self
 function mw.html:node(builder) end
 
 ---Appends an undetermined number of wikitext strings to the mw.html object. Note that this stops at the first nil item.
----@param ... string?
+---@param ... string|number|nil
 ---@return self
 function mw.html:wikitext(...) end
 
----Appends a newline to the mw.html object. 
+---Appends a newline to the mw.html object.
 ---@return self
 function mw.html:newline() end
 
@@ -163,7 +163,7 @@ function mw.html:tag(tagName, args) end
 
 ---Set an HTML attribute with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string
+---@param value string|number|nil
 ---@return self
 ---@overload fun(self, param: {[string]: string})
 function mw.html:attr(name, value) end
@@ -180,9 +180,9 @@ function mw.html:addClass(class) end
 
 ---Set a CSS property with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
----@param value string
+---@param value string|number|nil
 ---@return self
----@overload fun(self, param: {[string]: string})
+---@overload fun(self, param: {[string]: string|number|nil})
 function mw.html:css(name, value) end
 
 ---Add some raw css to the node's style attribute. If a nil parameter is passed, this is a no-op.
@@ -294,7 +294,7 @@ function mw.language:formatNum(num, options) end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
----@param timestamp string?
+---@param timestamp string|osdate?
 ---@param localTime boolean?
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime) end
@@ -538,6 +538,7 @@ function mw.text.unstrip(s) end
 ---@field baseText string
 ---@field subpageText string
 ---@field canTalk string
+---@field fragment string?
 ---@field exists boolean
 ---@field file File
 ---@field fileExists boolean

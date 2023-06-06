@@ -9,59 +9,90 @@
 local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
-local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local regionData = mw.loadData('Module:Region/Data')
-local countryToRegionData = Lua.loadDataIfExists('Module:Region/CountryData') or {}
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local noEntryFoundCategory = '[[Category:Pages using unsupported region values]]'
+local REGION_DATA = mw.loadData('Module:Region/Data')
+local COUNTRY_TO_REGION_DATA = Lua.loadDataIfExists('Module:Region/CountryData') or {}
 
+local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
+
+---Retrieves the name of a region as well as the display for it.
+---@param args {region: string?, country: string?}?
+---@return {display: string?, region: string?}
 function Region.run(args)
+	local regionValues = Region._raw(args)
+
+	return {
+		display = Region._toDisplay(regionValues),
+		region = regionValues.region or regionValues.input
+	}
+end
+
+---Builds the display for a region.
+---@param args {region: string?, country: string?}?
+---@return string
+function Region.display(args)
+	return Region._toDisplay(Region._raw(args)) or ''
+end
+
+---Retrieves the name for a region.
+---@param args {region: string?, country: string?}?
+---@return string
+function Region.name(args)
+	return Region._raw(args).region or ''
+end
+
+---Fetches the (raw) data for a region
+---@param args {region: string?, country: string?}?
+---@return {region: string?, flag: string?, file: string?, input: string?}
+function Region._raw(args)
 	args = args or {}
-	local region = args.region
-	local shouldOnlyReturnRegionName = Logic.readBool(args.onlyRegion)
-	local shouldOnlyReturnDisplay = Logic.readBool(args.onlyDisplay)
+	local regionInput = args.region
 
 	--determine region from country if region is empty
-	if String.isEmpty(region) then
+	if String.isEmpty(regionInput) then
 		local country = Flag.CountryName(args.country) or ''
-		region = countryToRegionData[string.lower(country)]
-		args.region = region
-		if String.isEmpty(region) then
-			return ''
+		regionInput = COUNTRY_TO_REGION_DATA[string.lower(country)]
+		if String.isEmpty(regionInput) then
+			return {}
 		end
 	end
+	---@cast regionInput -nil
 
 	--resolve aliases for the region
-	region = string.lower(region)
-	region = regionData.aliases[region] or region
+	local region = string.lower(regionInput)
+	region = REGION_DATA.aliases[region] or region
 
-	local regionValues = regionData[region] or {}
-	if shouldOnlyReturnRegionName then
-		return regionValues.region
-	else
-		local display = ''
-		if regionValues.flag then
-			display = Flag.Icon({flag = regionValues.flag, shouldLink = true})
-			if display then
-				display = display .. '&nbsp;'
-			else
-				display = ''
-			end
-		elseif regionValues.file then
-			display = '[[File:' .. regionValues.file .. ']]&nbsp;'
-		end
-		display = display .. (regionValues.region or (args.region .. noEntryFoundCategory))
-		if shouldOnlyReturnDisplay then
-			return display
-		else
-			return {
-				display = display,
-				region = regionValues.region or args.region
-			}
-		end
+	return Table.merge(REGION_DATA[region] or {}, {input = regionInput})
+end
+
+---Builds the display of a region from its (raw) data
+---@param regionValues {region: string?, flag: string?, file: string?, input: string?}
+---@return string?
+function Region._toDisplay(regionValues)
+	if Table.isEmpty(regionValues) then
+		return
 	end
+
+	local display = ''
+	if regionValues.flag then
+		display = Flag.Icon({flag = regionValues.flag, shouldLink = true})
+		if display then
+			display = display .. '&nbsp;'
+		else
+			display = ''
+		end
+	elseif regionValues.file then
+		display = '[[File:' .. regionValues.file .. ']]&nbsp;'
+	end
+
+	if not regionValues.region then
+		mw.ext.TeamLiquidIntegration.add_category(NO_ENTRY_FOUND_CATEGORY)
+	end
+
+	return display .. (regionValues.region or regionValues.input)
 end
 
 return Class.export(Region, {frameOnly = true})

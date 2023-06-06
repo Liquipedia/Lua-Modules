@@ -21,8 +21,8 @@ return {
 				lightMode = 'AoE1 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 		aoe2 = {
@@ -34,8 +34,8 @@ return {
 				lightMode = 'AoE2 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 		aoe3 = {
@@ -47,8 +47,8 @@ return {
 				lightMode = 'AoE3 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 		aoe4 = {
@@ -60,8 +60,8 @@ return {
 				lightMode = 'AoE4 Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 		aom = {
@@ -73,8 +73,8 @@ return {
 				lightMode = 'AoM Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 		aoeo = {
@@ -86,14 +86,13 @@ return {
 				lightMode = 'AoEO Icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Age of Empires Default Logo.png',
-				lightMode = 'Age of Empires Default Logo.png',
+				darkMode = 'Age of Empires default allmode.png',
+				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'aoe2',
 
-	defaultTeamLogo = 'Age of Empires Default Logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Age of Empires Default Logo.png', ---@deprecated
-	opponentLibrary = 'Opponent/Custom',
+	defaultTeamLogo = 'Age of Empires default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Age of Empires default allmode.png', ---@deprecated
 }

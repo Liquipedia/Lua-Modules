@@ -10,6 +10,9 @@ local Class = require('Module:Class')
 
 local HiddenSort = {}
 
+---Creates a hiddensort span
+---@param sortText string|number|nil
+---@return Html
 function HiddenSort.run(sortText)
 	return mw.html.create('span')
 		:css('display', 'none')

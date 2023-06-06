@@ -45,6 +45,7 @@ end
 
 function ResultOrError:finally(f)
 	local ret = self:map(f, f)
+	---@cast ret -nil
 	return ret.error and ret or self
 end
 

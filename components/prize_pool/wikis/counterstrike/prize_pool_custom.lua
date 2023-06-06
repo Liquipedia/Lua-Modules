@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -49,6 +48,8 @@ function CustomPrizePool.run(frame)
 
 	HEADER_DATA.tournamentName = args['tournament name']
 	HEADER_DATA.resultName = args['custom-name']
+
+	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
 	if Logic.readBool(args.qualifier) then
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
@@ -112,7 +113,7 @@ end
 ---@param type string
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

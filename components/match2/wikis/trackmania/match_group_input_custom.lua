@@ -199,7 +199,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
@@ -331,7 +331,7 @@ function matchFunctions.getOpponents(match)
 	local autoFinished = Logic.readBool(Logic.emptyOr(match.autofinished, true))
 	-- see if match should actually be finished if score is set
 	if isScoreSet and autoFinished and not Logic.readBool(match.finished) then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400

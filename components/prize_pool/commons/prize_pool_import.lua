@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
-local TournamentUtil = Lua.import('Module:Tournament/Util', {requireDevIfEnabled = true})
+local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -38,6 +38,7 @@ local GSL_STYLE_SCORES = {
 local BYE_OPPONENT_NAME = 'bye'
 
 local _parent
+local _last_vs_group_cache = {}
 
 local Import = {}
 
@@ -63,11 +64,11 @@ function Import._getConfig(args, placements)
 
 	return {
 		importLimit = Import._importLimit(args.importLimit, placements),
-		matchGroupsSpec = TournamentUtil.readMatchGroupsSpec(args)
-			or TournamentUtil.currentPageSpec(),
-		groupElimStatuses = Table.mapValues(
+		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
+			or TournamentStructure.currentPageSpec(),
+		groupElimStatuses = Array.map(
 			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			mw.text.trim
+			String.trim
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
@@ -86,9 +87,9 @@ function Import._getConfig(args, placements)
 		stageGroupElimStatuses = Table.mapArguments(
 			args,
 			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
-			function(key) return Table.mapValues(
+			function(key) return Array.map(
 				mw.text.split(args[key], ','),
-				mw.text.trim
+				String.trim
 			) end,
 			true
 		),
@@ -96,7 +97,7 @@ function Import._getConfig(args, placements)
 end
 
 function Import._enableImport(importInput)
-	local date = TournamentUtil.getContextualDateOrNow()
+	local date = DateExt.getContextualDateOrNow()
 	return Logic.nilOr(
 		Logic.readBoolOrNil(importInput),
 		date >= AUTOMATION_START_DATE
@@ -115,7 +116,7 @@ end
 
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
-	local stages = TournamentUtil.fetchStages(Import.config.matchGroupsSpec)
+	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 				local stageIndex = #stages + 1 - reverseStageIndex
@@ -146,7 +147,7 @@ end
 -- tournament stage. The placements are ordered from high placement to low.
 function Import._computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
-		return TournamentUtil.isGroupTable(matchGroup)
+		return TournamentStructure.isGroupTable(matchGroup)
 			and Import._computeGroupTablePlacementEntries(matchGroup, options)
 			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
@@ -419,11 +420,11 @@ end
 
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import._mergeEntry(
+		placement.opponents[opponentIndex] = Import._removeEpochZeroDate(Import._mergeEntry(
 			opponent,
 			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
-		)
+		))
 	end
 
 	assert(
@@ -542,18 +543,40 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 		table.insert(matchConditions, '[[match2id::' .. matchId .. ']]')
 	end
 
-	local matchData = mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[opponent::' .. opponentName .. ']] AND (' .. table.concat(matchConditions, ' OR ') .. ')',
-		order = 'date desc',
-		query = 'date, match2opponents, winner',
-		limit = 1
-	})
+	local conditions = table.concat(matchConditions, ' OR ')
 
-	if not type(matchData) == 'table' or not matchData[1] then
+	if conditions ~= _last_vs_group_cache.conditions then
+		_last_vs_group_cache.conditions = conditions
+		Import._lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
+			conditions = conditions,
+			order = 'date desc, match2id desc',
+			query = 'date, match2opponents, winner',
+			limit = 1000,
+		}))
+	end
+
+	local matchData = _last_vs_group_cache.data[opponentName]
+
+	if not matchData then
 		return {}
 	end
 
-	return Import._makeAdditionalDataFromMatch(opponentName, matchData[1])
+	return Import._makeAdditionalDataFromMatch(opponentName, matchData)
+end
+
+function Import._lastVsMatchesDataToCache(queryData)
+	local byOpponent = {}
+
+	for _, match in ipairs(queryData) do
+		for _, opponent in pairs(match.match2opponents) do
+			local name = opponent.name
+			if not byOpponent[name] then
+				byOpponent[name] = match
+			end
+		end
+	end
+
+	_last_vs_group_cache.data = byOpponent
 end
 
 function Import._makeAdditionalDataFromMatch(opponentName, match)
@@ -579,6 +602,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		score = score,
 		vsScore = vsScore,
 	}
+end
+
+function Import._removeEpochZeroDate(entry)
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.epochZero and entry.date
+		or nil
+
+	return entry
 end
 
 return Import

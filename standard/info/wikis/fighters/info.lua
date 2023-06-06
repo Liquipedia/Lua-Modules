@@ -289,8 +289,8 @@ return {
 			name = 'DNF Duel',
 			link = 'DNF Duel',
 			logo = {
-				darkMode = 'DNF Duel Logo.png',
-				lightMode = 'DNF Duel Logo.png',
+				darkMode = 'DNF Duel icon allmode.png',
+				lightMode = 'DNF Duel icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'DNF Duel Logo.png',
@@ -406,8 +406,8 @@ return {
 			name = 'Granblue Fantasy: Versus',
 			link = 'Granblue Fantasy: Versus',
 			logo = {
-				darkMode = 'GBFVS Logo.png',
-				lightMode = 'GBFVS Logo.png',
+				darkMode = 'Granblue Fantasy Versus icon darkmode.png',
+				lightMode = 'Granblue Fantasy Versus icon lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'GBFVS Logo.png',
@@ -546,8 +546,8 @@ return {
 		},
 		ggxrdr2 = {
 			abbreviation = 'GG XRD R2',
-			name = 'GUILTY GEAR Xrd REV 2',
-			link = 'GUILTY GEAR Xrd REV 2',
+			name = 'Guilty Gear Xrd REV 2',
+			link = 'Guilty Gear Xrd REV 2',
 			logo = {
 				darkMode = 'GGXrdR2 Logo.png',
 				lightMode = 'GGXrdR2 Logo.png',
@@ -559,8 +559,8 @@ return {
 		},
 		ggst = {
 			abbreviation = 'GGST',
-			name = 'GUILTY GEAR -STRIVE-',
-			link = 'GUILTY GEAR -STRIVE-',
+			name = 'Guilty Gear -STRIVE-',
+			link = 'Guilty Gear -STRIVE-',
 			logo = {
 				darkMode = 'Guilty Gear Strive default darkmode.png',
 				lightMode = 'Guilty Gear Strive default lightmode.png',
@@ -835,8 +835,8 @@ return {
 			name = 'Melty Blood: Type Lumina',
 			link = 'Melty Blood: Type Lumina',
 			logo = {
-				darkMode = 'Melty Blood Type Lumina Logo.png',
-				lightMode = 'Melty Blood Type Lumina Logo.png',
+				darkMode = 'Melty Blood Type Lumina icon allmode.png',
+				lightMode = 'Melty Blood Type Lumina icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Melty Blood Type Lumina Logo.png',
@@ -1316,12 +1316,12 @@ return {
 			name = 'Street Fighter 6',
 			link = 'Street Fighter 6',
 			logo = {
-				darkMode = 'SF6 default darkmode.png',
-				lightMode = 'SF6 default lightmode.png',
+				darkMode = 'Street Fighter 6 icon darkmode.png',
+				lightMode = 'Street Fighter 6 icon lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'SF6 default darkmode.png',
-				lightMode = 'SF6 default lightmode.png',
+				darkMode = 'SF6 Logo.png',
+				lightMode = 'SF6 Logo.png',
 			},
 		},
 		t4 = {
@@ -1378,8 +1378,8 @@ return {
 		},
 		t7 = {
 			abbreviation = 'TK7',
-			name = 'TEKKEN 7',
-			link = 'TEKKEN 7',
+			name = 'Tekken 7',
+			link = 'Tekken 7',
 			logo = {
 				darkMode = 'Tekken 7 default allmode.png',
 				lightMode = 'Tekken 7 default allmode.png',
@@ -1391,8 +1391,8 @@ return {
 		},
 		t8 = {
 			abbreviation = 'TK8',
-			name = 'TEKKEN 8',
-			link = 'TEKKEN 8',
+			name = 'Tekken 8',
+			link = 'Tekken 8',
 			logo = {
 				darkMode = 'Tekken 8 default allmode.png',
 				lightMode = 'Tekken 8 default allmode.png',
@@ -1589,8 +1589,8 @@ return {
 			name = 'Under Night In-Birth',
 			link = 'Under Night In-Birth',
 			logo = {
-				darkMode = 'UNIEL Logo.png',
-				lightMode = 'UNIEL Logo.png',
+				darkMode = 'Under Night-In Birth icon allmode.png',
+				lightMode = 'Under Night-In Birth icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'UNIEL Logo.png',
@@ -1608,6 +1608,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'League of Legends allmode.png',
 				lightMode = 'League of Legends allmode.png',
+			},
+		},
+		['idol showdown'] = {
+			abbreviation = 'Idol Showdown',
+			name = 'Idol Showdown',
+			link = 'Idol Showdown',
+			logo = {
+				darkMode = 'Idol Showdown allmode.png',
+				lightMode = 'Idol Showdown allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Idol Showdown allmode.png',
+				lightMode = 'Idol Showdown allmode.png',
 			},
 		},
 	},

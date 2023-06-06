@@ -142,7 +142,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	--set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if not Logic.isEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -167,7 +167,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local lastPlacement = NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score or '') or ''
+			local score = tonumber(opp.score)
 			counter = counter + 1
 			if counter == 1 and (winner or '') == '' then
 				if finished then
@@ -179,7 +179,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
 				lastPlacement = counter
-				lastScore = score
+				lastScore = score or NO_SCORE
 			end
 		end
 	end
@@ -335,7 +335,7 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 			'tournament_parent',
 			mw.title.getCurrentTitle().text
 		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
@@ -433,7 +433,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
@@ -443,7 +443,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if not String.isEmpty(match.winner) or Logic.readBool(match.finished) then
+	if not Logic.isEmpty(match.winner) or Logic.readBool(match.finished) then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 

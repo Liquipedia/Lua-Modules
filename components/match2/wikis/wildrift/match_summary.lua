@@ -141,7 +141,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add Match MVP(s)
 	local mvpData = match.extradata.mvp
-	if mvpData and mvpData.players and mvpData.players[1]  then
+	if mvpData and mvpData.players and mvpData.players[1] then
 		local mvp = MatchSummary.Mvp()
 		for _, player in ipairs(mvpData.players) do
 			mvp:addPlayer(player)
@@ -209,8 +209,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	end
 
 	if
-		String.isEmpty(game.length) and
-		String.isEmpty(game.winner) and
+		Logic.isEmpty(game.length) and
+		Logic.isEmpty(game.winner) and
 		championsDataIsEmpty
 	then
 		return nil
@@ -225,8 +225,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(CustomMatchSummary._createAbbreviation{
-			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
-			text = String.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
+			title = Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
+			text = Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
