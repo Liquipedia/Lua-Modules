@@ -169,14 +169,14 @@ end
 ---Returns the counted number based on the type of query
 ---@param queryType string
 ---@param lpdbConditions ConditionTree
----@return integer?
+---@return integer
 function Count._query(queryType, lpdbConditions)
 	local data = mw.ext.LiquipediaDB.lpdb(queryType, {
 		conditions = lpdbConditions:toString(),
 		query = 'count::objectname',
 	})
 
-	return tonumber(data[1]['count_objectname'])
+	return tonumber(data[1]['count_objectname']) --[[@as integer]]
 end
 
 
