@@ -23,6 +23,17 @@ function suite:testMath()
 	self:assertEquals(15625, Array.reduce(foo, Operator.pow), 'Pow')
 end
 
+function suite:testEquality()
+	local curry = function(f, x)
+		return function(y)
+			return f(x, y)
+		end
+	end
+	local foo = {5, 3, 2, 1}
+	self:assertDeepEquals({2}, Array.filter(foo, curry(Operator.eq, 2)), 'eq')
+	self:assertDeepEquals({5, 3, 1}, Array.filter(foo, curry(Operator.neq, 2)), 'neq')
+end
+
 function suite:testProperty()
 	local foo = {
 		{a = 3, b = 'abc'},
