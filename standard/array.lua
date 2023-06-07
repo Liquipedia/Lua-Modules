@@ -129,6 +129,10 @@ end
 
 ---@deprecated
 ---Use `Array.flatten(Array.map(tbl, funct))` instead
+---@generic T
+---@param tbl T[]
+---@param funct any
+---@return T[]
 function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
