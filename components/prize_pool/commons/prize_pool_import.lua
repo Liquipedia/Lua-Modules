@@ -8,7 +8,6 @@
 
 local Lua = require('Module:Lua')
 local Array = require('Module:Array')
-local ArrayExt = require('Module:Array/Ext')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
@@ -134,7 +133,7 @@ function Import._importPlacements(inputPlacements)
 		-- array of partial sums of the number of entries until a given placement/slot
 		local importedEntriesSums = MathUtil.partialSums(Array.map(placementEntries, function(entries) return #entries end))
 		-- slotIndex of the slot until which we want to import based on importLimit
-		local slotIndex = ArrayExt.findIndex(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
+		local slotIndex = Array.indexOf(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
 		if slotIndex ~= 0 then
 			placementEntries = Array.sub(placementEntries, 1, slotIndex - 1)
 		end

@@ -586,14 +586,14 @@ if no element satisfies the predicate.
 
 Example:
 
-Array.findIndex({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
+Array.indexOf({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 -- returns 3
 ]]
 ---@generic V
 ---@param array V[]
 ---@param pred fun(elem: V, ix: integer?): boolean
 ---@return integer
-function Array.findIndex(array, pred)
+function Array.indexOf(array, pred)
 	for ix, elem in ipairs(array) do
 		if pred(elem, ix) then
 			return ix
@@ -604,7 +604,7 @@ end
 
 --[[
 Returns the unique element in an array. Returns nil if there is more than one
-distinct element, or if the array is empty.
+distinct/unique element, or if the array is empty.
 
 Example:
 
@@ -626,26 +626,26 @@ function Array.uniqueElement(elems)
 end
 
 --[[
-Returns distinct elements of an array.
+Returns distinct/unique elements of an array.
 
 Example:
 
-Array.distinct({4, 5, 4, 3})
+Array.unique({4, 5, 4, 3})
 -- Returns {4, 5, 3}
 ]]
 ---@generic V
 ---@param elements V[]
 ---@return V[]
-function Array.distinct(elements)
+function Array.unique(elements)
 	local elementCache = {}
-	local distinctElements = {}
+	local uniqueElements = {}
 	for _, element in ipairs(elements) do
 		if elementCache[element] == nil then
-			table.insert(distinctElements, element)
+			table.insert(uniqueElements, element)
 			elementCache[element] = true
 		end
 	end
-	return distinctElements
+	return uniqueElements
 end
 
 return Array
