@@ -83,8 +83,6 @@ end
 ---@field freetext string?,
 ---@field game string?,
 ---@field id string?,
----@field idAudio string?,
----@field idIPA string?,
 ---@field name string?,
 ---@field nationality string?,
 ---@field nationality2 string?,
@@ -185,8 +183,6 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, playerInfo.extradata.game, args.defaultGame),
 		id = Logic.emptyOr(args.id, playerInfo.id),
-		idIPA = Logic.emptyOr(args.idIPA, playerInfo.extradata.idIPA),
-		idAudio = Logic.emptyOr(args.idAudio, playerInfo.extradata.idAudio),
 		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate),
 		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate),
 		nationality = Logic.emptyOr(args.nationality, playerInfo.nationality),
@@ -429,18 +425,17 @@ function PlayerIntroduction:_bornDisplay(isDeceased)
 		return ''
 	end
 
+	local displayDate = function(dateString)
+		return os.date("!%B %e, %Y", tonumber(mw.getContentLanguage():formatDate('U', dateString)))
+	end
+
 	if not isDeceased then
-		return ' (born '
----@diagnostic disable-next-line: param-type-mismatch
-			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
-			.. ')'
+		return ' (born ' .. displayDate(self.playerInfo.birthDate) .. ')'
 	elseif self.playerInfo.deathDate ~= DEFAULT_DATE then
 		return ' ('
----@diagnostic disable-next-line: param-type-mismatch
-			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
+			.. displayDate(self.playerInfo.birthDate)
 			.. ' – '
----@diagnostic disable-next-line: param-type-mismatch
-			.. os.date("!%B %d, %Y", tonumber(mw.getContentLanguage():formatDate('U', self.playerInfo.birthDate))):gsub(' 0',' ')
+			.. displayDate(self.playerInfo.deathDate)
 			.. ')'
 	end
 
