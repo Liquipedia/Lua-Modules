@@ -26,7 +26,7 @@ local INACTIVE_ROLE = 'inactive'
 local DEFAULT_DATE = '1970-01-01'
 
 ---@class PlayerIntroduction
----@operator call(table): PlayerIntroduction
+---@operator call(playerIntroArgsValues): PlayerIntroduction
 local PlayerIntroduction = Class.new(function(self, ...) self:init(...) end)
 
 ---@deprecated
