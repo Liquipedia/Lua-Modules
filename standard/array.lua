@@ -603,29 +603,6 @@ function Array.indexOf(array, pred)
 end
 
 --[[
-Returns the unique element in an array. Returns nil if there is more than one
-distinct/unique element, or if the array is empty.
-
-Example:
-
-Array.uniqueElement({4, 4, 4})
--- Returns 4
-]]
----@generic V
----@param elems V[]
----@return V?
-function Array.uniqueElement(elems)
-	local uniqueElem
-	for i, elem in ipairs(elems) do
-		if i ~= 1 and elem ~= uniqueElem then
-			return nil
-		end
-		uniqueElem = elem
-	end
-	return uniqueElem
-end
-
---[[
 Returns distinct/unique elements of an array.
 
 Example:
