@@ -56,7 +56,7 @@ function Operator.eq(a, b)
 	return a == b
 end
 
---- Uses the __eq metamethod and with negatated results (a ~= b)
+--- Uses the __eq metamethod with negated result (a ~= b)
 ---@param a any
 ---@param b any
 ---@return any
