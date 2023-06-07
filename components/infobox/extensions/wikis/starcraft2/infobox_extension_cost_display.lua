@@ -42,7 +42,7 @@ local ORDER = {
 }
 local CONCAT_VALUE = '&nbsp;'
 
----@class argsValues
+---@class sc2CostDisplayArgsValues
 ---@field faction string?
 ---@field minerals string|number?
 ---@field gas string|number?
@@ -53,7 +53,7 @@ local CONCAT_VALUE = '&nbsp;'
 ---@field buildTimeForced boolean?
 ---@field supplyForced boolean?
 
----@param args argsValues
+---@param args sc2CostDisplayArgsValues
 function CostDisplay.run(args)
 	if not args then
 		return {}
