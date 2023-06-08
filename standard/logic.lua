@@ -119,6 +119,41 @@ function Logic.try(f)
 	return require('Module:ResultOrError').try(f)
 end
 
+---Returns the result of a function if successful. Otherwise it returns the result of the second function.
+---If the first function fails, its error is logged to the console and stashed away for display.
+---@param f fun(): any
+---@param other? fun(error: Error): any
+---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
+---@return any?
+function Logic.tryOrElseLog(f, other, makeError)
+	return Logic.try(f)
+		:catch(function(error)
+			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
+			if makeError then
+				error = makeError(error)
+			end
+
+			require('Module:Error/Ext/downstream').logAndStash(error)
+
+			if other then
+				return other(error)
+			end
+		end)
+		:get()
+end
+
+---Returns the result of a function if successful. Otherwise it returns nil.
+---If the first function fails, its error is logged to the console and stashed away for display.
+---@param f fun(): any
+---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
+---@return function
+function Logic.wrapTryOrLog(f, makeError)
+	return function(...)
+		local args = require('Module:Table').pack(...)
+		return Logic.tryOrElseLog(function() return f(unpack(args)) end, nil, makeError)
+	end
+end
+
 ---Checks if a provided value is numeric
 ---@param val number|string|nil
 ---@return boolean
