@@ -293,23 +293,21 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
 	})
 
+	local extradata = tournament.extradata or {}
+	if String.isNotEmpty(extradata.liquipediatier) then
+		tournament.liquipediatier = extradata.liquipediatier
+	end
+	if String.isNotEmpty(extradata.liquipediatiertype) then
+		tournament.liquipediatiertype = extradata.liquipediatiertype
+	end
+
 	if type(queryData[1]) ~= 'table' then
 		return tournament
 	end
 
 	queryData[1].tournamentExtradata = queryData[1].extradata
 
-	local tournamentData = Table.merge(queryData[1], tournament)
-
-	local extradata = tournamentData.extradata or {}
-	if String.isNotEmpty(extradata.liquipediatier) then
-		tournamentData.liquipediatier = extradata.liquipediatier
-	end
-	if String.isNotEmpty(extradata.liquipediatiertype) then
-		tournamentData.liquipediatiertype = extradata.liquipediatiertype
-	end
-
-	return tournamentData
+	return Table.merge(queryData[1], tournament)
 end
 
 ---@param tournament table
