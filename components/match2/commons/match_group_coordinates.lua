@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local IteratorUtil = require('Module:IteratorUtil')
+local IteratorUtil = require('Module:Iterator')
 local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
