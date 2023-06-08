@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local ArrayExt = require('Module:Array/Ext')
 local FnUtil = require('Module:FnUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -154,7 +153,7 @@ function TournamentStructure.groupByStage(groupTables, brackets, spec)
 	recordGroups = Array.filter(recordGroups, function(recordGroup) return Table.isNotEmpty(recordGroup) end)
 
 	Array.sortInPlaceBy(recordGroups, getSortKey)
-	return ArrayExt.groupAdjacentBy(recordGroups, getStageKey)
+	return Array.groupAdjacentBy(recordGroups, getStageKey)
 end
 
 --- Checks if a given data set "recordGroup" is a group table (standings table) or not
