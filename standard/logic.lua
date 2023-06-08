@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Error = require('Module:Error')
+
 local Logic = {}
 
 ---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
@@ -128,6 +130,10 @@ end
 function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
 		:catch(function(error)
+			if type(error) == 'string' then
+				error = Error(error)
+			end
+
 			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
 			if makeError then
 				error = makeError(error)
