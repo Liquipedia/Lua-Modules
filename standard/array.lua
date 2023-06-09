@@ -127,16 +127,6 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
----@deprecated
----Use `Array.flatten(Array.map(tbl, funct))` instead
----@generic T
----@param tbl T[]
----@param funct any
----@return T[]
-function Array.flatMap(tbl, funct)
-	return Array.flatten(Array.map(tbl, funct))
-end
-
 ---Determnines whether all elements in an array satisfy a predicate.
 ---@generic T
 ---@param tbl T[]
