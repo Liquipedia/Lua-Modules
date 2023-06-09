@@ -304,7 +304,7 @@ function OpponentDisplay.InlineTeam(props)
 		template = 'default',
 	}))
 		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace))
+		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace) --[[@as string]])
 		:gsub('DefaultShort', props.team.shortName)
 		:gsub('DefaultBracket', props.team.bracketName))
 end
