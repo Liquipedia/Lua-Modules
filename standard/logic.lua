@@ -139,7 +139,7 @@ function Logic.tryOrElseLog(f, other, makeError)
 				error = makeError(error)
 			end
 
-			require('Module:Error/Ext/downstream').logAndStash(error)
+			require('Module:Error/Ext').logAndStash(error)
 
 			if other then
 				return other(error)
