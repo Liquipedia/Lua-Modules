@@ -6,10 +6,44 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local ErrorExt = require('Module:Error/Ext')
 local TypeUtil = require('Module:TypeUtil')
 
 local ErrorDisplay = {types = {}, propTypes = {}}
+
+---@param props {limit: integer?, errors: error[]}
+---@return Html
+function ErrorDisplay.ErrorList(props)
+	local defaultLimit = 5
+	local limit = props.limit or defaultLimit
+
+	local boxesNode = mw.html.create('span'):addClass('stashed-errors')
+	for index, error in ipairs(props.errors) do
+		boxesNode:node(ErrorDisplay.ErrorBox(error))
+
+		if index == limit and limit < #props.errors then
+			local overflowNode = ErrorDisplay.Box{
+				text = (#props.errors - limit) .. ' additional errors not shown',
+			}
+			boxesNode:node(overflowNode)
+			return boxesNode
+		end
+	end
+
+	return boxesNode
+end
+
+---Entry point of Template:StashedErrors
+---@param frame Frame
+---@return Html
+function ErrorDisplay.TemplateStashedErrors(frame)
+	local args = Arguments.getArgs(frame)
+	return ErrorDisplay.ErrorList{
+		errors = ErrorExt.Stash.retrieve(),
+		limit = tonumber(args.limit),
+	}
+end
 
 -- Error instance
 ErrorDisplay.types.Error = TypeUtil.struct{
@@ -49,10 +83,10 @@ end
 ---@param error error
 ---@return Html
 function ErrorDisplay.ErrorBox(error)
-	return ErrorDisplay.Box({
+	return ErrorDisplay.Box{
 		hasDetails = error.stacks ~= nil,
 		text = tostring(error),
-	})
+	}
 end
 
 ---Shows the message and stack trace of a lua error. Suitable for use in a popup.
