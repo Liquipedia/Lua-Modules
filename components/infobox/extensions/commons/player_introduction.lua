@@ -285,7 +285,9 @@ function PlayerIntroduction._readTransferFromTransfers(player)
 		query = 'fromteam, toteam, role2, date, extradata'
 	})
 
-	assert(type(queryData[1]) == 'table', queryData)
+	if type(queryData[1]) ~= 'table' then
+		return {}
+	end
 
 	queryData = queryData[1]
 	local extradata = queryData.extradata
@@ -386,7 +388,7 @@ function PlayerIntroduction:create()
 			game = gameDisplay or '',
 			faction = factionDisplay or '',
 			type = typeDisplay or '',
-			team = self:_teamDisplay(isDeceased),
+			team = self:_teamDisplay(isDeceased) or '',
 			subText = self.playerInfo.subText or '',
 			freeText = self.playerInfo.freeText or '',
 		}
