@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
@@ -51,6 +52,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
@@ -85,8 +87,13 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(_args.publisherpremier)
+end
+
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
+	lpdbData.publishertier = _args['publisherpremier'] == 'true' and 'true' or nil
 
 	return lpdbData
 end
