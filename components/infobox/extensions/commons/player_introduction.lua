@@ -391,8 +391,8 @@ function PlayerIntroduction:create()
 			faction = factionDisplay or '',
 			type = typeDisplay or '',
 			team = self:_teamDisplay(isDeceased) or '',
-			subText = self.playerInfo.subText or '',
-			freeText = self.playerInfo.freeText or '',
+			subText = self._addConcatText(self.playerInfo.subText),
+			freeText = self._addConcatText(self.playerInfo.freeText),
 		}
 	)
 end
