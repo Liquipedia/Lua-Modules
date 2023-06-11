@@ -88,12 +88,12 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(_args.publisherpremier)
+	return Logic.readBool(args.publisherpremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = _args['publisherpremier'] == 'true' and 'true' or nil
+	lpdbData.publishertier = Logic.readBool(args['publisherpremier']) and 'true' or nil
 
 	return lpdbData
 end
