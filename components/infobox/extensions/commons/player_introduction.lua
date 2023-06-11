@@ -553,7 +553,7 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 		return 'on the inactive roster of'
 	elseif self.options.showRole and role == 'streamer' or role == 'content creator' then
 		return AnOrA.main{role} .. ' for'
-	elseif self.options.showRole and role then
+	elseif self.options.showRole and String.isNotEmpty(role) then
 		return 'playing as ' .. AnOrA.main{role} .. ' for'
 	end
 
