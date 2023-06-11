@@ -529,7 +529,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
 		playedOrWorked = self:_playedOrWorked(isCurrentTense),
-		team = PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date),
+		team = PlayerIntroduction._displayTeam(transferInfo.team or playerInfo.team, transferInfo.date),
 		team2 = shouldDisplayTeam2
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
 			or '',
