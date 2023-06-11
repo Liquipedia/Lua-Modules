@@ -99,7 +99,7 @@ function CustomPlayer.run(frame)
 	if Logic.readBool((_args.autoPI or ''):lower()) then
 		local _, roleType = CustomPlayer._getRoleType(_args.roleList)
 
-		autoPlayerIntro = PlayerIntroduction{
+		autoPlayerIntro = PlayerIntroduction.run{
 			player = _args.id,
 			transferquery = 'datapoint',
 			defaultGame = 'Age of Empires II',
@@ -122,7 +122,7 @@ function CustomPlayer.run(frame)
 			nationality3 = _args.country3,
 			subtext = _args.subtext,
 			freetext = _args.freetext,
-		}:create()
+		}
 	end
 
 	return builtInfobox .. autoPlayerIntro
