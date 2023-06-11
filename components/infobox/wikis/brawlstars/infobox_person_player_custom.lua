@@ -59,7 +59,7 @@ function CustomPlayer.run(frame)
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
-		autoPlayerIntro = PlayerIntroduction._main{
+		autoPlayerIntro = PlayerIntroduction.run{
 			team = _args.team,
 			name = _args.name,
 			romanizedname = _args.romanized_name,
