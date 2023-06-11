@@ -413,7 +413,7 @@ function PlayerIntroduction:_nameDisplay()
 	end
 
 	if Table.isNotEmpty(self.playerInfo.alsoKnownAs) then
-		nameDisplay = nameDisplay .. self._addConcatText('(also known as')
+		nameDisplay = nameDisplay .. self._addConcatText('(also known as ')
 			.. mw.text.listToText(self.playerInfo.alsoKnownAs, ', ', ' and ')
 			.. ')'
 	end
@@ -451,7 +451,7 @@ end
 ---@return string?
 function PlayerIntroduction:_statusDisplay(isDeceased)
 	if self.playerInfo.status ~= 'active' and not isDeceased then
-		return self.playerInfo.status
+		return self._addConcatText(self.playerInfo.status)
 	end
 
 	return nil
@@ -470,7 +470,7 @@ function PlayerIntroduction:_nationalityDisplay()
 		return nil
 	end
 
-	return table.concat(nationalities, '/')
+	return self._addConcatText(table.concat(nationalities, '/'))
 end
 
 --- builds the game display
