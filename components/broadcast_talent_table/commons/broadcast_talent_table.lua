@@ -335,7 +335,7 @@ end
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	assert(tier, 'Broadcaster event with unset or invalid liquipedia tier: ' .. tournament.pagename)
+	assert(Tier.isValid(tier, tierType), 'Broadcaster event with unset or invalid liquipedia tier: ' .. tournament.pagename)
 
 	options.link = true
 	options.shortIfBoth = true
