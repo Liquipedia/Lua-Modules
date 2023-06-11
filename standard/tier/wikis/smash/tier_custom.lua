@@ -13,15 +13,6 @@ local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
 local TierCustom = Table.copy(Tier)
 
---- Converts input to standardized identifier format
----@param input string|integer|nil
----@return string|integer
-function Tier.toIdentifier(input)
-	-- for smash `''` is a valid tier ...
-	return tonumber(input)
-		or string.lower(input or ''):gsub(' ', '')
-end
-
 --- Builds the display for a given (tier, tierType) tuple
 --- smash want to have tier displayed without tiertype
 --- tiertype gets only stored and used for queries
