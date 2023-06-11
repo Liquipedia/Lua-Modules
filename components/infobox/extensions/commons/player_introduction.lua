@@ -236,7 +236,9 @@ function PlayerIntroduction._readTransferFromDataPoints(player)
 		query = 'information, extradata',
 	})
 
-	assert(type(queryData[1]) == 'table', queryData)
+	if type(queryData[1]) ~= 'table' then
+		return {}
+	end
 
 	table.sort(queryData, function (dataPoint1, dataPoint2)
 		local extradata1 = dataPoint1.extradata
