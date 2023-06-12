@@ -6,130 +6,191 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local PlacementStats = {}
+local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Template = require('Module:Template')
-local Table = require('Module:Table')
+local Config = mw.loadData('Module:InfoboxPlacementStats/config')
 local Medal = require('Module:Medal')
-local Config = require('Module:InfoboxPlacementStats/config')
+local Team = require('Module:Team')
+local Tier = require('Module:Tier/Custom')
 
---placements for which we query the data
---the ">" indicates all placements and is needed for the totals
-local _PLACEMENTS = { '1', '2', '3', '>' }
+local Opponent = require('Module:OpponentLibraries').Opponent
 
+local PlacementStats = {}
+
+---@class InfoboxPlacementStatsData
+---@field tiers {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}[]
+---@field totals {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}}
+
+---Entry Point: Queries placement statistics and builds a table for display of them below infoboxes
+---@param args any
+---@return Html?
 function PlacementStats.run(args)
 	args = args or {}
-	local mode = args.mode or ''
-	local participant = args.participant or mw.title.getCurrentTitle().prefixedText
 
-	local queryData = PlacementStats._getQueryData(mode, participant)
+	local opponentType = args.opponentType or Opponent.team
+	local opponent = args.participant or args.team or mw.title.getCurrentTitle().prefixedText
 
-	return PlacementStats:_makeTable(queryData)
+	local placementData = PlacementStats._fetchData(opponentType, opponent)
+
+	if placementData.totals.all == 0 then
+		return
+	end
+
+	return PlacementStats._buildTable(placementData)
 end
 
-function PlacementStats._getQueryData(mode, participant)
-	local sortedData = { total = { top3 = 0, total = 0 } }
-	for _, place in pairs(_PLACEMENTS) do
-		sortedData.total[place] = 0
+---Query the count values
+---@param opponentType string
+---@param opponent string
+---@return InfoboxPlacementStatsData
+function PlacementStats._fetchData(opponentType, opponent)
+	local baseConditions = PlacementStats._buildConditions(opponentType, opponent)
+	local placementData = {tiers = {}, totals = {top3 = 0, all = 0, placement = {}}}
+
+	for _, tier in ipairs(Config.tiers) do
+		PlacementStats._fetchForTier(tier, baseConditions, placementData)
 	end
 
-	local baseConditions = '[[mode::' .. mode .. ']] AND [[participant::' .. participant .. ']]'
-
-	if not Table.isEmpty(Config.exclusionTypes) then
-		baseConditions = baseConditions .. ' AND [[liquipediatiertype::!'
-			.. table.concat(Config.exclusionTypes, ']] AND [[liquipediatiertype::!')
-			.. ']]'
-	end
-
-	for _, tier in pairs(Config.tiers) do
-		sortedData[tier] = { top3 = 0 }
-		for _, place in pairs(_PLACEMENTS) do
-			local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
-				conditions = baseConditions ..
-					' AND [[liquipediatier::' .. tier .. ']] AND [[placement::' .. place .. ']]',
-				query = 'count::placement',
-			})
-			local count = tonumber(queryData[1].count_placement or 0) or 0
-			if place ~= _PLACEMENTS[4] then
-				sortedData[tier]['top3'] = sortedData[tier]['top3'] + count
-				sortedData[tier][place] = count
-				sortedData.total['top3'] = sortedData.total['top3'] + count
-				sortedData.total[place] = sortedData.total[place] + count
-			else
-				sortedData[tier].total = count
-				sortedData.total.total = sortedData.total.total + count
-			end
-		end
-	end
-
-	return sortedData
+	return placementData
 end
 
-function PlacementStats:_makeTable(data)
-	local placements = Table.copy(_PLACEMENTS)
-	placements [#placements] = nil
-	local frame = mw.getCurrentFrame()
-	if data.total.total > 0 then
-		local output = mw.html.create('table')
-			:addClass('wikitable sortable wikitable-striped wikitable-bordered')
+---Builds the base conditions for the queries
+---@param opponentType string
+---@param opponent string
+---@return string
+function PlacementStats._buildConditions(opponentType, opponent)
+	local conditions = {
+		'[[placement::!]]',
+		'[[opponentType::' .. opponentType .. ']]'
+	}
 
-		local tr = output:tag('tr')
-		tr:tag('th')
-			:wikitext('Tier')
-			:css('text-align', 'left')
-		for _, place in ipairs(placements) do
-			tr:tag('th')
-				:wikitext(Medal[place])
-		end
-		tr:tag('th')
-			:wikitext('<abbr title="Total of top 3">Top3</abbr>')
-		tr:tag('th')
-			:wikitext('<abbr title="Total">All</abbr>')
+	for _, excludedTierType in pairs(Config.exclusionTypes) do
+		table.insert(conditions, '[[liquipediatiertype::!' .. excludedTierType .. ']]')
+	end
 
-		placements[#placements + 1] = 'top3'
-		placements[#placements + 1] = 'total'
-
-		for _, tier in ipairs(Config.tiers) do
-			if data[tier].total > 0 then
-				tr = output:tag('tr')
-				local TierText = Template.safeExpand(frame, 'TierDisplay/'..tier)
-				tr:tag('td')
-					:wikitext('[['..TierText..'_Tournaments|'..TierText..']]')
-					:css('width', '220px')
-				for _, place in ipairs(placements) do
-					tr:tag('td')
-						:wikitext(data[tier][place])
-						:css('text-align', 'center')
-				end
-			end
-		end
-		tr = output:tag('tr')
-		tr:tag('th')
-			:wikitext('Total')
-			:css('text-align', 'left')
-		for _, place in ipairs(placements) do
-			tr:tag('th')
-				:wikitext(data.total[place])
-		end
-
-		local contentDiv = mw.html.create('div')
-		contentDiv:attr('class', 'fo-nttax-infobox wiki-bordercolor-light')
-
-		local div = mw.html.create('div')
-
-		local infoboxHeader = mw.html.create('div')
-		infoboxHeader:attr('class', 'infobox-header wiki-backgroundcolor-light')
-		infoboxHeader:wikitext('Placement Summary')
-
-		div:node(infoboxHeader)
-		contentDiv:node(div)
-
-		contentDiv = contentDiv:node(output)
-
-		return contentDiv
+	if opponentType ~= Opponent.team then
+		table.insert(conditions, '[[opponentname::' .. opponent .. ']]')
 	else
-		return ''
+		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
+		if not opponentTemplate then
+			error('Missing team template for team: ' .. opponent)
+		end
+
+		local teamTemplates = Team.queryHistorical(opponentTemplate)
+		teamTemplates = teamTemplates and Array.extractValues(teamTemplates) or {opponentTemplate}
+		local opponentConditions = Array.map(teamTemplates, function(teamTemplate)
+			return '[[opponenttemplate::' .. teamTemplate .. ']]'
+		end)
+
+		table.insert(conditions, '(' .. table.concat(teamTemplates, ' OR ') .. ')')
 	end
+
+	return table.concat(conditions, ' AND ')
+end
+
+---Fetches the placement count values for a given tier
+---@param tier string
+---@param baseConditions string
+---@param placementData InfoboxPlacementStatsData
+function PlacementStats._fetchForTier(tier, baseConditions, placementData)
+	placementData.tiers[tier] =  {top3 = 0, all = 0, placement = {}}
+
+	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
+		limit = 5000,
+		conditions = baseConditions .. ' AND [[liquipediatier::' .. tier .. ']] AND [[placement::!]]',
+		query = 'placement, count::placement',
+		groupby = 'placement asc'
+	})
+
+	for _, placement in pairs(queryData) do
+		local count = tonumber(placement.count_placement)
+		local place = tonumber(mw.text.split(placement.placement or '', '-', true)[1])
+
+		placementData.tiers[tier].all = placementData.tiers[tier].all + count
+		placementData.totals.all = placementData.totals.all + count
+		if place and place <= 3 then
+			placementData.tiers[tier].placement[place] = (placementData.tiers[tier].placement[place] or 0) + count
+			placementData.tiers[tier].top3 = placementData.tiers[tier].top3 + count
+			placementData.totals.placement[place] = (placementData.totals.placement[place] or 0) + count
+			placementData.totals.top3 = placementData.totals.top3 + count
+		end
+	end
+end
+
+---Builds the display
+---@param placementData InfoboxPlacementStatsData
+---@return Html
+function PlacementStats._buildTable(placementData)
+	local display = mw.html.create('table')
+		:addClass('wikitable sortable wikitable-striped wikitable-bordered')
+		:css('text-align', 'center')
+		:node(PlacementStats._header())
+
+	for _, tier in ipairs(Config.tiers) do
+		display:node(PlacementStats._buildRow(placementData.tiers[tier], tier))
+	end
+
+	display:node(PlacementStats._buildBottom(placementData))
+
+	local infoboxHeader = mw.html.create('div')
+		:addClass('infobox-header wiki-backgroundcolor-light')
+		:wikitext('Placement Summary')
+
+	return mw.html.create('div')
+		:addClass('fo-nttax-infobox wiki-bordercolor-light')
+		:node(infoboxHeader) --possibly needs another div wrapper???
+		:node(display)
+end
+
+---Builds the header
+---@return Html
+function PlacementStats._header()
+	return mw.html.create('tr')
+		:tag('th'):wikitext('Tier'):css('text-align', 'left'):done()
+		:tag('th'):wikitext(Medal['1']):done()
+		:tag('th'):wikitext(Medal['2']):done()
+		:tag('th'):wikitext(Medal['3']):done()
+		:tag('th'):wikitext(Abbreviation.make('Top3', 'Total of top 3')):done()
+		:tag('th'):wikitext(Abbreviation.make('All', 'Only count those appear in tournaments prizepool sections.')):done()
+end
+
+---Builds a row
+---@param placementData {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}
+---@param tier string
+---@return Html?
+function PlacementStats._buildRow(placementData, tier)
+	if placementData.all == 0 then
+		return
+	end
+
+	local row = mw.html.create('tr')
+		:tag('td'):css('text-align', 'left'):wikitext(Tier.display(tier, nil, {link = true})):done()
+
+	for _, placeCount in ipairs(placementData.placement) do
+		row:tag('td'):wikitext(placeCount)
+	end
+
+	return row
+		:tag('td'):wikitext(placementData.top3):done()
+		:tag('td'):wikitext(placementData.all):done()
+end
+
+---Builds the bottom row
+---@param placementData InfoboxPlacementStatsData
+---@return Html
+function PlacementStats._buildBottom(placementData)
+	local row = mw.html.create('tr')
+		:tag('td'):css('text-align', 'left'):wikitext('Total'):done()
+
+	for _, placeCount in ipairs(placementData.totals.placement) do
+		row:tag('td'):wikitext(placeCount)
+	end
+
+	return row
+		:tag('td'):wikitext(placementData.totals.top3):done()
+		:tag('td'):wikitext(placementData.totals.all):done()
 end
 
 return Class.export(PlacementStats, {frameOnly = true})
