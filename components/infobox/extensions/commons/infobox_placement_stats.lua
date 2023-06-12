@@ -84,7 +84,7 @@ function PlacementStats._buildConditions(opponentType, opponent)
 			return '[[opponenttemplate::' .. teamTemplate .. ']]'
 		end)
 
-		table.insert(conditions, '(' .. table.concat(teamTemplates, ' OR ') .. ')')
+		table.insert(conditions, '(' .. table.concat(opponentConditions, ' OR ') .. ')')
 	end
 
 	return table.concat(conditions, ' AND ')
