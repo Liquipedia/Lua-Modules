@@ -62,7 +62,7 @@ end
 function PlacementStats._buildConditions(opponentType, opponent)
 	local conditions = {
 		'[[placement::!]]',
-		'[[opponentType::' .. opponentType .. ']]'
+		'[[opponenttype::' .. opponentType .. ']]'
 	}
 
 	for _, excludedTierType in pairs(Config.exclusionTypes) do
@@ -135,20 +135,25 @@ function PlacementStats._buildTable(placementData)
 	display:node(PlacementStats._buildBottom(placementData))
 
 	local infoboxHeader = mw.html.create('div')
-		:addClass('infobox-header wiki-backgroundcolor-light')
-		:wikitext('Placement Summary')
+		:tag('div')
+			:addClass('infobox-header wiki-backgroundcolor-light')
+			:wikitext('Placement Summary')
+			:done()
 
 	return mw.html.create('div')
-		:addClass('fo-nttax-infobox wiki-bordercolor-light')
-		:node(infoboxHeader) --possibly needs another div wrapper???
-		:node(display)
+		:addClass('fo-nttax-infobox-wrapper')
+		:tag('div')
+			:addClass('fo-nttax-infobox wiki-bordercolor-light')
+			:node(infoboxHeader)
+			:node(display)
+			:done()
 end
 
 ---Builds the header
 ---@return Html
 function PlacementStats._header()
 	return mw.html.create('tr')
-		:tag('th'):wikitext('Tier'):css('text-align', 'left'):done()
+		:tag('th'):wikitext('Tier'):css('text-align', 'left'):css('width', '100%'):done()
 		:tag('th'):wikitext(Medal['1']):done()
 		:tag('th'):wikitext(Medal['2']):done()
 		:tag('th'):wikitext(Medal['3']):done()
@@ -168,8 +173,8 @@ function PlacementStats._buildRow(placementData, tier)
 	local row = mw.html.create('tr')
 		:tag('td'):css('text-align', 'left'):wikitext(Tier.display(tier, nil, {link = true})):done()
 
-	for _, placeCount in ipairs(placementData.placement) do
-		row:tag('td'):wikitext(placeCount)
+	for place = 1, 3 do
+		row:tag('td'):wikitext(placementData.placement[place])
 	end
 
 	return row
@@ -182,10 +187,11 @@ end
 ---@return Html
 function PlacementStats._buildBottom(placementData)
 	local row = mw.html.create('tr')
+		:css('text-weight', 'bold')
 		:tag('td'):css('text-align', 'left'):wikitext('Total'):done()
 
-	for _, placeCount in ipairs(placementData.totals.placement) do
-		row:tag('td'):wikitext(placeCount)
+	for place = 1, 3 do
+		row:tag('td'):wikitext(placementData.totals.placement[place])
 	end
 
 	return row
