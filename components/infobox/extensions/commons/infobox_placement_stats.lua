@@ -99,7 +99,7 @@ function PlacementStats._fetchForTier(tier, baseConditions, placementData)
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
-		conditions = baseConditions .. ' AND [[liquipediatier::' .. tier .. ']] AND [[placement::!]]',
+		conditions = baseConditions .. ' AND [[liquipediatier::' .. tier .. ']]',
 		query = 'placement, count::placement',
 		groupby = 'placement asc'
 	})
@@ -178,7 +178,7 @@ function PlacementStats._buildRow(placementData, tier)
 	end
 
 	return row
-		:tag('td'):wikitext(placementData.top3):done()
+		:tag('td'):wikitext(placementData.top3):css('font-weight', 'bold'):done()
 		:tag('td'):wikitext(placementData.all):done()
 end
 
@@ -187,16 +187,15 @@ end
 ---@return Html
 function PlacementStats._buildBottom(placementData)
 	local row = mw.html.create('tr')
-		:css('text-weight', 'bold')
-		:tag('td'):css('text-align', 'left'):wikitext('Total'):done()
+		:tag('th'):css('text-align', 'left'):wikitext('Total'):done()
 
 	for place = 1, 3 do
-		row:tag('td'):wikitext(placementData.totals.placement[place])
+		row:tag('th'):wikitext(placementData.totals.placement[place])
 	end
 
 	return row
-		:tag('td'):wikitext(placementData.totals.top3):done()
-		:tag('td'):wikitext(placementData.totals.all):done()
+		:tag('th'):wikitext(placementData.totals.top3):done()
+		:tag('th'):wikitext(placementData.totals.all):done()
 end
 
 return Class.export(PlacementStats, {frameOnly = true})
