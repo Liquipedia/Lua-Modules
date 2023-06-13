@@ -16,9 +16,11 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -74,6 +76,23 @@ local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 function CustomPlayer.run(frame)
 	_player = Player(frame)
 	_args = _player.args
+	
+	-- Automatic team, history
+	if String.isEmpty(_args.team) then
+		_args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+	automatedHistory = TeamHistoryAuto.results{player=_player.pagename, convertrole=true, addlpdbdata=true}
+	if String.isEmpty(_args.history) then
+		_args.history = automatedHistory
+	else
+		_args.history = tostring(mw.html.create('div')
+			:addClass("show-when-logged-in")
+			:addClass("navigation-not-searchable")
+			:tag('big'):wikitext("Automated History"):done()
+			:wikitext(automatedHistory)
+			:tag('big'):wikitext("Manual History"):done())
+			.. _args.history
+	end
 
 	-- Automatic achievements
 	_args.achievements = Achievements._player{player = _player.pagename}
