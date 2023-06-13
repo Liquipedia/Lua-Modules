@@ -9,12 +9,15 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Config = mw.loadData('Module:InfoboxPlacementStats/config')
 local Medal = require('Module:Medal')
+local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 
 local Opponent = require('Module:OpponentLibraries').Opponent
+
+local DEFAULT_TIERS = {'1', '2', '3'}
+local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
 
 local PlacementStats = {}
 
@@ -31,24 +34,27 @@ function PlacementStats.run(args)
 	local opponentType = args.opponentType or Opponent.team
 	local opponent = args.participant or args.team or mw.title.getCurrentTitle().prefixedText
 
-	local placementData = PlacementStats._fetchData(opponentType, opponent)
+	local tiers = args.tiers or DEFAULT_TIERS
+	local excludedTierTypes = args.excludedTierTypes or DEFAULT_EXCLUDED_TIER_TYPES
+
+	local placementData = PlacementStats._fetchData(opponentType, opponent, tiers, excludedTierTypes)
 
 	if placementData.totals.all == 0 then
 		return
 	end
 
-	return PlacementStats._buildTable(placementData)
+	return PlacementStats._buildTable(placementData, tiers)
 end
 
 ---Query the count values
 ---@param opponentType string
 ---@param opponent string
 ---@return InfoboxPlacementStatsData
-function PlacementStats._fetchData(opponentType, opponent)
-	local baseConditions = PlacementStats._buildConditions(opponentType, opponent)
+function PlacementStats._fetchData(opponentType, opponent, tiers, excludedTierTypes)
+	local baseConditions = PlacementStats._buildConditions(opponentType, opponent, excludedTierTypes)
 	local placementData = {tiers = {}, totals = {top3 = 0, all = 0, placement = {}}}
 
-	for _, tier in ipairs(Config.tiers) do
+	for _, tier in ipairs(tiers) do
 		PlacementStats._fetchForTier(tier, baseConditions, placementData)
 	end
 
@@ -59,13 +65,13 @@ end
 ---@param opponentType string
 ---@param opponent string
 ---@return string
-function PlacementStats._buildConditions(opponentType, opponent)
+function PlacementStats._buildConditions(opponentType, opponent, excludedTierTypes)
 	local conditions = {
 		'[[placement::!]]',
 		'[[opponenttype::' .. opponentType .. ']]'
 	}
 
-	for _, excludedTierType in pairs(Config.exclusionTypes) do
+	for _, excludedTierType in pairs(excludedTierTypes) do
 		table.insert(conditions, '[[liquipediatiertype::!' .. excludedTierType .. ']]')
 	end
 
@@ -122,13 +128,13 @@ end
 ---Builds the display
 ---@param placementData InfoboxPlacementStatsData
 ---@return Html
-function PlacementStats._buildTable(placementData)
+function PlacementStats._buildTable(placementData, tiers)
 	local display = mw.html.create('table')
 		:addClass('wikitable sortable wikitable-striped wikitable-bordered')
 		:css('text-align', 'center')
 		:node(PlacementStats._header())
 
-	for _, tier in ipairs(Config.tiers) do
+	for _, tier in ipairs(tiers) do
 		display:node(PlacementStats._buildRow(placementData.tiers[tier], tier))
 	end
 
