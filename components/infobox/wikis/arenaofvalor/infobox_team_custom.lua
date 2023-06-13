@@ -41,7 +41,10 @@ function CustomTeam:createBottomContent()
 		) .. Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run())
+		) .. tostring(PlacementStats.run{
+			tiers = { '1', '2', '3', '4', '5'},
+			excludedTierTypes = { 'Qualifier'},
+		})
 	end
 end
 
