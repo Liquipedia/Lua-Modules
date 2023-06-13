@@ -163,7 +163,7 @@ function PlacementStats._header()
 		:tag('th'):wikitext(Medal['2']):done()
 		:tag('th'):wikitext(Medal['3']):done()
 		:tag('th'):wikitext(Abbreviation.make('Top3', 'Total of top 3')):done()
-		:tag('th'):wikitext(Abbreviation.make('All', 'Only count those appear in tournaments prizepool sections.')):done()
+		:tag('th'):wikitext('All'):done()
 end
 
 ---Builds a row
