@@ -38,7 +38,6 @@ function CustomTeam:createBottomContent()
 	return tostring(PlacementStats.run{
 		participant = _team.pagename,
 		tiers = { '1', '2', '3', '4', '5'},
-		excludedTierTypes = {'Qualifier'},
 	}) .. upcomingTable
 end
 
