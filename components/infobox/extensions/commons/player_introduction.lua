@@ -236,7 +236,9 @@ function PlayerIntroduction._readTransferFromDataPoints(player)
 		query = 'information, extradata',
 	})
 
-	assert(type(queryData[1]) == 'table', queryData)
+	if type(queryData[1]) ~= 'table' then
+		return {}
+	end
 
 	table.sort(queryData, function (dataPoint1, dataPoint2)
 		local extradata1 = dataPoint1.extradata
@@ -285,7 +287,9 @@ function PlayerIntroduction._readTransferFromTransfers(player)
 		query = 'fromteam, toteam, role2, date, extradata'
 	})
 
-	assert(type(queryData[1]) == 'table', queryData)
+	if type(queryData[1]) ~= 'table' then
+		return {}
+	end
 
 	queryData = queryData[1]
 	local extradata = queryData.extradata
@@ -386,9 +390,9 @@ function PlayerIntroduction:create()
 			game = gameDisplay or '',
 			faction = factionDisplay or '',
 			type = typeDisplay or '',
-			team = self:_teamDisplay(isDeceased),
-			subText = self.playerInfo.subText or '',
-			freeText = self.playerInfo.freeText or '',
+			team = self:_teamDisplay(isDeceased) or '',
+			subText = self._addConcatText(self.playerInfo.subText),
+			freeText = self._addConcatText(self.playerInfo.freeText),
 		}
 	)
 end
@@ -409,7 +413,7 @@ function PlayerIntroduction:_nameDisplay()
 	end
 
 	if Table.isNotEmpty(self.playerInfo.alsoKnownAs) then
-		nameDisplay = nameDisplay .. self._addConcatText('(also known as')
+		nameDisplay = nameDisplay .. self._addConcatText('(also known as ')
 			.. mw.text.listToText(self.playerInfo.alsoKnownAs, ', ', ' and ')
 			.. ')'
 	end
@@ -447,7 +451,7 @@ end
 ---@return string?
 function PlayerIntroduction:_statusDisplay(isDeceased)
 	if self.playerInfo.status ~= 'active' and not isDeceased then
-		return self.playerInfo.status
+		return self._addConcatText(self.playerInfo.status)
 	end
 
 	return nil
@@ -466,7 +470,7 @@ function PlayerIntroduction:_nationalityDisplay()
 		return nil
 	end
 
-	return table.concat(nationalities, '/')
+	return self._addConcatText(table.concat(nationalities, '/'))
 end
 
 --- builds the game display
@@ -525,7 +529,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
 		playedOrWorked = self:_playedOrWorked(isCurrentTense),
-		team = PlayerIntroduction._displayTeam(transferInfo.team, transferInfo.date),
+		team = PlayerIntroduction._displayTeam(transferInfo.team or playerInfo.team, transferInfo.date),
 		team2 = shouldDisplayTeam2
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
 			or '',
@@ -549,7 +553,7 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 		return 'on the inactive roster of'
 	elseif self.options.showRole and role == 'streamer' or role == 'content creator' then
 		return AnOrA.main{role} .. ' for'
-	elseif self.options.showRole and role then
+	elseif self.options.showRole and String.isNotEmpty(role) then
 		return 'playing as ' .. AnOrA.main{role} .. ' for'
 	end
 
