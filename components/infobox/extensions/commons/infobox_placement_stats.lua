@@ -10,7 +10,6 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Medal = require('Module:Medal')
-local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 
