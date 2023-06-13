@@ -47,7 +47,7 @@ end
 
 function CustomTeam:createBottomContent()
 	return tostring(PlacementStats.run{
-		tiers = { '1', '2', '3', '4'},
+		tiers = {'1', '2', '3', '4'},
 		participant = _team.name,
 	}) .. Template.expandTemplate(
 		mw.getCurrentFrame(),
