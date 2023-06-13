@@ -52,6 +52,7 @@ local PREFIXES = {
 		player = 'https://challonge.com/users/',
 	},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
+	corestrike = {'https://corestrike.gg/lookup/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
