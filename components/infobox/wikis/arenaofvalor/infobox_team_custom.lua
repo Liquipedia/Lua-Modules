@@ -43,7 +43,7 @@ function CustomTeam:createBottomContent()
 			'Upcoming and ongoing tournaments of'
 		) .. tostring(PlacementStats.run{
 			tiers = { '1', '2', '3', '4', '5'},
-			excludedTierTypes = { 'Qualifier'},
+			excludedTierTypes = {'Qualifier'},
 		})
 	end
 end
