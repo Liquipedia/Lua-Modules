@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local PlacementStats = require('Module:InfoboxPlacementStats')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -45,11 +46,10 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Placement summary',
-		{team = _team.name}
-	) .. Template.expandTemplate(
+	return tostring(PlacementStats.run{
+		tiers = { '1', '2', '3', '4'},
+		participant = _team.name,
+	}) .. Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing tournaments of',
 		{team = _team.name}
