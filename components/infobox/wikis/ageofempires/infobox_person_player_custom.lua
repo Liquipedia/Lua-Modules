@@ -99,8 +99,8 @@ function CustomPlayer.run(frame)
 	if Logic.readBool((_args.autoPI or ''):lower()) then
 		local _, roleType = CustomPlayer._getRoleType(_args.roleList)
 
-		autoPlayerIntro = PlayerIntroduction._main{
-			playerInfo = 'direct',
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = _args.id,
 			transferquery = 'datapoint',
 			defaultGame = 'Age of Empires II',
 			team = _args.team,
