@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PlacementSummary = require('Module:Placement summary')
+local PlacementStats = require('Module:InfoboxPlacementStats')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -35,7 +35,11 @@ function CustomTeam:createBottomContent()
 			{team = _team.name or _team.pagename}
 		)
 	end
-	return tostring(PlacementSummary.get_data({team = _team.pagename})) .. upcomingTable
+	return tostring(PlacementStats.run{
+		participant = _team.pagename,
+		tiers = { '1', '2', '3', '4', '5'},
+		excludedTierTypes = {'Qualifier'},
+	}) .. upcomingTable
 end
 
 function CustomTeam:defineCustomPageVariables(args)
