@@ -21,15 +21,13 @@ local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supe
 	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_league = league
-	_args = _league.args
+	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.addToLpdb = CustomLeague.addToLpdb
