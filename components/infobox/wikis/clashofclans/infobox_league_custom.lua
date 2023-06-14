@@ -32,7 +32,6 @@ function CustomLeague.run(frame)
 	_args = _league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
@@ -62,7 +61,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = Logic.readBool(_args['supercell-sponsored'])
+	lpdbData.publishertier = Logic.readBool(_args['supercell-sponsored']) and 'true' or nil
 	lpdbData.participantsnumber = args.team_number
 
 	return lpdbData
