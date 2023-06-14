@@ -62,7 +62,7 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = _args['supercell-sponsored'] == 'true' and 'true' or nil
+	lpdbData.publishertier = Logic.readBool(_args['supercell-sponsored'])
 	lpdbData.participantsnumber = args.team_number
 
 	return lpdbData
