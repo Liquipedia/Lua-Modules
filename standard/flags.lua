@@ -244,4 +244,8 @@ function Flags._convertToLangKey(langName)
 		or langName
 end
 
+function Flags.isValidFlagInput(flagInput)
+	return String.isNotEmpty(Flags._convertToKey(flagInput))
+end
+
 return Class.export(Flags)
