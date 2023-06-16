@@ -63,17 +63,6 @@ function CustomInjector:addCustomCells(widgets)
 
 	table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarnings}})
 
-	--Ranking of Earnings this Year
-	local smwRes = mw.smw.ask('[[-Has subobject::<q>[[Earnings/'.. CURRENT_YEAR .. ']]</q>]]' ..
-		'[[Has player page::'.. _player.pagename .. ']] |link=none |mainlabel=- |headers=hide |?has earning ranking')
-
-	if smwRes and smwRes[1] then
-		local ranking = string.match(smwRes[1]['Has earning ranking'], '%d+')
-		table.insert(widgets, Cell{name = 'Earnings Ranking '.. CURRENT_YEAR, content = {
-			Placement.RangeLabel{ranking, ranking}
-		}})
-	end
-
 	return widgets
 end
 
