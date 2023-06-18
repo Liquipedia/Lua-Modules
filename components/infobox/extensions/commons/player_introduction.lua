@@ -364,7 +364,7 @@ end
 --- builds the display
 ---@return string
 function PlayerIntroduction:create()
-	if Table.isEmpty(self.playerInfo) then
+	if Logic.isEmpty(self.playerInfo.id) then
 		return ''
 	end
 
