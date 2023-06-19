@@ -2094,6 +2094,7 @@ local aliases = {
 	['britain'] = 'unitedkingdom',
 	['holland'] = 'netherlands',
 	['international'] = 'world',
+	['ivorycoast'] = 'cotedivoire',
 	['korea'] = 'southkorea',
 	['latam'] = 'latinamerica',
 	['macao'] = 'macau',
