@@ -963,7 +963,7 @@ local data = {
 	},
 	['saintmartin'] = {
 		flag = 'File:mf_hd.png',
-		localised = 'Saint-Martinoise',
+		localised = 'Saint-Martinois',
 		name = 'Saint Martin',
 	},
 	['saintpierreandmiquelon'] = {
@@ -1023,7 +1023,7 @@ local data = {
 	},
 	['sintmaarten'] = {
 		flag = 'File:sx_hd.png',
-		localised = 'Sint Maarten',
+		localised = 'Sint Maartener',
 		name = 'Sint Maarten',
 	},
 	['slovakia'] = {
