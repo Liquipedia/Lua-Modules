@@ -1794,7 +1794,7 @@ local threeLetter = {
 	['afg'] = 'afghanistan',
 	['ago'] = 'angola',
 	['aia'] = 'anguilla',
-	['ala'] = 'alandislands',
+	['ala'] = 'aland',
 	['alb'] = 'albania',
 	['and'] = 'andorra',
 	['are'] = 'unitedarabemirates',
@@ -2070,6 +2070,7 @@ local aliases = {
 	['yucs'] = 'yugoslavia',
 
 	-- Other
+	['alandislands'] = 'aland',
 	['america'] = 'unitedstates',
 	['americas'] = 'northamerica',
 	['arabianpeninsula'] = 'arabia',
