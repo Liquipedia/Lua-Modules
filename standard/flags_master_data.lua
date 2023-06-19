@@ -156,11 +156,6 @@ local data = {
 		localised = 'Bolivian',
 		name = 'Bolivia',
 	},
-	['bonaire,sinteustatiusandsaba'] = {
-		flag = 'File:bq_hd.png',
-		localised = 'Bonairean',
-		name = 'Bonaire, Sint Eustatius and Saba',
-	},
 	['bosniaandherzegovina'] = {
 		flag = 'File:ba_hd.png',
 		localised = 'Bosnian',
@@ -226,6 +221,11 @@ local data = {
 		localised = 'Canadian',
 		name = 'Canada',
 	},
+	['caribbeannetherlands'] = {
+		flag = 'File:bq_hd.png',
+		localised = 'Dutch Caribbean',
+		name = 'Caribbean Netherlands',
+	},
 	['caymanislands'] = {
 		flag = 'File:ky_hd.png',
 		localised = 'Caymanian',
@@ -256,7 +256,7 @@ local data = {
 		localised = 'Christmas Islander',
 		name = 'Christmas Island',
 	},
-	['cocos(keeling)islands'] = {
+	['cocoskeelingislands'] = {
 		flag = 'File:cc_hd.png',
 		localised = 'Cocos Islander',
 		name = 'Cocos (Keeling) Islands',
@@ -276,7 +276,7 @@ local data = {
 		localised = 'Congolese',
 		name = 'Congo',
 	},
-	['congo,democraticrepublicofthe'] = {
+	['congodemocraticrepublicofthe'] = {
 		flag = 'File:cd_hd.png',
 		localised = 'Congolese',
 		name = 'Democratic Republic of the Congo',
@@ -301,7 +301,7 @@ local data = {
 		localised = 'Cuban',
 		name = 'Cuba',
 	},
-	['curaçao'] = {
+	['curacao'] = {
 		flag = 'File:cw_hd.png',
 		localised = 'Curaçaoan',
 		name = 'Curaçao',
@@ -316,7 +316,7 @@ local data = {
 		localised = 'Czech',
 		name = 'Czechia',
 	},
-	['côted\'ivoire'] = {
+	['cotedivoire'] = {
 		flag = 'File:ci_hd.png',
 		localised = 'Ivorian',
 		name = 'Côte d\'Ivoire',
@@ -383,7 +383,7 @@ local data = {
 	},
 	['falklandislands'] = {
 		flag = 'File:fk_hd.png',
-		localised = 'Falkland Islands',
+		localised = 'Falkland Islander',
 		name = 'Falkland Islands',
 	},
 	['faroeislands'] = {
@@ -496,7 +496,7 @@ local data = {
 		localised = 'Guinean',
 		name = 'Guinea',
 	},
-	['guinea-bissau'] = {
+	['guineabissau'] = {
 		flag = 'File:gw_hd.png',
 		localised = 'Bissau-Guinean',
 		name = 'Guinea-Bissau',
@@ -513,7 +513,7 @@ local data = {
 	},
 	['heardislandandmcdonaldislands'] = {
 		flag = 'File:hm_hd.png',
-		localised = 'Heard Island',
+		localised = 'Heard Islander',
 		name = 'Heard Island and McDonald Islands',
 	},
 	['honduras'] = {
@@ -828,7 +828,7 @@ local data = {
 	},
 	['northernmarianaislands'] = {
 		flag = 'File:mp_hd.png',
-		localised = 'Northern Mariana Islands',
+		localised = 'Northern Mariana Islander',
 		name = 'Northern Mariana Islands',
 	},
 	['northkorea'] = {
@@ -893,7 +893,7 @@ local data = {
 	},
 	['pitcairn'] = {
 		flag = 'File:pn_hd.png',
-		localised = 'Pitcairn Island',
+		localised = 'Pitcairn Islander',
 		name = 'Pitcairn',
 	},
 	['poland'] = {
@@ -931,12 +931,12 @@ local data = {
 		localised = 'Rwandan',
 		name = 'Rwanda',
 	},
-	['réunion'] = {
+	['reunion'] = {
 		flag = 'File:re_hd.png',
 		localised = 'Réunionese',
 		name = 'Réunion',
 	},
-	['saintbarthélemy'] = {
+	['saintbarthelemy'] = {
 		flag = 'File:bl_hd.png',
 		localised = 'Barthélemois',
 		name = 'Saint Barthélemy',
@@ -956,10 +956,10 @@ local data = {
 		localised = 'Saint Lucian',
 		name = 'Saint Lucia',
 	},
-	['saintmartin(frenchpart)'] = {
+	['saintmartin'] = {
 		flag = 'File:mf_hd.png',
 		localised = 'Saint-Martinoise',
-		name = 'Saint Martin (French part)',
+		name = 'Saint Martin',
 	},
 	['saintpierreandmiquelon'] = {
 		flag = 'File:pm_hd.png',
@@ -1016,10 +1016,10 @@ local data = {
 		localised = 'Singaporean',
 		name = 'Singapore',
 	},
-	['sintmaarten(dutchpart)'] = {
+	['sintmaarten'] = {
 		flag = 'File:sx_hd.png',
 		localised = 'Sint Maarten',
-		name = 'Sint Maarten (Dutch part)',
+		name = 'Sint Maarten',
 	},
 	['slovakia'] = {
 		flag = 'File:sk_hd.png',
@@ -1048,7 +1048,7 @@ local data = {
 	},
 	['southgeorgiaandthesouthsandwichislands'] = {
 		flag = 'File:gs_hd.png',
-		localised = 'South Georgia Island',
+		localised = 'South Georgia Islander',
 		name = 'South Georgia and the South Sandwich Islands',
 	},
 	['southkorea'] = {
@@ -1121,7 +1121,7 @@ local data = {
 		localised = 'Thai',
 		name = 'Thailand',
 	},
-	['timor-leste'] = {
+	['timorleste'] = {
 		flag = 'File:tl_hd.png',
 		localised = 'Timorese',
 		name = 'Timor-Leste',
@@ -1168,7 +1168,7 @@ local data = {
 	},
 	['turksandcaicosislands'] = {
 		flag = 'File:tc_hd.png',
-		localised = 'Turks and Caicos Islands',
+		localised = 'Turks and Caicos Islander',
 		name = 'Turks and Caicos Islands',
 	},
 	['tuvalu'] = {
@@ -1236,15 +1236,15 @@ local data = {
 		localised = 'Vietnamese',
 		name = 'Vietnam',
 	},
-	['virginislands(british)'] = {
+	['britishvirginislands'] = {
 		flag = 'File:vg_hd.png',
-		localised = 'British Virgin Island',
-		name = 'Virgin Islands (British)',
+		localised = 'British Virgin Islander',
+		name = 'British Virgin Islands',
 	},
-	['virginislands(u.s.)'] = {
+	['usvirginislands'] = {
 		flag = 'File:vi_hd.png',
-		localised = 'U.S. Virgin Island',
-		name = 'Virgin Islands (U.S.)',
+		localised = 'U.S. Virgin Islander',
+		name = 'U.S. Virgin Islands',
 	},
 	['wallisandfutuna'] = {
 		flag = 'File:wf_hd.png',
@@ -1271,10 +1271,10 @@ local data = {
 		localised = 'Zimbabwean',
 		name = 'Zimbabwe',
 	},
-	['ålandislands'] = {
+	['aland'] = {
 		flag = 'File:ax_hd.png',
 		localised = 'Ålander',
-		name = 'Åland Islands',
+		name = 'Åland',
 	},
 
 	-- ISO 3166-1 alpha-2 User-assigned Code Elements
@@ -1351,9 +1351,9 @@ local data = {
 		localised = 'Asian',
 		name = 'Asia',
 	},
-	['asia-pacific'] = {
+	['asiapacific'] = {
 		flag = 'File:Asia-pacific flag hd.png',
-		localised = 'APAC',
+		localised = 'Asia-Pacific',
 		name = 'Asia-Pacific',
 	},
 	['benelux'] = {
@@ -1363,7 +1363,7 @@ local data = {
 	},
 	['centralamerica'] = {
 		flag = 'File:cais flag hd.png',
-		localised = 'Central America',
+		localised = 'Central American',
 		name = 'Central America',
 	},
 	['centralasia'] = {
@@ -1438,13 +1438,8 @@ local data = {
 	},
 	['oceania'] = {
 		flag = 'File:anz hd.png',
-		localised = 'Oceanian',
+		localised = 'Oceanic',
 		name = 'Oceania',
-	},
-	['persiangulfstates'] = {
-		flag = 'File:Space filler flag.png',
-		localised = 'Persian Gulf State',
-		name = 'Persian Gulf States',
 	},
 	['southamerica'] = {
 		flag = 'File:Unasur hd.png',
@@ -1498,7 +1493,7 @@ local data = {
 		name = 'Portuguese Speaking',
 	},
 	['russianspeaking'] = {
-		flag = 'File:RuBy hd.png',
+		flag = 'File:Ru hd.png',
 		localised = '',
 		name = 'Russian Speaking',
 	},
@@ -1507,7 +1502,7 @@ local data = {
 		localised = '',
 		name = 'Arabic Speaking',
 	},
-	['non-representing'] = {
+	['nonrepresenting'] = {
 		flag = 'File:non hd.png',
 		localised = 'non-country representing',
 		name = 'Non-representing',
@@ -1540,7 +1535,7 @@ local twoLetter = {
 	['at'] = 'austria',
 	['au'] = 'australia',
 	['aw'] = 'aruba',
-	['ax'] = 'ålandislands',
+	['ax'] = 'aland',
 	['az'] = 'azerbaijan',
 	['ba'] = 'bosniaandherzegovina',
 	['bb'] = 'barbados',
@@ -1551,11 +1546,11 @@ local twoLetter = {
 	['bh'] = 'bahrain',
 	['bi'] = 'burundi',
 	['bj'] = 'benin',
-	['bl'] = 'saintbarthélemy',
+	['bl'] = 'saintbarthelemy',
 	['bm'] = 'bermuda',
 	['bn'] = 'brunei',
 	['bo'] = 'bolivia',
-	['bq'] = 'bonaire,sinteustatiusandsaba',
+	['bq'] = 'caribbeannetherlands',
 	['br'] = 'brazil',
 	['bs'] = 'bahamas',
 	['bt'] = 'bhutan',
@@ -1564,12 +1559,12 @@ local twoLetter = {
 	['by'] = 'belarus',
 	['bz'] = 'belize',
 	['ca'] = 'canada',
-	['cc'] = 'cocos(keeling)islands',
-	['cd'] = 'congo,democraticrepublicofthe',
+	['cc'] = 'cocoskeelingislands',
+	['cd'] = 'congodemocraticrepublicofthe',
 	['cf'] = 'centralafricanrepublic',
 	['cg'] = 'congo',
 	['ch'] = 'switzerland',
-	['ci'] = 'côted\'ivoire',
+	['ci'] = 'cotedivoire',
 	['ck'] = 'cookislands',
 	['cl'] = 'chile',
 	['cm'] = 'cameroon',
@@ -1578,7 +1573,7 @@ local twoLetter = {
 	['cr'] = 'costarica',
 	['cu'] = 'cuba',
 	['cv'] = 'caboverde',
-	['cw'] = 'curaçao',
+	['cw'] = 'curacao',
 	['cx'] = 'christmasisland',
 	['cy'] = 'cyprus',
 	['cz'] = 'czechia',
@@ -1618,7 +1613,7 @@ local twoLetter = {
 	['gs'] = 'southgeorgiaandthesouthsandwichislands',
 	['gt'] = 'guatemala',
 	['gu'] = 'guam',
-	['gw'] = 'guinea-bissau',
+	['gw'] = 'guineabissau',
 	['gy'] = 'guyana',
 	['hk'] = 'hongkong',
 	['hm'] = 'heardislandandmcdonaldislands',
@@ -1666,7 +1661,7 @@ local twoLetter = {
 	['mc'] = 'monaco',
 	['md'] = 'moldova',
 	['me'] = 'montenegro',
-	['mf'] = 'saintmartin(frenchpart)',
+	['mf'] = 'saintmartin',
 	['mg'] = 'madagascar',
 	['mh'] = 'marshallislands',
 	['mk'] = 'northmacedonia',
@@ -1736,7 +1731,7 @@ local twoLetter = {
 	['ss'] = 'southsudan',
 	['st'] = 'saotomeandprincipe',
 	['sv'] = 'elsalvador',
-	['sx'] = 'sintmaarten(dutchpart)',
+	['sx'] = 'sintmaarten',
 	['sy'] = 'syria',
 	['sz'] = 'eswatini',
 	['tc'] = 'turksandcaicosislands',
@@ -1746,7 +1741,7 @@ local twoLetter = {
 	['th'] = 'thailand',
 	['tj'] = 'tajikistan',
 	['tk'] = 'tokelau',
-	['tl'] = 'timor-leste',
+	['tl'] = 'timorleste',
 	['tm'] = 'turkmenistan',
 	['tn'] = 'tunisia',
 	['to'] = 'tonga',
@@ -1764,8 +1759,8 @@ local twoLetter = {
 	['va'] = 'vaticancity',
 	['vc'] = 'saintvincentandthegrenadines',
 	['ve'] = 'venezuela',
-	['vg'] = 'virginislands(british)',
-	['vi'] = 'virginislands(u.s.)',
+	['vg'] = 'britishvirginislands',
+	['vi'] = 'usvirginislands',
 	['vn'] = 'vietnam',
 	['vu'] = 'vanuatu',
 	['wf'] = 'wallisandfutuna',
@@ -1778,7 +1773,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 User-assigned Code Elements
 	['xk'] = 'kosovo',
-	['xx'] = 'non-representing',
+	['xx'] = 'nonrepresenting',
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
@@ -1799,7 +1794,7 @@ local threeLetter = {
 	['afg'] = 'afghanistan',
 	['ago'] = 'angola',
 	['aia'] = 'anguilla',
-	['ala'] = 'ålandislands',
+	['ala'] = 'alandislands',
 	['alb'] = 'albania',
 	['and'] = 'andorra',
 	['are'] = 'unitedarabemirates',
@@ -1815,14 +1810,14 @@ local threeLetter = {
 	['bdi'] = 'burundi',
 	['bel'] = 'belgium',
 	['ben'] = 'benin',
-	['bes'] = 'bonaire,sinteustatiusandsaba',
+	['bes'] = 'caribbeannetherlands',
 	['bfa'] = 'burkinafaso',
 	['bgd'] = 'bangladesh',
 	['bgr'] = 'bulgaria',
 	['bhr'] = 'bahrain',
 	['bhs'] = 'bahamas',
 	['bih'] = 'bosniaandherzegovina',
-	['blm'] = 'saintbarthélemy',
+	['blm'] = 'saintbarthelemy',
 	['blr'] = 'belarus',
 	['blz'] = 'belize',
 	['bmu'] = 'bermuda',
@@ -1835,13 +1830,13 @@ local threeLetter = {
 	['bwa'] = 'botswana',
 	['caf'] = 'centralafricanrepublic',
 	['can'] = 'canada',
-	['cck'] = 'cocos(keeling)islands',
+	['cck'] = 'cocoskeelingislands',
 	['che'] = 'switzerland',
 	['chl'] = 'chile',
 	['chn'] = 'china',
-	['civ'] = 'côted\'ivoire',
+	['civ'] = 'cotedivoire',
 	['cmr'] = 'cameroon',
-	['cod'] = 'congo,democraticrepublicofthe',
+	['cod'] = 'congodemocraticrepublicofthe',
 	['cog'] = 'congo',
 	['cok'] = 'cookislands',
 	['col'] = 'colombia',
@@ -1849,7 +1844,7 @@ local threeLetter = {
 	['cpv'] = 'caboverde',
 	['cri'] = 'costarica',
 	['cub'] = 'cuba',
-	['cuw'] = 'curaçao',
+	['cuw'] = 'curacao',
 	['cxr'] = 'christmasisland',
 	['cym'] = 'caymanislands',
 	['cyp'] = 'cyprus',
@@ -1869,7 +1864,7 @@ local threeLetter = {
 	['eth'] = 'ethiopia',
 	['fin'] = 'finland',
 	['fji'] = 'fiji',
-	['flk'] = 'falklandislands(malvinas)',
+	['flk'] = 'falklandislands',
 	['fra'] = 'france',
 	['fro'] = 'faroeislands',
 	['fsm'] = 'federatedstatesofmicronesia',
@@ -1882,7 +1877,7 @@ local threeLetter = {
 	['gin'] = 'guinea',
 	['glp'] = 'guadeloupe',
 	['gmb'] = 'gambia',
-	['gnb'] = 'guinea-bissau',
+	['gnb'] = 'guineabissau',
 	['gnq'] = 'equatorialguinea',
 	['grc'] = 'greece',
 	['grd'] = 'grenada',
@@ -1931,7 +1926,7 @@ local threeLetter = {
 	['lux'] = 'luxembourg',
 	['lva'] = 'latvia',
 	['mac'] = 'macau',
-	['maf'] = 'saintmartin(frenchpart)',
+	['maf'] = 'saintmartin',
 	['mar'] = 'morocco',
 	['mco'] = 'monaco',
 	['mda'] = 'moldova',
@@ -1982,7 +1977,7 @@ local threeLetter = {
 	['pse'] = 'palestine',
 	['pyf'] = 'frenchpolynesia',
 	['qat'] = 'qatar',
-	['reu'] = 'réunion',
+	['reu'] = 'reunion',
 	['rou'] = 'romania',
 	['rus'] = 'russia',
 	['rwa'] = 'rwanda',
@@ -2007,7 +2002,7 @@ local threeLetter = {
 	['svn'] = 'slovenia',
 	['swe'] = 'sweden',
 	['swz'] = 'eswatini',
-	['sxm'] = 'sintmaarten(dutchpart)',
+	['sxm'] = 'sintmaarten',
 	['syc'] = 'seychelles',
 	['syr'] = 'syria',
 	['tca'] = 'turksandcaicosislands',
@@ -2017,7 +2012,7 @@ local threeLetter = {
 	['tjk'] = 'tajikistan',
 	['tkl'] = 'tokelau',
 	['tkm'] = 'turkmenistan',
-	['tls'] = 'timor-leste',
+	['tls'] = 'timorleste',
 	['ton'] = 'tonga',
 	['tto'] = 'trinidadandtobago',
 	['tun'] = 'tunisia',
@@ -2033,9 +2028,9 @@ local threeLetter = {
 	['uzb'] = 'uzbekistan',
 	['vat'] = 'vaticancity',
 	['vct'] = 'saintvincentandthegrenadines',
-	['ven'] = 'venezuela(bolivarianrepublicof)',
-	['vgb'] = 'virginislands(british)',
-	['vir'] = 'virginislands(u.s.)',
+	['ven'] = 'venezuela',
+	['vgb'] = 'britishvirginislands',
+	['vir'] = 'usvirginislands',
 	['vnm'] = 'vietnam',
 	['vut'] = 'vanuatu',
 	['wlf'] = 'wallisandfutuna',
@@ -2074,29 +2069,22 @@ local aliases = {
 	['suhh'] = 'ussr',
 	['yucs'] = 'yugoslavia',
 
-	-- Accents/special characters
-	['aland'] = 'ålandislands',
-	['Ålandislands'] = 'ålandislands',
-	['curacao'] = 'curaçao',
-	['ivorycoast'] = 'côted\'ivoire',
-
 	-- Other
 	['america'] = 'unitedstates',
 	['americas'] = 'northamerica',
 	['arabianpeninsula'] = 'arabia',
-	['asiapacific'] = 'asia-pacific',
-	['apac'] = 'asia-pacific',
-	['bonaire'] = 'bonaire,sinteustatiusandsaba',
-	['sinteustatius'] = 'bonaire,sinteustatiusandsaba',
-	['saba'] = 'bonaire,sinteustatiusandsaba',
-	['caribbeannetherlands'] = 'bonaire,sinteustatiusandsaba',
+	['apac'] = 'asiapacific',
+	['bonaire'] = 'caribbeannetherlands',
+	['sinteustatius'] = 'caribbeannetherlands',
+	['saba'] = 'caribbeannetherlands',
+	['bonairesinteustatiusandsaba'] = 'caribbeannetherlands',
 	['bosnia'] = 'bosniaandherzegovina',
-	['bosnia&herzegovina'] = 'bosniaandherzegovina',
+	['herzegovina'] = 'bosniaandherzegovina',
 	['bruneidarussalam'] = 'brunei',
-	['democraticrepublicofthecongo'] = 'congo,democraticrepublicofthe',
+	['democraticrepublicofthecongo'] = 'congodemocraticrepublicofthe',
 	['republicofthecongo'] = 'congo',
-	['cocosislands'] = 'cocos(keeling)islands',
-	['keelingislands'] = 'cocos(keeling)islands',
+	['cocosislands'] = 'cocoskeelingislands',
+	['keelingislands'] = 'cocoskeelingislands',
 	['czech'] = 'czechia',
 	['czechrepublic'] = 'czechia',
 	['europe'] = 'europeanunion',
@@ -2117,10 +2105,10 @@ local aliases = {
 	['makedonia'] = 'northmacedonia',
 	['micronesia'] = 'federatedstatesofmicronesia',
 	['middleeastnorthafrica'] = 'mena',
-	['republic of macedonia'] = 'northmacedonia',
+	['republicofmacedonia'] = 'northmacedonia',
 	['scandinavia'] = 'nordiccountries',
-	['saintmartin'] = 'saintmartin(frenchpart)',
-	['sintmaarten'] = 'sintmaarten(dutchpart)',
+	['saintmartinfrenchpart'] = 'saintmartin',
+	['sintmaartendutchpart'] = 'sintmaarten',
 	['slovakrepublic'] = 'slovakia',
 	['chinesetaipei'] = 'taiwan',
 	['thenetherlands'] = 'netherlands',
@@ -2130,13 +2118,13 @@ local aliases = {
 	['unitedstatesofamerica'] = 'unitedstates',
 	['holysee'] = 'vaticancity',
 	['vatican'] = 'vaticancity',
-	['virginislands'] = 'virginislands(british)',
-	['britishvirginislands'] = 'virginislands(british)',
-	['u.s.virginislands'] = 'virginislands(u.s.)',
-	['unitedstatesvirginislands'] = 'virginislands(u.s.)',
-	['u.s.minoroutlyingislands'] = 'unitedstatesminoroutlyingislands',
+	['virginislands'] = 'britishvirginislands',
+	['virginislandsbritish'] = 'britishvirginislands',
+	['virginislandsus'] = 'usvirginislands',
+	['unitedstatesvirginislands'] = 'usvirginislands',
+	['usminoroutlyingislands'] = 'unitedstatesminoroutlyingislands',
 	['oce'] = 'oceania',
-	['australia/newzealand'] = 'oceania',
+	['australianewzealand'] = 'oceania',
 	['global'] = 'world',
 	--needed due to lpdb length restrictions
 	--for inside matches --> max length 20
@@ -2170,9 +2158,8 @@ local aliases = {
 	['fillerflag'] = 'filler',
 	['unknown'] = 'filler',
 
-	['nonrepresenting'] = 'non-representing',
-	['non'] = 'non-representing',
-	['none'] = 'non-representing',
+	['non'] = 'nonrepresenting',
+	['none'] = 'nonrepresenting',
 }
 
 -- This table includes
