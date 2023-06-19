@@ -26,6 +26,11 @@ local data = {
 		localised = 'Afghan',
 		name = 'Afghanistan',
 	},
+	['aland'] = {
+		flag = 'File:ax_hd.png',
+		localised = 'Ålander',
+		name = 'Åland',
+	},
 	['albania'] = {
 		flag = 'File:al_hd.png',
 		localised = 'Albanian',
@@ -1270,11 +1275,6 @@ local data = {
 		flag = 'File:zw_hd.png',
 		localised = 'Zimbabwean',
 		name = 'Zimbabwe',
-	},
-	['aland'] = {
-		flag = 'File:ax_hd.png',
-		localised = 'Ålander',
-		name = 'Åland',
 	},
 
 	-- ISO 3166-1 alpha-2 User-assigned Code Elements
