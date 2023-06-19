@@ -2131,11 +2131,8 @@ local aliases = {
 	['oce'] = 'oceania',
 	['australianewzealand'] = 'oceania',
 	['global'] = 'world',
+
 	--needed due to lpdb length restrictions
-	--for inside matches --> max length 20
-	--minus the spaces in cut of the flag names
-	['southgeorgiaandth'] = 'southgeorgiaandthesouthsandwichislands',
-	['bosniaandherzegovi'] = 'bosniaandherzegovina',
 	--for inside player --> max length 40
 	--minus the spaces in cut of the flag names
 	['southgeorgiaandthesouthsandwichisl'] = 'southgeorgiaandthesouthsandwichislands',
