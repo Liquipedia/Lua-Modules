@@ -407,7 +407,7 @@ function PlayerIntroduction:_nameDisplay()
 		.. self._addConcatText(self.playerInfo.lastName)
 
 	if Table.isNotEmpty(self.playerInfo.formerlyKnownAs) then
-		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as')
+		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as ')
 			.. mw.text.listToText(self.playerInfo.formerlyKnownAs, ', ', ' and ')
 			.. ')'
 	end
