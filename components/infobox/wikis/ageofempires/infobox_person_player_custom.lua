@@ -118,7 +118,7 @@ function CustomPlayer.run(frame)
 		local _, roleType = CustomPlayer._getRoleType(_args.roleList)
 
 		autoPlayerIntro = PlayerIntroduction.run{
-			player = _args.id,
+			player = _player.pagename,
 			transferquery = 'datapoint',
 			defaultGame = 'Age of Empires II',
 			team = _args.team,
