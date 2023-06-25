@@ -17,6 +17,8 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local _ROLES = {
 	-- Playes
@@ -73,6 +75,9 @@ function CustomInjector:parse(id, widgets)
 				CustomPlayer._createRoleDisplay('role2', _args.role2)
 			}},
 		}
+	elseif id == 'history' and _args.nationalteams then
+		table.insert(widgets, 1, Center{content = {_args.nationalteams}})
+		table.insert(widgets, 1, Title{name = 'National Teams'})
 	end
 	return widgets
 end
