@@ -279,7 +279,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	else
 		priceCell
 			:wikitext(NONBREAKING_SPACE)
-			:addClass(participantNumber == -1 and 'Blank' or nil)
+			:addClass('Blank')
 	end
 
 	row:tag('div')
