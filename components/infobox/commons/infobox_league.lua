@@ -381,7 +381,10 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
-	Variables.varDefine('tournament_participantsnumber', tonumber(args.participants_number) or tonumber(args.team_number) or tonumber(args.player_number) or -1)
+	Variables.varDefine(
+		'tournament_participantsnumber',
+		tonumber(args.participants_number) or tonumber(args.team_number) or tonumber(args.player_number) or -1
+	)
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
