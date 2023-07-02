@@ -362,7 +362,7 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 
 	if tierData then
 		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link ..
-		'|' .. tierData.name .. ']] ' .. tierData.name
+			'|' .. tierData.name .. ']] ' .. tierData.name
 	end
 end
 
@@ -382,7 +382,7 @@ end
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 	span:css('white-space', 'nowrap')
-	:node(content)
+		:node(content)
 	return span
 end
 
