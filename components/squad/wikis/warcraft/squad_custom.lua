@@ -23,12 +23,13 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	local players = Array.mapIndexes(function (index)
+	local players = Array.mapIndexes(function(index)
 		return Json.parseIfString(args[index])
 	end)
 
-	Array.forEach(players, function (player)
+	Array.forEach(players, function(player)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		row:status(squad.type)
 		row:id{
 			player.id,
 			flag = player.flag,
@@ -58,6 +59,7 @@ function CustomSquad.run(frame)
 			mw.title.getCurrentTitle().prefixedText
 			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
 			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 	end)
 

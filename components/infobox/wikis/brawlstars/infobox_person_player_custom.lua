@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/infobox')
+local PlayerIntroduction = require('Module:PlayerIntroduction')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local Variables = require('Module:Variables')
@@ -59,7 +59,7 @@ function CustomPlayer.run(frame)
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
-		autoPlayerIntro = PlayerIntroduction._main{
+		autoPlayerIntro = PlayerIntroduction.run{
 			team = _args.team,
 			name = _args.name,
 			romanizedname = _args.romanized_name,

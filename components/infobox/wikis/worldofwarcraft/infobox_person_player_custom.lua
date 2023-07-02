@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -37,8 +36,6 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
-
-	_args.achievements = Template.safeExpand(mw.getCurrentFrame(), 'Player achievements', {player.pagename})
 
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables

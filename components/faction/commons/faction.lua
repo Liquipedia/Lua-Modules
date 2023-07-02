@@ -89,7 +89,7 @@ function Faction.readMultiFaction(input, options)
 
 	local inputArray = Array.map(
 		mw.text.split(input, options.sep or '', true),
-		function(faction) return mw.text.trim(faction) end
+		String.trim
 	)
 
 	local factions = Array.map(inputArray, function(faction) return Faction.read(faction, options) end)

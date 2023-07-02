@@ -295,6 +295,15 @@ return {
 			text = '$',
 		},
 	},
+	hnl = {
+		code = 'HNL',
+		name = 'Honduran lempira',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'L',
+		},
+	},
 	hrk = {
 		code = 'HRK',
 		name = 'Croatian kuna',
@@ -842,6 +851,15 @@ return {
 			hasSpace = false,
 			isAfter = false,
 			text = '₩',
+		},
+	},
+	xof = {
+		code = 'XOF',
+		name = 'CFA franc',
+		symbol = {
+			hasSpace = true,
+			isAfter = false,
+			text = 'F.CFA',
 		},
 	},
 	zar = {

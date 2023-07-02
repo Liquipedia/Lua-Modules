@@ -57,9 +57,14 @@ function League:createInfobox()
 
 	-- Split venue from legacy format to new format.
 	-- Legacy format is a wiki-code string that can include an external link
-	-- New format has |venue= and |venuelink= as different parameters.
+	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
 	-- This should be removed once there's been a bot run to change this.
-	if not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
+		-- Remove [[]] and split on `|`
+		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
+		args.venue = splitVenue[1]
+		args.venuename = splitVenue[2]
+	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
 		-- Remove [] and split on space
 		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
 		args.venuelink = splitVenue[1]
@@ -175,7 +180,7 @@ function League:createInfobox()
 						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
 					end
 
-					table.insert(venues, self:createLink(venueName, nil, args[prefix .. 'link'], description))
+					table.insert(venues, self:createLink(venueName, args[prefix .. 'name'], args[prefix .. 'link'], description))
 				end
 
 				return {Cell{
@@ -259,6 +264,9 @@ end
 
 function League:_getCategories(args)
 	local categories = {'Tournaments'}
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
+	end
 	Array.extendWith(categories, self:addParticipantTypeCategory(args))
 	Array.extendWith(categories, self:addTierCategories(args))
 
@@ -287,7 +295,7 @@ function League:addTierCategories(args)
 	table.insert(categories, tierCategory)
 	table.insert(categories, tierTypeCategory)
 
-	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
+	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
 		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
@@ -301,7 +309,8 @@ end
 
 --- Allows for overriding this functionality
 function League:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
@@ -574,7 +583,7 @@ function League:createLink(id, name, link, desc)
 
 	local output
 
-	if Page.exists(id) then
+	if Page.exists(id) or id:find('^[Ww]ikipedia:') then
 		output = '[[' .. id .. '|'
 		if String.isEmpty(name) then
 			output = output .. id .. ']]'

@@ -45,7 +45,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if String.isNotEmpty(match.walkover) then
+	if Logic.isNotEmpty(match.walkover) then
 		match.resulttype = match.walkover
 		match.walkover = match.winner
 	end
@@ -167,8 +167,8 @@ function MatchLegacy.storeMatchSMW(match, match2)
 		),
 		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
 		'Has winner=' .. (match.winner or ''),
-		'Has team left score=' .. (String.isEmpty(match.opponent1score) and '0' or match.opponent1score),
-		'Has team right score=' .. (String.isEmpty(match.opponent2score) and '0' or match.opponent2score),
+		'Has team left score=' .. (Logic.isEmpty(match.opponent1score) and '0' or match.opponent1score),
+		'Has team right score=' .. (Logic.isEmpty(match.opponent2score) and '0' or match.opponent2score),
 		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
 		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
 		'Has teams=' .. (match.opponent1 or ''),

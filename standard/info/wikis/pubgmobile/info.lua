@@ -65,6 +65,7 @@ return {
 		},
 	},
 	defaultGame = 'pubgm',
+	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'PUBG Mobile Default logo allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'PUBG Mobile Default logo allmode.png', ---@deprecated
 }

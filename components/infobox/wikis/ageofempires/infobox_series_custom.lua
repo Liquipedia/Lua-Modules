@@ -9,6 +9,7 @@
 local Cell = require('Module:Infobox/Widget/Cell')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Tier = require('Module:Tier/Custom')
 
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -24,6 +25,7 @@ function CustomSeries.run(frame)
 	local series = Series(frame)
 	series.addToLpdb = CustomSeries.addToLpdb
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	series.createLiquipediaTierDisplay = CustomSeries.createLiquipediaTierDisplay
 	_series = series
 
 	return series:createInfobox()
@@ -40,12 +42,12 @@ end
 
 function CustomSeries._getSeriesPrizepools(seriesName)
 	local pagename = mw.title.getCurrentTitle().text:gsub('%s', '_')
-	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[series::' .. seriesName .. ']] OR [[seriespage::' .. pagename .. ']]',
 		query = 'sum::prizepool'
 	})
 
-	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
 
 	if prizemoney == nil or prizemoney == 0 then
 		return nil
@@ -61,6 +63,13 @@ function CustomInjector:addCustomCells(widgets)
 		content = {CustomSeries._getSeriesPrizepools(_series.name)}
 	}))
 	return widgets
+end
+
+function CustomSeries:createLiquipediaTierDisplay(args)
+	return (Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype
+	) or '') .. self.appendLiquipediatierDisplay(args)
 end
 
 return CustomSeries

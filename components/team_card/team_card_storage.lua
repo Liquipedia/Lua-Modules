@@ -18,6 +18,10 @@ local Variables = require('Module:Variables')
 
 local TeamCardStorage = {}
 
+---@param args table
+---@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?}
+---@param players table
+---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	local team, teamTemplateName
 
@@ -58,6 +62,11 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 end
 
 -- Adds basic lpdb fields
+---@param lpdbData table
+---@param team string
+---@param args table
+---@param lpdbPrefix string
+---@return table
 function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix)
 	-- Name must match prize pool insertion
 	lpdbData.objectName = TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
@@ -65,15 +74,17 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	local title = mw.title.getCurrentTitle().text
 	local tournamentName = Variables.varDefault('tournament name pp') or Variables.varDefault('tournament_name')
 	local date = Variables.varDefault('tournament_date')
-	local startDate = Variables.varDefault('tournament_startdate', Variables.varDefault('tournament_sdate', date))
-	local endDate = Variables.varDefault('tournament_enddate', Variables.varDefault('tournament_edate', date))
+	local startDate = Variables.varDefault('tournament_startdate', date)
+	local endDate = Variables.varDefault('tournament_enddate', date)
 
 	lpdbData.participant = team
 	lpdbData.tournament = tournamentName or title
 	lpdbData.series = Variables.varDefault('tournament_series')
 	lpdbData.parent = Variables.varDefault('tournament_parent')
 	lpdbData.startdate = startDate
-	lpdbData.date = args.date or Variables.varDefault('enddate_' .. team .. lpdbPrefix .. '_date') or endDate
+	lpdbData.date = args.date
+		or Variables.varDefault(lpdbData.objectName .. '_placementdate')
+		or endDate
 	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = Qualifier.parseQualifier(args.qualifier)
 
 	if team ~= 'TBD' then
@@ -94,6 +105,9 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 end
 
 -- Build the standard LPDB "Object Name", which is used as primary key in the DB record
+---@param team string
+---@param lpdbPrefix string?
+---@return string
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	local storageName = (team == 'TBD' and 'participant') or 'ranking'
 	if String.isNotEmpty(lpdbPrefix) then

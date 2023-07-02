@@ -52,6 +52,7 @@ local PREFIXES = {
 		player = 'https://challonge.com/users/',
 	},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
+	corestrike = {'https://corestrike.gg/lookup/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -119,6 +120,7 @@ local PREFIXES = {
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
+	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
 		'',
@@ -138,6 +140,7 @@ local PREFIXES = {
 		player = 'https://siege.gg/players/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
+	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
@@ -175,6 +178,7 @@ local PREFIXES = {
 	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
+	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
 	['trackmania-io'] = {
 		'https://trackmania.io/#/competitions/comp/',
@@ -201,6 +205,7 @@ PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
 	cntft = {'/1'},
+	esportal = {'/event/info'},
 	facebook = {
 		'',
 		stream = '/live',
@@ -230,6 +235,26 @@ local ALIASES = {
 	zhanqitv = {'zhanqi'},
 }
 
+local ICON_KEYS_TO_RENAME = {
+	['bilibili-stream'] = 'bilibili',
+	daumcafe = 'cafe-daum',
+	['esea-d'] = 'esea-league',
+	['faceit-c'] = 'faceit',
+	['faceit-c2'] = 'faceit',
+	['faceit-hub'] = 'faceit',
+	['faceit-org'] = 'faceit',
+	matcherinolink = 'matcherino',
+	playlist = 'music',
+	privsteam = 'steam',
+	pubsteam = 'steam',
+	steamalternative = 'steam',
+	tlpdint = 'tlpd',
+	tlpdkr = 'tlpd-wol-korea',
+	tlpdsospa = 'tlpd-sospa',
+}
+
+---@param links {[string]: string}
+---@return {[string]: string}
 function Links.transform(links)
 	local function iterateLinks(tbl, aliases)
 		local index = 1
@@ -272,6 +297,10 @@ function Links.transform(links)
 	return transformedLinks
 end
 
+---@param platform string
+---@param id string?
+---@param variant string?
+---@return string
 function Links.makeFullLink(platform, id, variant)
 	if id == nil or id == '' then
 		return ''
@@ -291,17 +320,31 @@ function Links.makeFullLink(platform, id, variant)
 	return prefix .. id .. suffix
 end
 
+---@param links {[string]: string}
+---@param variant string?
+---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links._removeAppendedNumber(key), item, variant)
+		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
 	end
 	return links
 end
 
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
-function Links._removeAppendedNumber(key)
-	return string.gsub(key, '%d$', '')
+---@param key string
+---@return string
+function Links.removeAppendedNumber(key)
+	return (string.gsub(key, '%d$', ''))
+end
+
+---Builds the icon for a given link
+---@param key string
+---@param size number?
+---@return string
+function Links.makeIcon(key, size)
+	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
+		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
 
 return Class.export(Links, {frameOnly = true})

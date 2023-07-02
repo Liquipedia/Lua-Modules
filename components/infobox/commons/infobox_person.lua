@@ -147,7 +147,7 @@ function Person:createInfobox()
 		}},
 		Cell{name = 'Alternate IDs', content = {
 				table.concat(
-					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), function(id) return mw.text.trim(id) end),
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), String.trim),
 					', '
 				)
 			}
@@ -336,7 +336,8 @@ end
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
 function Person:shouldStoreData(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
@@ -383,11 +384,10 @@ function Person:calculateEarnings(args)
 end
 
 function Person:_createRegion(region, country)
-	region = Region.run({region = region, country = country})
-	if type(region) == 'table' then
-		_region = region.region
-		return region.display
-	end
+	local regionData = Region.run({region = region, country = country})
+	_region = regionData.region
+
+	return regionData.display
 end
 
 function Person:_createLocations(args, personType)

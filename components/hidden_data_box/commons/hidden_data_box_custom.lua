@@ -13,11 +13,16 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabl
 
 local CustomHiddenDataBox = {}
 
+---Entry point
+---@param args table
+---@return string
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)
 end
 
+---@param args table
+---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	--add your wiki specific vars here
 end

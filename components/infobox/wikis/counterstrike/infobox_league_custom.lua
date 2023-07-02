@@ -14,7 +14,6 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier/Custom')
-local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -305,7 +304,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
 	lpdbData.extradata.shortname2 = args.shortname2
 
-	Table.iter.forEach(CustomLeague.getRestrictions(_args.restrictions),
+	Array.forEach(CustomLeague.getRestrictions(_args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	return lpdbData

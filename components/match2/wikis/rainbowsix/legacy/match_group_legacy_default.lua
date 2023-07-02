@@ -96,7 +96,7 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 
 	--if bd.header starts with '!l'
 	if string.match(bd.header or '', '^!l') then
-		lowerHeader[roundNum] = round.G
+		lowerHeader[roundNum or ''] = round.G
 	end
 
 	-- opponents

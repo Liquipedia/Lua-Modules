@@ -93,6 +93,7 @@ function String.convertWikiListToHtmlList(str, delimiter)
 	if String.isEmpty(str) then
 		return ''
 	end
+	---@cast str -nil
 	if String.isEmpty(delimiter) then
 		delimiter = '*'
 	end
@@ -123,6 +124,13 @@ function String.interpolate(s, tbl)
 			end
 		)
 	)
+end
+
+---Uppercase the first letter of a string
+---@param str string
+---@return string
+function String.upperCaseFirst(str)
+	return mw.getContentLanguage():ucfirst(str)
 end
 
 return String

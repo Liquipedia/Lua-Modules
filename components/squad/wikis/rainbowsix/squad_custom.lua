@@ -47,6 +47,7 @@ function CustomSquad._playerRow(player, squadType)
 	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 
 	local row = SquadRow()
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
@@ -74,6 +75,7 @@ function CustomSquad._playerRow(player, squadType)
 	return row:create(
 		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_'
 		.. player.joindate .. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

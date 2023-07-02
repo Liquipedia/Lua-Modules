@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
@@ -38,6 +39,12 @@ local _LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
 local _defaultEarningsFunctionUsed = false
+
+---@enum statuses
+local Status = {
+	ACTIVE = 'active',
+	DISBANDED = 'disbanded',
+}
 
 local _warnings = {}
 
@@ -276,6 +283,7 @@ function Team:_setLpdbData(args, links)
 		coach = args.coaches or args.coach,
 		manager = args.manager,
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
+		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
@@ -308,7 +316,8 @@ function Team:addToLpdb(lpdbData, args)
 end
 
 function Team:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Team

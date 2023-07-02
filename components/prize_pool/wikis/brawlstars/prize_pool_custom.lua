@@ -9,8 +9,8 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -58,7 +58,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
-	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints', lpdbData.extradata.prizepoints)
 
 	if not Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('qualified_' .. lpdbData.opponentname, lpdbData.qualified)
@@ -80,7 +80,7 @@ end
 ---@param type string
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

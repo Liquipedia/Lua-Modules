@@ -23,6 +23,21 @@ local TBD = 'TBD'
 
 local BroadcasterCard = {}
 
+---@class broadCasterData
+---@field id string
+---@field name string
+---@field displayName string?
+---@field page string
+---@field language string?
+---@field position string
+---@field weight number
+---@field sort string|number
+---@field date string
+---@field flag string?
+
+---Template entry point
+---@param frame Frame
+---@return string
 function BroadcasterCard.create(frame)
 	local args = Arguments.getArgs(frame)
 	local language = args.lang
@@ -49,12 +64,12 @@ function BroadcasterCard.create(frame)
 		-- Create a title from the position.
 		local positions = Array.map(
 			mw.text.split(position, '/'),
-			function(pos) return mw.text.trim(pos) end
+			String.trim
 		)
 		if args.b2 then
 			positions = Array.map(positions, BroadcasterCard._pluralisePosition)
 		end
-		title = table.concat(positions, '/')  .. ':'
+		title = table.concat(positions, '/') .. ':'
 	end
 
 	-- Html for header
@@ -104,6 +119,8 @@ function BroadcasterCard.create(frame)
 	return outputList
 end
 
+---@param broadcaster broadCasterData
+---@return string
 function BroadcasterCard._display(broadcaster)
 	local displayName = broadcaster.displayName or broadcaster.name
 	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
@@ -113,10 +130,18 @@ function BroadcasterCard._display(broadcaster)
 		.. displayName
 end
 
+---@param position string
+---@return string
 function BroadcasterCard._pluralisePosition(position)
 	return String.endsWith(position, 's') and position or (position .. 's')
 end
 
+---Fetches information about the caster
+---@param args table
+---@param prefix string
+---@param casterPage string
+---@param restrictedQuery boolean
+---@return string?, string?
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 	local resolvedCasterPage = mw.ext.TeamLiquidIntegration.resolve_redirect(casterPage):gsub(' ','_' )
 
@@ -151,6 +176,11 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 	return getPersonInfo()
 end
 
+---Determines the sort value for a broadcaster
+---@param broadcaster broadCasterData
+---@param sortMode string|number|nil
+---@param casterIndex integer
+---@return string|number
 function BroadcasterCard.sortValue(broadcaster, sortMode, casterIndex)
 	if sortMode == 'flag' then
 		return broadcaster.flag
@@ -163,6 +193,9 @@ function BroadcasterCard.sortValue(broadcaster, sortMode, casterIndex)
 	return casterIndex
 end
 
+---Stores the broadcaster data into Lpdb
+---@param caster broadCasterData
+---@param status string?
 function BroadcasterCard.setLPDB(caster, status)
 	local smName = Variables.varDefault('show_match_name') or ''
 	local extradata = {status = ''}
@@ -197,6 +230,7 @@ function BroadcasterCard.setLPDB(caster, status)
 end
 
 -- Calculate the wiki specific Weight for the event
+---@return number
 function BroadcasterCard.getWeight()
 	local tPrizePool = Variables.varDefault('tournament_prizepoolusd') or 1
 	local tier = Variables.varDefault('tournament_liquipediatier')
@@ -206,7 +240,7 @@ function BroadcasterCard.getWeight()
 		return Weight.run(tier, tPrizePool, tierType)
 	end
 
-	return Template.safeExpand(mw.getCurrentFrame(), 'BroadcastWeight', {tier, tPrizePool})
+	return Template.safeExpand(mw.getCurrentFrame(), 'BroadcastWeight', {tier, tPrizePool}) --[[@as number]]
 end
 
 return BroadcasterCard

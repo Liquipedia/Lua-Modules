@@ -189,7 +189,8 @@ end
 ---@return table
 function mockLpdb._applyQuery(data, query)
 	if String.isNotEmpty(query) then
-		local fields = Table.mapValues(mw.text.split(query, ','), mw.text.trim)
+		---@cast query -nil
+		local fields = Array.map(mw.text.split(query, ','), String.trim)
 
 		return Array.map(data, function(entry)
 			return Table.map(entry, function(field, value)

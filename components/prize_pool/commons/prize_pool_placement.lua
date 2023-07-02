@@ -7,6 +7,7 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -35,6 +36,10 @@ local _tbd_index = 0
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
 --- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
+--- @field parseOpponents function
+--- @field getPrizeRewardForOpponent function
+--- @field parent PrizePool
+--- @field args table
 local Placement = Class.new(BasePlacement)
 
 Placement.specialStatuses = {
@@ -127,10 +132,10 @@ Placement.additionalData = {
 			end
 
 			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Table.mapValues(mw.text.split(input, '-'), mw.text.trim)
+			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
-				if String.isEmpty(rawScore) and String.isNotEmpty(rawScores[index + 1]) then
+				if Logic.isEmpty(rawScore) and Logic.isNotEmpty(rawScores[index + 1]) then
 					rawScores[index + 1] = '-' .. rawScores[index + 1]
 				else
 					table.insert(scores, rawScore)
@@ -300,9 +305,9 @@ function Placement:_displayPlace()
 		end
 	end
 
-	local start = Ordinal._ordinal(self.placeStart)
+	local start = Ordinal.toOrdinal(self.placeStart)
 	if self.placeEnd > self.placeStart then
-		return start .. DASH .. Ordinal._ordinal(self.placeEnd)
+		return start .. DASH .. Ordinal.toOrdinal(self.placeEnd)
 	end
 
 	return start

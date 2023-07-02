@@ -230,7 +230,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(Abbreviation.make(
 			score or ('Game ' .. gameIndex),
-			String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Map Scores'
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Map Scores'
 		))
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))

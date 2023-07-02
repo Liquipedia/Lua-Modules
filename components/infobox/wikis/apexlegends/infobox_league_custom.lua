@@ -67,13 +67,13 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, 1, Cell{
 				name = 'ALGS circuit tier',
 				content = {'[[Apex Legends Global Series|' .. algsTier .. ']]'},
-				classes = {'valvepremier-highlighted'}
+				classes = {'tournament-highlighted-bg'}
 			})
 		end
 		table.insert(widgets, Cell{
 			name = 'EA tier',
 			content = {Tier['ea'][string.lower(_args.eatier or '')]},
-			classes = {'valvepremier-highlighted'}
+			classes = {'tournament-highlighted-bg'}
 		})
 		return widgets
 	elseif id == 'customcontent' then
@@ -154,27 +154,25 @@ function CustomLeague:defineCustomPageVariables()
 	local eaMajor = _args.eamajor
 	if String.isEmpty(eaMajor) then
 		local eaTier = string.lower(_args.eatier or '')
-		if eaTier == 'major' then
-			eaMajor = 'true'
+		if String.isNotEmpty(eaTier) and eaTier ~= 'online' then
+			eaMajor = eaTier
 		else
 			local algsTier = string.lower(_args.algstier or '')
-			if algsTier == 'major' then
-				eaMajor = 'true'
+			if String.isNotEmpty(algsTier) and algsTier ~= 'online' then
+				eaMajor = algsTier
 			else
 				eaMajor = ''
 			end
 		end
 	end
-	Variables.varDefine('tournament_ea_major', eaMajor)
+	Variables.varDefine('tournament_publishertier', eaMajor)
 	local regionData = Locale.formatLocations(_args)
 	Variables.varDefine('tournament_location_region', regionData.region1 or _args.country)
 end
 
 function CustomLeague:addToLpdb(lpdbData)
 	lpdbData.participantsnumber = _args.team_number
-	lpdbData.publishertier = _args.pctier
-
-	lpdbData.extradata['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
 	lpdbData.extradata.platform = string.lower(_args.platform or 'pc')
 

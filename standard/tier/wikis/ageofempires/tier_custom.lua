@@ -18,12 +18,20 @@ local NON_BREAKING_SPACE = '&nbsp;'
 
 local TierCustom = Table.copy(Tier)
 
+--- Parses queryData to be processable for other Tier functions
+---@param queryData table
+---@return string?, string?, {game: string?}
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {game = queryData.game}
 end
 
+--- Builds the display for a given (tier, tierType) tuple
+---@param tier integer
+---@param tierType string?
+---@param options table?
+---@return string?
 function TierCustom.display(tier, tierType, options)
-	local tierData, tierTypeData = Tier._raw(tier, tierType)
+	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
 	if not tierData then return end
 
@@ -33,38 +41,48 @@ function TierCustom.display(tier, tierType, options)
 	tierDisplayOptions.game = options.game
 
 	if not tierTypeData then
-		return Tier.displaySingle(tierData, tierDisplayOptions)
+		return TierCustom.displaySingle(tierData, tierDisplayOptions)
 	end
 
 	local tierTypeDisplayOptions = Tier._displayOptions(options, 'tierType')
 	tierTypeDisplayOptions.game = options.game
 
 	if options.onlyTierTypeIfBoth then
-		return Tier.displaySingle(tierTypeData, tierTypeDisplayOptions)
+		return TierCustom.displaySingle(tierTypeData, tierTypeDisplayOptions)
 	end
 
 	if options.shortIfBoth then
 		options.short = true
 	end
 
-	return Tier.displaySingle(tierTypeData, tierDisplayOptions)
-		.. NON_BREAKING_SPACE .. '(' .. Tier.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
+	return TierCustom.displaySingle(tierTypeData, tierDisplayOptions)
+		.. NON_BREAKING_SPACE .. '(' .. TierCustom.displaySingle(tierData, tierTypeDisplayOptions) .. ')'
 end
 
-function Tier.displaySingle(data, options)
+--- Builds the display for a given tierData/tierTypeData table
+---@param data table
+---@param options {short: boolean?, link: boolean|string|nil, game: string?}
+---@return string?
+function TierCustom.displaySingle(data, options)
 	local display = options.short and data.short or data.name
 
 	if Logic.readBool(options.link) and data.link then
 		return Page.makeInternalLink({}, display, TierCustom.adjustLink(data.link, options.game))
-	elseif String.isNotEmpty(options.link) then
-		return Page.makeInternalLink({}, display, options.link)
+	elseif Logic.readBoolOrNil(options.link) == nil then
+		local link = options.link --[[@as string?]]
+		if String.isNotEmpty(link) then
+			return Page.makeInternalLink({}, display, link)
+		end
 	end
 
 	return display
 end
 
+---@param link string
+---@param game string?
+---@return string
 function TierCustom.adjustLink(link, game)
-	return game .. '/' .. link
+	return String.isNotEmpty(game) and (game .. '/' .. link) or link
 end
 
 return TierCustom

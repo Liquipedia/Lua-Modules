@@ -10,7 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -48,9 +48,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	)
 
 	local worldTourPoints = Array.filter(placement.parent.prizes, function (prize)
-		if prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORLD_TOUR then
-			return true
-		end
+		return prize.type == PRIZE_TYPE_POINTS and prize.data.title == PRIZE_TITLE_WORLD_TOUR
 	end)[1]
 
 	if worldTourPoints then
@@ -65,7 +63,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 end
 
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

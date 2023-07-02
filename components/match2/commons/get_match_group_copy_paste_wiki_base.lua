@@ -16,6 +16,8 @@ adjust this to fit the needs of your wiki^^
 
 local wikiCopyPaste = {}
 
+local INDENT = '    '
+
 --allowed opponent types on the wiki
 local MODES = {
 	['solo'] = 'solo',
@@ -37,7 +39,7 @@ function wikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local out = ''
 	for i = 1, bestof do
-		out = out .. '\n    |map' .. i .. '=' .. map
+		out = out .. '\n' .. INDENT .. '|map' .. i .. '=' .. map
 	end
 
 	return out
@@ -48,11 +50,11 @@ end
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
 	if out == '⧼BracketConfigMatchTemplate⧽' then
-		out = '{{Match\n    '
+		out = '{{Match\n' .. INDENT
 		for i = 1, opponents do
-			out = out .. '\n    |opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode)
+			out = out .. '\n' .. INDENT .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode)
 		end
-		out = out .. '\n    |finished=\n    |tournament=\n    }}'
+		out = out .. '\n' .. INDENT .. '|finished=\n' .. INDENT .. '|tournament=\n' .. INDENT .. '}}'
 	else
 		out = string.gsub(out, '<nowiki>', '')
 		out = string.gsub(out, '</nowiki>', '')

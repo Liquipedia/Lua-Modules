@@ -72,4 +72,10 @@ function suite:testCountryCode()
 	self:assertEquals(nlOutput, Flags.CountryCode('holland'))
 end
 
+function suite:testIsValidFlagInput()
+	self:assertEquals(true, Flags.isValidFlagInput('de'))
+	self:assertEquals(true, Flags.isValidFlagInput('germany'))
+	self:assertEquals(false, Flags.isValidFlagInput('aaaaaaa'))
+end
+
 return suite

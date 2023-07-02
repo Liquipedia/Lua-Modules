@@ -94,11 +94,14 @@ function TemplateMatch.storeVarsToLPDB()
 end
 
 local pagename = mw.title.getCurrentTitle().text
+---@param id string
+---@return string
+---@overload fun(): nil
 function TemplateMatch._getTrueID(id)
 	if id == nil then
 		return nil
 	else
-		return id:gsub(pagename:gsub('([^%w])', '%%%1') .. '_', '')
+		return (id:gsub(pagename:gsub('([^%w])', '%%%1') .. '_', ''))
 	end
 end
 
@@ -107,6 +110,7 @@ function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, appli
 	if Logic.isEmpty(id) then
 		return matches, applied
 	end
+	---@cast id -nil
 	id = TemplateMatch._getTrueID(id)
 	local match = matches[id]
 	if not Logic.isEmpty(match.bracketdata.header) and headerchild ~= true then

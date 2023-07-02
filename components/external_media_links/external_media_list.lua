@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local Logic = require('Module:Logic')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
@@ -18,6 +19,11 @@ local MediaList = {}
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---Main function for ExternalMediaList.
+---Queries External Media Links for the given conditions (via arguments).
+---Calls the display functions based on setting (supplied in arguments).
+---@param args table
+---@return Html?
 function MediaList.get(args)
 	args = MediaList._parseArgs(args)
 
@@ -45,6 +51,9 @@ function MediaList.get(args)
 		:node(MediaList._formLink(args.linkToForm))
 end
 
+---Parses the arguments for further usage in this module.
+---@param args table
+---@return table
 function MediaList._parseArgs(args)
 	args = args or {}
 
@@ -73,6 +82,9 @@ function MediaList._parseArgs(args)
 	}
 end
 
+---Builds the query conditions for the given arguments
+---@param args table
+---@return string
 function MediaList._buildConditions(args)
 	local conditions = {
 		'[[namespace::136]]'
@@ -110,13 +122,21 @@ function MediaList._buildConditions(args)
 
 	return table.concat(conditions, ' AND ')
 end
-
+---Builds a multi key condition for a given prefix and value
+---@param value string|number
+---@param prefix string
+---@param limit integer
+---@return string
 function MediaList._buildMultiKeyCondition(value, prefix, limit)
 	return table.concat(Array.map(Array.range(1, limit), function(index)
 		return '[[' .. prefix .. index .. '::' .. value .. ']]'
 	end), ' OR ')
 end
 
+---Builds the display for the dynamic tabs per year option
+---@param data table[]
+---@param args table
+---@return Html
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 
@@ -131,6 +151,10 @@ function MediaList._displayDynamic(data, args)
 	return Tabs.dynamic(tabsData)
 end
 
+---Builds the display for the per year option (without tabs)
+---@param data table[]
+---@param args table
+---@return Html
 function MediaList._displayByYear(data, args)
 	local display = mw.html.create()
 
@@ -143,6 +167,9 @@ function MediaList._displayByYear(data, args)
 	return display
 end
 
+---Groups provided data by year
+---@param data table[]
+---@return table[][]
 function MediaList._groupByYear(data)
 	local _, groupedData = Array.groupBy(data, function(item)
 		return item.date:sub(1, 4)
@@ -151,10 +178,19 @@ function MediaList._groupByYear(data)
 	return groupedData
 end
 
+---Sort function to sort External Media Links within a year
+---@param _ table?
+---@param key1 string
+---@param key2 string
+---@return boolean
 function MediaList._sortInYear(_, key1, key2)
 	return key1 > key2
 end
 
+---Displays the External Media Links for a given data set (usually of a year)
+---@param data table[]
+---@param args table
+---@return Html
 function MediaList._displayYear(data, args)
 	local yearDisplay = mw.html.create('ul')
 
@@ -165,6 +201,10 @@ function MediaList._displayYear(data, args)
 	return yearDisplay
 end
 
+---Displays a single External Media Link
+---@param item table
+---@param args table
+---@return Html
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
@@ -181,9 +221,15 @@ function MediaList._row(item, args)
 	end
 
 	local authors = {}
-	for _, author in Table.iter.pairsByPrefix(item.authors, 'author') do
+	for key, author in Table.iter.pairsByPrefix(item.authors, 'author') do
+		local displayname = item.authors[key .. 'dn']
 		if String.isNotEmpty(author) then
-			table.insert(authors, '[[' .. author .. ']]')
+			table.insert(authors,
+				Page.makeInternalLink({},
+					String.isNotEmpty(displayname) and displayname or author,
+					author
+				)
+			)
 		end
 	end
 	if Table.isNotEmpty(authors) then
@@ -207,10 +253,16 @@ function MediaList._row(item, args)
 	return row
 end
 
+---Display for the edit button in front of External Medial Link rows
+---@param page string
+---@return string
 function MediaList._editButton(page)
 	return mw.text.nowiki('[') .. '[[Data:' .. page .. '|e]]' .. mw.text.nowiki(']') .. NON_BREAKING_SPACE
 end
 
+---Displays the title for a given External Media Link
+---@param item table
+---@return Html
 function MediaList._displayTitle(item)
 	local title = item.link
 
@@ -224,6 +276,9 @@ function MediaList._displayTitle(item)
 			:wikitext('[' .. item.link .. ' ' .. title .. ']')
 end
 
+---Displays the event for a given External Media Link
+---@param item table
+---@return string
 function MediaList._displayEvent(item)
 	local prefix = NON_BREAKING_SPACE .. 'at' .. NON_BREAKING_SPACE
 	if Logic.readBoolOrNil(item.extradata.event_link) == false then
@@ -237,6 +292,9 @@ function MediaList._displayEvent(item)
 	return prefix .. '[[' .. item.extradata.event .. ']]'
 end
 
+---Displays the translation for a given External Media Link
+---@param item table
+---@return string
 function MediaList._displayTranslation(item)
 	local translation = NON_BREAKING_SPACE .. '(trans. '
 		.. Flag.Icon({flag = item.extradata.translation, shouldLink = false})
@@ -248,6 +306,9 @@ function MediaList._displayTranslation(item)
 	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. item.extradata.translator .. ')'
 end
 
+---Displays the link to the Form with which External Media Links are to be created.
+---@param show boolean defines if the link is to be displayed or not
+---@return Html?
 function MediaList._formLink(show)
 	if not show then return end
 

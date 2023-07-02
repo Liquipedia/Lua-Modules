@@ -55,6 +55,10 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Players',
 		content = {args.participants_number}
 	})
+	table.insert(widgets, Cell{
+		name = 'Version',
+		content = {CustomLeague:_createPatchCell(args)}
+	})
 	return widgets
 end
 
@@ -102,6 +106,18 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
+end
+
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local displayText = '[[Patch ' .. args.patch .. ']]'
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [[Patch ' .. args.epatch .. ']]'
+	end
+	return displayText
 end
 
 return CustomLeague

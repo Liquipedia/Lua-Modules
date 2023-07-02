@@ -52,7 +52,7 @@ function PrizePoolCurrency.display(args)
 		date = NOW
 	end
 
-	if currency == USD and String.isEmpty(prizepoolUsd) then
+	if currency == USD and Logic.isEmpty(prizepoolUsd) then
 		return PrizePoolCurrency._errorMessage('Need valid currency')
 	elseif currency ~= USD then
 		local errorMessage
@@ -100,7 +100,7 @@ function PrizePoolCurrency.display(args)
 			formatValue = true,
 			formatPrecision = displayRoundPrecision
 		})
-	if String.isNotEmpty(prizepool) then
+	if Logic.isNotEmpty(prizepool) then
 		display = Currency.display(currency, prizepool, {
 				setVariables = true,
 				formatValue = true,

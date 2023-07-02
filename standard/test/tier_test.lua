@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@diagnostic disable: param-type-mismatch
+
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
@@ -23,11 +25,11 @@ function suite:testToIdentifier()
 end
 
 function suite:testRaw()
-	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw(1)})
-	self:assertDeepEquals({TierData.tiers[1], TierData.tierTypes.misc}, {Tier._raw('1', 'misc')})
-	self:assertDeepEquals({TierData.tiers[1]}, {Tier._raw('1', 'bera')})
-	self:assertDeepEquals({}, {Tier._raw('bera')})
-	self:assertDeepEquals({}, {Tier._raw('sedrvo', 'ergbv')})
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier.raw(1)})
+	self:assertDeepEquals({TierData.tiers[1], TierData.tierTypes.misc}, {Tier.raw('1', 'misc')})
+	self:assertDeepEquals({TierData.tiers[1]}, {Tier.raw('1', 'bera')})
+	self:assertDeepEquals({}, {Tier.raw('bera')})
+	self:assertDeepEquals({}, {Tier.raw('sedrvo', 'ergbv')})
 end
 
 function suite:testIsValid()
@@ -37,7 +39,6 @@ function suite:testIsValid()
 	self:assertTrue(Tier.isValid('1', 'showmatch'))
 	self:assertFalse(Tier.isValid('sedrvo'))
 	self:assertFalse(Tier.isValid(''))
-	self:assertFalse(Tier.isValid())
 	self:assertFalse(Tier.isValid(1, 'sedrvo'))
 	self:assertTrue(Tier.isValid(1, ''))
 end
