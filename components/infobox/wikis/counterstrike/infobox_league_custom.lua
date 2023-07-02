@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = require('Module:Tier/Custom')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -23,6 +23,7 @@ local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requ
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -209,6 +210,10 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'Infobox league lacking localcurrency')
 	end
 
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
+	end
+
 	if String.isNotEmpty(args.sort_date) then
 		table.insert(categories, 'Tournaments with custom sort date')
 	end
@@ -375,9 +380,10 @@ function CustomLeague:_createValveTierCell(valveTier)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
+	local span = mw.html.create('span')
+	span:css('white-space', 'nowrap')
+	:node(content)
+	return span
 end
 
 return CustomLeague
