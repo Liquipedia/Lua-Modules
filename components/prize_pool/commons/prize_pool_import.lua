@@ -326,10 +326,11 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			end
 
 			-- Opponents knocked out from sole section (se) or lower bracket (de)
-			if coordinates.sectionIndex == #bracket.sections
+			if (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) and (
+				coordinates.sectionIndex == #bracket.sections
 
 				-- Include opponents directly knocked out from the upper bracket
-				or firstDeRoundIndex and coordinates.roundIndex < firstDeRoundIndex then
+				or firstDeRoundIndex and coordinates.roundIndex < firstDeRoundIndex) then
 
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
