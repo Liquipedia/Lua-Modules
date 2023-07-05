@@ -478,9 +478,6 @@ function CustomItem:setLpdbData(args)
 	local lpdbData = {
 		type = 'item',
 		name = args.itemname or self.pagename,
-		information = '',
-		image = '',
-		date = '',
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			cost = args.itemcost,
 			category = args.category,
