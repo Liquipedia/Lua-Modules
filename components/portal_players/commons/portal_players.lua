@@ -124,8 +124,8 @@ function PortalPlayers:_getPlayers()
 		conditionString = addConidition(conditionString, '[[status::'.. self.args.status .. ']]')
 	end
 
-	if String.isNotEmpty(self.args.extraConditions) then
-		conditionString = addConidition(conditionString, self.args.extraConditions)
+	if String.isNotEmpty(self.args.additionalConditions) then
+		conditionString = addConidition(conditionString, self.args.additionalConditions)
 	end
 
 	local players = mw.ext.LiquipediaDB.lpdb('player', {
