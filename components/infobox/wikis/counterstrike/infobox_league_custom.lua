@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -284,8 +285,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
-	Variables.varDefine('raw_sdate', args.sdate or args.date)
-	Variables.varDefine('raw_edate', args.edate or args.date)
 	Variables.varDefine('tournament_valve_major',
 		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
 	Variables.varDefine('tournament_valve_tier',
@@ -323,13 +322,16 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.team_number or args.player_number
 	lpdbData.sortdate = args.sort_date or lpdbData.enddate
 
-	lpdbData.extradata.prizepoollocal = Variables.varDefault('prizepoollocal', '')
-	lpdbData.extradata.startdate_raw = Variables.varDefault('raw_sdate', '')
-	lpdbData.extradata.enddate_raw = Variables.varDefault('raw_edate', '')
+	lpdbData.extradata.prizepoollocal = Variables.varDefault('prizepoollocal')
+	lpdbData.extradata.startdate_raw = args.sdate or args.date
+	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.shortname2 = args.shortname2
 
 	Array.forEach(CustomLeague.getRestrictions(_args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
+
+	-- Extradata variable
+	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
 	return lpdbData
 end
