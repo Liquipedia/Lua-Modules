@@ -248,8 +248,7 @@ function Count._baseConditions(args, isTournament)
 		conditions:add{ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName(endDateKey), Comparator.lt, args.edate),
 			ConditionNode(ColumnName(endDateKey), Comparator.eq, args.edate)
-			},
-		}
+		}}
 	end
 
 	if args.year then
