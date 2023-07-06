@@ -128,6 +128,7 @@ function StatisticsPortal.topEarningsChart(args)
 		chartData[1] = {
 			name = 'Total Earnings',
 			type = 'bar',
+			stack = config.stackType,
 			data = StatisticsPortal._addArrays(yearSeriesData),
 		}
 
@@ -1153,7 +1154,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		removeEmptyCategories = Logic.readBool(args.removeEmptyCategories),
 		removeEmptySeries = Logic.readBool(args.removeEmptySeries),
 		chartType = args.chartType or 'bar',
-		stackType = args.stackType,
+		stackType = args.stackType or 'total',
 		isForTeam = isForTeam,
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
