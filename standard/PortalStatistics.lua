@@ -25,7 +25,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Count = require('Module:Count/dev')
+local Count = require('Module:Count')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y'))
