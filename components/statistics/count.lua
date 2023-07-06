@@ -228,12 +228,12 @@ function Count._baseConditions(args, isTournament)
 	local startDateKey, endDateKey, sortDateKey
 	if isTournament then
 		startDateKey = 'startdate'
-		endDateKey= 'enddate'
-		sortDateKey= 'sortdate'
+		endDateKey = 'enddate'
+		sortDateKey = 'sortdate'
 	else
 		startDateKey = 'date'
 		endDateKey = 'date'
-		sortDateKey= 'date'
+		sortDateKey = 'date'
 	end
 
 	if args.sdate then
