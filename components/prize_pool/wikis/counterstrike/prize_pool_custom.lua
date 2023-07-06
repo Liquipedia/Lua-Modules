@@ -54,7 +54,7 @@ function CustomPrizePool.run(frame)
 
 	if Logic.readBool(args.qualifier) then
 		local extradata = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
-		extradata.qualifier = '1', -- This is the new field, rest are just what Infobox League sets
+		extradata.qualifier = '1' -- This is the new field, rest are just what Infobox League sets
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 		})
