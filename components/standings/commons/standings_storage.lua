@@ -249,9 +249,9 @@ function StandingsStorage.fromTemplateEntry(frame)
 		data.currentstatus = DISQUALIFIED
 	end
 
- 	data.placement = tonumber(data.placement)
- 	-- If template doesn't have slotIndex, use placement as workaround
- 	data.slotindex = tonumber(data.slotindex) or data.placement
+	data.placement = tonumber(data.placement)
+	-- If template doesn't have slotIndex, use placement as workaround
+	data.slotindex = tonumber(data.slotindex) or data.placement
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
