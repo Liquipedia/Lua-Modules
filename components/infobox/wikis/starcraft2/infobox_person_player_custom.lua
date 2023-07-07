@@ -433,6 +433,7 @@ function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
 		earnings[mode] = {}
 	end
 	local year = string.sub(data.date, 1, 4)
+	data.individualprizemoney = tonumber(data.individualprizemoney) or 0
 	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
 	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
 	earnings_total = (earnings_total or 0) + data.individualprizemoney
