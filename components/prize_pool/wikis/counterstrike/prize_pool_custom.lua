@@ -47,8 +47,8 @@ function CustomPrizePool.run(frame)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
-	HEADER_DATA.tournamentName = args['tournament name']
-	HEADER_DATA.resultName = args['custom-name']
+	HEADER_DATA.tournamentName = args['tournamentName']
+	HEADER_DATA.resultName = args['resultName']
 
 	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
