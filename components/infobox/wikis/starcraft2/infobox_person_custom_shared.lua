@@ -126,7 +126,9 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 	extradata.role = _args.role
 	extradata.role2 = _args.role2
 	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = not CustomPerson.getStatusToStore() and CustomPerson._isPlayer(_args) and Variables.varDefault('isActive', '') or ''
+	extradata.activeplayer = not CustomPerson.getStatusToStore()
+		and CustomPerson._isPlayer(_args)
+		and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
