@@ -13,7 +13,6 @@ local StreamLinks = {}
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -93,7 +92,7 @@ function StreamLinks.processStreams(forwardedInputArgs)
 
 		if Table.isEmpty(streamValues) then
 			streamValues = {[platformName] = Variables.varDefault(platformName)}
-		end 
+		end
 
 		Table.mergeInto(processedStreams, StreamLinks._processStreamsOfPlatform(streamValues, platformName))
 	end
