@@ -48,7 +48,6 @@ StreamLinks.streamPlatformLookupNames = {
 	twitch2 = 'twitch',
 }
 
-
 ---Extracts the streaming platform args from an argument table for use in Module:Countdown.
 ---@param args {[string]: string}
 ---@return table
