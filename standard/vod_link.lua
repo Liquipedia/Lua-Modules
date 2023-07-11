@@ -18,9 +18,9 @@ function VodLink.display(args)
 
 	if Logic.readBool(args.novod) then
 		return mw.html.create('span')
-			:addClass('plainlinks')
+			:addClass('plainlinks vodlink')
 			:attr('title', 'Help Liquipedia find this VOD')
-			:wikitext('[[File:NoVod.png|link=]]')
+			:wikitext('[[File:NoVod.png|32px|link=]]')
 	end
 
 	local title
@@ -48,7 +48,7 @@ function VodLink.display(args)
 	return mw.html.create('span')
 		:addClass('plainlinks vodlink')
 		:attr('title', title)
-		:wikitext('[[File:' .. fileName .. '|link=' .. link .. ']]')
+		:wikitext('[[File:' .. fileName .. '|32px|link=' .. link .. ']]')
 end
 
 return Class.export(VodLink, {frameOnly = true})
