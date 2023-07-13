@@ -195,6 +195,7 @@ local PREFIXES = {
 		team = 'https://www.vlr.gg/team/',
 		player = 'https://www.vlr.gg/player/'
 	},
+	vod = {''},
 	weibo = {'https://weibo.com/'},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
