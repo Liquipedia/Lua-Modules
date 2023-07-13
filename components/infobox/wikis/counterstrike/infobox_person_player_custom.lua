@@ -167,7 +167,7 @@ function CustomPlayer:getWikiCategories(categories)
 	local typeCategory = self:getPersonType(_args).category
 
 	Array.forEach(_games, function (gameIdentifier)
-			local prefix = Game.categoryPrefix{game = gameIdentifier} or Game.name{game = gameIdentifier}
+			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
 		end)
 
