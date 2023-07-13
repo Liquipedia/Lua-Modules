@@ -269,10 +269,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
-	Variables.varDefine('tournament_valve_major',
-		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
-	Variables.varDefine('tournament_valve_tier',
-		mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
+	Variables.varDefine('tournament_valve_tier', mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
 
 	Variables.varDefine('tournament_mode',
