@@ -149,6 +149,7 @@ local PREFIXES = {
 	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
+	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},

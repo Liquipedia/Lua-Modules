@@ -47,7 +47,6 @@ MILITARY_DATA.pending = MILITARY_DATA.starting
 MILITARY_DATA.started = MILITARY_DATA.ongoing
 MILITARY_DATA.ending = MILITARY_DATA.ongoing
 
-local _statusStore
 local _militaryStore
 local _args
 
@@ -127,7 +126,9 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 	extradata.role = _args.role
 	extradata.role2 = _args.role2
 	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
+	extradata.activeplayer = not CustomPerson.getStatusToStore()
+		and CustomPerson._isPlayer(_args)
+		and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
@@ -137,6 +138,11 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 	lpdbData.extradata = extradata
 
 	return lpdbData
+end
+
+function CustomPerson._isPlayer(args)
+	return not Logic.readBool(_args.isplayer) and
+		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
 end
 
 function CustomPerson.military(military)
@@ -158,16 +164,10 @@ end
 
 function CustomPerson.getStatusToStore()
 	if _args.death_date then
-		_statusStore = 'Deceased'
+		return 'Deceased'
 	elseif _args.retired then
-		_statusStore = 'Retired'
-	elseif
-		(not Logic.readBool(_args.isplayer)) and
-		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
-	then
-		_statusStore = 'not player'
+		return 'Retired'
 	end
-	return _statusStore
 end
 
 function CustomPerson.getPersonType()
