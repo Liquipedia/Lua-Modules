@@ -221,7 +221,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 		:wikitext(LANG:formatNum(Count.games(parameters)))
 		:css('text-align','right')
 
-	return resultsRow:allDone()
+	return resultsRow
 end
 
 
