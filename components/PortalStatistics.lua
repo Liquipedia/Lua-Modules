@@ -686,7 +686,7 @@ function StatisticsPortal.playerAgeTable(args)
 					showPlayerTeam  = true,
 				}):done()
 			:tag('td')
-				:wikitext(yearAge..' years, '..dayAge..' days')
+				:wikitext(yearAge .. ' years, ' .. dayAge .. ' days')
 	end
 
 	return mw.html.create('div'):addClass('table-responsive'):node(tbl)
