@@ -582,9 +582,9 @@ function StatisticsPortal.earningsTable(args)
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
-			return tonumber(a.extradata['earningsin'..args.year] or 0)
+			return tonumber(a.extradata['earningsin'..args.year]) or 0
 		else
-			return tonumber(a.earnings or 0)
+			return tonumber(a.earnings) or 0
 		end
 	end
 
