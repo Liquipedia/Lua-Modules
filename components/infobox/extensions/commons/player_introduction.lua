@@ -183,8 +183,8 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, playerInfo.extradata.game, args.defaultGame),
 		id = Logic.emptyOr(args.id, playerInfo.id),
-		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate),
-		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate),
+		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate, DEFAULT_DATE),
+		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate, DEFAULT_DATE),
 		nationality = Logic.emptyOr(args.nationality, playerInfo.nationality),
 		nationality2 = Logic.emptyOr(args.nationality2, playerInfo.nationality2),
 		nationality3 = Logic.emptyOr(args.nationality3, playerInfo.nationality3),
@@ -364,7 +364,7 @@ end
 --- builds the display
 ---@return string
 function PlayerIntroduction:create()
-	if Table.isEmpty(self.playerInfo) then
+	if Logic.isEmpty(self.playerInfo.id) then
 		return ''
 	end
 
@@ -407,7 +407,7 @@ function PlayerIntroduction:_nameDisplay()
 		.. self._addConcatText(self.playerInfo.lastName)
 
 	if Table.isNotEmpty(self.playerInfo.formerlyKnownAs) then
-		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as')
+		nameDisplay = nameDisplay .. self._addConcatText('(formerly known as ')
 			.. mw.text.listToText(self.playerInfo.formerlyKnownAs, ', ', ' and ')
 			.. ')'
 	end
@@ -529,7 +529,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
 		playedOrWorked = self:_playedOrWorked(isCurrentTense),
-		team = PlayerIntroduction._displayTeam(transferInfo.team or playerInfo.team, transferInfo.date),
+		team = PlayerIntroduction._displayTeam(isCurrentTense and playerInfo.team or transferInfo.team, transferInfo.date),
 		team2 = shouldDisplayTeam2
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
 			or '',
@@ -561,6 +561,8 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 end
 
 function PlayerIntroduction._displayTeam(team, date)
+	team = team:gsub('_', ' ')
+
 	if mw.ext.TeamTemplate.teamexists(team) then
 		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'

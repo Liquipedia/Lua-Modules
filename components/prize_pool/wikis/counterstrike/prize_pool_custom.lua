@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 
@@ -46,19 +47,16 @@ function CustomPrizePool.run(frame)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
-	HEADER_DATA.tournamentName = args['tournament name']
-	HEADER_DATA.resultName = args['custom-name']
+	HEADER_DATA.tournamentName = args['tournamentName']
+	HEADER_DATA.resultName = args['resultName']
 
 	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
 	if Logic.readBool(args.qualifier) then
+		local extradata = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
+		extradata.qualifier = '1' -- This is the new field, rest are just what Infobox League sets
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-				prizepoollocal = Variables.varDefault('prizepoollocal', ''),
-				startdate_raw = Variables.varDefault('raw_sdate', ''),
-				enddate_raw = Variables.varDefault('raw_edate', ''),
-				qualifier = '1', -- This is the new field, rest are just what Infobox League sets
-			}
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 		})
 	end
 

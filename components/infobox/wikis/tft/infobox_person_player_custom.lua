@@ -74,6 +74,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Role', content = {
 				CustomPlayer._getRoleData('role').value,
 				CustomPlayer._getRoleData('role2').value,
+				CustomPlayer._getRoleData('role3').value,
 			}},
 		}
 	elseif id == 'history' then
@@ -88,6 +89,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role3 = Variables.varDefault('role3')
 
 	return lpdbData
 end
@@ -104,6 +106,7 @@ end
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role', CustomPlayer._getRoleData('role').value)
 	Variables.varDefine('role2', CustomPlayer._getRoleData('role2').value)
+	Variables.varDefine('role3', CustomPlayer._getRoleData('role3').value)
 end
 
 function CustomPlayer:getPersonType(args)
