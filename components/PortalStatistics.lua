@@ -759,7 +759,7 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 	--Querying data
 	local queryParameters = {
 		conditions = LPDBConditions:toString(),
-		query = 'prizepool, '.. groupBy,
+		query = 'prizepool, ' .. groupBy,
 	}
 
 	--Querying data
