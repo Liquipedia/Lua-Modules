@@ -31,7 +31,6 @@ function suite:testDataRetrieve()
 	self:assertEquals(COMMONS_DATA.abbreviation, Game.abbreviation())
 	self:assertEquals(COMMONS_DATA.name, Game.name())
 	self:assertEquals(COMMONS_DATA.link, Game.link())
-	self:assertEquals(COMMONS_DATA.categoryPrefix, Game.categoryPrefix())
 	self:assertDeepEquals(COMMONS_DATA.defaultTeamLogo, Game.defaultTeamLogoData())
 end
 
@@ -65,10 +64,6 @@ function suite:testList()
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames()[1])
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames({ordered = true})[1])
 	self:assertEquals(COMMONS_IDENTIFIER, Game.listGames({ordered = false})[1])
-end
-
-function suite:testCategoryPrefix()
-	self:assertEquals(nil, Game.categoryPrefix())
 end
 
 function suite:testIsDefaultTeamLogo()
