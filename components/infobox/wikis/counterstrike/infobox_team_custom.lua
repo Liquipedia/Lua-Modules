@@ -104,7 +104,7 @@ function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
 	Array.forEach(_games, function (gameIdentifier)
-			local prefix = Game.categoryPrefix{game = gameIdentifier} or Game.name{game = gameIdentifier}
+			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' Teams')
 		end)
 
