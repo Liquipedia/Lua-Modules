@@ -195,7 +195,7 @@ function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
 	if Table.isNotEmpty(_game) then
-		table.insert(categories, (_game.abbreviation or _game.name) .. ' Competitions')
+		table.insert(categories, (_game.abbreviation or _game.name) .. ' Tournaments')
 	else
 		table.insert(categories, 'Tournaments without game version')
 	end
