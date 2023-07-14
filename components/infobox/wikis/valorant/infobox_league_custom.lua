@@ -76,6 +76,7 @@ function CustomInjector:parse(id, widgets)
 					Page.makeInternalLink({}, map, map .. game)
 				)))
 			end
+			table.sort(maps)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
