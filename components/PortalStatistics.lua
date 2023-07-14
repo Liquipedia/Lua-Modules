@@ -280,7 +280,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 
 	if String.isNotEmpty(args.showOther) then
 		resultsRow:tag(tagType)
-			:wikitext(LANG:formatNum(Count.totalTournaments(parameters) - runningTally))
+			:wikitext(LANG:formatNum(Count.tournaments(parameters) - runningTally))
 			:css('text-align', 'right')
 	end
 
@@ -297,7 +297,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	end
 
 	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(Count.totalTournaments(parameters)))
+		:wikitext(LANG:formatNum(Count.tournaments(parameters)))
 		:css('text-align', 'right')
 
 	return resultsRow:allDone()
@@ -455,7 +455,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext(Currency.display(US_DOLLAR, totalPrizePool / (Count.totalTournaments() or 1), CURRENCY_FORMAT_OPTIONS))
+			:wikitext(Currency.display(US_DOLLAR, totalPrizePool / (Count.tournaments() or 1), CURRENCY_FORMAT_OPTIONS))
 			:css('font-weight', 'bold')
 	end
 
