@@ -78,17 +78,17 @@ end
 
 ---Fetches all valid game identifiers, potentially ordered
 ---@param options? {ordered: boolean?}
----@return table
+---@return string[]
 function Game.listGames(options)
 	options = options or {}
 
-	local gamesList = Array.extractKeys(GamesData or {})
-	if Logic.readBool(options.ordered) and Array.all(gamesList, function(gameIdentifier)
-				return tonumber(GamesData[gameIdentifier].order)
-			end) then
-		return Array.sortBy(gamesList, function(gameIdentifier)
-				return tonumber(GamesData[gameIdentifier].order)
-			end)
+	local function getGameOrder(gameIdentifier)
+		return tonumber(GamesData[gameIdentifier].order)
+	end
+
+	local gamesList = Array.extractKeys(GamesData)
+	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
+		return Array.sortBy(gamesList, getGameOrder)
 	end
 
 	return gamesList
