@@ -35,6 +35,7 @@ local TIMESTAMP = DateExt.readTimestamp(DATE)
 local DEFAULT_ALLOWED_PLACES = Array.map(mw.text.split('1,2,3,1-2,2-3,2-4,3-4', ',', true), String.trim)
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
+local MAX_QUERY_LIMIT = 5000
 local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
@@ -390,7 +391,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 		local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 				query = 'sum::prizepool',
-				limit = 5000,
+				limit = MAX_QUERY_LIMIT,
 				conditions = conditions:toString(),
 				order = 'sortdate desc',
 			}
@@ -435,7 +436,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 	local totalData = mw.ext.LiquipediaDB.lpdb('tournament', {
 			query = 'sum::prizepool',
-			limit = 5000,
+			limit = MAX_QUERY_LIMIT,
 			conditions = conditions:toString(),
 			order = 'sortdate desc',
 		}
@@ -544,7 +545,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'sum::prizepool',
-		limit = 5000,
+		limit = MAX_QUERY_LIMIT,
 		conditions = conditions:toString(),
 		order = 'sortdate desc',
 	})
@@ -591,9 +592,9 @@ function StatisticsPortal.earningsTable(args)
 	local opponentData
 
 	if args.opponentType == Opponent.team then
-		opponentData = StatisticsPortal._getTeams(5000)
+		opponentData = StatisticsPortal._getTeams()
 	elseif args.opponentType == Opponent.solo then
-		opponentData = StatisticsPortal._getPlayers(5000)
+		opponentData = StatisticsPortal._getPlayers()
 	end
 
 	table.sort(opponentData, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
@@ -704,7 +705,7 @@ function StatisticsPortal._getPlayers(limit, addConditions, addOrder, addGroupBy
 		conditions = addConditions or '',
 		order = addOrder,
 		groupby = addGroupBy,
-		limit = limit or 5000,
+		limit = limit or MAX_QUERY_LIMIT,
 	})
 
 	return data
@@ -717,7 +718,7 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
 		conditions = addConditions or '',
 		order = addOrder,
 		groupby = addGroupBy,
-		limit = limit or 5000,
+		limit = limit or MAX_QUERY_LIMIT,
 	})
 
 	return data
@@ -820,7 +821,7 @@ function StatisticsPortal._cacheModeEarningsData(config)
 
 	local queryParameters = {
 		conditions = conditions:toString(),
-		limit = 5000,
+		limit = MAX_QUERY_LIMIT,
 		query = 'opponenttype, prizemoney, individualprizemoney, date, game',
 	}
 
