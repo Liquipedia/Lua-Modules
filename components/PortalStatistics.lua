@@ -396,7 +396,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			}
 		)
 
-		prizepoolSum = prizepoolSum + tonumber(data[1].sum_prizepool or 0)
+		prizepoolSum = prizepoolSum + (tonumber(data[1].sum_prizepool) or 0)
 
 		if Array.any(Array.extractValues(yearTable), function(value) return value == yearValue end) then
 			headerRow:tag('th')
