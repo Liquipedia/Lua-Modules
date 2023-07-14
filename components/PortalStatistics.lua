@@ -440,7 +440,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			order = 'sortdate desc',
 		}
 	)
-	local totalPrizePool = (tonumber(totalData[1].sum_prizepool or 0))
+	local totalPrizePool = tonumber(totalData[1].sum_prizepool) or 0
 	headerRow:tag('th')
 		:wikitext('Total')
 	resultsRow:tag('td')
