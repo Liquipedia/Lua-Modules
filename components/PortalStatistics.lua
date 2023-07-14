@@ -36,6 +36,7 @@ local DEFAULT_ALLOWED_PLACES = Array.map(mw.text.split('1,2,3,1-2,2-3,2-4,3-4', 
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
 local MAX_QUERY_LIMIT = 5000
+local US_DOLLAR = 'USD'
 local SHOWMATCH = 'Showmatch'
 local TIER1 = '1'
 local FIRST = '1'
@@ -403,7 +404,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			headerRow:tag('th')
 				:wikitext(StatisticsPortal._returnCustomYearText(prevYear, yearValue))
 			resultsRow:tag('td')
-				:wikitext(Currency.display('USD', prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS))
+				:wikitext(Currency.display(US_DOLLAR, prizepoolSum or 0, CURRENCY_FORMAT_OPTIONS))
 			prizepoolSum = 0
 			prevYear = yearValue + 1
 			colIndex = colIndex + 1
@@ -445,7 +446,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	headerRow:tag('th')
 		:wikitext('Total')
 	resultsRow:tag('td')
-		:wikitext(Currency.display('USD', totalPrizePool, CURRENCY_FORMAT_OPTIONS))
+		:wikitext(Currency.display(US_DOLLAR, totalPrizePool, CURRENCY_FORMAT_OPTIONS))
 		:css('font-weight','bold')
 
 	if Logic.readBool(args.showAverage) then
@@ -454,7 +455,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:attr('title', 'Average Prizepool per Tournament')
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
-			:wikitext(Currency.display('USD', totalPrizePool / (Count.totalTournaments() or 1), CURRENCY_FORMAT_OPTIONS))
+			:wikitext(Currency.display(US_DOLLAR, totalPrizePool / (Count.totalTournaments() or 1), CURRENCY_FORMAT_OPTIONS))
 			:css('font-weight','bold')
 	end
 
@@ -560,7 +561,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	summaryTable:tag('tr')
 		:tag('td')
-		:wikitext(Currency.display('USD', data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS))
+		:wikitext(Currency.display(US_DOLLAR, data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS))
 		:attr('data-sort-type', 'currency')
 		:css('font-weight','bold')
 
@@ -962,7 +963,7 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 
 	row:tag('td')
 		:css('text-align', 'right')
-		:wikitext(Currency.display('USD', earnings, CURRENCY_FORMAT_OPTIONS))
+		:wikitext(Currency.display(US_DOLLAR, earnings, CURRENCY_FORMAT_OPTIONS))
 
 	return row
 end
