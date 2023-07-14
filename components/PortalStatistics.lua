@@ -1159,7 +1159,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
 		height = tonumber(args.height) or 400,
-		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - tonumber(args.startYear or Info.startYear))),
+		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - (tonumber(args.startYear) or Info.startYear))),
 	}
 end
 
