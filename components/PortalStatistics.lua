@@ -158,10 +158,10 @@ function StatisticsPortal.coverageStatistics(args)
 	if args.alignSide then
 		tournamentTable
 			:addClass('template-box')
-			:css('padding-right','2em')
+			:css('padding-right', '2em')
 		matchTable
 			:addClass('template-box')
-			:css('padding-right','2em')
+			:css('padding-right', '2em')
 	end
 
 	tournamentTable:node(StatisticsPortal.coverageTournamentTable(args))
@@ -182,7 +182,7 @@ function StatisticsPortal.coverageMatchTable(args)
 
 	matchTable:tag('caption')
 		:wikitext(args.matchTableTitle or (Logic.readBool(args.alignSide) and '<br>' or ''))
-		:css('text-align','center')
+		:css('text-align', 'center')
 
 	local matchHeader = matchTable:tag('tr')
 
@@ -217,11 +217,11 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 
 	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.matches(parameters)))
-		:css('text-align','right')
+		:css('text-align', 'right')
 
 	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.games(parameters)))
-		:css('text-align','right')
+		:css('text-align', 'right')
 
 	return resultsRow
 end
@@ -239,7 +239,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 
 	tournamentTable:tag('caption')
 		:wikitext(args.tournamentTableTitle or 'Tournaments Covered')
-		:css('text-align','center')
+		:css('text-align', 'center')
 
 	tournamentTable:node(StatisticsPortal._coverageTournamentTableHeader(args))
 
@@ -273,7 +273,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				runningTally = runningTally + tournamentCount
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(tournamentCount))
-					:css('text-align','right')
+					:css('text-align', 'right')
 			end
 		end
 	end
@@ -281,7 +281,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	if String.isNotEmpty(args.showOther) then
 		resultsRow:tag(tagType)
 			:wikitext(LANG:formatNum(Count.totalTournaments(parameters) - runningTally))
-			:css('text-align','right')
+			:css('text-align', 'right')
 	end
 
 	if String.isNotEmpty(args.showTierTypes) then
@@ -291,14 +291,14 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(Count.tournaments(Table.merge(
 						{liquipediatiertype = LANG:ucfirst(tierTypeValue)}, parameters))))
-					:css('text-align','right')
+					:css('text-align', 'right')
 			end
 		end
 	end
 
 	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(Count.totalTournaments(parameters)))
-		:css('text-align','right')
+		:css('text-align', 'right')
 
 	return resultsRow:allDone()
 end
@@ -360,12 +360,12 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 	local prizepoolTable = wrapper:tag('table')
 		:addClass('wikitable wikitable-striped')
-		:css('width','100%')
-		:css('text-align','center')
+		:css('width', '100%')
+		:css('text-align', 'center')
 
 	prizepoolTable:tag('caption')
 		:wikitext('Prize Money Awarded')
-		:css('text-align','center')
+		:css('text-align', 'center')
 
 	local headerRow = prizepoolTable:tag('tr')
 	local resultsRow = prizepoolTable:tag('tr')
@@ -416,8 +416,8 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 			prizepoolTable = wrapper:tag('table')
 				:addClass('wikitable wikitable-striped')
-				:css('width','100%')
-				:css('text-align','center')
+				:css('width', '100%')
+				:css('text-align', 'center')
 
 			headerRow = prizepoolTable:tag('tr')
 			resultsRow = prizepoolTable:tag('tr')
@@ -447,7 +447,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 		:wikitext('Total')
 	resultsRow:tag('td')
 		:wikitext(Currency.display(US_DOLLAR, totalPrizePool, CURRENCY_FORMAT_OPTIONS))
-		:css('font-weight','bold')
+		:css('font-weight', 'bold')
 
 	if Logic.readBool(args.showAverage) then
 		headerRow:tag('th')
@@ -456,7 +456,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			:wikitext('AVG PPT')
 		resultsRow:tag('td')
 			:wikitext(Currency.display(US_DOLLAR, totalPrizePool / (Count.totalTournaments() or 1), CURRENCY_FORMAT_OPTIONS))
-			:css('font-weight','bold')
+			:css('font-weight', 'bold')
 	end
 
 	return wrapper
@@ -476,7 +476,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	wrapper:node(mw.html.create('div')
 		:addClass('template-box')
-		:css('padding-right','5em')
+		:css('padding-right', '5em')
 		:css('width', args.width)
 		:css('font-size', '85%')
 		:css('text-align', 'center')
@@ -489,7 +489,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	if args.multiGame then
 		wrapper:node(mw.html.create('div')
 			:addClass('template-box')
-			:css('padding-right','5em')
+			:css('padding-right', '5em')
 			:css('width', args.width)
 			:css('font-size', '85%')
 			:css('text-align', 'center')
@@ -503,7 +503,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 	if args.multiMode then
 		wrapper:node(mw.html.create('div')
 			:addClass('template-box')
-			:css('padding-right','5em')
+			:css('padding-right', '5em')
 			:css('width', args.width)
 			:css('font-size', '85%')
 			:css('text-align', 'center')
@@ -553,8 +553,8 @@ function StatisticsPortal.pieChartBreakdown(args)
 
 	local summaryTable = mw.html.create('table')
 		:addClass('wikitable')
-		:css('text-align','center')
-		:css('font-weight','bold')
+		:css('text-align', 'center')
+		:css('font-weight', 'bold')
 
 	summaryTable:tag('tr')
 		:tag('th'):wikitext('Total prize money awarded')
@@ -563,11 +563,11 @@ function StatisticsPortal.pieChartBreakdown(args)
 		:tag('td')
 		:wikitext(Currency.display(US_DOLLAR, data[1].sum_prizepool or 0, CURRENCY_FORMAT_OPTIONS))
 		:attr('data-sort-type', 'currency')
-		:css('font-weight','bold')
+		:css('font-weight', 'bold')
 
 	wrapper:node(mw.html.create('div')
 		:addClass('template-box')
-		:css('padding-right','1em')
+		:css('padding-right', '1em')
 		:node(summaryTable)
 	)
 
@@ -668,8 +668,8 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local tbl = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
-		:css('margin-left','0px')
-		:css('margin-right','auto')
+		:css('margin-left', '0px')
+		:css('margin-right', 'auto')
 
 	tbl:tag('tr')
 		:tag('th'):wikitext('ID'):addClass('unsortable'):done()
