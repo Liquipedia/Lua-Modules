@@ -215,12 +215,23 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
 	end
 
+	local matchCountValue
+	local gameCountValue
+
+	if Logic.readBool(args.queryMatch2) then
+		matchCountValue = Count.matches(parameters)
+		gameCountValue = Count.games(parameters)
+	else
+		matchCountValue = Count.match2gamesData(parameters)
+		gameCountValue = Count.match2(parameters)
+	end
+
 	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(Count.matches(parameters)))
+		:wikitext(LANG:formatNum(matchCountValue))
 		:css('text-align', 'right')
 
 	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(Count.games(parameters)))
+		:wikitext(LANG:formatNum(gameCountValue))
 		:css('text-align', 'right')
 
 	return resultsRow
