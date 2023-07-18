@@ -808,7 +808,7 @@ function StatisticsPortal._cacheModeEarningsData(config)
 		local teamConditions = ConditionTree(BooleanOperator.any)
 			:add{ConditionNode(ColumnName('opponentname'), Comparator.eq, config.opponentName)}
 		local prefix = config.opponentType == Opponent.team and 'team' or ''
-		for index = 1, 30 do
+		for index = 1, config.maxOpponents do
 			teamConditions:add{
 				ConditionNode(ColumnName('opponentplayers_p' .. index .. prefix), Comparator.eq, config.opponentName)}
 		end
@@ -1171,6 +1171,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		isForTeam = isForTeam,
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
+		maxOpponents = tonumber(args.maxOpponents) or 10,
 		height = tonumber(args.height) or 400,
 		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - (tonumber(args.startYear) or Info.startYear))),
 	}
