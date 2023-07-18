@@ -35,6 +35,7 @@ local TIMESTAMP = DateExt.readTimestamp(DATE)
 local DEFAULT_ALLOWED_PLACES = Array.map(mw.text.split('1,2,3,1-2,2-3,2-4,3-4', ',', true), String.trim)
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
+local MAX_OPPONENT_LIMIT = 10
 local MAX_QUERY_LIMIT = 5000
 local US_DOLLAR = 'USD'
 local SHOWMATCH = 'Showmatch'
@@ -1171,7 +1172,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		isForTeam = isForTeam,
 		opponentName = opponentName,
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
-		maxOpponents = tonumber(args.maxOpponents) or 10,
+		maxOpponents = tonumber(args.maxOpponents) or MAX_OPPONENT_LIMIT,
 		height = tonumber(args.height) or 400,
 		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - (tonumber(args.startYear) or Info.startYear))),
 	}
