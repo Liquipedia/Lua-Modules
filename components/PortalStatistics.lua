@@ -219,11 +219,11 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local gameCountValue
 
 	if Logic.readBool(args.queryMatch2) then
-		matchCountValue = Count.matches(parameters)
-		gameCountValue = Count.games(parameters)
-	else
 		matchCountValue = Count.match2gamesData(parameters)
 		gameCountValue = Count.match2(parameters)
+	else
+		matchCountValue = Count.matches(parameters)
+		gameCountValue = Count.games(parameters)
 	end
 
 	resultsRow:tag(tagType)
