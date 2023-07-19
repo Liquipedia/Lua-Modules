@@ -230,6 +230,11 @@ function Count._baseConditions(args, isTournament)
 		startDateKey = 'startdate'
 		endDateKey = 'enddate'
 		sortDateKey = 'sortdate'
+
+		if Logic.readBool(args.filterByStatus) then
+			conditions:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
+			conditions:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
+		end
 	else
 		startDateKey = 'date'
 		endDateKey = 'date'
