@@ -93,6 +93,7 @@ function StatisticsPortal.topEarningsChart(args)
 	local params = {
 		catLabel = Logic.readBool(args.isForTeam) and 'Teams' or 'Players',
 		flipAxes = true,
+		emphasis = 'none',
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
@@ -1095,7 +1096,7 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 					type = config.chartType,
 					stack = config.stackType,
 					data = seriesData[seriesIndex],
-					emphasis = {focus = 'series'},
+					emphasis = {focus = config.emphasis},
 				}
 			)
 		end
@@ -1160,6 +1161,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		variable = params.variable,
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
+		emphasis = params.emphasis or 'series',
 		customInputs = customInputs,
 		customLegend = StatisticsPortal._splitOrDefault(args.customLegend, customInputs),
 		customYears = args.customYears,
