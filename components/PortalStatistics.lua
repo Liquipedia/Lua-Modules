@@ -63,6 +63,7 @@ function StatisticsPortal.gameEarningsChart(args)
 		processFunction = StatisticsPortal._defaultProcessFunction,
 		catLabel = 'Year',
 		defaultInputs = GAMES,
+		axisRotate = tonumber(args.axisRotate),
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
@@ -78,6 +79,7 @@ function StatisticsPortal.modeEarningsChart(args)
 		processFunction = StatisticsPortal._defaultProcessFunction,
 		catLabel = 'Year',
 		defaultInputs = MODES,
+		axisRotate = tonumber(args.axisRotate),
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
@@ -136,8 +138,18 @@ function StatisticsPortal.topEarningsChart(args)
 			data = StatisticsPortal._addArrays(yearSeriesData),
 		}
 
-		config.yAxis = {type = 'value', name = 'Earnings ($USD)'}
-		config.xAxis = {type = 'category', name = config.catLabel, data = opponentNames}
+		config.yAxis = {
+			type = 'value', 
+			name = 'Earnings ($USD)',
+		}
+		config.xAxis = {
+			type = 'category', 
+			name = config.catLabel, 
+			data = opponentNames, 
+			axisTick = {
+        			alignWithLabel = true,
+			},
+		}
 		config.customLegend = config.customLegend or config.customInputs
 		return StatisticsPortal._drawChart(config, chartData)
 	end
@@ -1004,7 +1016,15 @@ end
 
 
 function StatisticsPortal._drawChart(config, chartData)
-	return mw.html.create('div'):node(mw.ext.Charts.chart({
+	return mw.html.create('div')
+		:addClass('table-responsive')
+		:node(mw.ext.Charts.chart({
+			grid = {
+				left = '15%',
+				right = '12%',
+				top = '15%',
+				bottom = '10%'
+			},
 			size = {
 				height = config.height,
 				width = config.width,
@@ -1101,9 +1121,22 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			)
 		end
 	end
-
-	config.yAxis = {type = 'value', name = 'Earnings ($USD)'}
-	config.xAxis = {type = 'category', name = config.catLabel, data = categoryNames}
+		
+	config.yAxis = {
+		type = 'value', 
+		name = 'Earnings ($USD)'
+	}
+	config.xAxis = {
+		type = 'category', 
+		name = config.catLabel, 
+		data = categoryNames, 
+		axisTick = {
+			alignWithLabel = true,
+		},
+		axisLabel = {
+			rotate = config.axisRotate,
+		},
+	}
 	config.customLegend = config.customLegend or seriesNames
 
 	return StatisticsPortal._drawChart(config, chartData)
@@ -1161,6 +1194,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		variable = params.variable,
 		catLabel = params.catLabel,
 		flipAxes = params.flipAxes or false,
+		axisRotate = params.axisRotate or 0,
 		emphasis = params.emphasis or 'series',
 		customInputs = customInputs,
 		customLegend = StatisticsPortal._splitOrDefault(args.customLegend, customInputs),
@@ -1176,7 +1210,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		opponentType = isForTeam and Opponent.team or Opponent.solo,
 		maxOpponents = tonumber(args.maxOpponents) or MAX_OPPONENT_LIMIT,
 		height = tonumber(args.height) or 400,
-		width = tonumber(args.width) or (200 + 65 * (CURRENT_YEAR - (tonumber(args.startYear) or Info.startYear))),
+		width = tonumber(args.width) or 1400,
 	}
 end
 
