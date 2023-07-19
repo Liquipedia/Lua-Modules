@@ -139,15 +139,15 @@ function StatisticsPortal.topEarningsChart(args)
 		}
 
 		config.yAxis = {
-			type = 'value', 
+			type = 'value',
 			name = 'Earnings ($USD)',
 		}
 		config.xAxis = {
-			type = 'category', 
-			name = config.catLabel, 
-			data = opponentNames, 
+			type = 'category',
+			name = config.catLabel,
+			data = opponentNames,
 			axisTick = {
-        			alignWithLabel = true,
+				alignWithLabel = true,
 			},
 		}
 		config.customLegend = config.customLegend or config.customInputs
@@ -1121,15 +1121,15 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			)
 		end
 	end
-		
+
 	config.yAxis = {
-		type = 'value', 
+		type = 'value',
 		name = 'Earnings ($USD)'
 	}
 	config.xAxis = {
-		type = 'category', 
-		name = config.catLabel, 
-		data = categoryNames, 
+		type = 'category',
+		name = config.catLabel,
+		data = categoryNames,
 		axisTick = {
 			alignWithLabel = true,
 		},
