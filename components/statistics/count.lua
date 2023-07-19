@@ -25,7 +25,7 @@ local ColumnName = Condition.ColumnName
 local Count = {}
 
 ---Counts the number of matches played on a wiki - querying lpdb_match2
----@param args table
+---@param args table?
 ---@return integer
 function Count.match2(args)
 	args = args or {}
@@ -38,7 +38,7 @@ end
 
 
 ---Counts the number of matches played on a wiki - querying lpdb_match2
----@param args table
+---@param args table?
 ---@return integer
 function Count.match2game(args)
 	args = args or {}
@@ -50,7 +50,7 @@ end
 
 
 ---Counts the number of games played on a wiki - querying lpdb_match2
----@param args table
+---@param args table?
 ---@return integer
 function Count.match2gamesData(args)
 	args = args or {}
@@ -79,7 +79,7 @@ end
 
 ---@deprecated `lpdb_game` is deprecated
 ---Counts the number of games played on a wiki
----@param args table
+---@param args table?
 ---@return integer
 function Count.games(args)
 	args = args or {}
@@ -92,7 +92,7 @@ end
 
 ---@deprecated `lpdb_match` is deprecated
 ---Counts the number of matches played on a wiki
----@param args table
+---@param args table?
 ---@return integer
 function Count.matches(args)
 	args = args or {}
@@ -105,7 +105,7 @@ end
 
 
 ---Counts the number of tournaments played on a wiki
----@param args table
+---@param args table?
 ---@return integer
 function Count.tournaments(args)
 	args = args or {}
@@ -118,7 +118,7 @@ end
 
 
 ---Counts the number of placements for a specified opponent on a wiki
----@param args table
+---@param args table?
 ---@return integer
 function Count.placements(args)
 	args = args or {}
