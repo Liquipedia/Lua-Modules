@@ -211,7 +211,12 @@ function StatisticsPortal.coverageMatchTable(args)
 
 	if Logic.readBool(args.multiGame) then
 		for _, game in Table.iter.spairs(args.customGames) do
-			matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {game = game, year = args.year}))
+			matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {
+						game = game, 
+						year = args.year
+					}
+				)
+			)
 		end
 	end
 
@@ -271,11 +276,22 @@ function StatisticsPortal.coverageTournamentTable(args)
 
 	if Logic.readBool(args.multiGame) then
 		for _, game in Table.iter.spairs(args.customGames) do
-			tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {game = game, year = args.year, filterByStatus = args.filterByStatus}))
+			tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {
+						game = game, 
+						year = args.year, 
+						filterByStatus = args.filterByStatus
+					}
+				)
+			)
 		end
 	end
 
-	tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {year = args.year, filterByStatus = args.filterByStatus}))
+	tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {
+				year = args.year, 
+				filterByStatus = args.filterByStatus
+			}
+		)
+	)
 
 	return tournamentTable
 end
