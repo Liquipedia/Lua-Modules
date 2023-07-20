@@ -258,6 +258,7 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.customGames = StatisticsPortal._splitOrDefault(args.customGames, GAMES)
 	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
+	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
 	local tournamentTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -270,11 +271,11 @@ function StatisticsPortal.coverageTournamentTable(args)
 
 	if Logic.readBool(args.multiGame) then
 		for _, game in Table.iter.spairs(args.customGames) do
-			tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {game = game, year = args.year}))
+			tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {game = game, year = args.year, filterByStatus = args.filterByStatus}))
 		end
 	end
 
-	tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {year = args.year}))
+	tournamentTable:node(StatisticsPortal._coverageTournamentTableRow(args, {year = args.year, filterByStatus = args.filterByStatus}))
 
 	return tournamentTable
 end
