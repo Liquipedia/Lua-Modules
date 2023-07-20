@@ -220,7 +220,11 @@ function StatisticsPortal.coverageMatchTable(args)
 		end
 	end
 
-	matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {year = args.year}))
+	matchTable:node(StatisticsPortal._coverageMatchTableRow(args, {
+				year = args.year
+			}
+		)
+	)
 
 	return matchTable
 end
