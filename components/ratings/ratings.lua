@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 -- Parameters related to LPDB
 local STATIC_CONDITIONS_MATCH = '[[mode::3v3]] AND [[finished::1]] AND [[liquipediatiertype::!School]]'
 local STATIC_CONDITIONS_LPR_TRANSFER = '[[namespace::4]] AND [[type::LPR_TRANSFER]]'
-local STATIC_CONDITIONS_LPR_RATING = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
+local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
 
 -- Parameters related to rating table
 local DAYS_IDLE_BEFORE_CLEANUP = 100
@@ -92,34 +92,36 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 	-- some static parameters
 	local expectation = 1 / (1 + 10 ^ ((ratingOther - ratingSelf) / RATING_RANGE_FACTOR))
 
-	local max = math.max(score1, score2)
-	local win = (score1 > score2)
+	local winnerScore = math.max(score1, score2)
+	local won = (score1 > score2)
 
-	-- static tier modifier
-	local mod = 1
-	-- dynamic tier modifier
-	local mod2 = 1
-	-- low match count rating bonus per tier
-	local mod3 = 1
-	-- BestOf modifier
-	local modBO = 1
-	if max < 2 then
-		modBO = 0.6
-	elseif max > 3 then
-		modBO = 1.15
+	-- Modifiers
+	local modifierTier, modifierDynamic, modifierLowMatchCount, modifierTierType, modifierBestOf
+
+	-- Best of
+	if winnerScore < 2 then
+		modifierBestOf = 0.6
+	elseif winnerScore > 3 then
+		modifierBestOf = 1.15
+	else
+		modifierBestOf = 1
 	end
-	-- external modifier
-	local modExternal = modExternalTable[win and 1 or 2]
 
-	-- increase possible won points if number of matches is low
-	if win and rpSelf.matches < 30 then
-		modExternal = modExternal * 1.5
+	-- External modifier
+	local modifierExternal = modExternalTable[won and 1 or 2]
+
+	-- Increase points if number of matches is low when winning
+	if won and rpSelf.matches < 30 then
+		modifierLowMatchCount = 1.5
+	else
+		modifierLowMatchCount = 1
 	end
 
 	-- tierType
-	local modTierType = 1
 	if tierType == 'Qualifier' then
-		modTierType = 0.67
+		modifierTierType = 0.67
+	else
+		modifierTierType = 1
 	end
 
 	-- tier modification
@@ -127,33 +129,34 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 	local mLose = 600
 
 	local function calcMod2(base, multiplier)
-		return win and (0.5 / (1 + 10 ^ ((ratingSelf - base) / mWin))) + 1 or
+		return won and (0.5 / (1 + 10 ^ ((ratingSelf - base) / mWin))) + 1 or
 				((-1 / (1 + 10 ^ ((ratingSelf - base) / mLose))) + 1) * multiplier
 	end
 
 	if tier == 1 then
-		mod = 4.5
-		mod2 = calcMod2(2300, 1)
+		modifierTier = 4.5
+		modifierDynamic = calcMod2(2300, 1)
 	elseif tier == 2 then
-		mod = 3
-		mod2 = calcMod2(2100, 1.22)
+		modifierTier = 3
+		modifierDynamic = calcMod2(2100, 1.22)
 	elseif tier == 3 then
-		mod = 2
-		mod2 = calcMod2(2100, 1.1)
+		modifierTier = 2
+		modifierDynamic = calcMod2(2100, 1.1)
 	elseif tier == 4 then
-		mod = 0.75
-		mod2 = calcMod2(1800, 1)
+		modifierTier = 0.75
+		modifierDynamic = calcMod2(1800, 1)
 	else
-		mod = 0.2
-		mod2 = calcMod2(1800, 1)
+		modifierTier = 0.2
+		modifierDynamic = calcMod2(1800, 1)
 	end
 
-	local delta = RATING_K * ((win and 1 or 0) - expectation) * mod * mod2 * mod3 * modBO * modExternal * modTierType
+	local delta = RATING_K * ((won and 1 or 0) - expectation) * modifierTier * modifierDynamic * modifierLowMatchCount
+			* modifierBestOf * modifierExternal * modifierTierType
 
 	-- set minimal gain/loss to +/- 1
-	if win and delta < 1 then
+	if won and delta < 1 then
 		delta = 1
-	elseif not win and delta > -1 then
+	elseif not won and delta > -1 then
 		delta = -1
 	end
 
@@ -161,11 +164,11 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 
 	-- set streak
 	if (rpSelf.streak > 0) then
-		rpSelf.streak = win and (rpSelf.streak + 1) or -1
+		rpSelf.streak = won and (rpSelf.streak + 1) or -1
 	elseif (rpSelf.streak < 0) then
-		rpSelf.streak = win and 1 or (rpSelf.streak - 1)
+		rpSelf.streak = won and 1 or (rpSelf.streak - 1)
 	else
-		rpSelf.streak = win and 1 or -1
+		rpSelf.streak = won and 1 or -1
 	end
 
 	--set last matches
@@ -237,7 +240,8 @@ local function getLatestSnapshotDate(name)
 			query = 'date',
 			limit = 1,
 			order = 'date DESC',
-			conditions = STATIC_CONDITIONS_LPR_RATING .. ' AND [[name::' .. name .. ']] AND [[pagename::!' .. mw.title.getCurrentTitle().text .. ']]'
+			conditions = STATIC_CONDITIONS_LPR_SNAPSHOT ..
+					' AND [[name::' .. name .. ']] AND [[pagename::!' .. mw.title.getCurrentTitle().text .. ']]'
 		}
 	)
 	return (res[1] or {}).date
@@ -249,8 +253,8 @@ local function getRatingTable(date, name)
 		{
 			query = 'extradata',
 			limit = 1,
-			conditions = STATIC_CONDITIONS_LPR_RATING ..
-			' AND [[name::' .. name .. ']] AND [[date::' .. os.date('!%x', os.time(date)) .. ']]'
+			conditions = STATIC_CONDITIONS_LPR_SNAPSHOT ..
+					' AND [[name::' .. name .. ']] AND [[date::' .. os.date('!%x', os.time(date)) .. ']]'
 		}
 	)
 	return Json.parseIfString(((res[1] or {}).extradata or {}).table) or {}
@@ -390,7 +394,7 @@ function Ratings.calc(frame)
 
 	-- Fetch data
 	local ratingTable = Table.map(getRatingTable(dateFrom, id), function(key, value)
-		-- Ensure key is string, can be lost in the parsing
+		-- Ensure key is string, can be lost in the json parsing
 		return tostring(key), value
 	end)
 	local transfers = getAllTransfers()

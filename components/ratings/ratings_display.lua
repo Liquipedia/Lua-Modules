@@ -75,19 +75,16 @@ local function createProgressionEntry(timestamp, rating)
 	}
 end
 
-function RatingsDisplay.display(frame)
-	local args = Arguments.getArgs(frame)
-
-	local latestSnapshot = getSnapshot(args.id)
-	if not latestSnapshot then
+local function getTeamRankings(id)
+	local snapshot = getSnapshot(id)
+	if not snapshot then
 		error('Could not find a Rating with this ID')
 	end
-	local latestSnapshotTime = os.time(parseDate(latestSnapshot.date))
-
-	-- apply limit to first rating table
 	local teamRanking = {}
-	for rank, teamName in ipairs(latestSnapshot.extradata.ranks) do
-		local team = latestSnapshot.extradata.table[teamName] or {}
+	teamRanking.latestSnapshotTime = os.time(parseDate(snapshot.date))
+
+	for rank, teamName in ipairs(snapshot.extradata.ranks) do
+		local team = snapshot.extradata.table[teamName] or {}
 		team.name = teamName
 		table.insert(teamRanking, team)
 		if rank > LIMIT_RANKS then
@@ -95,9 +92,15 @@ function RatingsDisplay.display(frame)
 		end
 	end
 
-	latestSnapshot = nil
+	return teamRanking
+end
 
-	Array.forEach(teamRanking, function(team)
+function RatingsDisplay.display(frame)
+	local args = Arguments.getArgs(frame)
+
+	local teamRankings = getTeamRankings(args.id)
+
+	Array.forEach(teamRankings, function(team)
 		-- Future functionality: Latest Matches details per team
 		--[[
 		local match2ids = {}
@@ -124,7 +127,7 @@ function RatingsDisplay.display(frame)
 		data.lastmatches = lm
 		--]]
 		team.progression = {
-			createProgressionEntry(latestSnapshotTime, team.rating)
+			createProgressionEntry(teamRankings.latestSnapshotTime, team.rating)
 		}
 	end)
 
@@ -136,7 +139,7 @@ function RatingsDisplay.display(frame)
 		end
 		local snapshotTime = os.time(parseDate(snapshot.date))
 
-		Array.forEach(teamRanking, function(team)
+		Array.forEach(teamRankings, function(team)
 			local rating = (snapshot.extradata.table[team.name] or {}).rating
 			if not rating then
 				return
@@ -147,7 +150,7 @@ function RatingsDisplay.display(frame)
 	end
 
 	--- Update team information
-	Array.forEach(teamRanking, function(team)
+	Array.forEach(teamRankings, function(team)
 		--- Fetch the region
 		team.region = getRegionOfTeam(team.name)
 		--- Reverse the order of progression
@@ -165,7 +168,7 @@ function RatingsDisplay.display(frame)
 			:tag('td'):wikitext('History'):done()
 		:allDone()
 
-	Array.forEach(teamRanking, function(team, rank)
+	Array.forEach(teamRankings, function(team, rank)
 		local chart = mw.ext.Charts.chart({
 			xAxis = {
 				type = 'category',
