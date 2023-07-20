@@ -169,7 +169,7 @@ function StandingsStorage.fromTemplateHeader(frame)
 	end
 
 	data.roundcount = tonumber(data.roundcount) or 1
-	data.finished = Logic.nilOr(Logic.readBoolOrNil(data.finished), true)
+	data.finished = Logic.readBool(data.finished)
 
 	StandingsStorage.table(data)
 end
