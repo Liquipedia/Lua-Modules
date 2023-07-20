@@ -661,7 +661,10 @@ function StatisticsPortal.earningsTable(args)
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
-	args.allowedPlacements = StatisticsPortal._splitOrDefault(args.allowedPlacements --[[@as string]], DEFAULT_ALLOWED_PLACES)
+	args.allowedPlacements = StatisticsPortal._splitOrDefault(
+		args.allowedPlacements --[[@as string]], 
+		DEFAULT_ALLOWED_PLACES
+	)
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
