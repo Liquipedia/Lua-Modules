@@ -70,6 +70,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.publisherpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.extradata.gamegroup = (Game.raw{game = args.game, useDefault = false} or {}).gameGroup
 
 	return lpdbData
 end
