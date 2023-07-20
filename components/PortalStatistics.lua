@@ -662,7 +662,7 @@ function StatisticsPortal.earningsTable(args)
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
 	args.allowedPlacements = StatisticsPortal._splitOrDefault(
-		args.allowedPlacements --[[@as string]], 
+		args.allowedPlacements --[[@as string]],
 		DEFAULT_ALLOWED_PLACES
 	)
 
