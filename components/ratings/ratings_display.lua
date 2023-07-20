@@ -81,7 +81,7 @@ local function getTeamRankings(id)
 		error('Could not find a Rating with this ID')
 	end
 	local teamRanking = {}
-	teamRanking.latestSnapshotTime = os.time(parseDate(snapshot.date))
+	teamRanking.date = os.time(parseDate(snapshot.date))
 
 	for rank, teamName in ipairs(snapshot.extradata.ranks) do
 		local team = snapshot.extradata.table[teamName] or {}
@@ -127,7 +127,7 @@ function RatingsDisplay.display(frame)
 		data.lastmatches = lm
 		--]]
 		team.progression = {
-			createProgressionEntry(teamRankings.latestSnapshotTime, team.rating)
+			createProgressionEntry(teamRankings.date, team.rating)
 		}
 	end)
 
