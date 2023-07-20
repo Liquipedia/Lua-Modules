@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:PortalStatistics
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -28,10 +35,10 @@ local ColumnName = Condition.ColumnName
 local Count = require('Module:Count')
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
-local CURRENT_YEAR = tonumber(os.date('%Y'))
-local DATE = os.date('%F')
+local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
+local DATE = os.date('%F') --[[@as string]]
 local EPOCH_DATE = '1970-01-01'
-local TIMESTAMP = DateExt.readTimestamp(DATE)
+local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = Array.map(mw.text.split('1,2,3,1-2,2-3,2-4,3-4', ',', true), String.trim)
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
 local LANG = mw.getContentLanguage()
@@ -55,6 +62,8 @@ Section: Chart Entry Functions
 ]] --
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
 
@@ -71,6 +80,9 @@ function StatisticsPortal.gameEarningsChart(args)
 	return StatisticsPortal._buildChartData(config, yearSeriesData, config.customLegend, true)
 end
 
+
+---@param args table
+---@return Html
 function StatisticsPortal.modeEarningsChart(args)
 	args = args or {}
 
@@ -88,6 +100,8 @@ function StatisticsPortal.modeEarningsChart(args)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
@@ -161,6 +175,8 @@ Section: Coverage Breakdown
 ]] --
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
 	args.alignSide = Logic.readBool(args.alignSide)
@@ -185,11 +201,13 @@ function StatisticsPortal.coverageStatistics(args)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
 	args.customGames = (type(args.customGames) == 'table' and args.customGames)
-		or StatisticsPortal._splitOrDefault(args.customGames, GAMES)
+		or StatisticsPortal._splitOrDefault(args.customGames --[[@as string]], GAMES)
 
 	local matchTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -230,6 +248,9 @@ function StatisticsPortal.coverageMatchTable(args)
 end
 
 
+---@param args table
+---@param parameters table
+---@return Html
 function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local resultsRow = mw.html.create('tr')
 	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
@@ -261,11 +282,13 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
-	args.customGames = StatisticsPortal._splitOrDefault(args.customGames, GAMES)
-	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers)
+	args.customGames = StatisticsPortal._splitOrDefault(args.customGames --[[@as string]], GAMES)
+	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers --[[@as string]])
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
@@ -301,6 +324,9 @@ function StatisticsPortal.coverageTournamentTable(args)
 end
 
 
+---@param args table
+---@param parameters table
+---@return Html
 function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	local resultsRow = mw.html.create('tr')
 	local tagType = (Logic.readBool(args.multiGame) and not parameters.game) and 'th' or 'td'
@@ -350,6 +376,8 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal._coverageTournamentTableHeader(args)
 	local headerRow = mw.html.create('tr')
 
@@ -394,6 +422,9 @@ end
 Section: Prizepool Breakdown
 ]]--
 
+
+---@param args table
+---@return Html
 function StatisticsPortal.prizepoolBreakdown(args)
 	args = args or {}
 	args.showAverage = Logic.readBool(args.showAverage)
@@ -509,6 +540,8 @@ function StatisticsPortal.prizepoolBreakdown(args)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.pieChartBreakdown(args)
 	args = args or {}
 	args.height = args.height or 300
@@ -621,12 +654,14 @@ function StatisticsPortal.pieChartBreakdown(args)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
-	args.allowedPlacements = StatisticsPortal._splitOrDefault(args.allowedPlacements, DEFAULT_ALLOWED_PLACES)
+	args.allowedPlacements = StatisticsPortal._splitOrDefault(args.allowedPlacements --[[@as string]], DEFAULT_ALLOWED_PLACES)
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
@@ -685,6 +720,8 @@ Section: Player Age Table Breakdown
 ]]--
 
 
+---@param args table
+---@return Html
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = args.earnings and tonumber(args.earnings) or 500
@@ -722,7 +759,7 @@ function StatisticsPortal.playerAgeTable(args)
 		:tag('th'):wikitext('Age')
 
 	for _, player in ipairs(playerData) do
-		local birthdate =  DateExt.readTimestamp(player.birthdate)
+		local birthdate =  DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
 		local yearAge = age.year - 1970
 		local dayAge = age.yday - 1
@@ -746,6 +783,11 @@ Section: Query Functions
 ]]--
 
 
+---@param limit number?
+---@param addConditions string?
+---@param addOrder string?
+---@param addGroupBy string?
+---@return table
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder, addGroupBy)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'pagename, id, nationality, earnings, extradata, birthdate, team',
@@ -759,6 +801,11 @@ function StatisticsPortal._getPlayers(limit, addConditions, addOrder, addGroupBy
 end
 
 
+---@param limit number?
+---@param addConditions string?
+---@param addOrder string?
+---@param addGroupBy string?
+---@return table
 function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		query = 'pagename, name, template, earnings, extradata',
@@ -772,6 +819,11 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
 end
 
 
+---@param args table
+---@param groupBy string
+---@param defaultValue string
+---@param groupValues table
+---@return table
 function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
 	args = args or {}
 	table.insert(groupValues, defaultValue)
@@ -829,6 +881,8 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 end
 
 
+---@param config table
+---@return table
 function StatisticsPortal._cacheModeEarningsData(config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
@@ -882,6 +936,8 @@ function StatisticsPortal._cacheModeEarningsData(config)
 end
 
 
+---@param args table
+---@return table
 function StatisticsPortal._cacheOpponentPlacementData(args)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier')}
@@ -957,6 +1013,10 @@ Section: Display Functions
 ]]--
 
 
+---@param args table
+---@param parameters table
+---@param tagType string
+---@return Html
 function StatisticsPortal._returnGameCell(args, parameters, tagType)
 	local gameCell = mw.html.create(tagType)
 	if Logic.readBool(args.multiGame) and not parameters.game then
@@ -968,6 +1028,8 @@ function StatisticsPortal._returnGameCell(args, parameters, tagType)
 end
 
 
+---@param args table
+---@return Html
 function StatisticsPortal._earningsTableHeader(args)
 	local columnText = args.opponentType == Opponent.team and 'Organization' or 'Player'
 
@@ -992,6 +1054,12 @@ function StatisticsPortal._earningsTableHeader(args)
 end
 
 
+---@param args table
+---@param placements table
+---@param earnings number
+---@param opponentIndex number
+---@param opponentDisplay Html
+---@return Html
 function StatisticsPortal._earningsTableRow(args, placements, earnings, opponentIndex, opponentDisplay)
 	local row = mw.html.create('tr')
 		:css('line-height', '25px')
@@ -1015,6 +1083,8 @@ function StatisticsPortal._earningsTableRow(args, placements, earnings, opponent
 end
 
 
+---@param data table
+---@return string
 function StatisticsPortal._achievementsDisplay(data)
 	local output = ''
 	if data and type(data[1]) == 'table' then
@@ -1036,6 +1106,9 @@ function StatisticsPortal._achievementsDisplay(data)
 end
 
 
+---@param config table
+---@param chartData table
+---@return Html
 function StatisticsPortal._drawChart(config, chartData)
 	return mw.html.create('div')
 		:addClass('table-responsive')
@@ -1063,6 +1136,9 @@ function StatisticsPortal._drawChart(config, chartData)
 end
 
 
+---@param args table
+---@param chartData table
+---@return Html
 function StatisticsPortal._drawPieChart(args, chartData)
 	return mw.html.create('div')
 		:addClass('table-responsive')
@@ -1080,6 +1156,9 @@ end
 --[[
 Section: Utility Functions
 ]]--
+
+
+---@return ConditionTree
 function StatisticsPortal._returnBaseConditions()
 	return ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'cancelled')}
@@ -1090,6 +1169,11 @@ function StatisticsPortal._returnBaseConditions()
 end
 
 
+---@param config table
+---@param yearSeriesData table
+---@param nonYearCategories table
+---@param transpose boolean?
+---@return Html
 function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategories, transpose)
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(config)
 	local prevYear = config.startYear
@@ -1164,6 +1248,9 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 end
 
 
+---@param categoryNames table
+---@param seriesData table
+---@return table, table
 function StatisticsPortal._removeCategories(categoryNames, seriesData)
 	local startsEmpty = true
 	local lastNotEmpty = 1
@@ -1200,6 +1287,9 @@ function StatisticsPortal._removeCategories(categoryNames, seriesData)
 end
 
 
+---@param args table
+---@param params table
+---@return table
 function StatisticsPortal._getChartConfig(args, params)
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
 	local customInputs = StatisticsPortal._splitOrDefault(args.customInputs, params.defaultInputs)
@@ -1235,6 +1325,11 @@ function StatisticsPortal._getChartConfig(args, params)
 	}
 end
 
+
+---@param tablePlace number
+---@param item table
+---@param config table
+---@return table
 function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 	local earnings
 	if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
@@ -1246,6 +1341,8 @@ function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 end
 
 
+---@param player table
+---@return table
 function StatisticsPortal._toOpponent(player)
 	return {
 		type = Opponent.solo,
@@ -1259,14 +1356,19 @@ function StatisticsPortal._toOpponent(player)
 end
 
 
+---@param input string
+---@param default table?
+---@return table
 function StatisticsPortal._splitOrDefault(input, default)
 	if String.isEmpty(input) then
-		return default
+		return default --[[@as table]]
 	end
 	return Array.map(mw.text.split(input, ',', true), String.trim)
 end
 
 
+---@param args table
+---@return table, table
 function StatisticsPortal._returnCustomYears(args)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 	local yearTable
@@ -1281,12 +1383,17 @@ function StatisticsPortal._returnCustomYears(args)
 end
 
 
+---@param prevYear number
+---@param yearValue number
+---@return string|number
 function StatisticsPortal._returnCustomYearText(prevYear, yearValue)
 	return (prevYear == yearValue) and yearValue or
 		'\'' .. (string.sub(prevYear, 3, 4) .. '-' .. string.sub(yearValue, 3, 4))
 end
 
 
+---@param arrays table
+---@return table
 function StatisticsPortal._addArrays(arrays)
 	return Array.map(arrays[1], function(_, index)
 		return Array.reduce(Array.map(arrays, Operator.property(index)), Operator.add)
