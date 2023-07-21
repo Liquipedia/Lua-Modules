@@ -10,8 +10,8 @@ local RatingsDisplay = {}
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Date = require('Module:DateExt')
 local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
@@ -22,7 +22,7 @@ local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHO
 local LIMIT_RANKS = 100
 local LIMIT_LPR_SNAPSHOT = 24
 
-local function getSnapshot(name, offset)
+function RatingsDisplay._getSnapshot(name, offset)
 	return mw.ext.LiquipediaDB.lpdb(
 		'datapoint',
 		{
@@ -35,26 +35,7 @@ local function getSnapshot(name, offset)
 	)[1]
 end
 
----@param str string
----@return osdate
----@overload fun():nil
-local function parseDate(str)
-	if not str then
-		return
-	end
-	local y, m, d = str:match('^(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)')
-	-- default to month and day = 1 if not set
-	if String.isEmpty(m) then
-		m = 1
-	end
-	if String.isEmpty(d) then
-		d = 1
-	end
-	-- create time
-	return {year = y, month = m, day = d}
-end
-
-local function getTeamInfo(name)
+function RatingsDisplay._getTeamInfo(name)
 	local res = mw.ext.LiquipediaDB.lpdb(
 		'team',
 		{
@@ -70,20 +51,20 @@ local function getTeamInfo(name)
 	return res[1]
 end
 
-local function createProgressionEntry(timestamp, rating)
+function RatingsDisplay._createProgressionEntry(timestamp, rating)
 	return {
 		date = os.date('%Y-%m-%d', timestamp),
 		rating = rating and math.floor(rating + 0.5) or '',
 	}
 end
 
-local function getTeamRankings(id)
-	local snapshot = getSnapshot(id)
+function RatingsDisplay._getTeamRankings(id)
+	local snapshot = RatingsDisplay._getSnapshot(id)
 	if not snapshot then
 		error('Could not find a Rating with this ID')
 	end
 	local teamRanking = {}
-	teamRanking.date = os.time(parseDate(snapshot.date))
+	teamRanking.date = os.time(Date.parseIsoDate(snapshot.date))
 
 	for rank, teamName in ipairs(snapshot.extradata.ranks) do
 		local team = snapshot.extradata.table[teamName] or {}
@@ -100,34 +81,34 @@ end
 function RatingsDisplay.display(frame)
 	local args = Arguments.getArgs(frame)
 
-	local teamRankings = getTeamRankings(args.id)
+	local teamRankings = RatingsDisplay._getTeamRankings(args.id)
 
 	Array.forEach(teamRankings, function(team)
 		-- TODO: Future functionality: Latest Matches details per team
 		team.progression = {
-			createProgressionEntry(teamRankings.date, team.rating)
+			RatingsDisplay._createProgressionEntry(teamRankings.date, team.rating)
 		}
 	end)
 
 	-- Build rating progression with older snapshots
 	for i = 1, LIMIT_LPR_SNAPSHOT do
-		local snapshot = getSnapshot(args.id, i)
+		local snapshot = RatingsDisplay._getSnapshot(args.id, i)
 		if not snapshot then
 			break
 		end
-		local snapshotTime = os.time(parseDate(snapshot.date))
+		local snapshotTime = os.time(Date.parseIsoDate(snapshot.date))
 
 		Array.forEach(teamRankings, function(team)
 			local rating = (snapshot.extradata.table[team.name] or {}).rating
 
-			table.insert(team.progression, createProgressionEntry(snapshotTime, rating))
+			table.insert(team.progression, RatingsDisplay._createProgressionEntry(snapshotTime, rating))
 		end)
 	end
 
 	--- Update team information
 	Array.forEach(teamRankings, function(team)
 		--- Information from team page
-		local teamInfo = getTeamInfo(team.name)
+		local teamInfo = RatingsDisplay._getTeamInfo(team.name)
 
 		team.region = teamInfo.region or '???'
 		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '') and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name

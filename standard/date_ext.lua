@@ -92,4 +92,26 @@ function DateExt.getContextualDateOrNow()
 		or os.date('%F') --[[@as string]]
 end
 
+--- Parses a YYYY-MM-DD string into a simplified osdate class
+--- String must start with the YYYY. Text is allowed after after the DD.
+--- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
+---@param str string
+---@return osdate
+---@overload fun():nil
+function DateExt.parseIsoDate(str)
+	if not str then
+		return
+	end
+	local year, month, day = str:match('^(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)')
+	-- Default month and day to 1 if not set
+	if String.isEmpty(month) then
+		month = 1
+	end
+	if String.isEmpty(day) then
+		day = 1
+	end
+	-- create time
+	return {year = year, month = month, day = day}
+end
+
 return DateExt

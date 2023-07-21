@@ -10,6 +10,7 @@ local Ratings = {}
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Date = require('Module:DateExt')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
@@ -31,41 +32,27 @@ local RATING_RANGE_FACTOR = 700.0
 local RATING_K = 15
 local RATING_INIT_VALUE = 1250
 
+-- Tracking variables
+local _processedMatches = 0
+local _allMatches = 0
+local _seenMatchIds = {}
+
 ---@param date osdate
 ---@param customDays integer?
 ---@return osdate
-local function stepDate(date, customDays)
+function Ratings._stepDate(date, customDays)
 	local newDate = Table.copy(date)
 	newDate.day = newDate.day + (customDays or 1)
 	return newDate
 end
 
----@param str string
----@return osdate
----@overload fun():nil
-local function parseDate(str)
-	if not str then
-		return
-	end
-	local y, m, d = str:match('^(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)')
-	-- default to month and day = 1 if not set
-	if String.isEmpty(m) then
-		m = 1
-	end
-	if String.isEmpty(d) then
-		d = 1
-	end
-	-- create time
-	return {year = y, month = m, day = d}
-end
-
-local function getDateRangeConditions(dateStart, dateEnd)
+function Ratings._getDateRangeConditions(dateStart, dateEnd)
 	dateEnd = dateEnd or dateStart
-	return '[[date::>' .. os.date('!%x', os.time(stepDate(dateStart, -1))) .. ' 23:59:59' .. ']]' ..
-		' AND [[date::<' .. os.date('!%x', os.time(stepDate(dateEnd))) .. ']]'
+	return '[[date::>' .. os.date('!%x', os.time(Ratings._stepDate(dateStart, -1))) .. ' 23:59:59' .. ']]' ..
+		' AND [[date::<' .. os.date('!%x', os.time(Ratings._stepDate(dateEnd))) .. ']]'
 end
 
-local function getAllTransfers()
+function Ratings._getAllTransfers()
 	local transfersAtDate = {}
 	Lpdb.executeMassQuery('datapoint', {
 		query = 'date, extradata',
@@ -82,7 +69,7 @@ local function getAllTransfers()
 	return transfersAtDate
 end
 
-local function calcRating(rpSelf, rpOther, score1, score2, match)
+function Ratings._calcRatingChange(rpSelf, rpOther, score1, score2, match)
 	local modExternalTable = {1, 1}
 	local tier = tonumber(match.liquipediatier)
 	local tierType = match.liquipediatiertype
@@ -177,7 +164,7 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 	table.insert(rpSelf.lastmatches, {
 		id = match.match2id,
 		ratingChange = delta,
-		timestamp = os.time(parseDate(match.date)),
+		timestamp = os.time(Date.parseIsoDate(match.date)),
 	})
 
 	-- Update matches played
@@ -186,7 +173,7 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 	return ratingSelf + delta
 end
 
-local function storeRatingTable(ratingTable, date, name)
+function Ratings._storeRatingTable(ratingTable, date, name)
 	local placementsToStore = {}
 	local ratingTableToStore = {}
 	for team, data in Table.iter.spairs(ratingTable, function(tbl, a, b) return tbl[a].rating > tbl[b].rating end) do
@@ -210,7 +197,7 @@ local function storeRatingTable(ratingTable, date, name)
 	)
 end
 
-local function storeTransfer(from, to, date, mod)
+function Ratings._storeTransfer(from, to, date, mod)
 	date = os.date('!%x', date)
 	mw.ext.LiquipediaDB.lpdb_datapoint(
 		'LPR_TRANSFER_' .. date .. '_' .. from .. '_' .. to,
@@ -226,7 +213,7 @@ local function storeTransfer(from, to, date, mod)
 	)
 end
 
-local function getLatestSnapshotDate(name)
+function Ratings._getLatestSnapshotDate(name)
 	local res = mw.ext.LiquipediaDB.lpdb(
 		'datapoint',
 		{
@@ -240,7 +227,7 @@ local function getLatestSnapshotDate(name)
 	return (res[1] or {}).date
 end
 
-local function getRatingTable(date, name)
+function Ratings._getRatingTable(date, name)
 	local res = mw.ext.LiquipediaDB.lpdb(
 		'datapoint',
 		{
@@ -253,17 +240,13 @@ local function getRatingTable(date, name)
 	return Json.parseIfString(((res[1] or {}).extradata or {}).table) or {}
 end
 
-local processedMatches = 0
-local allMatches = 0
-local matchids = {}
+function Ratings._processMatch(ratingTable, match)
+	_allMatches = _allMatches + 1
 
-local function processMatch(ratingTable, match)
-	allMatches = allMatches + 1
-
-	if matchids[match.match2id] then
+	if _seenMatchIds[match.match2id] then
 		return
 	end
-	matchids[match.match2id] = true
+	_seenMatchIds[match.match2id] = true
 
 	-- get opponents
 	local op1 = (match.match2opponents or {})[1]
@@ -282,8 +265,8 @@ local function processMatch(ratingTable, match)
 	local rp2 = ratingTable[op2.name] or {rating = RATING_INIT_VALUE, matches = 0, streak = 0, lastmatches = {}}
 
 	-- calculate the new ratings
-	local newRating1 = calcRating(rp1, rp2, op1.score, op2.score, match)
-	local newRating2 = calcRating(rp2, rp1, op2.score, op1.score, match)
+	local newRating1 = Ratings._calcRatingChange(rp1, rp2, op1.score, op2.score, match)
+	local newRating2 = Ratings._calcRatingChange(rp2, rp1, op2.score, op1.score, match)
 
 	-- apply new ratings
 	rp1.rating = newRating1
@@ -293,10 +276,10 @@ local function processMatch(ratingTable, match)
 	ratingTable[op1.name] = rp1
 	ratingTable[op2.name] = rp2
 
-	processedMatches = processedMatches + 1
+	_processedMatches = _processedMatches + 1
 end
 
-local function processTransfer(ratingTable, transfer)
+function Ratings._processTransfer(ratingTable, transfer)
 	local data = (transfer.extradata or {})
 	local from = data.from
 	local to = data.to
@@ -318,52 +301,52 @@ local function processTransfer(ratingTable, transfer)
 	end
 end
 
-local function cleanRatingTable(ratingTable, today)
-	local cutOff = os.time(stepDate(today, -DAYS_IDLE_BEFORE_CLEANUP))
+function Ratings._cleanRatingTable(ratingTable, today)
+	local cutOff = os.time(Ratings._stepDate(today, -DAYS_IDLE_BEFORE_CLEANUP))
 	return Table.filterByKey(ratingTable, function(_, team)
 		return os.difftime(team.lastmatches[#team.lastmatches].timestamp, cutOff) >= 0
 	end)
 end
 
-local function newDay(ratingTable, transfersForDay)
+function Ratings._newDay(ratingTable, transfersForDay)
 	if not transfersForDay then
 		return
 	end
-	local transferHandler = FnUtil.curry(processTransfer, ratingTable)
+	local transferHandler = FnUtil.curry(Ratings._processTransfer, ratingTable)
 	Array.forEach(transfersForDay, transferHandler)
 end
 
-local function newMonth(ratingTable, date, id, dateFormat)
-	ratingTable = cleanRatingTable(ratingTable, dateFormat)
-	storeRatingTable(ratingTable, date, id)
+function Ratings._newMonth(ratingTable, date, id, dateFormat)
+	ratingTable = Ratings._cleanRatingTable(ratingTable, dateFormat)
+	Ratings._storeRatingTable(ratingTable, date, id)
 end
 
-local function initStepDate(ratingTable, transfers, id)
+function Ratings._initStepDate(ratingTable, transfers, id)
 	local hasFirstMonth = false
 	---@param from osdate
 	---@param to osdate?
 	---@return osdate
 	return function(from, to)
 		if not to then
-			to = stepDate(from)
+			to = Ratings._stepDate(from)
 		end
 		local current = from
-		local prev = stepDate(from, -1)
+		local prev = Ratings._stepDate(from, -1)
 		while os.time(current) < os.time(to) do
 			local date = os.date('!%F', os.time(current)) --[[@as osdate]]
 
 			if os.date('%m', os.time(prev)) ~= os.date('%m', os.time(current)) then
 				if hasFirstMonth then
-					newMonth(ratingTable, date, id, current)
+					Ratings._newMonth(ratingTable, date, id, current)
 				else
 					hasFirstMonth = true
 				end
 			end
 
-			newDay(ratingTable, transfers[date])
+			Ratings._newDay(ratingTable, transfers[date])
 
 			prev = current
-			current = stepDate(current)
+			current = Ratings._stepDate(current)
 		end
 		return to
 	end
@@ -379,32 +362,32 @@ function Ratings.calc(frame)
 	end
 
 	-- date params
-	local dateFrom = parseDate(args.dateFrom or getLatestSnapshotDate(id))
-	local dateTo = parseDate(args.dateTo or os.date('!%F')--[[@as string]])
+	local dateFrom = Date.parseIsoDate(args.dateFrom or Ratings._getLatestSnapshotDate(id))
+	local dateTo = Date.parseIsoDate(args.dateTo or os.date('!%F')--[[@as string]])
 
 	-- Fetch data
-	local ratingTable = Table.map(getRatingTable(dateFrom, id), function(key, value)
+	local ratingTable = Table.map(Ratings._getRatingTable(dateFrom, id), function(key, value)
 		-- Ensure key is string, can be lost in the json parsing
 		return tostring(key), value
 	end)
-	local transfers = getAllTransfers()
+	local transfers = Ratings._getAllTransfers()
 
 	-- perform calculation
-	local lastDate = stepDate(dateFrom, -1)
+	local lastDate = Ratings._stepDate(dateFrom, -1)
 
-	local newDateFunc = initStepDate(ratingTable, transfers, id)
+	local newDateFunc = Ratings._initStepDate(ratingTable, transfers, id)
 
 	Lpdb.executeMassQuery('match2', {
 		query = 'date,match2opponents,liquipediatier,liquipediatiertype,match2id,extradata',
 		order = 'date ASC',
 		limit = 500,
-		conditions = getDateRangeConditions(dateFrom, dateTo) .. ' AND ' .. STATIC_CONDITIONS_MATCH
+		conditions = Ratings._getDateRangeConditions(dateFrom, dateTo) .. ' AND ' .. STATIC_CONDITIONS_MATCH
 	}, function (match)
 		-- Check and handle new dates
-		lastDate = newDateFunc(lastDate, parseDate(match.date))
+		lastDate = newDateFunc(lastDate, Date.parseIsoDate(match.date))
 
 		-- Process match
-		processMatch(ratingTable, match)
+		Ratings._processMatch(ratingTable, match)
 	end)
 
 	-- Tick through any remaining days
@@ -413,20 +396,20 @@ function Ratings.calc(frame)
 	end
 
 	if dateTo.day ~= 1 then
-		newMonth(ratingTable, os.date('!%F', os.time(dateTo)) --[[@as osdate]], id, dateTo)
+		Ratings._newMonth(ratingTable, os.date('!%F', os.time(dateTo)) --[[@as osdate]], id, dateTo)
 	end
 
 	-- Display something
 	local output = {}
-	table.insert(output, 'All matches: ' .. allMatches)
-	table.insert(output, 'Valid matches: ' .. processedMatches)
+	table.insert(output, 'All matches: ' .. _allMatches)
+	table.insert(output, 'Valid matches: ' .. _processedMatches)
 
 	return table.concat(output, '<br>')
 end
 
 function Ratings.transfer(frame)
 	local args = Arguments.getArgs(frame)
-	local date = os.time(parseDate(args.date))
+	local date = os.time(Date.parseIsoDate(args.date))
 	local from = mw.ext.TeamTemplate.teampage(args.from, args.date)
 	local to = String.isNotEmpty(args.to) and mw.ext.TeamTemplate.teampage(args.to, args.date) or ''
 	if String.startsWith(from, '<div class=') then
@@ -434,7 +417,7 @@ function Ratings.transfer(frame)
 	elseif String.startsWith(to, '<div class=') then
 		return to
 	else
-		storeTransfer(from, to, date, tonumber(args.mod))
+		Ratings._storeTransfer(from, to, date, tonumber(args.mod))
 	end
 	return '<code>' .. args.date .. ': ' .. from .. ' --> ' .. to .. '</code><br>'
 end
