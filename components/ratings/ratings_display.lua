@@ -12,6 +12,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 -- static conditions for LPDB
@@ -53,25 +54,26 @@ local function parseDate(str)
 	return {year = y, month = m, day = d}
 end
 
-local function getRegionOfTeam(name)
+local function getTeamInfo(name)
 	local res = mw.ext.LiquipediaDB.lpdb(
 		'team',
 		{
-			query = 'region',
+			query = 'region, template',
 			limit = 1,
 			conditions = '[[pagename::' .. string.gsub(name, ' ', '_') .. ']]'
 		}
 	)
 	if not res[1] then
 		mw.log('Cannot find teampage for ' .. name)
+		return {}
 	end
-	return (res[1] or {}).region or '???'
+	return res[1]
 end
 
 local function createProgressionEntry(timestamp, rating)
 	return {
 		date = os.date('%Y-%m-%d', timestamp),
-		rating = math.floor(rating + 0.5),
+		rating = rating and math.floor(rating + 0.5) or '',
 	}
 end
 
@@ -101,31 +103,7 @@ function RatingsDisplay.display(frame)
 	local teamRankings = getTeamRankings(args.id)
 
 	Array.forEach(teamRankings, function(team)
-		-- Future functionality: Latest Matches details per team
-		--[[
-		local match2ids = {}
-		local rcByMatch2id = {}
-		for _, item in ipairs(data.lastmatches) do
-			local match2id = item.id
-			table.insert(match2ids, match2id)
-			rcByMatch2id[match2id] = item.ratingChange
-		end
-		local lm = {}
-		for _, match in ipairs(getMatches(match2ids)) do
-			local ratingChange = rcByMatch2id[match.match2id]
-			local winner = tonumber(match.winner) or 1
-			local opponent = ratingChange and match.match2opponents[ratingChange > 0 and ((winner % 2) + 1) or winner] or {}
-			local historyMatch = {
-				id = match.match2id,
-				rc = ratingChange,
-				op = (opponent or {}).name or 'Error',
-				pn = match.pagename,
-				dt = match.date
-			}
-			table.insert(lm, historyMatch)
-		end
-		data.lastmatches = lm
-		--]]
+		-- TODO: Future functionality: Latest Matches details per team
 		team.progression = {
 			createProgressionEntry(teamRankings.date, team.rating)
 		}
@@ -141,9 +119,6 @@ function RatingsDisplay.display(frame)
 
 		Array.forEach(teamRankings, function(team)
 			local rating = (snapshot.extradata.table[team.name] or {}).rating
-			if not rating then
-				return
-			end
 
 			table.insert(team.progression, createProgressionEntry(snapshotTime, rating))
 		end)
@@ -151,8 +126,11 @@ function RatingsDisplay.display(frame)
 
 	--- Update team information
 	Array.forEach(teamRankings, function(team)
-		--- Fetch the region
-		team.region = getRegionOfTeam(team.name)
+		--- Information from team page
+		local teamInfo = getTeamInfo(team.name)
+
+		team.region = teamInfo.region or '???'
+		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '') and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name
 		--- Reverse the order of progression
 		team.progression = Array.reverse(team.progression)
 	end)
@@ -176,7 +154,8 @@ function RatingsDisplay.display(frame)
 			},
 			yAxis = {
 				type = 'value',
-				min = 1250,
+				min = 1000,
+				max = 3500,
 				axisTick = {
 					interval = 50
 				}
@@ -200,7 +179,7 @@ function RatingsDisplay.display(frame)
 		})
 
 		local popup = Template.expandTemplate(mw.getCurrentFrame(), 'Popup', {
-			label = 'Hist',
+			label = 'show',
 			title = 'Details for ' .. mw.ext.TeamTemplate.team(team.name),
 			content = chart,
 		})
@@ -220,7 +199,48 @@ function RatingsDisplay.display(frame)
 			:tag('td'):wikitext(popup):done()
 	end)
 
-	return tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
+	local topTeams = Array.sub(teamRankings, 1, 10)
+	mw.logObject()
+	local topTeamChart = mw.ext.Charts.chart({
+		xAxis = {
+			type = 'category',
+			data =  Array.map(topTeams[1].progression or {}, Operator.property('date'))
+		},
+		yAxis = {
+			name = 'Rating',
+			type = 'value',
+			min = 1000,
+			max = 3500,
+			axisTick = {
+				interval = 50
+			}
+		},
+		tooltip = {
+			trigger = 'axis'
+		},
+		grid = {
+			show = true
+		},
+		size = {
+			height = 500,
+			width = 700
+		},
+		legend = {
+			show = true,
+			selected = Table.map(topTeams, function(rank, team)
+				return team.shortName, rank <= 5 and true or false
+			end)
+		},
+		series = Array.map(topTeams, function(team)
+			return {
+				data =  Array.map(team.progression, Operator.property('rating')),
+				type = 'line',
+				name = team.shortName
+			}
+		end)
+	})
+
+	return topTeamChart .. tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
 end
 
 return RatingsDisplay
