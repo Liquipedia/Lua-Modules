@@ -1363,10 +1363,7 @@ end
 ---@return table
 function StatisticsPortal._splitOrDefault(input, default)
 	if String.isEmpty(input) then
-		if Table.isEmpty(default) then
-			return {}
-		end
-		return default --[[@as table]]
+		return default or {}
 	end
 	---@cast input -nil
 	return Array.map(mw.text.split(input, ',', true), String.trim)
