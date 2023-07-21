@@ -24,6 +24,7 @@ local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHO
 -- Parameters related to rating table
 local DAYS_IDLE_BEFORE_CLEANUP = 100
 local MATCHES_TO_KEEP_PER_TEAM = 5
+local MIN_MATCHES_TO_STORE = 10
 
 -- Parameters for the rating calculation
 local RATING_RANGE_FACTOR = 700.0
@@ -89,7 +90,7 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 	local ratingSelf = rpSelf.rating
 	local ratingOther = rpOther.rating
 
-	-- some static parameters
+	-- Expected score (https://en.wikipedia.org/wiki/Elo_rating_system#Mathematical_details)
 	local expectation = 1 / (1 + 10 ^ ((ratingOther - ratingSelf) / RATING_RANGE_FACTOR))
 
 	local winnerScore = math.max(score1, score2)
@@ -117,52 +118,50 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 		modifierLowMatchCount = 1
 	end
 
-	-- tierType
+	-- TierType Modifier
 	if tierType == 'Qualifier' then
 		modifierTierType = 0.67
 	else
 		modifierTierType = 1
 	end
 
-	-- tier modification
+	-- Modifications based on tier
 	local mWin = 600
 	local mLose = 600
 
-	local function calcMod2(base, multiplier)
+	local function calculateDynamicModifier(base, multiplier)
 		return won and (0.5 / (1 + 10 ^ ((ratingSelf - base) / mWin))) + 1 or
 				((-1 / (1 + 10 ^ ((ratingSelf - base) / mLose))) + 1) * multiplier
 	end
 
 	if tier == 1 then
 		modifierTier = 4.5
-		modifierDynamic = calcMod2(2300, 1)
+		modifierDynamic = calculateDynamicModifier(2300, 1)
 	elseif tier == 2 then
 		modifierTier = 3
-		modifierDynamic = calcMod2(2100, 1.22)
+		modifierDynamic = calculateDynamicModifier(2100, 1.22)
 	elseif tier == 3 then
 		modifierTier = 2
-		modifierDynamic = calcMod2(2100, 1.1)
+		modifierDynamic = calculateDynamicModifier(2100, 1.1)
 	elseif tier == 4 then
 		modifierTier = 0.75
-		modifierDynamic = calcMod2(1800, 1)
+		modifierDynamic = calculateDynamicModifier(1800, 1)
 	else
 		modifierTier = 0.2
-		modifierDynamic = calcMod2(1800, 1)
+		modifierDynamic = calculateDynamicModifier(1800, 1)
 	end
 
 	local delta = RATING_K * ((won and 1 or 0) - expectation) * modifierTier * modifierDynamic * modifierLowMatchCount
 			* modifierBestOf * modifierExternal * modifierTierType
 
-	-- set minimal gain/loss to +/- 1
+	-- Force minimal gain/loss to +/- 1
 	if won and delta < 1 then
 		delta = 1
 	elseif not won and delta > -1 then
 		delta = -1
 	end
 
-	rpSelf.matches = rpSelf.matches + 1
-
-	-- set streak
+	-- Update streak
 	if (rpSelf.streak > 0) then
 		rpSelf.streak = won and (rpSelf.streak + 1) or -1
 	elseif (rpSelf.streak < 0) then
@@ -171,7 +170,7 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 		rpSelf.streak = won and 1 or -1
 	end
 
-	--set last matches
+	-- Add to team's last matches
 	if Table.size(rpSelf.lastmatches) >= MATCHES_TO_KEEP_PER_TEAM then
 		table.remove(rpSelf.lastmatches, 1)
 	end
@@ -181,23 +180,17 @@ local function calcRating(rpSelf, rpOther, score1, score2, match)
 		timestamp = os.time(parseDate(match.date)),
 	})
 
-	--[[
-	if roster ~= nil then
-		if roster.p1 ~= nil and roster.p1 ~= "" then
-			self.last_roster = roster
-		end
-	end
-	--]]
+	-- Update matches played
+	rpSelf.matches = rpSelf.matches + 1
 
 	return ratingSelf + delta
 end
 
 local function storeRatingTable(ratingTable, date, name)
-	mw.log('stored ' .. date)
 	local placementsToStore = {}
 	local ratingTableToStore = {}
 	for team, data in Table.iter.spairs(ratingTable, function(tbl, a, b) return tbl[a].rating > tbl[b].rating end) do
-		if data.matches > 10 then
+		if data.matches >= MIN_MATCHES_TO_STORE then
 			table.insert(placementsToStore, team)
 			ratingTableToStore[team] = data
 		end
@@ -307,23 +300,21 @@ local function processTransfer(ratingTable, transfer)
 	local data = (transfer.extradata or {})
 	local from = data.from
 	local to = data.to
-	local modifier = data.mod or 1
+	local modifier = tonumber(data.mod) or 1
 
 	if String.isEmpty(from) then
-		-- New Team
-		mw.log('New', from, to)
+		-- New
+		-- Nothing needed to be done
 	elseif String.isEmpty(to) then
-		-- removal
+		-- Removal
 		ratingTable[from] = nil
-		mw.log('Del', from, to)
 	else
-		-- transfer
+		-- Transfer
 		ratingTable[to], ratingTable[from] = ratingTable[from], nil
 		ratingTable[to] = ratingTable[to]
 		if ratingTable[to] then
 			ratingTable[to].rating = (ratingTable[to].rating - RATING_INIT_VALUE) * modifier + RATING_INIT_VALUE
 		end
-		mw.log('Move', from, to)
 	end
 end
 
@@ -380,9 +371,8 @@ end
 
 --- calculates the rating and stores it to the LPDB
 function Ratings.calc(frame)
-	-- [[pagename::" .. mw.title.getCurrentTitle().text .. "]]"
-
 	local args = Arguments.getArgs(frame)
+
 	local id = args.id
 	if String.isEmpty(id) then
 		return '<code>id</code> is empty, needs to be set'
@@ -413,7 +403,7 @@ function Ratings.calc(frame)
 		-- Check and handle new dates
 		lastDate = newDateFunc(lastDate, parseDate(match.date))
 
-		-- process match
+		-- Process match
 		processMatch(ratingTable, match)
 	end)
 
@@ -426,15 +416,12 @@ function Ratings.calc(frame)
 		newMonth(ratingTable, os.date('!%F', os.time(dateTo)) --[[@as osdate]], id, dateTo)
 	end
 
-	-- text output
-	local out = ''
-	out = out .. 'All matches: ' .. allMatches .. '<br>'
-	out = out .. 'Valid matches: ' .. processedMatches .. '<br>'
-	--[[for team, data in Table.iter.spairs(ratingTable, function(tbl, a, b) return tbl[a].rating > tbl[b].rating end) do
-		out = out .. team .. " " .. Json.stringify(data) .. "<br>"
-	end ]]
-	--
-	return out
+	-- Display something
+	local output = {}
+	table.insert(output, 'All matches: ' .. allMatches)
+	table.insert(output, 'Valid matches: ' .. processedMatches)
+
+	return table.concat(output, '<br>')
 end
 
 function Ratings.transfer(frame)
@@ -450,27 +437,6 @@ function Ratings.transfer(frame)
 		storeTransfer(from, to, date, tonumber(args.mod))
 	end
 	return '<code>' .. args.date .. ': ' .. from .. ' --> ' .. to .. '</code><br>'
-end
-
-function Ratings.store(frame)
-	local args = Arguments.getArgs(frame)
-	local date = os.time(parseDate(args.date))
-	local id = args.id
-	local rawTable = Json.parse(args.table)
-	local ratingTable = {}
-	for key, data in pairs(rawTable) do
-		local team = mw.ext.TeamTemplate.teampage(key, args.date)
-		if not String.startsWith(team, '<div class=') and tonumber(data.rating) then
-			ratingTable[team] = {
-				rating = tonumber(data.rating),
-				streak = tonumber(data.streak),
-				matches = tonumber(data.matches),
-				lastmatches = data.lastmatches
-			}
-		end
-	end
-	storeRatingTable(ratingTable, date, id)
-	return Json.stringify(rawTable)
 end
 
 return Ratings
