@@ -111,7 +111,8 @@ function RatingsDisplay.display(frame)
 		local teamInfo = RatingsDisplay._getTeamInfo(team.name)
 
 		team.region = teamInfo.region or '???'
-		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '') and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name
+		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
+				and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name
 		--- Reverse the order of progression
 		team.progression = Array.reverse(team.progression)
 	end)

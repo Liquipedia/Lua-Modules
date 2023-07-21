@@ -285,13 +285,10 @@ function Ratings._processTransfer(ratingTable, transfer)
 	local to = data.to
 	local modifier = tonumber(data.mod) or 1
 
-	if String.isEmpty(from) then
-		-- New
-		-- Nothing needed to be done
-	elseif String.isEmpty(to) then
+	if String.isEmpty(to) then
 		-- Removal
 		ratingTable[from] = nil
-	else
+	elseif String.isNotEmpty(from) then
 		-- Transfer
 		ratingTable[to], ratingTable[from] = ratingTable[from], nil
 		ratingTable[to] = ratingTable[to]
