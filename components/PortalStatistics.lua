@@ -392,7 +392,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 				return value == headerIndex
 			end) then
 				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(headerValue, {link = true,}))
+					:wikitext(Tier.displaySingle(headerValue, {link = true}))
 			end
 		end
 	end
