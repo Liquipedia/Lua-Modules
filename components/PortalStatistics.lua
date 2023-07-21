@@ -62,7 +62,7 @@ Section: Chart Entry Functions
 ]] --
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
@@ -81,7 +81,7 @@ function StatisticsPortal.gameEarningsChart(args)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.modeEarningsChart(args)
 	args = args or {}
@@ -100,7 +100,7 @@ function StatisticsPortal.modeEarningsChart(args)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
@@ -175,7 +175,7 @@ Section: Coverage Breakdown
 ]] --
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.coverageStatistics(args)
 	args = args or {}
@@ -201,7 +201,7 @@ function StatisticsPortal.coverageStatistics(args)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
@@ -282,7 +282,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
@@ -407,7 +407,7 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				headerRow:tag('th')
-					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true,}))
+					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true}))
 			end
 		end
 	end
@@ -423,7 +423,7 @@ Section: Prizepool Breakdown
 ]]--
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.prizepoolBreakdown(args)
 	args = args or {}
@@ -540,7 +540,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.pieChartBreakdown(args)
 	args = args or {}
@@ -654,7 +654,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 end
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.earningsTable(args)
 	args = args or {}
@@ -723,7 +723,7 @@ Section: Player Age Table Breakdown
 ]]--
 
 
----@param args table
+---@param args table?
 ---@return Html
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
@@ -828,7 +828,6 @@ end
 ---@param groupValues table
 ---@return table
 function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupValues)
-	args = args or {}
 	table.insert(groupValues, defaultValue)
 	defaultValue = string.lower(defaultValue or '')
 
