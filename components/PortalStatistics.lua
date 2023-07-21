@@ -1358,13 +1358,17 @@ function StatisticsPortal._toOpponent(player)
 end
 
 
----@param input string
+---@param input string?
 ---@param default table?
 ---@return table
 function StatisticsPortal._splitOrDefault(input, default)
 	if String.isEmpty(input) then
+		if Table.isEmpty(default) then
+			return {}
+		end
 		return default --[[@as table]]
 	end
+	---@cast input -nil
 	return Array.map(mw.text.split(input, ',', true), String.trim)
 end
 
