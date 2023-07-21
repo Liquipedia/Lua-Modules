@@ -52,15 +52,6 @@ Placement.specialStatuses = {
 		end,
 		lpdb = 'DQ',
 	},
-	DNS = {
-		active = function (args)
-			return Logic.readBool(args.dns)
-		end,
-		display = function ()
-			return Abbreviation.make('DNS', 'Did not start')
-		end,
-		lpdb = 'DNS',
-	},
 	DNF = {
 		active = function (args)
 			return Logic.readBool(args.dnf)
@@ -78,33 +69,6 @@ Placement.specialStatuses = {
 			return Abbreviation.make('DNP', 'Did not participate')
 		end,
 		lpdb = 'DNP',
-	},
-	DNPQ = {
-		active = function (args)
-			return Logic.readBool(args.dnpq)
-		end,
-		display = function ()
-			return Abbreviation.make('DNPQ', 'Did not pre-qualify')
-		end,
-		lpdb = 'DNPQ',
-	},
-	DNQ = {
-		active = function (args)
-			return Logic.readBool(args.dnq)
-		end,
-		display = function ()
-			return Abbreviation.make('DNQ', 'Did not qualify')
-		end,
-		lpdb = 'DNQ',
-	},
-	NC = {
-		active = function (args)
-			return Logic.readBool(args.nc)
-		end,
-		display = function ()
-			return Abbreviation.make('NC', 'Not classified')
-		end,
-		lpdb = 'NC',
 	},
 	W = {
 		active = function (args)
