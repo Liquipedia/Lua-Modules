@@ -206,8 +206,7 @@ end
 function StatisticsPortal.coverageMatchTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
-	args.customGames = (type(args.customGames) == 'table' and args.customGames)
-		or StatisticsPortal._splitOrDefault(args.customGames --[[@as string]], GAMES)
+	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 
 	local matchTable = mw.html.create('table')
 		:addClass('wikitable wikitable-striped')
@@ -287,8 +286,8 @@ end
 function StatisticsPortal.coverageTournamentTable(args)
 	args = args or {}
 	args.multiGame = Logic.readBool(args.multiGame)
-	args.customGames = StatisticsPortal._splitOrDefault(args.customGames --[[@as string]], GAMES)
-	args.customTiers = StatisticsPortal._splitOrDefault(args.customTiers --[[@as string]])
+	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
+	args.customTiers = StatisticsPortal._isTableOrSplitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
@@ -574,7 +573,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			:css('text-align', 'center')
 			:wikitext('Game Breakdown')
 			:node(StatisticsPortal._getPieChartData(
-				args, 'game', 'Other', StatisticsPortal._splitOrDefault(args.customGames, GAMES)
+				args, 'game', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 			))
 		)
 	end
@@ -588,7 +587,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			:css('text-align', 'center')
 			:wikitext('Mode Breakdown')
 			:node(StatisticsPortal._getPieChartData(
-				args, 'mode', 'Other', StatisticsPortal._splitOrDefault(args.customModes, {'Team'})
+				args, 'mode', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customModes, {'Team'})
 			))
 		)
 	end
@@ -661,8 +660,8 @@ function StatisticsPortal.earningsTable(args)
 	args.limit = tonumber(args.limit) or 20
 	args.opponentType = args.opponentType or Opponent.team
 	args.displayShowMatches = Logic.readBool(args.displayShowMatches)
-	args.allowedPlacements = StatisticsPortal._splitOrDefault(
-		args.allowedPlacements --[[@as string]],
+	args.allowedPlacements = StatisticsPortal._isTableOrSplitOrDefault(
+		args.allowedPlacements,
 		DEFAULT_ALLOWED_PLACES
 	)
 
@@ -1294,7 +1293,7 @@ end
 ---@return table
 function StatisticsPortal._getChartConfig(args, params)
 	local isForTeam = String.isNotEmpty(args.team) or Logic.readBool(args.isForTeam)
-	local customInputs = StatisticsPortal._splitOrDefault(args.customInputs, params.defaultInputs)
+	local customInputs = StatisticsPortal._isTableOrSplitOrDefault(args.customInputs, params.defaultInputs)
 	local opponentName
 	if isForTeam then
 		opponentName = args.team
@@ -1310,7 +1309,7 @@ function StatisticsPortal._getChartConfig(args, params)
 		axisRotate = params.axisRotate or 0,
 		emphasis = params.emphasis or 'series',
 		customInputs = customInputs,
-		customLegend = StatisticsPortal._splitOrDefault(args.customLegend, customInputs),
+		customLegend = StatisticsPortal._isTableOrSplitOrDefault(args.customLegend, customInputs),
 		customYears = args.customYears,
 		startYear = args.startYear or Info.startYear,
 		yearBreakdown = Logic.readBool(args.yearBreakdown),
@@ -1358,11 +1357,13 @@ function StatisticsPortal._toOpponent(player)
 end
 
 
----@param input string?
+---@param input string|table|nil
 ---@param default table?
 ---@return table
-function StatisticsPortal._splitOrDefault(input, default)
-	if String.isEmpty(input) then
+function StatisticsPortal._isTableOrSplitOrDefault(input, default)
+	if type(input) == 'table' then
+		return input
+	elseif String.isEmpty(input) then
 		return default or {}
 	end
 	---@cast input -nil
@@ -1377,7 +1378,7 @@ function StatisticsPortal._returnCustomYears(args)
 	local yearTable
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
 	if String.isNotEmpty(args.customYears) then
-		yearTable = Array.map(StatisticsPortal._splitOrDefault(args.customYears), function(tier) return tonumber(tier) end)
+		yearTable = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customYears), function(tier) return tonumber(tier) end)
 		table.insert(yearTable, CURRENT_YEAR)
 		return yearTable, defaultYearTable
 	else
