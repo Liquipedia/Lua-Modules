@@ -1378,7 +1378,12 @@ function StatisticsPortal._returnCustomYears(args)
 	local yearTable
 	local defaultYearTable = Array.range(args.startYear, CURRENT_YEAR)
 	if String.isNotEmpty(args.customYears) then
-		yearTable = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customYears), function(tier) return tonumber(tier) end)
+		yearTable = Array.map(
+			StatisticsPortal._isTableOrSplitOrDefault(args.customYears),
+			function(tier)
+				return tonumber(tier)
+			end
+		)
 		table.insert(yearTable, CURRENT_YEAR)
 		return yearTable, defaultYearTable
 	else
