@@ -282,7 +282,7 @@ function MvpTable._queryMatch1(conditions)
 
 					if not playerList[identifier] then
 						playerList[identifier] = MvpTable._findPlayerInfo(match, {
-							player:lower(),
+							player:lower():gsub('_', ' '),
 							player:lower():gsub(' ', '_'),
 							redirectResolvedPlayer:lower(),
 							identifier:lower(),
