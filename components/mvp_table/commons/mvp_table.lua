@@ -324,7 +324,7 @@ function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
 			if String.isNotEmpty(player) and Table.includes(lookupTable, player:lower()) then
 				playerData.flag = match['opponent' .. opponentIndex .. 'players'][prefix .. 'flag']
 				playerData.displayName = match['opponent' .. opponentIndex .. 'players'][prefix .. 'dn'] or playerData.displayName
-				playerData.team = match.opponent1
+				playerData.team = match['opponent' .. opponentIndex]
 				return playerData
 			end
 		end
