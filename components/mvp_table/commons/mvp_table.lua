@@ -272,7 +272,7 @@ function MvpTable._queryMatch1(conditions)
 	local mvpList = {}
 
 	for _, match in pairs(queryData) do
-		local players, points = string.match((match.extradata or {}).mvp or '', '([%w\(\) _,\-]+);(%d+)')
+		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
 		if players and points then
 			for _, player in pairs(mw.text.split(players, ',')) do
 				if String.isNotEmpty(player) then
