@@ -52,6 +52,10 @@ local CONCAT_VALUE = '&nbsp;'
 ---@field gasForced boolean?
 ---@field buildTimeForced boolean?
 ---@field supplyForced boolean?
+---@field mineralsTotal string|number?
+---@field gasTotal string|number?
+---@field buildTimeTotal string|number?
+---@field supplyTotal string|number?
 
 ---@param args sc2CostDisplayArgsValues
 function CostDisplay.run(args)
@@ -67,7 +71,8 @@ function CostDisplay.run(args)
 		local icon = iconData[faction] or iconData.default
 		local value = tonumber(args[key]) or 0
 		if value ~= 0 or args[key .. 'Forced'] then
-			local display = icon .. CONCAT_VALUE .. value
+			local display = icon .. CONCAT_VALUE .. value ..
+				(args[key .. 'Total'] and (CONCAT_VALUE .. '(' .. args[key .. 'Total'] .. ')') or '')
 			table.insert(displays, display)
 		end
 	end
