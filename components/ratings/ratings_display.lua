@@ -6,14 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local RatingsDisplay = {}
-
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Date = require('Module:DateExt')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+--- Liquipedia Ratings (LPR) Display
+local RatingsDisplay = {}
 
 -- static conditions for LPDB
 local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
@@ -182,7 +183,7 @@ function RatingsDisplay.display(frame)
 	end)
 
 	local topTeams = Array.sub(teamRankings, 1, 10)
-	mw.logObject()
+
 	local topTeamChart = mw.ext.Charts.chart({
 		xAxis = {
 			type = 'category',

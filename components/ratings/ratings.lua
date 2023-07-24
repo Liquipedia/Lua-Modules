@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Ratings = {}
-
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Date = require('Module:DateExt')
@@ -16,6 +14,9 @@ local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
+
+--- Liquipedia Ratings (LPR)
+local Ratings = {}
 
 -- Parameters related to LPDB
 local STATIC_CONDITIONS_MATCH = '[[mode::3v3]] AND [[finished::1]] AND [[liquipediatiertype::!School]]'
