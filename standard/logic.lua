@@ -155,6 +155,7 @@ end
 ---@return function
 function Logic.wrapTryOrLog(f, makeError)
 	return function(...)
+		--need to pack and unpack so we can pass `...` along, using it directly results in the module not being savable
 		local args = require('Module:Table').pack(...)
 		return Logic.tryOrElseLog(function() return f(unpack(args)) end, nil, makeError)
 	end
