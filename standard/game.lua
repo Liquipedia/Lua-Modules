@@ -122,15 +122,16 @@ function Game.defaultTeamLogoData(options)
 	return Game.raw(options).defaultTeamLogo
 end
 
+---@class gameIconOptions
+---@field game string?
+---@field size string?
+---@field noLink boolean?
+---@field link string?
+---@field noSpan boolean?
+---@field spanClass string?
+
 ---Builds the icon for a given game
----@param options? {game: string?,
----		useDefault: boolean?,
----		size: string?,
----		noLink: boolean?,
----		link: string?,
----		noSpan: boolean?,
----		spanClass: string?,
----}
+---@param options gameIconOptions?
 ---@return string
 function Game.icon(options)
 	options = options or {}
