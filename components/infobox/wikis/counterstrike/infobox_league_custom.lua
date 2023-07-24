@@ -103,16 +103,15 @@ local _MODE_TEAM = 'team'
 local PRIZE_POOL_ROUND_PRECISION = 2
 
 local _args
-local _game
 
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
-	_game = Game.raw{game = _args.game, useDefault = false}
 
 	_args.publisherdescription = 'metadesc-valve'
 	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
 	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
+	_args.gameData = Game.raw{game = _args.game, useDefault = false}
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -195,8 +194,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if Table.isNotEmpty(_game) then
-		table.insert(categories, (_game.abbreviation or _game.name) .. ' Tournaments')
+	if Table.isNotEmpty(_args.gameData) then
+		table.insert(categories, (_args.gameData.abbreviation or _args.gameData.name) .. ' Tournaments')
 	else
 		table.insert(categories, 'Tournaments without game version')
 	end
@@ -318,14 +317,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_createGameCell(args)
-	if Table.isEmpty(_game) and String.isEmpty(args.patch) then
+	if Table.isEmpty(_args.gameData) and String.isEmpty(args.patch) then
 		return nil
 	end
 
 	local content = ''
 
-	if Table.isNotEmpty(_game) then
-		content = content .. Page.makeInternalLink({}, _game.name, _game.link)
+	if Table.isNotEmpty(_args.gameData) then
+		content = content .. Page.makeInternalLink({}, _args.gameData.name, _args.gameData.link)
 	end
 
 	if String.isEmpty(args.epatch) and String.isNotEmpty(args.patch) then

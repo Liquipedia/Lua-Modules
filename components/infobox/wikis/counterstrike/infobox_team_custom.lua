@@ -25,7 +25,6 @@ local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _team
-local _games
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
@@ -35,10 +34,11 @@ function CustomTeam.run(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
 
-	_team = team
-	_games = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	team.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return team.args[gameIdentifier]
 		end)
+
+	_team = team
 
 	return team:createInfobox()
 end
@@ -69,7 +69,7 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell {
 			name = 'Games',
-			content = Array.map(_games, function (gameIdentifier)
+			content = Array.map(_team.args.gamesList, function (gameIdentifier)
 					return Game.text{game = gameIdentifier}
 				end)
 		}
@@ -103,12 +103,12 @@ end
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	Array.forEach(_games, function (gameIdentifier)
+	Array.forEach(_team.args.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' Teams')
 		end)
 
-	if Table.isEmpty(_games) then
+	if Table.isEmpty(_team.args.gamesList) then
 		table.insert(categories, 'Gameless Teams')
 	end
 

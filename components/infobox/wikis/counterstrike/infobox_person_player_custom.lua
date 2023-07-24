@@ -58,7 +58,6 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _games
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
@@ -78,10 +77,11 @@ function CustomPlayer.run(frame)
 	player.getPersonType = CustomPlayer.getPersonType
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
-	_args = player.args
-	_games = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	player.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return player.args[gameIdentifier]
 		end)
+
+	_args = player.args
 
 	return player:createInfobox()
 end
@@ -114,7 +114,7 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell {
 			name = 'Games',
-			content = Array.map(_games, function (gameIdentifier)
+			content = Array.map(_args.gamesList, function (gameIdentifier)
 					return Game.text{game = gameIdentifier}
 				end)
 		}
@@ -166,12 +166,12 @@ end
 function CustomPlayer:getWikiCategories(categories)
 	local typeCategory = self:getPersonType(_args).category
 
-	Array.forEach(_games, function (gameIdentifier)
+	Array.forEach(_args.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
 		end)
 
-	if Table.isEmpty(_games) then
+	if Table.isEmpty(_args.gamesList) then
 		table.insert(categories, 'Gameless Players')
 	end
 
