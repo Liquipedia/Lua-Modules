@@ -170,7 +170,7 @@ function Game._createIcon(options)
 		}
 	)
 	if String.isNotEmpty(options.spanClass) then
-		return mw.html.create('span'):addClass(options.spanClass):node(iconString)
+		return tostring(mw.html.create('span'):addClass(options.spanClass):node(iconString))
 	else
 		return iconString
 	end
