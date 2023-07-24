@@ -8,7 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Date = require('Module:DateExt')
+local Date = require('Module:Date/Ext')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
