@@ -16,6 +16,10 @@ local Class = {}
 
 Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 
+---@class BaseClass
+---@operator call:self
+---@field is_a function
+
 function Class.new(base, init)
 	local instance = {}
 

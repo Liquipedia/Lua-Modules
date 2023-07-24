@@ -127,7 +127,7 @@ OpponentDisplay.propTypes.InlineOpponent = {
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field dq boolean?
----@field teamStyle teamStyle
+---@field teamStyle teamStyle?
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
