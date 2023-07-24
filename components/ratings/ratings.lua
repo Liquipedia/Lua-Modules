@@ -8,7 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Date = require('Module:DateExt')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
