@@ -55,6 +55,7 @@ function BroadcasterCard.create(frame)
 	else
 		position = TBD
 	end
+	---@cast position string
 
 	if args.title then
 		title = args.title

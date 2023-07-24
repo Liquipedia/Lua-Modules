@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
 --[[
@@ -32,7 +32,7 @@ DateExt.epochZero = 0
 ---@param dateString string|number
 ---@return integer?
 function DateExt.readTimestamp(dateString)
-	if String.isEmpty(dateString) then
+	if Logic.isEmpty(dateString) then
 		return nil
 	elseif type(dateString) == 'number' then
 		return dateString
