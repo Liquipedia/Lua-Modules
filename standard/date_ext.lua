@@ -102,7 +102,7 @@ function DateExt.parseIsoDate(str)
 	if not str then
 		return
 	end
-	local year, month, day = str:match('^(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)')
+	local year, month, day = str:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
 	-- Default month and day to 1 if not set
 	if String.isEmpty(month) then
 		month = 1
@@ -110,7 +110,7 @@ function DateExt.parseIsoDate(str)
 	if String.isEmpty(day) then
 		day = 1
 	end
-	-- create time
+	-- create simplified osdate
 	return {year = year, month = month, day = day}
 end
 
