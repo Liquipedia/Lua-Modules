@@ -92,7 +92,7 @@ ErrorExt.Stash = Stash
 
 ---Adds an Error instance to the local store.
 ---@param error error
----@param storeAsPageVar boolean
+---@param storeAsPageVar boolean?
 function Stash.add(error, storeAsPageVar)
 	if storeAsPageVar then
 		local count = tonumber(pageVars:get('count')) or 0

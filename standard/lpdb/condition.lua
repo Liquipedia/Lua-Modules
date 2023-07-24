@@ -13,8 +13,7 @@ local Array = require('Module:Array')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
----@class AbstractConditionNode
----@field is_a function
+---@class AbstractConditionNode:BaseClass
 local _ConditionNode = Class.new()
 
 ---A tree of conditions, specifying the conditions for an LPDB request.
