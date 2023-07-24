@@ -318,7 +318,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) and String.isEmpty(args.patch) then
+	if Table.isEmpty(_game) and String.isEmpty(args.patch) then
 		return nil
 	end
 
