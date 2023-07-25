@@ -726,7 +726,7 @@ Section: Player Age Table Breakdown
 ---@return Html
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
-	args.earnings = args.earnings and tonumber(args.earnings) or 500
+	args.earnings = tonumber(args.earnings) or 500
 	args.limit = args.limit and tonumber(args.limit) or 20
 	args.order = args.order and 'birthdate ' .. args.order or 'birthdate desc'
 
