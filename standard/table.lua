@@ -148,8 +148,8 @@ function Table.deepCopy(tbl_, options)
 	end
 
 	if options.reuseRef ~= false then
-		---@diagnostic disable-next-line: cast-local-type
-		deepCopy = require('Module:FnUtil').memoize(deepCopy)
+		local FnUtil = require('Module:FnUtil')
+		deepCopy = FnUtil.memoize(deepCopy)
 	end
 
 	return deepCopy(tbl_)
