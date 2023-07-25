@@ -69,10 +69,13 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Cost', content = {CostDisplay.run{
 				faction = _race,
 				minerals = _args.min,
+				mineralsTotal = _args.totalmin,
 				mineralsForced = true,
 				gas = _args.gas,
+				gasTotal = _args.totalgas,
 				gasForced = true,
 				buildTime = _args.buildtime,
+				buildTimeTotal = _args.totalbuildtime,
 			}}},
 		}
 	elseif id == 'requirements' then
@@ -181,8 +184,11 @@ function CustomBuilding:setLpdbData(args)
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			builtby = args.builtby,
 			minerals = args.min,
+			mineralstotal = args.totalmin,
 			gas = args.gas,
+			gastotal = args.totalgas,
 			buildtime = args.buildtime,
+			buildtimetotal = args.totalbuildtime,
 			hp = args.hp,
 			shield = args.shield,
 			armor = args.armor or 1,
