@@ -728,7 +728,7 @@ function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
 	args.limit = args.limit and tonumber(args.limit) or 20
-	args.order = args.order and 'birthdate ' .. args.order or 'birthdate desc'
+	args.order = 'birthdate ' .. (args.order or 'desc')
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
