@@ -82,11 +82,15 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Cost', content = {CostDisplay.run{
 				faction = _args.race,
 				minerals = _args.min,
+				mineralsTotal = _args.totalmin,
 				mineralsForced = true,
 				gas = _args.gas,
+				gasTotal = _args.totalgas,
 				gasForced = true,
 				buildTime = _args.buildtime,
+				buildTimeTotal = _args.totalbuildtime,
 				supply = _args.supply or _args.control or _args.psy,
+				supplyTotal = _args.totalsupply or _args.totalcontrol or _args.totalpsy,
 			}}},
 		}
 	elseif id == 'requirements' then
@@ -183,8 +187,11 @@ function CustomUnit:setLpdbData(args)
 			builtfrom = args.builtfrom,
 			requires = args.requires,
 			minerals = args.min,
+			mineralstotal = args.totalmin,
 			gas = args.gas,
+			gastotal = args.totalgas,
 			buildtime = args.buildtime,
+			buildtimetotal = args.totalbuildtime,
 			attributes = args.attributes,
 			hp = args.hp,
 			shield = args.shield,
@@ -201,6 +208,8 @@ function CustomUnit:setLpdbData(args)
 			morphs = args.morphs,
 			strong_against = args.strong,
 			weak_against = args.weak,
+			supply = args.supply or args.control or args.psy,
+			supplytotal = args.totalsupply or args.totalcontrol or args.totalpsy,
 		}),
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', lpdbData)

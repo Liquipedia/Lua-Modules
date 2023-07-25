@@ -14,15 +14,17 @@ local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Tier = require('Module:Tier/Custom')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -31,14 +33,6 @@ local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
-
-local GAMES = {
-	cs16 = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS1.6 Competitions'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ Competitions'},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS Competitions'},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO Competitions'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO Competitions'},
-}
 
 local ESL_PRO_TIERS_SIZE = '40x40px'
 local ESL_PRO_TIERS = {
@@ -103,8 +97,6 @@ local RESTRICTIONS = {
 
 local _DATE_TBA = 'tba'
 
-local _TIER_VALVE_MAJOR = 'major'
-
 local _MODE_1v1 = '1v1'
 local _MODE_TEAM = 'team'
 
@@ -119,12 +111,12 @@ function CustomLeague.run(frame)
 	_args.publisherdescription = 'metadesc-valve'
 	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
 	_args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
+	_args.gameData = Game.raw{game = _args.game, useDefault = false}
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.shouldStore = CustomLeague.shouldStore
 
@@ -141,17 +133,17 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {(_args.team_number or '') .. (_args.team_slots and ('/' .. _args.team_slots) or '')}
-	})
+			name = 'Teams',
+			content = {(_args.team_number or '') .. (_args.team_slots and ('/' .. _args.team_slots) or '')}
+		})
 	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
+			name = 'Players',
+			content = {_args.player_number}
+		})
 	table.insert(widgets, Cell{
-		name = 'Restrictions',
-		content = CustomLeague.createRestrictionsCell(_args.restrictions)
-	})
+			name = 'Restrictions',
+			content = CustomLeague.createRestrictionsCell(_args.restrictions)
+		})
 
 	return widgets
 end
@@ -164,8 +156,8 @@ function CustomInjector:parse(id, widgets)
 
 			for _, map in ipairs(League:getAllArgsForBase(_args, 'map')) do
 				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
-					Page.makeInternalLink({}, map, map .. game)
-				)))
+							Page.makeInternalLink({}, map, map .. game)
+						)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
@@ -202,11 +194,9 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if CustomLeague.getGame() then
-		table.insert(categories, CustomLeague.getGame().category)
-	end
-
-	if String.isEmpty(args.game) then
+	if Table.isNotEmpty(_args.gameData) then
+		table.insert(categories, (_args.gameData.abbreviation or _args.gameData.name) .. ' Tournaments')
+	else
 		table.insert(categories, 'Tournaments without game version')
 	end
 
@@ -218,6 +208,10 @@ function CustomLeague:getWikiCategories(args)
 
 	if String.isNotEmpty(args.prizepool) and String.isEmpty(args.localcurrency) then
 		table.insert(categories, 'Infobox league lacking localcurrency')
+	end
+
+	if String.isEmpty(args.country) then
+		table.insert(categories, 'Tournaments without location')
 	end
 
 	if String.isNotEmpty(args.sort_date) then
@@ -236,26 +230,15 @@ function CustomLeague:getWikiCategories(args)
 		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
 				function(res) return res.link end))
 	end
+
 	return categories
 end
 
-function CustomLeague:liquipediaTierHighlighted(args)
-	return String.isEmpty(args.valvetier) and Logic.readBool(args.valvemajor)
-end
-
 function CustomLeague:appendLiquipediatierDisplay()
-	local content = ''
-
-	if String.isEmpty(_args.valvetier) and Logic.readBool(_args.valvemajor) then
-		content = content .. ' [[File:Valve_logo_black.svg|x12px|link=Valve_icon.png|x16px|' ..
-			'link=Counter-Strike Majors|Counter-Strike Major]]'
-	end
-
 	if Logic.readBool(_args.cstrikemajor) then
-		content = content .. ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
+		return ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
 	end
-
-	return content
+	return ''
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -285,10 +268,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
-	Variables.varDefine('tournament_valve_major',
-		(args.valvetier or ''):lower() == _TIER_VALVE_MAJOR and 'true' or args.valvemajor)
-	Variables.varDefine('tournament_valve_tier',
-		mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
+	Variables.varDefine('tournament_valve_tier', mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
 
 	Variables.varDefine('tournament_mode',
@@ -297,9 +277,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('no team result',
 		(args.series == 'ESEA Rank S' or
-		args.series == 'FACEIT Pro League' or
-		args.series == 'Danish Pro League' or
-		args.series == 'Swedish Pro League') and 'true' or 'false')
+			args.series == 'FACEIT Pro League' or
+			args.series == 'Danish Pro League' or
+			args.series == 'Swedish Pro League') and 'true' or 'false')
 
 	-- Prize Pool vars
 	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
@@ -337,15 +317,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) and String.isEmpty(args.patch) then
+	if Table.isEmpty(_args.gameData) and String.isEmpty(args.patch) then
 		return nil
 	end
 
 	local content = ''
 
-	local gameData = CustomLeague.getGame()
-	if gameData then
-		content = content .. Page.makeInternalLink({}, gameData.name, gameData.link)
+	if Table.isNotEmpty(_args.gameData) then
+		content = content .. Page.makeInternalLink({}, _args.gameData.name, _args.gameData.link)
 	end
 
 	if String.isEmpty(args.epatch) and String.isNotEmpty(args.patch) then
@@ -355,10 +334,6 @@ function CustomLeague:_createGameCell(args)
 	end
 
 	return content
-end
-
-function CustomLeague.getGame()
-	return _args.game and GAMES[_args.game] or nil
 end
 
 function CustomLeague.getRestrictions(restrictions)
@@ -388,7 +363,7 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 
 	if tierData then
 		return '[[File:'.. tierData.icon ..'|' .. ESL_PRO_TIERS_SIZE .. '|link=' .. tierData.link ..
-				'|' .. tierData.name .. ']] ' .. tierData.name
+			'|' .. tierData.name .. ']] ' .. tierData.name
 	end
 end
 
@@ -406,10 +381,9 @@ function CustomLeague:_createValveTierCell(valveTier)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 return CustomLeague
