@@ -761,7 +761,7 @@ function StatisticsPortal.playerAgeTable(args)
 		:tag('th'):wikitext('Age')
 
 	for _, player in ipairs(playerData) do
-		local birthdate =  DateExt.readTimestamp(player.birthdate) --[[@as integer]]
+		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
 		local yearAge = age.year - 1970
 		local dayAge = age.yday - 1
