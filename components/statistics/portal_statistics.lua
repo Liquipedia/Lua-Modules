@@ -1092,7 +1092,7 @@ function StatisticsPortal._achievementsDisplay(data)
 		for _, item in ipairs(data) do
 			item.icon = string.gsub(item.icon, 'File:', '')
 			item.iconDark = string.gsub(item.iconDark or '', 'File:', '')
-			item.icon = String.isNotEmpty(item.icon) and item.icon or 'Gold.png'
+			item.icon = Logic.emptyOr(item.icon, 'Gold.png')
 			output = output .. LeagueIcon.display{
 				icon = item.icon,
 				iconDark = item.iconDark,
