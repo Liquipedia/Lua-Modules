@@ -20,8 +20,10 @@ local RatingsDisplay = {}
 local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
 
 -- Settings
-local LIMIT_RANKS = 100
-local LIMIT_LPR_SNAPSHOT = 24
+local LIMIT_TEAMS_LIST = 100 -- How many teams to show in the list/table
+local LIMIT_TEAMS_GRAPH = 10 -- How many teams to show in the combined graph
+local LIMIT_TEAMS_GRAPH_SELECTED = 5 -- How many teams are preselected in the graph
+local LIMIT_LPR_SNAPSHOT = 24 -- How many months of data is fetched for graphs (graph mode and team rating history)
 
 function RatingsDisplay._getSnapshot(name, offset)
 	return mw.ext.LiquipediaDB.lpdb(
@@ -59,65 +61,69 @@ function RatingsDisplay._createProgressionEntry(timestamp, rating)
 	}
 end
 
-function RatingsDisplay._getTeamRankings(id)
+function RatingsDisplay._getTeamRankings(id, limit)
 	local snapshot = RatingsDisplay._getSnapshot(id)
 	if not snapshot then
 		error('Could not find a Rating with this ID')
 	end
-	local teamRanking = {}
-	teamRanking.date = os.time(Date.parseIsoDate(snapshot.date))
 
+	-- Merge the ranking and team data tables
+	-- Toss away teams that are lower ranked than what is interesting
+	local teams = {}
 	for rank, teamName in ipairs(snapshot.extradata.ranks) do
 		local team = snapshot.extradata.table[teamName] or {}
 		team.name = teamName
-		table.insert(teamRanking, team)
-		if rank > LIMIT_RANKS then
+		table.insert(teams, team)
+		if rank >= limit then
 			break
 		end
 	end
 
-	return teamRanking
+	teams = RatingsDisplay._addProgressionData(teams, id)
+	teams = RatingsDisplay._enrichTeamInformation(teams)
+
+	return teams
 end
 
-function RatingsDisplay.display(frame)
-	local args = Arguments.getArgs(frame)
-
-	local teamRankings = RatingsDisplay._getTeamRankings(args.id)
-
-	Array.forEach(teamRankings, function(team)
-		-- TODO: Future functionality: Latest Matches details per team
-		team.progression = {
-			RatingsDisplay._createProgressionEntry(teamRankings.date, team.rating)
-		}
-	end)
-
-	-- Build rating progression with older snapshots
-	for i = 1, LIMIT_LPR_SNAPSHOT do
-		local snapshot = RatingsDisplay._getSnapshot(args.id, i)
+function RatingsDisplay._addProgressionData(teams, id)
+	-- Build rating progression with snapshots
+	for i = 0, LIMIT_LPR_SNAPSHOT do
+		local snapshot = RatingsDisplay._getSnapshot(id, i)
 		if not snapshot then
 			break
 		end
 		local snapshotTime = os.time(Date.parseIsoDate(snapshot.date))
 
-		Array.forEach(teamRankings, function(team)
+		Array.forEach(teams, function(team)
 			local rating = (snapshot.extradata.table[team.name] or {}).rating
+			team.progression = team.progression or {}
 
 			table.insert(team.progression, RatingsDisplay._createProgressionEntry(snapshotTime, rating))
 		end)
 	end
 
-	--- Update team information
-	Array.forEach(teamRankings, function(team)
-		--- Information from team page
+	-- Put progression in the correct order (oldest to newest)
+	Array.forEach(teams, function(team)
+		team.progression = Array.reverse(team.progression)
+	end)
+
+	return teams
+end
+
+function RatingsDisplay._enrichTeamInformation(teams)
+	-- Update team information from Team Tempalte and Team Page
+	Array.forEach(teams, function(team)
 		local teamInfo = RatingsDisplay._getTeamInfo(team.name)
 
 		team.region = teamInfo.region or '???'
 		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
 				and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name
-		--- Reverse the order of progression
-		team.progression = Array.reverse(team.progression)
 	end)
 
+	return teams
+end
+
+function RatingsDisplay._toList(teamRankings)
 	local htmlTable = mw.html.create('table'):addClass('wikitable'):css('text-align', 'center')
 		:tag('tr'):css('font-weight', 'bold')
 			:tag('td'):wikitext('#'):done()
@@ -139,9 +145,6 @@ function RatingsDisplay.display(frame)
 				type = 'value',
 				min = 1000,
 				max = 3500,
-				axisTick = {
-					interval = 50
-				}
 			},
 			tooltip = {
 				trigger = 'axis'
@@ -181,21 +184,22 @@ function RatingsDisplay.display(frame)
 			:tag('td'):css('font-weight', 'bold'):addClass(streakClass):wikitext(streakText):done()
 			:tag('td'):wikitext(popup):done()
 	end)
+	return tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
+end
 
-	local topTeams = Array.sub(teamRankings, 1, 10)
-
-	local topTeamChart = mw.ext.Charts.chart({
+function RatingsDisplay._toGraph(teamRankings)
+	return mw.ext.Charts.chart({
 		xAxis = {
 			type = 'category',
-			data =  Array.map(topTeams[1].progression or {}, Operator.property('date'))
+			data =  Array.map(teamRankings[1].progression or {}, Operator.property('date'))
 		},
 		yAxis = {
 			name = 'Rating',
 			type = 'value',
-			min = 1000,
+			min = 1500,
 			max = 3500,
 			axisTick = {
-				interval = 50
+				interval = 500
 			}
 		},
 		tooltip = {
@@ -210,11 +214,11 @@ function RatingsDisplay.display(frame)
 		},
 		legend = {
 			show = true,
-			selected = Table.map(topTeams, function(rank, team)
-				return team.shortName, rank <= 5 and true or false
+			selected = Table.map(teamRankings, function(rank, team)
+				return team.shortName, rank <= LIMIT_TEAMS_GRAPH_SELECTED and true or false
 			end)
 		},
-		series = Array.map(topTeams, function(team)
+		series = Array.map(teamRankings, function(team)
 			return {
 				data =  Array.map(team.progression, Operator.property('rating')),
 				type = 'line',
@@ -222,8 +226,22 @@ function RatingsDisplay.display(frame)
 			}
 		end)
 	})
+end
 
-	return topTeamChart .. tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
+function RatingsDisplay.graph(frame)
+	local args = Arguments.getArgs(frame)
+
+	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_GRAPH)
+
+	return RatingsDisplay._toGraph(teamRankings)
+end
+
+function RatingsDisplay.list(frame)
+	local args = Arguments.getArgs(frame)
+
+	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_LIST)
+
+	return RatingsDisplay._toList(teamRankings)
 end
 
 return RatingsDisplay
