@@ -727,7 +727,7 @@ Section: Player Age Table Breakdown
 function StatisticsPortal.playerAgeTable(args)
 	args = args or {}
 	args.earnings = tonumber(args.earnings) or 500
-	args.limit = args.limit and tonumber(args.limit) or 20
+	args.limit = tonumber(args.limit) or 20
 	args.order = 'birthdate ' .. (args.order or 'desc')
 
 	local conditions = ConditionTree(BooleanOperator.all)
