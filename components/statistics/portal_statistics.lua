@@ -1166,7 +1166,7 @@ function StatisticsPortal._returnBaseConditions()
 		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'delayed')}
 		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'postponed')}
 		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('prizepool'), Comparator.gt, '0')}
+		:add{ConditionNode(ColumnName('prizepool'), Comparator.neq, '0')}
 end
 
 
