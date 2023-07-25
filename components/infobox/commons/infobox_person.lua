@@ -303,7 +303,7 @@ function Person:getStandardNationalityValue(nationality)
 			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
-		nationalityToStore = nil
+		return nil
 	end
 
 	return nationalityToStore
@@ -375,7 +375,7 @@ function Person:calculateEarnings(args)
 	}
 
 	-- store earnings values in wiki variables for storage in smw
-	for year, earningsOfYear in pairs(earningsPerYear) do
+	for year, earningsOfYear in pairs(earningsPerYear or {}) do
 		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 	Variables.varDefine('earnings', totalEarnings)

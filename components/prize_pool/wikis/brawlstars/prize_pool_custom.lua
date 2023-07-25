@@ -77,7 +77,7 @@ end
 ---@param prizeMoney number
 ---@param tier string?
 ---@param place integer
----@param type string
+---@param type string?
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 	if Logic.isEmpty(tier) then

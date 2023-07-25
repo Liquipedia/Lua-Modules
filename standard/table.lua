@@ -148,7 +148,8 @@ function Table.deepCopy(tbl_, options)
 	end
 
 	if options.reuseRef ~= false then
-		deepCopy = require('Module:FnUtil').memoize(deepCopy)
+		local FnUtil = require('Module:FnUtil')
+		deepCopy = FnUtil.memoize(deepCopy)
 	end
 
 	return deepCopy(tbl_)
@@ -286,6 +287,7 @@ f('player4', 4, 'player')
 ---@generic K, V, T, I
 ---@param args {[K] : V}
 ---@param prefixes string[]
+---@param f function
 ---@return {[I] : T}
 function Table.mapArgumentsByPrefix(args, prefixes, f)
 	local function indexFromKey(key)
@@ -308,7 +310,7 @@ end
 --
 ---@generic K, V, T, I
 ---@param args {[K] : V}
----@param indexFromKey fun(key?: K): integer
+---@param indexFromKey fun(key?: K): integer?
 ---@param f fun(key?: K, index?: integer, ...?: any): T
 ---@param noInterleave boolean?
 ---@return {[I] : T}
