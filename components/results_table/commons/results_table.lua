@@ -77,7 +77,7 @@ function ResultsTable:buildRow(placement)
 	end
 
 	if self.config.displayGameIcons then
-		row:tag('td'):node(Game.icon{game = placement.game})
+		row:tag('td'):node(Game.icon{game = placement.game, noSpan = true})
 	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
