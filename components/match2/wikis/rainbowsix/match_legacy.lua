@@ -8,7 +8,7 @@
 
 local MatchLegacy = {}
 
-local json = require('Module:Json')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -35,8 +35,8 @@ function MatchLegacy.storeMatch(match2, options)
 end
 
 function MatchLegacy.storeMatchSMW(match, match2)
-	local streams = json.parseIfString(match.stream or {})
-	local links = json.parseIfString(match.links or {})
+	local streams = Json.parseIfString(match.stream or {})
+	local links = Json.parseIfString(match.links or {})
 	local icon = Variables.varDefault('tournament_icon')
 	mw.smw.subobject({
 		'legacymatch_' .. match2.match2id,
@@ -68,17 +68,17 @@ function MatchLegacy.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		-- Extradata
-		local extradata = json.parseIfString(game2.extradata)
+		local extradata = Json.parseIfString(game2.extradata)
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata.t1bans and extradata.t2bans then
-			game.extradata.opponent1bans = table.concat(json.parseIfString(extradata.t1bans), ', ')
-			game.extradata.opponent2bans = table.concat(json.parseIfString(extradata.t2bans), ', ')
+			game.extradata.opponent1bans = table.concat(Json.parseIfString(extradata.t1bans), ', ')
+			game.extradata.opponent2bans = table.concat(Json.parseIfString(extradata.t2bans), ', ')
 		end
 		if extradata.t1firstside and extradata.t1halfs and extradata.t2halfs then
-			extradata.t1firstside = json.parseIfString(extradata.t1firstside)
-			extradata.t1halfs = json.parseIfString(extradata.t1halfs)
-			extradata.t2halfs = json.parseIfString(extradata.t2halfs)
+			extradata.t1firstside = Json.parseIfString(extradata.t1firstside)
+			extradata.t1halfs = Json.parseIfString(extradata.t1halfs)
+			extradata.t2halfs = Json.parseIfString(extradata.t2halfs)
 			local team1 = {}
 			local team2 = {}
 			if extradata.t1firstside.rt == 'atk' then
@@ -115,7 +115,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.date = match.date
 		local scores = game2.scores or {}
 		if type(scores) == 'string' then
-			scores = json.parse(scores)
+			scores = Json.parse(scores)
 		end
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
@@ -146,7 +146,7 @@ function MatchLegacy._convertParameters(match2)
 
 	-- Handle extradata fields
 	match.extradata = {}
-	local extradata = json.parseIfString(match2.extradata)
+	local extradata = Json.parseIfString(match2.extradata)
 
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
@@ -160,14 +160,14 @@ function MatchLegacy._convertParameters(match2)
 
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
-	local bracketData = json.parseIfString(match2.match2bracketdata)
+	local bracketData = Json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
 		if bracketData.inheritedheader then
 			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
 	end
 
-	local veto = json.parseIfString(extradata.mapveto)
+	local veto = Json.parseIfString(extradata.mapveto)
 	if veto then
 		for k, round in ipairs(veto) do
 			if k == 1 then
