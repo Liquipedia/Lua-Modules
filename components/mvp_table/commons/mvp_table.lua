@@ -28,7 +28,7 @@ local MvpTable = {}
 ---Fetches mvpData for a given set of matchGroupIds or tournaments.
 ---Displays the fetched data as a table.
 ---@param args table
----@return Html|string
+---@return Html|string|nil
 function MvpTable.run(args)
 	args = args or {}
 	args = MvpTable._parseArgs(args)
@@ -117,7 +117,6 @@ function MvpTable._parseArgs(args)
 end
 
 ---@param args mvpTableParsedArgs
----@param conditions string
 ---@return string
 function MvpTable._buildConditions(args)
 	local matchGroupIDConditions

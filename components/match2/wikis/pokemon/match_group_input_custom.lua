@@ -328,7 +328,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 		mvpteam = match.mvpteam or match.winner
 	}
 	return match

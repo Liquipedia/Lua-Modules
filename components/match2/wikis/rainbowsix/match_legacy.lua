@@ -148,10 +148,14 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata = {}
 	local extradata = json.parseIfString(match2.extradata)
 
-	local mvp = json.parseIfString(extradata.mvp)
+	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
-		mvp.players = Table.mapValues(mvp.players, mw.ext.TeamLiquidIntegration.resolve_redirect)
-		match.extradata.mvp = table.concat(mvp.players, ',') .. ';' .. mvp.points
+		local players = {}
+		for _, player in ipairs(mvp.players) do
+			table.insert(players, player.name .. '|' .. player.displayname)
+		end
+		match.extradata.mvp = table.concat(players, ',')
+		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
 	end
 
 	match.extradata.matchsection = extradata.matchsection

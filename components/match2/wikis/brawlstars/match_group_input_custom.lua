@@ -146,7 +146,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
 end

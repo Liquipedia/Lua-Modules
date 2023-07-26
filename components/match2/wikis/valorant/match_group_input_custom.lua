@@ -332,28 +332,9 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if String.isEmpty(match.mvp) then
-		return nil
-	end
-
-	local mvpPoints = tonumber(match.mvppoints) or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players = players, points = mvpPoints}
 end
 
 -- Parse the mapVeto input
