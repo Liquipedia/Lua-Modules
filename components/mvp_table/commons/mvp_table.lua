@@ -50,7 +50,7 @@ function MvpTable.run(args)
 	end
 
 	--in case we catch it and in case we did not get match2 results
-	if not mvpList then
+	if Table.isEmpty(mvpList) then
 		mvpList = MvpTable._queryMatch1(conditions)
 	end
 
@@ -272,21 +272,32 @@ function MvpTable._queryMatch1(conditions)
 	local mvpList = {}
 
 	for _, match in pairs(queryData) do
-		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
+		local extradata = match.extradata or {}
+		local players, points
+		--on some wikis points is not specified but instead `extradata.mvpteam` is set
+		local mvpTeam = tonumber(extradata.mvpteam)
+		if mvpTeam then
+			players = string.match(match.extradata.mvp, "([%w%(%) _,%w%-]+)")
+			points = 1
+		else
+			players, points = string.match(extradata.mvp or '', '([%w%(%) _,%w%-]+);(%d+)?')
+		end
+
 		if players and points then
 			for _, player in pairs(mw.text.split(players, ',')) do
 				if String.isNotEmpty(player) then
 					player = mw.text.trim(player)
 					local redirectResolvedPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
-					local identifier = redirectResolvedPlayer:gsub(' ', '_')
+					local link = redirectResolvedPlayer:gsub(' ', '_')
+					local identifier = link:lower()
 
-					if not playerList[identifier] then
+					if not playerList[identifier] or not playerList[identifier].flag then
 						playerList[identifier] = MvpTable._findPlayerInfo(match, {
 							player:lower():gsub('_', ' '),
 							player:lower():gsub(' ', '_'),
 							redirectResolvedPlayer:lower(),
-							identifier:lower(),
-						}, identifier, player)
+							identifier,
+						}, link, player, mvpTeam and {mvpTeam} or {1, 2}, playerList[identifier])
 					end
 
 					playerList[identifier].points = playerList[identifier].points + points
@@ -296,8 +307,8 @@ function MvpTable._queryMatch1(conditions)
 		end
 	end
 
-	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
-		table.insert(mvpList, item)
+	for _, playerData in Table.iter.spairs(playerList, MvpTable.sortFunction) do
+		table.insert(mvpList, playerData)
 	end
 
 	return mvpList
@@ -310,21 +321,22 @@ end
 ---@param link string
 ---@param displayName string
 ---@return {points: number, mvp: number, displayName:string, name:string, flag:string?, team:string?}
-function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
+function MvpTable._findPlayerInfo(match, lookupTable, link, displayName, opponentIndexes, playerData)
 	--basic information obtainable from mvp field without any lookup in opponent player data
-	local playerData = {
+	playerData = playerData or {
 		name = link,
 		displayName = displayName,
 		points = 0,
 		mvp = 0,
 	}
 
-	for opponentIndex = 1, 2 do
+	for _, opponentIndex in pairs(opponentIndexes) do
 		for prefix, player in Table.iter.pairsByPrefix(match['opponent' .. opponentIndex .. 'players'], 'p') do
 			if String.isNotEmpty(player) and Table.includes(lookupTable, player:lower()) then
 				playerData.flag = match['opponent' .. opponentIndex .. 'players'][prefix .. 'flag']
 				playerData.displayName = match['opponent' .. opponentIndex .. 'players'][prefix .. 'dn'] or playerData.displayName
 				playerData.team = match['opponent' .. opponentIndex]
+				playerData.name = match['opponent' .. opponentIndex .. 'players'][prefix]
 				return playerData
 			end
 		end
