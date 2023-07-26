@@ -148,16 +148,6 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata = {}
 	local extradata = Json.parseIfString(match2.extradata)
 
-	local mvp = Json.parseIfString(extradata.mvp)
-	if mvp and mvp.players then
-		local players = {}
-		for _, player in ipairs(mvp.players) do
-			table.insert(players, player.name .. '|' .. player.displayname)
-		end
-		match.extradata.mvp = table.concat(players, ',')
-		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
-	end
-
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
