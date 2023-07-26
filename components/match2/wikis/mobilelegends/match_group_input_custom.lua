@@ -337,7 +337,7 @@ function matchFunctions.getExtraData(match)
 		))
 	end
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 		mvpteam = match.mvpteam or match.winner,
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
 	}

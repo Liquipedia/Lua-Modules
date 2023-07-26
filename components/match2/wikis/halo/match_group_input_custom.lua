@@ -317,7 +317,7 @@ function matchFunctions.getExtraData(match)
 	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 
 	match.extradata = {
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
 	}
 	return match
@@ -360,22 +360,6 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 		displayName = displayName,
 		flag = flag,
 	}
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)

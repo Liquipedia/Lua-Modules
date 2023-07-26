@@ -336,7 +336,7 @@ function matchFunctions.getExtraData(match)
 
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
 	}
 	return match
@@ -409,16 +409,6 @@ function matchFunctions.getMapVeto(match)
 		data[1].vetostart = vetoStart
 	end
 	return data
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return nil end
-
-	-- Split & trim the input
-	local players = Array.map(mw.text.split(match.mvp, ','), String.trim)
-
-	return {players = players, points = match.mvppoints or 1}
 end
 
 function matchFunctions.getOpponents(match)

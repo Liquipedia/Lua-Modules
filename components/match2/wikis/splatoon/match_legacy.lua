@@ -77,9 +77,6 @@ function MatchLegacy._convertParameters(match2)
 
 	-- Handle extradata fields
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata = {
-		mvp = extradata.mvp,
-	}
 
 	for index, map in pairs(match2.match2games or {}) do
 		match.extradata['vodgame' .. index] = map.vod

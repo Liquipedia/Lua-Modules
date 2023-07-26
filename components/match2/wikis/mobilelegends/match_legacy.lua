@@ -58,7 +58,6 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.mvpteam = extradata.mvpteam
-	match.extradata.mvp = extradata.mvp
 	match.extradata.comment = extradata.comment
 
 	local opponents = match2.match2opponents or {}
