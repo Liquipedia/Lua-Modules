@@ -141,7 +141,9 @@ function MatchLegacy._convertParameters(match2)
 	match.staticid = match2.match2id
 
 	-- Handle extradata fields
-	local extradata = Json.parseIfString(match2.extradata)
+	local extradata = Json.parseIfString(match2.extradata) or {}
+	match.extradata = {}
+
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		local players = {}
