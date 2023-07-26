@@ -1087,7 +1087,7 @@ function StatisticsPortal._achievementsDisplay(data)
 	local output = ''
 	if data and type(data[1]) == 'table' then
 		for _, item in ipairs(data) do
-			item.icon = string.gsub(item.icon, 'File:', '')
+			item.icon = string.gsub(item.icon or '', 'File:', '')
 			item.iconDark = string.gsub(item.iconDark or '', 'File:', '')
 			item.icon = Logic.emptyOr(item.icon, 'Gold.png')
 			output = output .. LeagueIcon.display{
