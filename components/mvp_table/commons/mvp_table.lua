@@ -277,10 +277,10 @@ function MvpTable._queryMatch1(conditions)
 		--on some wikis points is not specified but instead `extradata.mvpteam` is set
 		local mvpTeam = tonumber(extradata.mvpteam)
 		if mvpTeam then
-			players = string.match(match.extradata.mvp, "([%w%(%) _,%w%-]+)")
+			players = string.match(extradata.mvp, "([%w%(%) _,%w%-]+)")
 			points = 1
 		else
-			players, points = string.match(extradata.mvp or '', '([%w%(%) _,%w%-]+);(%d+)?')
+			players, points = string.match(extradata.mvp or '', '([%w%(%) _,%w%-]+);(%d+)')
 		end
 
 		if players and points then
@@ -307,8 +307,8 @@ function MvpTable._queryMatch1(conditions)
 		end
 	end
 
-	for _, playerData in Table.iter.spairs(playerList, MvpTable.sortFunction) do
-		table.insert(mvpList, playerData)
+	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
+		table.insert(mvpList, item)
 	end
 
 	return mvpList
