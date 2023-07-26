@@ -147,20 +147,26 @@ function Game.icon(options)
 		(String.isNotEmpty(options.spanClass) and options.spanClass) or
 			DEFAULT_SPAN_CLASS
 
+	local gameIcons
+
 	if gameData.logo.lightMode == gameData.logo.darkMode then
-		return Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link, spanClass = spanClass}
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link, spanClass = spanClass}
+	else
+		gameIcons = Game._createIcon{size = options.size, link = link, mode = 'light', icon = gameData.logo.lightMode} ..
+			Game._createIcon{size = options.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
 	end
 
-	return Game._createIcon{size = options.size, link = link, mode = 'light',
-		icon = gameData.logo.lightMode, spanClass = spanClass}
-	.. Game._createIcon{size = options.size, link = link, mode = 'dark',
-		icon = gameData.logo.darkMode, spanClass = spanClass}
+	if String.isNotEmpty(spanClass) then
+		return tostring(mw.html.create('span'):addClass(spanClass):node(gameIcons))
+	else
+		return gameIcons
+	end
 end
 
----@param options {mode: string?, icon: string?, size: string?, link: string?, spanClass: string?}
+---@param options {mode: string?, icon: string?, size: string?, link: string?}
 ---@return string
 function Game._createIcon(options)
-	local iconString = String.interpolate(
+	return String.interpolate(
 		ICON_STRING,
 		{
 			icon = options.icon,
@@ -169,11 +175,6 @@ function Game._createIcon(options)
 			link = options.link or '',
 		}
 	)
-	if String.isNotEmpty(options.spanClass) then
-		return tostring(mw.html.create('span'):addClass(options.spanClass):node(iconString))
-	else
-		return iconString
-	end
 end
 
 ---Fetches a text display for a given game
