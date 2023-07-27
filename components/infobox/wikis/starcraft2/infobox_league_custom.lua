@@ -451,8 +451,6 @@ function CustomLeague:defineCustomPageVariables()
 		end
 	end
 	Variables.varDefine('tournament_finished', tostring(finished))
-	--month and day
-	local monthAndDay = string.match(Variables.varDefault('tournament_enddate', ''), '%d%d-%d%d') or ''
 
 	--maps
 	local maps = CustomLeague._getMaps('map')
