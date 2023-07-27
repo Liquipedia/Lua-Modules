@@ -116,7 +116,6 @@ function CustomInjector:parse(id, widgets)
 
 		--teams section
 		if _args.team_number or String.isNotEmpty(_args.team1) then
-			Variables.varDefine('is_team_tournament', 1)
 			table.insert(widgets, Title{name = 'Teams'})
 		end
 		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
@@ -395,10 +394,7 @@ function CustomLeague._playerRaceBreakDown()
 			end
 		end
 	end
-	Variables.varDefine('nbnotableP', protossNumber)
-	Variables.varDefine('nbnotableT', terranNumbner)
-	Variables.varDefine('nbnotableZ', zergNumber)
-	Variables.varDefine('nbnotableR', randomNumber)
+
 	return playerBreakDown or {}
 end
 
@@ -457,7 +453,6 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_finished', tostring(finished))
 	--month and day
 	local monthAndDay = string.match(Variables.varDefault('tournament_enddate', ''), '%d%d-%d%d') or ''
-	Variables.varDefine('Month_Day', monthAndDay)
 
 	--maps
 	local maps = CustomLeague._getMaps('map')
