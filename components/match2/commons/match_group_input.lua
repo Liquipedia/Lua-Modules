@@ -138,6 +138,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
+		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
