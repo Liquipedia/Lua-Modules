@@ -279,7 +279,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	else
 		priceCell
 			:wikitext(NONBREAKING_SPACE)
-			:addClass(participantNumber == -1 and 'Blank' or nil)
+			:addClass('Blank')
 	end
 
 	row:tag('div')
@@ -293,7 +293,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	else
 		participantsNumberCell
 			:wikitext('-')
-			:addClass(prizeValue > 0 and 'Blank' or nil)
+			:addClass(not config.showTier and prizeValue == 0 and 'Blank' or nil)
 	end
 
 	if status == CANCELLED then

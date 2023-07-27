@@ -123,6 +123,7 @@ function Currency.raw(currencyCode)
 	if String.isEmpty(currencyCode) then
 		return nil
 	end
+	---@cast currencyCode -nil
 
 	return CurrencyData[currencyCode:lower()]
 end

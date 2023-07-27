@@ -163,8 +163,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
-	-- Legacy tier vars
-
 	-- Legacy notability vars
 	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
 
@@ -317,9 +315,12 @@ function CustomLeague:_getMaps()
 			display = mapInput[1]
 		else
 			link = mapInput[1]
-			display = mapInput[2]
+			display = mapInput[2] or mapInput[1]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
+		if link == display then
+			display = nil
+		end
 
 		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end

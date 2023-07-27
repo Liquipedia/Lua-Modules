@@ -149,6 +149,7 @@ local PREFIXES = {
 	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
+	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
@@ -194,6 +195,7 @@ local PREFIXES = {
 		team = 'https://www.vlr.gg/team/',
 		player = 'https://www.vlr.gg/player/'
 	},
+	vod = {''},
 	weibo = {'https://weibo.com/'},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},

@@ -9,12 +9,13 @@
 local Lua = require('Module:Lua')
 
 local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 -- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
 local Variables = require('Module:Variables')
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local TeamCardStorage = {}
 

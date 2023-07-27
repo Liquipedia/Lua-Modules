@@ -140,14 +140,18 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpData = match.extradata.mvp
-	if mvpData and mvpData.players and mvpData.players[1] then
-		local mvp = MatchSummary.Mvp()
-		for _, player in ipairs(mvpData.players) do
-			mvp:addPlayer(player)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
 		end
 
-		body:addRow(mvp)
 	end
 
 	-- Pre-Process Champion Ban Data

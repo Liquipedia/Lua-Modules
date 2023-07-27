@@ -103,7 +103,8 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
 				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D,
 				name = 'R' .. round.R .. 'D' .. round.D,
-				displayname = 'R' .. round.R .. 'D' .. round.D .. 'display',
+				link = 'R' .. round.R .. 'D' .. round.D,
+				p1 = 'R' .. round.R .. 'D' .. round.D .. 'display',
 				flag = 'R' .. round.R .. 'D' .. round.D .. 'flag'
 			}
 		end
@@ -125,7 +126,8 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
 				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W,
 				name = 'R' .. round.R .. 'W' .. round.W,
-				displayname = 'R' .. round.R .. 'W' .. round.W .. 'display',
+				link = 'R' .. round.R .. 'W' .. round.W,
+				p1 = 'R' .. round.R .. 'W' .. round.W .. 'display',
 				flag = 'R' .. round.R .. 'W' .. round.W .. 'flag'
 			}
 		end
@@ -150,7 +152,8 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
 				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D,
 				name = 'R' .. round.R .. 'D' .. round.D,
-				displayname = 'R' .. round.R .. 'D' .. round.D .. 'display',
+				link = 'R' .. round.R .. 'D' .. round.D,
+				p1 = 'R' .. round.R .. 'D' .. round.D .. 'display',
 				flag = 'R' .. round.R .. 'D' .. round.D .. 'flag'
 			}
 		end
@@ -172,7 +175,8 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
 				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W,
 				name = 'R' .. round.R .. 'W' .. round.W,
-				displayname = 'R' .. round.R .. 'W' .. round.W .. 'display',
+				link = 'R' .. round.R .. 'W' .. round.W,
+				p1 = 'R' .. round.R .. 'W' .. round.W .. 'display',
 				flag = 'R' .. round.R .. 'W' .. round.W .. 'flag'
 			}
 		end

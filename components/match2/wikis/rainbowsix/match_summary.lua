@@ -39,7 +39,7 @@ local _LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-	opl = {icon = 'File:OPL_icon_lightmode.png', iconDark = 'File:OPL_icon_darkmode.png', text = 'OPL Match Page'},
+	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
 	esl = {
 		icon = 'File:ESL_2019_icon_lightmode.png',
 		iconDark = 'File:ESL_2019_icon_darkmode.png',

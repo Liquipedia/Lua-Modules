@@ -6,13 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-return {
+local infoData = {
 	startYear = 2000,
 	wikiName = 'counterstrike',
 	name = 'Counter-Strike',
 	games = {
-		cs16 = {
-			abbreviation = 'CS',
+		cs1 = {
+			order = 1,
+			abbreviation = 'CS1',
 			name = 'Counter-Strike',
 			link = 'Counter-Strike',
 			logo = {
@@ -24,7 +25,22 @@ return {
 				lightMode = 'CS default lightmode.png',
 			},
 		},
+		cscz = {
+			order = 2,
+			abbreviation = 'CS:CZ',
+			name = 'Condition Zero',
+			link = 'Counter-Strike: Condition Zero',
+			logo = {
+				darkMode = 'Cscz small.png',
+				lightMode = 'Cscz small.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'CS default darkmode.png',
+				lightMode = 'CS default lightmode.png',
+			},
+		},
 		css = {
+			order = 3,
 			abbreviation = 'CS:S',
 			name = 'Source',
 			link = 'Counter-Strike: Source',
@@ -37,20 +53,8 @@ return {
 				lightMode = 'CS default lightmode.png',
 			},
 		},
-		cscz = {
-			abbreviation = 'CS:CZ',
-			name = 'Condition Zero',
-			link = 'Counter-Strike: Condition Zero',
-			logo = {
-				darkMode = 'Cszo small.png',
-				lightMode = 'Cszo small.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'CS default darkmode.png',
-				lightMode = 'CS default lightmode.png',
-			},
-		},
 		cso = {
+			order = 4,
 			abbreviation = 'CSO',
 			name = 'Counter-Strike Online',
 			link = 'Counter-Strike Online',
@@ -64,6 +68,7 @@ return {
 			},
 		},
 		csgo = {
+			order = 5,
 			abbreviation = 'CS:GO',
 			name = 'Global Offensive',
 			link = 'Counter-Strike: Global Offensive',
@@ -77,6 +82,7 @@ return {
 			},
 		},
 		cs2 = {
+			order = 6,
 			abbreviation = 'CS2',
 			name = 'Counter-Strike 2',
 			link = 'Counter-Strike 2',
@@ -95,6 +101,7 @@ return {
 		csgo = 'CSGO default lightmode.png',
 		cso = 'CS Online default lightmode.png',
 		css = 'CS default lightmode.png',
+		cs1 = 'CS default lightmode.png',
 		cs16 = 'CS default lightmode.png',
 		cscz = 'CS default lightmode.png',
 		cs2 = 'Counter-Strike 2 default lightmode.png',
@@ -103,8 +110,14 @@ return {
 		csgo = 'CSGO default darkmode.png',
 		cso = 'CS Online default lightmode.png',
 		css = 'CS default darkmode.png',
+		cs1 = 'CS default lightmode.png',
 		cs16 = 'CS default darkmode.png',
 		cscz = 'CS default darkmode.png',
 		cs2 = 'Counter-Strike 2 default lightmode.png',
 	}, ---@deprecated
 }
+
+infoData.games.cs16 = infoData.games.cs1
+infoData.games.cs = infoData.games.cs1
+
+return infoData

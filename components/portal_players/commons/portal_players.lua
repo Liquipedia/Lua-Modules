@@ -43,6 +43,7 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@field status string?
 ---@field queryOnlyByRegion boolean
 ---@field showLocalizedName boolean
+---@field additionalConditions string?
 
 ---Init function for PortalPlayers
 ---@param args portalPlayerArgs
@@ -121,6 +122,10 @@ function PortalPlayers:_getPlayers()
 
 	if String.isNotEmpty(self.args.status) then
 		conditionString = addConidition(conditionString, '[[status::'.. self.args.status .. ']]')
+	end
+
+	if String.isNotEmpty(self.args.additionalConditions) then
+		conditionString = addConidition(conditionString, self.args.additionalConditions)
 	end
 
 	local players = mw.ext.LiquipediaDB.lpdb('player', {

@@ -9,11 +9,10 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
@@ -23,14 +22,6 @@ local Cell = Widgets.Cell
 local CustomSeries = {}
 
 local CustomInjector = Class.new(Injector)
-
-local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero'},
-	css = {name = 'Source', link = 'Counter-Strike: Source'},
-	cso = {name = 'Online', link = 'Counter-Strike Online'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive'},
-}
 
 local _args
 
@@ -52,9 +43,9 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		return {Cell{
-			name = 'Type',
-			content = {String.isNotEmpty(_args.type) and mw.getContentLanguage():ucfirst(_args.type) or nil}
-		}}
+				name = 'Type',
+				content = {String.isNotEmpty(_args.type) and mw.getContentLanguage():ucfirst(_args.type) or nil}
+			}}
 	end
 	return widgets
 end
@@ -67,20 +58,11 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{
 			name = 'Games',
-			content = Array.map(CustomSeries.getGames(), function (gameData)
-				return Page.makeInternalLink({}, gameData.name, gameData.link)
-			end)
+			content = Array.map(Game.listGames({ordered = true}), function (gameIdentifier)
+					return _args[gameIdentifier] and Game.text{game = gameIdentifier} or nil
+				end)
 		}
 	}
-end
-
-function CustomSeries.getGames()
-	return Array.extractValues(Table.map(GAMES, function (key, data)
-		if _args[key] then
-			return key, data
-		end
-		return key, nil
-	end))
 end
 
 return CustomSeries

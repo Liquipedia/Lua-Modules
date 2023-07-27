@@ -386,7 +386,7 @@ function matchFunctions.getExtraData(match)
 			match.featured,
 			matchFunctions.isFeatured(match)
 		),
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 		headtohead = match.headtohead,
 	}
 	return match

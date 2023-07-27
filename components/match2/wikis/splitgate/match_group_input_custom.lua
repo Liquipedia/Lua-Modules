@@ -330,7 +330,7 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 		isconverted = 0
 	}
 	return match
@@ -356,22 +356,6 @@ function matchFunctions.getMapVeto(match)
 	end
 
 	return vetoData
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -452,8 +436,7 @@ end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
+	match['opponent' .. opponentIndex].match2players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
@@ -461,8 +444,7 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
+			table.insert(match['opponent' .. opponentIndex].match2players, player)
 		end
 	end
 	return match

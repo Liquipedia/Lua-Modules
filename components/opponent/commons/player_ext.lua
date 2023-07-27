@@ -11,6 +11,7 @@ local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -226,7 +227,7 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
-	local date = options.date or DateExt.getContextualDateOrNow()
+	local date = DateExt.toYmdInUtc(Logic.emptyOr(options.date, DateExt.getContextualDateOrNow()))
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
