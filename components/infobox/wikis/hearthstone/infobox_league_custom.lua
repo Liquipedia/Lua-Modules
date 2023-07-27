@@ -86,7 +86,6 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
 
 	return lpdbData
 end

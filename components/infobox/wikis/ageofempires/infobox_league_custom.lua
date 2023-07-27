@@ -196,7 +196,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	-- Currently, args.patch shall be used for official patches,
 	-- whereas voobly is used to denote non-official version played via voobly
 	lpdbData.patch = args.patch or args.voobly
-	lpdbData.participantsnumber = args.team_number or args.player_number
 
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.deadline = DateClean._clean(args.deadline or '')

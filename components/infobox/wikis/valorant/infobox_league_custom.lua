@@ -109,8 +109,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.publishertier = 'Sponsored'
 	end
 
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date

@@ -128,7 +128,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	if CustomLeague:_validPublisherTier(args.ubisofttier) then
 		lpdbData.publishertier = args.ubisofttier:lower()
 	end
-	lpdbData.participantsnumber = args.player_number or args.team_number
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)

@@ -73,7 +73,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.game = Game.name{game = args.game}
 	lpdbData.publishertier = args['atvi-sponsored']
-	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)
 
 	return lpdbData

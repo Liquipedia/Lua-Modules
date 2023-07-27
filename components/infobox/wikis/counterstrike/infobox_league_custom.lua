@@ -299,7 +299,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.publishertier = args.valvetier
 	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
-	lpdbData.participantsnumber = args.team_number or args.player_number
 	lpdbData.sortdate = args.sort_date or lpdbData.enddate
 
 	lpdbData.extradata.prizepoollocal = Variables.varDefault('prizepoollocal')

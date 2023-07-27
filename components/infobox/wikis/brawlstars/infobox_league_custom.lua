@@ -92,7 +92,6 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.publishertier = args['supercell-sponsored']
-	lpdbData.participantsnumber = args.team_number
 
 	return lpdbData
 end

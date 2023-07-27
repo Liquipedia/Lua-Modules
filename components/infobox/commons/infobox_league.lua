@@ -381,10 +381,6 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
-	Variables.varDefine(
-		'tournament_participantsnumber',
-		tonumber(args.participants_number) or tonumber(args.team_number) or tonumber(args.player_number) or -1
-	)
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -450,7 +446,10 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		participantsnumber = Variables.varDefault('tournament_participantsnumber'),
+		participantsnumber = tonumber(args.participants_number)
+			or tonumber(args.team_number)
+			or tonumber(args.player_number)
+			or -1,
 		status = Variables.varDefault('tournament_status'),
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(

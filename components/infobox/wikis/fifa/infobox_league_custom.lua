@@ -92,7 +92,6 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(args.publisherpremier) and 'true' or nil
 
 	return lpdbData
