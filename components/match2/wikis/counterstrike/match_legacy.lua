@@ -12,7 +12,6 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
-local Variables = require('Module:Variables')
 
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
