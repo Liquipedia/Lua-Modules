@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -19,8 +18,6 @@ local Weight = require('Module:Weight')
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-
-local Opponent = require('Module:OpponentLibraries').Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
