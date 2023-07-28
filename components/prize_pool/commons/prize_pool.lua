@@ -10,10 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
 
 local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true})
 local BasePrizePool = Lua.import('Module:PrizePool/Base', {requireDevIfEnabled = true})
@@ -29,14 +26,7 @@ local TableRow = require('Module:Widget/Table/Row')
 --- @field _lpdbInjector LpdbInjector?
 local PrizePool = Class.new(BasePrizePool)
 
-local tournamentVars = PageVariableNamespace('Tournament')
-
 local NON_BREAKING_SPACE = '&nbsp;'
-
--- Allowed none-numeric score values.
-local WALKOVER_SCORE = 'W'
-local FORFEIT_SCORE = 'FF'
-local SPECIAL_SCORES = {WALKOVER_SCORE, FORFEIT_SCORE , 'L', 'DQ', 'D'}
 
 function PrizePool:readPlacements(args)
 	local currentPlace = 0
