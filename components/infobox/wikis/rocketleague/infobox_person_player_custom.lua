@@ -225,7 +225,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 
 	lpdbData.extradata.role = _args.role
 
-	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
+	local birthMonthAndDay = string.match(_args.birth_date or '', '%-%d%d?%-%d%d?$')
 	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
 
 	lpdbData.extradata.birthmonthandday = birthMonthAndDay

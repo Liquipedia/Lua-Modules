@@ -14,7 +14,6 @@ local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -116,11 +115,11 @@ function CustomTeam:getWikiCategories(args)
 		table.insert(categories, 'Team without clan tag')
 	end
 
-	local teamType, typeCategory = 'Esport team', 'Esport Teams'
+	local typeCategory = 'Esport team'
 	if CustomTeam._isFactionTeam(self.name) then
-		teamType, typeCategory = 'Race team', 'Race Teams'
+		typeCategory = 'Race team'
 	elseif CustomTeam._isNationalTeam(self.name) then
-		teamType, typeCategory = 'National team', 'National Teams'
+		typeCategory = 'National team'
 	end
 
 	table.insert(categories, typeCategory)
