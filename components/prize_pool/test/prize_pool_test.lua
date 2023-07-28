@@ -75,7 +75,6 @@ function suite:testHeaderInput()
 			resolveRedirect = false,
 			showBaseCurrency = true,
 			storeLpdb = true,
-			storeSmw = true,
 			syncPlayers = true,
 		},
 		ppt.options
