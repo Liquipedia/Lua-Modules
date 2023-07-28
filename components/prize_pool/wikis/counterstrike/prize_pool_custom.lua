@@ -43,7 +43,6 @@ function CustomPrizePool.run(frame)
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
 	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		prizePool:setConfig('storeSmw', false)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
