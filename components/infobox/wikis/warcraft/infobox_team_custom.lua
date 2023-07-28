@@ -124,7 +124,6 @@ function CustomTeam:getWikiCategories(args)
 	end
 
 	table.insert(categories, typeCategory)
-	Variables.varDefine('teamtype', teamType) -- for SMW
 
 	return categories
 end

@@ -38,7 +38,6 @@ function CustomPlayer.run(frame)
 	_args = player.args
 
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
 	return player:createInfobox()
@@ -86,20 +85,6 @@ function CustomPlayer:getWikiCategories(categories)
 	end
 
 	return categories
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- needed for SMW
-	local roleData = CustomPlayer._getRoleData(args.role)
-	local role2Data = CustomPlayer._getRoleData(args.role2)
-
-	if roleData then
-		Variables.varDefine('role', roleData.variable)
-	end
-
-	if role2Data then
-		Variables.varDefine('role2', role2Data.variable)
-	end
 end
 
 return CustomPlayer

@@ -149,10 +149,6 @@ function CustomInjector:parse(id, widgets)
 			_args.team_number = string.gsub(_args.team_number, '%+', '')
 		end
 
-		-- Variable only needed for storage in SMW via Infobox league template
-		-- to be removed once SMW is removed
-		Variables.varDefine('player_number', playerNumber or 0)
-
 		--maps
 		if String.isNotEmpty(_args.map1) then
 			table.insert(widgets, Title{name = _args['maptitle'] or 'Maps'})

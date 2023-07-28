@@ -173,7 +173,6 @@ function CustomPlayer._createRole(role)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
 	local roleData = CustomPlayer._getRole(args.role)
 
 	if roleData then

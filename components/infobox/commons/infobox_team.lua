@@ -122,7 +122,6 @@ function Team:createInfobox()
 							perYear = true,
 							queryHistorical = args.queryEarningsHistorical
 						}
-						Variables.varDefine('earnings', self.totalEarnings) -- needed for SMW
 						local totalEarningsDisplay
 						if self.totalEarnings > 0 then
 							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
@@ -292,8 +291,6 @@ function Team:_setLpdbData(args, links)
 
 	for year, earningsOfYear in pairs(self.earnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		--make these values available for smw storage
-		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
