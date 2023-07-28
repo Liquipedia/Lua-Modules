@@ -446,6 +446,10 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		participantsnumber = tonumber(args.participants_number)
+			or tonumber(args.team_number)
+			or tonumber(args.player_number)
+			or -1,
 		status = Variables.varDefault('tournament_status'),
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(

@@ -63,7 +63,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 function League:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = _args['moonton-sponsored'] == 'true' and 'true' or nil
 
 	return lpdbData

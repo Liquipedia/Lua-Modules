@@ -74,7 +74,6 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.participants_number or args.team_number
 	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or

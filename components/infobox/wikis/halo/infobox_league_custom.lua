@@ -99,7 +99,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.game = _game or args.game
 	lpdbData.publishertier = args['hcs-sponsored']
-	lpdbData.participantsnumber = args.player_number or args.team_number
 
 	lpdbData.extradata.maps = Json.stringify(maps)
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)

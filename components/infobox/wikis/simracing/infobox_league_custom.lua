@@ -43,7 +43,6 @@ function CustomLeague.run(frame)
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
 	league.getWikiCategories = CustomLeague.getWikiCategories
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
@@ -70,12 +69,6 @@ function CustomInjector:addCustomCells(widgets)
 	})
 
 	return widgets
-end
-
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
-	return lpdbData
 end
 
 function CustomLeague:defineCustomPageVariables()

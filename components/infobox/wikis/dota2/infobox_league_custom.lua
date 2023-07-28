@@ -119,7 +119,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = string.lower(args.game or 'dota2')
 	lpdbData.publishertier = args.pctier
-	lpdbData.participantsnumber = args.team_number or args.player_number
 
 	lpdbData.extradata.valvepremier = String.isNotEmpty(args.valvepremier) and '1' or '0'
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''

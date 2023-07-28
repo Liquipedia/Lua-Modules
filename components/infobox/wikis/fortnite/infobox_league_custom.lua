@@ -52,7 +52,6 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.publishertier = args.epicpremier
 
 	return lpdbData

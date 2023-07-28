@@ -171,7 +171,6 @@ function CustomLeague:defineCustomPageVariables()
 end
 
 function CustomLeague:addToLpdb(lpdbData)
-	lpdbData.participantsnumber = _args.team_number
 	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
 	lpdbData.extradata.platform = string.lower(_args.platform or 'pc')
