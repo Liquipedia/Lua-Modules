@@ -56,17 +56,13 @@ CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(
 Displays a player opponent (solo, duo, trio, or quad) as an inline element.
 ]]
 function CustomOpponentDisplay.PlayerInlineOpponent(props)
-	local showFaction = props.showFaction ~= false
+	props.showFaction = props.showFaction ~= false
 	local opponent = props.opponent
 
 	local playerTexts = Array.map(opponent.players, function(player)
-		local node = CustomPlayerDisplay.InlinePlayer({
-			flip = props.flip,
-			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showFaction = showFaction,
-		})
+		local node = CustomPlayerDisplay.InlinePlayer(
+			Table.merge(props, {player = player})
+		)
 		return tostring(node)
 	end)
 	if props.flip then

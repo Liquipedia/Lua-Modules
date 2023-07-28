@@ -19,6 +19,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 local CivIcon = Lua.import('Module:CivIcon', {requireDevIfEnabled = true})
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local ZERO_WIDTH_SPACE = '&#8203;'
 
 local html = mw.html
 
@@ -45,13 +46,12 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
-	local zeroWidthSpace = '&#8203;'
 	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
 		:wikitext(
 			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and player.pageName
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, zeroWidthSpace)
+			or Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
@@ -80,23 +80,6 @@ function CustomPlayerDisplay.BlockPlayer(props)
 		:node(civNode)
 		:node(nameNode)
 		:node(teamNode)
-end
-
-function CustomPlayerDisplay.HiddenSort(name, flag, civ, field)
-	local text
-	if field == 'civ' then
-		text = civ
-	elseif field == 'name' then
-		text = name
-	elseif field == 'flag' then
-		text = flag
-	else
-		text = field
-	end
-
-	return html.create('span')
-		:css('display', 'none')
-		:wikitext(text)
 end
 
 return CustomPlayerDisplay
