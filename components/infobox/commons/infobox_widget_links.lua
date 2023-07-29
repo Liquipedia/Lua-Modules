@@ -80,6 +80,7 @@ local PRIORITY_GROUPS = {
 		'steam',
 		'steamalternative',
 		'telegram',
+		'threads',
 		'tiktok',
 		'twitter',
 		'vk',
