@@ -160,6 +160,7 @@ local PREFIXES = {
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
+	threads = {'https://threads.net/@'},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
@@ -230,6 +231,7 @@ local ALIASES = {
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
+	instagram = {'threads'},
 	letsplaylive = {'cybergamer'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
