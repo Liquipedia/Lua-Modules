@@ -12,7 +12,7 @@ local HighlightConditions = {}
 ---@param data table
 ---@return boolean
 function HighlightConditions.tournament(data)
-	return (data.publishertier == 'Highlighted')
+	return (data.publishertier == 'highlighted')
 end
 
 return HighlightConditions
