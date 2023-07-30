@@ -103,8 +103,8 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	if Logic.readBool(args.riotpremier) then
-		lpdbData.publishertier = 'major'
+	if Logic.readBool(args['riot-highlighted']) then
+		lpdbData.publishertier = 'Highlighted'
 	elseif Logic.readBool(args['riot-sponsored']) then
 		lpdbData.publishertier = 'Sponsored'
 	end
@@ -117,12 +117,12 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args['riot-sponsored'])
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args['riot-highlighted'])
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args['riot-sponsored']) then
+	if Logic.readBool(_args['riot-highlighted']) or Logic.readBool(_args['riot-sponsored']) then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
