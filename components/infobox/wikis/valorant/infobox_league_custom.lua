@@ -104,9 +104,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
 	if Logic.readBool(args['riot-highlighted']) then
-		lpdbData.publishertier = 'Highlighted'
+		lpdbData.publishertier = 'highlighted'
 	elseif Logic.readBool(args['riot-sponsored']) then
-		lpdbData.publishertier = 'Sponsored'
+		lpdbData.publishertier = 'sponsored'
 	end
 
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
