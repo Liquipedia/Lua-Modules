@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Flags = require('Module:Flags')
 local Game = require('Module:Game')
-local HighlightConditions = require('Module:HighlightConditions')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local LeagueIcon = require('Module:LeagueIcon')
@@ -27,6 +26,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
+local HighlightConditions = Lua.import('Module:HighlightConditions', {requireDevIfEnabled = true})
 local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
 local LANG = mw.language.new('en')
