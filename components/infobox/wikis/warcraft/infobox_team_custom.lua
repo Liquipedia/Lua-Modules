@@ -117,7 +117,7 @@ function CustomTeam:getWikiCategories(args)
 
 	local typeCategory = 'Esport Teams'
 	if CustomTeam._isFactionTeam(self.name) then
-		typeCategory = 'Race team'
+		typeCategory = 'Race Teams'
 	elseif CustomTeam._isNationalTeam(self.name) then
 		typeCategory = 'National team'
 	end
