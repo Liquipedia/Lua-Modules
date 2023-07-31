@@ -68,7 +68,6 @@ function StarcraftLegacyPrizePool.run(frame)
 	CACHED_DATA.defaultOpponentType = defaultOpponentType
 	CACHED_DATA.defaultIsArchon = header.defaultIsArchon
 
-	newArgs.storesmw = header.storeSmw or header['smw mute']
 	newArgs.storelpdb = header.storeLpdb
 	newArgs.storeTournament = header.storeTournament
 	newArgs.series = header.series
