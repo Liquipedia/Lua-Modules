@@ -119,7 +119,7 @@ function CustomTeam:getWikiCategories(args)
 	if CustomTeam._isFactionTeam(self.name) then
 		typeCategory = 'Race Teams'
 	elseif CustomTeam._isNationalTeam(self.name) then
-		typeCategory = 'National team'
+		typeCategory = 'National Teams'
 	end
 
 	table.insert(categories, typeCategory)
