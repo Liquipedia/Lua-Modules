@@ -41,7 +41,6 @@ function CustomPrizePool.run(frame)
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
 	if not Namespace.isMain() then
-		prizePool:setConfig('storeSmw', false)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
