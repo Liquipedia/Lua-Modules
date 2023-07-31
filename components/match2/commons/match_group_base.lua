@@ -22,7 +22,6 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store, true),
 		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store, true),
 		storePageVar = Logic.nilOr(Logic.readBoolOrNil(args.storePageVar), show),
-		storeSmw = Logic.nilOr(Logic.readBoolOrNil(args.storeSmw), store, true),
 	}
 
 	local warnings = {}

@@ -279,7 +279,7 @@ function BigMatch._match2Director(args)
 	match.bracketid, match.matchid = 'MATCH_' .. bracketId, matchId
 
 	-- Don't store match1 as BigMatch records are not complete
-	Match.store(match, {storeMatch1 = false, storeSmw = false})
+	Match.store(match, {storeMatch1 = false})
 
 	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
 end

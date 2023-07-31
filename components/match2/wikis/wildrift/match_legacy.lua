@@ -12,14 +12,9 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
-
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match, match2)
-	end
 
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
@@ -149,71 +144,6 @@ function MatchLegacy.storeGames(match, match2)
 		games = games .. res
 	end
 	return games
-end
-
-function MatchLegacy.storeMatchSMW(match, match2)
-	local data = {
-		'legacymatch_' .. match2.match2id,
-		'is map number=1',
-		'has team left=' .. (match.opponent1 or ''),
-		'has team right=' .. (match.opponent2 or ''),
-		'Has map date=' .. (match.date or ''),
-		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
-		'Has tournament tier=' .. (match.liquipediatier or ''),
-		'Has tournament name=' .. Logic.emptyOr(
-			match.tickername,
-			match.name,
-			Variables.varDefault('tournament_name', mw.title.getCurrentTitle().prefixedText)
-		),
-		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
-		'Is riot premier=' .. Variables.varDefault('tournament_riot_premier', ''),
-		'Has winner=' .. (match.winner or ''),
-		'Has team left score=' .. (match.opponent1score or '0'),
-		'Has team right score=' .. (match.opponent2score or '0'),
-		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
-		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-		'Has teams=' .. (match.opponent1 or ''),
-		'Has teams=' .. (match.opponent2 or ''),
-		'Has teams name=' .. (match.opponent1 or ''),
-		'Has teams name=' .. (match.opponent2 or ''),
-		'Has calendar description=- ' .. match.opponent1 .. ' vs ' .. match.opponent2 .. ' on ' .. match.date,
-	}
-	local extradata = Json.parseIfString(match2.extradata) or {}
-	local mvp = Json.parseIfString(extradata.mvp)
-	if mvp and mvp.players then
-		for index, player in ipairs(mvp.players) do
-			local mvpString = player.name .. '§§§§'.. (player.team or '') ..'§§§§0'
-			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
-		end
-	end
-	local streams = match.stream or {}
-	streams = Json.parseIfString(streams)
-	for key, item in pairs(streams) do
-		table.insert(
-			data,
-			'Has match ' .. key .. '=' .. item
-		)
-	end
-
-	for key, item in pairs(extradata) do
-		if String.startsWith(key, 'vodgame') then
-			table.insert(
-				data,
-				'Has match ' .. key .. '=' .. item
-			)
-		end
-	end
-
-	if match.dateexact then
-		--shift date about 1 hour
-		local calendarEndDate = string.gsub(match.date, '+00:00', '-01:00')
-		table.insert(
-			data,
-			'Has calendar end date=' .. calendarEndDate
-		)
-	end
-
-	mw.smw.subobject(data)
 end
 
 return MatchLegacy

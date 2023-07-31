@@ -70,9 +70,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storeMatch1 = Logic.nilOr(options.storeMatch1, true),
 		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
 		storePageVar = Logic.nilOr(options.storePageVar, false),
-		storeSmw = Logic.nilOr(options.storeSmw, true),
 	}
-	local LegacyMatch = (options.storeMatch1 or options.storeSmw)
+	local LegacyMatch = options.storeMatch1
 		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)

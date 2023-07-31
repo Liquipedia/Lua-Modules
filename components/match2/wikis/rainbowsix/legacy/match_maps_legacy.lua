@@ -31,7 +31,7 @@ function MatchMaps.main(frame)
 end
 
 function MatchMaps._main(args, frame)
-	-- Data storage (SMW and LPDB)
+	-- Data storage (LPDB)
 	if Logic.readBool(matchlistVars:get('store')) then
 
 		--preparing storage as match2 in lpdb id bracketid is set

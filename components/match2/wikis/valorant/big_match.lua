@@ -41,7 +41,7 @@ function BigMatch.run(frame)
 	match['bracketid'] = 'MATCH_' .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	-- Don't store match1 as BigMatch records are not complete
-	Match.store(match, {storeMatch1 = false, storeSmw = false})
+	Match.store(match, {storeMatch1 = false})
 
 	-- Attempty to automatically retrieve tournament link from the bracket
 	if String.isEmpty(args.tournamentlink) then
