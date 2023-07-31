@@ -115,7 +115,7 @@ function CustomTeam:getWikiCategories(args)
 		table.insert(categories, 'Team without clan tag')
 	end
 
-	local typeCategory = 'Esport team'
+	local typeCategory = 'Esport Teams'
 	if CustomTeam._isFactionTeam(self.name) then
 		typeCategory = 'Race team'
 	elseif CustomTeam._isNationalTeam(self.name) then
