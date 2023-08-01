@@ -207,7 +207,7 @@ end
 
 function Placement:_getLpdbData(...)
 	local entries = {}
-	for opponentIndex, opponent in ipairs(self.opponents) do
+	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
