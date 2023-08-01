@@ -369,18 +369,10 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	local totalEarnings, earningsPerYear = Earnings.calculateForPlayer{
+	return Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-
-	-- store earnings values in wiki variables for storage in smw
-	for year, earningsOfYear in pairs(earningsPerYear or {}) do
-		Variables.varDefine('earningsin' .. year, earningsOfYear)
-	end
-	Variables.varDefine('earnings', totalEarnings)
-
-	return totalEarnings, earningsPerYear
 end
 
 function Person:_createRegion(region, country)

@@ -85,7 +85,6 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	return player:createInfobox()
 end
@@ -273,21 +272,6 @@ function CustomPlayer._createRole(key, role)
 	else
 		return Variables.varDefineEcho(key or 'role', roleData.variable)
 	end
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if String.isNotEmpty(args.role) then
-		local roleData = _ROLES[args.role:lower()]
-		-- If the role is missing, assume it is a player
-		if roleData and roleData.isplayer == false then
-			Variables.varDefine('isplayer', 'false')
-		else
-			Variables.varDefine('isplayer', 'true')
-		end
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
 end
 
 return CustomPlayer
