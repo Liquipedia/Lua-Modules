@@ -87,12 +87,13 @@ local prizepoolClasses = {
 	nc = 'bg-dq',
 }
 
-local useBlackTextFor = {
+local USE_BLACK_TEXT = {
 	'dnf',
 	'dns',
 	'dnpq',
 	'dnp',
 	'dnq',
+	'dq',
 	'nc',
 }
 
@@ -135,7 +136,7 @@ function Placement.raw(placement)
 	end
 
 	-- Determine any black text placements
-	raw.blackText = Table.includes(useBlackTextFor, raw.placement[1])
+	raw.blackText = Table.includes(USE_BLACK_TEXT, raw.placement[1])
 
 	return raw
 end
