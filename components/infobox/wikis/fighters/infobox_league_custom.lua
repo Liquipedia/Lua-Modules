@@ -110,6 +110,26 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Cell{name = 'Points', content = {_args.points}})
 			table.insert(widgets, Chronology{content = {next = _args.circuit_next, previous = _args.circuit_previous}})
 		end
+		if _args.circuit2 or _args.points2 or _args.circuit2_next or _args.circuit2_previous then
+			table.insert(
+				widgets,
+				Cell{
+					name = 'Circuit',
+					content = {
+						CustomLeague:_createCircuit(
+							_args.circuit2,
+							_args.circuit2abbr,
+							_args.circuit2IconLight,
+							_args.circuit2IconDark or _args.circuit2IconLight
+						)
+					}
+				}
+			)
+			table.insert(widgets, Cell{name = 'Circuit Tier', content = {_args.circuit2tier}})
+			table.insert(widgets, Cell{name = 'Tournament Region', content = {_args.region2}})
+			table.insert(widgets, Cell{name = 'Points', content = {_args.points2}})
+			table.insert(widgets, Chronology{content = {next = _args.circuit2_next, previous = _args.circuit2_previous}})
+		end
 
 	elseif id == 'prizepool' then
 		return {
@@ -138,7 +158,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.assumedprizepool = tostring(_args.prizepoolassumed)
 	lpdbData.extradata.circuit = _args.circuit
-	lpdbData.extradata.circuit_tier = _args.circuit_tier
+	lpdbData.extradata.circuittier = _args.circuittier
+	lpdbData.extradata.circuit2 = _args.circuit2
+	lpdbData.extradata.circuit2tier = _args.circuit2tier
 
 	return lpdbData
 end
@@ -149,6 +171,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('circuit', _args.circuit)
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('circuitabbr', _args.circuitabbr)
+	Variables.varDefine('circuit2', _args.circuit2)
+	Variables.varDefine('circuit2tier', _args.circuit2tier)
+	Variables.varDefine('circuit2abbr', _args.circuit2abbr)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
 	Variables.varDefine('tournament_link', self.pagename)
 
