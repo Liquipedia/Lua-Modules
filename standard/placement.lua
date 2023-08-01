@@ -87,6 +87,15 @@ local prizepoolClasses = {
 	nc = 'bg-dq',
 }
 
+local useBlackTextFor = {
+	'dnf',
+	'dns',
+	'dnpq',
+	'dnp',
+	'dnq',
+	'nc',
+}
+
 ---Processes a placement text input into raw data.
 ---Returned table will not always contain every key.
 ---@param placement string?
@@ -126,7 +135,7 @@ function Placement.raw(placement)
 	end
 
 	-- Determine any black text placements
-	raw.blackText = (raw.placement[1] == 'dnp')
+	raw.blackText = Table.includes(useBlackTextFor, raw.placement[1])
 
 	return raw
 end
