@@ -124,12 +124,20 @@ function Brawler:create()
 end
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
+	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local matchSummary = MatchSummary():init()
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
+
+	if bracketResetMatch then
+		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
+			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
+	end
 
 	-- comment
 	if match.comment then
