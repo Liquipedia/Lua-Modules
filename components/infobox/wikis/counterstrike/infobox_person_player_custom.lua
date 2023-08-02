@@ -73,7 +73,6 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
@@ -211,17 +210,6 @@ end
 function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.management or roleData.coach)
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
 end
 
 function CustomPlayer:getPersonType(args)

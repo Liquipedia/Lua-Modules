@@ -62,7 +62,6 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
 
@@ -130,7 +129,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 		end
 	end
 
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
@@ -161,17 +160,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

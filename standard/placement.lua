@@ -39,7 +39,12 @@ local PLACEMENT_CLASSES = {
 	['w'] = 'placement-win',
 	['l'] = 'placement-lose',
 	['dq'] = 'placement-lose',
+	['dnf'] = 'placement-dnp',
+	['dns'] = 'placement-dnp',
+	['dnpq'] = 'placement-dnp',
 	['dnp'] = 'placement-dnp',
+	['dnq'] = 'placement-dnp',
+	['nc'] = 'placement-dnp',
 	['proceeded'] = 'placement-up',
 	['stay'] = 'placement-stay',
 	['relegated'] = 'placement-down',
@@ -55,9 +60,14 @@ local CUSTOM_SORTS = {
 	['l'] = '1030',
 	['relegated'] = '1031',
 	['dnp'] = '1032',
-	['dq'] = '1033',
-	['div'] = '1034',
-	[''] = '1035',
+	['dnpq'] = '1033',
+	['dnf'] = '1034',
+	['dns'] = '1035',
+	['dnq'] = '1036',
+	['nc'] = '1037',
+	['dq'] = '1038',
+	['div'] = '1039',
+	[''] = '1040',
 }
 
 local prizepoolClasses = {
@@ -69,6 +79,22 @@ local prizepoolClasses = {
 	q = 'bg-win',
 	l = 'bg-lose',
 	dq = 'bg-dq',
+	dnq = 'bg-dq',
+	dns = 'bg-dq',
+	dnf = 'bg-dq',
+	dnp = 'bg-dq',
+	dnpq = 'bg-dq',
+	nc = 'bg-dq',
+}
+
+local USE_BLACK_TEXT = {
+	'dnf',
+	'dns',
+	'dnpq',
+	'dnp',
+	'dnq',
+	'dq',
+	'nc',
 }
 
 ---Processes a placement text input into raw data.
@@ -110,7 +136,7 @@ function Placement.raw(placement)
 	end
 
 	-- Determine any black text placements
-	raw.blackText = (raw.placement[1] == 'dnp')
+	raw.blackText = Table.includes(USE_BLACK_TEXT, raw.placement[1])
 
 	return raw
 end

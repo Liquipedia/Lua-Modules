@@ -207,7 +207,7 @@ end
 
 function Placement:_getLpdbData(...)
 	local entries = {}
-	for opponentIndex, opponent in ipairs(self.opponents) do
+	for _, opponent in ipairs(self.opponents) do
 		local participant, image, imageDark, players
 		local opponentType = opponent.opponentData.type
 
@@ -239,7 +239,6 @@ function Placement:_getLpdbData(...)
 			participantlink = Opponent.toName(opponent.opponentData),
 			participantflag = opponentType == Opponent.solo and players.p1flag or nil,
 			participanttemplate = opponent.opponentData.template,
-			opponentindex = opponentIndex, -- Needed in SMW
 			players = players,
 			placement = self:_lpdbValue(),
 			prizemoney = prizeMoney,

@@ -224,18 +224,17 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
 	lpdbData.extradata.role = _args.role
-	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
+
+	local birthMonthAndDay = string.match(_args.birth_date or '', '%-%d%d?%-%d%d?$')
+	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
+
+	lpdbData.extradata.birthmonthandday = birthMonthAndDay
 
 	return lpdbData
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('id', args.id or _pagename)
-
-	--retrieve birth month + day for storage in smw
-	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
-	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
-	Variables.varDefine('birth_monthandday', birthMonthAndDay)
 end
 
 function CustomPlayer:createBottomContent(infobox)

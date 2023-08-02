@@ -64,7 +64,6 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
@@ -117,7 +116,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(_args.role) and 'false' or 'true'
 
 	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
 	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
@@ -157,15 +156,6 @@ end
 function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
 end
 
 function CustomPlayer:getPersonType(args)
