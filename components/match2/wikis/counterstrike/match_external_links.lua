@@ -230,6 +230,22 @@ return {
 	},
 	{},
 	{
+		name = 'bo3gg',
+		icon = 'bo3.gg icon allmode.png',
+		prefixLink = 'https://bo3.gg/matches/',
+		label = 'bo3.gg Matchpage',
+		max = 2,
+		stats = {'bo3ggstats'}
+	},
+	{
+		name = 'bo3ggstats',
+		icon = 'stats',
+		prefixLink = 'https://bo3.gg/matches/',
+		label = 'Stats on bo3.gg',
+		isMapStats = true
+	},
+	{},
+	{
 		name = 'cstats',
 		icon = 'stats',
 		prefixLink = '',
