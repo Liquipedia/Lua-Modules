@@ -345,6 +345,7 @@ function matchFunctions.getLinks(match)
 
 	local platforms = mw.loadData('Module:MatchExternalLinks')
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
+	local matchPlatforms = {}
 
 	for _, platform in ipairs(platforms) do
 		-- Stat external links inserted in {{Map}}
@@ -356,15 +357,19 @@ function matchFunctions.getLinks(match)
 
 			if match[name] then
 				table.insert(platformLinks, {prefixLink .. match[name] .. suffixLink, 0})
+				matchPlatforms[name] = match[name]
 				match[name] = nil
 			end
 
 			if platform.isMapStats then
 				for i = 1, match.bestof do
 					local map = match['map' .. i]
-					if map and map[platform.name] then
-						table.insert(platformLinks, {prefixLink .. match['map' .. i][name] .. suffixLink, i})
-						match['map' .. i][platform.name] = nil
+					if map and map[name] then
+						table.insert(platformLinks, {prefixLink .. map[name] .. suffixLink, i})
+						match['map' .. i][name] = nil
+					elseif map and (name == 'bo3ggstats') and matchPlatforms['bo3gg'] and Logic.readBool(map.finished) then
+						local mapName = map.map:lower():gsub('dust ii', 'dust2')
+						table.insert(platformLinks, {prefixLink .. matchPlatforms['bo3gg'] .. '/' .. mapName .. suffixLink, i})
 					end
 				end
 			else
