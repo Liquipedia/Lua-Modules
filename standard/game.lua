@@ -138,22 +138,20 @@ function Game.icon(options)
 	options = options or {}
 
 	local gameData = Game.raw(options)
-	if Table.isEmpty(gameData) then
-		return Game._createIcon{icon = ICON_PLACEHOLDER, size = options.size}
-	end
 
+	local gameIcons
 	local link = Logic.readBool(options.noLink) and '' or options.link or gameData.link
 	local spanClass = (Logic.readBool(options.noSpan) and '') or
 		(String.isNotEmpty(options.spanClass) and options.spanClass) or
 			DEFAULT_SPAN_CLASS
 
-	local gameIcons
-
-	if gameData.logo.lightMode == gameData.logo.darkMode then
-		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link, spanClass = spanClass}
+	if Table.isEmpty(gameData) then
+		gameIcons = Game._createIcon{icon = ICON_PLACEHOLDER, size = options.size}
+	elseif gameData.logo.lightMode == gameData.logo.darkMode then
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link}
 	else
-		gameIcons = Game._createIcon{size = options.size, link = link, mode = 'light', icon = gameData.logo.lightMode} ..
-			Game._createIcon{size = options.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
+		gameIcons = Game._createIcon{ icon = gameData.logo.lightMode, size = options.size, link = link, mode = 'light'} ..
+			Game._createIcon{icon = gameData.logo.darkMode, size = options.size, link = link, mode = 'dark'}
 	end
 
 	if String.isNotEmpty(spanClass) then
