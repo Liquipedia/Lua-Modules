@@ -193,17 +193,17 @@ return {
 				lightMode = 'Power Rangers default allmode.png',
 			},
 		},
-		brpf = {
-			abbreviation = 'BRPF',
-			name = 'Bloody Roar: Primal Fury',
-			link = 'Bloody Roar: Primal Fury',
+		brex = {
+			abbreviation = 'BREX',
+			name = 'Bloody Roar: Extreme',
+			link = 'Bloody Roar: Extreme',
 			logo = {
-				darkMode = 'Bloody Roar Primal Fury logo.png',
-				lightMode = 'Bloody Roar Primal Fury logo.png',
+				darkMode = 'Bloody Roar Extreme logo.png',
+				lightMode = 'Bloody Roar Extreme logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Bloody Roar Primal Fury logo.png',
-				lightMode = 'Bloody Roar Primal Fury logo.png',
+				darkMode = 'Bloody Roar Extreme logo.png',
+				lightMode = 'Bloody Roar Extreme logo.png',
 			},
 		},
 		cvs = {
