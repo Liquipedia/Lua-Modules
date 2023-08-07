@@ -330,19 +330,19 @@ function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUndersc
 	local plOpp = opponents[plIndex]
 	local vsOpp = opponents[vsIndex]
 
-	local prace = Faction.read(plOpp.match2players[1].extradata.faction)
-	prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
-	local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
-	orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
+	local pRace = Faction.read(plOpp.match2players[1].extradata.faction)
+	pRace = pRace and pRace ~= Faction.defaultFaction and pRace or 'r'
+	local oRace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+	oRace = oRace and oRace ~= Faction.defaultFaction and oRace or 'r'
 
-	vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-	vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+	vs[pRace][oRace].win = vs[pRace][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace][oRace].loss = vs[pRace][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
 
-	vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-	vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+	vs['total'][oRace].win = vs['total'][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total'][oRace].loss = vs['total'][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
 
-	vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-	vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+	vs[pRace]['total'].win = vs[pRace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace]['total'].loss = vs[pRace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
 	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
