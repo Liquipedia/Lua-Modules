@@ -20,6 +20,7 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
+local DISQUALIFIED = 'dq'
 
 ---@param data table
 function StandingsStorage.run(data)
@@ -167,6 +168,9 @@ function StandingsStorage.fromTemplateHeader(frame)
 		return
 	end
 
+	data.roundcount = tonumber(data.roundcount) or 1
+	data.finished = Logic.readBool(data.finished)
+
 	StandingsStorage.table(data)
 end
 
@@ -240,8 +244,14 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
 
-	-- Template don't have SlotIndex, use placement as workaround
-	data.slotindex = data.placement
+	if (data.placement or ''):lower() == DISQUALIFIED then
+		data.definitestatus = DISQUALIFIED
+		data.currentstatus = DISQUALIFIED
+	end
+
+	data.placement = tonumber(data.placement)
+	-- If template doesn't have slotIndex, use placement as workaround
+	data.slotindex = tonumber(data.slotindex) or data.placement
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
