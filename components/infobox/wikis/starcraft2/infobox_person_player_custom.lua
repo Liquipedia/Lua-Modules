@@ -314,8 +314,7 @@ end
 
 function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
 	--catch matches vs empty opponents and literals
-	if not opponents[1] or not opponents[2] or
-		opponents[1].type == Opponent.literal or opponents[2].type == Opponent.literal then
+	if #opponents ~= 2 or Array.any(opponents, function(opponent) return opponent.type == Opponent.literal end) then
 
 		return vs
 	end
