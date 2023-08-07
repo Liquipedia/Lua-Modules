@@ -313,34 +313,37 @@ function CustomPlayer._setVarsForVS(table)
 end
 
 function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
+	--catch matches vs empty opponents and literals
+	if not opponents[1] or not opponents[2] or opponents[1].type == Opponent.literal or opponents[2].type == Opponent.literal then
+		return vs
+	end
+
 	local plIndex = 1
 	local vsIndex = 2
-	--catch matches vs empty opponents
-	if opponents[1] and opponents[2] then
-		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
-			plIndex = 2
-			vsIndex = 1
-		end
-		local plOpp = opponents[plIndex]
-		local vsOpp = opponents[vsIndex]
 
-		local prace = Faction.read(plOpp.match2players[1].extradata.faction)
-		prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
-		local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
-		orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
-
-		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+	if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
+		plIndex = 2
+		vsIndex = 1
 	end
+	local plOpp = opponents[plIndex]
+	local vsOpp = opponents[vsIndex]
+
+	local prace = Faction.read(plOpp.match2players[1].extradata.faction)
+	prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
+	local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+	orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
+
+	vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
+	vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	return vs
 end
