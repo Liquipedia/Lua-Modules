@@ -91,30 +91,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
 			table.insert(widgets, Title{name = 'Circuit Information'})
-			CustomLeague:_createCircuitInformation(widgets, {
-				circuit = _args.circuit,
-				abbreviation = _args.abbreviation,
-				icon = _args.circuitIconLight,
-				iconDark = _args.circuitIconDark,
-				tier = _args.circuittier,
-				region = _args.region,
-				points = _args.points,
-				next = _args.circuit_next,
-				previous = _args.circuit_previous
-			})
+			CustomLeague:_createCircuitInformation(widgets)
 		end
 		if _args.circuit2 or _args.points2 or _args.circuit2_next or _args.circuit2_previous then
-			CustomLeague:_createCircuitInformation(widgets, {
-				circuit = _args.circuit2,
-				abbreviation = _args.abbreviation2,
-				icon = _args.circuit2IconLight,
-				iconDark = _args.circuit2IconDark,
-				tier = _args.circuit2tier,
-				region = _args.region2,
-				points = _args.points2,
-				next = _args.circuit2_next,
-				previous = _args.circuit2_previous
-			})
+			CustomLeague:_createCircuitInformation(widgets, '2')
 		end
 
 	elseif id == 'prizepool' then
@@ -299,7 +279,20 @@ function CustomLeague:_cleanPrizeValue(value, currency)
 	return value
 end
 
-function CustomLeague:_createCircuitInformation(widgets, circuitArgs)
+function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
+	circuitIndex = circuitIndex or ''
+	local circuitArgs = {
+		circuit = _args['circuit' .. circuitIndex],
+		abbreviation = _args['abbreviation' .. circuitIndex],
+		icon = _args['circuit' .. circuitIndex .. 'IconLight'],
+		iconDark = _args['circuit' .. circuitIndex .. 'IconDark'],
+		tier = _args['circuit' .. circuitIndex .. 'tier'],
+		region = _args['region' .. circuitIndex],
+		points = _args['points' .. circuitIndex],
+		next = _args['circuit' .. circuitIndex .. '_next'],
+		previous = _args['circuit' .. circuitIndex .. '_previous'],
+	}
+
 	table.insert(
 		widgets,
 		Cell{
