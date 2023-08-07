@@ -11,6 +11,8 @@ local LeagueIcon = require('Module:LeagueIcon')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 
+local Opponent = require('Module:OpponentLibraries').Opponent
+
 local BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',
 	'[[liquipediatiertype::!Charity]]',
@@ -47,7 +49,7 @@ function Achievements._fetchDataForTeam(historicalPages, opponentType)
 			return '[[' .. lpdbKey .. '::' .. team .. ']]'
 		end), ' OR ') .. ')'
 	), ' AND ')
-	
+
 	return mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
 		query = 'icon, icondark, pagename, shortname, objectname, date, prizepoolindex',
