@@ -344,7 +344,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				return value == rowIndex
 			end) then
 				local tierData = countData[rowValue.value] or {}
-				local tournamentCount = tonumber(Table.extract(tierData, "")) or 0
+				local tournamentCount = tonumber(Table.extract(tierData, '')) or 0
 				runningTally = runningTally + tournamentCount
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(tournamentCount))
@@ -359,8 +359,8 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			if tierTypeData then
 				local count = Array.reduce(
 					Array.map(Array.extractValues(countData),
-						function(el, index)
-							return Table.extract(el, tierTypeValue) or 0
+						function(typeCounts, index)
+							return Table.extract(typeCounts, tierTypeValue) or 0
 						end
 					),
 					Operator.add, 0
