@@ -58,4 +58,43 @@ function suite:testMethod()
 	self:assertDeepEquals({4, 10, 7}, Array.map(foo, Operator.method('f', 1)))
 end
 
+function suite:testIdentity()
+	self:assertEquals(11, Operator.identity(11))
+	self:assertEquals('a', Operator.identity('a'))
+	self:assertEquals(nil, Operator.identity())
+	self:assertEquals('1', Operator.identity('1'))
+
+	local tbl = {a = 1, b = 'a', c = '1'}
+	self:assertDeepEquals(tbl, Operator.identity(tbl))
+end
+
+function suite:testCompareByKey()
+	local tbl = {
+		{sort = 50, anotherKey = 2},
+		{sort = 100, anotherKey = 1},
+		{sort = 1, anotherKey = 3},
+	}
+
+	table.sort(tbl, Operator.compareByKey('sort'))
+	self:assertDeepEquals({
+		{sort = 100, anotherKey = 1},
+		{sort = 50, anotherKey = 2},
+		{sort = 1, anotherKey = 3},
+	}, tbl)
+
+	table.sort(tbl, Operator.compareByKey('sort', true))
+	self:assertDeepEquals({
+		{sort = 1, anotherKey = 3},
+		{sort = 50, anotherKey = 2},
+		{sort = 100, anotherKey = 1},
+	}, tbl)
+
+	table.sort(tbl, Operator.compareByKey('sort', false))
+	self:assertDeepEquals({
+		{sort = 100, anotherKey = 1},
+		{sort = 50, anotherKey = 2},
+		{sort = 1, anotherKey = 3},
+	}, tbl)
+end
+
 return suite
