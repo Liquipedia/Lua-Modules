@@ -91,24 +91,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'customcontent' then
 		if _args.circuit or _args.points or _args.circuit_next or _args.circuit_previous then
 			table.insert(widgets, Title{name = 'Circuit Information'})
-			table.insert(
-				widgets,
-				Cell{
-					name = 'Circuit',
-					content = {
-						CustomLeague:_createCircuit(
-							_args.circuit,
-							_args.circuitabbr,
-							_args.circuitIconLight,
-							_args.circuitIconDark or _args.circuitIconLight
-						)
-					}
-				}
-			)
-			table.insert(widgets, Cell{name = 'Circuit Tier', content = {_args.circuittier}})
-			table.insert(widgets, Cell{name = 'Tournament Region', content = {_args.region}})
-			table.insert(widgets, Cell{name = 'Points', content = {_args.points}})
-			table.insert(widgets, Chronology{content = {next = _args.circuit_next, previous = _args.circuit_previous}})
+			CustomLeague:_createCircuitInformation(widgets)
+		end
+		if _args.circuit2 or _args.points2 or _args.circuit2_next or _args.circuit2_previous then
+			CustomLeague:_createCircuitInformation(widgets, '2')
 		end
 
 	elseif id == 'prizepool' then
@@ -138,7 +124,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.assumedprizepool = tostring(_args.prizepoolassumed)
 	lpdbData.extradata.circuit = _args.circuit
-	lpdbData.extradata.circuit_tier = _args.circuit_tier
+	lpdbData.extradata.circuittier = _args.circuittier
+	lpdbData.extradata.circuit2 = _args.circuit2
+	lpdbData.extradata.circuit2tier = _args.circuit2tier
 
 	return lpdbData
 end
@@ -149,6 +137,9 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('circuit', _args.circuit)
 	Variables.varDefine('circuittier', _args.circuittier)
 	Variables.varDefine('circuitabbr', _args.circuitabbr)
+	Variables.varDefine('circuit2', _args.circuit2)
+	Variables.varDefine('circuit2tier', _args.circuit2tier)
+	Variables.varDefine('circuit2abbr', _args.circuit2abbr)
 	Variables.varDefine('seriesabbr', _args.abbreviation)
 	Variables.varDefine('tournament_link', self.pagename)
 
@@ -288,7 +279,41 @@ function CustomLeague:_cleanPrizeValue(value, currency)
 	return value
 end
 
-function CustomLeague:_createCircuit(circuit, abbreviation, icon, iconDark)
+function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
+	circuitIndex = circuitIndex or ''
+	local circuitArgs = {
+		circuit = _args['circuit' .. circuitIndex],
+		abbreviation = _args['abbreviation' .. circuitIndex],
+		icon = _args['circuit' .. circuitIndex .. 'IconLight'],
+		iconDark = _args['circuit' .. circuitIndex .. 'IconDark'],
+		tier = _args['circuit' .. circuitIndex .. 'tier'],
+		region = _args['region' .. circuitIndex],
+		points = _args['points' .. circuitIndex],
+		next = _args['circuit' .. circuitIndex .. '_next'],
+		previous = _args['circuit' .. circuitIndex .. '_previous'],
+	}
+
+	table.insert(
+		widgets,
+		Cell{
+			name = 'Circuit',
+			content = {
+				CustomLeague:_createCircuitLink(
+					circuitArgs.circuit,
+					circuitArgs.abbreviation,
+					circuitArgs.icon,
+					circuitArgs.iconDark or circuitArgs.icon
+				)
+			}
+		}
+	)
+	table.insert(widgets, Cell{name = 'Circuit Tier', content = {circuitArgs.tier}})
+	table.insert(widgets, Cell{name = 'Tournament Region', content = {circuitArgs.region}})
+	table.insert(widgets, Cell{name = 'Points', content = {circuitArgs.points}})
+	table.insert(widgets, Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}})
+end
+
+function CustomLeague:_createCircuitLink(circuit, abbreviation, icon, iconDark)
 	if String.isEmpty(circuit) then
 		return
 	end
