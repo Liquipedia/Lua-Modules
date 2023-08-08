@@ -15,7 +15,7 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 
-local CustomDefaultOptions = Lua.loadDataIfExists('Module:ThisLinkIsDead') or {}
+local CustomDefaultOptions = Lua.loadDataIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
