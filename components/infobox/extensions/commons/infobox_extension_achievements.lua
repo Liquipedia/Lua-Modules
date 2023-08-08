@@ -196,7 +196,7 @@ function Achievements.display(data, options)
 		return nil
 	end
 
-	table.sort(data, Operator.compareByKey('date', true))
+	table.sort(data, Operator.compareByKey('date'))
 
 	return String.nilIfEmpty(table.concat(Array.map(data, function(item)
 		return Achievements._displayIcon(item, options)
