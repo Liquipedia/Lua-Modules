@@ -28,13 +28,25 @@ local DEFAULT_BASE_CONDITIONS = {
 
 local Achievements = {}
 
+---@class AchievementIconsArgs
+---@field noTemplate boolean?
+---@field onlyForFirstPrizePoolOfPage boolean?
+---@field adjustItem? fun(item:table):table
+---@field baseConditions string[]?
+---@field player string?
+---@field onlySolo boolean?
+---@field playerLimit integer?
+
+---Entry point for achievements icons in infobox player
+---@param args AchievementIconsArgs
+---@return string?
 function Achievements.player(args)
 	args = args or {}
 	local options = Achievements._readOptions(args)
 
 	local player = args.player or mw.title.getCurrentTitle().text
 
-	local onlySolo = Logic.readBool(Logic.nilOr(args.onlySolo, true))
+	local onlySolo = Logic.readBool(args.onlySolo)
 
 	local conditions = table.concat(Array.extend(
 		options.baseConditions,
@@ -42,11 +54,14 @@ function Achievements.player(args)
 		onlySolo and ('[[opponenttype::' .. Opponent.solo .. ']]') or nil
 	), ' AND ')
 
-mw.logObject(conditions)
-
 	return Achievements.display(Achievements._fetchData(conditions), options)
 end
 
+---Builds player conditions for query in `Achievements.player`
+---@param player string
+---@param onlySolo boolean
+---@param playerLimit integer
+---@return unknown
 function Achievements._playerConditions(player, onlySolo, playerLimit)
 	player = player:gsub(' ', '_')
 	local playerNoUnderScore = player:gsub('_', ' ')
@@ -63,6 +78,10 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 	return '(' .. table.concat(playerConditions) .. ')'
 end
 
+---Entry point for infobox team to fetch both team achievements and solo achievements while on team as sep. icon strings
+---@param args AchievementIconsArgs
+---@return string? #Team Achievements icon string
+---@return string? #Solo Achievements while on team icon string
 function Achievements.teamAndTeamSolo(args)
 	local historicalPages = Achievements._getTeamNames()
 	local options = Achievements._readOptions(args)
@@ -71,6 +90,9 @@ function Achievements.teamAndTeamSolo(args)
 		Achievements.display(Achievements._fetchDataForTeam(historicalPages, Opponent.solo, options), options)
 end
 
+---Entry point for infobox team to fetch solo achievements while on team as icon strings
+---@param args AchievementIconsArgs
+---@return string?
 function Achievements.teamSolo(args)
 	local options = Achievements._readOptions(args)
 
@@ -78,6 +100,9 @@ function Achievements.teamSolo(args)
 		Achievements._getTeamNames(), Opponent.team, options), options)
 end
 
+---Entry point for infobox team to fetch team achievements as icon strings
+---@param args AchievementIconsArgs
+---@return string?
 function Achievements.team(args)
 	local options = Achievements._readOptions(args)
 
@@ -85,6 +110,8 @@ function Achievements.team(args)
 		Achievements._getTeamNames(), Opponent.solo, options), options)
 end
 
+---Fetches (historical) teamNames (both with underscore and without) of a given team
+---@return string[]
 function Achievements._getTeamNames()
 	local pageName = mw.title.getCurrentTitle().text
 	local historicalPages = Team.queryHistoricalNames(pageName)
@@ -96,6 +123,15 @@ function Achievements._getTeamNames()
 	)
 end
 
+---@class AchievementIconsOptions
+---@field noTemplate boolean
+---@field onlyForFirstPrizePoolOfPage boolean
+---@field adjustItem fun(item:table):table
+---@field baseConditions string[]
+
+---Read options
+---@param args AchievementIconsArgs?
+---@return AchievementIconsOptions
 function Achievements._readOptions(args)
 	args = args or {}
 
@@ -110,10 +146,19 @@ function Achievements._readOptions(args)
 	}
 end
 
+---@param historicalPages string[]
+---@param opponentType OpponentType
+---@param options AchievementIconsOptions
+---@return table[]
 function Achievements._fetchDataForTeam(historicalPages, opponentType, options)
 	return Achievements._fetchData(Achievements._buildTeamConditions(historicalPages, opponentType, options))
 end
 
+---Builds query conditions for a team
+---@param historicalPages string[]
+---@param opponentType OpponentType
+---@param options AchievementIconsOptions
+---@return string
 function Achievements._buildTeamConditions(historicalPages, opponentType, options)
 	local lpdbKey = opponentType == Opponent.team and 'opponentname' or 'opponentplayers_p1team'
 
@@ -126,6 +171,9 @@ function Achievements._buildTeamConditions(historicalPages, opponentType, option
 	), ' AND ')
 end
 
+---Query data for given conditions
+---@param conditions string
+---@return {icon:string?,icondark:string?,pagename:string,tournament:string?,date:osdate,prizepoolindex:integer}[]
 function Achievements._fetchData(conditions)
 	return mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
@@ -135,6 +183,10 @@ function Achievements._fetchData(conditions)
 	})
 end
 
+---Build the display
+---@param data {icon:string?,icondark:string?,pagename:string,tournament:string?,date:osdate,prizepoolindex:integer}[]
+---@param options AchievementIconsOptions?
+---@return string?
 function Achievements.display(data, options)
 	--read (default) options in case this function is accessed directly
 	options = options or Achievements._readOptions()
@@ -150,9 +202,11 @@ function Achievements.display(data, options)
 	end)))
 end
 
+---Build the icon for a single entry
+---@param item {icon:string?,icondark:string?,pagename:string,tournament:string?,date:osdate,prizepoolindex:integer}
+---@param options AchievementIconsOptions
+---@return string
 function Achievements._displayIcon(item, options)
-	--in case we get passed data from outside this module make sure we are having data
-	--with prizepoolindex 1
 	if tonumber(item.prizepoolindex) ~= 1 and options.onlyForFirstPrizePoolOfPage then
 		--can not return nil else Array.map breaks off
 		return ''
