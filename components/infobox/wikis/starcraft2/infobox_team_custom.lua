@@ -88,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
-		local achievements, soloAchievements = Achievements.team()
+		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
 		widgets = {}
 		if achievements then
 			table.insert(widgets, Title{name = 'Achievements'})
