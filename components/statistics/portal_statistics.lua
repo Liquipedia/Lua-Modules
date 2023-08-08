@@ -372,7 +372,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			end
 		end
 	end
-	
+
 	if String.isNotEmpty(args.showOther) then
 		local countOther = Array.reduce(
 			Array.flatten(Array.map(Array.extractValues(countData),
