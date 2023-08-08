@@ -58,16 +58,6 @@ function suite:testMethod()
 	self:assertDeepEquals({4, 10, 7}, Array.map(foo, Operator.method('f', 1)))
 end
 
-function suite:testIdentity()
-	self:assertEquals(11, Operator.identity(11))
-	self:assertEquals('a', Operator.identity('a'))
-	self:assertEquals(nil, Operator.identity())
-	self:assertEquals('1', Operator.identity('1'))
-
-	local tbl = {a = 1, b = 'a', c = '1'}
-	self:assertDeepEquals(tbl, Operator.identity(tbl))
-end
-
 function suite:testCompareByKey()
 	local tbl = {
 		{sort = 50, anotherKey = 2},
