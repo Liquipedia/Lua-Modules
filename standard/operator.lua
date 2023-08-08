@@ -85,4 +85,24 @@ function Operator.method(funcName, ...)
 	end
 end
 
+---@generic T
+---@param a T
+---@return T
+function Operator.identity(a)
+	return a
+end
+
+---@param item string
+---@param invert boolean?
+---@return fun(a: table, b: table): boolean
+function Operator.compareByKey(key, invert)
+	return function(a, b)
+		if invert then
+			return a[key] < b[key]
+		end
+
+		return a[key] > b[key]
+	end
+end
+
 return Operator
