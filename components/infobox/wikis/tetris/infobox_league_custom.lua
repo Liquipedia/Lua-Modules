@@ -11,6 +11,7 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -23,6 +24,17 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+
+local GAME_GROUPS = {
+	classic = {'Tetris', 'NES (1989)', 'NES (1989) NTSC', 'NES (1989) PAL', 'NES (1989) DAS', 'Super Tetris',
+		'Plus', 'Plus 2'},
+	modern = {'Tetris Effect', 'Tetris Effect: Connected', 'Jstris', 'Worldwide Combos', 'TETR.IO', 'Nuketris',
+		'Tetris 2', 'Puyo Puyo Tetris', 'Puyo Puyo Tetris 2', 'Tetris 99', 'Tetris DS', 'Tetris Friends',
+		'Tetris Online Japan', 'Tetris Online Poland'},
+	other = {'Attack', '64 (1998)', 'The New Tetris', 'Tetris & Dr.Mario', 'NullpoMino', 'Blockbox', 'Cultris 2',
+		'TetriNET 2'},
+	tgm = {'The Grand Master', 'The Grand Master 2', 'The Grand Master 3'},
+}
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -69,8 +81,17 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = Game.name{game = _args.game}
 	lpdbData.publishertier = args.publisherpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
+	lpdbData.extradata.gamegroup = CustomLeague._determineGameGroup(lpdbData.game)
 
 	return lpdbData
+end
+
+function CustomLeague._determineGameGroup(game)
+	for gameGroup, games in pairs(GAME_GROUPS) do
+		if Table.includes(games, game) then
+			return gameGroup
+		end
+	end
 end
 
 function League:defineCustomPageVariables()
