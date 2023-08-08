@@ -23,7 +23,6 @@ return {
 				darkMode = 'Tetris default allmode.png',
 				lightMode = 'Tetris default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		classic = {
 			abbreviation = 'NES',
@@ -37,7 +36,6 @@ return {
 				darkMode = 'Tetris 1989 NTSC default allmode.png',
 				lightMode = 'Tetris 1989 NTSC default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		['classic ntsc'] = {
 			abbreviation = 'NES NTSC',
@@ -51,7 +49,6 @@ return {
 				darkMode = 'Tetris 1989 NTSC default allmode.png',
 				lightMode = 'Tetris 1989 NTSC default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		['classic pal'] = {
 			abbreviation = 'NES PAL',
@@ -65,7 +62,6 @@ return {
 				darkMode = 'Tetris 1989 PAL default allmode.png',
 				lightMode = 'Tetris 1989 PAL default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		['classic das'] = {
 			abbreviation = 'NES DAS',
@@ -79,7 +75,6 @@ return {
 				darkMode = 'Tetris 1989 DAS default allmode.png',
 				lightMode = 'Tetris 1989 DAS default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		te = {
 			abbreviation = 'TE',
@@ -93,7 +88,6 @@ return {
 				darkMode = 'Tetris Effect default darkmode.png',
 				lightMode = 'Tetris Effect default lightmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		tec = {
 			abbreviation = 'TE:C',
@@ -107,7 +101,6 @@ return {
 				darkMode = 'Tetris Effect default darkmode.png',
 				lightMode = 'Tetris Effect default lightmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		jstris = {
 			abbreviation = 'Jstris',
@@ -121,7 +114,6 @@ return {
 				darkMode = 'Jstris default allmode.png',
 				lightMode = 'Jstris default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		wwc = {
 			abbreviation = 'WWC',
@@ -135,7 +127,6 @@ return {
 				darkMode = 'Worldwide Combos default allmode.png',
 				lightMode = 'Worldwide Combos default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		super = {
 			abbreviation = 'Super',
@@ -149,7 +140,6 @@ return {
 				darkMode = 'Super Tetris default allmode.png',
 				lightMode = 'Super Tetris default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		attack = {
 			abbreviation = 'Attack',
@@ -163,7 +153,6 @@ return {
 				darkMode = 'Tetris Attack default allmode.png',
 				lightMode = 'Tetris Attack default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		plus = {
 			abbreviation = 'Plus',
@@ -177,7 +166,6 @@ return {
 				darkMode = 'Tetris Plus default allmode.png',
 				lightMode = 'Tetris Plus default allmode.png',
 			},
-			gameGroup = 'classic',
 		},
 		['plus 2'] = {
 			abbreviation = 'Plus 2',
@@ -191,7 +179,6 @@ return {
 				darkMode = 'Tetris Plus 2 default allmode.png',
 				lightMode = 'Tetris Plus 2 default allmode.png',
 			},
-			gameGroup = 'classic 2',
 		},
 		tgm = {
 			abbreviation = 'TGM',
@@ -205,7 +192,6 @@ return {
 				darkMode = 'Tetris The Grand Master default allmode.png',
 				lightMode = 'Tetris The Grand Master default allmode.png',
 			},
-			gameGroup = 'tgm',
 		},
 		['tgm2'] = {
 			abbreviation = 'TGM 2',
@@ -219,7 +205,6 @@ return {
 				darkMode = 'Tetris The Grand Master 2 default allmode.png',
 				lightMode = 'Tetris The Grand Master 2 default allmode.png',
 			},
-			gameGroup = 'tgm',
 		},
 		['tgm3'] = {
 			abbreviation = 'TGM 3',
@@ -233,7 +218,6 @@ return {
 				darkMode = 'Tetris The Grand Master 3 default allmode.png',
 				lightMode = 'Tetris The Grand Master 3 default allmode.png',
 			},
-			gameGroup = 'tgm',
 		},
 		['tetrio'] = {
 			abbreviation = 'TETR.IO',
@@ -247,7 +231,6 @@ return {
 				darkMode = 'TETR.IO default allmode.png',
 				lightMode = 'TETR.IO default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		nuketris = {
 			abbreviation = 'Nuketris',
@@ -261,7 +244,6 @@ return {
 				darkMode = 'Nuketris default darkmode.png',
 				lightMode = 'Nuketris default lightmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['tetris 2'] = {
 			abbreviation = 'T2',
@@ -275,7 +257,6 @@ return {
 				darkMode = 'Tetris 2 default allmode.png',
 				lightMode = 'Tetris 2 default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['ppt1'] = {
 			abbreviation = 'PPT',
@@ -289,7 +270,6 @@ return {
 				darkMode = 'Puyo Puyo Tetris default allmode.png',
 				lightMode = 'Puyo Puyo Tetris default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['ppt2'] = {
 			abbreviation = 'PPT2',
@@ -303,7 +283,6 @@ return {
 				darkMode = 'Puyo Puyo Tetris 2 default allmode.png',
 				lightMode = 'Puyo Puyo Tetris 2 default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['t99'] = {
 			abbreviation = 'T99',
@@ -317,7 +296,6 @@ return {
 				darkMode = 'Tetris 99 default allmode.png',
 				lightMode = 'Tetris 99 default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		ds = {
 			abbreviation = 'DS',
@@ -331,7 +309,6 @@ return {
 				darkMode = 'Tetris DS default allmode.png',
 				lightMode = 'Tetris DS default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['64'] = {
 			abbreviation = '64',
@@ -345,7 +322,6 @@ return {
 				darkMode = 'Tetris 64 default allmode.png',
 				lightMode = 'Tetris 64 default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		tnt = {
 			abbreviation = 'TNT',
@@ -359,7 +335,6 @@ return {
 				darkMode = 'The New Tetris default allmode.png',
 				lightMode = 'The New Tetris default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		['tetris & dr.mario'] = {
 			abbreviation = 'Dr.Mario',
@@ -373,7 +348,6 @@ return {
 				darkMode = 'Tetris Dr.Mario default allmode.png',
 				lightMode = 'Tetris Dr.Mario default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		nullpomino = {
 			abbreviation = 'NPM',
@@ -387,7 +361,6 @@ return {
 				darkMode = 'NullpoMino default allmode.png',
 				lightMode = 'NullpoMino default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		blockbox = {
 			abbreviation = 'BB',
@@ -401,7 +374,6 @@ return {
 				darkMode = 'Blockbox default allmode.png',
 				lightMode = 'Blockbox default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		['tetris friends'] = {
 			abbreviation = 'TF',
@@ -415,7 +387,6 @@ return {
 				darkMode = 'Tetris Friends default allmode.png',
 				lightMode = 'Tetris Friends default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['tetris online japan'] = {
 			abbreviation = 'TOJ',
@@ -429,7 +400,6 @@ return {
 				darkMode = 'Tetris Online Japan default allmode.png',
 				lightMode = 'Tetris Online Japan default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['tetris online poland'] = {
 			abbreviation = 'TOP',
@@ -443,7 +413,6 @@ return {
 				darkMode = 'Tetris Online Poland default allmode.png',
 				lightMode = 'Tetris Online Poland default allmode.png',
 			},
-			gameGroup = 'modern',
 		},
 		['cultris 2'] = {
 			abbreviation = 'C2',
@@ -457,7 +426,6 @@ return {
 				darkMode = 'Cultris default allmode.png',
 				lightMode = 'Cultris default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 		['tetrinet 2'] = {
 			abbreviation = 'Tnet2',
@@ -471,7 +439,6 @@ return {
 				darkMode = 'TetriNET default allmode.png',
 				lightMode = 'TetriNET default allmode.png',
 			},
-			gameGroup = 'other',
 		},
 	},
 	defaultGame = 'tetris',
