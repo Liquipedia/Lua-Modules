@@ -352,7 +352,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			end
 		end
 	end
-	
+
 	if String.isNotEmpty(args.showTierTypes) then
 		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
@@ -376,7 +376,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 	if String.isNotEmpty(args.showOther) then
 		local countOther = Array.reduce(
 			Array.flatten(Array.map(Array.extractValues(countData),
-				function(el, index) 
+				function(el, index)
 					return Table.isNotEmpty(el) and Array.extractValues(el) or 0
 				end
 			)), Operator.add, 0)
@@ -385,7 +385,6 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 			:wikitext(LANG:formatNum(countOther))
 			:css('text-align', 'right')
 	end
-	
 
 	resultsRow:tag(tagType)
 		:wikitext(LANG:formatNum(runningTally))
