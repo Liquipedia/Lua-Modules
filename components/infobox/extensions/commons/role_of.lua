@@ -41,7 +41,7 @@ function RoleOf.get(args)
 		name = teamData.id,
 		link = teamData.link,
 		flag = teamData.nationality,
-	}})
+	} --[[@as standardOpponent]] })
 end
 
 return Class.export(RoleOf)

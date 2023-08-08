@@ -145,6 +145,7 @@ end
 
 function CustomLeague._mapsDisplay(prefix)
 	local maps = CustomLeague._getMaps(prefix)
+	---@cast maps -nil
 
 	return {table.concat(
 		Array.map(maps, function(mapData)
@@ -291,11 +292,11 @@ function CustomLeague._computeChronology()
 		and (String.isEmpty(_args.next) or String.isEmpty(_args.previous))
 
 	if automateChronology then
-		local previous = String.isNotEmpty(_args.previous) and _args.previous
-		local next = String.isNotEmpty(_args.next) and _args.next
-		local nextPage = String.isEmpty(_args.next) and
+		local previous = String.isNotEmpty(_args.previous) and _args.previous or nil
+		local next = String.isNotEmpty(_args.next) and _args.next or nil
+		local nextPage = not next and
 			title.basePageTitle:subPageTitle(tostring(number + 1)).fullText
-		local previousPage = String.isEmpty(_args.previous) and
+		local previousPage = not previous and
 			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
 
 		if not next and PageLink.exists(nextPage) then
@@ -464,10 +465,10 @@ function CustomLeague._getMaps(prefix)
 	local mapArgs = _league:getAllArgsForBase(_args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
-		map = mw.text.split(map, '|')
+		local mapArray = mw.text.split(map, '|')
 		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
 		}
 	end)
 end

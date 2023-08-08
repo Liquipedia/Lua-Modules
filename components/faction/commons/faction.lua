@@ -38,14 +38,14 @@ local byName = Table.map(Data.factionProps, function(faction, props) return prop
 local byLowerName = Table.map(byName, function(name, faction) return name:lower(), faction end)
 
 --- Checks if a entered faction is valid
----@param faction string
+---@param faction string?
 ---@return boolean
 function Faction.isValid(faction)
 	return Data.factionProps[faction] ~= nil
 end
 
 --- Fetches the properties of an entered faction
----@param faction string
+---@param faction string?
 ---@return table?
 function Faction.getProps(faction)
 	return Data.factionProps[faction]
@@ -54,7 +54,7 @@ end
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 -- If `options.alias` is set to false the function will not look in the aliases provided via the data module.
----@param faction string
+---@param faction string?
 ---@param options {alias: boolean?}?
 ---@return string?
 function Faction.read(faction, options)
@@ -74,13 +74,14 @@ end
 --- Parses multiple factions from input.
 -- Returns an array of faction identifiers.
 -- Returns an empty array for nil input. Throws upon invalid inputs.
----@param input string
+---@param input string?
 ---@param options {sep: string?, alias: boolean?}?
 ---@return table
 function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
 		return {}
 	end
+	---@cast input -nil
 
 	options = options or {}
 
@@ -100,7 +101,7 @@ function Faction.readMultiFaction(input, options)
 end
 
 --- Returns the name of an entered faction identifier
----@param faction string
+---@param faction string?
 ---@return string?
 function Faction.toName(faction)
 	local factionProps = Faction.getProps(faction)
@@ -123,7 +124,7 @@ local namedSizes = {
 }
 
 --- Returns the icon of an entered faction identifier
----@param props {faction: string, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+---@param props {faction: string?, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string?
 function Faction.Icon(props)
 	local faction = Faction.read(props.faction)
@@ -151,7 +152,7 @@ end
 
 
 --- Returns the background color class of a given faction
----@param faction string
+---@param faction string?
 ---@return string?
 function Faction.bgClass(faction)
 	local factionProps = Faction.getProps(faction)
