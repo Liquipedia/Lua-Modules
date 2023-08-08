@@ -116,6 +116,27 @@ function Count.tournaments(args)
 	return Count._query('tournament', lpdbConditions)
 end
 
+---Counts the number of tournaments played on a wiki per tier/tiertype
+---@param args table?
+---@return table
+function Count.tournamentsByTier(args)
+	args = args or {}
+	
+	local lpdbConditions = Count._baseConditions(args, true)
+	
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = lpdbConditions:toString(),
+		query = 'liquipediatier, liquipediatiertype, count::objectname',
+		groupby = 'liquipediatier asc, liquipediatiertype asc'
+	})
+	
+	return Table.mapValues(
+		Table.groupBy(data, function(_, tbl) return Table.extract(tbl, 'liquipediatier') end),
+		function(tierTable)
+			return Table.map(tierTable, function(_, typeTable) return typeTable['liquipediatiertype'], typeTable['count_objectname'] end)
+		end
+	)
+end
 
 ---Counts the number of placements for a specified opponent on a wiki
 ---@param args table?
