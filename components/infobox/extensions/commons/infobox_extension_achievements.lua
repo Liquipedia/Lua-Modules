@@ -18,6 +18,7 @@ local CustomDefaultOptions = Lua.requireIfExists('Module:ThisLinkIsDead') or {}
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
+local DEFAULT_PLAYER_LIMIT = 10
 local DEFAULT_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',
 	'[[liquipediatiertype::!Charity]]',
@@ -73,13 +74,15 @@ end
 function Achievements.teamSolo(args)
 	local options = Achievements._readOptions(args)
 
-	return Achievements.display(Achievements._fetchDataForTeam(Achievements._getTeamNames(), Opponent.team, options), options)
+	return Achievements.display(Achievements._fetchDataForTeam(
+		Achievements._getTeamNames(), Opponent.team, options), options)
 end
 
 function Achievements.team(args)
 	local options = Achievements._readOptions(args)
 
-	return Achievements.display(Achievements._fetchDataForTeam(Achievements._getTeamNames(), Opponent.solo, options), options)
+	return Achievements.display(Achievements._fetchDataForTeam(
+		Achievements._getTeamNames(), Opponent.solo, options), options)
 end
 
 function Achievements._getTeamNames()
@@ -98,7 +101,10 @@ function Achievements._readOptions(args)
 
 	return {
 		noTemplate = Logic.readBool(Logic.nilOr(args.noTemplate, CustomDefaultOptions.noTemplate)),
-		onlyForFirstPrizePoolOfPage = Logic.readBool(Logic.nilOr(args.onlyForFirstPrizePoolOfPage, CustomDefaultOptions.onlyForFirstPrizePoolOfPage)),
+		onlyForFirstPrizePoolOfPage = Logic.readBool(Logic.nilOr(
+			args.onlyForFirstPrizePoolOfPage,
+			CustomDefaultOptions.onlyForFirstPrizePoolOfPage
+		)),
 		adjustItem = args.adjustItem or CustomDefaultOptions.adjustItem or Operator.identity,
 		baseConditions = args.baseConditions or CustomDefaultOptions.baseConditions or DEFAULT_BASE_CONDITIONS,
 	}
