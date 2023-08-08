@@ -67,23 +67,23 @@ function suite:testCompareByKey()
 
 	table.sort(tbl, Operator.compareByKey('sort'))
 	self:assertDeepEquals({
-		{sort = 100, anotherKey = 1},
-		{sort = 50, anotherKey = 2},
 		{sort = 1, anotherKey = 3},
+		{sort = 50, anotherKey = 2},
+		{sort = 100, anotherKey = 1},
 	}, tbl)
 
 	table.sort(tbl, Operator.compareByKey('sort', true))
 	self:assertDeepEquals({
-		{sort = 1, anotherKey = 3},
-		{sort = 50, anotherKey = 2},
 		{sort = 100, anotherKey = 1},
+		{sort = 50, anotherKey = 2},
+		{sort = 1, anotherKey = 3},
 	}, tbl)
 
 	table.sort(tbl, Operator.compareByKey('sort', false))
 	self:assertDeepEquals({
-		{sort = 100, anotherKey = 1},
-		{sort = 50, anotherKey = 2},
 		{sort = 1, anotherKey = 3},
+		{sort = 50, anotherKey = 2},
+		{sort = 100, anotherKey = 1},
 	}, tbl)
 end
 
