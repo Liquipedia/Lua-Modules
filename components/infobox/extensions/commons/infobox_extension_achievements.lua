@@ -7,10 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator/dev')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 
@@ -141,7 +142,7 @@ function Achievements._readOptions(args)
 			args.onlyForFirstPrizePoolOfPage,
 			CustomDefaultOptions.onlyForFirstPrizePoolOfPage
 		)),
-		adjustItem = args.adjustItem or CustomDefaultOptions.adjustItem or Operator.identity,
+		adjustItem = args.adjustItem or CustomDefaultOptions.adjustItem or FnUtil.identity,
 		baseConditions = args.baseConditions or CustomDefaultOptions.baseConditions or DEFAULT_BASE_CONDITIONS,
 	}
 end
