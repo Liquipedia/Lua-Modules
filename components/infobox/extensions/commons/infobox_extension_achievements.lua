@@ -216,7 +216,7 @@ function Achievements._displayIcon(item, options)
 	options.adjustItem(item)
 
 	return LeagueIcon.display{
-		icon = item.icon,
+		icon = Logic.emptyOr(item.icon, 'Gold.png'),
 		iconDark = item.icondark,
 		link = item.pagename,
 		name = item.tournament,
