@@ -76,7 +76,7 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 		return '[[' .. lpdbKey .. '::' .. player .. ']] OR [[' .. lpdbKey .. '::' .. playerNoUnderScore .. ']]'
 	end)
 
-	return '(' .. table.concat(playerConditions) .. ')'
+	return '(' .. table.concat(playerConditions, ' OR ') .. ')'
 end
 
 ---Entry point for infobox team to fetch both team achievements and solo achievements while on team as sep. icon strings
