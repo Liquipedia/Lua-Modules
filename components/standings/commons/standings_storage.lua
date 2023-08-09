@@ -122,6 +122,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 			buchholz = tonumber(entry.buchholz),
 		},
 		roundindex = roundIndex,
+		slotindex = slotIndex,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, entry.extradata)),
 	}
 
