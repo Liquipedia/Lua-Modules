@@ -98,7 +98,7 @@ function Achievements.teamSolo(args)
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(
-		Achievements._getTeamNames(), Opponent.team, options), options)
+		Achievements._getTeamNames(), Opponent.solo, options), options)
 end
 
 ---Entry point for infobox team to fetch team achievements as icon strings
@@ -108,7 +108,7 @@ function Achievements.team(args)
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(
-		Achievements._getTeamNames(), Opponent.solo, options), options)
+		Achievements._getTeamNames(), Opponent.team, options), options)
 end
 
 ---Fetches (historical) teamNames (both with underscore and without) of a given team
