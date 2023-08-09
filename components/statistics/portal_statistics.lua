@@ -55,6 +55,7 @@ local TYPES = {'Online', 'Offline'}
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value.name
 end)
+local DEFAULT_TIERTYPES = {'', 'Weekly', 'Monthly'}
 
 
 local StatisticsPortal = {}
@@ -291,6 +292,8 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 	args.customTiers = StatisticsPortal._isTableOrSplitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
+	args.includeTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.includeTierTypes, DEFAULT_TIERTYPES)
+	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
 	local tournamentTable = mw.html.create('table')
@@ -344,7 +347,13 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				return value == rowIndex
 			end) then
 				local tierData = countData[rowValue.value] or {}
-				local tournamentCount = tonumber(Table.extract(tierData, '')) or 0
+				local tournamentCount = 0
+				Array.forEach(args.includeTierTypes,
+					function(tiertype, _)
+						local typeCount = tonumber(Table.extract(tierData, tiertype)) or 0
+						tournamentCount = tournamentCount + typeCount
+					end
+				)
 				runningTally = runningTally + tournamentCount
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(tournamentCount))
@@ -353,8 +362,8 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		end
 	end
 
-	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
+	if #args.showTierTypes then
+		for _, tierTypeValue in ipairs(args.showTierTypes) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				local count = Array.reduce(
@@ -415,8 +424,8 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 		end
 	end
 
-	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
+	if #args.showTierTypes then
+		for _, tierTypeValue in ipairs(args.showTierTypes) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				headerRow:tag('th')
