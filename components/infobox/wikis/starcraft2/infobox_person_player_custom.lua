@@ -9,7 +9,6 @@
 -- This module is used for both the Player and Commentator infoboxes
 
 local Abbreviation = require('Module:Abbreviation')
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
@@ -22,6 +21,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
