@@ -69,6 +69,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		series = Variables.varDefault('tournament_series'),
 	})
 
+	if Opponent.isTbd(opponent.opponentData) then
+		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
+	end
+
 	return lpdbData
 end
 
