@@ -146,8 +146,6 @@ end
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 	local resolvedCasterPage = mw.ext.TeamLiquidIntegration.resolve_redirect(casterPage):gsub(' ','_' )
 
-	local pageid = mw.title.getCurrentTitle().id
-
 	local function getPersonInfo()
 		local data = mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = '[[pagename::' .. resolvedCasterPage .. ']]',
@@ -164,7 +162,8 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]] AND [[pageid::!' .. pageid .. ']]',
+			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]'
+				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 			query = 'name, flag, id',
 			order = 'date desc',
 			limit = 1
