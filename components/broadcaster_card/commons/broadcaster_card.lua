@@ -124,8 +124,7 @@ end
 ---@return string
 function BroadcasterCard._display(broadcaster)
 	local displayName = broadcaster.displayName or broadcaster.name
-	displayName = (String.isEmpty(displayName) or displayName == broadcaster.id)
-		and '' or ('&nbsp;(' .. displayName ..')')
+	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
 
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
@@ -147,6 +146,8 @@ end
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 	local resolvedCasterPage = mw.ext.TeamLiquidIntegration.resolve_redirect(casterPage):gsub(' ','_' )
 
+	local pageid = mw.title.getCurrentTitle().id
+
 	local function getPersonInfo()
 		local data = mw.ext.LiquipediaDB.lpdb('player', {
 			conditions = '[[pagename::' .. resolvedCasterPage .. ']]',
@@ -163,7 +164,7 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]',
+			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]] AND [[pageid::!' .. pageid .. ']]',
 			query = 'name, flag, id',
 			order = 'date desc',
 			limit = 1
