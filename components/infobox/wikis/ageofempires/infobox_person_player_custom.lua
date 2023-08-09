@@ -95,7 +95,6 @@ function CustomPlayer.run(frame)
 
 	-- Automatic achievements
 	_args.achievements = Achievements.player{player = _player.pagename, noTemplate = true}
-	mw.logObject(_args.achievements)
 
 	-- Uppercase first letter in status
 	if _args.status then
