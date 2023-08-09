@@ -36,12 +36,14 @@ function RoleOf.get(args)
 	end
 
 	Variables.varDefine(args.role .. 'id', teamData.link)
-	return tostring(OpponentDisplay.InlineOpponent{opponent = Opponent.readOpponentArgs{
+	local opponent = Opponent.readOpponentArgs{
 		type = Opponent.solo,
 		name = teamData.id,
 		link = teamData.link,
 		flag = teamData.nationality,
-	} --[[@as standardOpponent]] })
+	}
+	---@cast opponent -nil
+	return tostring(OpponentDisplay.InlineOpponent{opponent = opponent})
 end
 
 return Class.export(RoleOf)
