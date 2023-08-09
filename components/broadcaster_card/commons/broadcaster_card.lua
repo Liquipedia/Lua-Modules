@@ -124,7 +124,8 @@ end
 ---@return string
 function BroadcasterCard._display(broadcaster)
 	local displayName = broadcaster.displayName or broadcaster.name
-	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
+	displayName = (String.isEmpty(displayName) or displayName == broadcaster.id)
+		and '' or ('&nbsp;(' .. displayName ..')')
 
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
