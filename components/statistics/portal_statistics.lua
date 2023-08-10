@@ -689,6 +689,7 @@ function StatisticsPortal.earningsTable(args)
 		args.allowedPlacements,
 		DEFAULT_ALLOWED_PLACES
 	)
+	args.minimumEarnings = tonumber(args.minimumEarnings) or 1000
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
@@ -722,7 +723,7 @@ function StatisticsPortal.earningsTable(args)
 		local opponentDisplay
 		local earnings = earningsFunction(opponent)
 
-		if opponentIndex > args.limit or earnings < 1000 then break end
+		if opponentIndex > args.limit or earnings < args.minimumEarnings then break end
 
 		if args.opponentType == Opponent.team then
 			opponentDisplay = OpponentDisplay.BlockOpponent{
