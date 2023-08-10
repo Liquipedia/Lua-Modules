@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
@@ -13,6 +14,7 @@ local DateExt = require('Module:Date/Ext')
 local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Medal = require('Module:Medal')
 local Operator = require('Module:Operator')
@@ -32,7 +34,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Count = require('Module:Count')
+local Count = Lua.import('Module:Count', {requireDevIfEnabled = true})
 
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
@@ -53,6 +55,7 @@ local TYPES = {'Online', 'Offline'}
 local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), function(value)
 	return value.name
 end)
+local DEFAULT_TIERTYPES = {'', 'Weekly', 'Monthly'}
 
 
 local StatisticsPortal = {}
@@ -289,6 +292,8 @@ function StatisticsPortal.coverageTournamentTable(args)
 	args.customGames = StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
 	args.customTiers = StatisticsPortal._isTableOrSplitOrDefault(args.customTiers)
 	args.customTiers = args.customTiers and Array.map(args.customTiers, function(tier) return tonumber(tier) end)
+	args.includeTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.includeTierTypes, DEFAULT_TIERTYPES)
+	args.showTierTypes = StatisticsPortal._isTableOrSplitOrDefault(args.showTierTypes, {})
 	args.filterByStatus = Logic.readBool(args.filterByStatus) or false
 
 	local tournamentTable = mw.html.create('table')
@@ -335,12 +340,20 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		resultsRow:node(StatisticsPortal._returnGameCell(args, parameters, tagType))
 	end
 
+	local countData = Count.tournamentsByTier(parameters)
 	for rowIndex, rowValue in Tier.iterate('tiers') do
 		if String.isNotEmpty(rowValue.value) and tonumber(rowValue.value) > 0 then
 			if not args.customTiers or Array.any(Array.extractValues(args.customTiers), function(value)
 				return value == rowIndex
 			end) then
-				local tournamentCount = Count.tournaments(Table.merge({liquipediatier = rowIndex}, parameters))
+				local tierData = countData[rowValue.value] or {}
+				local tournamentCount = 0
+				Array.forEach(args.includeTierTypes,
+					function(tiertype, _)
+						local typeCount = tonumber(Table.extract(tierData, tiertype)) or 0
+						tournamentCount = tournamentCount + typeCount
+					end
+				)
 				runningTally = runningTally + tournamentCount
 				resultsRow:tag(tagType)
 					:wikitext(LANG:formatNum(tournamentCount))
@@ -349,26 +362,41 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 		end
 	end
 
-	if String.isNotEmpty(args.showOther) then
-		resultsRow:tag(tagType)
-			:wikitext(LANG:formatNum(Count.tournaments(parameters) - runningTally))
-			:css('text-align', 'right')
-	end
-
-	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
+	if #args.showTierTypes then
+		for _, tierTypeValue in ipairs(args.showTierTypes) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
+				local count = Array.reduce(
+					Array.map(Array.extractValues(countData),
+						function(typeCounts, index)
+							return Table.extract(typeCounts, tierTypeValue) or 0
+						end
+					),
+					Operator.add, 0
+				)
+				runningTally = runningTally + count
 				resultsRow:tag(tagType)
-					:wikitext(LANG:formatNum(Count.tournaments(Table.merge(
-						{liquipediatiertype = LANG:ucfirst(tierTypeValue)}, parameters))))
+					:wikitext(LANG:formatNum(count))
 					:css('text-align', 'right')
 			end
 		end
 	end
 
+	if String.isNotEmpty(args.showOther) then
+		local countOther = Array.reduce(
+			Array.flatten(Array.map(Array.extractValues(countData),
+				function(typeCounts, index)
+					return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
+				end
+			)), Operator.add, 0)
+		runningTally = runningTally + countOther
+		resultsRow:tag(tagType)
+			:wikitext(LANG:formatNum(countOther))
+			:css('text-align', 'right')
+	end
+
 	resultsRow:tag(tagType)
-		:wikitext(LANG:formatNum(Count.tournaments(parameters)))
+		:wikitext(LANG:formatNum(runningTally))
 		:css('text-align', 'right')
 
 	return resultsRow:allDone()
@@ -396,19 +424,19 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 		end
 	end
 
-	if String.isNotEmpty(args.showOther) then
-		headerRow:tag('th')
-			:wikitext('Other')
-	end
-
-	if String.isNotEmpty(args.showTierTypes) then
-		for _, tierTypeValue in pairs(mw.text.split(args.showTierTypes, ',', true)) do
+	if #args.showTierTypes then
+		for _, tierTypeValue in ipairs(args.showTierTypes) do
 			local _, tierTypeData = Tier.raw(nil, tierTypeValue)
 			if tierTypeData then
 				headerRow:tag('th')
 					:wikitext(Tier.displaySingle(tierTypeData, {link = true, short = true}))
 			end
 		end
+	end
+
+	if String.isNotEmpty(args.showOther) then
+		headerRow:tag('th')
+			:wikitext(Abbreviation.make('Other', 'Includes otherwise unlisted tournaments (e.g. with tiertypes, misc.)'))
 	end
 
 	headerRow:tag('th')
