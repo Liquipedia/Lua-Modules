@@ -26,6 +26,12 @@ local _NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
+local FIRST_PICK_CONVERSION = {
+	blue = 1,
+	['1'] = 1,
+	red = 2,
+	['2'] = 2,
+}
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -289,6 +295,7 @@ function mapFunctions.getExtraData(map)
 		comment = map.comment,
 		header = map.header,
 		maptype = map.maptype,
+		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')]
 	}
 
 	local bans = {}
