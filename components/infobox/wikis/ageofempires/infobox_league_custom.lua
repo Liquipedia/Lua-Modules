@@ -336,7 +336,7 @@ function CustomLeague:_checkMapInformation(name, link, game)
 		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',
 		query = 'name, extradata'
 	})
-	if #data and Table.isNotEmpty(data[1]) then
+	if Table.isNotEmpty(data[1]) then
 		local extradata = data[1].extradata or {}
 		if extradata.game ~= game then
 			mw.logObject('Map ' .. name .. ' is linking to ' .. link .. ', an ' .. extradata.game .. ' page.')
