@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -40,10 +41,7 @@ function CustomTeam:createBottomContent()
 		) .. Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of'
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Placement summary'
-		)
+		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
 	end
 end
 
