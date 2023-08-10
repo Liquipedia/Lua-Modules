@@ -34,7 +34,7 @@ function CustomPlayer.run(frame)
 	_args = _player.args
 
 	-- Automatic achievements
-	_args.achievements = Achievements.player()
+	_args.achievements = Achievements.player{noTemplate = true}
 
 	-- Profiles to links
 	_args.esl = _args.esl or _args.eslprofile
