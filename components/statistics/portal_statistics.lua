@@ -56,6 +56,7 @@ local GAMES = Array.map(Array.extractValues(Info.games, Table.iter.spairs), func
 	return value.name
 end)
 local DEFAULT_TIERTYPES = {'', 'Weekly', 'Monthly'}
+local MINIMUM_EARNINGS = 1000
 
 
 local StatisticsPortal = {}
@@ -689,7 +690,7 @@ function StatisticsPortal.earningsTable(args)
 		args.allowedPlacements,
 		DEFAULT_ALLOWED_PLACES
 	)
-	args.minimumEarnings = tonumber(args.minimumEarnings) or 1000
+	args.minimumEarnings = tonumber(args.minimumEarnings) or MINIMUM_EARNINGS
 
 	local earningsFunction = function (a)
 		if String.isNotEmpty(args.year) and a.extradata then
