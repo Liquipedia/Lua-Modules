@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomMission.getWikiCategories()
+function CustomMission:getWikiCategories()
 	_fullGameName = _GAME_SWITCH[_args.game] or 'Wings of Liberty'
 	return {
 		_fullGameName .. ' Missions',

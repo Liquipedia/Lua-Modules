@@ -122,7 +122,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function CustomTeam.getWikiCategories()
+function CustomTeam:getWikiCategories()
 	local categories = {}
 	if String.isNotEmpty(_args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')

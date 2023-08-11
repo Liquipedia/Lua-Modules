@@ -217,7 +217,7 @@ function CustomLeague._getPlatform()
 	end
 end
 
-function CustomLeague.getWikiCategories(args)
+function CustomLeague:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.algstier) then
 		table.insert(categories, 'Apex Legends Global Series Tournaments')

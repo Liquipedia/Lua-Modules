@@ -158,7 +158,7 @@ function CustomHero:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomHero.getWikiCategories()
+function CustomHero:getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
