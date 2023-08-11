@@ -156,7 +156,7 @@ function CustomLeague:defineCustomPageVariables(args)
 		Variables.varDefault('tournament_liquipediatiertype', DEFAULT_TIERTYPE))
 
 	if CustomLeague:_validPublisherTier(args.ubisofttier) then
-		Variables.varDefault('tournament_publishertier', args.ubisofttier:lower())
+		Variables.varDefine('tournament_publishertier', args.ubisofttier:lower())
 	end
 
 	--Legacy vars
