@@ -79,10 +79,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki Custom
-	Variables.varDefine('tournament_mode', (_args.individual or _args. player_number) and '1v1' or 'team')
-	Variables.varDefine('patch', _args.patch or '')
+	Variables.varDefine('tournament_mode', (args.individual or args. player_number) and '1v1' or 'team')
+	Variables.varDefine('patch', args.patch or '')
 end
 
 function CustomLeague:_createNoWrappingSpan(content)

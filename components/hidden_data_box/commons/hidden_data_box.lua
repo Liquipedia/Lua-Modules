@@ -81,6 +81,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
 	HiddenDataBox.checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
+	HiddenDataBox.checkAndAssign('tournament_publishertier', args.publishertier, queryResult.publishertier)
 
 	HiddenDataBox.checkAndAssign('tournament_type', args.type, queryResult.type)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)

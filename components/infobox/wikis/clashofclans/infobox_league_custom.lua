@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
@@ -30,9 +31,9 @@ function CustomLeague.run(frame)
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.addToLpdb = CustomLeague.addToLpdb
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 
 	return league:createInfobox()
 end
@@ -54,14 +55,12 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args['supercell-sponsored'])
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
+function CustomLeague:appendLiquipediatierDisplay(args)
+	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = Logic.readBool(_args['supercell-sponsored']) and 'true' or nil
-
-	return lpdbData
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', Logic.readBool(args['supercell-sponsored']) and 'true' or nil)
 end
 
 return CustomLeague

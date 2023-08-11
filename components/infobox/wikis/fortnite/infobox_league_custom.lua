@@ -26,7 +26,6 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
@@ -51,20 +50,14 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = args.epicpremier
-
-	return lpdbData
-end
-
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_publishertier', _args.epicpremier)
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', args.epicpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.epicpremier)
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.epicpremier)
 end
 
 return CustomLeague

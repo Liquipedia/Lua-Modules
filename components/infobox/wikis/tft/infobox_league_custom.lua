@@ -80,15 +80,15 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args['riot-sponsored'])
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args['riot-sponsored']) then
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if Logic.readBool(args['riot-sponsored']) then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
 end
 
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_mode', string.lower(_args.mode or ''))
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_mode', string.lower(args.mode or ''))
 end
 
 function CustomLeague:_createPatchCell(args)
@@ -106,6 +106,6 @@ function CustomLeague:_createPatchCell(args)
 end
 
 function CustomLeague.getWikiCategories(args)
-	return {_args.mode .. ' Mode Tournaments'}
+	return {args.mode .. ' Mode Tournaments'}
 end
 return CustomLeague

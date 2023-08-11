@@ -103,12 +103,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	if Logic.readBool(args['riot-highlighted']) then
-		lpdbData.publishertier = 'highlighted'
-	elseif Logic.readBool(args['riot-sponsored']) then
-		lpdbData.publishertier = 'sponsored'
-	end
-
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
@@ -144,12 +138,19 @@ function CustomLeague:_createPatchCell(args)
 	return content
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki Custom
-	Variables.varDefine('female', _args.female or 'false')
-	Variables.varDefine('tournament_riot_premier', _args.riotpremier and 'true' or '')
-	Variables.varDefine('tournament_mode', (_args.individual or _args. player_number) and '1v1' or 'team')
-	Variables.varDefine('patch', _args.patch or '')
+	Variables.varDefine('female', args.female or 'false')
+	Variables.varDefine('tournament_riot_premier', args.riotpremier and 'true' or '')
+	Variables.varDefine('tournament_mode', (args.individual or args.player_number) and '1v1' or 'team')
+	Variables.varDefine('patch', args.patch or '')
+
+	-- Publishertier vars
+	if Logic.readBool(args['riot-highlighted']) then
+		Variables.varDefine('tournament_publishertier', 'highlighted')
+	elseif Logic.readBool(args['riot-sponsored']) then
+		Variables.varDefine('tournament_publishertier', 'sponsored')
+	end
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))

@@ -90,12 +90,12 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_prizepool', _args.prizepoolusd)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('tournament_prizepool', args.prizepoolusd)
+	Variables.varDefine('tournament_mode', args.mode)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -106,21 +106,21 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('mode', args.mode)
 end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if _args.mode then
-		table.insert(categories, _args.mode .. ' Tournaments')
+	if args.mode then
+		table.insert(categories, args.mode .. ' Tournaments')
 	end
 
 	return categories
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args.blizzardpremier) then
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if Logic.readBool(args.blizzardpremier) then
 		return '[[File:Blizzard_logo.png|x12px|link=Blizzard Entertainment|Premier Tournament held by Blizzard]]'
 	end
 

@@ -417,27 +417,27 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--override var to standardize its entries
-	Variables.varDefine('tournament_game', _args.game)
+	Variables.varDefine('tournament_game', args.game)
 
 	--patch data
 	CustomLeague._setPatchData()
-	Variables.varDefine('patch', _args.patch)
-	Variables.varDefine('epatch', _args.epatch)
+	Variables.varDefine('patch', args.patch)
+	Variables.varDefine('epatch', args.epatch)
 
 	--SC2 specific vars
-	Variables.varDefine('tournament_mode', _args.mode or '1v1')
-	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
+	Variables.varDefine('tournament_mode', args.mode or '1v1')
+	Variables.varDefine('headtohead', args.headtohead or 'true')
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.featured)))
 	--series number
-	local seriesNumber = _args.number
+	local seriesNumber = args.number
 	if Logic.isNumeric(seriesNumber) then
 		seriesNumber = string.format('%05i', seriesNumber)
 		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBool(args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -473,24 +473,23 @@ function CustomLeague._getMaps(prefix)
 	end)
 end
 
-function CustomLeague:addToLpdb(lpdbData)
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = _args.game
+	lpdbData.game = args.game
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefaultMulti('epatch', 'patch', '')
-	local status = _args.status
+	local status = args.status
 		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
 	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
 	if participantsNumber == 0 then
-		participantsNumber = _args.team_number or 0
+		participantsNumber = args.team_number or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
-	lpdbData.publishertier = Variables.varDefault('tournament_publishertier')
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
@@ -517,7 +516,7 @@ function CustomLeague:getWikiCategories(args)
 		return {}
 	end
 
-	local betaPrefix = String.isNotEmpty(_args.beta) and 'Beta ' or ''
+	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 	local gameAbbr = Game.abbreviation{game = args.game}
 	return {betaPrefix .. gameAbbr .. ' Competitions'}
 end

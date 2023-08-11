@@ -51,19 +51,18 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = args.publisherpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
-	if _args.player_number then
+function CustomLeague:defineCustomPageVariables(args)
+	if args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	else
 		Variables.varDefine('tournament_mode', 'team')
 	end
-	Variables.varDefine('tournament_publishertier', _args['publisherpremier'])
+	Variables.varDefine('tournament_publishertier', args.publisherpremier)
 end
 
 return CustomLeague

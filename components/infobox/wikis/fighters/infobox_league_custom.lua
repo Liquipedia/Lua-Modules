@@ -116,37 +116,37 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = string.gsub(_args.player_number or '', ',', '')
+	lpdbData.participantsnumber = string.gsub(args.player_number or '', ',', '')
 
-	if Logic.readBool(_args.overview) then
+	if Logic.readBool(args.overview) then
 		lpdbData.game = 'none'
 	end
 
-	lpdbData.extradata.assumedprizepool = tostring(_args.prizepoolassumed)
-	lpdbData.extradata.circuit = _args.circuit
-	lpdbData.extradata.circuittier = _args.circuittier
-	lpdbData.extradata.circuit2 = _args.circuit2
-	lpdbData.extradata.circuit2tier = _args.circuit2tier
+	lpdbData.extradata.assumedprizepool = tostring(args.prizepoolassumed)
+	lpdbData.extradata.circuit = args.circuit
+	lpdbData.extradata.circuittier = args.circuittier
+	lpdbData.extradata.circuit2 = args.circuit2
+	lpdbData.extradata.circuit2tier = args.circuit2tier
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Custom vars
-	Variables.varDefine('assumedpayout', tostring(_args.prizepoolassumed))
-	Variables.varDefine('circuit', _args.circuit)
-	Variables.varDefine('circuittier', _args.circuittier)
-	Variables.varDefine('circuitabbr', _args.circuitabbr)
-	Variables.varDefine('circuit2', _args.circuit2)
-	Variables.varDefine('circuit2tier', _args.circuit2tier)
-	Variables.varDefine('circuit2abbr', _args.circuit2abbr)
-	Variables.varDefine('seriesabbr', _args.abbreviation)
+	Variables.varDefine('assumedpayout', tostring(args.prizepoolassumed))
+	Variables.varDefine('circuit', args.circuit)
+	Variables.varDefine('circuittier', args.circuittier)
+	Variables.varDefine('circuitabbr', args.circuitabbr)
+	Variables.varDefine('circuit2', args.circuit2)
+	Variables.varDefine('circuit2tier', args.circuit2tier)
+	Variables.varDefine('circuit2abbr', args.circuit2abbr)
+	Variables.varDefine('seriesabbr', args.abbreviation)
 	Variables.varDefine('tournament_link', self.pagename)
 
 	-- Legacy vars
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
 	Variables.varDefine('prizepoolusd', Variables.varDefault('tournament_prizepoolusd'))
-	Variables.varDefine('tournament_entrants', string.gsub(_args.player_number or '', ',', ''))
+	Variables.varDefine('tournament_entrants', string.gsub(args.player_number or '', ',', ''))
 	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency', ''):upper())
 
 	-- Legacy date vars
@@ -164,8 +164,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if _args.game then
-		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
+	if args.game then
+		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
 	end
 
 	return categories
