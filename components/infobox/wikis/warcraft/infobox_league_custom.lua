@@ -360,7 +360,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	end
 
 	--publisher tier
-	Variables.varDefine('tournament_publishertier', ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil)
+	Variables.varDefine('tournament_publishertier',
+		ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
+	)
 
 	CustomLeague._getGameVersion()
 end
