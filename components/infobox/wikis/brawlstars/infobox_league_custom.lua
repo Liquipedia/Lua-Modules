@@ -90,11 +90,12 @@ function CustomLeague:appendLiquipediatierDisplay()
 end
 
 function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', args['supercell-sponsored'])
+
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
 	Variables.varDefine('tournament_tier', args.liquipediatier or '')
 	Variables.varDefine('tournament_prizepool', args.prizepool or '')
-	Variables.varDefine('tournament_publishertier', args['supercell-sponsored'])
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
