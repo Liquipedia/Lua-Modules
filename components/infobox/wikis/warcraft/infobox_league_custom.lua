@@ -359,6 +359,9 @@ function CustomLeague:defineCustomPageVariables(args)
 		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
 
+	--publisher tier
+	Variables.varDefine('tournament_publishertier', ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil)
+
 	CustomLeague._getGameVersion()
 end
 
@@ -408,7 +411,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.sortdate = Variables.varDefault('tournament_starttime')
 		and (Variables.varDefault('tournament_starttime') .. (Variables.varDefault('tournament_timezone') or ''))
 		or Variables.varDefault('firstmatch', Variables.varDefault('tournament_startdate'))
-	lpdbData.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
 	lpdbData.mode = CustomLeague._getMode()
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
