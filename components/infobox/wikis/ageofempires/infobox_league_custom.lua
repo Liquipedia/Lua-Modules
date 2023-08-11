@@ -321,12 +321,28 @@ function CustomLeague:_getMaps()
 			display = nil
 		end
 
+		CustomLeague:_checkMapInformation(display or link, link, Variables.varDefault('tournament_game'))
+
 		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end
 
 	_league.maps = maps
 
 	return maps
+end
+
+function CustomLeague:_checkMapInformation(name, link, game)
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',
+		query = 'name, extradata'
+	})
+	if Table.isNotEmpty(data[1]) then
+		local extradata = data[1].extradata or {}
+		if extradata.game ~= game then
+			mw.logObject('Map ' .. name .. ' is linking to ' .. link .. ', an ' .. extradata.game .. ' page.')
+			table.insert(categories, 'Tournaments linking to maps for a different game')
+		end
+	end
 end
 
 function CustomLeague:_displayMaps(maps)
