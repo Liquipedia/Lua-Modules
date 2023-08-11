@@ -71,16 +71,15 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = CustomLeague._getGameVersion()
-	lpdbData.publishertier = args.pokemonpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.mode = CustomLeague:_getGameMode()
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
-	Variables.varDefine('tournament_publishertier', _args['pokemonpremier'])
+	Variables.varDefine('tournament_publishertier', args.pokemonpremier)
 	Variables.varDefine('tournament_mode', CustomLeague:_getGameMode())
 
 	--Legacy Vars:

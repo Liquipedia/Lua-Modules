@@ -78,8 +78,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = Game.name{game = _args.game}
-	lpdbData.publishertier = args.publisherpremier
+	lpdbData.game = Game.name{game = args.game}
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.gamegroup = CustomLeague._determineGameGroup(lpdbData.game)
 
@@ -94,13 +93,13 @@ function CustomLeague._determineGameGroup(game)
 	end
 end
 
-function League:defineCustomPageVariables()
-	if _args.team_number then
+function CustomLeague:defineCustomPageVariables(args)
+	if args.team_number then
 		Variables.varDefine('tournament_mode', 'team')
 	else
 		Variables.varDefine('tournament_mode', 'individual')
 	end
-	Variables.varDefine('tournament_publishertier', _args.publisherpremier)
+	Variables.varDefine('tournament_publishertier', args.publisherpremier)
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)

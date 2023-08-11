@@ -295,13 +295,13 @@ function CustomLeague._playerRaceBreakDown()
 	return playerBreakDown or {}
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
+	Variables.varDefine('tournament_ticker_name', args.tickername or name)
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 	Variables.varDefine('tournament_icon_filename', Variables.varDefault('tournament_icon'))
-	Variables.varDefine('tournament_icon_name', (_args.abbreviation or ''):lower())
+	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
 
 	Variables.varDefine('usd prize', Variables.varDefault('tournament_prizepoolusd'))
 	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
@@ -312,17 +312,17 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tempdate', Variables.varDefault('tournament_enddate'))
 
 	-- Warcraft specific stuff
-	Variables.varDefine('environment', (_args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
+	Variables.varDefine('environment', (args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
 
-	if _args.starttime then
-		Variables.varDefine('tournament_starttimeraw', Variables.varDefault('tournament_startdate', '') .. _args.starttime)
+	if args.starttime then
+		Variables.varDefine('tournament_starttimeraw', Variables.varDefault('tournament_startdate', '') .. args.starttime)
 
 		local startTime = Variables.varDefault('tournament_startdate', '') .. ' '
-			.. _args.starttime:gsub('<.*', '')
+			.. args.starttime:gsub('<.*', '')
 
 		Variables.varDefine('tournament_starttime', startTime)
 		Variables.varDefine('start_time', startTime)
-		local timeZone = _args.starttime:match('data%-tz="(.-)"')
+		local timeZone = args.starttime:match('data%-tz="(.-)"')
 		if timeZone then
 			Variables.varDefine('tournament_timezone', timeZone)
 		end
@@ -331,10 +331,10 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('firstmatch', CustomLeague._getFirstMatchTime())
 
 	--override var to standardize its entries
-	Variables.varDefine('tournament_game', GAMES[_args.game])
+	Variables.varDefine('tournament_game', GAMES[args.game])
 
 	--check if tournament is finished
-	local finished = Logic.readBoolOrNil(_args.finished)
+	local finished = Logic.readBoolOrNil(args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if finished == nil and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -354,7 +354,7 @@ function CustomLeague:defineCustomPageVariables()
 	local maps = CustomLeague._getMaps('map')
 	Variables.varDefine('tournament_maps', maps and Json.stringify(maps) or '')
 
-	local seriesNumber = _args.number
+	local seriesNumber = args.number
 	if Logic.isNumeric(seriesNumber) then
 		Variables.varDefine('tournament_series_number', seriesNumber)
 	end
@@ -390,25 +390,25 @@ function CustomLeague._getMaps(prefix)
 	end)
 end
 
-function CustomLeague:addToLpdb(lpdbData)
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = GAMES[_args.game]
+	lpdbData.game = GAMES[args.game]
 	lpdbData.patch = Variables.varDefault('tournament_patch')
 	lpdbData.endpatch = Variables.varDefault('tournament_endpatch', Variables.varDefault('tournament_patch'))
-	local status = _args.status
+	local status = args.status
 		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	local participantsNumber = tonumber(_args.team_number) or 0
+	local participantsNumber = tonumber(args.team_number) or 0
 	if participantsNumber == 0 then
-		participantsNumber = tonumber(_args.player_number) or 0
+		participantsNumber = tonumber(args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.sortdate = Variables.varDefault('tournament_starttime')
 		and (Variables.varDefault('tournament_starttime') .. (Variables.varDefault('tournament_timezone') or ''))
 		or Variables.varDefault('firstmatch', Variables.varDefault('tournament_startdate'))
-	lpdbData.publishertier = ESL_TIERS[(_args.eslprotier or ''):lower()] and _args.eslprotier:lower() or nil
+	lpdbData.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
 	lpdbData.mode = CustomLeague._getMode()
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
@@ -437,7 +437,7 @@ function CustomLeague._determineGame()
 end
 
 function CustomLeague:addParticipantTypeCategory(args)
-	return {(MODES[_args.mode] or MODES.default).category .. ' Tournaments'}
+	return {(MODES[args.mode] or MODES.default).category .. ' Tournaments'}
 end
 
 function CustomLeague:getWikiCategories(args)
@@ -480,8 +480,8 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	return tierDisplay .. self.appendLiquipediatierDisplay(args)
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	local modeDisplay = (MODES[_args.mode] or {}).tier
+function CustomLeague:appendLiquipediatierDisplay(args)
+	local modeDisplay = (MODES[args.mode] or {}).tier
 	if not modeDisplay then
 		return ''
 	end
