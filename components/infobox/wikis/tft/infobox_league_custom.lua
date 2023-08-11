@@ -105,7 +105,7 @@ function CustomLeague:_createPatchCell(args)
 	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 end
 
-function CustomLeague.getWikiCategories(args)
+function CustomLeague:getWikiCategories(args)
 	return {args.mode .. ' Mode Tournaments'}
 end
 return CustomLeague

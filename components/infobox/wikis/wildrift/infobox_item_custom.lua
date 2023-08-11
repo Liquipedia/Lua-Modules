@@ -258,7 +258,7 @@ function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomItem.getWikiCategories()
+function CustomItem:getWikiCategories()
 	if Namespace.isMain() then
 		if not String.isEmpty(_args.str) then
 			table.insert(_categories, 'Strength Items')
