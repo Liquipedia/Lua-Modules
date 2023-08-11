@@ -62,6 +62,7 @@ function Import._getConfig(args, placements)
 	end
 
 	return {
+		ignoreNonScoreEliminations = Logic.readBool(args.ignoreNonScoreEliminations),
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
@@ -254,7 +255,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
 				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
-			)
+			) and (not Import.config.ignoreNonScoreEliminations or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
 
