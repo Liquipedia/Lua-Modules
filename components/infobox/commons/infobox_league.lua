@@ -344,7 +344,7 @@ function League:createLiquipediaTierDisplay(args)
 		return
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 function League:_createPrizepool(args)

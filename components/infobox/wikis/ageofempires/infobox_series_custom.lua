@@ -69,7 +69,7 @@ function CustomSeries:createLiquipediaTierDisplay(args)
 	return (Tier.display(
 		args.liquipediatier,
 		args.liquipediatiertype
-	) or '') .. self.appendLiquipediatierDisplay(args)
+	) or '') .. self:appendLiquipediatierDisplay(args)
 end
 
 return CustomSeries
