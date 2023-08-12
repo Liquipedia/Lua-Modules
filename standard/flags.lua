@@ -160,7 +160,10 @@ function Flags.CountryName(flagName)
 		return MasterData.data[flagKey].name
 	else
 		mw.log('Unknown flag: ', flagName)
-		return mw.text.trim(mw.text.split(Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName), '|', true)[2] or '')
+		return mw.text.trim(mw.text.split(mw.text.split(
+					Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName),
+					'Category:', true)[2] or '',
+						"[%]%|]", false)[1])
 	end
 end
 
