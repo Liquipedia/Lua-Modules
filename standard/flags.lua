@@ -51,9 +51,9 @@ function Flags.Icon(args, flagName)
 				link = 'Category:' .. flagData.name
 			end
 			return '<span class="flag">[[' .. flagData.flag ..
-				'|' .. flagData.name .. '|link=' .. link .. ']]</span>'
+				'|36x24px|' .. flagData.name .. '|link=' .. link .. ']]</span>'
 		else
-			return '<span class="flag">[[' .. flagData.flag .. '|link=]]</span>'
+			return '<span class="flag">[[' .. flagData.flag .. '|36x24px|link=]]</span>'
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
