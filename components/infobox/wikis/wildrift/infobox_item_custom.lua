@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -48,7 +49,7 @@ function CustomItem.run(frame)
 
 	item.nameDisplay = CustomItem.nameDisplay
 	item.getWikiCategories = CustomItem.getWikiCategories
-	--item.setLpdbData = CustomItem.setLpdbData--to be added later
+	item.setLpdbData = CustomItem.setLpdbData
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
 	return item:createInfobox()
@@ -257,7 +258,7 @@ function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomItem.getWikiCategories()
+function CustomItem:getWikiCategories()
 	if Namespace.isMain() then
 		if not String.isEmpty(_args.str) then
 			table.insert(_categories, 'Strength Items')
@@ -471,6 +472,20 @@ function CustomItem._shopDisplay()
 		index = index + 1
 	end
 	return contents
+end
+
+function CustomItem:setLpdbData(args)
+	local lpdbData = {
+		type = 'item',
+		name = args.itemname or self.pagename,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			cost = args.itemcost,
+			category = args.category,
+			type = args.itemtype,
+			removed = tostring(Logic.readBool(args.removed)),
+		})
+	}
+	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.itemname or self.pagename), lpdbData)
 end
 
 return CustomItem

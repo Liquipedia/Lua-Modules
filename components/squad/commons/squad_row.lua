@@ -132,14 +132,8 @@ function SquadRow:role(args)
 
 	if role == 'sub' then
 		self.content:addClass('sub')
-	elseif role == 'coach' then
-		self.content:addClass('coach')
-		self.content:addClass('roster-coach')
-	elseif role == 'coach/manager' then
-		self.content:addClass('coach/manager')
-		self.content:addClass('roster-coach')
-	elseif role == 'coach/substitute' then
-		self.content:addClass('coach/substitute')
+	elseif role:find('coach', 1, true) then
+		self.content:addClass(role)
 		self.content:addClass('roster-coach')
 	end
 

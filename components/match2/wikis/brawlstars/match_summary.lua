@@ -25,6 +25,10 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
+local LEFT_SIDE = 1
+local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|First pick]]'
+local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|First pick]]'
+
 local htmlCreate = mw.html.create
 
 local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
@@ -54,19 +58,22 @@ local Brawler = Class.new(
 	end
 )
 
-function Brawler:createHeader(text)
+function Brawler:createHeader()
 	self.table:tag('tr')
-		:tag('th'):css('width','40%'):wikitext(''):done()
+		:tag('th'):css('width','35%'):wikitext(''):done()
+		:tag('th'):css('width','5%'):wikitext(''):done()
 		:tag('th'):css('width','20%'):wikitext(self.isBan and 'Bans' or 'Picks'):done()
-		:tag('th'):css('width','40%'):wikitext(''):done()
+		:tag('th'):css('width','5%'):wikitext(''):done()
+		:tag('th'):css('width','35%'):wikitext(''):done()
 	return self
 end
 
-function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
+function Brawler:row(brawlerData, gameNumber, numberBrawlers, date, firstPick)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
 			:tag('td')
 				:node(self:_opponentBrawlerDisplay(brawlerData[1], numberBrawlers, false, date))
+			:tag('td'):wikitext(Brawler._firstPick(firstPick, 1))
 			:tag('td')
 				:node(mw.html.create('div')
 					:wikitext(Abbreviation.make(
@@ -75,11 +82,20 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date)
 						)
 					)
 				)
+			:tag('td'):wikitext(Brawler._firstPick(firstPick, 2))
 			:tag('td')
 				:node(self:_opponentBrawlerDisplay(brawlerData[2], numberBrawlers, true, date))
 	end
 
 	return self
+end
+
+function Brawler._firstPick(firstPick, side)
+	if firstPick ~= side then
+		return nil
+	end
+
+	return side == LEFT_SIDE and ARROW_LEFT or ARROW_RIGHT
 end
 
 function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, date)
@@ -124,12 +140,20 @@ function Brawler:create()
 end
 
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local options = {mergeBracketResetMatch = false}
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
+	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
+		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
 
 	local matchSummary = MatchSummary():init()
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 		:body(CustomMatchSummary._createBody(match))
+
+	if bracketResetMatch then
+		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
+			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
+	end
 
 	-- comment
 	if match.comment then
@@ -210,19 +234,18 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
 			end
+			mvp:setPoints(mvpData.points)
 
 			body:addRow(mvp)
 		end
+
 	end
 
 	-- Pre-Process Brawler picks
@@ -251,7 +274,7 @@ function CustomMatchSummary._createBody(match)
 		local brawler = Brawler({isBan = false})
 
 		for gameIndex, pickData in ipairs(showGamePicks) do
-			brawler:row(pickData, gameIndex, pickData.numberOfPicks, match.date)
+			brawler:row(pickData, gameIndex, pickData.numberOfPicks, match.date, match.games[gameIndex].extradata.firstpick)
 		end
 
 		body:addRow(brawler)

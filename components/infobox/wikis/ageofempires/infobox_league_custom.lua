@@ -163,8 +163,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
-	-- Legacy tier vars
-
 	-- Legacy notability vars
 	Variables.varDefine('tournament_notability_mod', args.notabilitymod or 1)
 
@@ -198,7 +196,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	-- Currently, args.patch shall be used for official patches,
 	-- whereas voobly is used to denote non-official version played via voobly
 	lpdbData.patch = args.patch or args.voobly
-	lpdbData.participantsnumber = args.team_number or args.player_number
 
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.deadline = DateClean._clean(args.deadline or '')
@@ -317,9 +314,14 @@ function CustomLeague:_getMaps()
 			display = mapInput[1]
 		else
 			link = mapInput[1]
-			display = mapInput[2]
+			display = mapInput[2] or mapInput[1]
 		end
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(link)
+		if link == display then
+			display = nil
+		end
+
+		CustomLeague:_checkMapInformation(display or link, link, Variables.varDefault('tournament_game'))
 
 		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end
@@ -327,6 +329,20 @@ function CustomLeague:_getMaps()
 	_league.maps = maps
 
 	return maps
+end
+
+function CustomLeague:_checkMapInformation(name, link, game)
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',
+		query = 'name, extradata'
+	})
+	if Table.isNotEmpty(data[1]) then
+		local extradata = data[1].extradata or {}
+		if extradata.game ~= game then
+			mw.logObject('Map ' .. name .. ' is linking to ' .. link .. ', an ' .. extradata.game .. ' page.')
+			table.insert(categories, 'Tournaments linking to maps for a different game')
+		end
+	end
 end
 
 function CustomLeague:_displayMaps(maps)
@@ -353,7 +369,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		return
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 return CustomLeague

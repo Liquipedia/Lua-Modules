@@ -157,7 +157,7 @@ function CustomChampion:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomChampion.getWikiCategories()
+function CustomChampion:getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Champions'}
@@ -171,16 +171,19 @@ function CustomChampion.getWikiCategories()
 	return categories
 end
 
-function CustomChampion.setLpdbData()
+function CustomChampion:setLpdbData(args)
 	local lpdbData = {
 		type = 'hero',
-		name = _args.championname or _pagename,
-		image = _args.image,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			releasedate = _args.releasedate,
-		})
+		name = args.championname or _pagename,
+		information = args.primaryrole,
+		image = args.image,
+		date = args.releasedate,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			costbe = args.costbe,
+			costrp = args.costrp,
+		}
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (_args.championname or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.championname or _pagename), lpdbData)
 end
 
 return CustomChampion

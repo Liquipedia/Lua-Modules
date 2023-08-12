@@ -228,11 +228,11 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or name)
+	Variables.varDefine('tournament_abbreviation', args.abbreviation or '')
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--Legacy date vars
@@ -247,16 +247,16 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('lpdbtime', mw.getContentLanguage():formatDate('U', endDate))
 
 	--SC specific vars
-	Variables.varDefine('tournament_mode', _args.mode or '1v1')
-	Variables.varDefine('headtohead', _args.headtohead or 'true')
+	Variables.varDefine('tournament_mode', args.mode or '1v1')
+	Variables.varDefine('headtohead', args.headtohead or 'true')
 	--series number
-	local seriesNumber = _args.number or ''
+	local seriesNumber = args.number or ''
 	if String.isNotEmpty(seriesNumber) then
 		seriesNumber = string.format('%05i', seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBool(args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -275,27 +275,27 @@ function CustomLeague:defineCustomPageVariables()
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	Variables.varDefine('tournament_series', _args.series)
+	Variables.varDefine('tournament_series', args.series)
 end
 
-function CustomLeague:addToLpdb(lpdbData)
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefault('epatch', '')
-	local status = _args.status
+	local status = args.status
 		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
-	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
+	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', args.team_number or 0)
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	lpdbData.series = _args.series
+	lpdbData.series = args.series
 
-	lpdbData.extradata.female = Logic.readBool(_args.female) or nil
+	lpdbData.extradata.female = Logic.readBool(args.female) or nil
 
 	return lpdbData
 end

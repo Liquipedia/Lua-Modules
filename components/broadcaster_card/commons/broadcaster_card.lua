@@ -55,6 +55,7 @@ function BroadcasterCard.create(frame)
 	else
 		position = TBD
 	end
+	---@cast position string
 
 	if args.title then
 		title = args.title
@@ -161,7 +162,8 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]',
+			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]'
+				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 			query = 'name, flag, id',
 			order = 'date desc',
 			limit = 1

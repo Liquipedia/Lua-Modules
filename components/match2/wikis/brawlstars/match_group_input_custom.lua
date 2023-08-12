@@ -26,6 +26,12 @@ local _NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
+local FIRST_PICK_CONVERSION = {
+	blue = 1,
+	['1'] = 1,
+	red = 2,
+	['2'] = 2,
+}
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -146,7 +152,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
 end
@@ -263,13 +269,15 @@ function matchFunctions.getOpponents(args)
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
+	match['opponent' .. opponentIndex].match2players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
 		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
+			table.insert(match['opponent' .. opponentIndex].match2players, player)
 		end
 	end
 	return match
@@ -287,6 +295,7 @@ function mapFunctions.getExtraData(map)
 		comment = map.comment,
 		header = map.header,
 		maptype = map.maptype,
+		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')]
 	}
 
 	local bans = {}

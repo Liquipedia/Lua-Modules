@@ -103,11 +103,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	if CustomLeague:_validPublisherTier(args.blizzardtier) then
-		lpdbData.publishertier = args.blizzardtier:lower()
-	end
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
@@ -117,7 +112,7 @@ function CustomLeague:_validPublisherTier(publishertier)
 	return String.isNotEmpty(publishertier) and _BLIZZARD_TIERS[publishertier:lower()]
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
 	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
@@ -129,7 +124,10 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
 
-	Variables.varDefine('tournament_blizzard_premier', _args.publishertier or '')
+	if CustomLeague:_validPublisherTier(args.blizzardtier) then
+		Variables.varDefine('tournament_blizzard_premier', args.blizzardtier:lower())
+	end
+
 end
 
 function CustomLeague:getWikiCategories(args)

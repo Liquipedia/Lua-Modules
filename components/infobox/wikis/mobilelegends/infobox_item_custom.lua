@@ -161,7 +161,7 @@ function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomItem.getWikiCategories()
+function CustomItem:getWikiCategories()
 	if Namespace.isMain() then
 		if
 			String.isNotEmpty(_args.str) or

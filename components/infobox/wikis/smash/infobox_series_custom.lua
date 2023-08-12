@@ -26,6 +26,7 @@ function CustomSeries.run(frame)
 
 	_series.createWidgetInjector = CustomSeries.createWidgetInjector
 	_series.addToLpdb = CustomSeries.addToLpdb
+	_series.createLiquipediaTierDisplay = function() return nil end
 
 	return _series:createInfobox()
 end

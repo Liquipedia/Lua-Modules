@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Json = require('Module:Json')
@@ -20,6 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -88,7 +88,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = _PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
 		}
 	elseif id == 'achievements' then
-		local achievements, soloAchievements = CustomTeam.getAutomatedAchievements(_team.pagename)
+		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
 		widgets = {}
 		if achievements then
 			table.insert(widgets, Title{name = 'Achievements'})
@@ -145,7 +145,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function CustomTeam.getWikiCategories()
+function CustomTeam:getWikiCategories()
 	local categories = {}
 	if String.isNotEmpty(_args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')
@@ -198,13 +198,6 @@ function CustomTeam.playerBreakDown(args)
 		end
 	end
 	return playerBreakDown
-end
-
-function CustomTeam.getAutomatedAchievements(team)
-	local achievements = String.nilIfEmpty(Achievements.team{team = team})
-	local achievementsSolo = String.nilIfEmpty(Achievements.team_solo{team = team})
-
-	return achievements, achievementsSolo
 end
 
 function CustomTeam.calculateEarnings(args)

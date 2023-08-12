@@ -7,9 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -97,7 +99,7 @@ teamhistory data point.
 For specific uses only.
 ]]
 function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
-	date = date or PlayerExt.getContextualDateOrNow()
+	date = date or DateExt.getContextualDateOrNow()
 
 	local conditions = {
 		'[[type::teamhistory]]',
@@ -225,7 +227,7 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
-	local date = options.date or PlayerExt.getContextualDateOrNow()
+	local date = DateExt.toYmdInUtc(Logic.emptyOr(options.date, DateExt.getContextualDateOrNow()))
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
@@ -274,12 +276,6 @@ team to page variables.
 ]]
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))
-end
-
--- copy of a function (2 merged into 1) from Module:Tournament/Util to avoid a require loop
-function PlayerExt.getContextualDateOrNow()
-	return globalVars:get('tournament_enddate')
-		or os.date('%F')
 end
 
 return PlayerExt

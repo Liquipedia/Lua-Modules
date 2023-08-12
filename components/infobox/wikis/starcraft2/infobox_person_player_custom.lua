@@ -9,7 +9,6 @@
 -- This module is used for both the Player and Commentator infoboxes
 
 local Abbreviation = require('Module:Abbreviation')
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
@@ -22,6 +21,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
@@ -313,34 +313,38 @@ function CustomPlayer._setVarsForVS(table)
 end
 
 function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
+	--catch matches vs empty opponents and literals
+	if #opponents ~= 2 or Array.any(opponents, function(opponent) return opponent.type == Opponent.literal end) then
+
+		return vs
+	end
+
 	local plIndex = 1
 	local vsIndex = 2
-	--catch matches vs empty opponents
-	if opponents[1] and opponents[2] then
-		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
-			plIndex = 2
-			vsIndex = 1
-		end
-		local plOpp = opponents[plIndex]
-		local vsOpp = opponents[vsIndex]
 
-		local prace = Faction.read(plOpp.match2players[1].extradata.faction)
-		prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
-		local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
-		orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
-
-		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+	if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
+		plIndex = 2
+		vsIndex = 1
 	end
+	local plOpp = opponents[plIndex]
+	local vsOpp = opponents[vsIndex]
+
+	local pRace = Faction.read(plOpp.match2players[1].extradata.faction)
+	pRace = pRace and pRace ~= Faction.defaultFaction and pRace or 'r'
+	local oRace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+	oRace = oRace and oRace ~= Faction.defaultFaction and oRace or 'r'
+
+	vs[pRace][oRace].win = vs[pRace][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace][oRace].loss = vs[pRace][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total'][oRace].win = vs['total'][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total'][oRace].loss = vs['total'][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs[pRace]['total'].win = vs[pRace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace]['total'].loss = vs[pRace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	return vs
 end
@@ -433,6 +437,7 @@ function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
 		earnings[mode] = {}
 	end
 	local year = string.sub(data.date, 1, 4)
+	data.individualprizemoney = tonumber(data.individualprizemoney) or 0
 	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
 	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
 	earnings_total = (earnings_total or 0) + data.individualprizemoney

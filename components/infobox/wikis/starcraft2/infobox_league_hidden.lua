@@ -412,10 +412,10 @@ function HiddenInfoboxLeague._getMaps()
 	local mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, prefix)
 
 	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
-		map = mw.text.split(map, '|')
+		local mapArray = mw.text.split(map, '|')
 		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
 		}
 	end))
 end

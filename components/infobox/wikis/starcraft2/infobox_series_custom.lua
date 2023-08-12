@@ -47,6 +47,7 @@ function CustomSeries.run(frame)
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
 	_args.liquipediatier = _args.liquipediatier or _args.tier
 
+	series.addToLpdb = CustomSeries.addToLpdb
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
 	return series:createInfobox()
@@ -183,7 +184,7 @@ function CustomSeries._addCustomVariables()
 	end
 end
 
-function Series:addToLpdb(lpdbData)
+function CustomSeries:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
 	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
 	return lpdbData

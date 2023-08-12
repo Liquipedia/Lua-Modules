@@ -332,28 +332,9 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if String.isEmpty(match.mvp) then
-		return nil
-	end
-
-	local mvpPoints = tonumber(match.mvppoints) or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players = players, points = mvpPoints}
 end
 
 -- Parse the mapVeto input
@@ -442,6 +423,7 @@ function matchFunctions.getOpponents(match)
 end
 
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
+	match['opponent' .. opponentIndex].match2players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
 		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
@@ -449,9 +431,10 @@ function matchFunctions.getPlayers(match, opponentIndex, teamName)
 		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
+			table.insert(match['opponent' .. opponentIndex].match2players, player)
 		end
 	end
+
 	return match
 end
 

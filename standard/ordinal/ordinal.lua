@@ -138,7 +138,7 @@ function Ordinal._writtenBelowHundred(value, applyOrdinal)
 end
 
 ---@param value string|number|nil
----@param options {superScript: boolean?}
+---@param options {superScript: boolean?}?
 ---@return string?
 function Ordinal.suffix(value, options)
 	if Logic.isEmpty(value) then

@@ -45,7 +45,6 @@ function CustomLeague.run(frame)
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
@@ -90,18 +89,13 @@ function CustomLeague:appendLiquipediatierDisplay()
 	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.publishertier = args['supercell-sponsored']
-	lpdbData.participantsnumber = args.team_number
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', args['supercell-sponsored'])
 
-	return lpdbData
-end
-
-function CustomLeague:defineCustomPageVariables()
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
+	Variables.varDefine('tournament_prizepool', args.prizepool or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')

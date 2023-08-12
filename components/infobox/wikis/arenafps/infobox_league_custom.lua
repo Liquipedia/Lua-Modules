@@ -109,17 +109,16 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
-	lpdbData.participantsnumber = args.player_number or args.team_number
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_prizepool', _args.prizepoolusd)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('tournament_prizepool', args.prizepoolusd)
+	Variables.varDefine('tournament_mode', args.mode)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -130,20 +129,20 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('mode', args.mode)
 end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if Game.name{game = _args.game} then
-		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
+	if Game.name{game = args.game} then
+		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
 	else
 		table.insert(categories, 'Tournaments without game version')
 	end
 
-	if _args.mode then
-		table.insert(categories, _args.mode .. ' Tournaments')
+	if args.mode then
+		table.insert(categories, args.mode .. ' Tournaments')
 	else
 		table.insert(categories, 'Tournaments Missing Mode')
 	end

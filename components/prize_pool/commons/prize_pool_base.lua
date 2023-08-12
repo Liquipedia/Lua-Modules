@@ -13,14 +13,12 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
 local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -31,8 +29,6 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
-
-local tournamentVars = PageVariableNamespace('Tournament')
 
 --- @class BasePrizePool
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -77,19 +73,6 @@ BasePrizePool.config = {
 		default = 4,
 		read = function(args)
 			return tonumber(args.cutafter)
-		end
-	},
-	storeSmw = {
-		default = true,
-		read = function(args)
-			local disabledVariable = Logic.readBoolOrNil(Variables.varDefault('disable_LPDB_storage'))
-			if disabledVariable ~= nil then
-				disabledVariable = not disabledVariable
-			end
-			return Logic.nilOr(
-				Logic.readBoolOrNil(args.storesmw),
-				disabledVariable
-			)
 		end
 	},
 	storeLpdb = {
@@ -527,7 +510,7 @@ function BasePrizePool:build(isAward)
 		wrapper:wikitext(self:_currencyExchangeInfo())
 	end
 
-	if self.options.storeLpdb or self.options.storeSmw then
+	if self.options.storeLpdb then
 		self:storeData()
 	end
 
@@ -640,10 +623,6 @@ end
 
 function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
-end
-
-function BasePrizePool:storeSmw(lpdbEntry, smwTournamentStash)
-	error('Function storeSmw needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
 function BasePrizePool:_getPrizeSummaryText()
@@ -789,12 +768,7 @@ function BasePrizePool:storeData()
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
-	local smwTournamentStash = {}
 	for _, lpdbEntry in ipairs(lpdbData) do
-		if self.options.storeSmw then
-			smwTournamentStash = self:storeSmw(lpdbEntry, smwTournamentStash)
-		end
-
 		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
 		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
 		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
@@ -805,10 +779,6 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
-	end
-
-	if Table.isNotEmpty(smwTournamentStash) then
-		tournamentVars:set('smwRecords.tournament', Json.stringify(smwTournamentStash))
 	end
 
 	return self
@@ -827,14 +797,6 @@ end
 function BasePrizePool:setLpdbInjector(lpdbInjector)
 	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
-	return self
-end
-
---- Set the SmwInjector.
--- @param smwInjector SmwInjector An instance of a class that implements the SmwInjector interface
-function BasePrizePool:setSmwInjector(smwInjector)
-	assert(smwInjector:is_a(SmwInjector), 'setSmwInjector: Not an SMW Injector')
-	self._smwInjector = smwInjector
 	return self
 end
 

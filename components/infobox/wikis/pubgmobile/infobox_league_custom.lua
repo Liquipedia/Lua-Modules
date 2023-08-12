@@ -111,16 +111,14 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = args.platform
-	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args['pubgpremier'])
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_game', _game or args.game)
+	Variables.varDefine('tournament_publishertier', args.pubgpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end

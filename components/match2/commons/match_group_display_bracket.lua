@@ -333,7 +333,7 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = {
-				header = config.qualifiedHeader or '!q',
+				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
 		end

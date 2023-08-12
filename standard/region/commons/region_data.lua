@@ -31,6 +31,8 @@ return {
 
 		['middle east'] = 'me',
 
+		['middle east north africa'] = 'mena',
+
 		africa = 'af',
 
 		['asia pacific'] = 'apac',
@@ -40,6 +42,13 @@ return {
 		['malaysia/singapore/philippines'] = 'msp',
 		['malaysia, singapore, philippines'] = 'msp',
 		['malaysia, singapore, and the philippines'] = 'msp',
+
+		['latin american north'] = 'latam north',
+		['latin american south'] = 'latam south',
+
+		['sub saharan africa'] = 'sub-saharan africa',
+
+		['global'] = 'world',
 	},
 
 	cis = {
@@ -62,6 +71,18 @@ return {
 		region = 'Central America',
 		flag = 'central america',
 	},
+	['latin america'] = {
+		region = 'Latin America',
+		flag = 'latin america',
+	},
+	['latam north'] = {
+		region = 'Latin America North',
+		flag = 'latin america north',
+	},
+	['latam south'] = {
+		region = 'Latin America South',
+		flag = 'latin america south',
+	},
 	sea = {
 		region = 'Southeast Asia',
 		flag = 'sea',
@@ -73,6 +94,14 @@ return {
 	['northeast asia'] = {
 		region = 'Northeast Asia',
 		flag = 'northeast asia',
+	},
+	['east asia'] = {
+		region = 'East Asia',
+		flag = 'east asia',
+	},
+	['central asia'] = {
+		region = 'Central Asia',
+		flag = 'central asia',
 	},
 	oce = {
 		region = 'Oceania',
@@ -92,10 +121,54 @@ return {
 	},
 	apac = {
 		region = 'Asia Pacific',
-		flag = 'asia',
+		flag = 'asia-pacific',
 	},
 	msp = {
 		region = 'MSP',
 		flag = 'msp',
+	},
+	benelux = {
+		region = 'Benelux',
+		flag = 'benelux',
+	},
+	iberia = {
+		region = 'Iberia',
+		flag = 'iberia',
+	},
+	['nordic countries'] = {
+		region = 'Nordic Countries',
+		flag = 'nordic countries',
+	},
+	arabia = {
+		region = 'Arabia',
+		flag = 'arabia',
+	},
+	['arab states'] = {
+		region = 'Arab States',
+		flag = 'arab states',
+	},
+	levant = {
+		region = 'Levant',
+		flag = 'levant',
+	},
+	mena = {
+		region = 'MENA',
+		flag = 'mena',
+	},
+	['persian gulf states'] = {
+		region = 'Persian Gulf States',
+		flag = 'persian gulf states',
+	},
+	['sub-saharan africa'] = {
+		region = 'Sub-Saharan Africa',
+		flag = 'sub saharan africa',
+	},
+	['north africa'] = {
+		region = 'North Africa',
+		flag = 'north africa',
+	},
+	world = {
+		region = 'World',
+		flag = 'world',
 	},
 }

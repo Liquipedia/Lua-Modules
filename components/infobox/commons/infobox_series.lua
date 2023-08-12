@@ -234,7 +234,7 @@ end
 
 function Series:createLiquipediaTierDisplay(args)
 	return (Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true}) or '')
-		.. self.appendLiquipediatierDisplay(args)
+		.. self:appendLiquipediatierDisplay(args)
 end
 
 --- Allows for overriding this functionality

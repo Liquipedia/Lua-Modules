@@ -57,11 +57,11 @@ function Flags.Icon(args, flagName)
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName:lower()) ..
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. mw.ustring.lower(flagName)) ..
 				'[[Category:Pages with unknown flags]]'
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName:lower()) ..
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. mw.ustring.lower(flagName)) ..
 				'[[Category:Pages with unknown flags]]'
 	end
 end
@@ -228,7 +228,10 @@ Flags.readKey('Czechoslovakia') -- returns nil
 ---@param flagName string
 ---@return string?
 function Flags._convertToKey(flagName)
-	flagName = flagName:gsub(' ', ''):lower()
+	-- lowercase all unicode
+	flagName = mw.ustring.lower(flagName)
+	-- removes all accents and special characters
+	flagName = string.gsub(mw.ustring.toNFKD(flagName), '[^%l]', '')
 
 	return MasterData.twoLetter[flagName]
 		or MasterData.threeLetter[flagName]
@@ -242,6 +245,10 @@ function Flags._convertToLangKey(langName)
 	return MasterData.languageTwoLetter[langName]
 		or MasterData.languageThreeLetter[langName]
 		or langName
+end
+
+function Flags.isValidFlagInput(flagInput)
+	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
 return Class.export(Flags)

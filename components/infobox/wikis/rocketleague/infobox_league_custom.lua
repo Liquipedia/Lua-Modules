@@ -122,7 +122,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		return
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted()
@@ -188,9 +188,8 @@ function CustomLeague.parseShowHeadToHead(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData['game'] = 'rocket league'
-	lpdbData['patch'] = args.patch
-	lpdbData['participantsnumber'] = args.team_number or args.player_number
+	lpdbData.game = 'rocket league'
+	lpdbData.patch = args.patch
 
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.mode = args.mode
@@ -198,9 +197,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
 	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
 	lpdbData.extradata['is rlcs'] = Variables.varDefault('tournament_rlcs_premier', 0)
-	lpdbData.extradata.participantsnumber =
-			not String.isEmpty(args.team_number) and args.team_number or args.player_number
-
 
 	return lpdbData
 end

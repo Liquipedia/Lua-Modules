@@ -41,7 +41,6 @@ function CustomPrizePool.run(frame)
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
 	if not Namespace.isMain() then
-		prizePool:setConfig('storeSmw', false)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
@@ -58,7 +57,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 
-	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints', lpdbData.extradata.prizepoints)
 
 	if not Opponent.isTbd(opponent.opponentData) then
 		Variables.varDefine('qualified_' .. lpdbData.opponentname, lpdbData.qualified)
@@ -70,6 +69,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		series = Variables.varDefault('tournament_series'),
 	})
 
+	if Opponent.isTbd(opponent.opponentData) then
+		Variables.varDefine('minimum_secured', lpdbData.extradata.prizepoints)
+	end
+
 	return lpdbData
 end
 
@@ -77,7 +80,7 @@ end
 ---@param prizeMoney number
 ---@param tier string?
 ---@param place integer
----@param type string
+---@param type string?
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 	if Logic.isEmpty(tier) then

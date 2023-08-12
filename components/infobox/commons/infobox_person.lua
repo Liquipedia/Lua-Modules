@@ -303,7 +303,7 @@ function Person:getStandardNationalityValue(nationality)
 			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
-		nationalityToStore = nil
+		return nil
 	end
 
 	return nationalityToStore
@@ -369,18 +369,10 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	local totalEarnings, earningsPerYear = Earnings.calculateForPlayer{
+	return Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-
-	-- store earnings values in wiki variables for storage in smw
-	for year, earningsOfYear in pairs(earningsPerYear) do
-		Variables.varDefine('earningsin' .. year, earningsOfYear)
-	end
-	Variables.varDefine('earnings', totalEarnings)
-
-	return totalEarnings, earningsPerYear
 end
 
 function Person:_createRegion(region, country)

@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
@@ -16,11 +15,14 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -74,9 +76,25 @@ local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 function CustomPlayer.run(frame)
 	_player = Player(frame)
 	_args = _player.args
+	-- Automatic team, history
+	if String.isEmpty(_args.team) then
+		_args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+	local automatedHistory = TeamHistoryAuto.results{player=_player.pagename, convertrole=true, addlpdbdata=true}
+	if String.isEmpty(_args.history) then
+		_args.history = automatedHistory
+	else
+		_args.history = tostring(mw.html.create('div')
+			:addClass("show-when-logged-in")
+			:addClass("navigation-not-searchable")
+			:tag('big'):wikitext("Automated History"):done()
+			:wikitext(automatedHistory)
+			:tag('big'):wikitext("Manual History"):done())
+			.. _args.history
+	end
 
 	-- Automatic achievements
-	_args.achievements = Achievements._player{player = _player.pagename}
+	_args.achievements = Achievements.player{player = _player.pagename, noTemplate = true}
 
 	-- Uppercase first letter in status
 	if _args.status then
@@ -99,8 +117,8 @@ function CustomPlayer.run(frame)
 	if Logic.readBool((_args.autoPI or ''):lower()) then
 		local _, roleType = CustomPlayer._getRoleType(_args.roleList)
 
-		autoPlayerIntro = PlayerIntroduction._main{
-			playerInfo = 'direct',
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = _player.pagename,
 			transferquery = 'datapoint',
 			defaultGame = 'Age of Empires II',
 			team = _args.team,

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -32,7 +33,7 @@ DateExt.epochZero = 0
 ---@param dateString string|number
 ---@return integer?
 function DateExt.readTimestamp(dateString)
-	if String.isEmpty(dateString) then
+	if Logic.isEmpty(dateString) then
 		return nil
 	elseif type(dateString) == 'number' then
 		return dateString
@@ -90,6 +91,28 @@ end
 function DateExt.getContextualDateOrNow()
 	return DateExt.getContextualDate()
 		or os.date('%F') --[[@as string]]
+end
+
+--- Parses a YYYY-MM-DD string into a simplified osdate class
+--- String must start with the YYYY. Text is allowed after after the DD.
+--- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
+---@param str string
+---@return osdate
+---@overload fun():nil
+function DateExt.parseIsoDate(str)
+	if not str then
+		return
+	end
+	local year, month, day = str:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
+	-- Default month and day to 1 if not set
+	if String.isEmpty(month) then
+		month = 1
+	end
+	if String.isEmpty(day) then
+		day = 1
+	end
+	-- create simplified osdate
+	return {year = year, month = month, day = day}
 end
 
 return DateExt

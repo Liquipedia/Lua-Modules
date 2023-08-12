@@ -82,11 +82,6 @@ function AwardPrizePool:_toggleExpand()
 	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)
 end
 
--- No smw storage for awards
-function AwardPrizePool:storeSmw(lpdbEntry, smwTournamentStash)
-	return nil
-end
-
 -- Get the lpdbObjectName depending on opponenttype
 function AwardPrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	local objectName = 'award'
