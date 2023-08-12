@@ -11,6 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -42,6 +43,7 @@ local Achievements = {}
 ---@param args AchievementIconsArgs
 ---@return string?
 function Achievements.player(args)
+	if not Namespace.isMain() then return end
 	args = args or {}
 	local options = Achievements._readOptions(args)
 
@@ -84,6 +86,7 @@ end
 ---@return string? #Team Achievements icon string
 ---@return string? #Solo Achievements while on team icon string
 function Achievements.teamAndTeamSolo(args)
+	if not Namespace.isMain() then return end
 	local historicalPages = Achievements._getTeamNames()
 	local options = Achievements._readOptions(args)
 
@@ -95,6 +98,7 @@ end
 ---@param args AchievementIconsArgs
 ---@return string?
 function Achievements.teamSolo(args)
+	if not Namespace.isMain() then return end
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(
@@ -105,6 +109,7 @@ end
 ---@param args AchievementIconsArgs
 ---@return string?
 function Achievements.team(args)
+	if not Namespace.isMain() then return end
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(
