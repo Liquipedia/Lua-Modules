@@ -57,12 +57,12 @@ function Flags.Icon(args, flagName)
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. mw.ustring.lower(flagName)) ..
-				'[[Category:Pages with unknown flags]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. mw.ustring.lower(flagName))
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. mw.ustring.lower(flagName)) ..
-				'[[Category:Pages with unknown flags]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. mw.ustring.lower(flagName))
 	end
 end
 
@@ -160,6 +160,7 @@ function Flags.CountryName(flagName)
 		return MasterData.data[flagKey].name
 	else
 		mw.log('Unknown flag: ', flagName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
 		return mw.text.trim(mw.text.split(mw.text.split(
 					Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName),
 					'Category:', true)[2] or '',
