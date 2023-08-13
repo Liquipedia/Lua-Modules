@@ -11,10 +11,10 @@ return {
 	wikiName = 'battlerite',
 	name = 'Battlerite',
 	games = {
-		abbreviation = 'Battlerite',
-		name = 'Battlerite',
-		link = 'Battlerite',
 		battlerite = {
+			abbreviation = 'Battlerite',
+			name = 'Battlerite',
+			link = 'Battlerite',
 			logo = {
 				darkMode = 'Logo filler event.png',
 				lightMode = 'Logo filler event.png',
@@ -26,6 +26,6 @@ return {
 		},
 	},
 	defaultGame = 'battlerite',
-	defaultTeamLogo = 'Battlerite logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Battlerite logo.png', ---@deprecated
+	defaultTeamLogo = 'Battlerite default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Battlerite default allmode.png', ---@deprecated
 }
