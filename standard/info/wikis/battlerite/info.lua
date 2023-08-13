@@ -20,8 +20,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Battlerite logo.png',
-				lightMode = 'Battlerite logo.png',
+				darkMode = 'Battlerite default allmode.png',
+				lightMode = 'Battlerite default allmode.png',
 			},
 		},
 	},
