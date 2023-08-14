@@ -82,9 +82,8 @@ function matchFunctions.adjustMapData(match)
 		opponents[opponentIndex] = match['opponent' .. opponentIndex]
 	end
 	local mapIndex = 1
-	while match['map'..mapIndex] do
-		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
-		mapIndex = mapIndex + 1
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		map = mapFunctions.getParticipants(map, opponents)
 	end
 
 	return match
