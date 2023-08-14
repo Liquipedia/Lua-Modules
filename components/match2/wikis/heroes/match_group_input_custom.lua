@@ -1,4 +1,4 @@
----
+8---
 -- @Liquipedia
 -- wiki=heroes
 -- page=Module:MatchGroup/Input/Custom
@@ -82,7 +82,7 @@ function matchFunctions.adjustMapData(match)
 		opponents[opponentIndex] = match['opponent' .. opponentIndex]
 	end
 	for _, map in Table.iter.pairsByPrefix(match, 'map') do
-		map = mapFunctions.getParticipants(map)
+		map = mapFunctions.getParticipants(map, opponents)
 	end
 
 	return match
