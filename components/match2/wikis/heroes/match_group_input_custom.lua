@@ -81,7 +81,6 @@ function matchFunctions.adjustMapData(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		opponents[opponentIndex] = match['opponent' .. opponentIndex]
 	end
-	local mapIndex = 1
 	for _, map in Table.iter.pairsByPrefix(match, 'map') do
 		map = mapFunctions.getParticipants(map, opponents)
 	end
