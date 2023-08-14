@@ -18,6 +18,7 @@ local ChampionIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -31,14 +32,16 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
-local TBD = 'TBD'
+local FP = 'First Pick'
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Champion Ban Class
 local ChampionBan = Class.new(
-	function(self)
+	function(self, options)
+		options = options or {}
+		self.isBan = options.isBan
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
@@ -60,11 +63,12 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
 		:tag('td')
 			:node(mw.html.create('div')
-				:wikitext(CustomMatchSummary._createAbbreviation{
-					title = 'Bans in game ' .. gameNumber,
-					text = 'Game ' .. gameNumber,
-				})
-			)
+				:wikitext(Abbreviation.make(
+							'Game ' .. gameNumber,
+							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
+						)
+					)
+				)
 		:tag('td')
 			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
 	return self
@@ -141,7 +145,7 @@ end
 
 function MapVeto._displayMap(map)
 	if Logic.isEmpty(map) then
-		map = TBD
+		map = FP
 	else
 		map = '[[' .. map .. ']]'
 	end
@@ -331,7 +335,7 @@ function CustomMatchSummary._createBody(match)
 
 	-- Add the Champion Bans
 	if not Table.isEmpty(championBanData) then
-		local championBan = ChampionBan()
+		local championBan = ChampionBan({isBan = true})
 
 		for gameIndex, banData in ipairs(championBanData) do
 			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
@@ -439,10 +443,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
-function CustomMatchSummary._createAbbreviation(args)
-	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
-end
-
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
 	local color = opponentChampionsData.color or ''
@@ -471,7 +471,8 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 
 	local display = mw.html.create('div')
 	if isBan then
-		display:addClass('brkts-popup-side-shade-out' .. (flip and '-flipped' or ''))
+		display:addClass('brkts-popup-side-shade-out')
+		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
 	end
 
 	for _, item in ipairs(opponentChampionsDisplay) do
