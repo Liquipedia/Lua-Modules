@@ -29,6 +29,9 @@ local NUM_CHAMPIONS_PICK = 5
 local GREEN_CHECK  = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
+local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local TBD = 'TBD'
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
