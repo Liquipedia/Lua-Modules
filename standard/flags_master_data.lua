@@ -2150,6 +2150,7 @@ local aliases = {
 	['ukni'] = 'northernireland',
 
 	--language flag abbreviations
+	['usgb'] = 'englishspeaking',
 	['usuk'] = 'englishspeaking',
 	['deat'] = 'germanspeaking',
 	['esmx'] = 'spanishspeaking',
