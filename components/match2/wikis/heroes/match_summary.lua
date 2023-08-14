@@ -24,7 +24,7 @@ local Array = require('Module:Array')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local MAX_NUM_BANS = 5
+local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK  = '[[File:GreenCheck.png|14x14px|link=]]'
