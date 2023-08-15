@@ -83,6 +83,7 @@ function matchFunctions.adjustMapData(match)
 	end
 	for _, map in Table.iter.pairsByPrefix(match, 'map') do
 		mapFunctions.getParticipants(map, opponents)
+		mapFunctions.getAdditionalExtraData(map)
 	end
 
 	return match
@@ -550,8 +551,6 @@ function mapFunctions.getAdditionalExtraData(map)
 	map.extradata.comment = map.comment
 	map.extradata.team1side = string.lower(map.team1side or '')
 	map.extradata.team2side = string.lower(map.team2side or '')
-
-	return map
 end
 
 -- Parse participant information
@@ -590,7 +589,6 @@ function mapFunctions.getParticipants(map, opponents)
 
 	map.extradata = championData
 	map.participants = participants
-	return mapFunctions.getAdditionalExtraData(map)
 end
 
 function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, champion, kda)
