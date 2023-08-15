@@ -1302,6 +1302,11 @@ local data = {
 	},
 
 	-- ISO 3166-1 alpha-2 Traditional Reservations
+	['serbiaandmontenegro'] = {
+		flag = 'File:cs_hd.png',
+		localised = 'Serbian and Montenegrin',
+		name = 'Serbia and Montenegro',
+	},
 	['yugoslavia'] = {
 		flag = 'File:yu_hd.png',
 		localised = 'Yugoslavian',
@@ -1782,6 +1787,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 Traditional Reservations
 	['yu'] = 'yugoslavia',
+	['cs'] = 'serbiaandmontenegro',
 }
 
 -- This table includes:
@@ -2144,6 +2150,7 @@ local aliases = {
 	['ukni'] = 'northernireland',
 
 	--language flag abbreviations
+	['usgb'] = 'englishspeaking',
 	['usuk'] = 'englishspeaking',
 	['deat'] = 'germanspeaking',
 	['esmx'] = 'spanishspeaking',
