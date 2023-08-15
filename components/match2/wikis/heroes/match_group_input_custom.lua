@@ -416,47 +416,66 @@ function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
 end
 
 function matchFunctions.getOpponents(match)
-	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		-- read opponent
-		local opponent = match['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
-			end
+	for _, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent') do
+		CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- apply status
-			opponent.score = string.upper(opponent.score or '')
-			if Logic.isNumeric(opponent.score) then
-				opponent.score = tonumber(opponent.score)
-				opponent.status = STATUS_SCORE
-				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
-				opponent.status = opponent.score
-				opponent.score = NOT_PLAYED_SCORE
-			end
-
-			-- get players from vars for teams
-			if opponent.type == Opponent.team then
-				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
-				end
-			elseif Opponent.typeIsParty(opponent) then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
-				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
-			end
-
-			opponents[opponentIndex] = opponent
+		-- Retrieve icon for team
+		if opponent.type == Opponent.team then
+			opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 		end
+
+		-- apply status
+		opponent.score = string.upper(opponent.score or '')
+		if Logic.isNumeric(opponent.score) then
+			opponent.score = tonumber(opponent.score)
+			opponent.status = STATUS_SCORE
+			isScoreSet = true
+		elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			opponent.status = opponent.score
+			opponent.score = NOT_PLAYED_SCORE
+		end
+
+		-- get players from vars for teams
+		if opponent.type == Opponent.team then
+			if not Logic.isEmpty(opponent.name) then
+				match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
+			end
+		elseif Opponent.typeIsParty(opponent) then
+			opponent.match2players = Json.parseIfString(opponent.match2players) or {}
+			opponent.match2players[1] = opponent.match2players[1] or {}
+			opponent.match2players[1].name = opponent.match2players[1].name or opponent.name
+		elseif opponent.type ~= Opponent.literal then
+			error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
+		end
+
+		opponents[opponentIndex] = opponent
 	end
 
+	matchFunctions.applyWalkover(match, opponents)
+	matchFunctions.checkIfFinished(match, isScoreSet, opponents)
+
+
+	-- apply placements and winner if finshed
+	if
+		not Logic.isEmpty(match.winner) or
+		Logic.readBool(match.finished) or
+		CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
+	then
+		match.finished = true
+		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
+	end
+
+	-- Update all opponents with new values
+	for opponentIndex, opponent in pairs(opponents) do
+		match['opponent' .. opponentIndex] = opponent
+	end
+	return match
+end
+
+function matchFunctions.applyWalkover(match, opponents)
 	--apply walkover input
 	match.walkover = string.upper(match.walkover or '')
 	if Logic.isNumeric(match.walkover) then
@@ -470,7 +489,9 @@ function matchFunctions.getOpponents(match)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
 	end
+end
 
+function matchFunctions.checkIfFinished(match, isScoreSet, opponents)
 	-- see if match should actually be finished if bestof limit was reached
 	match.finished = Logic.readBool(match.finished)
 		or isScoreSet and (
@@ -489,22 +510,6 @@ function matchFunctions.getOpponents(match)
 			match.finished = true
 		end
 	end
-
-	-- apply placements and winner if finshed
-	if
-		not Logic.isEmpty(match.winner) or
-		Logic.readBool(match.finished) or
-		CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
-	then
-		match.finished = true
-		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
-	end
-
-	-- Update all opponents with new values
-	for opponentIndex, opponent in pairs(opponents) do
-		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
 end
 
 function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
