@@ -1,4 +1,4 @@
-8---
+---
 -- @Liquipedia
 -- wiki=heroes
 -- page=Module:MatchGroup/Input/Custom
