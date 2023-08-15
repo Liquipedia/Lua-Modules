@@ -41,7 +41,7 @@ function CustomLeague.run(frame)
 	_args = _league.args
 
 	-- Abbreviations
-	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
+	_args.circuitabbr = _args.circuitabbr or CustomLeague.getAbbrFromSeries(_args.circuit)
 
 	-- Auto Icon
 	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(_args.series)
@@ -283,7 +283,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	circuitIndex = circuitIndex or ''
 	local circuitArgs = {
 		circuit = _args['circuit' .. circuitIndex],
-		abbreviation = _args['abbreviation' .. circuitIndex],
+		abbreviation = _args['circuit' .. circuitIndex .. 'abbr'],
 		icon = _args['circuit' .. circuitIndex .. 'IconLight'],
 		iconDark = _args['circuit' .. circuitIndex .. 'IconDark'],
 		tier = _args['circuit' .. circuitIndex .. 'tier'],
