@@ -32,7 +32,8 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
-local FP = 'First Pick'
+local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
+local TBD = 'TBD'
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -125,64 +126,53 @@ function MapVeto:createHeader()
 	return self
 end
 
-function MapVeto:vetoStart(firstVeto)
+function MapVeto:vetoStart(firstVeto, format)
+	format = format and ('Veto format: ' .. format) or nil
 	local textLeft
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
 		textLeft = MAP_VETO_START
 		textCenter = ARROW_LEFT
+		textRight = format
 	elseif firstVeto == 2 then
+		textLeft = format
 		textCenter = ARROW_RIGHT
 		textRight = MAP_VETO_START
 	else return self end
+
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
 		:tag('th'):wikitext(textCenter):done()
 		:tag('th'):wikitext(textRight or ''):done()
+
 	return self
 end
 
-function MapVeto._displayMap(map)
-	if Logic.isEmpty(map) then
-		map = FP
-	else
-		map = '[[' .. map .. ']]'
+function MapVeto._displayMaps(map1, map2)
+	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
+		return TBD, TBD
 	end
 
-	return map
+	return Logic.isEmpty(map1) and FP or ('[[' .. map1 .. ']]'),
+		Logic.isEmpty(map2) and FP or ('[[' .. map2 .. ']]')
 end
 
-function MapVeto:addDecider(map)
-	map = MapVeto._displayMap(map)
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
+local VETO_TYPE_TO_TEXT = {
+	ban = 'BAN',
+	pick = 'PICK',
+	decider = 'DECIDER',
+	defaultban = 'DEFAULT BAN',
+}
 
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
-	self:addColumnVetoMap(row, map)
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
+function MapVeto:addRound(vetoType, map1, map2)
+	map1, map2 = MapVeto._displayMaps(map1, map2)
 
-	self.table:node(row)
-	return self
-end
+	local vetoText = VETO_TYPE_TO_TEXT[vetoType]
 
-function MapVeto:addRound(vetotype, map1, map2)
-	map1 = MapVeto._displayMap(map1)
-	map2 = MapVeto._displayMap(map2)
+	if not vetoText then return self end
 
-	local class
-	local vetoText
-	if vetotype == 'ban' then
-		vetoText = 'BAN'
-		class = 'brkts-popup-mapveto-ban'
-	elseif vetotype == 'pick' then
-		vetoText = 'PICK'
-		class = 'brkts-popup-mapveto-pick'
-	elseif vetotype == 'defaultban' then
-		vetoText = 'DEFAULT BAN'
-		class = 'brkts-popup-mapveto-defaultban'
-	else
-		return self
-	end
+	local class = 'brkts-popup-mapveto-' .. vetoType
 
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
@@ -349,16 +339,12 @@ function CustomMatchSummary._createBody(match)
 		local vetoData = match.extradata.mapveto
 		if vetoData then
 			local mapVeto = MapVeto()
+			if vetoData.vetostart then
+				mapVeto:vetoStart(tonumber(vetoData.vetostart), vetoData.format)
+			end
 
 			for _,vetoRound in ipairs(vetoData) do
-				if vetoRound.vetostart then
-					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
-				end
-				if vetoRound.type == 'decider' then
-					mapVeto:addDecider(vetoRound.decider)
-				else
-					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-				end
+				mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
 			end
 
 			body:addRow(mapVeto)
