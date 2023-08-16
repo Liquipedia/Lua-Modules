@@ -447,9 +447,7 @@ end
 function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
 	options = options or {}
 
-	local maxNumPlayers = options.maxNumPlayers or
-		options.disallowGaps and math.huge or
-		DEFAULT_MAX_NUM_PLAYERS
+	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
 	local opponent = match['opponent' .. opponentIndex]
 	local playersData = Json.parseIfString(opponent.players) or {}
 
