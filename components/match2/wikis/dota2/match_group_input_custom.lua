@@ -476,6 +476,7 @@ function matchFunctions.getOpponents(match)
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 						resolveRedirect = true,
 						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
 					})
 				end
 			elseif opponent.type == Opponent.solo then
