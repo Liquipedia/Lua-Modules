@@ -434,7 +434,6 @@ end
 
 ---@class MatchGroupInputReadPlayersOfTeamOptions
 ---@field maxNumPlayers integer?
----@field playersData string?
 ---@field resolveRedirect boolean?
 ---@field disallowGaps boolean?
 ---@field applyUnderScores boolean?
