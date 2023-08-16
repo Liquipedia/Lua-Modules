@@ -46,35 +46,6 @@ local _LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
--- Custom Caster Class
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-	return self
-end
-
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
-end
-
 local CustomMatchSummary = {}
 
 function CustomMatchSummary.getByMatchId(args)
@@ -178,7 +149,7 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = Casters()
+		local casterRow = MatchSummary.Casters()
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end
