@@ -8,7 +8,6 @@
 
 local CustomMatchGroupInput = {}
 
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
