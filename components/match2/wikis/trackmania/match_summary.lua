@@ -7,14 +7,12 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
-local Flags = require('Module:Flags')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})

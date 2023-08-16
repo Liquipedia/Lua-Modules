@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')

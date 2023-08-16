@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
