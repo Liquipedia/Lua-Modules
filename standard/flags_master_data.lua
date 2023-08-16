@@ -1443,7 +1443,7 @@ local data = {
 	},
 	['oceania'] = {
 		flag = 'File:anz hd.png',
-		localised = 'Oceanic',
+		localised = 'Oceanian',
 		name = 'Oceania',
 	},
 	['southamerica'] = {
