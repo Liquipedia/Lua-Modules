@@ -367,6 +367,7 @@ function matchFunctions.getOpponents(match)
 						disallowGaps = true,
 						resolveRedirect = true,
 						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
 					})
 				end
 			elseif Opponent.typeIsParty(opponent) then
