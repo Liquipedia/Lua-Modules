@@ -21,6 +21,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -63,6 +64,12 @@ function CustomPlayer.run(frame)
 	local player = Person(frame)
 	_args = player.args
 	_player = player
+
+	_args.achievements = Achievements.player{noTemplate = true, baseConditions = {
+		'[[liquipediatiertype::]]',
+		'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+		'[[placement::1]]',
+	}}
 
 	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.adjustLPDB = CustomPlayer.adjustLPDB
