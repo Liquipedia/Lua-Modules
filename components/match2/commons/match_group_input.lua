@@ -436,7 +436,7 @@ end
 ---@field maxNumPlayers integer?
 ---@field playersData string?
 ---@field resolveRedirect boolean?
----@field allowGaps boolean?
+---@field disallowGaps boolean?
 ---@field applyUnderScores boolean?
 
 ---reads the players of a team from input and wiki variables
@@ -448,10 +448,9 @@ end
 function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
 	options = options or {}
 
-	local allowGaps = Logic.nilOr(options.allowGaps, true)
 	local maxNumPlayers = options.maxNumPlayers or
-		allowGaps and DEFAULT_MAX_NUM_PLAYERS or
-		math.huge
+		options.disallowGaps and math.huge or
+		DEFAULT_MAX_NUM_PLAYERS
 	local opponent = match['opponent' .. opponentIndex]
 	local playersData = Json.parseIfString(opponent.players) or {}
 
@@ -476,7 +475,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 
 		if Table.isNotEmpty(player) then
 			table.insert(players, player)
-		elseif not allowGaps then
+		elseif options.disallowGaps then
 			break
 		end
 	end
