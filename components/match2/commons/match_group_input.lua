@@ -509,7 +509,7 @@ end
 ---@param name string
 ---@param flag string?
 ---@param displayName string?
----@return {name:string, displayName: string?, flag: string?}
+---@return {name:string, displayName: string, flag: string?}
 function MatchGroupInput._getCasterInformation(name, flag, displayName)
 	flag = Logic.emptyOr(flag, Variables.varDefault(name .. '_flag'))
 	displayName = Logic.emptyOr(displayName, Variables.varDefault(name .. 'dn'))
