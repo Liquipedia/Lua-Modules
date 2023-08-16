@@ -72,26 +72,25 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.game = Game.name{game = args.game}
-	lpdbData.publishertier = args['atvi-sponsored']
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end
-	Variables.varDefine('tournament_game', Game.name{game = _args.game})
-	Variables.varDefine('tournament_publishertier', _args['atvi-sponsored'])
+	Variables.varDefine('tournament_game', Game.name{game = args.game})
+	Variables.varDefine('tournament_publishertier', args['atvi-sponsored'])
 
 	--Legacy Vars:
-	Variables.varDefine('tournament_ticker_name', _args.tickername)
+	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(_args['atvi-sponsored'])
+	return Logic.readBool(args['atvi-sponsored'])
 end
 
 function CustomLeague:_createNoWrappingSpan(content)

@@ -71,11 +71,11 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('tournament_mode', args.mode)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -86,14 +86,14 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('mode', args.mode)
 end
 
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if _args.game then
-		table.insert(categories, _args.game .. ' Competitions')
+	if args.game then
+		table.insert(categories, args.game .. ' Competitions')
 	else
 		table.insert(categories, 'Tournaments without game version')
 	end
@@ -107,11 +107,11 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	end)
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
+function CustomLeague:appendLiquipediatierDisplay(args)
 	local content = ''
 
 	for param, icon in pairs(SPECIAL_SPONSORS) do
-		if _args[param..'-sponsored'] then
+		if args[param..'-sponsored'] then
 			content = content .. icon
 		end
 	end

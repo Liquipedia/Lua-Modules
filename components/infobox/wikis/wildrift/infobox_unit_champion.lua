@@ -157,7 +157,7 @@ function CustomChampion:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomChampion.getWikiCategories()
+function CustomChampion:getWikiCategories()
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Champions'}

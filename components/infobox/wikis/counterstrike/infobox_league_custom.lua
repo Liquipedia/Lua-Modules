@@ -194,8 +194,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if Table.isNotEmpty(_args.gameData) then
-		table.insert(categories, (_args.gameData.abbreviation or _args.gameData.name) .. ' Tournaments')
+	if Table.isNotEmpty(args.gameData) then
+		table.insert(categories, (args.gameData.abbreviation or args.gameData.name) .. ' Tournaments')
 	else
 		table.insert(categories, 'Tournaments without game version')
 	end
@@ -234,8 +234,8 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args.cstrikemajor) then
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if Logic.readBool(args.cstrikemajor) then
 		return ' [[File:cstrike-icon.png|x16px|link=Counter-Strike Majors|Counter-Strike Major]]'
 	end
 	return ''
@@ -268,7 +268,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
-	Variables.varDefine('tournament_valve_tier', mw.getContentLanguage():ucfirst((args.valvetier or ''):lower()))
+	local valveTier = mw.getContentLanguage():ucfirst((args.valvetier or ''):lower())
+	Variables.varDefine('tournament_valve_tier', valveTier)
+	Variables.varDefine('tournament_publishertier', valveTier)
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
 
 	Variables.varDefine('tournament_mode',
@@ -297,7 +299,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		lpdbData.prizepool = 0
 	end
 
-	lpdbData.publishertier = args.valvetier
 	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.sortdate = args.sort_date or lpdbData.enddate
 
@@ -306,7 +307,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.shortname2 = args.shortname2
 
-	Array.forEach(CustomLeague.getRestrictions(_args.restrictions),
+	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	-- Extradata variable
@@ -316,14 +317,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:_createGameCell(args)
-	if Table.isEmpty(_args.gameData) and String.isEmpty(args.patch) then
+	if Table.isEmpty(args.gameData) and String.isEmpty(args.patch) then
 		return nil
 	end
 
 	local content = ''
 
-	if Table.isNotEmpty(_args.gameData) then
-		content = content .. Page.makeInternalLink({}, _args.gameData.name, _args.gameData.link)
+	if Table.isNotEmpty(args.gameData) then
+		content = content .. Page.makeInternalLink({}, args.gameData.name, args.gameData.link)
 	end
 
 	if String.isEmpty(args.epatch) and String.isNotEmpty(args.patch) then

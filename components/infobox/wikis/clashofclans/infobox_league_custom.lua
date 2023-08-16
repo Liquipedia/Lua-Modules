@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
+-- wiki=clashofclans
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,20 +17,25 @@ local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomLeague = Class.new()
-local CustomInjector = Class.new(Injector)
+local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell'
+	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
+	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
 local _args
+
+local CustomLeague = Class.new()
+local CustomInjector = Class.new(Injector)
 
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -39,25 +44,23 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
-		name = 'Number of Players',
-		content = {_args.player_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Teams',
+		name = 'Teams',
 		content = {_args.team_number}
 	})
 
 	return widgets
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_publishertier', args.epicpremier)
-	--Legacy Vars:
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args['supercell-sponsored'])
 end
 
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.epicpremier)
+function CustomLeague:appendLiquipediatierDisplay(args)
+	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
+end
+
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', Logic.readBool(args['supercell-sponsored']) and 'true' or nil)
 end
 
 return CustomLeague

@@ -122,7 +122,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 		return
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 function CustomLeague:liquipediaTierHighlighted()

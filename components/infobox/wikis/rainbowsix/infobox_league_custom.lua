@@ -125,10 +125,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	if CustomLeague:_validPublisherTier(args.ubisofttier) then
-		lpdbData.publishertier = args.ubisofttier:lower()
-	end
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)
 	lpdbData.extradata.enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date)
@@ -154,17 +150,21 @@ function CustomLeague:_standardiseRawDate(dateString)
 	return dateString
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Variables with different handling compared to commons
 	Variables.varDefine('tournament_liquipediatiertype',
 		Variables.varDefault('tournament_liquipediatiertype', DEFAULT_TIERTYPE))
 
+	if CustomLeague:_validPublisherTier(args.ubisofttier) then
+		Variables.varDefine('tournament_publishertier', args.ubisofttier:lower())
+	end
+
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
-	Variables.varDefine('tournament_mode', _args.mode or '')
+	Variables.varDefine('tournament_prizepool', args.prizepool or '')
+	Variables.varDefine('tournament_mode', args.mode or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')

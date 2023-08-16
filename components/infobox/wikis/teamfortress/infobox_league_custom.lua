@@ -78,11 +78,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_prizepool', _args.prizepoolusd)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('tournament_prizepool', args.prizepoolusd)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -98,8 +98,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if _args.mode then
-		table.insert(categories, _args.mode .. ' Tournaments')
+	if args.mode then
+		table.insert(categories, args.mode .. ' Tournaments')
 	end
 
 	return categories

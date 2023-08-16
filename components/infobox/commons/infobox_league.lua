@@ -344,7 +344,7 @@ function League:createLiquipediaTierDisplay(args)
 		return
 	end
 
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 function League:_createPrizepool(args)
@@ -446,6 +446,7 @@ function League:_setLpdbData(args, links)
 		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
 		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
+		publishertier = Variables.varDefault('tournament_publishertier'),
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)
