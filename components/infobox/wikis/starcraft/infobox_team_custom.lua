@@ -19,6 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -53,6 +54,8 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
 	_args = team.args
+
+	_args.achievements = Achievements.team()
 
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
@@ -122,7 +125,7 @@ function CustomTeam:addToLpdb(lpdbData)
 	return lpdbData
 end
 
-function CustomTeam.getWikiCategories()
+function CustomTeam:getWikiCategories()
 	local categories = {}
 	if String.isNotEmpty(_args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')
