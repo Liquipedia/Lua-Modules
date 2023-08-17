@@ -26,7 +26,7 @@ local PlacementStats = {}
 
 ---Entry Point: Queries placement statistics and builds a table for display of them below infoboxes
 ---@param args any
----@return Html?
+---@return Html|string
 function PlacementStats.run(args)
 	args = args or {}
 
@@ -39,7 +39,7 @@ function PlacementStats.run(args)
 	local placementData = PlacementStats._fetchData(opponentType, opponent, tiers, excludedTierTypes)
 
 	if placementData.totals.all == 0 then
-		return
+		return ''
 	end
 
 	return PlacementStats._buildTable(placementData, tiers)
@@ -48,6 +48,8 @@ end
 ---Query the count values
 ---@param opponentType string
 ---@param opponent string
+---@param tiers string[]
+---@param excludedTierTypes string[]
 ---@return InfoboxPlacementStatsData
 function PlacementStats._fetchData(opponentType, opponent, tiers, excludedTierTypes)
 	local baseConditions = PlacementStats._buildConditions(opponentType, opponent, excludedTierTypes)
@@ -63,6 +65,7 @@ end
 ---Builds the base conditions for the queries
 ---@param opponentType string
 ---@param opponent string
+---@param excludedTierTypes string[]
 ---@return string
 function PlacementStats._buildConditions(opponentType, opponent, excludedTierTypes)
 	local conditions = {
@@ -126,6 +129,7 @@ end
 
 ---Builds the display
 ---@param placementData InfoboxPlacementStatsData
+---@param tiers string[]
 ---@return Html
 function PlacementStats._buildTable(placementData, tiers)
 	local display = mw.html.create('table')
