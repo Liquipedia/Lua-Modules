@@ -137,11 +137,11 @@ end
 function Company:_getOrganizerPrizepools()
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =
-			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer3::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer4::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer5::' .. self.pagename .. ']]',
+			'[[organizers_organizer1::' .. self.pagename:gsub('_', ' ') .. ']] OR ' ..
+			'[[organizers_organizer2::' .. self.pagename:gsub('_', ' ') .. ']] OR ' ..
+			'[[organizers_organizer3::' .. self.pagename:gsub('_', ' ') .. ']] OR ' ..
+			'[[organizers_organizer4::' .. self.pagename:gsub('_', ' ') .. ']] OR ' ..
+			'[[organizers_organizer5::' .. self.pagename:gsub('_', ' ') .. ']]',
 		query = 'sum::prizepool'
 	})
 

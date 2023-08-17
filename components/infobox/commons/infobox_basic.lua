@@ -25,7 +25,7 @@ local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
 local BasicInfobox = Class.new(
 	function(self, frame)
 		self.args = Arguments.getArgs(frame)
-		self.pagename = mw.title.getCurrentTitle().text
+		self.pagename = mw.title.getCurrentTitle().text:gsub(' ', '_')
 		self.name = self.args.name or self.pagename
 		self.wiki = self.args.wiki or Info.wikiName
 
