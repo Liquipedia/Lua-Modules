@@ -6,13 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -34,7 +34,7 @@ function CustomPlayer.run(frame)
 	_args = _player.args
 
 	-- Automatic achievements
-	_args.achievements = Achievements._player{player = _player.pagename}
+	_args.achievements = Achievements.player{noTemplate = true}
 
 	-- Profiles to links
 	_args.esl = _args.esl or _args.eslprofile
