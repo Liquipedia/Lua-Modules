@@ -120,7 +120,8 @@ function Team:createInfobox()
 						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
 							team = self.pagename or self.name,
 							perYear = true,
-							queryHistorical = args.queryEarningsHistorical
+							queryHistorical = args.queryEarningsHistorical,
+							doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
 						}
 						local totalEarningsDisplay
 						if self.totalEarnings > 0 then
