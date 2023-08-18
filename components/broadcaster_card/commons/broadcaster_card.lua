@@ -180,7 +180,7 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 				.. ' AND ([[name::!]] OR [[flag::!]])',
 			query = 'name, flag',
 			groupby = 'flag asc, name asc',
-			limit = 1
+			limit = 5000,
 		})
 
 		if type(data) ~= 'table' or not data[1] then
