@@ -205,9 +205,7 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name, {
-					disallowGaps = true,
-				})
+				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
 			end
 		end
 	end

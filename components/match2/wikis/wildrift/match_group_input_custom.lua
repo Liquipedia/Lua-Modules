@@ -364,10 +364,8 @@ function matchFunctions.getOpponents(match)
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
-						disallowGaps = true,
 						resolveRedirect = true,
 						applyUnderScores = true,
-						maxNumPlayers = math.huge,
 					})
 				end
 			elseif Opponent.typeIsParty(opponent) then
