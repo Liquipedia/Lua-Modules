@@ -85,6 +85,7 @@ function BroadcasterCard.create(frame)
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
 		local link = args[prefix .. 'link'] or caster
+		args[prefix .. 'flag' ] = Flags.CountryName(args[prefix .. 'flag' ])
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
 		local date = Variables.varDefault('tournament_enddate')
 
