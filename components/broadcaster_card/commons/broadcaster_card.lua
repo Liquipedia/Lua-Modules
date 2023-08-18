@@ -114,17 +114,23 @@ function BroadcasterCard.create(frame)
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
 
 	for _, broadcaster in ipairs(casters) do
-		outputList = outputList .. BroadcasterCard._display(broadcaster)
+		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = Logic.readBool(args.alwaysShowName)})
 	end
 
 	return outputList
 end
 
 ---@param broadcaster broadCasterData
+---@param options {alwaysShowName: boolean}
 ---@return string
-function BroadcasterCard._display(broadcaster)
+function BroadcasterCard._display(broadcaster, options)
 	local displayName = broadcaster.displayName or broadcaster.name
-	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
+
+	if String.isNotEmpty(displayName)  and (options.alwaysShowName or displayName ~= broadcaster.id) then
+		displayName = ('&nbsp;(' .. displayName ..')')
+	else
+		displayName = ''
+	end
 
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
