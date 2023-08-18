@@ -172,7 +172,7 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]'
+			conditions = '[[extradata_manualinput::true]] AND [[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]'
 				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 			query = 'name, flag, id',
 			order = 'date desc',
