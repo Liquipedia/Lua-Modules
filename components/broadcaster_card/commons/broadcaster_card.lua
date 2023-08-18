@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -167,25 +168,47 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 			return String.nilIfEmpty(data[1].romanizedname) or data[1].name, data[1].nationality
 		end
 
-		if String.isNotEmpty(args[prefix .. 'name']) and String.isNotEmpty(args[prefix .. 'flag' ]) or restrictedQuery then
-			return args[prefix .. 'name' ],	args[prefix .. 'flag' ]
+		local name, flag = args[prefix .. 'name'], args[prefix .. 'flag']
+
+		if String.isNotEmpty(name) and String.isNotEmpty(flag) or restrictedQuery then
+			return name, flag
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[extradata_manualinput::true]] AND [[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]'
-				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-			query = 'name, flag, id',
-			order = 'date desc',
+			conditions = '[[extradata_manualinput::true]] AND [[page::' .. resolvedCasterPage .. ']]'
+				.. ' AND ([[name::!]] OR [[flag::!]])',
+			query = 'name, flag',
+			groupby = 'flag asc, name asc',
 			limit = 1
 		})
-		if type(data) == 'table' and data[1] then
-			return data[1].name, data[1].flag
+
+		if type(data) ~= 'table' or not data[1] then
+			return name, flag
 		end
 
-		return args[prefix .. 'name'], args[prefix .. 'flag']
+		return BroadcasterCard._findUnique(data, 'name') or name,
+			BroadcasterCard._findUnique(data, 'flag') or flag
 	end
 
 	return getPersonInfo()
+end
+
+---@param data {name: string?, flag: string?}
+---@param property 'name'|'flag'
+---@return string?
+function BroadcasterCard._findUnique(data, property)
+	--remove all empty values
+	local foundItems = Array.filter(data, function(item) return String.isNotEmpty(item[property]) end)
+	--extract the array of tables to an array of values want to look at
+	foundItems = Array.map(foundItems, Operator.property(property))
+
+	--remove duplicates
+	foundItems = Array.unique(foundItems)
+
+	--if we only have 1 unique element then we have a definitive query, return the value
+	if #foundItems == 1 then
+		return foundItems[1]
+	end
 end
 
 ---Determines the sort value for a broadcaster
