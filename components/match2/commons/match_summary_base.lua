@@ -273,7 +273,7 @@ function Casters:addCaster(caster)
 		---@cast caster -nil
 		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
 		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster.flag) .. ' ' .. nameDisplay)
+			table.insert(self.casters, Flags.Icon(caster.flag) .. '&nbsp;' .. nameDisplay)
 		else
 			table.insert(self.casters, nameDisplay)
 		end
