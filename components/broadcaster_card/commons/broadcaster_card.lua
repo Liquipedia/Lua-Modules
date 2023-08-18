@@ -34,6 +34,7 @@ local BroadcasterCard = {}
 ---@field sort string|number
 ---@field date string
 ---@field flag string?
+---@field isManualInput boolean
 
 ---Template entry point
 ---@param frame Frame
@@ -100,6 +101,9 @@ function BroadcasterCard.create(frame)
 			date = date,
 			sort = tonumber(args[prefix .. 'sort'])
 		}
+		--if entered name and stored name as well as entered flag and stored flag match mark it as manual input
+		broadcaster.isManualInput = args[prefix .. 'name'] == name and args[prefix .. 'flag' ] == nationality
+
 		broadcaster.sort = BroadcasterCard.sortValue(broadcaster, args.sort, casterIndex)
 
 		BroadcasterCard.setLPDB(broadcaster, args.status)
@@ -206,7 +210,7 @@ end
 ---@param status string?
 function BroadcasterCard.setLPDB(caster, status)
 	local smName = Variables.varDefault('show_match_name') or ''
-	local extradata = {status = ''}
+	local extradata = {status = '', manualinput = tostring(caster.isManualInput)}
 	if Logic.readBool(Variables.varDefault('show_match')) then
 		extradata.showmatchname = smName
 		extradata.showmatch = 'true'
