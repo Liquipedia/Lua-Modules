@@ -188,8 +188,8 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 			return name, flag
 		end
 
-		return BroadcasterCard._findUnique(data, 'name') or name,
-			BroadcasterCard._findUnique(data, 'flag') or flag
+		return BroadcasterCard._findUnique(data, 'name', resolvedCasterPage) or name,
+			BroadcasterCard._findUnique(data, 'flag', resolvedCasterPage) or flag
 	end
 
 	return getPersonInfo()
@@ -197,8 +197,9 @@ end
 
 ---@param data {name: string?, flag: string?}
 ---@param property 'name'|'flag'
+---@param page string
 ---@return string?
-function BroadcasterCard._findUnique(data, property)
+function BroadcasterCard._findUnique(data, property, page)
 	--remove all empty values
 	local foundItems = Array.filter(data, function(item) return String.isNotEmpty(item[property]) end)
 	--extract the array of tables to an array of values want to look at
@@ -210,6 +211,8 @@ function BroadcasterCard._findUnique(data, property)
 	--if we only have 1 unique element then we have a definitive query, return the value
 	if #foundItems == 1 then
 		return foundItems[1]
+	elseif #foundItems > 1 then
+		mw.logObject(foundItems, property .. 's not unique for ' .. page)
 	end
 end
 
