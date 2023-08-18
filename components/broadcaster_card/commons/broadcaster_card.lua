@@ -119,7 +119,8 @@ function BroadcasterCard.create(frame)
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
 
 	for _, broadcaster in ipairs(casters) do
-		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = Logic.readBool(args.alwaysShowName)})
+		local alwaysShowName = Logic.readBool(args.alwaysShowName)
+		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = alwaysShowName})
 	end
 
 	return outputList
