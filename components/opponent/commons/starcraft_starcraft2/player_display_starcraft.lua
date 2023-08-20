@@ -135,7 +135,7 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		displayName = args[1],
 		flag = args.flag,
 		pageName = args.link,
-		race = StarcraftPlayerExt.readRace(args.race),
+		race = Faction.read(args.race),
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
