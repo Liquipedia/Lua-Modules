@@ -156,41 +156,37 @@ end
 ---@param restrictedQuery boolean
 ---@return string?, string?
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
-	local function getPersonInfo()
-		local data = mw.ext.LiquipediaDB.lpdb('player', {
-			conditions = '[[pagename::' .. casterPage .. ']]',
-			query = 'romanizedname, name, pagename, nationality',
-			limit = 1,
-		})
+	local data = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = '[[pagename::' .. casterPage .. ']]',
+		query = 'romanizedname, name, pagename, nationality',
+		limit = 1,
+	})
 
-		if type(data) == 'table' and data[1] then
-			return String.nilIfEmpty(data[1].romanizedname) or data[1].name, data[1].nationality
-		end
-
-		local name, flag = args[prefix .. 'name'], args[prefix .. 'flag']
-
-		if String.isNotEmpty(name) and String.isNotEmpty(flag) or restrictedQuery then
-			return name, flag
-		end
-
-		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[extradata_manualinput::true]] AND [[page::' .. casterPage .. ']]'
-				.. ' AND ([[name::!]] OR [[flag::!]])'
-				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-			query = 'name, flag',
-			groupby = 'flag asc, name asc',
-			limit = 5000,
-		})
-
-		if type(data) ~= 'table' or not data[1] then
-			return name, flag
-		end
-
-		return BroadcasterCard._findUnique(data, 'name', casterPage) or name,
-			BroadcasterCard._findUnique(data, 'flag', casterPage) or flag
+	if type(data) == 'table' and data[1] then
+		return String.nilIfEmpty(data[1].romanizedname) or data[1].name, data[1].nationality
 	end
 
-	return getPersonInfo()
+	local name, flag = args[prefix .. 'name'], args[prefix .. 'flag']
+
+	if String.isNotEmpty(name) and String.isNotEmpty(flag) or restrictedQuery then
+		return name, flag
+	end
+
+	data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+		conditions = '[[extradata_manualinput::true]] AND [[page::' .. casterPage .. ']]'
+			.. ' AND ([[name::!]] OR [[flag::!]])'
+			.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
+		query = 'name, flag',
+		groupby = 'flag asc, name asc',
+		limit = 5000,
+	})
+
+	if type(data) ~= 'table' or not data[1] then
+		return name, flag
+	end
+
+	return BroadcasterCard._findUnique(data, 'name', casterPage) or name,
+		BroadcasterCard._findUnique(data, 'flag', casterPage) or flag
 end
 
 ---@param data {name: string?, flag: string?}
