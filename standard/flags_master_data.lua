@@ -1782,7 +1782,6 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
-	['uk'] = 'unitedkingdom',
 	['un'] = 'unitednations',
 
 	--   ISO 3166-1 alpha-2 Traditional Reservations
@@ -2163,6 +2162,7 @@ local aliases = {
 	['gerspeaking'] = 'germanspeaking',
 	['araspeaking'] = 'arabicspeaking',
 
+	['uk'] = 'unitedkingdom',
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
 	['unknown'] = 'filler',
