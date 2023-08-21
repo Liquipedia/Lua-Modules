@@ -86,7 +86,7 @@ function BroadcasterCard.create(frame)
 	-- Add people
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
-		local link = args[prefix .. 'link'] or caster
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(args[prefix .. 'link'] or caster):gsub(' ','_')
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
 		local date = Variables.varDefault('tournament_enddate')
 
@@ -94,7 +94,7 @@ function BroadcasterCard.create(frame)
 			id = caster,
 			name = name or '',
 			displayName = args[prefix .. 'name_o'],
-			page = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ','_' ),
+			page = link,
 			language = language,
 			position = position,
 			weight = BroadcasterCard.getWeight(),
@@ -156,11 +156,9 @@ end
 ---@param restrictedQuery boolean
 ---@return string?, string?
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
-	local resolvedCasterPage = mw.ext.TeamLiquidIntegration.resolve_redirect(casterPage):gsub(' ','_' )
-
 	local function getPersonInfo()
 		local data = mw.ext.LiquipediaDB.lpdb('player', {
-			conditions = '[[pagename::' .. resolvedCasterPage .. ']]',
+			conditions = '[[pagename::' .. casterPage .. ']]',
 			query = 'romanizedname, name, pagename, nationality',
 			limit = 1,
 		})
@@ -176,7 +174,7 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 		end
 
 		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[extradata_manualinput::true]] AND [[page::' .. resolvedCasterPage .. ']]'
+			conditions = '[[extradata_manualinput::true]] AND [[page::' .. casterPage .. ']]'
 				.. ' AND ([[name::!]] OR [[flag::!]])'
 				.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 			query = 'name, flag',
@@ -188,8 +186,8 @@ function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
 			return name, flag
 		end
 
-		return BroadcasterCard._findUnique(data, 'name', resolvedCasterPage) or name,
-			BroadcasterCard._findUnique(data, 'flag', resolvedCasterPage) or flag
+		return BroadcasterCard._findUnique(data, 'name', casterPage) or name,
+			BroadcasterCard._findUnique(data, 'flag', casterPage) or flag
 	end
 
 	return getPersonInfo()
