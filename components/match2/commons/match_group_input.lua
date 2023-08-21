@@ -435,7 +435,6 @@ end
 ---@class MatchGroupInputReadPlayersOfTeamOptions
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
----@field disallowGaps boolean?
 ---@field applyUnderScores boolean?
 
 ---reads the players of a team from input and wiki variables
@@ -472,8 +471,6 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 
 		if Table.isNotEmpty(player) then
 			table.insert(players, player)
-		elseif options.disallowGaps then
-			break
 		end
 	end
 
