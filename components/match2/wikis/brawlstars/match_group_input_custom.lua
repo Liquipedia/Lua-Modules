@@ -24,7 +24,6 @@ local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local _NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local MAX_NUM_VODGAMES = 20
 local FIRST_PICK_CONVERSION = {
 	blue = 1,
@@ -211,7 +210,7 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -266,21 +265,6 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 	return args
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	match['opponent' .. opponentIndex].match2players = {}
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			table.insert(match['opponent' .. opponentIndex].match2players, player)
-		end
-	end
-	return match
 end
 
 --

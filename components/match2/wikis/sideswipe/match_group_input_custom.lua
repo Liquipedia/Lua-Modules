@@ -8,7 +8,6 @@
 
 local CustomMatchGroupInput = {}
 
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -206,7 +205,7 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -267,19 +266,6 @@ function matchFunctions.getOpponents(args)
 	then args.resulttype = _RESULT_TYPE_DRAW
 	end
 	return args
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-		end
-	end
-	return match
 end
 
 --

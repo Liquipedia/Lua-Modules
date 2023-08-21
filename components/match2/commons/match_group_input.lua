@@ -23,6 +23,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 
 local globalVars = PageVariableNamespace({cached = true})
 
+local DEFAULT_MAX_NUM_PLAYERS = 10
+
 local MatchGroupInput = {}
 
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
@@ -428,6 +430,53 @@ function MatchGroupInput.readMvp(match)
 	end)
 
 	return {players = parsedPlayers, points = mvppoints}
+end
+
+---@class MatchGroupInputReadPlayersOfTeamOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field applyUnderScores boolean?
+
+---reads the players of a team from input and wiki variables
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@param options MatchGroupInputReadPlayersOfTeamOptions?
+---@return table
+function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
+	options = options or {}
+
+	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
+	local opponent = match['opponent' .. opponentIndex]
+	local playersData = Json.parseIfString(opponent.players) or {}
+
+	local players = {}
+
+	for playerIndex = 1, maxNumPlayers do
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+
+		player.name = player.name or playersData['p' .. playerIndex]
+			or Variables.varDefault(teamName .. '_p' .. playerIndex)
+
+		player.name = player.name and options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			or player.name
+
+		player.name = player.name and options.applyUnderScores and player.name:gsub(' ', '_') or player.name
+
+		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+
+		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+
+		if Table.isNotEmpty(player) then
+			table.insert(players, player)
+		end
+	end
+
+	opponent.match2players = players
+
+	return match
 end
 
 return MatchGroupInput

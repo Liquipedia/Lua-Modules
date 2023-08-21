@@ -25,7 +25,6 @@ local STATUS_DEFAULT_WIN = 'W'
 local ALLOWED_STATUSES = { STATUS_DEFAULT_WIN, 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local RESULT_TYPE_DRAW = 'draw'
 local BYE_OPPONENT_NAME = 'bye'
 local RESULT_TYPE_WALKOVER = 'default'
@@ -256,7 +255,7 @@ function matchFunctions.readOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -353,23 +352,6 @@ function matchFunctions.getOpponents(match)
 
 	-- set the match winner
 	match = matchFunctions.setMatchWinner(winner, opponents, match)
-	return match
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.displayname = player.displayname
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn', player.name and player.name:gsub('_', ' ') or nil)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-		else
-			break
-		end
-	end
 	return match
 end
 
