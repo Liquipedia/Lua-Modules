@@ -479,7 +479,6 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	return match
 end
 
-
 ---reads the caster input of a match
 ---@param match table
 ---@param options {noSort: boolean?}?
