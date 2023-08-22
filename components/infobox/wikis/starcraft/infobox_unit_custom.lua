@@ -46,7 +46,7 @@ function CustomUnit.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	local contenWithBonus = function(key, bonusNumber)
+	local contentWithBonus = function(key, bonusNumber)
 		return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
 			or _args[key]}
 	end
@@ -68,23 +68,23 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {_args.cooldown}},
 		Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {_args.gcd}},
 		Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {_args.acd}},
-		Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = contenWithBonus('cd2', 2)},
-		Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = contenWithBonus('gcd2', 4)},
-		Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = contenWithBonus('acd2', 5)},
+		Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = contentWithBonus('cd2', 2)},
+		Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = contentWithBonus('gcd2', 4)},
+		Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = contentWithBonus('acd2', 5)},
 		Cell{name = 'Air Attacks', content = {_args.aa}},
 		Cell{name = 'Attacks', content = {_args.ga}},
 		Cell{name = '[[Game Speed#DPS|DPS]]', content = {_args.dps}},
 		Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {_args.gdps}},
 		Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {_args.adps}},
-		Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = contenWithBonus('dps2', 3)},
-		Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = contenWithBonus('gdps2', 6)},
-		Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = contenWithBonus('adps2', 7)},
-		Cell{name = '[[Game Speed#Regeneration Rates|Energy Maximum]]', content = contenWithBonus('energy', 8)},
-		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]', content = contenWithBonus('energystart', 9)},
+		Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = contentWithBonus('dps2', 3)},
+		Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = contentWithBonus('gdps2', 6)},
+		Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = contentWithBonus('adps2', 7)},
+		Cell{name = '[[Game Speed#Regeneration Rates|Energy Maximum]]', content = contentWithBonus('energy', 8)},
+		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]', content = contentWithBonus('energystart', 9)},
 		Cell{name = '[[Distance#Range|Sight]]', content = {_args.sight}},
 		Cell{name = '[[Distance#Range|Detection Range]]', content = {_args.detection_range}},
 		Cell{name = '[[Game Speed#Movement Speed|Speed]]', content = {_args.speed}},
-		Cell{name = '[[Game Speed#Movement Speed|Speed Bonus]]', content = contenWithBonus('speed2', 1)},
+		Cell{name = '[[Game Speed#Movement Speed|Speed Bonus]]', content = contentWithBonus('speed2', 1)},
 		Cell{name = 'Morphs into', content = {_args.morphs, _args.morphs2}},
 		Cell{name = 'Morphs From', content = {_args.morphsf}},
 	}
