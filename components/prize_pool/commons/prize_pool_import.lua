@@ -290,7 +290,7 @@ end
 -- Computes the placements of a LPDB bracket
 -- @options.importWinners: Whether to include placements for non-eliminated opponents.
 function Import._computeBracketPlacementGroups(bracket, options)
-	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
+	local firstDropdownRoundIndexes = Import._findBracketFirstDropdownRounds(bracket)
 	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
 
 	local function getGroupKeys(matchId)
@@ -328,10 +328,11 @@ function Import._computeBracketPlacementGroups(bracket, options)
 
 			-- Opponents knocked out from sole section (se) or lower bracket (de)
 			if (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) and (
+				-- Include lowest bracket section always
 				coordinates.sectionIndex == #bracket.sections
 
-				-- Include opponents directly knocked out from the upper bracket
-				or firstDeRoundIndex and coordinates.roundIndex < firstDeRoundIndex) then
+				-- Include opponents directly knocked out from an upper bracket
+				or firstDropdownRoundIndexes[coordinates.sectionIndex] and coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex]) then
 
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
@@ -381,20 +382,24 @@ end
 -- Finds the first round in where upper bracket opponents drop to the lower
 -- bracket. Returns nil if it cannot be determined unambiguously, or if the
 -- bracket is not double elimination.
-function Import._findDeRoundIndex(bracket)
-	if #bracket.sections ~= 2 then
-		return
+---@return number[]
+function Import._findBracketFirstDropdownRounds(bracket)
+	local firstDropdownRoundPerSection = {-1}
+	if #bracket.sections == 1 then
+		return firstDropdownRoundPerSection
 	end
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
-
-	for roundIndex = 1, #bracket.rounds do
-		local lbCount = countsByRound[roundIndex][2]
-		if lbCount == 0 then
-			return roundIndex
-		elseif lbCount > 0 then
-			return
+	for sectionIndex = 2, #bracket.sections do
+		for roundIndex = 1, #bracket.rounds do
+			local lbCount = countsByRound[roundIndex][sectionIndex]
+			if lbCount == 0 then
+				firstDropdownRoundPerSection[sectionIndex - 1] = roundIndex
+			elseif lbCount > 0 then
+				firstDropdownRoundPerSection[sectionIndex - 1] = -1
+			end
 		end
 	end
+	return firstDropdownRoundPerSection
 end
 
 function Import._mergePlacements(lpdbEntries, placements)
