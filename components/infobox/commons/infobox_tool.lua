@@ -17,7 +17,6 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
 
 local UNKNOWN = 'Unknown'
 
