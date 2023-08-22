@@ -26,6 +26,7 @@ local _args
 
 function CustomMap.run(frame)
 	local customMap = Map(frame)
+
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.getWikiCategories = CustomMap.getWikiCategories
 	customMap.addToLpdb = CustomMap.addToLpdb
@@ -37,11 +38,11 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local id = _args.id
 
-	Array.extendWith(widgets,
+	Array.appendWith(widgets,
 		Cell{name = 'Tileset', content = {_args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
 		Cell{name = 'Size', content = {_args.tileset or CustomMap:_getSize(id)}},
 		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id)}},
-		Cell{name = 'Versions', content = {_args.versions}},
+		Cell{name = 'Versions', content = {_args.versions and ('\n' .. _args.versions) or nil}},
 		Cell{name = 'Competition Span', content = {_args.span}},
 		Cell{name = 'Leagues Featured', content = {_args.leagues}}
 	)
