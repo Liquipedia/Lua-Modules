@@ -48,7 +48,7 @@ function CustomInjector:addCustomCells(widgets)
 		return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
 			or _args[key]}
 	end
-	
+
 	return {
 		Title{name = 'Unit stats'},
 		Cell{name = 'Attributes', content = {_args.att}},
