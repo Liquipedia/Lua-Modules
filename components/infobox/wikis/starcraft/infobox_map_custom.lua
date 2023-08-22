@@ -28,6 +28,8 @@ function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
 	customMap.getWikiCategories = CustomMap.getWikiCategories
+	customMap.addToLpdb = CustomMap.addToLpdb
+
 	_args = customMap.args
 	return customMap:createInfobox()
 end
