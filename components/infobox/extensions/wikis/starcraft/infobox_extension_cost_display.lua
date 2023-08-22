@@ -13,22 +13,22 @@ local CostDisplay = {}
 
 local ICONS = {
 	minerals = {
-		default = '[[File:scr-minerals.png|baseline|link=Resources#Minerals|Minerals]]',
+		default = '[[File:scr-minerals.png|baseline|20px|20px|link=Resources#Minerals|Minerals]]',
 	},
 	gas = {
-		t = '[[File:scr-gas-t.png|baseline|link=Resources#Vespene_Gas|Vespene Gas]]',
-		p = '[[File:scr-gas-p.png|baseline|link=Resources#Vespene_Gas|Vespene Gas]]',
-		z = '[[File:scr-gas-z.png|baseline|link=Resources#Vespene_Gas|Vespene Gas]]',
-		default = '[[File:scr-gas-t.png|baseline|link=Resources#Vespene_Gas|Vespene Gas]]',
+		t = '[[File:scr-gas-t.png|baseline|20px|20px|link=Resources#Vespene_Gas|Vespene Gas]]',
+		p = '[[File:scr-gas-p.png|baseline|20px|20px|link=Resources#Vespene_Gas|Vespene Gas]]',
+		z = '[[File:scr-gas-z.png|baseline|20px|20px|link=Resources#Vespene_Gas|Vespene Gas]]',
+		default = '[[File:scr-gas-t.png|baseline|20px|20px|link=Resources#Vespene_Gas|Vespene Gas]]',
 	},
 	buildTime = {
-		default = '[[File:DurationIcon.gif|baseline|link=Game Speed#Build Time|Build Time]]',
+		default = '[[File:DurationIcon.gif|baseline|20px|20px|link=Game Speed#Build Time|Build Time]]',
 	},
 	supply = {
-		t = '[[File:scr-food-t.png|baseline|link=Resources#Supply|Supply]]',
-		p = '[[File:scr-food-p.png|baseline|link=Resources#Supply|Supply]]',
-		z = '[[File:scr-food-t.png|baseline|link=Resources#Supply|Supply]]',
-		default = '[[File:scr-food-t.png|baseline|link=Resources#Supply|Supply]]',
+		t = '[[File:scr-food-t.png|baseline|20px|20px|link=Resources#Supply|Supply]]',
+		p = '[[File:scr-food-p.png|baseline|20px|20px|link=Resources#Supply|Supply]]',
+		z = '[[File:scr-food-t.png|baseline|20px|20px|link=Resources#Supply|Supply]]',
+		default = '[[File:scr-food-t.png|baseline|20px|20px|link=Resources#Supply|Supply]]',
 	},
 }
 local ORDER = {
