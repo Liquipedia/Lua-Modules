@@ -170,7 +170,7 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
-function CustomUnit:getWikiCategories(args)
+function CustomBuilding:getWikiCategories(args)
 	if String.isEmpty(args.race) then
 		return {}
 	end
