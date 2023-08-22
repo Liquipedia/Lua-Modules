@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
@@ -249,6 +250,46 @@ function Footer:create()
 	return self.root
 end
 
+---MatchSummary Casters Class
+---@class MatchSummaryCasters
+---@operator call: MatchSummaryCasters
+---@field root Html
+---@field casters string[]
+local Casters = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('brkts-popup-comment')
+			:css('white-space','normal')
+			:css('font-size','85%')
+		self.casters = {}
+	end
+)
+
+---adds a casters display to thge casters list
+---@param caster {name: string, displayName: string, flag: string?}?
+---@return MatchSummaryCasters
+function Casters:addCaster(caster)
+	if Logic.isNotEmpty(caster) then
+		---@cast caster -nil
+		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
+		if caster.flag then
+			table.insert(self.casters, Flags.Icon(caster.flag) .. '&nbsp;' .. nameDisplay)
+		else
+			table.insert(self.casters, nameDisplay)
+		end
+	end
+
+	return self
+end
+
+---creates the casters display
+---@return Html
+function Casters:create()
+	return self.root
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
+end
+
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
 MatchSummary.Body = Body
@@ -257,6 +298,7 @@ MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
 MatchSummary.Mvp = Mvp
+MatchSummary.Casters = Casters
 
 function MatchSummary:init(width)
 	self.root = mw.html.create('div')
