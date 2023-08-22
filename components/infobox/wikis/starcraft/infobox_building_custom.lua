@@ -49,9 +49,9 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = '[[Distance#Sight Range|Detection Range]]', content = {_args.detection_range}},
 		Cell{name = 'Type', content = {_args.type}},
 		Cell{name = 'Size', content = {_args.size}},
-		Cell{name = '[[Game Speed#DPS|Energy Maximum]]', content = CustomBuilding._contenWithBonus('energy', 8)},
+		Cell{name = '[[Game Speed#DPS|Energy Maximum]]', content = CustomBuilding._contentWithBonus('energy', 8)},
 		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]',
-			content = CustomBuilding._contenWithBonus('energystart', 9)},
+			content = CustomBuilding._contentWithBonus('energystart', 9)},
 		Cell{name = 'Animated', content = {_args.banimation}},
 	}
 end
@@ -101,21 +101,21 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Damage', content = {_args.damage}},
 			Cell{name = '[[Distance#Range|Range]]', content = {_args.range}},
 			Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {_args.cooldown}},
-			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = CustomBuilding._contenWithBonus('cd2', 2)},
+			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('cd2', 2)},
 			Cell{name = '[[Game Speed#DPS|DPS]]', content = {_args.dps}},
-			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = CustomBuilding._contenWithBonus('dps2', 3)},
+			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = CustomBuilding._contentWithBonus('dps2', 3)},
 			Cell{name = 'Ground Attack', content = {_args.ground_attack}},
 			Cell{name = '[[Distance#Range|Ground Range]]', content = {_args.grange}},
 			Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {_args.gcd}},
-			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = CustomBuilding._contenWithBonus('gcd2', 4)},
+			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('gcd2', 4)},
 			Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {_args.gdps}},
-			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = CustomBuilding._contenWithBonus('gdps2', 6)},
+			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = CustomBuilding._contentWithBonus('gdps2', 6)},
 			Cell{name = 'Air Attack', content = {_args.air_attack}},
 			Cell{name = '[[Distance#Range|Air Range]]', content = {_args.arange}},
 			Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {_args.acd}},
-			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = CustomBuilding._contenWithBonus('acd2', 5)},
+			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('acd2', 5)},
 			Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {_args.adps}},
-			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = CustomBuilding._contenWithBonus('adps2', 7)},
+			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = CustomBuilding._contentWithBonus('adps2', 7)},
 		}
 	end
 	return widgets
@@ -124,7 +124,7 @@ end
 ---@param key string
 ---@param bonusNumber integer
 ---@return {string?}
-function CustomBuilding._contenWithBonus(key, bonusNumber)
+function CustomBuilding._contentWithBonus(key, bonusNumber)
 	return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
 		or _args[key]}
 end
