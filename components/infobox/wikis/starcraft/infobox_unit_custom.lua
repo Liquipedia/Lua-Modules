@@ -19,7 +19,6 @@ local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CustomUnit = Class.new()
 
@@ -45,7 +44,7 @@ function CustomUnit.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	widgets = {
+	return {
 		Title{name = 'Unit stats'},
 		Cell{name = 'Attributes', content = {_args.att}},
 		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay()}},
@@ -63,15 +62,15 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {_args.gcd}},
 		Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {_args.acd}},
 		Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = {
-			_arg.cd2 and _args.bonus2 and (_args.cd2 .. ' ' .. _args.bonus2)
+			_args.cd2 and _args.bonus2 and (_args.cd2 .. ' ' .. _args.bonus2)
 			or _args.cd2
 		}},
 		Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = {
-			_arg.gcd2 and _args.bonus4 and (_args.gcd2 .. ' ' .. _args.bonus4)
+			_args.gcd2 and _args.bonus4 and (_args.gcd2 .. ' ' .. _args.bonus4)
 			or _args.gcd2
 		}},
 		Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = {
-			_arg.acd2 and _args.bonus5 and (_args.acd2 .. ' ' .. _args.bonus5)
+			_args.acd2 and _args.bonus5 and (_args.acd2 .. ' ' .. _args.bonus5)
 			or _args.acd2
 		}},
 		Cell{name = 'Air Attacks', content = {_args.aa}},
@@ -80,37 +79,35 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {_args.gdps}},
 		Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {_args.adps}},
 		Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = {
-			_arg.dps2 and _args.bonus3 and (_args.dps2 .. ' ' .. _args.bonus3)
+			_args.dps2 and _args.bonus3 and (_args.dps2 .. ' ' .. _args.bonus3)
 			or _args.dps2
 		}},
 		Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = {
-			_arg.gdps2 and _args.bonus6 and (_args.gdps2 .. ' ' .. _args.bonus6)
+			_args.gdps2 and _args.bonus6 and (_args.gdps2 .. ' ' .. _args.bonus6)
 			or _args.gdps2
 		}},
 		Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = {
-			_arg.adps2 and _args.bonus7 and (_args.adps2 .. ' ' .. _args.bonus7)
+			_args.adps2 and _args.bonus7 and (_args.adps2 .. ' ' .. _args.bonus7)
 			or _args.adps2
 		}},
 		Cell{name = '[[Game Speed#Regeneration Rates|Energy Maximum]]', content = {
-			_arg.energy and _args.bonus8 and (_args.energy .. ' ' .. _args.bonus8)
+			_args.energy and _args.bonus8 and (_args.energy .. ' ' .. _args.bonus8)
 			or _args.energy
 		}},
 		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]', content = {
-			_arg.energystart and _args.bonus9 and (_args.energystart .. ' ' .. _args.bonus9)
+			_args.energystart and _args.bonus9 and (_args.energystart .. ' ' .. _args.bonus9)
 			or _args.energystart
 		}},
 		Cell{name = '[[Distance#Range|Sight]]', content = {_args.sight}},
 		Cell{name = '[[Distance#Range|Detection Range]]', content = {_args.detection_range}},
 		Cell{name = '[[Game Speed#Movement Speed|Speed]]', content = {_args.speed}},
 		Cell{name = '[[Game Speed#Movement Speed|Speed Bonus]]', content = {
-			_arg.speed2 and _args.bonus1 and (_args.speed2 .. ' ' .. _args.bonus1)
+			_args.speed2 and _args.bonus1 and (_args.speed2 .. ' ' .. _args.bonus1)
 			or _args.speed2
 		}},
 		Cell{name = 'Morphs into', content = {_args.morphs, _args.morphs2}},
 		Cell{name = 'Morphs From', content = {_args.morphsf}},
 	}
-
-	return widgets
 end
 
 function CustomInjector:parse(id, widgets)
