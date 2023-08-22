@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
@@ -18,6 +19,7 @@ local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
 local Title = Widgets.Title
 
 local CustomUnit = Class.new()
@@ -122,7 +124,19 @@ function CustomInjector:parse(id, widgets)
 		end
 		return {Cell{name = 'Type', content = {display}}}
 	elseif id == 'defense' or id == 'attack' then return {}
+	elseif id == 'customcontent' then
+		local aoeArgs = Json.parseIfTable(_args.aoe)
+		if not aoeArgs or String.isEmpty(aoeArgs.name) then return {} end
+
+		return {
+			Title{name = aoeArgs.name},
+			Cell{name = 'Inner', content = {aoeArgs.size1}},
+			Cell{name = 'Medium', content = {aoeArgs.size2}},
+			Cell{name = 'Outer', content = {aoeArgs.size3}},
+			Center{content = {aoeArgs.footnotes and ('<small>' .. aoeArgs.footnotes .. '</small>') or nil}}
+		}
 	end
+
 	return widgets
 end
 
