@@ -8,10 +8,8 @@
 
 local CustomMatchGroupInput = {}
 
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -162,16 +160,6 @@ function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 
-	local casters = {}
-	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			casterName,
-			match[casterKey .. 'flag'],
-			match[casterKey .. 'name']
-		))
-	end
-	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
-
 	local showh2h = Logic.readBool(match.showh2h)
 		and opponent1.type == Opponent.team
 		and opponent2.type == Opponent.team
@@ -179,50 +167,11 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		casters = MatchGroupInput.readCasters(match),
 		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
 		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
 	return match
-end
-
-function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
-	if String.isEmpty(flag) then
-		flag = Variables.varDefault(name .. '_flag')
-	end
-	if String.isEmpty(displayName) then
-		displayName = Variables.varDefault(name .. '_dn')
-	end
-	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
-		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
-			query = 'flag, id',
-			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
-		end
-	end
-	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
-	end
-	if String.isEmpty(displayName) then
-		displayName = name
-	end
-	if String.isNotEmpty(displayName) then
-		Variables.varDefine(name .. '_dn', displayName)
-	end
-	return {
-		name = name,
-		displayName = displayName,
-		flag = flag,
-	}
 end
 
 function matchFunctions.readOpponents(match)

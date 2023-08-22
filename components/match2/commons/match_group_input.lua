@@ -479,4 +479,68 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	return match
 end
 
+---reads the caster input of a match
+---@param match table
+---@param options {noSort: boolean?}?
+---@return string?
+function MatchGroupInput.readCasters(match, options)
+	options = options or {}
+	local casters = {}
+	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, MatchGroupInput._getCasterInformation(
+			casterName,
+			match[casterKey .. 'flag'],
+			match[casterKey .. 'name']
+		))
+	end
+
+	if not options.noSort then
+		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
+	end
+
+	return Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+end
+
+---fills in missing information for a given caster
+---@param name string
+---@param flag string?
+---@param displayName string?
+---@return {name:string, displayName: string, flag: string?}
+function MatchGroupInput._getCasterInformation(name, flag, displayName)
+	flag = Logic.emptyOr(flag, Variables.varDefault(name .. '_flag'))
+	displayName = Logic.emptyOr(displayName, Variables.varDefault(name .. 'dn'))
+
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	Variables.varDefine(name .. '_dn', displayName)
+
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
+end
+
 return MatchGroupInput
