@@ -332,7 +332,7 @@ function Import._computeBracketPlacementGroups(bracket, options)
 				coordinates.sectionIndex == #bracket.sections
 
 				-- Include opponents directly knocked out from an upper bracket
-				or firstDropdownRoundIndexes[coordinates.sectionIndex] and coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex]) then
+				or firstDropdownRoundIndexes[coordinates.sectionIndex] and firstDropdownRoundIndexes[coordinates.sectionIndex] ~= -1 and coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex]) then
 
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
@@ -384,7 +384,7 @@ end
 -- bracket is not double elimination.
 ---@return number[]
 function Import._findBracketFirstDropdownRounds(bracket)
-	local firstDropdownRoundPerSection = {-1}
+	local firstDropdownRoundPerSection = {}
 	if #bracket.sections == 1 then
 		return firstDropdownRoundPerSection
 	end
@@ -394,7 +394,8 @@ function Import._findBracketFirstDropdownRounds(bracket)
 			local lbCount = countsByRound[roundIndex][sectionIndex]
 			if lbCount == 0 then
 				firstDropdownRoundPerSection[sectionIndex - 1] = roundIndex
-			elseif lbCount > 0 then
+				break
+			else
 				firstDropdownRoundPerSection[sectionIndex - 1] = -1
 			end
 		end
