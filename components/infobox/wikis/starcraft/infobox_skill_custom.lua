@@ -79,16 +79,13 @@ function CustomSkill:getResearchCost()
 end
 
 function CustomSkill:getResearchFrom()
-	local from = _args.from
-	if String.isEmpty(from) then
-		from = 'No research needed'
-	elseif not String.isEmpty(_args.from2) then
-		from = '[[' .. from .. ']], [[' .. _args.from2 .. ']]'
+	if String.isEmpty(_args.from) then
+		return 'No research needed'
+	elseif String.isEmpty(_args.from2) then
+		return '[[' .. _args.from .. ']]'
 	else
-		from = '[[' .. from .. ']]'
+		return '[[' .. _args.from .. ']], [[' .. _args.from2 .. ']]'
 	end
-
-	return from
 end
 
 function CustomSkill:getResearchHotkey()
