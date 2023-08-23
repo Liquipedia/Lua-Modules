@@ -21,7 +21,7 @@ local Cell = Widgets.Cell
 
 local CustomSkill = Class.new()
 
-local ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
+local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
 
 local CustomInjector = Class.new(Injector)
 
@@ -125,7 +125,7 @@ end
 
 function CustomSkill:getCostDisplay()
 	local energy = tonumber(_args.energy or 0) or 0
-	return ENERGY .. '&nbsp;' .. energy
+	return ENERGY_ICON .. '&nbsp;' .. energy
 end
 
 return CustomSkill
