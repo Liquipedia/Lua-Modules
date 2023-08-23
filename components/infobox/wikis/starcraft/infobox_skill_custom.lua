@@ -118,7 +118,7 @@ function CustomSkill:getHotkeys()
 end
 
 function CustomSkill:getCostDisplay()
-	local energy = tonumber(_args.energy or 0) or 0
+	local energy = tonumber(_args.energy) or 0
 	return ENERGY_ICON .. '&nbsp;' .. energy
 end
 
