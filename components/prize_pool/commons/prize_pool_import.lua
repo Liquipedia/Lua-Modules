@@ -319,7 +319,7 @@ function Import._computeBracketPlacementGroups(bracket, options)
 				if not (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) then
 					return false
 				elseif coordinates.sectionIndex == #bracket.sections then
-					-- Always include lowest bracket section 
+					-- Always include lowest bracket section
 					return true
 				elseif firstDropdownRoundIndexes[coordinates.sectionIndex] == -1 then
 					-- No dropdown opponents for this level
