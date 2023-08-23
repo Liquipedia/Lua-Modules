@@ -315,25 +315,32 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			return {}
 
 		else
-			local groupKeys = {}
+			local function shouldImportKnockedOutOpponents()
+				if not (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) then
+					return false
+				elseif coordinates.sectionIndex == #bracket.sections then
+					-- Always include lowest bracket section 
+					return true
+				elseif firstDropdownRoundIndexes[coordinates.sectionIndex] == -1 then
+					-- No dropdown opponents for this level
+					return false
+				elseif coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex] then
+					-- Also include opponents directly knocked out from an upper bracket
+					return true
+				end
+				return false
+			end
 
-			-- Winners of root matches
+			local groupKeys = {}
 			if coordinates.depth == 0 and options.importWinners then
+				-- Winners of root matches
 				table.insert(groupKeys, {0, coordinates.sectionIndex, 1})
 				-- in case of qualLose also Loser of root match if not lower bracket (lower bracket gets handled below)
 				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
 					table.insert(groupKeys, {0, coordinates.sectionIndex, 2})
 				end
-			end
-
-			-- Opponents knocked out from sole section (se) or lower bracket (de)
-			if (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) and (
-				-- Include lowest bracket section always
-				coordinates.sectionIndex == #bracket.sections
-
-				-- Include opponents directly knocked out from an upper bracket
-				or firstDropdownRoundIndexes[coordinates.sectionIndex] and firstDropdownRoundIndexes[coordinates.sectionIndex] ~= -1 and coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex]) then
-
+			elseif shouldImportKnockedOutOpponents() then
+				-- Opponents knocked out from sole section (se) or lower sections (de/te/etc.)
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
 
