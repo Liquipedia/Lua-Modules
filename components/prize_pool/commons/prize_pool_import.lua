@@ -339,7 +339,8 @@ function Import._computeBracketPlacementGroups(bracket, options)
 				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
 					table.insert(groupKeys, {0, coordinates.sectionIndex, 2})
 				end
-			elseif shouldImportKnockedOutOpponents() then
+			end
+			if shouldImportKnockedOutOpponents() then
 				-- Opponents knocked out from sole section (se) or lower sections (de/te/etc.)
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
