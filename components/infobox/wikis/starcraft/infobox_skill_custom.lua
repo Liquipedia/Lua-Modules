@@ -108,16 +108,13 @@ function CustomSkill:getCategories(args)
 end
 
 function CustomSkill:getHotkeys()
-	local display
 	if not String.isEmpty(_args.shortcut) then
 		if not String.isEmpty(_args.shortcut2) then
-			display = Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'slash')
+			return Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'slash')
 		else
-			display = Hotkeys.hotkey(_args.shortcut)
+			return Hotkeys.hotkey(_args.shortcut)
 		end
 	end
-
-	return display
 end
 
 function CustomSkill:getCostDisplay()
