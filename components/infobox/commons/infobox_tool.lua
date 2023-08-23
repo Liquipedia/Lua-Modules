@@ -77,13 +77,4 @@ function Tool:getWikiCategories(args)
 	return {}
 end
 
---- Allows for overriding this functionality
----Adjust Lpdb data
----@param lpdbData table
----@param args table
----@return table
-function Tool:setLpdbData(lpdbData, args)
-	return lpdbData
-end
-
 return Tool
