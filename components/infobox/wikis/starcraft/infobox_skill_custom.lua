@@ -92,12 +92,11 @@ function CustomSkill:getResearchFrom()
 end
 
 function CustomSkill:getResearchHotkey()
-	local display
-	if not String.isEmpty(_args.from) then
-		display = Hotkeys.hotkey(_args.rshortcut)
+	if String.isEmpty(_args.from) then
+		return
 	end
 
-	return display
+	return Hotkeys.hotkey(_args.rshortcut)
 end
 
 function CustomSkill:getCategories(args)
