@@ -82,7 +82,7 @@ end
 ---@param lpdbData table
 ---@param args table
 ---@return table
-function Tool:addToLpdb(lpdbData, args)
+function Tool:setLpdbData(lpdbData, args)
 	return lpdbData
 end
 
