@@ -94,6 +94,7 @@ function Unit:createInfobox()
 		},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
+		Customizable{id = 'customcontent', children = {}},
 	}
 
 	infobox:categories('Units')
