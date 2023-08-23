@@ -379,28 +379,20 @@ function Import._getPreTiebreakMatchIds(bracket)
 	return sfMatchIds
 end
 
--- Finds the first round in where upper bracket opponents drop to the lower
--- bracket. Returns nil if it cannot be determined unambiguously, or if the
--- bracket is not double elimination.
+-- Gets the first round of each level (section) of a bracket where losers drop to the level below.
+-- Returns empty array if the bracket is single elimination. If no losers drop to a lower level, then
+-- the array will contain `-1` for that level.
 ---@return number[]
 function Import._findBracketFirstDropdownRounds(bracket)
-	local firstDropdownRoundPerSection = {}
 	if #bracket.sections == 1 then
-		return firstDropdownRoundPerSection
+		return {}
 	end
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
-	for sectionIndex = 2, #bracket.sections do
-		for roundIndex = 1, #bracket.rounds do
-			local lbCount = countsByRound[roundIndex][sectionIndex]
-			if lbCount == 0 then
-				firstDropdownRoundPerSection[sectionIndex - 1] = roundIndex
-				break
-			else
-				firstDropdownRoundPerSection[sectionIndex - 1] = -1
-			end
-		end
-	end
-	return firstDropdownRoundPerSection
+	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
+		return Array.find(Array.range(1, #bracket.rounds), function(roundIndex)
+			return countsByRound[roundIndex][sectionIndex] == 0
+		end) or -1
+	end)
 end
 
 function Import._mergePlacements(lpdbEntries, placements)
