@@ -501,12 +501,12 @@ function CustomPlayer:getWikiCategories(categories)
 	end
 
 	local botCategoryKeys = {
-			'language',
-			'wrapper',
-			'terrain_analysis',
-			'aitechniques',
-			'framework',
-		}
+		'language',
+		'wrapper',
+		'terrain_analysis',
+		'aitechniques',
+		'framework',
+	}
 	for _, key in pairs(botCategoryKeys) do
 		if _args.informationType == BOT_INFORMATION_TYPE and _args[key] then
 			table.insert(categories, _args[key] .. ' bot')
