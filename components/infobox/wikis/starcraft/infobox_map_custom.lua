@@ -62,13 +62,13 @@ function CustomMap:getNameDisplay(args)
 	return args.name
 end
 
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.name = CustomMap:getNameDisplay(_args)
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.name = CustomMap:getNameDisplay(args)
 	lpdbData.extradata = {
-		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator),
-		spawns = _args.players,
-		height = _args.height,
-		width = _args.width,
+		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator),
+		spawns = args.players,
+		height = args.height,
+		width = args.width,
 	}
 	return lpdbData
 end
