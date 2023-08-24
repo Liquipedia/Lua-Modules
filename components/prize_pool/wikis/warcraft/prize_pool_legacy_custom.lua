@@ -172,7 +172,7 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 	return opponentData
 end
 
-function CustomLegacyPrizePool.adjustBeforeRun(newArgs)
+function CustomLegacyPrizePool.afterSlots(newArgs)
 	if _cache.opponentType == Opponent.duo then
 		for _, slot in ipairs(newArgs) do
 			slot.opponents = Array.map(slot.opponents, CustomLegacyPrizePool._addDuoLastVs)
