@@ -184,7 +184,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			opponents[key].placement = 1
 		end
 	elseif specialType == DEFAULT_RESULT_TYPE then
-		for key, _ in pairs(opponents) do
+		for key in pairs(opponents) do
 			if key == winner then
 				opponents[key].placement = 1
 			else
