@@ -330,8 +330,6 @@ end
 function matchFunctions.getExtraData(match)
 		match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = MatchGroupInput.readMvp(match),
-		mvpteam = match.mvpteam or match.winner,
 		casters = MatchGroupInput.readCasters(match),
 	}
 	return match
