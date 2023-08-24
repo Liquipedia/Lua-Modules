@@ -42,7 +42,7 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Tileset', content = {_args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
 		Cell{name = 'Size', content = {_args.tileset or CustomMap:_getSize(id)}},
 		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id)}},
-		Cell{name = 'Versions', content = {_args.versions and ('\n' .. _args.versions) or nil}},
+		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(_args.versions)}},
 		Cell{name = 'Competition Span', content = {_args.span}},
 		Cell{name = 'Leagues Featured', content = {_args.leagues}}
 	)
