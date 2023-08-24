@@ -322,9 +322,9 @@ function Import._computeBracketPlacementGroups(bracket, options)
 					-- Always include lowest bracket section
 					return true
 				elseif not firstDropdownRoundIndexes[coordinates.sectionIndex] then
-					--No dropdown opponents for this level
+					-- No dropdown opponents for this level
 					return false
-				elseif coordinates.roundIndex <= firstDropdownRoundIndexes[coordinates.sectionIndex] then
+				elseif coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex] then
 					-- Also include opponents directly knocked out from an upper bracket
 					return true
 				end
@@ -393,11 +393,14 @@ end
 ---@return number[]
 function Import._findBracketFirstDropdownRounds(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
+	local roundIndexes = Array.range(1, #bracket.rounds)
 
-	return Array.map(Array.range(1, #bracket.sections), function(sectionIndex)
-		return Array.find(Array.range(1, #bracket.rounds), function(roundIndex)
-			return countsByRound[roundIndex][sectionIndex] == 0
-		end) or -1
+	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
+		local firstRoundWithPositiveCount = Array.find(roundIndexes, function(roundIndex)
+			return countsByRound[roundIndex][sectionIndex] >= 0 end)
+
+		return firstRoundWithPositiveCount and countsByRound[firstRoundWithPositiveCount][sectionIndex] == 0
+			and firstRoundWithPositiveCount or -1
 	end)
 end
 
