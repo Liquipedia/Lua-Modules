@@ -180,8 +180,8 @@ end
 
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
-			opponents[key].placement = 1
+		for _, opponent in pairs(opponents) do
+			opponent.placement = 1
 		end
 	elseif specialType == DEFAULT_RESULT_TYPE then
 		for key in pairs(opponents) do
