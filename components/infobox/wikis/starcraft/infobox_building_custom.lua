@@ -123,7 +123,7 @@ end
 
 ---@param key string
 ---@param bonusNumber integer
----@return {string?}
+---@return string[]
 function CustomBuilding._contentWithBonus(key, bonusNumber)
 	return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
 		or _args[key]}

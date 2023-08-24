@@ -333,7 +333,7 @@ function League:liquipediaTierHighlighted(args)
 end
 
 --- Allows for overriding this functionality
-function League:appendLiquipediatierDisplay()
+function League:appendLiquipediatierDisplay(args)
 	return ''
 end
 

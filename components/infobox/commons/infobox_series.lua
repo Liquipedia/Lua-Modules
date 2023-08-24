@@ -243,7 +243,7 @@ function Series:liquipediaTierHighlighted(args)
 end
 
 --- Allows for overriding this functionality
-function Series:appendLiquipediatierDisplay()
+function Series:appendLiquipediatierDisplay(args)
 	return ''
 end
 
