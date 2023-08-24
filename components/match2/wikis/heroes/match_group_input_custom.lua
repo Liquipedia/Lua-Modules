@@ -198,7 +198,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and (winner or '') == '' then
+			if counter == 1 and String.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
