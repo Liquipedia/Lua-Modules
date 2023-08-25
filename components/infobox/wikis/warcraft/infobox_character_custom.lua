@@ -13,7 +13,6 @@ local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Math = require('Module:Math')
-local String = require('Module:String')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
@@ -65,7 +64,7 @@ function CustomCharacter.run(frame)
 	character.getWikiCategories = CustomCharacter.getWikiCategories
 	character.nameDisplay = CustomCharacter.nameDisplay
 	character.addToLpdb = CustomCharacter.addToLpdb
-	
+
 	return character:createInfobox(frame)
 end
 
@@ -120,7 +119,7 @@ function CustomCharacter._basicAttribute(attribute)
 		.. '<br><b>' .. (_args['base' .. attribute] or '') .. '</b>'
 		.. ' +' .. (_args[attribute .. 'gain'] or '')
 end
-	
+
 function CustomCharacter._getDamageAttribute()
 	local mainAttribute = _args.mainattribute
 
@@ -135,7 +134,7 @@ function CustomCharacter._getDamageAttribute()
 	return ATTRIBUTE_ICONS.damage
 		.. '<br>' .. minimumDamage .. ' - ' .. maximumDamage
 end
-	
+
 function CustomCharacter._getArmorAttribute()
 	local armorValue = (tonumber(_args.baseagi) or 0) * 0.3
 		- 2 + (tonumber(_args.basearmor) or 0)
@@ -143,7 +142,7 @@ function CustomCharacter._getArmorAttribute()
 	return ATTRIBUTE_ICONS.armor
 		.. '<br>' .. Abbreviation.make(Math.round{armorValue, 0}, armorValue)
 end
-	
+
 function CustomCharacter._getPrimaryAttribute()
 	return ATTRIBUTE_ICONS[ATTRIBUTES[_args.mainattribute]:lower()] .. '<br>Primary Attribute'
 end
@@ -236,7 +235,7 @@ function CustomCharacter._hitPointsRegenType()
 end
 
 function CustomCharacter:getWikiCategories(args)
-	local character = args.informationType 
+	local character = args.informationType
 	local faction = Faction.toName(Faction.read(args.race)) or NEUTRAL
 
 	local attribute = ATTRIBUTES[args.mainattribute]
