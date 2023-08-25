@@ -69,7 +69,6 @@ function CustomPatch:addToLpdb(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
 		name = self.name,
 		type = 'patch',
-		information = monthAndDay,
 		date = args.release,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			beta = tostring(Logic.readBool(args.beta)),
