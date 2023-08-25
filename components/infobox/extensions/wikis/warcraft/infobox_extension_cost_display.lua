@@ -15,7 +15,7 @@ local ICONS = {
 	lumber = '[[File:Lumber WC3 Icon.gif|15}px|link=Lumber]]',
 	buildTime = '[[File:Cooldown Clock.png|15px]]',
 	food = '[[File:Food WC3 Icon.gif|15px|link=Food]]',
-} 
+}
 local ORDER = {
 	'gold',
 	'lumber',
