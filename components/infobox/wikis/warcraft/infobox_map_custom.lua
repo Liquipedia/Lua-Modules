@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
@@ -61,7 +60,7 @@ function CustomMap._mercenaryCamp(postfix)
 		return nil
 	end
 
-	return Page.makeInternalLink({onlyIfExists == true}, campInput, 'Mercenary Camp#' .. campInput)
+	return Page.makeInternalLink({onlyIfExists = true}, campInput, 'Mercenary Camp#' .. campInput)
 		or campInput
 end
 
