@@ -55,9 +55,7 @@ function Lpdb.executeMassQuery(tableName, queryParameters, itemChecker, limit)
 		queryParameters.limit = math.min(queryParameters.limit, limit - queryParameters.offset)
 
 		local lpdbData = mw.ext.LiquipediaDB.lpdb(tableName, queryParameters)
-		if type(lpdbData) == 'string' then
-			error(lpdbData)
-		end
+		assert(type(lpdbData) == 'table', lpdbData)
 		for _, value in ipairs(lpdbData) do
 			if itemChecker(value) == false then
 				return
