@@ -30,6 +30,8 @@ local _args
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomPatch.run(frame)
 	local customPatch = Patch(frame)
 	_args = customPatch.args
@@ -41,10 +43,14 @@ function CustomPatch.run(frame)
 	return customPatch:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomPatch:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'release' then
 		return {
@@ -57,6 +63,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
+---@return string?
 function CustomPatch._netEaseRelease(args)
 	if not args.release or DateExt.readTimestamp(args.release) <= IGNORE_NET_EASE_RELEASE_BEFORE then
 		return
@@ -65,7 +73,8 @@ function CustomPatch._netEaseRelease(args)
 	return args.release_netease == SKIP and SKIPPED or args.release_netease
 end
 
-function CustomPatch:addToLpdb(args)
+---@param args table
+function CustomPatch:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
 		name = self.name,
 		type = 'patch',
@@ -83,6 +92,8 @@ function CustomPatch:addToLpdb(args)
 	})
 end
 
+---@param args table
+---@return {previous: string?, next: string?, previous2: string?, next2: string?}
 function CustomPatch:getChronologyData(args)
 	local previousBalanceUpdate, nextBalanceUpdate = CustomPatch._automaticChronologyData(args)
 
@@ -109,6 +120,9 @@ function CustomPatch:getChronologyData(args)
 	}
 end
 
+---@param args table
+---@return string?
+---@return string?
 function CustomPatch._automaticChronologyData(args)
 	if not args.release or not CustomPatch._hasBalanceUpdate(args) then
 		return
@@ -133,6 +147,8 @@ function CustomPatch._automaticChronologyData(args)
 	return previousBalanceUpdate.name, nextBalanceUpdate.name
 end
 
+---@param args table
+---@return boolean
 function CustomPatch._hasBalanceUpdate(args)
 	return Array.any(Array.mapIndexes(function(index) return args['highlight' .. index] end), function(highlight)
 		return String.contains(highlight, BALANCE_UPDATE)
