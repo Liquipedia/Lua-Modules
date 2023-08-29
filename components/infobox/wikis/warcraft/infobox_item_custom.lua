@@ -53,6 +53,8 @@ local CLASSES = {
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomItem.run(frame)
 	local customItem = Item(frame)
 	_args = customItem.args
@@ -75,6 +77,8 @@ function CustomItem.run(frame)
 	return customItem:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		_args.desc and Title{name = 'Description'} or nil,
@@ -84,6 +88,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'info' then
 		return {
@@ -124,21 +131,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomItem._mercenaryCamp(postfix)
-	postfix = postfix or ''
-	local campInput = _args['merccamp' .. postfix]
-	if not campInput then
-		return nil
-	end
-
-	return Page.makeInternalLink({onlyIfExists = true}, campInput, 'Mercenary Camp#' .. campInput)
-		or campInput
-end
-
+---@return WidgetInjector
 function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param args table
 function CustomItem:setLpdbData(args)
 	local class = (CLASSES[(_args.class or ''):lower()] or MISCELLANEOUS)
 
@@ -163,6 +161,8 @@ function CustomItem:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. lpdbData.name, lpdbData)
 end
 
+---@param args table
+---@return string[]
 function CustomItem:getWikiCategories(args)
 	local class = (CLASSES[(_args.class or ''):lower()] or MISCELLANEOUS) .. ' Items'
 	if not _args.level then
