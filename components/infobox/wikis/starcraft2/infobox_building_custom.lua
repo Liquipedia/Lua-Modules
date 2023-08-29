@@ -45,6 +45,7 @@ function CustomBuilding.run(frame)
 
 	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
+	building.getWikiCategories = CustomBuilding.getWikiCategories
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
 
 	return building:createInfobox()
@@ -234,6 +235,18 @@ function CustomBuilding:setLpdbData(args)
 			cooldown = args.cooldown,
 		}),
 	})
+end
+
+---@param args table
+---@return string[]
+function CustomBuilding:getWikiCategories(args)
+	local race = Faction.read(args.race)
+
+	if not race then
+		return {}
+	end
+
+	return {Faction.toName(race) .. ' Buildings'}
 end
 
 return CustomBuilding
