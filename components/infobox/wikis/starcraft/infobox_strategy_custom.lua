@@ -98,7 +98,7 @@ end
 
 ---@param race string?
 ---@param matchups string?
----@return table
+---@return string[]
 function CustomStrategy:_getCategories(race, matchups)
 	race = Faction.toName(Faction.read(race))
 	if String.isEmpty(matchups) or not race then
