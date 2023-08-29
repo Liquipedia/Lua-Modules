@@ -14,7 +14,6 @@ local GameClock = require('Module:GameClock')
 local Hotkey = require('Module:Hotkey')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
