@@ -135,7 +135,7 @@ function CustomInjector:parse(id, widgets)
 
 		if _args.player_number then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of players', content = {_args.player_number or raceBreakDown.total}},
+				Cell{name = 'Number of Players', content = {_args.player_number or raceBreakDown.total}},
 				Breakdown{content = raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 
@@ -143,7 +143,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if _args.team_number then
-			table.insert(widgets, Cell{name = 'Number of teams',
+			table.insert(widgets, Cell{name = 'Number of Teams',
 				content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
 
 			-- clean var of '+' suffix

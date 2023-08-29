@@ -107,7 +107,7 @@ function CustomInjector:parse(id, widgets)
 		if raceBreakDown then
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
-				Cell{name = 'Number of players', content = {raceBreakDown.total}},
+				Cell{name = 'Number of Players', content = {raceBreakDown.total}},
 				Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
