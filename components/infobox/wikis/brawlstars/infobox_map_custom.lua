@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
+-- wiki=brawlstars
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -27,6 +27,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _map
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	_map = customMap
@@ -39,6 +41,8 @@ function CustomMap.run(frame)
 		:node(CustomMap._intro(_args))
 end
 
+---@param args table
+---@return Html
 function CustomMap._intro(args)
 	local modes = CustomMap._getModes(args)
 
@@ -62,10 +66,13 @@ function CustomMap._intro(args)
 		:wikitext(mw.text.listToText(alsoKnownAs, ', ', ' and ') .. '.')
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local modes = CustomMap._getModes(_args)
 
@@ -78,6 +85,8 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param args table
+---@return string[]?
 function CustomMap._getModes(args)
 	local modes = _map:getAllArgsForBase(args, 'mode')
 
