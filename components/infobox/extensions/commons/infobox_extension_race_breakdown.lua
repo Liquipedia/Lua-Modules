@@ -15,7 +15,7 @@ local RaceBreakdown = {}
 ---Calculates the race breakdown values and builds the display contents for it
 ---@param args table
 ---@param factions string[]?
----@return {playernumber: number, display: string[]}?
+---@return {total: number, display: string[]}?
 function RaceBreakdown.run(args, factions)
 	if Table.isEmpty(factions) then
 		factions = Array.map(Array.map(Faction.knownFactions, Faction.toName), string.lower)
