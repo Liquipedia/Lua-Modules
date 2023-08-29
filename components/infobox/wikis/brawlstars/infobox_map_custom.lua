@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local ModeIcon = require('Module:ModeIcon')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -42,8 +41,6 @@ end
 
 function CustomMap._intro(args)
 	local modes = CustomMap._getModes(args)
-
-	local alsoKnownAs = ''
 
 	local intro = mw.html.create()
 		:tag('b'):wikitext(_map.name):done()
