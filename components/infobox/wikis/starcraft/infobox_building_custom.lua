@@ -30,6 +30,8 @@ local UNKNOWN_RACE = 'u'
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomBuilding.run(frame)
 	local building = Building(frame)
 	_args = building.args
@@ -42,6 +44,8 @@ function CustomBuilding.run(frame)
 	return building:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{name = 'Attributes', content = {_args.att}},
@@ -56,6 +60,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
 		return {
@@ -129,10 +136,12 @@ function CustomBuilding._contentWithBonus(key, bonusNumber)
 		or _args[key]}
 end
 
+---@return CustomWidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string
 function CustomBuilding:_defenseDisplay()
 	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
@@ -141,6 +150,8 @@ function CustomBuilding:_defenseDisplay()
 	return display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
 end
 
+---@param args table
+---@return string
 function CustomBuilding:nameDisplay(args)
 	local raceIcon = Faction.Icon{size = 'large', faction = args.race or UNKNOWN_RACE}
 	raceIcon = raceIcon and (raceIcon .. '&nbsp;') or ''
@@ -148,6 +159,7 @@ function CustomBuilding:nameDisplay(args)
 	return raceIcon .. (args.name or self.pagename)
 end
 
+---@return string?
 function CustomBuilding:_getHotkeys()
 	local display
 	if not String.isEmpty(_args.shortcut) then
@@ -161,6 +173,7 @@ function CustomBuilding:_getHotkeys()
 	return display
 end
 
+---@param args table
 function CustomBuilding:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', {
 		name = args.name,
@@ -170,6 +183,8 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
+---@param args table
+---@return string[]
 function CustomBuilding:getWikiCategories(args)
 	if String.isEmpty(args.race) then
 		return {}
