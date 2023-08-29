@@ -29,6 +29,8 @@ local _args
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomStrategy.run(frame)
 	local customStrategy = Strategy(frame)
 	_args = customStrategy.args
@@ -43,10 +45,13 @@ function CustomStrategy.run(frame)
 	return customStrategy:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomStrategy:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{name = 'Matchups', content = {_args.matchups or 'All'}},
@@ -59,6 +64,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		return {
@@ -71,24 +79,32 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return string
 function CustomStrategy:_getNameDisplay()
 	local race = Faction.Icon{size = 'large', faction = _args.race} or ''
 	return race .. (_args.name or mw.title.getCurrentTitle().text)
 end
 
+---@param tlarticle string?
+---@return string?
 function CustomStrategy:_getTLarticle(tlarticle)
 	if not String.isEmpty(tlarticle) then
+		---@cast tlarticle -nil
 		return '[[File:TL Strategy presents.png|left|95px]] ' ..
 			'This article is a spotlighted, peer-reviewed guide by TL Strategy. ['
 			.. tlarticle .. ' Link]'
 	end
 end
 
+---@param race string?
+---@param matchups string?
+---@return table
 function CustomStrategy:_getCategories(race, matchups)
 	race = Faction.toName(Faction.read(race))
 	if String.isEmpty(matchups) or not race then
 		return {'InfoboxIncomplete'}
 	end
+	---@cast matchups -nil
 
 	local categories = {}
 
@@ -111,6 +127,7 @@ function CustomStrategy:_getCategories(race, matchups)
 	return categories
 end
 
+---@return string[]
 function CustomStrategy._raceMatchups()
 	local raceMatchups = {}
 	for _, faction1 in pairs(Faction.coreFactions) do
