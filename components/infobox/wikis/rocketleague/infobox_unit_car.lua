@@ -37,11 +37,9 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	local widgets = {
+	return {
 		Cell{name = 'Released', content = {_args.released}},
 	}
-
-	return widgets
 end
 
 ---@return WidgetInjector
