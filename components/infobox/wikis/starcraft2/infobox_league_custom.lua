@@ -105,7 +105,7 @@ function CustomInjector:parse(id, widgets)
 		_args.player_number = raceBreakDown.total or playerBreakDownEvent.playerNumber
 
 		if _args.player_number and _args.player_number > 0 then
-			Array.append(widgets,
+			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
 				Cell{name = 'Number of players', content = {raceBreakDown.total}},
 				Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }},

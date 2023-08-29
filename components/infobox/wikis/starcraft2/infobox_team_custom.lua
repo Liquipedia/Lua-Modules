@@ -105,7 +105,7 @@ function CustomInjector:parse(id, widgets)
 		--achievements display, hence moved it here
 		local raceBreakDown = RaceBreakdown.run(_args)
 		if raceBreakDown then
-			Array.append(widgets,
+			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
 				Cell{name = 'Number of players', content = {raceBreakDown.total}},
 				Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }}
