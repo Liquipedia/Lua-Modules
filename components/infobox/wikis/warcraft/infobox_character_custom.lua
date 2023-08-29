@@ -52,9 +52,12 @@ local LEVEL_CHANGE_CLASSES = {
 local HP_REGEN_BLIGHT = 'blight'
 local HP_REGEN_NIGHT = 'night'
 local FACTION_TO_HP_REGEN_TYPE = {u = HP_REGEN_BLIGHT, n = HP_REGEN_NIGHT}
+local DEFAULT_HP_REGEN_TITLE = '[[Hit_Points#Hit_Points_Gain|HP <abbr title=Regeneration>Regen.</abbr>]]:'
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomCharacter.run(frame)
 	local character = Character(frame)
 	_args = character.args
@@ -68,10 +71,13 @@ function CustomCharacter.run(frame)
 	return character:createInfobox(frame)
 end
 
+---@return WidgetInjector
 function CustomCharacter:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return Array.append(widgets,
 		Title{name = 'Attributes'},
@@ -114,12 +120,15 @@ function CustomInjector:addCustomCells(widgets)
 	)
 end
 
+---@param attribute string
+---@return string
 function CustomCharacter._basicAttribute(attribute)
 	return ATTRIBUTE_ICONS[ATTRIBUTES[attribute]:lower()]
 		.. '<br><b>' .. (_args['base' .. attribute] or '') .. '</b>'
 		.. ' +' .. (_args[attribute .. 'gain'] or '')
 end
 
+---@return string
 function CustomCharacter._getDamageAttribute()
 	local mainAttribute = _args.mainattribute
 
@@ -135,6 +144,7 @@ function CustomCharacter._getDamageAttribute()
 		.. '<br>' .. minimumDamage .. ' - ' .. maximumDamage
 end
 
+---@return string
 function CustomCharacter._getArmorAttribute()
 	local armorValue = (tonumber(_args.baseagi) or 0) * 0.3
 		- 2 + (tonumber(_args.basearmor) or 0)
@@ -143,10 +153,12 @@ function CustomCharacter._getArmorAttribute()
 		.. '<br>' .. Abbreviation.make(Math.round{armorValue, 0}, armorValue)
 end
 
+---@return string
 function CustomCharacter._getPrimaryAttribute()
 	return ATTRIBUTE_ICONS[ATTRIBUTES[_args.mainattribute]:lower()] .. '<br>Primary Attribute'
 end
 
+---@return string
 function CustomCharacter._displayIcon()
 	local keyToDisplay = function(key)
 		return _args[key] and ('[[File:Wc3BTN' .. _args[key] .. '.png]]') or ''
@@ -155,21 +167,30 @@ function CustomCharacter._displayIcon()
 	return keyToDisplay('icon') .. keyToDisplay('icon2')
 end
 
+---@param gainFactor number
+---@return number
 function CustomCharacter._calculateHitPoints(gainFactor)
 	local gain = math.floor((tonumber(_args.strgain) or 0) * gainFactor)
 	return (gain + (tonumber(_args.basestr) or 0)) * 25 + (tonumber(_args.basehp) or 100)
 end
 
+---@param gainFactor number
+---@return number
 function CustomCharacter._calculateMana(gainFactor)
 	local gain = math.floor((tonumber(_args.intgain) or 0) * gainFactor)
 	return (gain + (tonumber(_args.baseint) or 0)) * 15
 end
 
+---@param gainFactor number
+---@return number
 function CustomCharacter._calculateManaRegen(gainFactor)
 	local gain = math.floor((tonumber(_args.intgain) or 0) * gainFactor)
 	return (gain + (tonumber(_args.baseint) or 0)) * 0.05 + 0.01
 end
 
+---@param gainFactor number
+---@param abbreviate boolean?
+---@return string|number|nil
 function CustomCharacter._calculateArmor(gainFactor, abbreviate)
 	local gain = math.floor((tonumber(_args.agigain) or 0) * gainFactor)
 	local armor = (gain + (tonumber(_args.baseagi) or 0)) * 0.3
@@ -182,30 +203,36 @@ function CustomCharacter._calculateArmor(gainFactor, abbreviate)
 	return armor
 end
 
+---@param gainFactor number
+---@return string
 function CustomCharacter._calculateDamage(gainFactor)
 	local gain = math.floor((tonumber(_args[_args.mainattribute .. 'gain']) or 0) * gainFactor)
 
 	return (CustomCharacter._baseMinimumDamage() + gain) .. ' - ' .. (CustomCharacter._baseMaximumDamage() + gain)
 end
 
+---@return number
 function CustomCharacter._baseMinimumDamage()
 	return (tonumber(_args['base' .. _args.mainattribute]) or 0)
 		+ (tonumber(_args.basedamage) or 0)
 		+ (tonumber(_args.numdice) or 2)
 end
 
+---@return number
 function CustomCharacter._baseMaximumDamage()
 	return (tonumber(_args['base' .. _args.mainattribute]) or 0)
 		+ (tonumber(_args.basedamage) or 0)
 		+ (tonumber(_args.numdice) or 2) * (tonumber(_args.sidesdie) or 1)
 end
 
+---@param gainFactor number
+---@return number
 function CustomCharacter._calculateCooldown(gainFactor)
 	local gain = math.floor((tonumber(_args.agigain) or 0) * gainFactor)
 	return (tonumber(_args.basecd) or 0) / (1 + (gain + (tonumber(_args.baseagi) or 0)) * 0.02)
 end
 
-local DEFAULT_HP_REGEN_TITLE = '[[Hit_Points#Hit_Points_Gain|HP <abbr title=Regeneration>Regen.</abbr>]]:'
+---@return string
 function CustomCharacter._hitPointsRegenTitle()
 	local hpRegenType = CustomCharacter._hitPointsRegenType()
 
@@ -218,6 +245,8 @@ function CustomCharacter._hitPointsRegenTitle()
 	return DEFAULT_HP_REGEN_TITLE
 end
 
+---@param gainFactor number
+---@return number
 function CustomCharacter._calculateHitPointsRegen(gainFactor)
 	local hpRegenType = CustomCharacter._hitPointsRegenType()
 	local gain = math.floor((tonumber(_args.strgain) or 0) * gainFactor)
@@ -230,10 +259,13 @@ function CustomCharacter._calculateHitPointsRegen(gainFactor)
 	return baseHpRegen + 0.25
 end
 
+---@return string
 function CustomCharacter._hitPointsRegenType()
 	return _args.hpregentype or FACTION_TO_HP_REGEN_TYPE[Faction.read(_args.race)]
 end
 
+---@param args table
+---@return string[]
 function CustomCharacter:getWikiCategories(args)
 	local character = args.informationType
 	local faction = Faction.toName(Faction.read(args.race)) or NEUTRAL
@@ -246,12 +278,17 @@ function CustomCharacter:getWikiCategories(args)
 	return {faction .. ' ' .. character, attribute .. ' ' .. character}
 end
 
+---@param args table
+---@return string
 function CustomCharacter:nameDisplay(args)
 	local factionIcon = Faction.Icon{faction = Faction.read(args.race)}
 
 	return (factionIcon and (factionIcon .. NON_BREAKING_SPACE) or '') .. self.name
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	return {
 		type = 'hero',
@@ -278,6 +315,8 @@ function CustomCharacter:addToLpdb(lpdbData, args)
 	}
 end
 
+---@param args table
+---@return number[]
 function CustomCharacter._calculateDps(args)
 	local baseAverageDamage = (CustomCharacter._baseMinimumDamage() + CustomCharacter._baseMaximumDamage()) / 2
 	local baseGain = tonumber(args[args.mainattribute .. 'gain']) or 0
@@ -289,6 +328,8 @@ function CustomCharacter._calculateDps(args)
 	return {toDps(0), toDps(2), toDps(4), toDps(9)}
 end
 
+---@param args table
+---@return number[]
 function CustomCharacter._calculateEhp(args)
 	local toEhp = function(gainFactor)
 		return Math.round{
@@ -300,6 +341,9 @@ function CustomCharacter._calculateEhp(args)
 	return {toEhp(0), toEhp(4), toEhp(9)}
 end
 
+---@param funct fun(num:number): number|string|nil
+---@param title string
+---@return {content: table, contentClasses: table}}
 function CustomCharacter._toLevelChangesRow(funct, title)
 	return {content = {title, funct(0), funct(4), funct(9)}, contentClasses = LEVEL_CHANGE_CLASSES}
 end
