@@ -114,17 +114,17 @@ function CustomPatch._automaticChronologyData(args)
 		return
 	end
 
-	local baseConditions = '[[type:patch]] AND [[extradata_balanceupdates::true]] AND [[date::<'
+	local baseConditions = '[[type:patch]] AND [[extradata_balanceupdates::true]] AND '
 
 	local previousBalanceUpdate = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = baseConditions .. '<' .. args.release .. ']]',
+		conditions = baseConditions .. '[[date::<' .. args.release .. ']]',
 		order = 'date desc',
 		query = 'name',
 		limit = 1,
 	})[1] or {}
 
 	local nextBalanceUpdate = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = baseConditions .. '>' .. args.release .. ']]',
+		conditions = baseConditions .. '[[date::>' .. args.release .. ']]',
 		order = 'date desc',
 		query = 'name',
 		limit = 1,
