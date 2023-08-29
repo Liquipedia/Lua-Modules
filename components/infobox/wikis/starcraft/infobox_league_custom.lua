@@ -65,12 +65,12 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch()}})
 	elseif id == 'customcontent' then
-		local raceBreakDown = RaceBreakdown.run(_args)
-		if raceBreakDown then
+		local raceBreakdown = RaceBreakdown.run(_args)
+		if raceBreakdown then
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakDown.total}},
-				Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }}
+				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
 			)
 		end
 

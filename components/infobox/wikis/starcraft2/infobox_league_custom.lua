@@ -100,15 +100,15 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'customcontent' then
-		local raceBreakDown = RaceBreakdown.run(_args) or {}
+		local raceBreakdown = RaceBreakdown.run(_args) or {}
 		local playerBreakDownEvent = CustomLeague._playerBreakDownEvent() or {}
-		_args.player_number = raceBreakDown.total or playerBreakDownEvent.playerNumber
+		_args.player_number = raceBreakdown.total or playerBreakDownEvent.playerNumber
 
 		if _args.player_number and _args.player_number > 0 then
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakDown.total}},
-				Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }},
+				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }},
 				Breakdown{content = playerBreakDownEvent.display, classes = {'infobox-center'}}
 			)
 		end

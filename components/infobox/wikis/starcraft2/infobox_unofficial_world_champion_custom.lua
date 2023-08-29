@@ -37,11 +37,11 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Builder{
 			builder = function()
-				local raceBreakDown = RaceBreakdown.run(_args)
-				if raceBreakDown then
+				local raceBreakdown = RaceBreakdown.run(_args)
+				if raceBreakdown then
 					return {
 						Title{name = 'Racial Distribution of Champions'},
-						Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }}
+						Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
 					}
 				end
 			end

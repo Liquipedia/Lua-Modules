@@ -126,8 +126,8 @@ function CustomInjector:parse(id, widgets)
 			return dateCells
 		end
 	elseif id == 'customcontent' then
-		local raceBreakDown = RaceBreakdown.run(_args, BREAKDOWN_RACES) or {}
-		_args.player_number = _args.player_number or raceBreakDown.total
+		local raceBreakdown = RaceBreakdown.run(_args, BREAKDOWN_RACES) or {}
+		_args.player_number = _args.player_number or raceBreakdown.total
 
 		if _args.player_number or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
@@ -135,8 +135,8 @@ function CustomInjector:parse(id, widgets)
 
 		if _args.player_number then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of Players', content = {_args.player_number or raceBreakDown.total}},
-				Breakdown{content = raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Cell{name = 'Number of Players', content = {_args.player_number or raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display or {}, classes = { 'infobox-center' }}
 			)
 
 			_args.player_number = string.gsub(_args.player_number, '%+', '')
