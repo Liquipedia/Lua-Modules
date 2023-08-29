@@ -33,6 +33,8 @@ local UNKNOWN_RACE = 'u'
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -45,6 +47,8 @@ function CustomUnit.run(frame)
 	return unit:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local contentWithBonus = function(key, bonusNumber)
 		return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
@@ -90,6 +94,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' and not String.isEmpty(_args.min) then
 		return {
@@ -140,10 +147,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string
 function CustomUnit:_defenseDisplay()
 	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
@@ -154,6 +163,8 @@ function CustomUnit:_defenseDisplay()
 	return display
 end
 
+---@param args table
+---@return string
 function CustomUnit:nameDisplay(args)
 	local raceIcon = Faction.Icon{size = 'large', faction = args.race or UNKNOWN_RACE}
 	raceIcon = raceIcon and (raceIcon .. '&nbsp;') or ''
@@ -161,6 +172,7 @@ function CustomUnit:nameDisplay(args)
 	return raceIcon .. (args.name or self.pagename)
 end
 
+---@return string?
 function CustomUnit:_getHotkeys()
 	local display
 	if not String.isEmpty(_args.shortcut) then
@@ -174,6 +186,7 @@ function CustomUnit:_getHotkeys()
 	return display
 end
 
+---@param args table
 function CustomUnit:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', {
 		name = args.name,
@@ -183,6 +196,8 @@ function CustomUnit:setLpdbData(args)
 	})
 end
 
+---@param args table
+---@return string[]
 function CustomUnit:getWikiCategories(args)
 	if String.isEmpty(args.race) then
 		return {}

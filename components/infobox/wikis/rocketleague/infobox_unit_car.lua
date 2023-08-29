@@ -22,6 +22,8 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -32,7 +34,9 @@ function CustomUnit.run(frame)
 	return unit:createInfobox()
 end
 
-function CustomInjector:addCustomCells()
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
 	local widgets = {
 		Cell{name = 'Released', content = {_args.released}},
 	}
@@ -40,10 +44,13 @@ function CustomInjector:addCustomCells()
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param args table
+---@return string[]
 function CustomUnit:getWikiCategories(args)
 	local categories = {}
 	if Namespace.isMain() then
@@ -53,6 +60,7 @@ function CustomUnit:getWikiCategories(args)
 	return categories
 end
 
+---@param args table
 function CustomUnit:setLpdbData(args)
 	local game = args.game or 'rl'
 	if game == 'rl' then
@@ -75,10 +83,6 @@ function CustomUnit:setLpdbData(args)
 	objectName = 'car_' .. objectName
 
 	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
-end
-
-function CustomInjector:parse(_, widgets)
-	return widgets
 end
 
 return CustomUnit

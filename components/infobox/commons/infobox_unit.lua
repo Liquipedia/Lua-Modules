@@ -21,13 +21,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class UnitInfobox: BasicInfobox
 local Unit = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Unit.run(frame)
 	local unit = Unit(frame)
 	return unit:createInfobox()
 end
 
+---@return Html
 function Unit:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -109,10 +113,14 @@ function Unit:createInfobox()
 	return builtInfobox
 end
 
+---@param args table
+---@return string[]
 function Unit:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Unit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
@@ -126,14 +134,19 @@ function Unit:_getHotkeys(args)
 	return display
 end
 
+---@param args table
+---@return string?
 function Unit:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Unit:setLpdbData(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string?
 function Unit:subHeaderDisplay(args)
 	return args.title
 end
