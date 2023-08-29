@@ -23,13 +23,17 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 local Highlights = require('Module:Infobox/Widget/Highlights')
 
+---@class PatchInfobox: BasicInfobox
 local Patch = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Patch.run(frame)
 	local patch = Patch(frame)
 	return patch:createInfobox()
 end
 
+---@return Html
 function Patch:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -86,6 +90,7 @@ function Patch:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---@param args table
 function Patch:addToLpdb(args)
 	local date = args.release
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
@@ -98,6 +103,8 @@ function Patch:addToLpdb(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return {previous: string?, next: string?}
 function Patch:getChronologyData(args)
 	return { previous = args.previous, next = args.next }
 end
