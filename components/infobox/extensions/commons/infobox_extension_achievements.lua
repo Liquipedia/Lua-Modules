@@ -64,7 +64,7 @@ end
 ---@param player string
 ---@param onlySolo boolean
 ---@param playerLimit integer
----@return unknown
+---@return string
 function Achievements._playerConditions(player, onlySolo, playerLimit)
 	player = player:gsub(' ', '_')
 	local playerNoUnderScore = player:gsub('_', ' ')

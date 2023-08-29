@@ -97,7 +97,7 @@ function CustomMission:getWikiCategories(args)
 	}
 end
 
----@return unknown
+---@return WidgetInjector
 function CustomMission:createWidgetInjector()
 	return CustomInjector()
 end
