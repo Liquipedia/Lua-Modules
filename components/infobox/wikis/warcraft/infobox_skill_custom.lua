@@ -27,6 +27,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomSkill.run(frame)
 	local customSkill = Skill(frame)
 	customSkill.createWidgetInjector = CustomSkill.createWidgetInjector
@@ -36,6 +38,8 @@ function CustomSkill.run(frame)
 	return customSkill:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{name = 'Move Speed', content = {_args.movespeed}},
@@ -45,6 +49,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
 		return {Cell{name = 'Cost', content = {CustomSkill:getCostDisplay()}}}
@@ -59,10 +66,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomSkill:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string[]?
 function CustomSkill:getResearchCost()
 	if String.isEmpty(_args.from) then
 		return nil
@@ -76,6 +85,7 @@ function CustomSkill:getResearchCost()
 	}
 end
 
+---@return string
 function CustomSkill:getResearchFrom()
 	if String.isEmpty(_args.from) then
 		return 'No research needed'
@@ -86,6 +96,8 @@ function CustomSkill:getResearchFrom()
 	end
 end
 
+---@param args table
+---@return string[]
 function CustomSkill:getCategories(args)
 	local skill = args.informationType .. 's'
 	local categories = {skill}
@@ -97,6 +109,7 @@ function CustomSkill:getCategories(args)
 	return categories
 end
 
+---@return string
 function CustomSkill:getHotkeys()
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then
@@ -107,6 +120,7 @@ function CustomSkill:getHotkeys()
 	end
 end
 
+---@return string
 function CustomSkill:getCostDisplay()
 	local energy = tonumber(_args.energy) or 0
 	return ENERGY_ICON .. '&nbsp;' .. energy
