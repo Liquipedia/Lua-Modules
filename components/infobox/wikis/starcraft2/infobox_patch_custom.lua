@@ -30,7 +30,7 @@ function CustomPatch.run(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
+	customPatch.setLpdbData = CustomPatch.setLpdbData
 	return customPatch:createInfobox()
 end
 
@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
-function CustomPatch:addToLpdb(args)
+function CustomPatch:setLpdbData(args)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		local date = args.narelease or args.eurelease
 		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)

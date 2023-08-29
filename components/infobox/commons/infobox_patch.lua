@@ -83,7 +83,7 @@ function Patch:createInfobox()
 
 	if Namespace.isMain() then
 		infobox:categories('Patches')
-		self:addToLpdb(args)
+		self:setLpdbData(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
@@ -91,7 +91,7 @@ end
 
 --- Allows for overriding this functionality
 ---@param args table
-function Patch:addToLpdb(args)
+function Patch:setLpdbData(args)
 	local date = args.release
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {

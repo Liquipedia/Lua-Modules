@@ -29,7 +29,7 @@ function CustomPatch.run(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
+	customPatch.setLpdbData = CustomPatch.setLpdbData
 	return customPatch:createInfobox()
 end
 
@@ -50,7 +50,7 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 ---@param args table
-function CustomPatch:addToLpdb(args)
+function CustomPatch:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
 		name = self.name,
 		type = 'patch',
