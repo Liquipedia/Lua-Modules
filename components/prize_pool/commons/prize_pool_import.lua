@@ -316,12 +316,12 @@ function Import._computeBracketPlacementGroups(bracket, options)
 
 		else
 			local function shouldImportKnockedOutOpponents()
-				if not (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) then
+				if bracket.bracketDatasById[matchId].qualLose and not options.importWinners then
 					return false
 				elseif coordinates.sectionIndex == #bracket.sections then
 					-- Always include lowest bracket section
 					return true
-				elseif firstDropdownRoundIndexes[coordinates.sectionIndex] == -1 then
+				elseif not firstDropdownRoundIndexes[coordinates.sectionIndex] then
 					-- No dropdown opponents for this level
 					return false
 				elseif coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex] then
@@ -392,14 +392,15 @@ end
 -- the array will contain `-1` for that level.
 ---@return number[]
 function Import._findBracketFirstDropdownRounds(bracket)
-	if #bracket.sections == 1 then
-		return {}
-	end
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
+	local roundIndexes = Array.range(1, #bracket.rounds)
+
 	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
-		return Array.find(Array.range(1, #bracket.rounds), function(roundIndex)
-			return countsByRound[roundIndex][sectionIndex] == 0
-		end) or -1
+		local firstRoundWithPositiveCount = Array.find(roundIndexes, function(roundIndex)
+			return countsByRound[roundIndex][sectionIndex] >= 0 end)
+
+		return firstRoundWithPositiveCount and countsByRound[firstRoundWithPositiveCount][sectionIndex] == 0
+			and firstRoundWithPositiveCount or -1
 	end)
 end
 
