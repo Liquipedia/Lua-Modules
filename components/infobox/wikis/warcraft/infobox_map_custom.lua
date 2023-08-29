@@ -24,6 +24,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 
@@ -35,6 +37,8 @@ function CustomMap.run(frame)
 	return customMap:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	Array.appendWith(widgets,
 		Cell{name = 'Tileset', content = {_args.tileset}},
@@ -53,6 +57,8 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param postfix string?
+---@return string?
 function CustomMap._mercenaryCamp(postfix)
 	postfix = postfix or ''
 	local campInput = _args['merccamp' .. postfix]
@@ -64,10 +70,14 @@ function CustomMap._mercenaryCamp(postfix)
 		or campInput
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		creator = args.creator,
@@ -78,6 +88,8 @@ function CustomMap:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomMap:getWikiCategories(args)
 	if String.isEmpty(args.players) then
 		return {'InfoboxIncomplete'}
