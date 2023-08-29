@@ -57,7 +57,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
----@param postfix string?
+---@param postfix number|string|nil
 ---@return string?
 function CustomMap._mercenaryCamp(postfix)
 	postfix = postfix or ''
