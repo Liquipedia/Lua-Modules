@@ -67,7 +67,7 @@ function CostDisplay.run(args)
 		local iconData = ICONS[key]
 		local icon = iconData[faction] or iconData.default
 		local value = tonumber(args[key]) or 0
-		if value ~= 0 or args[key .. 'Forced'] then
+		if value ~= 0 or args[key .. 'Forced'] or args[key .. 'Total'] then
 			local display = icon .. CONCAT_VALUE .. value ..
 				(args[key .. 'Total'] and (CONCAT_VALUE .. '(' .. args[key .. 'Total'] .. ')') or '')
 			table.insert(displays, display)
