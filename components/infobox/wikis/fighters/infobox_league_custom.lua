@@ -30,7 +30,7 @@ local _league
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local DEFAULT_TYPE = 'offline'
-local MANUAL_SERIES_ICON = 1
+local MANUAL_SERIES_ICON = true
 local TODAY = os.date('%Y-%m-%d', os.time())
 
 local CustomLeague = Class.new()
