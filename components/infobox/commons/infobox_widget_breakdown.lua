@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 ---@class BreakdownWidget: Widget
----@operator call(table): BreakdownWidget
+---@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
 ---@field contents (string|number)[]
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
