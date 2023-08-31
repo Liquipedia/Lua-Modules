@@ -58,9 +58,10 @@ local CONCAT_VALUE = '&nbsp;'
 ---@field supplyTotal string|number?
 
 ---@param args sc2CostDisplayArgsValues
+---@return string?
 function CostDisplay.run(args)
 	if not args then
-		return {}
+		return nil
 	end
 
 	local faction = Faction.read(args.faction)
