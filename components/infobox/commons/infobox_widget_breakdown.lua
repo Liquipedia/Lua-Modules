@@ -25,7 +25,7 @@ local Breakdown = Class.new(
 	end
 )
 
----@return Html[]
+---@return {[1]: Html}
 function Breakdown:make()
 	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
 end

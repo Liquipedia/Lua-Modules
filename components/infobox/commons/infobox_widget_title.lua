@@ -21,7 +21,7 @@ local Title = Class.new(
 	end
 )
 
----@return Html[]
+---@return {[1]: Html}
 function Title:make()
 	return {Title:_create(self.content)}
 end

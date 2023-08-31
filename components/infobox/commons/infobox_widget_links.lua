@@ -115,7 +115,7 @@ local PRIORITY_GROUPS = {
 	}
 }
 
----@return Html[]
+---@return {[1]: Html}
 function Links:make()
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
