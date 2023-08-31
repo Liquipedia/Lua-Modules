@@ -23,13 +23,18 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class ShowInfobox: BasicInfobox
 local Show = Class.new(BasicInfobox)
 
+---Entry point
+---@param frame Frame
+---@return Html
 function Show.run(frame)
 	local show = Show(frame)
 	return show:createInfobox()
 end
 
+---@return Html
 function Show:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -79,6 +84,9 @@ function Show:createInfobox()
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
+---@param country string?
+---@param city string?
+---@return string
 function Show:_createLocation(country, city)
 	if country == nil or country == '' then
 		return ''
@@ -90,6 +98,8 @@ function Show:_createLocation(country, city)
 		'[[:Category:' .. countryDisplay .. '|' .. (city or countryDisplay) .. ']]'
 end
 
+---@param args table
+---@return string
 function Show:_addSecondaryLinkDisplay(args)
 	local secondaryLinks = {}
 	if args.topicid then
