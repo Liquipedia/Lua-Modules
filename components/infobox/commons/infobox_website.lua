@@ -21,6 +21,7 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class WebsiteInfobox: BasicInfobox
 local Website = Class.new(BasicInfobox)
 
 ---@param frame Frame
