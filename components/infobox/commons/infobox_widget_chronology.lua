@@ -13,8 +13,8 @@ local Table = require('Module:Table')
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 ---@class ChronologyWidget: Widget
----@operator call({content: table}): ChronologyWidget
----@field links table<string, string>
+---@operator call({content: table<string, string|number|nil>}): ChronologyWidget
+---@field links table<string, string|number|nil>
 local Chronology = Class.new(
 	Widget,
 	function(self, input)
@@ -27,7 +27,7 @@ function Chronology:make()
 	return Chronology:_chronology(self.links)
 end
 
----@param links table<string, string>
+---@param links table<string, string|number|nil>
 ---@return Html[]
 function Chronology:_chronology(links)
 	if links == nil or Table.size(links) == 0 then
