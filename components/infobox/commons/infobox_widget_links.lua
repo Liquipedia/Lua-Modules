@@ -14,7 +14,7 @@ local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 ---@class LinksWidget: Widget
----@operator call({content: table, variant: string?}): LinksWidget
+---@operator call({content: table<string, string>, variant: string?}): LinksWidget
 ---@field links table<string, string>
 ---@field variant string?
 local Links = Class.new(
