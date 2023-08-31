@@ -42,7 +42,7 @@ function CustomSkill.run(frame)
 	skill.createWidgetInjector = CustomSkill.createWidgetInjector
 	skill.getCategories = CustomSkill.getCategories
 	_args = skill.args
-	assert(INFORMATIONTYPE_TO_CATEGORY[_args.informationType], 'Missing or invalid "informationType"')
+	assert(INFORMATIONTYPE_TO_CATEGORY[(_args.informationType or ''):lower()], 'Missing or invalid "informationType"')
 	return skill:createInfobox()
 end
 
@@ -118,7 +118,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomSkill:getCategories(args)
-	local skill = INFORMATIONTYPE_TO_CATEGORY[args.informationType]
+	local skill = INFORMATIONTYPE_TO_CATEGORY[(_args.informationType or ''):lower()]
 	local categories = {skill}
 	local race = Faction.toName(Faction.read(_args.race))
 	if race then
