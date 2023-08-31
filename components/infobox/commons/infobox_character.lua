@@ -20,13 +20,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class CharacterInfobox: BasicInfobox
 local Character = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Character.run(frame)
 	local character = Character(frame)
 	return character:createInfobox()
 end
 
+---@return Html
 function Character:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -97,6 +101,8 @@ function Character:createInfobox()
 	return builtInfobox
 end
 
+---@param location string?
+---@return string
 function Character:_createLocation(location)
 	if location == nil then
 		return ''
@@ -106,18 +112,25 @@ function Character:_createLocation(location)
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
+---@param args table
+---@return string?
 function Character:subHeader(args)
 	return args.title
 end
 
+---@param args table
+---@return string[]
 function Character:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Character:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Character:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
@@ -132,6 +145,9 @@ function Character:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('character_' .. self.name, lpdbData)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function Character:addToLpdb(lpdbData, args)
 	return lpdbData
 end
