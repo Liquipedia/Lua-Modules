@@ -114,10 +114,6 @@ function CustomLegacyPrizePool.overwriteMapOpponents(slot, newData, mergeSlots)
 	local opponents = Array.map(Array.range(1, slot.opponentsInSlot), function(opponentIndex)
 		return mapOpponent(opponentIndex) or {} end)
 
-	if _cache.opponentType == Opponent.duo then
-		opponents = Array.map(opponents, CustomLegacyPrizePool._addDuoLastVs)
-	end
-
 	return opponents
 end
 
@@ -174,6 +170,16 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 	opponentData.vs = slot['lastvs' .. opponentIndex] -- this is just a ref to a different opponent
 
 	return opponentData
+end
+
+function CustomLegacyPrizePool.afterSlots(newArgs)
+	if _cache.opponentType == Opponent.duo then
+		for _, slot in ipairs(newArgs) do
+			slot.opponents = Array.map(slot.opponents, CustomLegacyPrizePool._addDuoLastVs)
+		end
+	end
+
+	return newArgs
 end
 
 function CustomLegacyPrizePool._addDuoLastVs(opponent)
