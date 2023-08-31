@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Skill/Spell
+-- page=Module:Infobox/Skill/Spell/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
