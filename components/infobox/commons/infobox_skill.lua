@@ -21,13 +21,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class SkillInfobox: BasicInfobox
 local Skill = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Skill.run(frame)
 	local skill = Skill(frame)
 	return skill:createInfobox()
 end
 
+---@return Html
 function Skill:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -97,10 +101,14 @@ function Skill:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string[]
 function Skill:getCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
