@@ -16,23 +16,27 @@ local Breakdown = Class.new(
 	function(self, input)
 		self.contents = input.content
 		self.classes = input.classes
+		self.contentClasses = input.contentClasses or {}
 	end
 )
 
 function Breakdown:make()
-	return {Breakdown:_breakdown(self.contents, self.classes)}
+	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
 end
 
-function Breakdown:_breakdown(contents, classes)
+function Breakdown:_breakdown(contents, classes, contentClasses)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
 
 	local div = mw.html.create('div')
 	local number = #contents
-	for _, content in ipairs(contents) do
+	for contentIndex, content in ipairs(contents) do
 		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number)
 		for _, class in pairs(classes or {}) do
+			infoboxCustomCell:addClass(class)
+		end
+		for _, class in pairs(contentClasses['content' .. contentIndex] or {}) do
 			infoboxCustomCell:addClass(class)
 		end
 		infoboxCustomCell:wikitext(content)
