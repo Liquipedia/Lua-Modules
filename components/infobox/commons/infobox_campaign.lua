@@ -15,6 +15,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 
+---@class CampaignInfobox: BasicInfobox
 local Campaign = Class.new(BasicInfobox)
 
 ---@param frame Frame
