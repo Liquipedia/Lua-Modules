@@ -26,7 +26,6 @@ local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 ---@field displayRoundPrecision string?
 ---@field prizepool string?
 ---@field prizepoolUsd string?
----@field prizepoolusd string?
 ---@field rate string?
 ---@field setvariables string?
 ---@field text string?
