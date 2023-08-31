@@ -12,6 +12,9 @@ local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class HighlightsWidget: Widget
+---@operator call({content: (string|number)[]?}):HighlightsWidget
+---@field list (string|number)[]?
 local Highlights = Class.new(
 	Widget,
 	function(self, input)
@@ -19,10 +22,13 @@ local Highlights = Class.new(
 	end
 )
 
+---@return {[1]: Html}?
 function Highlights:make()
 	return Highlights:_highlights(self.list)
 end
 
+---@param list (string|number)[]?
+---@return Html?
 function Highlights:_highlights(list)
 	if list == nil or Table.size(list) == 0 then
 		return nil
