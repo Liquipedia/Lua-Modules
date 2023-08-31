@@ -72,7 +72,7 @@ function CustomInjector:addCustomCells(widgets)
 				['padding-bottom'] = '0px',
 				['border-top-style'] = 'none'},
 			}
-		ringTable:addRow(CustomMap:_createRingTableHeader() --[[@as Html]])
+		ringTable:addRow(CustomMap:_createRingTableHeader())
 		for _, ringData in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
 			ringTable:addRow(CustomMap:_createRingTableRow(ringData) --[[@as Html]])
 		end
