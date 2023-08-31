@@ -74,7 +74,7 @@ function CustomInjector:addCustomCells(widgets)
 			}
 		ringTable:addRow(CustomMap:_createRingTableHeader())
 		for _, ringData in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
-			ringTable:addRow(CustomMap:_createRingTableRow(ringData) --[[@as Html]])
+			ringTable:addRow(CustomMap:_createRingTableRow(ringData)
 		end
 		table.insert(widgets, Title{name = 'Ring Information'})
 		table.insert(widgets, ringTable)
