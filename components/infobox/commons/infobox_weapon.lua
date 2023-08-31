@@ -21,6 +21,7 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class WeaponInfobox: BasicInfobox
 local Weapon = Class.new(BasicInfobox)
 
 ---@param frame Frame
