@@ -26,6 +26,8 @@ local _series
 
 local _totalSeriesPrizepool = 0
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	series.addToLpdb = CustomSeries.addToLpdb
@@ -35,15 +37,20 @@ function CustomSeries.run(frame)
 	return series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomSeries.addToLpdb(series, lpdbData)
+---@param lpdbData table
+---@return table
+function CustomSeries:addToLpdb(lpdbData)
 	lpdbData['prizepool'] = _totalSeriesPrizepool
 	return lpdbData
 end
 
+---@param series string
+---@return string?
 function CustomSeries._getSeriesPrizepools(series)
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[series::' .. series .. ']]',
@@ -60,6 +67,8 @@ function CustomSeries._getSeriesPrizepools(series)
 	return '$' .. Language:formatNum(Math.round{prizemoney})
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell({
 		name = 'Total prize money',
