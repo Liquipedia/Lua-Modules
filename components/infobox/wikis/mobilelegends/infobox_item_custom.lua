@@ -211,7 +211,7 @@ function CustomItem:getWikiCategories(args)
 end
 
 ---@param args table
----@return string
+---@return string?
 function CustomItem.nameDisplay(args)
 	return args.itemname
 end
