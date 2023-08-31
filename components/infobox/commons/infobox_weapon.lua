@@ -23,11 +23,14 @@ local Customizable = Widgets.Customizable
 
 local Weapon = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Weapon.run(frame)
 	local weapon = Weapon(frame)
 	return weapon:createInfobox()
 end
 
+---@return Html
 function Weapon:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -114,6 +117,8 @@ function Weapon:createInfobox()
 	return builtInfobox
 end
 
+---@param location string?
+---@return string
 function Weapon:_createLocation(location)
 	if location == nil then
 		return ''
@@ -123,18 +128,25 @@ function Weapon:_createLocation(location)
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
+---@param args table
+---@return nil
 function Weapon:subHeader(args)
 	return nil
 end
 
+---@param args table
+---@return string[]
 function Weapon:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Weapon:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Weapon:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
@@ -149,6 +161,9 @@ function Weapon:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, lpdbData)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function Weapon:addToLpdb(lpdbData, args)
 	return lpdbData
 end
