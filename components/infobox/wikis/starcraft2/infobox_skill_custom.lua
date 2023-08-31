@@ -135,8 +135,10 @@ function CustomSkill:getDuration(postfix)
 
 	local display
 
-	if Logic.readBool(_args['channeled' .. postfix]) then
+	if Logic.readBool(_args['channeled' .. postfix]) and String.isNotEmpty(_args['duration' .. postfix]) then
 		display = 'Channeled&nbsp;' .. _args['duration' .. postfix]
+	elseif Logic.readBool(_args['channeled' .. postfix]) then
+		display = 'Channeled'
 	elseif String.isNotEmpty(_args['duration' .. postfix]) then
 		display = _args['duration' .. postfix]
 	else
