@@ -24,11 +24,14 @@ local Builder = Widgets.Builder
 
 local Game = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
+---@return Html
 function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args

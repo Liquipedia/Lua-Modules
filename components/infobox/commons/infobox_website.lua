@@ -23,11 +23,14 @@ local Customizable = Widgets.Customizable
 
 local Website = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Website.run(frame)
 	local website = Website(frame)
 	return website:createInfobox()
 end
 
+---@return Html
 function Website:createInfobox()
 	local infobox = self.infobox
 	local args = self.args

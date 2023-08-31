@@ -17,11 +17,14 @@ local Center = Widgets.Center
 
 local Campaign = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Campaign.run(frame)
 	local campaign = Campaign(frame)
 	return campaign:createInfobox()
 end
 
+---@return Html
 function Campaign:createInfobox()
 	local infobox = self.infobox
 	local args = self.args

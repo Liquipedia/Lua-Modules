@@ -13,6 +13,8 @@ local Website = Lua.import('Module:Infobox/Website', {requireDevIfEnabled = true
 
 local CustomWebsite = Class.new()
 
+---@param frame Frame
+---@return Html
 function CustomWebsite.run(frame)
 	local website = Website(frame)
 	return website:createInfobox()
