@@ -119,7 +119,7 @@ function Item:getWikiCategories(args)
 end
 
 ---@param args table
----@return string
+---@return string?
 function Item:nameDisplay(args)
 	return args.name
 end
