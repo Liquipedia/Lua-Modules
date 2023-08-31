@@ -42,6 +42,8 @@ local _CATEGORY_DISPLAY = {
 	enchantment = 'Enchantment [[Category:Enchantments]]',
 }
 
+---@param frame Frame
+---@return Html
 function CustomItem.run(frame)
 	local item = Item(frame)
 	_args = item.args
@@ -55,6 +57,9 @@ function CustomItem.run(frame)
 	return item:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if not String.isEmpty(_args.itemcost) then
@@ -254,55 +259,58 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomItem:getWikiCategories()
+---@param args table
+---@return string[]
+function CustomItem:getWikiCategories(args)
 	if Namespace.isMain() then
-		if not String.isEmpty(_args.str) then
+		if not String.isEmpty(args.str) then
 			table.insert(_categories, 'Strength Items')
 			table.insert(_categories, 'Attribute Items')
 		end
-		if not String.isEmpty(_args.agi) then
+		if not String.isEmpty(args.agi) then
 			table.insert(_categories, 'Agility Items')
 			table.insert(_categories, 'Attribute Items')
 		end
-		if not String.isEmpty(_args.int) then
+		if not String.isEmpty(args.int) then
 			table.insert(_categories, 'Intelligence Items')
 			table.insert(_categories, 'Attribute Items')
 		end
-		if not String.isEmpty(_args.hp) then
+		if not String.isEmpty(args.hp) then
 			table.insert(_categories, 'Health Items')
 		end
-		if not String.isEmpty(_args.mana) then
+		if not String.isEmpty(args.mana) then
 			table.insert(_categories, 'Mana Pool Items')
 		end
-		if not String.isEmpty(_args.hpregen) then
+		if not String.isEmpty(args.hpregen) then
 			table.insert(_categories, 'Health Regeneration Items')
 		end
-		if not String.isEmpty(_args.manaregen) then
+		if not String.isEmpty(args.manaregen) then
 			table.insert(_categories, 'Mana Regeneration Items')
 		end
-		if not String.isEmpty(_args.armor) then
+		if not String.isEmpty(args.armor) then
 			table.insert(_categories, 'Armor Bonus Items')
 		end
-		if not String.isEmpty(_args.evasion) then
+		if not String.isEmpty(args.evasion) then
 			table.insert(_categories, 'Evasion Items')
 		end
-		if not String.isEmpty(_args.magicresist) then
+		if not String.isEmpty(args.magicresist) then
 			table.insert(_categories, 'Magic Resistance Items')
 		end
-		if not String.isEmpty(_args.damage) then
+		if not String.isEmpty(args.damage) then
 			table.insert(_categories, 'Damage Items')
 		end
-		if not String.isEmpty(_args.active) then
+		if not String.isEmpty(args.active) then
 			table.insert(_categories, 'Items with Active Abilities')
 		end
-		if not String.isEmpty(_args.passive) then
+		if not String.isEmpty(args.passive) then
 			table.insert(_categories, 'Items with Passive Abilities')
 		end
-		if not (String.isEmpty(_args.movespeed) and String.isEmpty(_args.movespeedmult)) then
+		if not (String.isEmpty(args.movespeed) and String.isEmpty(args.movespeedmult)) then
 			table.insert(_categories, 'Movement Speed Items')
 		end
 	end
@@ -311,10 +319,13 @@ function CustomItem:getWikiCategories()
 
 end
 
-function CustomItem.nameDisplay()
-	return _args.itemname
+---@param args table
+---@return string?
+function CustomItem.nameDisplay(args)
+	return args.itemname
 end
 
+---@return string[]
 function CustomItem._getCostDisplay()
 	local costs = Item:getAllArgsForBase(_args, 'itemcost')
 
@@ -356,6 +367,7 @@ function CustomItem._getCostDisplay()
 	return {display}
 end
 
+---@return boolean
 function CustomItem._hasAttributes()
 	return not (
 		String.isEmpty(_args.str) and
@@ -397,6 +409,8 @@ function CustomItem._hasAttributes()
 	)
 end
 
+---@param attributeType string
+---@return string
 function CustomItem._attributeIcons(attributeType)
 	_args[attributeType] = _args[attributeType] or 0
 	local attributes = Item:getAllArgsForBase(_args, attributeType)
@@ -404,29 +418,38 @@ function CustomItem._attributeIcons(attributeType)
 		.. '<br><b>+ ' .. table.concat(attributes, '/ ') .. '</b>'
 end
 
+---@param base string?
+---@return string?
 function CustomItem._positiveConcatedArgsForBase(base)
 	if not String.isEmpty(_args[base]) then
+		---@cast base -nil
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '+ ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
+---@param base string?
+---@return string?
 function CustomItem._negativeConcatedArgsForBase(base)
 	if not String.isEmpty(_args[base]) then
+		---@cast base -nil
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '- ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
+---@param base string?
+---@return string?
 function CustomItem._positivePercentDisplay(base)
-mw.logObject(base)
 	if not String.isEmpty(_args[base]) then
+		---@cast base -nil
 		local number = tonumber(_args[base])
 		number = number * 100
 		return '+ ' .. number .. '%'
 	end
 end
 
+---@return string?
 function CustomItem._manaLossDisplay()
 	local display = ''
 	if not String.isEmpty(_args['mana loss']) then
@@ -440,6 +463,7 @@ function CustomItem._manaLossDisplay()
 	end
 end
 
+---@return string?
 function CustomItem._movementSpeedDisplay()
 	local display = ''
 	if not String.isEmpty(_args.movespeed) then
@@ -453,6 +477,7 @@ function CustomItem._movementSpeedDisplay()
 	end
 end
 
+---@return string?
 function CustomItem._categoryDisplay()
 	local display = _CATEGORY_DISPLAY[string.lower(_args.category or '')]
 	if display then
@@ -462,6 +487,7 @@ function CustomItem._categoryDisplay()
 	end
 end
 
+---@return string[]
 function CustomItem._shopDisplay()
 	local contents = {}
 	local index = 1
@@ -474,6 +500,7 @@ function CustomItem._shopDisplay()
 	return contents
 end
 
+---@param args table
 function CustomItem:setLpdbData(args)
 	local lpdbData = {
 		type = 'item',
