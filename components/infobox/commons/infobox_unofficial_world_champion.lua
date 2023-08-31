@@ -22,13 +22,17 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Breakdown = Widgets.Breakdown
 
+---@class UnofficialWorldChampionInfobox: BasicInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
+---@return Html
 function UnofficialWorldChampion:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
