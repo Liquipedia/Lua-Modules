@@ -24,6 +24,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 
@@ -35,6 +37,8 @@ function CustomMap.run(frame)
 	return customMap:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local id = _args.id
 
@@ -50,10 +54,13 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param args table
+---@return string?
 function CustomMap:getNameDisplay(args)
 	if String.isEmpty(args.name) then
 		return CustomMap:_tlpdMap(args.id, 'name')
@@ -62,6 +69,9 @@ function CustomMap:getNameDisplay(args)
 	return args.name
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = CustomMap:getNameDisplay(args)
 	lpdbData.extradata = {
@@ -73,6 +83,8 @@ function CustomMap:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param id string?
+---@return string
 function CustomMap:_getSize(id)
 	local width = _args.width
 		or CustomMap:_tlpdMap(id, 'width') or ''
@@ -81,6 +93,8 @@ function CustomMap:_getSize(id)
 	return width .. 'x' .. height
 end
 
+---@param id string?
+---@return string
 function CustomMap:_getSpawn(id)
 	local players = _args.players
 		or CustomMap:_tlpdMap(id, 'players') or ''
@@ -89,11 +103,16 @@ function CustomMap:_getSpawn(id)
 	return players .. ' at ' .. positions
 end
 
+---@param id string?
+---@param query string
+---@return string?
 function CustomMap:_tlpdMap(id, query)
 	if not id then return nil end
 	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', {id, query})
 end
 
+---@param args table
+---@return string[]
 function CustomMap:getWikiCategories(args)
 	local players = args.players
 	if String.isEmpty(players) then

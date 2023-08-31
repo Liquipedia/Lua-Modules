@@ -26,6 +26,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _map
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local map = Map(frame)
 	_map = map
@@ -35,10 +37,13 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game Mode(s)',
@@ -77,6 +82,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return WidgetTableRow
 function CustomMap:_createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
@@ -87,6 +93,8 @@ function CustomMap:_createRingTableHeader()
 		:addCell(TableCell{content = {'End Diameter (m)'}})
 end
 
+---@param ringData string
+---@return WidgetTableRow
 function CustomMap:_createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
@@ -95,10 +103,13 @@ function CustomMap:_createRingTableRow(ringData)
 	return row
 end
 
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator or '')
-	lpdbData.extradata.gamemode = _args.gamemode
-	lpdbData.extradata.competitive = String.isNotEmpty(_args.spanstart) and String.isEmpty(_args.spanend)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator or '')
+	lpdbData.extradata.gamemode = args.gamemode
+	lpdbData.extradata.competitive = String.isNotEmpty(args.spanstart) and String.isEmpty(args.spanend)
 	return lpdbData
 end
 
