@@ -13,6 +13,8 @@ local Game = Lua.import('Module:Infobox/Game', {requireDevIfEnabled = true})
 
 local CustomGame = Class.new()
 
+---@param frame Frame
+---@return Html
 function CustomGame.run(frame)
 	local customGame = Game(frame)
 	return customGame:createInfobox()

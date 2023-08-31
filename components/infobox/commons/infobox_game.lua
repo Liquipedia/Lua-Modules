@@ -22,13 +22,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class GameInfobox: BasicInfobox
 local Game = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
+---@return Html
 function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
