@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Skill/Spell/Custom
+-- page=Module:Infobox/Skill/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -22,9 +22,14 @@ local Skill = Lua.import('Module:Infobox/Skill', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local Spell = Class.new()
+local CustomSkill = Class.new()
 
 local ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'
+local SPELL = 'Spell'
+local INFORMATIONTYPE_TO_CATEGORY = {
+	spell = 'Spells',
+	ability = 'Abilities',
+}
 
 local CustomInjector = Class.new(Injector)
 
@@ -32,12 +37,18 @@ local _args
 
 ---@param frame Frame
 ---@return unknown
-function Spell.run(frame)
-	local spell = Skill(frame)
-	spell.createWidgetInjector = Spell.createWidgetInjector
-	spell.getCategories = Spell.getCategories
-	_args = spell.args
-	return spell:createInfobox()
+function CustomSkill.run(frame)
+	local skill = Skill(frame)
+	skill.createWidgetInjector = CustomSkill.createWidgetInjector
+	skill.getCategories = CustomSkill.getCategories
+	_args = skill.args
+	assert(INFORMATIONTYPE_TO_CATEGORY[_args.informationType], 'Missing or invalid "informationType"')
+	return skill:createInfobox()
+end
+
+---@return WidgetInjector
+function CustomSkill:createWidgetInjector()
+	return CustomInjector()
 end
 
 ---@param widgets Widget[]
@@ -45,10 +56,10 @@ end
 function CustomInjector:addCustomCells(widgets)
 	return Array.append(
 		widgets,
-		Cell{name = '[[Game Speed|Duration 2]]', content = {Spell:getDuration(2)}},
-		Cell{name = 'Researched from', content = {Spell:getResearchFrom()}},
-		Cell{name = 'Research Cost', content = {Spell:getResearchCost()}},
-		Cell{name = 'Research Hotkey', content = {Spell:getResearchHotkey()}},
+		Cell{name = '[[Game Speed|Duration 2]]', content = {CustomSkill:getDuration(2)}},
+		Cell{name = 'Researched from', content = {CustomSkill:getResearchFrom()}},
+		Cell{name = 'Research Cost', content = {CustomSkill:getResearchCost()}},
+		Cell{name = 'Research Hotkey', content = {CustomSkill:getResearchHotkey()}},
 		Cell{name = 'Move Speed', content = {_args.movespeed}}
 	)
 end
@@ -58,41 +69,22 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
-		return {Cell{name = 'Cost', content = {Spell:getCostDisplay()}}}
+		return {Cell{name = 'Cost', content = {CustomSkill:getCostDisplay()}}}
 	elseif id == 'hotkey' then
-		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {Spell:getHotkeys()}}}
+		return {Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomSkill:getHotkeys()}}}
 	elseif id == 'cooldown' then
 		return {
-			Cell{ame = Page.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown', content = {_args.cooldown}}
+			Cell{name = Page.makeInternalLink({onlyIfExists = true},'Cooldown') or 'Cooldown', content = {_args.cooldown}}
 		}
 	elseif id == 'duration' then
-		return {Cell{name = '[[Game Speed|Duration]]', content = {Spell:getDuration()}}}
+		return {Cell{name = '[[Game Speed|Duration]]', content = {CustomSkill:getDuration()}}}
 	end
 
 	return widgets
 end
 
----@return WidgetInjector
-function Spell:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@return string?
-function Spell:getResearchCost()
-	if String.isEmpty(_args.from) then
-		return nil
-	end
-
-	return CostDisplay.run{
-		faction = _args.race,
-		minerals = _args.min,
-		gas = _args.gas,
-		buildTime = _args.buildtime,
-	}
-end
-
----@return string?
-function Spell:getResearchFrom()
+function CustomSkill:getResearchFrom()
 	if String.isEmpty(_args.from) then
 		return 'No research needed'
 	elseif String.isNotEmpty(_args.from2) then
@@ -103,18 +95,34 @@ function Spell:getResearchFrom()
 end
 
 ---@return string?
-function Spell:getResearchHotkey()
+function CustomSkill:getResearchHotkey()
 	if String.isNotEmpty(_args.from) then
 		return Hotkeys.hotkey(_args.rhotkey)
 	end
 end
 
+---@return string?
+function CustomSkill:getResearchCost()
+	if String.isEmpty(_args.from) or _args.informationType ~= SPELL then
+		return
+	end
+
+	return CostDisplay.run{
+		faction = _args.race,
+		minerals = _args.min,
+		gas = _args.gas,
+		buildTime = _args.buildtime,
+	}
+end
+
+---@param args table
 ---@return string[]
-function Spell:getCategories()
-	local categories = {'Spells'}
+function CustomSkill:getCategories(args)
+	local skill = INFORMATIONTYPE_TO_CATEGORY[args.informationType]
+	local categories = {skill}
 	local race = Faction.toName(Faction.read(_args.race))
 	if race then
-		table.insert(categories, race .. ' Spells')
+		table.insert(categories, race .. ' ' .. skill)
 	end
 
 	return categories
@@ -122,7 +130,7 @@ end
 
 ---@param postfix string|number|nil
 ---@return string?
-function Spell:getDuration(postfix)
+function CustomSkill:getDuration(postfix)
 	postfix = postfix or ''
 
 	local display
@@ -143,7 +151,7 @@ function Spell:getDuration(postfix)
 end
 
 ---@return string?
-function Spell:getHotkeys()
+function CustomSkill:getHotkeys()
 	if String.isNotEmpty(_args.hotkey) and String.isNotEmpty(_args.hotkey2) then
 		return Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'slash')
 	elseif String.isNotEmpty(_args.hotkey) then
@@ -151,10 +159,21 @@ function Spell:getHotkeys()
 	end
 end
 
----@return string
-function Spell:getCostDisplay()
-	local energy = tonumber(_args.energy or 0) or 0
-	return ENERGY .. '&nbsp;' .. energy
+---@return string?
+function CustomSkill:getCostDisplay()
+	if _args.informationType == SPELL then
+		return ENERGY .. '&nbsp;' .. (tonumber(_args.energy or 0) or 0)
+	end
+
+	return CostDisplay.run{
+		faction = _args.race,
+		minerals = _args.min,
+		mineralsForced = true,
+		gas = _args.gas,
+		gasForced = true,
+		buildTime = _args.buildtime,
+		supply = _args.supply or _args.control or _args.psy,
+	}
 end
 
-return Spell
+return CustomSkill
