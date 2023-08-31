@@ -39,10 +39,10 @@ local CONCAT_VALUE = '&nbsp;'
 ---@field foodTotal string|number?
 
 ---@param args scCostDisplayArgsValues
----@return string[]?
+---@return string?
 function CostDisplay.run(args)
 	if not args then
-		return {}
+		return nil
 	end
 
 	local displays = {}
