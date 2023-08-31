@@ -11,6 +11,11 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class BreakdownWidget: Widget
+---@operator call(table): BreakdownWidget
+---@field contents (string|number)[]
+---@field classes string[]
+---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
@@ -20,10 +25,15 @@ local Breakdown = Class.new(
 	end
 )
 
+---@return Html[]
 function Breakdown:make()
 	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
 end
 
+---@param contents (string|number)[]
+---@param classes string[]
+---@param contentClasses table<integer, string[]> --can have gaps in the outer table
+---@return Html?
 function Breakdown:_breakdown(contents, classes, contentClasses)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
