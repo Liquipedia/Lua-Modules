@@ -12,6 +12,10 @@ local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class CentereWidget: Widget
+---@operator call({content: (string|number)[], classes: string[]}): CentereWidget
+---@field content (string|number)[]
+---@field classes string[]
 local Center = Class.new(
 	Widget,
 	function(self, input)
@@ -20,12 +24,14 @@ local Center = Class.new(
 	end
 )
 
+---@return {[1]: Html?}
 function Center:make()
-	return {
-		Center:_create(self.content, self.classes)
-	}
+	return {Center:_create(self.content, self.classes)}
 end
 
+---@param content (string|number)[]
+---@param classes string[]
+---@return Html?
 function Center:_create(content, classes)
 	if Table.isEmpty(content) then
 		return nil
