@@ -21,6 +21,7 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class SkillInfobox: BasicInfobox
 local Skill = Class.new(BasicInfobox)
 
 ---@param frame Frame
