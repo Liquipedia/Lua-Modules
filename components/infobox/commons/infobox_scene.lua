@@ -24,6 +24,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class SceneInfobox: BasicInfobox
 local Scene = Class.new(BasicInfobox)
 
 ---@param frame Frame
