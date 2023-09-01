@@ -8,7 +8,7 @@
 
 local CustomMatchSummary = {}
 
-local Date = require('Module:Date')
+local Date = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
@@ -18,7 +18,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled
 
 
 function CustomMatchSummary.getByMatchId(args)
-	mw.log(args.matchId)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('420px')
@@ -50,7 +49,7 @@ function CustomMatchSummary._createOverallPage(match)
 	local schedule = mw.html.create('div')
 	schedule:wikitext('Schedule')
 	for idx, game in ipairs(match.games) do
-		schedule:tag('div'):wikitext('Game '):wikitext(idx):wikitext(': '):node(CustomMatchSummary._gameCountdown(game))
+		schedule:tag('div'):wikitext('Game ', idx, ': '):node(CustomMatchSummary._gameCountdown(game))
 	end
 
 	-- Help Text
@@ -63,6 +62,9 @@ end
 
 function CustomMatchSummary._gameCountdown(game)
 	local timestamp = Date.readTimestamp(game.date)
+	if not timestamp then
+		return
+	end
 	local dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. Timezone.getTimezoneString('UTC')
 
 	local stream = Table.merge(game.stream, {
