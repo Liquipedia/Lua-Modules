@@ -71,6 +71,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
 	header = 'string?',
+	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
 	lowerMatchIds = TypeUtil.array('string'),
 	qualLose = 'boolean?',
@@ -146,7 +147,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
----@field players standardPlayer[]
+---@field players standardPlayer[]?
 ---@field score number?
 ---@field score2 number?
 ---@field status string?
@@ -538,6 +539,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
+			inheritedHeader = nilIfEmpty(data.inheritedheader),
 			lowerEdges = data.loweredges and Array.map(data.loweredges, MatchGroupUtil.indexTableFromRecord),
 			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualifiedHeader = nilIfEmpty(data.qualifiedheader),
