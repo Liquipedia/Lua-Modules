@@ -33,7 +33,7 @@ StarcraftOpponentDisplay.propTypes.InlineOpponent = {
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 }
 
----@class StarcraftInlineOpponentProps
+---@class StarcraftInlineOpponentProps: InlineOpponentProps
 ---@field flip boolean?
 ---@field opponent StarcraftStandardOpponent
 ---@field showFlag boolean?
@@ -58,7 +58,7 @@ function StarcraftOpponentDisplay.InlineOpponent(props)
 			template = opponent.template or 'tbd',
 		})
 	elseif opponent.type == 'literal' then
-		return OpponentDisplay.InlineOpponent(props --[[@as InlineOpponentProps]])
+		return OpponentDisplay.InlineOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
 		return StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 	end
@@ -77,7 +77,7 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	abbreviateTbd = 'boolean?',
 }
 
----@class StarcraftBlockOpponentProps
+---@class StarcraftBlockOpponentProps: BlockOpponentProps
 ---@field flip boolean?
 ---@field opponent StarcraftStandardOpponent
 ---@field overflow ('ellipsis'|'wrap'|'hidden')?
@@ -117,7 +117,7 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 			Table.merge(props, {showLink = showLink})
 		)
 	elseif opponent.type == 'literal' then
-		return OpponentDisplay.BlockOpponent(props --[[@as BlockOpponentProps]])
+		return OpponentDisplay.BlockOpponent(props)
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
 		return StarcraftOpponentDisplay.PlayerBlockOpponent(
 			Table.merge(props, {showLink = showLink})
@@ -130,7 +130,7 @@ end
 ---@return string?
 function StarcraftOpponentDisplay.InlineTeamContainer(props)
 	return props.template == 'default'
-		and OpponentDisplay.InlineTeam(props --[[@as InlineOpponentProps]])
+		and OpponentDisplay.InlineTeam({flip = props.flip, template = props.template, teamStyle = props.style})
 		or OpponentDisplay.InlineTeamContainer(props)
 end
 

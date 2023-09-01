@@ -25,7 +25,7 @@ CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentD
 	showRace = 'boolean?',
 })
 
----@class WarcraftInlineOpponentProps
+---@class WarcraftInlineOpponentProps: InlineOpponentProps
 ---@field flip boolean?
 ---@field opponent WarcraftStandardOpponent
 ---@field showFlag boolean?
@@ -44,7 +44,7 @@ function CustomOpponentDisplay.InlineOpponent(props)
 		return CustomOpponentDisplay.InlinePlayers(props)
 	end
 
-	return OpponentDisplay.InlineOpponent(props --[[@as InlineOpponentProps]])
+	return OpponentDisplay.InlineOpponent(props)
 end
 
 CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
@@ -53,7 +53,7 @@ CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDi
 	playerClass = 'string?',
 })
 
----@class WarcraftBlockOpponentProps
+---@class WarcraftBlockOpponentProps: BlockOpponentProps
 ---@field flip boolean?
 ---@field opponent StarcraftStandardOpponent
 ---@field overflow ('ellipsis'|'wrap'|'hidden')?
@@ -81,7 +81,7 @@ function CustomOpponentDisplay.BlockOpponent(props)
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	end
 
-	return OpponentDisplay.BlockOpponent(props --[[@as BlockOpponentProps]])
+	return OpponentDisplay.BlockOpponent(props)
 end
 
 ---@param props WarcraftInlineOpponentProps
