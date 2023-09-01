@@ -56,7 +56,7 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{name = 'Matchups', content = {_args.matchups or 'All'}},
 		Cell{name = 'Type', content = {_args.type or 'Opening'}},
-		Cell{name = 'Popularized by', content = {_args.popularized}, options = {makeLink = true}},
+		Cell{name = 'Popularized by', content = {_args.popularized}},
 		Cell{name = 'Converted Form', content = {_args.convert}},
 		Cell{name = 'TL-Article', content = {CustomStrategy:_getTLarticle(_args.tlarticle)}},
 		Cell{name = 'Game', content = {_args.game or
