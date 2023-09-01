@@ -55,7 +55,7 @@ end
 
 ---Retrieves all values stashed by Template.stashReturnValue.
 ---@param namespace string
----@return table
+---@return table[]
 function Template.retrieveReturnValues(namespace)
 	local pageVars = PageVariableNamespace(namespace or 'Template.return')
 
