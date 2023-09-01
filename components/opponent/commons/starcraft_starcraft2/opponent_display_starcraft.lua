@@ -58,7 +58,7 @@ function StarcraftOpponentDisplay.InlineOpponent(props)
 			template = opponent.template or 'tbd',
 		})
 	elseif opponent.type == 'literal' then
-		return OpponentDisplay.InlineOpponent(props)
+		return OpponentDisplay.InlineOpponent(props --[[@as InlineOpponentProps]])
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
 		return StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 	end
@@ -117,7 +117,7 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 			Table.merge(props, {showLink = showLink})
 		)
 	elseif opponent.type == 'literal' then
-		return OpponentDisplay.BlockOpponent(props)
+		return OpponentDisplay.BlockOpponent(props --[[@as BlockOpponentProps]])
 	else -- opponent.type == 'solo' 'duo' 'trio' 'quad'
 		return StarcraftOpponentDisplay.PlayerBlockOpponent(
 			Table.merge(props, {showLink = showLink})
@@ -130,7 +130,7 @@ end
 ---@return string?
 function StarcraftOpponentDisplay.InlineTeamContainer(props)
 	return props.template == 'default'
-		and OpponentDisplay.InlineTeam(props)
+		and OpponentDisplay.InlineTeam(props --[[@as InlineOpponentProps]])
 		or OpponentDisplay.InlineTeamContainer(props)
 end
 

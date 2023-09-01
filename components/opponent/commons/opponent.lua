@@ -54,7 +54,7 @@ Opponent.quad = OpponentTypes.quad
 Opponent.literal = OpponentTypes.literal
 
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
-Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
+Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal}) --[[@as table]]
 
 ---@enum PartySize
 Opponent.partySizes = {
@@ -424,7 +424,9 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix] = player.pageName
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
-			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
+			players[prefix .. 'team'] = player.team and
+				Opponent.toName({type = Opponent.team, template = player.team, players = {}}) or
+				nil
 			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players

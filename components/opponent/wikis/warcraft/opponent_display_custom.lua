@@ -44,7 +44,7 @@ function CustomOpponentDisplay.InlineOpponent(props)
 		return CustomOpponentDisplay.InlinePlayers(props)
 	end
 
-	return OpponentDisplay.InlineOpponent(props)
+	return OpponentDisplay.InlineOpponent(props --[[@as InlineOpponentProps]])
 end
 
 CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
@@ -81,7 +81,7 @@ function CustomOpponentDisplay.BlockOpponent(props)
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	end
 
-	return OpponentDisplay.BlockOpponent(props)
+	return OpponentDisplay.BlockOpponent(props --[[@as BlockOpponentProps]])
 end
 
 ---@param props WarcraftInlineOpponentProps
