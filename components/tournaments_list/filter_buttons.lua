@@ -77,6 +77,7 @@ function FilterButtons._loadCategories(category)
 end
 
 ---@param category Category
+---@return Html
 function FilterButtons._getButtonRow(category)
 	local buttons = mw.html.create('div')
 		:addClass('filter-buttons')
@@ -150,7 +151,8 @@ function FilterButtons._getButtonRow(category)
 		local section = mw.html.create('div')
 			:addClass('filter-category--hidden')
 			:attr('data-filter-group', 'tournaments-list-dropdown')
-        	:attr('data-filter-category', 'dropdown-' .. category.name)
+			:attr('data-filter-category', 'dropdown-' .. category.name)
+			:attr('data-filter-category', 'dropdown-' .. category.name)
 			:css('margin-top','-8px')
 			:node(buttons)
 		return section
