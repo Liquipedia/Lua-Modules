@@ -557,7 +557,7 @@ function League:_createLocation(args)
 	return table.concat(display)
 end
 
----@param options table
+---@param options table?
 ---@param series string?
 ---@param abbreviation string?
 ---@param icon string?
