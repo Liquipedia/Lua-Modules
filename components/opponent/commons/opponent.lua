@@ -174,7 +174,7 @@ end
 ---@return boolean
 function Opponent.isEmpty(opponent)
 	local opponentCopy = Table.copy(opponent or {})
-	--remove type since it might be set while the opponent is empty otherwise 
+	--remove type since it might be set while the opponent is empty otherwise
 	opponentCopy.type = nil
 
 	return Table.deepEquals(opponent, Opponent.blank(opponent.type)) or Table.isEmpty(opponentCopy)
