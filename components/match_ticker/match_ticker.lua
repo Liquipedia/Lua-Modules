@@ -8,6 +8,7 @@
 
 --todo:
 -- - display
+--	--> if > 2 opponents or only TBD/Empty opponents display round instead (prep for battle royale)
 -- - custom
 
 local Array = require('Module:Array')
@@ -198,9 +199,7 @@ end
 function MatchTicker:filterMatches(matches)
 	--remove matches with empty/BYE opponents
 	matches = Array.filter(matches, function(match)
-		return Array.any(match.match2opponents, function(opponent)
-			return Opponent.isEmpty(opponent) or Opponent.isBye(opponent)
-		end)
+		return Array.any(match.match2opponents, Opponent.isBye)
 	end)
 
 	if self.config.showAllTbdMatches then
