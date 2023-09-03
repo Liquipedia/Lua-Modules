@@ -173,11 +173,15 @@ end
 ---@param opponent standardOpponent?
 ---@return boolean
 function Opponent.isEmpty(opponent)
+	if not opponnet.type or Table.deepEquals(opponent, Opponent.blank(opponent.type)) then
+		return true
+	end
+
 	local opponentCopy = Table.copy(opponent or {})
 	--remove type since it might be set while the opponent is empty otherwise
 	opponentCopy.type = nil
 
-	return Table.deepEquals(opponent, Opponent.blank(opponent.type)) or Table.isEmpty(opponentCopy)
+	return Table.isEmpty(opponentCopy)
 end
 
 ---Checks whether an opponent is a BYE Opponent
