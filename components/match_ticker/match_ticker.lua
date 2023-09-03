@@ -210,7 +210,7 @@ function MatchTicker:filterMatches(matches)
 	local previousMatchWasTbd
 	Array.forEach(matches, function(match)
 		local isTbdMatch = Array.all(match.match2opponents, function(opponent)
-			return Opponent.isTbd(opponent)
+			return Opponent.isTbd(opponent) or Opponent.isEmpty(opponent)
 		end)
 		if isTbdMatch and previousMatchWasTbd then
 			match.isTbdMatch = true
