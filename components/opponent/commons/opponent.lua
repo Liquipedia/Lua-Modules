@@ -177,7 +177,7 @@ function Opponent.isEmpty(opponent)
 		return true
 	end
 
-	local opponentCopy = Table.copy(opponent or {})
+	local opponentCopy = Table.copy(opponent)
 	--remove type since it might be set while the opponent is empty otherwise
 	opponentCopy.type = nil
 
