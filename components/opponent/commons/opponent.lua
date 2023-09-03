@@ -177,7 +177,7 @@ function Opponent.isEmpty(opponent)
 	--remove type since it might be set while the opponent is empty otherwise 
 	opponentCopy.type = nil
 
-	return Table.isEmpty(opponentCopy)
+	return Table.deepEquals(opponent, Opponent.blank(opponent.type)) or Table.isEmpty(opponentCopy)
 end
 
 ---Checks whether an opponent is a BYE Opponent
