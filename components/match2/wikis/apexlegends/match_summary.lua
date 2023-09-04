@@ -8,7 +8,9 @@
 
 local CustomMatchSummary = {}
 
+local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
@@ -53,9 +55,25 @@ function CustomMatchSummary._createOverallPage(match)
 	end
 
 	-- Help Text
+	local scoring = match.extradata.scoring
 	local helpText = mw.html.create('div')
 	helpText:wikitext('Points Distribution')
-	helpText:wikitext('blablabla')
+
+	helpText:tag('div'):wikitext('1 kill ', Table.extract(scoring, 'kill'), ' kill point')
+	local points = Table.groupBy(scoring, function (_, value)
+		return value
+	end)
+	for point, placements in Table.iter.spairs(points, function (tbl, a, b)
+		return a > b
+	end) do
+		if Table.size(placements) == 1 then
+			helpText:tag('div'):wikitext(Array.extractKeys(placements)[1], ' ', point, ' placement points')
+		else
+			local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
+			helpText:tag('div'):wikitext(placementRange[1], ' - ', placementRange[#placementRange], ' ', point, ' placement points')
+		end
+	end
+
 
 	return wrapper:node(schedule):node(helpText)
 end

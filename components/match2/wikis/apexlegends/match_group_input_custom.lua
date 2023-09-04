@@ -164,11 +164,11 @@ end
 --
 function MatchFunctions.parseScoreSetting(match)
 	match.scoreSettings = {
-		kill = match.p_kill or 1,
+		kill = tonumber(match.p_kill) or 1,
 	}
 
 	Table.mergeInto(match.scoreSettings, Array.mapIndexes(function(idx)
-		return match['p' .. idx]
+		return tonumber(match['p' .. idx])
 	end))
 
 	return match
@@ -225,7 +225,10 @@ function MatchFunctions.getVodStuff(match)
 end
 
 function MatchFunctions.getExtraData(match)
-	match.extradata = {}
+	match.extradata = {
+		scoring = match.scoreSettings
+	}
+
 	return match
 end
 
