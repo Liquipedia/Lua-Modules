@@ -6,9 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local ChampionIcon = require('Module:ChampionIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
@@ -57,8 +55,6 @@ _ROLES['adc'] = _ROLES.bottom
 _ROLES['bot'] = _ROLES.bottom
 _ROLES['ad carry'] = _ROLES.bottom
 _ROLES['sup'] = _ROLES.support
-
-local _SIZE_CHAMPION = '25x25px'
 
 local CustomPlayer = Class.new()
 
