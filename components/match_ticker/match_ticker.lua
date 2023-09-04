@@ -22,13 +22,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local WRAPPER_DEFAULT_CLASS = 'fo-nttax-infobox wiki-bordercolor-light'
-local DEFAULT_LIMIT = 20
-local LIMIT_INCREASE = 20
-local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
-local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
-local DEFAULT_LIVE_HOURS = 3
-local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 local DEFAULT_QUERY_COLUMNS = {
 	'match2opponents',
 	'winner',
@@ -50,16 +43,17 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 }
+local WRAPPER_DEFAULT_CLASS = 'fo-nttax-infobox wiki-bordercolor-light'
+local DEFAULT_LIMIT = 20
+local LIMIT_INCREASE = 20
+local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
+local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
+local DEFAULT_LIVE_HOURS = 3
+local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
+local PARTICIPANT_DISPLAY_MODE = 'participant'
+local DEFAULT_DISPLAY_MODE = 'default'
 
----@enum tickerDisplayModes
-local TICKER_DISPLAY_MODES = {
-	player = 'participant',
-	team = 'participant',
-	participant = 'participant',
-	tournament = 'tournament',
-	plain = 'plain',
-	default = 'plain',
-}
+---@alias tickerDisplayModes 'participant'|'default'
 
 ---@class MatchTickerConfig
 ---@field tournaments string[]
@@ -93,7 +87,7 @@ MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents
 function MatchTicker:init(args)
 	self.args = args
 
-	local hasopponent = Logic.isNotEmpty(args.player or args.team)
+	local hasOpponent = Logic.isNotEmpty(args.player or args.team)
 
 	local config = {
 		tournaments = Array.extractValues(
@@ -104,7 +98,7 @@ function MatchTicker:init(args)
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
 		teamPages = args.team and Team.queryHistoricalNames(args.team) or nil,
-		displayMode = TICKER_DISPLAY_MODES[args.displayMode] or TICKER_DISPLAY_MODES.default,
+		displayMode = hasOpponent and PARTICIPANT_DISPLAY_MODE or DEFAULT_DISPLAY_MODE,
 		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
@@ -112,7 +106,7 @@ function MatchTicker:init(args)
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.upcoming),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
-		enteredOpponentOnLeft = hasopponent and Logic.readBool(Logic.emptyOr(args.enteredOpponentOnLeft, hasopponent)),
+		enteredOpponentOnLeft = hasOpponent and Logic.readBool(Logic.emptyOr(args.enteredOpponentOnLeft, hasOpponent)),
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
