@@ -85,11 +85,13 @@ local TICKER_DISPLAY_MODES = {
 ---@field showAllTbdMatches boolean
 
 ---@class MatchTicker
+---@operator call(table): BasicInfobox
 ---@field args table
 ---@field config MatchTickerConfig
+---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
-MatchTicker.displayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
+MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
 
 ---@param args any
 ---@return table
@@ -148,7 +150,7 @@ function MatchTicker:query()
 	end
 
 	mw.logObject(matches)
-	self.matches = {}
+
 	return self
 end
 
