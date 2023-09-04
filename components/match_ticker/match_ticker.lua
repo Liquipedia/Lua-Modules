@@ -70,7 +70,7 @@ local TICKER_DISPLAY_MODES = {
 ---@field limit integer
 ---@field order string
 ---@field player string?
----@field team string?
+---@field teamPages string[]?
 ---@field displayMode tickerDisplayModes
 ---@field maximumLiveHoursOfMatches integer
 ---@field queryColumns string[]
@@ -79,7 +79,7 @@ local TICKER_DISPLAY_MODES = {
 ---@field upcoming boolean
 ---@field ongoing boolean
 ---@field onlyExact boolean
----@field hasOpponent boolean
+---@field enteredOpponentOnLeft boolean
 ---@field linkLeftOpponent boolean
 ---@field queryByParent boolean
 ---@field showAllTbdMatches boolean
@@ -96,6 +96,8 @@ MatchTicker.displayComponents = Lua.import('Module:MatchTicker/DisplayComponents
 function MatchTicker:init(args)
 	self.args = args
 
+	local hasopponent = Logic.isNotEmpty(args.player or args.team)
+
 	local config = {
 		tournaments = Array.extractValues(
 			Table.filterByKey(args, function(key) return string.find(key, '^tournament%d-$') ~= nil end)
@@ -103,8 +105,8 @@ function MatchTicker:init(args)
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
-		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player) or nil,
-		team = args.team,
+		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
+		teamPages = args.team and Team.queryHistoricalNames(args.team) or nil,
 		displayMode = TICKER_DISPLAY_MODES[args.displayMode] or TICKER_DISPLAY_MODES.default,
 		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
@@ -113,8 +115,8 @@ function MatchTicker:init(args)
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.upcoming),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
-		hasOpponent = Logic.isNotEmpty(args.player or args.team),
-		linkLeftOpponent = Logic.readBool(Logic.emptyOr(args.linkLeftOpponent, Logic.isEmpty(args.player or args.team))),
+		enteredOpponentOnLeft = hasopponent and Logic.readBool(Logic.emptyOr(args.enteredOpponentOnLeft, hasopponent)),
+		linkLeftOpponent = Logic.readBool(Logic.emptyOr(args.linkLeftOpponent, not hasopponent)),
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
@@ -140,11 +142,14 @@ function MatchTicker:query()
 	})
 
 	if type(matches[1]) == 'table' then
-		return Array.sub(MatchTicker:filterMatches(matches), 1, self.config.limit)
+		matches = Array.sub(MatchTicker:filterMatches(matches), 1, self.config.limit)
+		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
+		return self
 	end
 
 	mw.logObject(matches)
-	return {}
+	self.matches = {}
+	return self
 end
 
 ---@return string
@@ -164,20 +169,19 @@ function MatchTicker:buildQueryConditions()
 	end
 
 	if config.player then
-		local underScorePlayer = config.player:gsub(' ', '_')
+		local playerNoUnderScore = config.player:gsub('_', ' ')
 		conditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('opponent'), Comparator.eq, config.player),
-			ConditionNode(ColumnName('opponent'), Comparator.eq, underScorePlayer),
+			ConditionNode(ColumnName('opponent'), Comparator.eq, playerNoUnderScore),
 			ConditionNode(ColumnName('player'), Comparator.eq, config.player),
-			ConditionNode(ColumnName('player'), Comparator.eq, underScorePlayer),
+			ConditionNode(ColumnName('player'), Comparator.eq, playerNoUnderScore),
 		})
 	end
 
-	local teamPages = config.team and Team.queryHistoricalNames(config.team)
-	if teamPages then
+	if config.teamPages then
 		local teamConditions = ConditionTree(BooleanOperator.any)
 
-		Array.forEach(teamConditions, function (team)
+		Array.forEach(config.teamPages, function (team)
 			local teamWithUnderScore = team:gsub(' ', '_')
 			teamConditions:add{
 				ConditionNode(ColumnName('opponent'), Comparator.eq, team),
@@ -255,6 +259,38 @@ function MatchTicker:filterMatches(matches)
 	end)
 
 	return Array.filter(matches, function(match) return not match.isTbdMatch end)
+end
+
+function MatchTicker:adjustMatch(match)
+	if not self.config.enteredOpponentOnLeft or #match.match2opponents ~= 2 then
+		return match
+	end
+
+	local opponentNames = Array.append({self.config.player}, self.config.teamPages)
+	if
+		--check for the name value
+		Table.includes(opponentNames, match.match2opponents[2].name:gsub(' ', '_'))
+		--check inside match2players too for the player value
+		or self.config.player and Table.any(match.match2opponents[2].match2players, function(playerData)
+			return (playerData.name or ''):gsub(' ', '_') == self.config.player end)
+	then
+		return MatchTicker.switchOpponents(match)
+	end
+
+	return match
+end
+
+function MatchTicker.switchOpponents(match)
+	local winner = tonumber(match.winner) or 0
+	match.winner = winner == 1 and 2
+		or winner == 2 and 1
+		or winner
+
+	local tempOpponent = match.match2opponents[1]
+	match.match2opponents[1] = match.match2opponents[2]
+	match.match2opponents[2] = tempOpponent
+
+	return match
 end
 
 return MatchTicker
