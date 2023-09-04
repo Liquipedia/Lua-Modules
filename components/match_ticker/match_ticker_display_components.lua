@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
--- Holds DisplayComponents for the MatchTicker modules
+-- Holds DisplayComponents for the MatchTicker module
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
