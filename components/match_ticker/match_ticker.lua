@@ -18,9 +18,7 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -57,7 +55,41 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 }
 
+---@enum tickerDisplayModes
+local TICKER_DISPLAY_MODES = {
+	player = 'participant',
+	team = 'participant',
+	participant = 'participant',
+	tournament = 'tournament',
+	plain = 'plain',
+	default = 'plain',
+}
+
+---@class MatchTickerConfig
+---@field tournaments string[]
+---@field limit integer
+---@field order string
+---@field player string?
+---@field team string?
+---@field displayMode tickerDisplayModes
+---@field maximumLiveHoursOfMatches integer
+---@field queryColumns string[]
+---@field additionalConditions string
+---@field recent boolean
+---@field upcoming boolean
+---@field ongoing boolean
+---@field onlyExact boolean
+---@field hasOpponent boolean
+---@field linkLeftOpponent boolean
+---@field queryByParent boolean
+---@field showAllTbdMatches boolean
+
+---@class MatchTicker
+---@field args table
+---@field config MatchTickerConfig
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
+
+MatchTicker.displayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
 
 ---@param args any
 ---@return table
@@ -71,9 +103,9 @@ function MatchTicker:init(args)
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
-		player = args.player,
+		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player) or nil,
 		team = args.team,
-		mode = args.tickerMode, -- player, team,
+		displayMode = TICKER_DISPLAY_MODES[args.displayMode] or TICKER_DISPLAY_MODES.default,
 		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
@@ -81,6 +113,8 @@ function MatchTicker:init(args)
 		upcoming = Logic.readBool(args.upcoming),
 		ongoing = Logic.readBool(args.upcoming),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
+		hasOpponent = Logic.isNotEmpty(args.player or args.team),
+		linkLeftOpponent = Logic.readBool(Logic.emptyOr(args.linkLeftOpponent, Logic.isEmpty(args.player or args.team))),
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
@@ -106,7 +140,7 @@ function MatchTicker:query()
 	})
 
 	if type(matches[1]) == 'table' then
-		return MatchTicker:filterMatches(matches)
+		return Array.sub(MatchTicker:filterMatches(matches), 1, self.config.limit)
 	end
 
 	mw.logObject(matches)
