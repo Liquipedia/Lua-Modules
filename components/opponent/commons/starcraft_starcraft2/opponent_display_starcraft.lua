@@ -34,13 +34,8 @@ StarcraftOpponentDisplay.propTypes.InlineOpponent = {
 }
 
 ---@class StarcraftInlineOpponentProps: InlineOpponentProps
----@field flip boolean?
 ---@field opponent StarcraftStandardOpponent
----@field showFlag boolean?
----@field showLink boolean?
 ---@field showRace boolean?
----@field dq boolean?
----@field teamStyle teamStyle
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props StarcraftInlineOpponentProps
@@ -78,15 +73,7 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 }
 
 ---@class StarcraftBlockOpponentProps: BlockOpponentProps
----@field flip boolean?
 ---@field opponent StarcraftStandardOpponent
----@field overflow ('ellipsis'|'wrap'|'hidden')?
----@field showFlag boolean?
----@field showLink boolean?
----@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
----@field playerClass string?
----@field teamStyle teamStyle?
 ---@field showRace boolean?
 
 --[[
