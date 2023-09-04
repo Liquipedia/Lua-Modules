@@ -27,6 +27,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local WRAPPER_DEFAULT_CLASS = 'fo-nttax-infobox wiki-bordercolor-light'
 local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
@@ -85,7 +86,7 @@ local TICKER_DISPLAY_MODES = {
 ---@field showAllTbdMatches boolean
 
 ---@class MatchTicker
----@operator call(table): BasicInfobox
+---@operator call(table): MatchTicker
 ---@field args table
 ---@field config MatchTickerConfig
 ---@field matches table[]?
@@ -293,6 +294,27 @@ function MatchTicker.switchOpponents(match)
 	match.match2opponents[2] = tempOpponent
 
 	return match
+end
+
+---@param header MatchTickerHeader?
+---@param classes string[]?
+---@return Html
+function MatchTicker:create(header, classes)
+	local wrapper = mw.html.create('div')
+
+	for _, class in pairs(classes or {WRAPPER_DEFAULT_CLASS}) do
+		wrapper:addClass(class)
+	end
+
+	if header then
+		wrapper:node(header:create())
+	end
+
+	for _, match in ipairs(self.matches or {}) do
+		wrapper:node(MatchTicker.DisplayComponents.Match{config = self.config, match = match}:create())
+	end
+
+	return wrapper
 end
 
 return MatchTicker
