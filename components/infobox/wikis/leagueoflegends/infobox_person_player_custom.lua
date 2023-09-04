@@ -122,21 +122,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Champion
-	local championIcons = Array.map(Player:getAllArgsForBase(_args, 'champion'),
-		function(champion, _)
-			return ChampionIcon.getImage{champion, size = _SIZE_CHAMPION}
-		end
-	)
-	return {Cell{
-		name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
-		content = {
-			table.concat(championIcons, '&nbsp;')
-		}
-	}}
-end
-
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
