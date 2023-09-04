@@ -1,0 +1,364 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:MatchTicker/DisplayComponents
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+-- Holds DisplayComponents for the MatchTicker modules
+
+local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Countdown = require('Module:Countdown')
+local String = require('Module:StringUtils')
+local LeagueIcon = require('Module:LeagueIcon')
+local Logic = require('Module:Logic')
+local Table = require('Module:Table')
+local VodLink = require('Module:VodLink')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local VS = 'vs.'
+local TBD = 'TBD'
+local SCORE_STATUS = 'S'
+local CURRENT_PAGE = mw.title.getCurrentTitle().text
+local DEFAULT_BR_MATCH_TEXT = 'Unknown Round'
+local WINNER_TO_BG_CLASS = {
+	[0] = 'recent-matches-draw',
+	'recent-matches-left',
+	'recent-matches-right',
+}
+local PARTICIPANT_DISPLAY_MODE = 'participant'
+local TOURNAMENT_DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
+local ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+
+---Display class for the header of a match ticker
+---@class MatchTickerHeader
+---@field root Html
+local Header = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('infobox-header wiki-backgroundcolor-light')
+	end
+)
+
+---@param text string|number|nil
+---@return MatchTickerHeader
+function Header:text(text)
+	self.root:wikitext(text)
+	return self
+end
+
+---@param class string?
+---@return MatchTickerHeader
+function Header:addClass(class)
+	self.root:addClass(class)
+	return self
+end
+
+---@return Html
+function Header:create()
+	return self.root
+end
+
+---Display class for matches shown within a match ticker
+---@class MatchTickerVersus
+---@operator call(table): MatchTickerVersus
+---@field root Html
+---@field match table
+local Versus = Class.new(
+	function(self, match)
+		self.root = mw.html.create('div')
+		self.match = match
+	end
+)
+
+---@return Html
+function Versus:create()
+	local bestof = self:bestof()
+	local scores, scores2 = self:scores()
+	local upperText, lowerText
+	if String.isNotEmpty(scores2) then
+		upperText = scores2
+		lowerText = scores
+	elseif bestof then
+		upperText = scores
+		lowerText = bestof
+	elseif scores then
+		upperText = scores
+		lowerText = VS
+	end
+
+	if not lowerText then
+		return self.root:wikitext(VS)
+	end
+
+	return self.root
+		:node(mw.html.create('div')
+			:css('line-height', '1.1'):node(upperText)
+		):node(mw.html.create('div')
+			:addClass('versus-lower'):wikitext('(' .. lowerText .. ')')
+		)
+end
+
+---@return string?
+function Versus:bestof()
+	local bestof = tonumber(self.match.bestof) or 0
+	if bestof > 0 then
+		return Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof)
+	end
+end
+
+---@return string?
+---@return string?
+function Versus:scores()
+	local winner = tonumber(self.match.winner)
+
+	local scores, scores2 = {}, {}
+	local hasSecondScore
+
+	local setWinner = function(score, opponentIndex)
+		if winner == opponentIndex then
+			return '<b>' .. score .. '</b>'
+		end
+		return score
+	end
+
+	Array.forEach(self.match.match2opponents, function(opponent, opponentIndex)
+		local score = opponent.status ~= SCORE_STATUS and opponent.status
+			or tonumber(opponent.score) or -1
+
+		table.insert(scores, setWinner(score ~= -1 and score or 0))
+
+		local score2 = tonumber((opponent.extradata or {}).score2) or 0
+		table.insert(scores2, setWinner(score2))
+		if score2 > 0 then
+			hasSecondScore = true
+		end
+	end)
+
+	if hasSecondScore then
+		return table.concat(scores, ':'), table.concat(scores2, ':')
+	end
+
+	return table.concat(scores, ':')
+end
+
+---Display class for matches shown within a match ticker
+---@class MatchTickerScoreBoard
+---@operator call(table): MatchTickerScoreBoard
+---@field root Html
+---@field match table
+local ScoreBoard = Class.new(
+	function(self, match)
+		self.root = mw.html.create('tr')
+		self.match = match
+	end
+)
+
+---@return Html
+function ScoreBoard:create()
+	local match = self.match
+	local winner = tonumber(match.winner)
+
+	return self.root
+		:addClass(WINNER_TO_BG_CLASS[winner])
+		:node(ScoreBoard:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(ScoreBoard:versus())
+		:node(ScoreBoard:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+end
+
+---@param opponent standardOpponent
+---@param isWinner boolean
+---@param flip boolean?
+---@return Html
+function ScoreBoard:opponent(opponent, isWinner, flip)
+	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
+		return mw.html.create('td')
+			:tag('i'):wikitext(TBD)
+	end
+
+	return mw.html.create('td')
+		:node(OpponentDisplay.InlineOpponent{
+			opponent = opponent,
+			teamStyle = 'short',
+			flip = flip,
+			showLink = not opponent.name ~= CURRENT_PAGE
+		})
+end
+
+---@return Html
+function ScoreBoard:versus()
+	return mw.html.create('td')
+		:addClass('versus')
+		:node(Versus(self.match):create())
+end
+
+---Display class for matches shown within a match ticker
+---@class MatchTickerDetails
+---@operator call({config: MatchTickerConfig, match: table, isBrMatch: boolean}): MatchTickerMatch
+---@field root Html
+---@field displayMode string
+---@field isBrMatch boolean
+---@field match table
+local Details = Class.new(
+	function(self, args)
+		self.root = mw.html.create('tr')
+		self.displayMode = args.displayMode
+		self.isBrMatch = args.isBrMatch
+		self.match = args.match
+	end
+)
+
+---@return Html
+function Details:create()
+	local td = mw.html.create('td')
+		:addClass('match-filler')
+		:node(mw.html.create('span')
+			:node(self:countdown())
+			:node(self:tournament())
+		)
+
+	if not self.isBrMatch then
+		td:attr('colspan', 3)
+	end
+
+	return self.root:node(td)
+end
+
+---@return Html
+function Details:countdown()
+	local match = self.match
+
+	local countdownArgs = Table.merge(match.stream or {}, {
+		rawcountdown = not Logic.readBool(match.finished),
+		rawdatetime = Logic.readBool(match.finished),
+		date = match.date .. ABBR_UTC,
+		finished = match.finished
+	})
+
+	local countdownDisplay = mw.html.create('span')
+		:addClass('match-countdown')
+		:node(Countdown._create(countdownArgs))
+		:node('&nbsp;&nbsp;')
+
+	if String.isNotEmpty(match.vod) then
+		countdownDisplay:node(VodLink.display{vod = match.vod})
+	end
+
+	return countdownDisplay
+end
+
+---@return Html?
+function Details:tournament()
+	if self.displayMode == PARTICIPANT_DISPLAY_MODE then
+		return
+	end
+
+	local match = self.match
+
+	local icon = LeagueIcon.display{
+		icon = Logic.emptyOr(match.icon, TOURNAMENT_DEFAULT_ICON),
+		iconDark = match.icondark,
+		link = match.pagename,
+		name = match.tournament,
+		options = {noTemplate = true},
+	}
+
+	local displayName = Logic.emptyOr(
+		match.tickername,
+		match.tournament,
+		match.parent:gsub('_', ' ')
+	)
+
+	return mw.html.create('div')
+		:addClass('tournament')
+		:node(mw.html.create('span')
+			:css('float', 'right')
+			:node(icon)
+		)
+		:node(mw.html.create('div')
+			:addClass('tournament-text')
+			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]&nbsp;&nbsp;')
+		)
+
+end
+
+---Display class for matches shown within a match ticker
+---@class MatchTickerMatch
+---@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatch
+---@field root Html
+---@field config MatchTickerConfig
+---@field match table
+local Match = Class.new(
+	function(self, args)
+		self.root = mw.html.create('table')
+			:addClass('wikitable wikitable-striped infobox_matches_content')
+		self.config = args.config
+		self.match = args.match
+	end
+)
+
+---@return Html
+function Match:create()
+	local matchDisplay = mw.html.create('table')
+		:addClass('wikitable wikitable-striped infobox_matches_content')
+
+	local isBrMatch = #self.match.match2opponnets ~= 2
+	if isBrMatch then
+		matchDisplay:node(self:brMatchRow())
+	else
+		matchDisplay:node(self:standardMatchRow())
+	end
+
+	matchDisplay:node(self:detailsRow(isBrMatch))
+
+	return matchDisplay
+end
+
+---@return Html
+function Match:brMatchRow()
+	local displayText = self.match.match2bracketdata.sectionheader or DEFAULT_BR_MATCH_TEXT
+
+	local inheritedHeader = self.match.match2bracketdata.inheritedheader
+	if inheritedHeader then
+		local headerArray = mw.text.split(inheritedHeader, '!')
+
+		local index = 1
+		if String.isEmpty(headerArray[1]) then
+			index = 2
+		end
+		displayText = Logic.emptyOr(
+			mw.message.new('brkts-header-' .. headerArray[index]):params(headerArray[index + 1] or ''):plain(),
+			inheritedHeader
+		)--[[@as string]]
+	end
+
+
+	return mw.html.create('tr')
+		:addClass('versus')
+		:wikitext(displayText)
+end
+
+---@return Html
+function Match:standardMatchRow()
+	return ScoreBoard(self.match):create()
+end
+
+---@param isBrMatch boolean
+---@return Html
+function Match:detailsRow(isBrMatch)
+	return Details{match = self.match, displayMode = self.config.displayMode, isBrMatch = isBrMatch}:create()
+end
+
+return {
+	Header = Header,
+	Match = Match,
+	Details = Details,
+	ScoreBoard = ScoreBoard,
+	Versus = Versus,
+}
