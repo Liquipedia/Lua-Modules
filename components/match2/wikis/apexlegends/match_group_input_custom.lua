@@ -53,7 +53,7 @@ local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
-	match = MatchFunctions.parseScoreSetting(match)
+	match = MatchFunctions.parseSetting(match)
 	-- Adjust map data, especially set participants data
 	match = MatchFunctions.adjustMapData(match)
 	match = MatchFunctions.getScoreFromMaps(match)
@@ -162,7 +162,8 @@ end
 --
 -- match related functions
 --
-function MatchFunctions.parseScoreSetting(match)
+function MatchFunctions.parseSetting(match)
+	-- Score Settings
 	match.scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
 	}
@@ -170,6 +171,15 @@ function MatchFunctions.parseScoreSetting(match)
 	Table.mergeInto(match.scoreSettings, Array.mapIndexes(function(idx)
 		return tonumber(match['p' .. idx])
 	end))
+
+	-- Up/Down colors and 
+	match.statusSettings = {
+		advTitle = match.advtitle,
+		outTitle = match.outtitle,
+		advCount = match.advteams,
+		advColor = match.advcolor,
+		outColor = match.outcolor,
+	}
 
 	return match
 end
@@ -226,7 +236,8 @@ end
 
 function MatchFunctions.getExtraData(match)
 	match.extradata = {
-		scoring = match.scoreSettings
+		scoring = match.scoreSettings,
+		status = match.statusSettings,
 	}
 
 	return match
