@@ -6,11 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---todo:
--- - display
---	--> if > 2 opponents or only TBD/Empty opponents display round instead (prep for battle royale)
--- - custom
-
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -81,7 +76,6 @@ local TICKER_DISPLAY_MODES = {
 ---@field ongoing boolean
 ---@field onlyExact boolean
 ---@field enteredOpponentOnLeft boolean
----@field linkLeftOpponent boolean
 ---@field queryByParent boolean
 ---@field showAllTbdMatches boolean
 
@@ -119,7 +113,6 @@ function MatchTicker:init(args)
 		ongoing = Logic.readBool(args.upcoming),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
 		enteredOpponentOnLeft = hasopponent and Logic.readBool(Logic.emptyOr(args.enteredOpponentOnLeft, hasopponent)),
-		linkLeftOpponent = Logic.readBool(Logic.emptyOr(args.linkLeftOpponent, not hasopponent)),
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
