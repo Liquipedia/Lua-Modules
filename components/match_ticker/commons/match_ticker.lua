@@ -91,8 +91,9 @@ function MatchTicker:init(args)
 
 	local config = {
 		tournaments = Array.extractValues(
-			Table.filterByKey(args, function(key) return string.find(key, '^tournament%d-$') ~= nil end)
-		),
+			Table.filterByKey(args, function(key)
+				return string.find(key, '^tournament%d-$') ~= nil or Logic.isNumeric(key)
+		end)),
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),

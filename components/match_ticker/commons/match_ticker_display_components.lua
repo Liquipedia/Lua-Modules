@@ -38,20 +38,15 @@ local ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)"
 
 ---Display class for the header of a match ticker
 ---@class MatchTickerHeader
+---@operator call(string|number|nil): MatchTickerHeader
 ---@field root Html
 local Header = Class.new(
-	function(self)
+	function(self, text)
 		self.root = mw.html.create('div')
 			:addClass('infobox-header wiki-backgroundcolor-light')
+			:wikitext(text)
 	end
 )
-
----@param text string|number|nil
----@return MatchTickerHeader
-function Header:text(text)
-	self.root:wikitext(text)
-	return self
-end
 
 ---@param class string?
 ---@return MatchTickerHeader
