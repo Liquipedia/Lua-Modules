@@ -32,9 +32,9 @@ local WINNER_TO_BG_CLASS = {
 	'recent-matches-left',
 	'recent-matches-right',
 }
-local PARTICIPANT_DISPLAY_MODE = 'participant'
 local TOURNAMENT_DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
 local ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---Display class for the header of a match ticker
 ---@class MatchTickerHeader
@@ -81,7 +81,7 @@ function Versus:create()
 		upperText = scores2
 		lowerText = scores
 	elseif bestof then
-		upperText = scores
+		upperText = scores or VS
 		lowerText = bestof
 	elseif scores then
 		upperText = scores
@@ -94,7 +94,7 @@ function Versus:create()
 
 	return self.root
 		:node(mw.html.create('div')
-			:css('line-height', '1.1'):node(upperText)
+			:css('line-height', '1.1'):node(upperText or VS)
 		):node(mw.html.create('div')
 			:addClass('versus-lower'):wikitext('(' .. lowerText .. ')')
 		)
@@ -111,6 +111,10 @@ end
 ---@return string?
 ---@return string?
 function Versus:scores()
+	if self.match.date > NOW then
+		return
+	end
+
 	local winner = tonumber(self.match.winner)
 
 	local scores, scores2 = {}, {}
@@ -127,10 +131,10 @@ function Versus:scores()
 		local score = opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
-		table.insert(scores, setWinner(score ~= -1 and score or 0))
+		table.insert(scores, setWinner(score ~= -1 and score or 0, opponentIndex))
 
 		local score2 = tonumber((opponent.extradata or {}).score2) or 0
-		table.insert(scores2, setWinner(score2))
+		table.insert(scores2, setWinner(score2, opponentIndex))
 		if score2 > 0 then
 			hasSecondScore = true
 		end
@@ -162,9 +166,9 @@ function ScoreBoard:create()
 
 	return self.root
 		:addClass(WINNER_TO_BG_CLASS[winner])
-		:node(ScoreBoard:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
-		:node(ScoreBoard:versus())
-		:node(ScoreBoard:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:versus())
+		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
 end
 
 ---@param opponent standardOpponent
@@ -172,18 +176,25 @@ end
 ---@param flip boolean?
 ---@return Html
 function ScoreBoard:opponent(opponent, isWinner, flip)
-	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
+	opponent = Opponent.fromMatch2Record(opponent)
+	if not opponent or Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
 		return mw.html.create('td')
 			:tag('i'):wikitext(TBD)
 	end
 
-	return mw.html.create('td')
+	local opponentDispaly = mw.html.create('td')
 		:node(OpponentDisplay.InlineOpponent{
 			opponent = opponent,
 			teamStyle = 'short',
 			flip = flip,
-			showLink = not opponent.name ~= CURRENT_PAGE
+			showLink = Opponent.toName(opponent):gsub('_', ' ') ~= CURRENT_PAGE
 		})
+
+	if isWinner then
+		opponentDispaly:css('font-weight', 'bold')
+	end
+
+	return opponentDispaly
 end
 
 ---@return Html
@@ -197,13 +208,13 @@ end
 ---@class MatchTickerDetails
 ---@operator call({config: MatchTickerConfig, match: table, isBrMatch: boolean}): MatchTickerMatch
 ---@field root Html
----@field displayMode string
+---@field hideTournament boolean
 ---@field isBrMatch boolean
 ---@field match table
 local Details = Class.new(
 	function(self, args)
 		self.root = mw.html.create('tr')
-		self.displayMode = args.displayMode
+		self.hideTournament = args.hideTournament
 		self.isBrMatch = args.isBrMatch
 		self.match = args.match
 	end
@@ -250,7 +261,7 @@ end
 
 ---@return Html?
 function Details:tournament()
-	if self.displayMode == PARTICIPANT_DISPLAY_MODE then
+	if self.hideTournament then
 		return
 	end
 
@@ -303,7 +314,7 @@ function Match:create()
 	local matchDisplay = mw.html.create('table')
 		:addClass('wikitable wikitable-striped infobox_matches_content')
 
-	local isBrMatch = #self.match.match2opponnets ~= 2
+	local isBrMatch = #self.match.match2opponents ~= 2
 	if isBrMatch then
 		matchDisplay:node(self:brMatchRow())
 	else
@@ -347,7 +358,7 @@ end
 ---@param isBrMatch boolean
 ---@return Html
 function Match:detailsRow(isBrMatch)
-	return Details{match = self.match, displayMode = self.config.displayMode, isBrMatch = isBrMatch}:create()
+	return Details{match = self.match, hideTournament = self.config.hideTournament, isBrMatch = isBrMatch}:create()
 end
 
 return {

@@ -50,10 +50,6 @@ local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local DEFAULT_LIVE_HOURS = 3
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
-local PARTICIPANT_DISPLAY_MODE = 'participant'
-local DEFAULT_DISPLAY_MODE = 'default'
-
----@alias tickerDisplayModes 'participant'|'default'
 
 ---@class MatchTickerConfig
 ---@field tournaments string[]
@@ -61,7 +57,7 @@ local DEFAULT_DISPLAY_MODE = 'default'
 ---@field order string
 ---@field player string?
 ---@field teamPages string[]?
----@field displayMode tickerDisplayModes
+---@field hideTournament boolean
 ---@field maximumLiveHoursOfMatches integer
 ---@field queryColumns string[]
 ---@field additionalConditions string
@@ -72,6 +68,7 @@ local DEFAULT_DISPLAY_MODE = 'default'
 ---@field enteredOpponentOnLeft boolean
 ---@field queryByParent boolean
 ---@field showAllTbdMatches boolean
+---@field showInfoForEmptyResults boolean
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -82,9 +79,10 @@ local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
 MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
 
----@param args any
+---@param args table?
 ---@return table
 function MatchTicker:init(args)
+	args = args or {}
 	self.args = args
 
 	local hasOpponent = Logic.isNotEmpty(args.player or args.team)
@@ -99,15 +97,15 @@ function MatchTicker:init(args)
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
 		teamPages = args.team and Team.queryHistoricalNames(args.team) or nil,
-		displayMode = hasOpponent and PARTICIPANT_DISPLAY_MODE or DEFAULT_DISPLAY_MODE,
 		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
-		recent = Logic.readsBool(args.recent),
+		recent = Logic.readBool(args.recent),
 		upcoming = Logic.readBool(args.upcoming),
-		ongoing = Logic.readBool(args.upcoming),
+		ongoing = Logic.readBool(args.ongoing),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
-		enteredOpponentOnLeft = hasOpponent and Logic.readBool(Logic.emptyOr(args.enteredOpponentOnLeft, hasOpponent)),
+		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
+		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults)
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
@@ -117,15 +115,18 @@ function MatchTicker:init(args)
 	config.showAllTbdMatches = Logic.readBool(Logic.nilOr(args.showAllTbdMatches,
 		Table.isEmpty(config.tournaments)))
 
+	config.hideTournament = Logic.readBool(args.hideTournament or Table.isNotEmpty(config.tournaments))
+
 	self.config = config
 
 	return self
 end
 
 ---queries the matches and filters them for unwanted ones
----@return table[]
-function MatchTicker:query()
-	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
+---@param matches table?
+---@return MatchTicker
+function MatchTicker:query(matches)
+	matches = matches or mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = self:buildQueryConditions(),
 		order = self.config.order,
 		query = table.concat(self.config.queryColumns, ','),
@@ -133,12 +134,10 @@ function MatchTicker:query()
 	})
 
 	if type(matches[1]) == 'table' then
-		matches = Array.sub(MatchTicker:filterMatches(matches), 1, self.config.limit)
+		matches = Array.sub(self:filterMatches(matches), 1, self.config.limit)
 		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
 		return self
 	end
-
-	mw.logObject(matches)
 
 	return self
 end
@@ -228,7 +227,7 @@ end
 function MatchTicker:filterMatches(matches)
 	--remove matches with empty/BYE opponents
 	matches = Array.filter(matches, function(match)
-		return Array.any(match.match2opponents, Opponent.isBye)
+		return not Array.any(match.match2opponents, Opponent.isBye)
 	end)
 
 	if self.config.showAllTbdMatches then
@@ -262,7 +261,7 @@ function MatchTicker:adjustMatch(match)
 		--check for the name value
 		Table.includes(opponentNames, match.match2opponents[2].name:gsub(' ', '_'))
 		--check inside match2players too for the player value
-		or self.config.player and Table.any(match.match2opponents[2].match2players, function(playerData)
+		or self.config.player and Table.any(match.match2opponents[2].match2players, function(_, playerData)
 			return (playerData.name or ''):gsub(' ', '_') == self.config.player end)
 	then
 		return MatchTicker.switchOpponents(match)
@@ -275,7 +274,7 @@ function MatchTicker.switchOpponents(match)
 	local winner = tonumber(match.winner) or 0
 	match.winner = winner == 1 and 2
 		or winner == 2 and 1
-		or winner
+		or match.winner
 
 	local tempOpponent = match.match2opponents[1]
 	match.match2opponents[1] = match.match2opponents[2]
@@ -286,8 +285,12 @@ end
 
 ---@param header MatchTickerHeader?
 ---@param classes string[]?
----@return Html
+---@return Html|string
 function MatchTicker:create(header, classes)
+	if not self.matches and not self.config.showInfoForEmptyResults then
+		return ''
+	end
+
 	local wrapper = mw.html.create('div')
 
 	for _, class in pairs(classes or {WRAPPER_DEFAULT_CLASS}) do
@@ -296,6 +299,10 @@ function MatchTicker:create(header, classes)
 
 	if header then
 		wrapper:node(header:create())
+	end
+
+	if not self.matches then
+		return wrapper:wikitext('No Results found.')
 	end
 
 	for _, match in ipairs(self.matches or {}) do
