@@ -171,7 +171,8 @@ end
 ---@param opponent standardOpponent?
 ---@return boolean
 function Opponent.isEmpty(opponent)
-	if not opponent or not opponent.type or Table.deepEquals(opponent, Opponent.blank(opponent.type)) then
+	if not opponent or not opponent.type or
+		(Table.deepEquals(opponent, Opponent.blank(opponent.type)) and not Opponent.isTbd(opponent)) then
 		return true
 	end
 
