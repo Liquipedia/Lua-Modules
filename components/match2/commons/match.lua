@@ -273,21 +273,22 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
 		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
 			return mw.ext.LiquipediaDB.lpdb_match2player(
-				matchRecord.match2id .. '_m2o_' .. opponentIndex .. '_m2p_' .. string.format('%02d', playerIndex),
+				matchRecord.match2id .. '_m2o_' .. string.format('%02d', opponentIndex)
+						.. '_m2p_' .. string.format('%02d', playerIndex),
 				player
 			)
 		end)
 
 		opponentRecord.match2players = table.concat(playerIndexes)
 		return mw.ext.LiquipediaDB.lpdb_match2opponent(
-			matchRecord.match2id .. '_m2o_' .. opponentIndex,
+			matchRecord.match2id .. '_m2o_' .. string.format('%02d', opponentIndex),
 			opponentRecord
 		)
 	end)
 
 	local gameIndexes = Array.map(records.gameRecords, function(gameRecord, gameIndex)
 		return mw.ext.LiquipediaDB.lpdb_match2game(
-			matchRecord.match2id .. '_m2g_' .. gameIndex,
+			matchRecord.match2id .. '_m2g_' .. string.format('%03d', gameIndex),
 			gameRecord
 		)
 	end)

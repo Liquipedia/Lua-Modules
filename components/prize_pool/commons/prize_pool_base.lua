@@ -583,6 +583,7 @@ function BasePrizePool:_buildRows()
 			Array.forEach(prizeCells, function (prizeCell, columnIndex)
 				local lastInColumn = previousOpponent[columnIndex]
 
+				---@cast prizeCell -nil
 				if Table.isEmpty(prizeCell.content) then
 					prizeCell = BasePrizePool._emptyCell()
 				end

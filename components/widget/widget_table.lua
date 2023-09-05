@@ -33,7 +33,7 @@ local Table = Class.new(
 	end
 )
 
----@param row Html
+---@param row WidgetTableRow?
 ---@return self
 function Table:addRow(row)
 	table.insert(self.rows, row)
