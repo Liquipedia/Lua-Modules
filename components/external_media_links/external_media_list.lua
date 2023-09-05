@@ -64,7 +64,8 @@ function MediaList._parseArgs(args)
 		types = args.type and Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower) or nil,
 		author = args.author and mw.ext.TeamLiquidIntegration.resolve_redirect(args.author) or nil,
 		subjects = Array.mapIndexes(function(subjectIndex)
-			return args['subject' .. subjectIndex] or args['player' .. subjectIndex]
+			local subject = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
+			return subject and mw.ext.TeamLiquidIntegration.resolve_redirect(subject) or nil
 		end),
 		org = args.organization and mw.ext.TeamLiquidIntegration.resolve_redirect(args.organization) or nil,
 		showUsUk = Logic.readBool(args.show_usuk),
