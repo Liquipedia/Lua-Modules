@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
@@ -43,7 +44,9 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 }
+local NONE = 'none'
 local WRAPPER_DEFAULT_CLASS = 'fo-nttax-infobox wiki-bordercolor-light'
+local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
@@ -107,8 +110,6 @@ function MatchTicker:init(args)
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
-		wrapperClasses = type(args.wrapperClasses) == 'string' and mw.text.split(args.wrapperClasses)
-			or args.wrapperClasses or {WRAPPER_DEFAULT_CLASS}
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
@@ -119,6 +120,20 @@ function MatchTicker:init(args)
 		Table.isEmpty(config.tournaments)))
 
 	config.hideTournament = Logic.readBool(args.hideTournament or Table.isNotEmpty(config.tournaments))
+
+	local wrapperClasses = type(args.wrapperClasses) == 'table' and args.wrapperClasses
+		or args.wrapperClasses == NONE and {}
+		or {args.wrapperClasses or WRAPPER_DEFAULT_CLASS}
+
+	local game = args.game and Game.abbreviation{game = args.game}:lower()
+
+	if Logic.readBool(args.infoboxWrapperClass) or game then
+		table.insert(wrapperClasses, INFOBOX_WRAPPER_CLASS)
+	end
+	if game then
+		table.insert(wrapperClasses, 'infobox-' .. game)
+	end
+	config.wrapperClasses = wrapperClasses
 
 	self.config = config
 
@@ -155,7 +170,8 @@ function MatchTicker:buildQueryConditions()
 		local lpdbField = config.queryByParent and 'parent' or 'pagename'
 
 		Array.forEach(config.tournaments, function(tournament)
-			tournamentConditions:add{{ConditionNode(ColumnName(lpdbField), Comparator.eq, tournament)}}
+			tournament = tournament:gsub(' ', '_')
+			tournamentConditions:add{ConditionNode(ColumnName(lpdbField), Comparator.eq, tournament)}
 		end)
 
 		conditions:add(tournamentConditions)
@@ -304,7 +320,7 @@ function MatchTicker:create(header)
 	end
 
 	if not self.matches then
-		return wrapper:wikitext('No Results found.')
+		return wrapper:css('text-align', 'center'):wikitext('No Results found.')
 	end
 
 	for _, match in ipairs(self.matches or {}) do

@@ -23,7 +23,6 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local VS = 'vs.'
-local TBD = 'TBD'
 local SCORE_STATUS = 'S'
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local DEFAULT_BR_MATCH_TEXT = 'Unknown Round'

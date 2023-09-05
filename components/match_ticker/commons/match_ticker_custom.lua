@@ -27,6 +27,8 @@ function CustomMatchTicker.tournament(frame)
 	args.ongoing = true
 	args.recent = false
 	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
+	args.queryByParent = args.queryByParent or true
+	args.showAllTbdMatches = args.showAllTbdMatches or true
 
 	return MatchTicker(args):query():create(
 		MatchTicker.DisplayComponents.Header('Upcoming matches')
@@ -38,7 +40,6 @@ end
 ---@return Html|string
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
-	args.wrapperClasses = args.wrapperClasses or {}
 	return MatchTicker(args):query():create()
 end
 
