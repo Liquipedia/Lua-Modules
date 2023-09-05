@@ -49,7 +49,7 @@ function CustomMap._intro(args)
 	local intro = mw.html.create()
 		:tag('b'):wikitext(_map.name):done()
 		:wikitext(' is a map')
-		:wikitext(modes and (' for ' .. mw.text.listToText(modes, ', ', ' and ')) or '')
+		:wikitext(modes and (' for ' .. mw.text.listToText(modes, ', ', ', and ')) or '')
 		:wikitext(' in '):done()
 		:tag('i'):wikitext('Brawl Stars'):done()
 		:wikitext('.')
@@ -63,7 +63,7 @@ function CustomMap._intro(args)
 	alsoKnownAs = Array.map(alsoKnownAs, function(aka) return '<b>' .. aka .. '</b>' end)
 
 	return intro:wikitext(' The map was formerly known as ')
-		:wikitext(mw.text.listToText(alsoKnownAs, ', ', ' and ') .. '.')
+		:wikitext(mw.text.listToText(alsoKnownAs, ', ', ', and ') .. '.')
 end
 
 ---@return WidgetInjector
