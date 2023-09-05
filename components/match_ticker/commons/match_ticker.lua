@@ -100,7 +100,6 @@ function MatchTicker:init(args)
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
-		teamPages = args.team and Team.queryHistoricalNames(args.team) or nil,
 		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
@@ -115,6 +114,18 @@ function MatchTicker:init(args)
 	assert(config.recent or config.upcoming or config.ongoing and
 		not (config.recent and config.upcoming and config.ongoing),
 		'Invalid recent, upcoming, ongoing combination')
+
+	local teamPages = args.team and Team.queryHistoricalNames(args.team) or nil
+	if teamPages then
+		Array.extendWith(teamPages,
+		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),
+		Array.map(teamPages, function(team) return mw.getContentLanguage():ucfirst(team) end),
+		Array.map(teamPages, function(team) return (mw.getContentLanguage():ucfirst(team):gsub(' ', '_')) end)
+		)
+	end
+
+
+	config.teamPages = teamPages
 
 	config.showAllTbdMatches = Logic.readBool(Logic.nilOr(args.showAllTbdMatches,
 		Table.isEmpty(config.tournaments)))
@@ -191,10 +202,8 @@ function MatchTicker:buildQueryConditions()
 		local teamConditions = ConditionTree(BooleanOperator.any)
 
 		Array.forEach(config.teamPages, function (team)
-			local teamWithUnderScore = team:gsub(' ', '_')
 			teamConditions:add{
 				ConditionNode(ColumnName('opponent'), Comparator.eq, team),
-				ConditionNode(ColumnName('opponent'), Comparator.eq, teamWithUnderScore),
 			}
 		end)
 
