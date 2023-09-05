@@ -17,6 +17,8 @@ local TypeUtil = require('Module:TypeUtil')
 local PlayerExt = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
 	or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
+local BYE = 'bye'
+
 --[[
 Structural type representation of an opponent.
 
@@ -165,6 +167,14 @@ function Opponent.isTbd(opponent)
 	else
 		return Array.any(opponent.players, Opponent.playerIsTbd)
 	end
+end
+
+---Checks whether an opponent is a BYE Opponent
+---@param opponent standardOpponent
+---@return boolean
+function Opponent.isBye(opponent)
+	return string.lower(opponent.name or '') == BYE
+		or string.lower(opponent.template or '') == BYE
 end
 
 ---Checks if a player is a TBD player
