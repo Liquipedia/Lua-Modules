@@ -208,7 +208,7 @@ end
 
 ---Display class for matches shown within a match ticker
 ---@class MatchTickerDetails
----@operator call({config: MatchTickerConfig, match: table, isBrMatch: boolean, onlyHighlightOnValue: string?}): MatchTickerMatch
+---@operator call(table): MatchTickerMatch
 ---@field root Html
 ---@field hideTournament boolean
 ---@field isBrMatch boolean
@@ -216,6 +216,7 @@ end
 ---@field match table
 local Details = Class.new(
 	function(self, args)
+		assert(args.match 'No Match passed to MatchTickerDetails class')
 		self.root = mw.html.create('tr')
 		self.hideTournament = args.hideTournament
 		self.isBrMatch = args.isBrMatch
