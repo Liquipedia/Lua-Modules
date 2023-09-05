@@ -9,8 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
@@ -73,6 +73,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field showAllTbdMatches boolean
 ---@field showInfoForEmptyResults boolean
 ---@field wrapperClasses string[]?
+---@field onlyHighlightOnValue string?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -109,6 +110,7 @@ function MatchTicker:init(args)
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
+		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and

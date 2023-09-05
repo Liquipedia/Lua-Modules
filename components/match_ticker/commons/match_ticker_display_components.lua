@@ -15,8 +15,11 @@ local Countdown = require('Module:Countdown')
 local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
+
+local HighlightConditions = Lua.import('Module:HighlightConditions', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -26,6 +29,7 @@ local VS = 'vs.'
 local SCORE_STATUS = 'S'
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local DEFAULT_BR_MATCH_TEXT = 'Unknown Round'
+local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local WINNER_TO_BG_CLASS = {
 	[0] = 'recent-matches-draw',
 	'recent-matches-left',
@@ -204,16 +208,18 @@ end
 
 ---Display class for matches shown within a match ticker
 ---@class MatchTickerDetails
----@operator call({config: MatchTickerConfig, match: table, isBrMatch: boolean}): MatchTickerMatch
+---@operator call({config: MatchTickerConfig, match: table, isBrMatch: boolean, onlyHighlightOnValue: string?}): MatchTickerMatch
 ---@field root Html
 ---@field hideTournament boolean
 ---@field isBrMatch boolean
+---@field onlyHighlightOnValue string?
 ---@field match table
 local Details = Class.new(
 	function(self, args)
 		self.root = mw.html.create('tr')
 		self.hideTournament = args.hideTournament
 		self.isBrMatch = args.isBrMatch
+		self.onlyHighlightOnValue = args.onlyHighlightOnValue
 		self.match = args.match
 	end
 )
@@ -229,6 +235,12 @@ function Details:create()
 
 	if not self.isBrMatch then
 		td:attr('colspan', 3)
+	end
+
+	local highlightCondition = HighlightConditions.match or HighlightConditions.tournament
+
+	if highlightCondition(self.match, {onlyHighlightOnValue = self.onlyHighlightOnValue}) then
+		self.root:addClass(HIGHLIGHT_CLASS)
 	end
 
 	return self.root:node(td)
@@ -356,7 +368,12 @@ end
 ---@param isBrMatch boolean
 ---@return Html
 function Match:detailsRow(isBrMatch)
-	return Details{match = self.match, hideTournament = self.config.hideTournament, isBrMatch = isBrMatch}:create()
+	return Details{
+		match = self.match,
+		hideTournament = self.config.hideTournament,
+		isBrMatch = isBrMatch,
+		onlyHighlightOnValue = self.config.onlyHighlightOnValue
+	}:create()
 end
 
 return {
