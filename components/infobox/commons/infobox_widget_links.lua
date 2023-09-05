@@ -13,6 +13,10 @@ local Table = require('Module:Table')
 local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class LinksWidget: Widget
+---@operator call({content: table<string, string>, variant: string?}): LinksWidget
+---@field links table<string, string>
+---@field variant string?
 local Links = Class.new(
 	Widget,
 	function(self, input)
@@ -111,6 +115,7 @@ local PRIORITY_GROUPS = {
 	}
 }
 
+---@return {[1]: Html}
 function Links:make()
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
@@ -143,6 +148,9 @@ function Links:make()
 	}
 end
 
+---@param key string
+---@param value string?
+---@return string
 function Links:_makeLink(key, value)
 	key = UtilLinks.removeAppendedNumber(key)
 	return '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..

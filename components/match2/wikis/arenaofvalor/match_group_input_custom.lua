@@ -108,7 +108,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, date, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -368,7 +368,7 @@ function matchFunctions.getOpponents(match)
 						maxNumPlayers = _MAX_NUM_PLAYERS,
 					})
 				end
-			elseif Opponent.typeIsParty(opponent) then
+			elseif Opponent.typeIsParty(opponent.type) then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
 			elseif opponent.type ~= Opponent.literal then

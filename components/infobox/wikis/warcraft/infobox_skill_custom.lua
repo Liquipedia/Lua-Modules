@@ -71,7 +71,7 @@ function CustomSkill:createWidgetInjector()
 	return CustomInjector()
 end
 
----@return string[]?
+---@return string?
 function CustomSkill:getResearchCost()
 	if String.isEmpty(_args.from) then
 		return nil
@@ -109,7 +109,7 @@ function CustomSkill:getCategories(args)
 	return categories
 end
 
----@return string
+---@return string?
 function CustomSkill:getHotkeys()
 	if not String.isEmpty(_args.hotkey) then
 		if not String.isEmpty(_args.hotkey2) then

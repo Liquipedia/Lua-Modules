@@ -23,7 +23,7 @@ local FortniteOpponentDisplay = {propTypes = {}, types={}}
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html|string
+---@return Html|string|nil
 function FortniteOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
@@ -52,7 +52,6 @@ determined by its layout context, and not of the opponent.
 function FortniteOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
-	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 

@@ -23,16 +23,16 @@ local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 ---@class InfoboxExtensionsPrizePoolArgs
 ---@field currency string?
 ---@field date string?
----@field displayRoundPrecision string?
----@field prizepool string?
----@field prizepoolUsd string?
+---@field displayRoundPrecision number|string|nil
+---@field prizepool number|string|nil
+---@field prizepoolusd number|string|nil
 ---@field rate string?
 ---@field setvariables string?
 ---@field text string?
 ---@field varRoundPrecision string?
 
 ---@param args InfoboxExtensionsPrizePoolArgs
----@return string?
+---@return string|number|nil
 function PrizePoolCurrency.display(args)
 	args = args or {}
 	local currency = string.upper(args.currency or USD)
@@ -51,10 +51,10 @@ function PrizePoolCurrency.display(args)
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			return (args.prizepool or args.prizepoolUsd or '')
+			return (args.prizepool or args.prizepoolusd or '')
 				.. '[[Category:Tournaments with invalid prize pool]]'
 		else
-			return args.prizepool or args.prizepoolUsd or ''
+			return args.prizepool or args.prizepoolusd or ''
 		end
 	end
 
@@ -162,7 +162,7 @@ function PrizePoolCurrency._cleanDate(dateString)
 	return string.match(dateString, '%d%d%d%d%-%d%d%-%d%d')
 end
 
----@param valueString string
+---@param valueString string|number|nil
 ---@return number?
 function PrizePoolCurrency._cleanValue(valueString)
 	valueString = string.gsub(valueString or '', '[^%d%.?]', '')

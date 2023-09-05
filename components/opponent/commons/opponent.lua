@@ -17,6 +17,8 @@ local TypeUtil = require('Module:TypeUtil')
 local PlayerExt = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
 	or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
+local BYE = 'bye'
+
 --[[
 Structural type representation of an opponent.
 
@@ -54,7 +56,7 @@ Opponent.quad = OpponentTypes.quad
 Opponent.literal = OpponentTypes.literal
 
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
-Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
+Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal}) --[[@as table]]
 
 ---@enum PartySize
 Opponent.partySizes = {
@@ -181,6 +183,14 @@ function Opponent.isEmpty(opponent)
 	opponentCopy.type = nil
 
 	return Table.isEmpty(opponentCopy)
+end
+
+---Checks whether an opponent is a BYE Opponent
+---@param opponent standardOpponent
+---@return boolean
+function Opponent.isBye(opponent)
+	return string.lower(opponent.name or '') == BYE
+		or string.lower(opponent.template or '') == BYE
 end
 
 ---Checks if a player is a TBD player
@@ -440,7 +450,9 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix] = player.pageName
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
-			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
+			players[prefix .. 'team'] = player.team and
+				Opponent.toName({type = Opponent.team, template = player.team, players = {}}) or
+				nil
 			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players
