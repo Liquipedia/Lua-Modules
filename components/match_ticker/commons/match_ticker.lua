@@ -69,6 +69,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field queryByParent boolean
 ---@field showAllTbdMatches boolean
 ---@field showInfoForEmptyResults boolean
+---@field wrapperClasses string[]?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -105,7 +106,9 @@ function MatchTicker:init(args)
 		ongoing = Logic.readBool(args.ongoing),
 		onlyExact = Logic.readBool(Logic.emptyOr(args.onlyExact, true)),
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
-		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults)
+		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
+		wrapperClasses = type(args.wrapperClasses) == 'string' and mw.text.split(args.wrapperClasses)
+			or args.wrapperClasses or {WRAPPER_DEFAULT_CLASS}
 	}
 
 	assert(config.recent or config.upcoming or config.ongoing and
@@ -237,7 +240,7 @@ function MatchTicker:filterMatches(matches)
 	local previousMatchWasTbd
 	Array.forEach(matches, function(match)
 		local isTbdMatch = Array.all(match.match2opponents, function(opponent)
-			return Opponent.isTbd(opponent) or Opponent.isEmpty(opponent)
+			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
 		end)
 		if isTbdMatch and previousMatchWasTbd then
 			match.isTbdMatch = true
@@ -284,16 +287,15 @@ function MatchTicker.switchOpponents(match)
 end
 
 ---@param header MatchTickerHeader?
----@param classes string[]?
 ---@return Html|string
-function MatchTicker:create(header, classes)
+function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
 		return ''
 	end
 
 	local wrapper = mw.html.create('div')
 
-	for _, class in pairs(classes or {WRAPPER_DEFAULT_CLASS}) do
+	for _, class in pairs(self.config.wrapperClasses) do
 		wrapper:addClass(class)
 	end
 

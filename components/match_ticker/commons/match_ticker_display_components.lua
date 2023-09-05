@@ -177,9 +177,8 @@ end
 ---@return Html
 function ScoreBoard:opponent(opponent, isWinner, flip)
 	opponent = Opponent.fromMatch2Record(opponent)
-	if not opponent or Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
-		return mw.html.create('td')
-			:tag('i'):wikitext(TBD)
+	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
+		opponent = Opponent.tbd(Opponent.literal)
 	end
 
 	local opponentDispaly = mw.html.create('td')

@@ -37,7 +37,9 @@ end
 ---@param frame Frame
 ---@return Html|string
 function CustomMatchTicker.mainPage(frame)
-	return MatchTicker(Arguments.getArgs(frame)):query():create()
+	local args = Arguments.getArgs(frame)
+	args.wrapperClasses = args.wrapperClasses or {}
+	return MatchTicker(args):query():create()
 end
 
 ---Entry point for display on main page
