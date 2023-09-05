@@ -29,7 +29,7 @@ local TableRow = Class.new(
 	end
 )
 
----@param cell WidgetTableCell
+---@param cell WidgetTableCell?
 ---@return self
 function TableRow:addCell(cell)
 	table.insert(self.cells, cell)
