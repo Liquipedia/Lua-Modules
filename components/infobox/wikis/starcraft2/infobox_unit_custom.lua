@@ -12,6 +12,7 @@ local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
@@ -183,6 +184,9 @@ function CustomUnit:setLpdbData(args)
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			wasonlybeta = tostring(Logic.readBool(args.wasOnlyBeta)),
+			deprecated = tostring(Logic.readBool(args.deprecated)),
+			iscampaignunit = tostring(Logic.readBool(args.isCampaignUnit)),
 			race = Faction.read(args.race),
 			size = args.size,
 			type = args.type,
