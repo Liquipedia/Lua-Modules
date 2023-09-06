@@ -183,6 +183,9 @@ function CustomUnit:setLpdbData(args)
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			wasonlybeta = tostring(Logic.readBool(args.wasOnlyBeta)),
+			deprecated = tostring(Logic.readBool(args.deprecated)),
+			iscampaignunit = tostring(Logic.readBool(args.isCampaignUnit)),
 			race = Faction.read(args.race),
 			size = args.size,
 			type = args.type,
