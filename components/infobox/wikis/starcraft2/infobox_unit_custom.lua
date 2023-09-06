@@ -12,6 +12,7 @@ local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
