@@ -6,18 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local ArmorIcon = require('Module:ArmorIcon')
 local Array = require('Module:Array')
-local AttackIcon = require('Module:AttackIcon')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -29,7 +25,6 @@ local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared', {requir
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local BreakDown = Widgets.Breakdown
 local Title = Widgets.Title
 
 local CustomBuilding = Class.new()
@@ -41,7 +36,6 @@ local EXPERIENCE = mw.loadData('Module:Experience')
 local DEFAULT_BUILDING_TYPE_RACE = 'Neutral'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
 local ICON_FOOD = '[[File:Food_WC3_Icon.gif|15px|link=Food]]'
-local GOLD = '[[File:Gold WC3 Icon.gif|15px|link=Gold]]'
 
 local _args
 
