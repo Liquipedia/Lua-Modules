@@ -199,7 +199,8 @@ function CustomBuildingUnit.parseAttackInput(args, attackIndex)
 	if attackSpeedBonus > 0 then
 		local attackSpeedBonusPlus1 = 1 + attackSpeedBonus
 		local animation = (damagePoint / attackSpeedBonusPlus1) .. '/' .. (backSwingPoint / attackSpeedBonusPlus1)
-		coolDown = coolDown .. ' (' .. Abbreviation.make(coolDownValue / attackSpeedBonusPlus1, 'Attack animation: ' .. animation) .. ')'
+		coolDown = coolDown .. ' (' .. Abbreviation.make(coolDownValue / attackSpeedBonusPlus1,
+			'Attack animation: ' .. animation) .. ')'
 	end
 
 	local data = {
@@ -332,7 +333,9 @@ function CustomBuildingUnit.calculateIncreasedMaxDamage(args, index)
 end
 
 function CustomBuildingUnit.mercenaryStats(args)
-	if CustomBuildingUnit.raceValue(args.race) ~= 'creeps' or Logic.readBool(args.cannot_be_built) or not args.stockstart then
+	if CustomBuildingUnit.raceValue(args.race) ~= 'creeps' or Logic.readBool(args.cannot_be_built)
+		or not args.stockstart then
+
 		return
 	end
 
@@ -351,7 +354,6 @@ function CustomBuildingUnit.movement(args, title)
 	if speedValue == 0 then return end
 
 	local speed = args.speed or '0'
-	local speedValue = tonumber(args.speed) or 0
 	local speedBonus = tonumber(args.movementspeed_bonus) or 0
 	if speedBonus > 0 then
 		speed = speed .. ' (' .. (speedValue + speedBonus) .. ')'
@@ -374,7 +376,7 @@ function CustomBuildingUnit.raceValue(race)
 
 	race = (race or ''):lower()
 
-	local cleanedRace = (Faction.toName(Faction.read(race))
+	return (Faction.toName(Faction.read(race))
 		or EXTRA_RACE_SUPPORT[race] or race):lower()
 end
 
