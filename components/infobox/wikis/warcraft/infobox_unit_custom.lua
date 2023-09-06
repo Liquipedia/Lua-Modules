@@ -6,21 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local ArmorIcon = require('Module:ArmorIcon')
 local Array = require('Module:Array')
-local AttackIcon = require('Module:AttackIcon')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
@@ -29,7 +24,6 @@ local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared', {requir
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local BreakDown = Widgets.Breakdown
 local Title = Widgets.Title
 
 local CustomUnit = Class.new()
@@ -39,24 +33,8 @@ local CustomInjector = Class.new(Injector)
 local EXPERIENCE = mw.loadData('Module:Experience')
 
 local CRITTERS = 'critters'
-local HP_REGEN_TYPE_DISPLAY = {'(always)', 'on Blight', 'at Night'}
-local MELEE = 'Melee'
-local DEFAULT_BUILDING_RACE = 'Other'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
-local ICON_FOOD = '[[File:Food_WC3_Icon.gif|15px|link=Food]]'
 local GOLD = '[[File:Gold WC3 Icon.gif|15px|link=Gold]]'
-local AOE_VALUE = {
-	artillery = 2,
-	aline = 2,
-	msplash = 2,
-	mbounce = 3,
-	mline = 1,
-}
-local AREA_VALUE_TO_AREA_DESCRIPTION = {
-	[0] = nil, nil, 'Area', 'Bounce', nil, nil,
-	'Area', 'Bounce', 'Area', 'Area', 'Area', 'Area/Bounce',
-	'Bounce', 'Bounce', 'Bounce/Area', 'Bounce'
-}
 
 local _args
 
@@ -220,7 +198,7 @@ function CustomUnit:setLpdbData(args)
 
 	local experience = EXPERIENCE[tonumber(args.level)] or 0
 
-	local extradata = Table.merge(extradata, {
+	extradata = Table.merge(extradata, {
 		food = args.food,
 		gold = args.gold,
 		lumber = args.lumber,
