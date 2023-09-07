@@ -79,16 +79,19 @@ function BracketListDisplay.Bracket(props)
 
 	local headers = BracketListDisplay.computeHeaders(props.bracket, config)
 
-	local bracketNode = mw.html.create('div'):addClass('brkts-bracket-list-row')
+	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
-	for _, header in ipairs(headers) do
+	for idx, header in ipairs(headers) do
 		local nodeProps = {
 			config = config,
 			header = header,
+			index = idx,
 		}
-		bracketNode:node(BracketListDisplay.NodeHeader(nodeProps))
+		list:node(BracketListDisplay.NodeHeader(nodeProps))
 	end
+	local bracketNode = mw.html.create('div'):addClass('navigation-tabs'):attr('role', 'tabpanel'):node(list)
 
+	local matchNode = mw.html.create('div'):addClass('brkts-match-info-row')
 	for _, matchId in ipairs(Array.extractKeys(props.bracket.matchesById)) do
 		local matchProps = {
 			MatchSummaryContainer = config.MatchSummaryContainer,
@@ -96,10 +99,10 @@ function BracketListDisplay.Bracket(props)
 			forceShortName = config.forceShortName,
 			match = props.bracket.matchesById[matchId],
 		}
-		bracketNode:node(BracketListDisplay.Match(matchProps))
+		matchNode:node(BracketListDisplay.Match(matchProps))
 	end
 
-	return mw.html.create('div'):addClass('brkts-bracket-wrapper'):node(bracketNode)
+	return mw.html.create('div'):addClass('brkts-br-wrapper'):node(bracketNode):node(matchNode)
 end
 
 function BracketListDisplay.computeHeaders(bracket, config)
@@ -141,7 +144,16 @@ function BracketListDisplay.NodeHeader(props)
 		return nil
 	end
 
-	return mw.html.create('div'):addClass('brkts-bracket-list-item'):wikitext(props.header)
+	local isSelected = props.index == 1
+
+	return mw.html.create('li')
+			:addClass('navigation-tabs__list-item')
+			:addClass(isSelected and 'tab--active' or nil)
+			:attr('role', 'tab')
+			:attr('aria-selected', tostring(isSelected))
+			:attr('aria-controls', 'panel' .. props.index)
+			:attr('tabindex', '0')
+			:wikitext(props.header)
 end
 
 BracketListDisplay.propTypes.Match = {
