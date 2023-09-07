@@ -449,11 +449,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
-	if participantsNumber == 0 then
-		participantsNumber = args.team_number or 0
-	end
-	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 
