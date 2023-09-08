@@ -9,10 +9,12 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
@@ -20,6 +22,8 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+
+local MATCHLIST_MATCH_GROUP_TYPE = 'matchlist'
 
 -- The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
 -- a matchlist.
@@ -93,8 +97,15 @@ function MatchGroup.MatchGroupById(args)
 
 	local matchGroupType = matches[1].bracketData.type
 
+	if Logic.readBool(args.forceMatchList) then
+		matchGroupType = MATCHLIST_MATCH_GROUP_TYPE
+		Array.forEach(matches, function(match)
+			match.bracketData.header = match.bracketData.header and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
+		end)
+	end
+
 	local config
-	if matchGroupType == 'matchlist' then
+	if matchGroupType == MATCHLIST_MATCH_GROUP_TYPE then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		config = MatchlistDisplay.configFromArgs(args)
 	else
