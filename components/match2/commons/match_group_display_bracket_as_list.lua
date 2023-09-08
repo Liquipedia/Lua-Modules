@@ -91,13 +91,14 @@ function BracketListDisplay.Bracket(props)
 	end
 	local bracketNode = mw.html.create('div'):addClass('navigation-tabs'):attr('role', 'tabpanel'):node(list)
 
-	local matchNode = mw.html.create('div'):addClass('brkts-match-info-row')
-	for _, matchId in ipairs(Array.extractKeys(props.bracket.matchesById)) do
+	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
+	for idx, matchId in ipairs(Array.extractKeys(props.bracket.matchesById)) do
 		local matchProps = {
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
 			forceShortName = config.forceShortName,
 			match = props.bracket.matchesById[matchId],
+			index = idx,
 		}
 		matchNode:node(BracketListDisplay.Match(matchProps))
 	end
@@ -169,7 +170,7 @@ Display component for a match
 ]]
 function BracketListDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, BracketListDisplay.propTypes.Match)
-	local matchNode = mw.html.create('div'):addClass('brkts-bracket-list-match')
+	local matchNode = mw.html.create('div'):addClass('navigation-content'):attr('id', 'navigationContent' .. props.index):addClass(props.index > 1 and 'is--hidden' or nil)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
