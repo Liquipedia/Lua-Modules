@@ -100,7 +100,8 @@ function MatchGroup.MatchGroupById(args)
 	if Logic.readBool(args.forceMatchList) then
 		matchGroupType = MATCHLIST_MATCH_GROUP_TYPE
 		Array.forEach(matches, function(match)
-			match.bracketData.header = match.bracketData.header and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
+			match.bracketData.header = match.bracketData.header
+				and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
 		end)
 	end
 
