@@ -24,6 +24,19 @@ return {
 				lightMode = 'Teamfight Tactics Double Up lightmode.png',
 			},
 		},
+		ffgs = {
+			abbreviation = 'FFGS',
+			name = 'Fight for the Golden Spatula',
+			link = 'Fight for the Golden Spatula^',
+			logo = {
+				darkMode = 'Golden Spatula allmode.png',
+				lightMode = 'Golden Spatula allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Golden Spatula allmode.png',
+				lightMode = 'Golden Spatula allmode.png',
+			},
+		},
 	},
 	defaultGame = 'tft',
 	defaultRoundPrecision = 0,
