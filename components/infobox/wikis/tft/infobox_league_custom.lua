@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -64,6 +65,10 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
+			name = 'Game Version',
+			content = {Game.name{game = _args.game}}
+		})
+		table.insert(widgets, Cell{
 			name = 'Patch',
 			content = {CustomLeague:_createPatchCell(_args)}
 		})
@@ -103,6 +108,11 @@ function CustomLeague:_createPatchCell(args)
 	end
 
 	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
+end
+
+function CustomLeague:addToLpdb(lpdbData, args)
+	lpdbData.game = Game.name{game = _args.game}
+	return lpdbData
 end
 
 function CustomLeague:getWikiCategories(args)
