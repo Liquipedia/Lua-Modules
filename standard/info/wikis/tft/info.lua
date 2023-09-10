@@ -27,7 +27,7 @@ return {
 		ffgs = {
 			abbreviation = 'FFGS',
 			name = 'Fight For the Golden Spatula',
-			link = 'Fight For the Golden Spatula^',
+			link = 'Fight For the Golden Spatula',
 			logo = {
 				darkMode = 'Golden Spatula allmode.png',
 				lightMode = 'Golden Spatula allmode.png',
