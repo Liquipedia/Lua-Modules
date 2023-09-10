@@ -35,7 +35,7 @@ local WINNER_TO_BG_CLASS = {
 	'recent-matches-left',
 	'recent-matches-right',
 }
-local TOURNAMENT_DEFAULT_ICON = 'InfoboxIcon_Tournament.png'
+local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
