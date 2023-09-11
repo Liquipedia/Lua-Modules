@@ -65,7 +65,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		table.insert(widgets, Cell{
-			name = 'Game Version',
+			name = 'Game',
 			content = {Game.name{game = _args.game}}
 		})
 		table.insert(widgets, Cell{
