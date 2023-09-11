@@ -110,11 +110,6 @@ function CustomLeague:_createPatchCell(args)
 	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = Game.name{game = _args.game}
-	return lpdbData
-end
-
 function CustomLeague:getWikiCategories(args)
 	return {args.mode .. ' Mode Tournaments'}
 end
