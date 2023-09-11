@@ -1,12 +1,16 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 
 local FilterButtons = {}
 
----@class Category
+local DROPDOWN_ARROW = '&#8203;▼&#8203;'
+
+---@class FilterButtonCategory
 ---@field name string
 ---@field query string?
 ---@field items string[]?
@@ -15,6 +19,7 @@ local FilterButtons = {}
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order function?
+---@field load function?
 
 ---@return Html
 function FilterButtons.getFromConfig()
@@ -22,7 +27,7 @@ function FilterButtons.getFromConfig()
 end
 
 ---Entrypoint building a set of FilterButtons
----@param categories Category[]
+---@param categories FilterButtonCategory[]
 ---@return Html
 function FilterButtons.get(categories)
 	Array.forEach(categories, FilterButtons._loadCategories)
@@ -30,8 +35,9 @@ function FilterButtons.get(categories)
 	local div = mw.html.create('div')
 
 	for index, category in ipairs(categories) do
+		-- Variable used to pass default values on to other modules using these.
 		Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
-		local buttons = FilterButtons._getButtonRow(category)
+		local buttons = FilterButtons.getButtonRow(category)
 		if index > 1 then
 			buttons:css('margin-top', '-7px')
 		end
@@ -41,44 +47,38 @@ function FilterButtons.get(categories)
 	return div
 end
 
----@param category Category
+---@param category FilterButtonCategory
 function FilterButtons._loadCategories(category)
-	if category.items then
-		if not category.defaultItems then
-			category.defaultItems = category.items
-		end
+	if category.load then
+		category.load(category)
+		return
 	end
 
-	category.items = {}
-	local tournaments = mw.ext.LiquipediaDB.lpdb(
-		'tournament',
-		{
-			limit = 15,
-			query = category.query,
-			order = category.query .. ' ASC',
-			groupby = category.query .. ' ASC'
-		}
-	)
+	if Table.isEmpty(category.items) then
+		local tournaments = mw.ext.LiquipediaDB.lpdb(
+			'tournament',
+			{
+				limit = 15,
+				query = category.query,
+				order = category.query .. ' ASC',
+				groupby = category.query .. ' ASC'
+			}
+		)
 
-	assert(type(tournaments) == 'table', tournaments)
-	for _, tournament in ipairs(tournaments) do
-		if not String.isEmpty(tournament[category.query]) then
-			table.insert(category.items, tournament[category.query])
-		end
+		assert(type(tournaments) == 'table', tournaments)
+		category.items = Array.map(Array.filter(tournaments, String.isNotEmpty), Operator.property(category.query))
 	end
 
 	if category.order then
 		Array.orderInPlaceBy(category.items, category.order)
 	end
 
-	if not category.defaultItems then
-		category.defaultItems = category.items
-	end
+	category.defaultItems = Logic.emptyOr(category.defaultItems, category.items)
 end
 
----@param category Category
+---@param category FilterButtonCategory
 ---@return Html
-function FilterButtons._getButtonRow(category)
+function FilterButtons.getButtonRow(category)
 	local buttons = mw.html.create('div')
 		:addClass('filter-buttons')
 		:attr('data-filter', 'data-filter')
@@ -125,7 +125,7 @@ function FilterButtons._getButtonRow(category)
 			:addClass('filter-buttons')
 			:attr('data-filter', 'data-filter')
 			:attr('data-filter-effect','fade')
-			:attr('data-filter-group', 'tournaments-list-dropdown')
+			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.expandKey)
 			:css('display','flex')
 			:css('padding','1px')
 			:css('justify-content','center')
@@ -138,7 +138,9 @@ function FilterButtons._getButtonRow(category)
 				:css('padding-left','2px')
 				:css('padding-right','2px')
 				:attr('data-filter-on', 'all')
-				:wikitext('&#8203;▼&#8203;'))
+				:wikitext(DROPDOWN_ARROW))
+			-- Invisible dummy button used to trigger two actions with a single click
+			-- Enable dropdown, while not 
 			:node(mw.html.create('span')
 				:addClass('filter-button')
 				:css('display','none')
@@ -150,8 +152,7 @@ function FilterButtons._getButtonRow(category)
 	if category.expandable then
 		local section = mw.html.create('div')
 			:addClass('filter-category--hidden')
-			:attr('data-filter-group', 'tournaments-list-dropdown')
-			:attr('data-filter-category', 'dropdown-' .. category.name)
+			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.name)
 			:attr('data-filter-category', 'dropdown-' .. category.name)
 			:css('margin-top','-8px')
 			:node(buttons)
