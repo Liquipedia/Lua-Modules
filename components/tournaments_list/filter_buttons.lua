@@ -140,7 +140,7 @@ function FilterButtons.getButtonRow(category)
 				:attr('data-filter-on', 'all')
 				:wikitext(DROPDOWN_ARROW))
 			-- Invisible dummy button used to trigger two actions with a single click
-			-- Enable dropdown, while not 
+			-- Enable dropdown, while not triggering all items button
 			:node(mw.html.create('span')
 				:addClass('filter-button')
 				:css('display','none')
