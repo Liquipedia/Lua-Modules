@@ -15,11 +15,11 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field query string?
 ---@field items string[]?
 ---@field defaultItems string[]?
----@field transform function?
+---@field transform? fun(item: string): string
 ---@field expandKey string?
 ---@field expandable boolean?
----@field order function?
----@field load function?
+---@field order? fun(a: string, b: string): boolean
+---@field load? fun(cat: FilterButtonCategory): FilterButtonCategory
 
 ---@return Html
 function FilterButtons.getFromConfig()
