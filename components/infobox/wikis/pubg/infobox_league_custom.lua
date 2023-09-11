@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
@@ -91,6 +92,10 @@ function CustomInjector:parse(id, widgets)
 					CustomLeague:_getGameMode()
 				}
 			},
+			Cell{name = 'Patch', content = {
+					CustomLeague._getPatchVersion()
+				}
+			},
 			Cell{name = 'Platform', content = {
 					CustomLeague:_getPlatform()
 				}
@@ -165,6 +170,17 @@ function CustomLeague:_getPlatform()
 	local platform = string.lower(_args.platform or '')
 
 	return _PLATFORMS[platform] or _PLATFORMS['default']
+end
+
+function CustomLeague._getPatchVersion()
+	if String.isEmpty(_args.patch) then return nil end
+	local content = PageLink.makeInternalLink(_args.patch, 'Patch ' .. _args.patch)
+	if not String.isEmpty(_args.epatch) then
+		content = content .. '&nbsp;&ndash;&nbsp;'
+		content = content .. PageLink.makeInternalLink(_args.epatch, 'Patch ' .. _args.epatch)
+	end
+
+	return content
 end
 
 return CustomLeague
