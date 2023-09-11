@@ -118,6 +118,7 @@ function CustomSquad.run(frame)
 			role = player.role,
 			team = player.team,
 			teamrole = player.teamrole,
+			date = player.leavedate or player.inactivedate or player.leavedate,
 		}
 			:name{name = player.name}
 			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
