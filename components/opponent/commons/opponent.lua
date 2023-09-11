@@ -173,16 +173,9 @@ end
 ---@param opponent standardOpponent?
 ---@return boolean
 function Opponent.isEmpty(opponent)
-	if not opponent or not opponent.type or
-		(Table.deepEquals(opponent, Opponent.blank(opponent.type)) and not Opponent.isTbd(opponent)) then
-		return true
-	end
-
-	local opponentCopy = Table.copy(opponent)
-	--remove type since it might be set while the opponent is empty otherwise
-	opponentCopy.type = nil
-
-	return Table.isEmpty(opponentCopy)
+	return not opponent or not opponent.type
+		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Table.isEmpty(opponent.players))
+		or (not Opponent.isTbd(opponent) and Table.deepEquals(opponent, Opponent.blank(opponent.type)))
 end
 
 ---Checks whether an opponent is a BYE Opponent
