@@ -238,7 +238,7 @@ function MatchesTable:determineMatchHeader(match)
 
 
 	--if the header is a default bracket header we need to convert it to proper display text
-	local headerArray DisplayHelper.expandHeader(matchHeader)
+	local headerArray = DisplayHelper.expandHeader(matchHeader)
 
 	self.currentId = match.match2bracketid
 	self.currentMatchHeader = headerArray
