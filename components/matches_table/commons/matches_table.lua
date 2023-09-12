@@ -80,19 +80,29 @@ function MatchesTable:init(args)
 	return self
 end
 
----@return MatchesTable
-function MatchesTable:build()
+---@return Html?
+function MatchesTable:create()
 	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = self.config.limit,
 		order = 'date asc',
 		conditions = self:buildConditions(),
 	})
 
-	if type(matches[1]) == 'table' then
-		self.matches = matches
+	if type(matches[1]) ~= 'table' then
+		return
 	end
+	self.matches = matches
 
-	return self
+	self.output = mw.html.create('table')
+		:addClass('wikitable wikitable-striped sortable match-card')
+		:node(self:header())
+
+	Array.forEach(self.matches, function(match, matchIndex) return self:row(match) end)
+
+	return mw.html.create('div')
+		:addClass('table-responsive')
+		:css('margin-bottom', '10px')
+		:node(self.output)
 end
 
 ---@return string
@@ -131,22 +141,6 @@ function MatchesTable:buildConditions()
 	end
 
 	return conditions:toString()
-end
-
----@return Html?
-function MatchesTable:create()
-	if not self.matches then return end
-
-	self.output = mw.html.create('table')
-		:addClass('wikitable wikitable-striped sortable match-card')
-		:node(self:header())
-
-	Array.forEach(self.matches, function(match, matchIndex) return self:row(match) end)
-
-	return mw.html.create('div')
-		:addClass('table-responsive')
-		:css('margin-bottom', '10px')
-		:node(self.output)
 end
 
 ---@return Html
@@ -237,7 +231,10 @@ function MatchesTable:determineMatchHeader(match)
 	))
 
 	--if the header is a default bracket header we need to convert it to proper display text
-	local headerArray = DisplayHelper.expandHeader(matchHeader)
+	local headerArray
+	if type(matchHeader) == 'string' then
+		headerArray = DisplayHelper.expandHeader(matchHeader)
+	end
 
 	self.currentId = match.match2bracketid
 	self.currentMatchHeader = headerArray
@@ -362,4 +359,4 @@ function MatchesTable._bestof(value)
 	return Abbreviation.make('Bo' .. value, 'Best of ' .. value) --[[@as string]]
 end
 
-return Class.export(MatchesTable)
+return MatchesTable

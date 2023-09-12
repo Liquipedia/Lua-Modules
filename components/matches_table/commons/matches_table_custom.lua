@@ -14,7 +14,7 @@ local MatchesTable = Lua.import('Module:MatchesTable', {requireDevIfEnabled = tr
 local CustomMatchesTable = {}
 
 function CustomMatchesTable.run(args)
-	return MatchesTable(args):build():create()
+	return MatchesTable(args):create()
 end
 
 return Class.export(CustomMatchesTable)
