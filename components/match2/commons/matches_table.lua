@@ -10,35 +10,36 @@ local MatchesTable = {}
 
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
-local String = require('Module:StringUtils')
 local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
-local Table = require('Module:Table')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 
--- overridable if wikis have custom modules
-MatchesTable.OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-MatchesTable.Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local _UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
-local _TBD = 'TBD'
-local _DEFAULT_TBD_IDENTIFIER = 'tbd'
-local _WINNER_LEFT = 1
-local _WINNER_RIGHT = 2
-local _SCORE_STATUS = 'S'
-local _DO_FLIP = true
-local _NO_FLIP = false
-local _LEFT_SIDE_OPPONENT = 'Left'
-local _RIGHT_SIDE_OPPONENT = 'Right'
-local _DEFAULT_QUERY_LIMIT = 1000
+local UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
+local TBD = 'TBD'
+local DEFAULT_TBD_IDENTIFIER = 'tbd'
+local WINNER_LEFT = 1
+local WINNER_RIGHT = 2
+local SCORE_STATUS = 'S'
+local DO_FLIP = true
+local NO_FLIP = false
+local LEFT_SIDE_OPPONENT = 'Left'
+local RIGHT_SIDE_OPPONENT = 'Right'
+local DEFAULT_QUERY_LIMIT = 1000
 
 local _args
 local _matchHeader
 local _currentId
 
 -- If run in abbreviated roundnames mode
-local _ABBREVIATIONS = {
+local ABBREVIATIONS = {
 	["Upper Bracket"] = "UB",
 	["Lower Bracket"] = "LB",
 }
@@ -47,7 +48,7 @@ function MatchesTable.run(args)
 	_args = args or {}
 
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = tonumber(_args.limit) or _DEFAULT_QUERY_LIMIT,
+		limit = tonumber(_args.limit) or DEFAULT_QUERY_LIMIT,
 		offset = 0,
 		order = 'date asc',
 		conditions = MatchesTable._buildConditions(),
@@ -214,8 +215,8 @@ function MatchesTable._row(match)
 	row:node(
 		MatchesTable._buildOpponent(
 			match.match2opponents[1],
-			_DO_FLIP,
-			_LEFT_SIDE_OPPONENT
+			DO_FLIP,
+			LEFT_SIDE_OPPONENT
 		)
 	)
 
@@ -224,8 +225,8 @@ function MatchesTable._row(match)
 	row:node(
 		MatchesTable._buildOpponent(
 			match.match2opponents[2],
-			_NO_FLIP,
-			_RIGHT_SIDE_OPPONENT
+			NO_FLIP,
+			RIGHT_SIDE_OPPONENT
 		)
 	)
 
@@ -239,14 +240,14 @@ function MatchesTable._applyCustomAbbreviations(matchHeader)
 end
 
 function MatchesTable._buildOpponent(opponent, flip, side)
-	opponent = MatchesTable.Opponent.fromMatch2Record(opponent)
+	opponent = Opponent.fromMatch2Record(opponent)
 
 	local opponentDisplay
 	if MatchesTable.opponentIsTbdOrEmpty(opponent) then
 		opponentDisplay = mw.html.create('i')
-			:wikitext(_TBD)
+			:wikitext(TBD)
 	else
-		opponentDisplay = MatchesTable.OpponentDisplay.InlineOpponent{
+		opponentDisplay = OpponentDisplay.InlineOpponent{
 			opponent = opponent,
 			teamStyle = 'short',
 			flip = flip,
@@ -259,7 +260,7 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 end
 
 -- overridable value
-MatchesTable.tbdIdentifier = _DEFAULT_TBD_IDENTIFIER
+MatchesTable.tbdIdentifier = DEFAULT_TBD_IDENTIFIER
 function MatchesTable.opponentIsTbdOrEmpty(opponent)
 	local firstPlayer = (opponent.players or {})[1] or {}
 
@@ -308,16 +309,16 @@ end
 function MatchesTable.scoreDisplay(match)
 	return MatchesTable.getOpponentScore(
 		match.match2opponents[1],
-		match.winner == _WINNER_LEFT
+		match.winner == WINNER_LEFT
 	) .. ':' .. MatchesTable.getOpponentScore(
 		match.match2opponents[2],
-		match.winner == _WINNER_RIGHT
+		match.winner == WINNER_RIGHT
 	)
 end
 
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score
-	if opponent.status == _SCORE_STATUS then
+	if opponent.status == SCORE_STATUS then
 		score = tonumber(opponent.score)
 		if score == -1 then
 			score = 0
