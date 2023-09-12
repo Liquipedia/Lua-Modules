@@ -113,8 +113,9 @@ function MatchTicker:init(args)
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 	}
 
-	assert(config.recent or config.upcoming or config.ongoing and
-		not (config.recent and config.upcoming and config.ongoing),
+	--min 1 of them has to be set; recent can not be set while any of the others is set
+	assert(config.ongoing or config.upcoming or config.recent and
+		not (config.upcoming or config.ongoing),
 		'Invalid recent, upcoming, ongoing combination')
 
 	local teamPages = args.team and Team.queryHistoricalNames(args.team) or nil
