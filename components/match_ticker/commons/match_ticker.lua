@@ -125,8 +125,6 @@ function MatchTicker:init(args)
 		Array.map(teamPages, function(team) return (mw.getContentLanguage():ucfirst(team):gsub(' ', '_')) end)
 		)
 	end
-
-
 	config.teamPages = teamPages
 
 	config.showAllTbdMatches = Logic.readBool(Logic.nilOr(args.showAllTbdMatches,
