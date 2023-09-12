@@ -175,7 +175,7 @@ end
 function Opponent.isEmpty(opponent)
 	-- if no type is set consider opponent as empty
 	return not opponent or not opponent.type
-		-- if neither name not template not players are set consider the opponent as empty
+		-- if neither name nor template nor players are set consider the opponent as empty
 		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Table.isEmpty(opponent.players))
 		-- if opponent equals blank consider it empty
 		-- need to exclude TBD Opponents since Opponet.blank sets a TBD Opponent for type `team`
