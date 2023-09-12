@@ -336,7 +336,7 @@ end
 ---@return integer
 function MatchesTable._parseDateTime(str)
 	local year, month, day, hour, minutes, seconds
-		= str:match("(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$")
+		= str:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?) (%d?%d?):(%d?%d?):(%d?%d?)$')
 
 	-- Adjust time based on server timezone offset from UTC
 	local offset = os.time(os.date("*t") --[[@as osdateparam]]) - os.time(os.date("!*t") --[[@as osdateparam]])
