@@ -92,16 +92,16 @@ function MatchesTable:create()
 	end
 	self.matches = matches
 
-	self.output = mw.html.create('table')
+	local output = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable match-card')
 		:node(self:header())
 
-	Array.forEach(self.matches, function(match, matchIndex) return self:row(match) end)
+	Array.forEach(self.matches, function(match, matchIndex) output:node(self:row(match)) end)
 
 	return mw.html.create('div')
 		:addClass('table-responsive')
 		:css('margin-bottom', '10px')
-		:node(self.output)
+		:node(output)
 end
 
 ---@return string
@@ -193,6 +193,7 @@ function MatchesTable:dateDisplay(match)
 end
 
 ---@param match table
+---@return Html
 function MatchesTable:row(match)
 	local matchHeader = self:determineMatchHeader(match)
 
@@ -204,12 +205,10 @@ function MatchesTable:row(match)
 		row:tag('td'):addClass('Round'):wikitext(matchHeader)
 	end
 
-	row
+	return row
 		:node(MatchesTable._buildOpponent(match.match2opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
 		:node(MatchesTable.score(match))
 		:node(MatchesTable._buildOpponent(match.match2opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
-
-	self.output:node(row)
 end
 
 ---@param match table
