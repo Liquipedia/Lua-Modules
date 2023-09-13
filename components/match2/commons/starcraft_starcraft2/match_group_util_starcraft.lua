@@ -75,9 +75,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Add additional fields to opponents
 	StarcraftMatchGroupUtil.populateOpponents(match)
 
-	-- Remove submatches from match.games because submatches will be computed later (even when fetching from lpdb)
-	match.games = Array.filter(match.games, function(game) return game.resultType ~= 'submatch' end)
-
 	-- Compute game.opponents by looking up game.participants in match.opponents
 	for _, game in ipairs(match.games) do
 		game.opponents = StarcraftMatchGroupUtil.computeGameOpponents(game, match.opponents)
@@ -86,6 +83,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Determine whether the match is a team match with different players each game
 	match.opponentMode = match.mode:match('team') and 'team' or 'uniform'
 
+	local extradata = match.extradata
+	---@cast extradata table
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
@@ -95,25 +94,25 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 		-- Extract submatch headers from extradata
 		for _, submatch in pairs(match.submatches) do
-			submatch.header = Table.extract(match.extradata, 'subGroup' .. submatch.subgroup .. 'header')
+			submatch.header = Table.extract(extradata, 'subGroup' .. submatch.subgroup .. 'header')
 		end
 	end
 
 	-- Add vetoes
 	match.vetoes = {}
 	for vetoIx = 1, math.huge do
-		local map = Table.extract(match.extradata, 'veto' .. vetoIx)
-		local by = tonumber(Table.extract(match.extradata, 'veto' .. vetoIx .. 'by'))
+		local map = Table.extract(extradata, 'veto' .. vetoIx)
+		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIx .. 'by'))
 		if not map then break end
 
 		table.insert(match.vetoes, {map = map, by = by})
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
-	match.isFfa = Logic.readBool(Table.extract(match.extradata, 'ffa'))
-	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
-	match.casters = String.nilIfEmpty(Table.extract(match.extradata, 'casters'))
+	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
+	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
+	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
+	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
 end
@@ -234,6 +233,7 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 			table.insert(submatchGames, currentGames)
 			previousSubgroup = game.subgroup
 		end
+		---@cast currentGames -nil
 		table.insert(currentGames, game)
 	end
 	return submatchGames
