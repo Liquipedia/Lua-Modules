@@ -110,9 +110,7 @@ local gamestuff = {
 	{
 		class = 'cell--button',
 		header = {
-			value = function ()
-				return ''
-			end,
+			value = '',
 		},
 		row = {
 			value = function (opponent)
@@ -123,9 +121,7 @@ local gamestuff = {
 	{
 		class = 'cell--rank',
 		header = {
-			value = function ()
-				return 'Rank'
-			end,
+			value = 'Rank',
 		},
 		row = {
 			value = function (opponent)
@@ -136,9 +132,7 @@ local gamestuff = {
 	{
 		class = 'cell--team',
 		header = {
-			value = function ()
-				return 'Team'
-			end,
+			value = 'Team',
 		},
 		row = {
 			value = function (opponent)
@@ -149,12 +143,9 @@ local gamestuff = {
 	{
 		class = 'cell--total-points',
 		header = {
-			value = function ()
-				return 'Total Points'
-			end,
+			value = 'Total Points',
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
 				return opponent.score
 			end,
@@ -163,9 +154,7 @@ local gamestuff = {
 	{
 		class = 'cell--placements',
 		header = {
-			value = function ()
-				return 'Placement Points'
-			end,
+			value = 'Placement Points',
 		},
 		row = {
 			value = function (opponent)
@@ -176,9 +165,7 @@ local gamestuff = {
 	{
 		class = 'cell--kills',
 		header = {
-			value = function ()
-				return 'Kill Points'
-			end,
+			value = 'Kill Points',
 		},
 		row = {
 			value = function (opponent)
@@ -193,7 +180,7 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	local wrapper = mw.html.create('div'):addClass('panel-table')
 	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
 	for _, column in ipairs(gamestuff) do
-		header:tag('div'):wikitext(column.header.value()):addClass('panel-table__cell'):addClass(column.class)
+		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
 	for opponentIdx, opponentMatch in ipairs(match.opponents) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
