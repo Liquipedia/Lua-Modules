@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -176,10 +177,7 @@ function Opponent.isEmpty(opponent)
 	-- if no type is set consider opponent as empty
 	return not opponent or not opponent.type
 		-- if neither name nor template nor players are set consider the opponent as empty
-		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Table.isEmpty(opponent.players))
-		-- if opponent equals blank consider it empty
-		-- need to exclude TBD Opponents since Opponet.blank sets a TBD Opponent for type `team`
-		or (not Opponent.isTbd(opponent) and Table.deepEquals(opponent, Opponent.blank(opponent.type)))
+		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Logic.isDeepEmpty(opponent.players))
 end
 
 ---Checks whether an opponent is a BYE Opponent
