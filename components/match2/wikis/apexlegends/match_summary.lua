@@ -103,64 +103,52 @@ function CustomMatchSummary._createGameTab(match, idx)
 	-- Help Text
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
 
-	return tostring(infoArea) .. tostring(CustomMatchSummary._createGameStandings(game))
+	return tostring(infoArea) .. tostring(CustomMatchSummary._createGameStandings(match, idx))
 end
 
 local gamestuff = {
 	{
+		class = 'cell--button',
 		header = {
-			class = nil,
 			value = function ()
 				return ''
 			end,
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
 				return '\\/'
 			end,
 		},
-		show = function ()
-			return false
-		end,
 	},
 	{
+		class = 'cell--rank',
 		header = {
-			class = nil,
 			value = function ()
 				return 'Rank'
 			end,
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
-				return 'TODO'
+				return opponent.placement
 			end,
 		},
-		show = function ()
-			return true
-		end,
 	},
 	{
+		class = 'cell--team',
 		header = {
-			class = nil,
 			value = function ()
 				return 'Team'
 			end,
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
 				return opponent.name
 			end,
 		},
-		show = function ()
-			return true
-		end,
 	},
 	{
+		class = 'cell--total-points',
 		header = {
-			class = nil,
 			value = function ()
 				return 'Total Points'
 			end,
@@ -171,54 +159,47 @@ local gamestuff = {
 				return opponent.score
 			end,
 		},
-		show = function ()
-			return true
-		end,
 	},
 	{
+		class = 'cell--placements',
 		header = {
-			class = nil,
 			value = function ()
 				return 'Placement Points'
 			end,
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
-				return 'TODO'
+				return opponent.scoreBreakdown.placePoints
 			end,
 		},
-		show = function ()
-			return true
-		end,
 	},
 	{
+		class = 'cell--kills',
 		header = {
-			class = nil,
 			value = function ()
 				return 'Kill Points'
 			end,
 		},
 		row = {
-			class = nil,
 			value = function (opponent)
-				return 'TODO'
+				return opponent.scoreBreakdown.killPoints
 			end,
 		},
-		show = function ()
-			return true
-		end,
 	},
 }
 
-function CustomMatchSummary._createGameStandings(game)
-	local wrapper = mw.html.create('div')
+function CustomMatchSummary._createGameStandings(match, idx)
+	local game = match.games[idx]
+	local wrapper = mw.html.create('div'):addClass('panel-table')
+	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
 	for _, column in ipairs(gamestuff) do
-		wrapper:node(mw.html.create('div'):wikitext(column.header.value()))
+		header:tag('div'):wikitext(column.header.value()):addClass('panel-table__cell'):addClass(column.class)
 	end
-	for _, opponent in ipairs({}) do
+	for opponentIdx, opponentMatch in ipairs(match.opponents) do
+		local row = wrapper:tag('div'):addClass('panel-table__row')
+		local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 		for _, column in ipairs(gamestuff) do
-			wrapper:node(mw.html.create('div'):wikitext(column.row.value(opponent)))
+			row:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell'):addClass(column.class)
 		end
 	end
 	return wrapper

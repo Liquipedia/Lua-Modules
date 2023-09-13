@@ -12,6 +12,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -73,11 +74,13 @@ function MatchFunctions.adjustMapData(match)
 	local mapIndex = 1
 	while match['map' .. mapIndex] do
 		local map = match['map' .. mapIndex]
+		local scores
 		Table.mergeInto(map, MatchFunctions.readDate(map))
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
-		map = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
+		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
 		map = MapFunctions.getTournamentVars(map)
+		map = MapFunctions.getExtraData(map, scores)
 
 		match['map' .. mapIndex] = map
 		mapIndex = mapIndex + 1
@@ -315,9 +318,10 @@ end
 --
 
 -- Parse extradata information
-function MapFunctions.getAdditionalExtraData(map)
+function MapFunctions.getExtraData(map, scores)
 	map.extradata = {
-		comment = map.comment
+		comment = map.comment,
+		opponents = scores,
 	}
 
 	return map
@@ -341,7 +345,7 @@ function MapFunctions.getParticipants(map, opponents)
 	end
 
 	map.participants = participants
-	return MapFunctions.getAdditionalExtraData(map)
+	return map
 end
 
 function MapFunctions.attachToParticipant(player, opponentIndex, players, participants)
@@ -366,7 +370,6 @@ end
 
 -- Calculate Score and Winner of the map
 function MapFunctions.getScoresAndWinner(map, scoreSettings)
-	mw.logObject(scoreSettings)
 	map.scores = {}
 	local indexedScores = {}
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do
@@ -376,12 +379,16 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			break
 		end
 		local score = NO_SCORE
+		local scoreBreakdown = {}
 		if Logic.isNumeric(teamData[1]) and Logic.isNumeric(teamData[2]) then
-			score = (scoreSettings[tonumber(teamData[1])] or 0) + tonumber(teamData[2]) * scoreSettings.kill
+			scoreBreakdown.placePoints = (scoreSettings[tonumber(teamData[1])] or 0)
+			scoreBreakdown.killPoints = tonumber(teamData[2]) * scoreSettings.kill
+			score = scoreBreakdown.placePoints + scoreBreakdown.killPoints
 		end
 		local opponent = {
 			status = STATUS_SCORE,
 			score = score,
+			scoreBreakdown = scoreBreakdown,
 		}
 		table.insert(map.scores, score)
 		indexedScores[scoreIndex] = opponent
@@ -389,7 +396,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
-	return map
+	return map, indexedScores
 end
 
 function MapFunctions.getTournamentVars(map)
