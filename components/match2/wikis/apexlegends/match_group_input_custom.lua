@@ -383,6 +383,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 		if Logic.isNumeric(teamData[1]) and Logic.isNumeric(teamData[2]) then
 			scoreBreakdown.placePoints = (scoreSettings[tonumber(teamData[1])] or 0)
 			scoreBreakdown.killPoints = tonumber(teamData[2]) * scoreSettings.kill
+			scoreBreakdown.kills = tonumber(teamData[2])
 			score = scoreBreakdown.placePoints + scoreBreakdown.killPoints
 		end
 		local opponent = {

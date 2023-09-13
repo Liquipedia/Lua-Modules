@@ -86,7 +86,7 @@ function CustomMatchSummary._createOverallPage(match)
 
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
 
-	return tostring(infoArea) -- .. CustomMatchSummary._createOverallStandings(match)
+	return tostring(infoArea) .. tostring(CustomMatchSummary._createOverallStandings(match))
 end
 
 function CustomMatchSummary._createGameTab(match, idx)
@@ -104,6 +104,108 @@ function CustomMatchSummary._createGameTab(match, idx)
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
 
 	return tostring(infoArea) .. tostring(CustomMatchSummary._createGameStandings(match, idx))
+end
+
+local matchstuff = {
+	{
+		class = 'cell--status',
+		header = {
+			value = '',
+		},
+		row = {
+			value = function (opponent)
+				return '-'
+			end,
+		},
+	},
+	{
+		class = 'cell--rank',
+		header = {
+			value = 'Rank',
+		},
+		row = {
+			value = function (opponent)
+				return opponent.placement
+			end,
+		},
+	},
+	{
+		class = 'cell--team',
+		header = {
+			value = 'Team',
+		},
+		row = {
+			value = function (opponent)
+				return opponent.name
+			end,
+		},
+	},
+	{
+		class = 'cell--total-points',
+		header = {
+			value = 'Total Points',
+		},
+		row = {
+			value = function (opponent)
+				return opponent.score
+			end,
+		},
+	},
+	game = {
+		{
+			class = 'cell--game-placement',
+			header = {
+				value = 'P',
+			},
+			row = {
+				value = function (opponent)
+					return opponent.placement
+				end,
+			},
+		},
+		{
+			class = 'cell--game-kills',
+			header = {
+				value = 'K',
+			},
+			row = {
+				value = function (opponent)
+					return opponent.scoreBreakdown.kills
+				end,
+			},
+		},
+	}
+}
+
+function CustomMatchSummary._createOverallStandings(match)
+	local wrapper = mw.html.create('div'):addClass('panel-table')
+	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
+	for _, column in ipairs(matchstuff) do
+		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
+	end
+	for _, game in ipairs(match.games) do
+		local gameHeader = header:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
+		gameHeader:tag('div'):addClass('panel-table__cell-game'):addClass('cell--game-details')
+				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game Num'):done()
+				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date'):wikitext('Date'):done()
+		for _, column in ipairs(matchstuff.game) do
+			gameHeader:tag('div'):wikitext(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
+		end
+	end
+	for opponentIdx, opponentMatch in ipairs(match.opponents) do
+		local row = wrapper:tag('div'):addClass('panel-table__row')
+		for _, column in ipairs(matchstuff) do
+			row:tag('div'):wikitext(column.row.value(opponentMatch)):addClass('panel-table__cell'):addClass(column.class)
+		end
+		for _, game in ipairs(match.games) do
+			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
+			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
+			for _, column in ipairs(matchstuff.game) do
+				gameRow:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell-game'):addClass(column.class)
+			end
+		end
+	end
+	return wrapper
 end
 
 local gamestuff = {
