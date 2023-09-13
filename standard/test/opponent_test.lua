@@ -154,7 +154,8 @@ function suite:testReadOpponentArgs()
 				{displayName = 'test2', flag = 'Austria'},
 			}}, Opponent.readOpponentArgs{p1 = 'test', p1flag = 'de', p1link = 'testLink', p1team = 'mouz',
 		p2 = 'test2', p2flag = 'at', type = Opponent.duo})
-	self:assertDeepEquals({name = 'test', type = Opponent.literal}, Opponent.readOpponentArgs{type = Opponent.literal, name = 'test'})
+	self:assertDeepEquals({name = 'test', type = Opponent.literal},
+		Opponent.readOpponentArgs{type = Opponent.literal, name = 'test'})
 	self:assertDeepEquals({template = 'test', type = Opponent.team},
 		Opponent.readOpponentArgs{type = Opponent.team, template = 'test'})
 	self:assertDeepEquals({name = 'test', type = Opponent.literal},
