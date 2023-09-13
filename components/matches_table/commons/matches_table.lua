@@ -234,7 +234,7 @@ function MatchesTable:determineMatchHeader(match)
 	if type(matchHeader) == 'string' then
 		headerArray = DisplayHelper.expandHeader(matchHeader)
 	else
-		headerArray = matchHeader
+		headerArray = matchHeader or {}
 	end
 
 	self.currentId = match.match2bracketid
