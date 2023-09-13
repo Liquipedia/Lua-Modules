@@ -7,7 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local config = Lua.import('Module:Opponent/testcases/config', {requireDevIfEnabled = true})
@@ -80,7 +79,7 @@ function suite:testIsEmpty()
 	self:assertTrue(Opponent.isEmpty(config.blankSolo))
 	self:assertTrue(Opponent.isEmpty(config.blankDuo))
 	self:assertTrue(Opponent.isEmpty(config.emptyTeam))
-	self:assertFalse(Opponent.isEmpty(config.blankTeam))	
+	self:assertFalse(Opponent.isEmpty(config.blankTeam))
 	self:assertFalse(Opponent.isEmpty(config.tbdLiteral))
 	self:assertFalse(Opponent.isEmpty(config.tbdSolo))
 	self:assertFalse(Opponent.isEmpty(config.tbdDuo))
@@ -97,7 +96,7 @@ function suite:testIsBye()
 	self:assertFalse(Opponent.isBye(config.blankSolo))
 	self:assertFalse(Opponent.isBye(config.blankDuo))
 	self:assertFalse(Opponent.isBye(config.emptyTeam))
-	self:assertFalse(Opponent.isBye(config.blankTeam))	
+	self:assertFalse(Opponent.isBye(config.blankTeam))
 	self:assertFalse(Opponent.isBye(config.tbdLiteral))
 	self:assertFalse(Opponent.isBye(config.tbdSolo))
 	self:assertFalse(Opponent.isBye(config.tbdDuo))
@@ -152,18 +151,23 @@ function suite:testReadOpponentArgs()
 		}}, Opponent.readOpponentArgs{type = Opponent.solo, p1 = 'test', flag = 'de', link = 'testLink', team = 'mouz'})
 	self:assertDeepEquals({type = Opponent.duo, players = {
 				{displayName = 'test', flag = 'Germany', pageName = 'testLink', team = 'mouz'},
-				{displayName = 'test2', flag = 'Austria'},	
+				{displayName = 'test2', flag = 'Austria'},
 			}}, Opponent.readOpponentArgs{p1 = 'test', p1flag = 'de', p1link = 'testLink', p1team = 'mouz',
 		p2 = 'test2', p2flag = 'at', type = Opponent.duo})
 	self:assertDeepEquals({name = 'test', type = Opponent.literal}, Opponent.readOpponentArgs{type = Opponent.literal, name = 'test'})
-	self:assertDeepEquals({template = 'test', type = Opponent.team}, Opponent.readOpponentArgs{type = Opponent.team, template = 'test'})
-	self:assertDeepEquals({name = 'test', type = Opponent.literal}, Opponent.readOpponentArgs{type = Opponent.literal, 'test'})
-	self:assertDeepEquals({template = 'test', type = Opponent.team}, Opponent.readOpponentArgs{type = Opponent.team, 'test'})
+	self:assertDeepEquals({template = 'test', type = Opponent.team},
+		Opponent.readOpponentArgs{type = Opponent.team, template = 'test'})
+	self:assertDeepEquals({name = 'test', type = Opponent.literal},
+		Opponent.readOpponentArgs{type = Opponent.literal, 'test'})
+	self:assertDeepEquals({template = 'test', type = Opponent.team},
+		Opponent.readOpponentArgs{type = Opponent.team, 'test'})
 end
 
 function suite:testFromMatch2Record()
-	self:assertDeepEquals({name = '', type = Opponent.literal}, Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral))
-	self:assertDeepEquals({template = 'exon march 2020', type = Opponent.team}, Opponent.fromMatch2Record(config.exampleMatch2RecordTeam))
+	self:assertDeepEquals({name = '', type = Opponent.literal},
+		Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral))
+	self:assertDeepEquals({template = 'exon march 2020', type = Opponent.team},
+		Opponent.fromMatch2Record(config.exampleMatch2RecordTeam))
 	self:assertDeepEquals({type = Opponent.solo, players = {
 			{displayName = 'Krystianer', flag = 'Poland', pageName = 'Krystianer'}}},
 		Opponent.fromMatch2Record(config.exampleMatch2RecordSolo))
