@@ -29,7 +29,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = ' <abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
-local TBD = 'TBD'
 local WINNER_LEFT = 1
 local WINNER_RIGHT = 2
 local SCORE_STATUS = 'S'
@@ -234,6 +233,8 @@ function MatchesTable:determineMatchHeader(match)
 	local headerArray
 	if type(matchHeader) == 'string' then
 		headerArray = DisplayHelper.expandHeader(matchHeader)
+	else
+		headerArray = matchHeader
 	end
 
 	self.currentId = match.match2bracketid
@@ -266,7 +267,7 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 	opponent = Opponent.fromMatch2Record(opponent)
 
 	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
-		return opponentCell:tag('i'):wikitext(TBD):done()
+		opponent = Opponent.tbd(Opponent.literal)
 	end
 
 	return opponentCell:node(OpponentDisplay.InlineOpponent{
