@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -167,6 +168,16 @@ function Opponent.isTbd(opponent)
 	else
 		return Array.any(opponent.players, Opponent.playerIsTbd)
 	end
+end
+
+---Checks if an opponent is empty
+---@param opponent standardOpponent?
+---@return boolean
+function Opponent.isEmpty(opponent)
+	-- if no type is set consider opponent as empty
+	return not opponent or not opponent.type
+		-- if neither name nor template nor players are set consider the opponent as empty
+		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Logic.isDeepEmpty(opponent.players))
 end
 
 ---Checks whether an opponent is a BYE Opponent
