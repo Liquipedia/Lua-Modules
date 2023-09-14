@@ -38,25 +38,12 @@ function Class.new(base, init)
 	local metatable = {}
 
 	metatable.__call = function(class_tbl, ...)
+		local varArgs = {n = select('#', ...), ...}
 		local object = {}
 		setmetatable(object, instance)
 
-		-- Call constructors
-		if init and base and base.init then
-			-- If the base class has a constructor,
-			-- make sure to call that first
-			base.init(object, ...)
-			init(object, ...)
-		elseif init then
-			-- Else we just call our own
-			init(object, ...)
-		else
-			-- And in cases where we don't have one but the
-			-- base class does, call that one
-			if base and base.init then
-				base.init(object, ...)
-			end
-		end
+		Class.construct(instance, object, varArgs)
+
 		return object
 	end
 
@@ -77,6 +64,19 @@ function Class.new(base, init)
 	end
 	setmetatable(instance, metatable)
 	return instance
+end
+
+---Calls constructors recursively
+---@param instance table
+---@param object table
+---@param varArgs table
+function Class.construct(instance, object, varArgs)
+	if instance._base then
+		Class.construct(instance._base, object, varArgs)
+	end
+	if instance.init then
+		instance.init(object, unpack(varArgs))
+	end
 end
 
 ---@generic T
