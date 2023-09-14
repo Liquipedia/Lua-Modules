@@ -22,6 +22,8 @@ function suite:testTypeIsParty()
 	self:assertFalse(Opponent.typeIsParty(Opponent.literal))
 	self:assertFalse(Opponent.typeIsParty(Opponent.team))
 	self:assertFalse(Opponent.typeIsParty())
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertFalse(Opponent.typeIsParty('someBs'))
 end
 
@@ -33,6 +35,8 @@ function suite:testPartySize()
 	self:assertEquals(nil, Opponent.partySize(Opponent.literal))
 	self:assertEquals(nil, Opponent.partySize(Opponent.team))
 	self:assertEquals(nil, Opponent.partySize())
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertEquals(nil, Opponent.partySize('someBs'))
 end
 
@@ -42,6 +46,8 @@ function suite:testBlank()
 	self:assertDeepEquals(config.blankTeam, Opponent.blank(Opponent.team))
 	self:assertDeepEquals(config.blankLiteral, Opponent.blank(Opponent.literal))
 	self:assertDeepEquals(config.blankLiteral, Opponent.blank())
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertDeepEquals(config.blankLiteral, Opponent.blank('someBs'))
 end
 
@@ -51,6 +57,8 @@ function suite:testTbd()
 	self:assertDeepEquals(config.tbdTeam, Opponent.tbd(Opponent.team))
 	self:assertDeepEquals(config.tbdLiteral, Opponent.tbd(Opponent.literal))
 	self:assertDeepEquals(config.tbdLiteral, Opponent.tbd())
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertDeepEquals(config.tbdLiteral, Opponent.tbd('someBs'))
 end
 
@@ -69,7 +77,9 @@ function suite:testIsTbd()
 	self:assertFalse(Opponent.isTbd(config.filledSolo))
 	self:assertFalse(Opponent.isTbd(config.filledDuo))
 	self:assertThrows(Opponent.isTbd)--misisng input
-	self:assertThrows(function() return Opponent.isTbd('someBs') end)--invalid input
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
+	self:assertThrows(function() return Opponent.isTbd('someBs') end)
 end
 
 function suite:testIsEmpty()
@@ -107,10 +117,14 @@ function suite:testIsBye()
 	self:assertTrue(Opponent.isBye(config.byeLiteral))
 	self:assertTrue(Opponent.isBye(config.byeTeam))
 	self:assertThrows(Opponent.isBye)
-	self:assertFalse(Opponent.isBye('someBs'))--invalid input
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
+	self:assertFalse(Opponent.isBye('someBs'))
 end
 
 function suite:testReadType()
+	---intended missing input
+	---@diagnostic disable-next-line: missing-parameter
 	self:assertEquals(nil, Opponent.readType())
 	self:assertEquals(nil, Opponent.readType('someBs'))
 	self:assertEquals(Opponent.solo, Opponent.readType('solo'))
@@ -141,6 +155,8 @@ function suite:testToName()
 	self:assertEquals('test', Opponent.toName(config.filledSolo))
 	self:assertEquals('test / test2', Opponent.toName(config.filledDuo))
 	self:assertThrows(Opponent.toName)
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertEquals(nil, Opponent.toName('someBs'))
 	--can not test team type due to missing team templates on commons
 end
@@ -180,12 +196,12 @@ end
 
 function suite:testToLpdbStruct()
 	self:assertDeepEquals({opponentname = '', opponenttype = Opponent.literal},
-		Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral)))
+		Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral)--[[@as standardOpponent]]))
 	self:assertDeepEquals({opponentname = 'Krystianer', opponenttype = Opponent.solo, opponentplayers = {
 			p1 = 'Krystianer',
 			p1dn = 'Krystianer',
 			p1flag = 'Poland',
-		}}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordSolo)))
+		}}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordSolo)--[[@as standardOpponent]]))
 	self:assertDeepEquals({opponentname = 'Semper / Jig', opponenttype = Opponent.duo, opponentplayers = {
 			p1 = 'Semper',
 			p1dn = 'Semper',
@@ -193,16 +209,16 @@ function suite:testToLpdbStruct()
 			p2 = 'Jig',
 			p2dn = 'Jig',
 			p2flag = 'Canada',
-		}}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordDuo)))
+		}}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(config.exampleMatch2RecordDuo)--[[@as standardOpponent]]))
 	--can not test for team opponent due to missing team templates
 end
 
 function suite:testFromLpdbStruct()
-	local opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral)
+	local opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordLiteral) --[[@as standardOpponent]]
 	self:assertDeepEquals(opponent, Opponent.fromLpdbStruct(Opponent.toLpdbStruct(opponent)))
-	opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordSolo)
+	opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordSolo) --[[@as standardOpponent]]
 	self:assertDeepEquals(opponent, Opponent.fromLpdbStruct(Opponent.toLpdbStruct(opponent)))
-	opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordDuo)
+	opponent = Opponent.fromMatch2Record(config.exampleMatch2RecordDuo) --[[@as standardOpponent]]
 	self:assertDeepEquals(opponent, Opponent.fromLpdbStruct(Opponent.toLpdbStruct(opponent)))
 	--can not test for team opponent due to missing team templates
 end
