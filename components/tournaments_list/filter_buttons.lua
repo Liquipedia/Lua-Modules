@@ -1,7 +1,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
