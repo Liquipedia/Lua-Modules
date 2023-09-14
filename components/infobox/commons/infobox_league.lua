@@ -52,7 +52,7 @@ function League.run(frame)
 	return league:createInfobox()
 end
 
----@return string
+---@return Html
 function League:createInfobox()
 	local args = self.args
 	args.abbreviation = self:_fetchAbbreviation()
@@ -262,7 +262,10 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(WarningBox.displayAll(League.warnings))
+		:node(Logic.readBool(args.autointro) and self:seoText(args) or nil)
 end
 
 ---@param args table
@@ -433,6 +436,8 @@ function League:_definePageVariables(args)
 	-- if wikis want it unset they can unset it via the defineCustomPageVariables() call
 	Variables.varDefine('tournament_currency', args.localcurrency or '')
 
+	Variables.varDefine('tournament_summary', self:seoText(args))
+
 	self:defineCustomPageVariables(args)
 end
 
@@ -487,6 +492,7 @@ function League:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
+		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
 		},
