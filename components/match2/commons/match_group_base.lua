@@ -8,19 +8,21 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
 
 function MatchGroupBase.readOptions(args, matchGroupType)
-	local store = Logic.readBoolOrNil(args.store)
+	local store = Logic.nilOr(Logic.readBoolOrNil(args.store),
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage')))
 	local show = not Logic.readBool(args.hide)
 	local options = {
 		bracketId = MatchGroupBase.readBracketId(args.id),
 		matchGroupType = matchGroupType,
 		shouldWarnMissing = Logic.nilOr(Logic.readBoolOrNil(args.warnMissing), true),
 		show = show,
-		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store, true),
-		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store, true),
+		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store),
+		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store),
 		storePageVar = Logic.nilOr(Logic.readBoolOrNil(args.storePageVar), show),
 	}
 
