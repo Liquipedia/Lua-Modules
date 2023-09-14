@@ -134,8 +134,10 @@ function suite:testTryCatch()
 
 	self:assertEquals(nil, Logic.tryCatch(function() assert(false, 'some failed assert') end, catch))
 	self:assertTrue(errorCaught)
+	errorCaught = false
 
 	self:assertEquals('someVal', Logic.tryCatch(function() return 'someVal' end, catch))
+	self:assertFalse(errorCaught)
 end
 
 function suite:testIsNumeric()
