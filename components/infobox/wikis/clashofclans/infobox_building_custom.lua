@@ -47,7 +47,7 @@ function CustomInjector:addCustomCells(widgets)
 	Array.appendWith(
 		widgets,
 		Cell{name = 'Range', content = {_args.range}},
-		Cell{name = 'Damage Type', content = {_args.damagetypo}},
+		Cell{name = 'Damage Type', content = {_args.damagetype}},
 		Cell{name = 'Target', content = {_args.target}},
 		Cell{name = 'Favorite Target', content = {_args.favtarget}},
 		Cell{name = 'Release Date', content = {_args.releasedate}}
