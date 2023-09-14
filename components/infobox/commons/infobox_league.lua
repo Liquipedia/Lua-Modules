@@ -265,7 +265,7 @@ function League:createInfobox()
 	return mw.html.create()
 		:node(builtInfobox)
 		:node(WarningBox.displayAll(League.warnings))
-		:node(Logic.readBool(args.autointro) and self:seoText(args) or nil)
+		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
 ---@param args table
