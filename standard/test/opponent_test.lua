@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Array/testcases
+-- page=Module:Opponent/testcases
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
