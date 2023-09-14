@@ -25,7 +25,6 @@ function Class.new(base, init)
 
 	if not init and type(base) == 'function' then
 		init = base
-		base = nil
 	elseif type(base) == 'table' then
 		for index, value in pairs(base) do
 			instance[index] = value
