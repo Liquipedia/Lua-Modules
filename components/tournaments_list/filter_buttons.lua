@@ -54,21 +54,6 @@ function FilterButtons._loadCategories(category)
 		return
 	end
 
-	if Table.isEmpty(category.items) then
-		local tournaments = mw.ext.LiquipediaDB.lpdb(
-			'tournament',
-			{
-				limit = 15,
-				query = category.query,
-				order = category.query .. ' ASC',
-				groupby = category.query .. ' ASC'
-			}
-		)
-
-		assert(type(tournaments) == 'table', tournaments)
-		category.items = Array.map(Array.filter(tournaments, String.isNotEmpty), Operator.property(category.query))
-	end
-
 	if category.order then
 		Array.orderInPlaceBy(category.items, category.order)
 	end
