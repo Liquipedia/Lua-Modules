@@ -23,8 +23,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
-local MATCHLIST_MATCH_GROUP_TYPE = 'matchlist'
-
 -- The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
 -- a matchlist.
 local MatchGroup = {}
@@ -98,7 +96,7 @@ function MatchGroup.MatchGroupById(args)
 	local matchGroupType = matches[1].bracketData.type
 
 	if Logic.readBool(args.forceMatchList) then
-		matchGroupType = MATCHLIST_MATCH_GROUP_TYPE
+		matchGroupType = 'matchlist'
 		Array.forEach(matches, function(match)
 			match.bracketData.header = match.bracketData.header
 				and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
@@ -106,7 +104,7 @@ function MatchGroup.MatchGroupById(args)
 	end
 
 	local config
-	if matchGroupType == MATCHLIST_MATCH_GROUP_TYPE then
+	if matchGroupType == 'matchlist' then
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		config = MatchlistDisplay.configFromArgs(args)
 	else
