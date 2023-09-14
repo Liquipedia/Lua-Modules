@@ -110,7 +110,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
@@ -219,10 +219,6 @@ function StarcraftMatchGroupInput._adjustData(match)
 		if Logic.isNotEmpty(vodgame) and Logic.isNotEmpty(match['map' .. index]) then
 			match['map' .. index].vod = match['map' .. index].vod or vodgame
 		end
-	end
-
-	if string.find(match.mode, 'team') then
-		match = StarcraftMatchGroupInput._subMatchStructure(match)
 	end
 
 	match = StarcraftMatchGroupInput._matchWinnerProcessing(match)
@@ -360,69 +356,6 @@ function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 				end
 			end
 		end
-	end
-
-	return match
-end
-
-function StarcraftMatchGroupInput._subMatchStructure(match)
-	local subMatches = {}
-	local numberOfMaps = 0
-
-	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
-		local subGroupIndex = map.subgroup
-
-		--create a new sub-match if necessary
-		subMatches[subGroupIndex] = subMatches[subGroupIndex] or {
-			date = map.date,
-			game = map.game,
-			liquipediatier = map.liquipediatier,
-			liquipediatiertype = map.liquipediatiertype,
-			participants = Table.deepCopy(map.participants or {}),
-			mode = map.mode,
-			resulttype = 'submatch',
-			subgroup = subGroupIndex,
-			extradata = {
-				header = Logic.emptyOr(
-					match['subGroup' .. subGroupIndex .. 'header'],
-					match['subgroup' .. subGroupIndex .. 'header'],
-					match['submatch' .. subGroupIndex .. 'header']
-				),
-				noQuery = match.noQuery,
-				matchsection = Variables.varDefault('matchsection'),
-				featured = match.publishertier,
-				isSubMatch = 'true',
-				opponent1 = map.extradata.opponent1,
-				opponent2 = map.extradata.opponent2,
-			},
-			type = match.type,
-			scores = {0, 0},
-			winner = 0
-		}
-
-		--adjust sub-match scores
-		if map.map and String.startsWith(map.map, 'Submatch') then
-			for opponentIndex, score in ipairs(subMatches[subGroupIndex].scores) do
-				subMatches[subGroupIndex].scores[opponentIndex] = score + (map.scores[opponentIndex] or 0)
-			end
-		else
-			local winner = tonumber(map.winner) or ''
-			if subMatches[subGroupIndex].scores[winner] then
-				subMatches[subGroupIndex].scores[winner] = subMatches[subGroupIndex].scores[winner] + 1
-			end
-		end
-		numberOfMaps = mapIndex
-	end
-
-	for subMatchIndex, subMatch in ipairs(subMatches) do
-		--get winner
-		if subMatch.scores[1] > subMatch.scores[2] then
-			subMatch.winner = 1
-		elseif subMatch.scores[2] > subMatch.scores[1] then
-			subMatch.winner = 2
-		end
-
-		match['map' .. (numberOfMaps + subMatchIndex)] = subMatch
 	end
 
 	return match
@@ -691,6 +624,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
 		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
 		if Logic.isNotEmpty(name) then
+			---@cast name -nil
 			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
 			players[playerIndex] = {
 				name = name:gsub(' ', '_'),
@@ -725,7 +659,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 		opponent.extradata.short = Logic.emptyOr(opponent.short, opponent.name, opponent[1] or '')
 		opponent.extradata.bracket = Logic.emptyOr(opponent.bracket, opponent.name, opponent[1] or '')
 	else
-		opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], ''))
+		opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], '')--[[@as string]])
 		if String.isEmpty(opponent.template) then
 			opponent.template = 'tbd'
 		end
@@ -787,7 +721,6 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment or '',
 		header = map.header or '',
-		isSubMatch = 'false',
 		noQuery = match.noQuery,
 		server = map.server,
 	}
