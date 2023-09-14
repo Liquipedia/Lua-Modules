@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Opponent/testcases/config
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Lua = require('Module:Lua')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
