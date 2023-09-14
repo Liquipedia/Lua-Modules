@@ -9,9 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -20,7 +17,6 @@ local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = tr
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local Breakdown = Widgets.Breakdown
 
 ---@class CustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
@@ -30,7 +26,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 local _pagename = mw.title.getCurrentTitle().text
-local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param frame Frame
 ---@return Html
