@@ -84,6 +84,8 @@ function suite:testReadBool()
 	self:assertFalse(Logic.readBool('n'))
 	self:assertFalse(Logic.readBool('someBs'))
 	self:assertFalse(Logic.readBool())
+	---intended bad value
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertFalse(Logic.readBool{})
 end
 
@@ -104,6 +106,8 @@ function suite:testReadBoolOrNil()
 	self:assertFalse(Logic.readBoolOrNil('n'))
 	self:assertEquals(nil, Logic.readBoolOrNil('someBs'))
 	self:assertEquals(nil, Logic.readBoolOrNil())
+	---intended bad value
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertEquals(nil, Logic.readBoolOrNil{})
 end
 
@@ -146,7 +150,11 @@ function suite:testIsNumeric()
 	self:assertFalse(Logic.isNumeric('1+2'))
 	self:assertFalse(Logic.isNumeric())
 	self:assertFalse(Logic.isNumeric('string'))
+	---intended bad value
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertFalse(Logic.isNumeric{})
+	---intended bad value
+	---@diagnostic disable-next-line: param-type-mismatch
 	self:assertFalse(Logic.isNumeric{just = 'a table'})
 end
 
