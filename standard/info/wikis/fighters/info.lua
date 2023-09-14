@@ -882,6 +882,19 @@ return {
 				lightMode = 'Mortal Kombat 11 default allmode.png',
 			},
 		},
+		mk1 = {
+			abbreviation = 'MK1',
+			name = 'Mortal Kombat 1',
+			link = 'Mortal Kombat 1',
+			logo = {
+				darkMode = 'Mortal Kombat 1 default darkmode.png',
+				lightMode = 'Mortal Kombat 1 default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Mortal Kombat 1 default darkmode.png',
+				lightMode = 'Mortal Kombat 1 default lightmode.png',
+			},
+		},
 		mvc2 = {
 			abbreviation = 'MvC 2',
 			name = 'Marvel vs. Capcom 2',
