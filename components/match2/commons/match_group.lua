@@ -9,10 +9,12 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
@@ -92,6 +94,14 @@ function MatchGroup.MatchGroupById(args)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
 
 	local matchGroupType = matches[1].bracketData.type
+
+	if Logic.readBool(args.forceMatchList) then
+		matchGroupType = 'matchlist'
+		Array.forEach(matches, function(match)
+			match.bracketData.header = match.bracketData.header
+				and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
+		end)
+	end
 
 	local config
 	if matchGroupType == 'matchlist' then
