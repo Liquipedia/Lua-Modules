@@ -52,24 +52,37 @@ end
 
 function CustomMatchSummary._createPointsDistributionTable(match)
 	local wrapper = mw.html.create(nil)
-	local scoring = match.extradata.scoring
+	local scoring = Table.copy(match.extradata.scoring)
 	wrapper:tag('h5'):addClass('panel-content__button'):addClass('is--collapsed'):attr('tabindex', 0):wikitext('Points Distribution')
 
-	local pointsList = wrapper:tag('div')
-	pointsList:addClass('panel-content__container'):addClass('is--hidden'):attr('id', 'panelContent1'):attr('role', 'tabpanel'):attr('hidden')
-	pointsList:tag('div'):wikitext('1 kill ', Table.extract(scoring, 'kill'), ' kill point')
+	local function createItem(icon, title, desc)
+		return mw.html.create('li'):addClass('panel-content__points-distribution__list-item')
+				:tag('span'):addClass('panel-content__points-distribution__icon'):tag('i'):addClass(icon):allDone()
+				:tag('span'):addClass('panel-content__points-distribution__title'):wikitext(title):allDone()
+				:tag('span'):wikitext(desc):allDone()
+	end
+
+	local pointDist = wrapper:tag('div')
+	pointDist:addClass('panel-content__container'):addClass('is--hidden'):attr('id', 'panelContent1'):attr('role', 'tabpanel'):attr('hidden')
+
+	local pointsList = pointDist:tag('ul'):addClass('panel-content__points-distribution')
+	pointsList:node(createItem('fas fa-skull', '1 kill', (Table.extract(scoring, 'kill') or '') .. ' kill point'))
+
 	local points = Table.groupBy(scoring, function (_, value)
 		return value
 	end)
 	for point, placements in Table.iter.spairs(points, function (_, a, b)
 		return a > b
 	end) do
+		-- TODO: Trophy Icon for 1st to 3rd place
+		local title
 		if Table.size(placements) == 1 then
-			pointsList:tag('div'):wikitext(Array.extractKeys(placements)[1], ' ', point, ' placement points')
+			title = Array.extractKeys(placements)[1]
 		else
 			local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-			pointsList:tag('div'):wikitext(placementRange[1], ' - ', placementRange[#placementRange], ' ', point, ' placement points')
+			title = placementRange[1] .. ' - ' .. placementRange[#placementRange]
 		end
+		pointsList:node(createItem('', title, point .. ' placement points'))
 	end
 	return wrapper
 end
@@ -80,8 +93,15 @@ function CustomMatchSummary._createOverallPage(match)
 	infoArea:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Schedule')
 	local schedule = infoArea:tag('div')
 	schedule:addClass('panel-content__container'):attr('id', 'panelContent1'):attr('role', 'tabpanel')
+	local scheduleList = schedule:tag('ul'):addClass('panel-content__game-schedule')
 	for idx, game in ipairs(match.games) do
-		schedule:tag('div'):wikitext('Game ', idx, ': '):node(CustomMatchSummary._gameCountdown(game))
+		scheduleList:tag('li')
+				:tag('i'):addClass('fas fa-check'):addClass('panel-content__game-schedule__icon'):addClass('icon--green'):done() -- TODO: Update based status
+				-- finished: fa-check with class icon--green
+				-- ongoing: fa-circle with class icon--red
+				-- upcoming: fa-clock
+				:tag('span'):addClass('panel-content__game-schedule__title'):wikitext('Game ', idx, ':'):done()
+				:node(CustomMatchSummary._gameCountdown(game)):done()
 	end
 
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
@@ -306,10 +326,7 @@ function CustomMatchSummary._gameCountdown(game)
 		date = dateString,
 		finished = game.finished and 'true' or nil,
 	})
-	return mw.html.create('div'):addClass('match-countdown-block')
-		:css('text-align', 'center')
-		-- Workaround for .brkts-popup-body-element > * selector
-		:css('display', 'block')
+	return mw.html.create('div'):addClass('panel-content__game-schedule__countdown'):addClass('match-countdown-block')
 		:node(require('Module:Countdown')._create(stream))
 end
 
