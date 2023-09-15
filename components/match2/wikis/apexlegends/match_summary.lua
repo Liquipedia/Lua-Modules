@@ -17,6 +17,7 @@ local Timezone = require('Module:Timezone')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -88,6 +89,11 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 end
 
 function CustomMatchSummary._createOverallPage(match)
+	local statusToIcon = {
+		finished = 'fas fa-check icon--green',
+		live = 'fas fa-circle icon--red',
+		upcoming = 'fa-clock',
+	}
 	local infoArea = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel1')
 	-- Schedule
 	infoArea:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Schedule')
@@ -95,11 +101,16 @@ function CustomMatchSummary._createOverallPage(match)
 	schedule:addClass('panel-content__container'):attr('id', 'panelContent1'):attr('role', 'tabpanel')
 	local scheduleList = schedule:tag('ul'):addClass('panel-content__game-schedule')
 	for idx, game in ipairs(match.games) do
+		local icon
+		if match.finished then
+			icon = statusToIcon.finished
+		elseif NOW > match.timestamp then
+			icon = statusToIcon.live
+		else
+			icon = statusToIcon.upcoming
+		end
 		scheduleList:tag('li')
-				:tag('i'):addClass('fas fa-check'):addClass('panel-content__game-schedule__icon'):addClass('icon--green'):done() -- TODO: Update based status
-				-- finished: fa-check with class icon--green
-				-- ongoing: fa-circle with class icon--red
-				-- upcoming: fa-clock
+				:tag('i'):addClass(icon):addClass('panel-content__game-schedule__icon'):done()
 				:tag('span'):addClass('panel-content__game-schedule__title'):wikitext('Game ', idx, ':'):done()
 				:node(CustomMatchSummary._gameCountdown(game)):done()
 	end
