@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Namespace = require('Module:Namespace')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
@@ -18,6 +19,12 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
+local modeAvailability = {
+	home 	= {order = 1, name = 'Home Village'},
+	builder = {order = 2, name = 'Builder Base'},
+	clan 	= {order = 3, name = 'Clan Capital'},
+	}
+
 ---@class CustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
 
@@ -25,7 +32,7 @@ local CustomBuilding = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _pagename = mw.title.getCurrentTitle().text
+local PAGENAME = mw.title.getCurrentTitle().text
 
 ---@param frame Frame
 ---@return Html
@@ -53,11 +60,6 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Release Date', content = {_args.releasedate}}
 	)
 
-local modeAvailability = {
-		home = {order = 1, name = 'Home Village'},
-		builder = {order = 2, name = 'Builder Base'},
-		clan = {order = 3, name = 'Clan Capital'},
-	}
 	if Table.any(_args, function(key) return modeAvailability[key] end) then
 		table.insert(widgets, Title{name = 'Mode Availability'})
 		local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
@@ -72,6 +74,16 @@ end
 ---@return WidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
+end
+
+---@param args table
+---@return string[]
+function CustomBuilding:getWikiCategories(args)
+	local categories = {}
+	if Namespace.isMain() then
+		categories = {'Buildings'}
+	end
+	return categories
 end
 
 ---@param args table
