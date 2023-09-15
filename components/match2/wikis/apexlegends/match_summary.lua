@@ -19,6 +19,12 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
+local MATCH_STATUS_TO_ICON = {
+	finished = 'fas fa-check icon--green',
+	live = 'fas fa-circle icon--red',
+	upcoming = 'fa-clock',
+}
+
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
@@ -89,11 +95,6 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 end
 
 function CustomMatchSummary._createOverallPage(match)
-	local statusToIcon = {
-		finished = 'fas fa-check icon--green',
-		live = 'fas fa-circle icon--red',
-		upcoming = 'fa-clock',
-	}
 	local infoArea = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel1')
 	-- Schedule
 	infoArea:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Schedule')
@@ -101,16 +102,8 @@ function CustomMatchSummary._createOverallPage(match)
 	schedule:addClass('panel-content__container'):attr('id', 'panelContent1'):attr('role', 'tabpanel')
 	local scheduleList = schedule:tag('ul'):addClass('panel-content__game-schedule')
 	for idx, game in ipairs(match.games) do
-		local icon
-		if match.finished then
-			icon = statusToIcon.finished
-		elseif NOW > match.timestamp then
-			icon = statusToIcon.live
-		else
-			icon = statusToIcon.upcoming
-		end
 		scheduleList:tag('li')
-				:tag('i'):addClass(icon):addClass('panel-content__game-schedule__icon'):done()
+				:tag('i'):addClass(CustomMatchSummary._countdownIcon(game)):addClass('panel-content__game-schedule__icon'):done()
 				:tag('span'):addClass('panel-content__game-schedule__title'):wikitext('Game ', idx, ':'):done()
 				:node(CustomMatchSummary._gameCountdown(game)):done()
 	end
@@ -323,6 +316,21 @@ function CustomMatchSummary._createGameStandings(match, idx)
 		end
 	end
 	return wrapper
+end
+
+function CustomMatchSummary._countdownIcon(game)
+	local timestamp = Date.readTimestamp(game.date)
+	if not timestamp then
+		return
+	end
+
+	if game.winner then
+		return MATCH_STATUS_TO_ICON.finished
+	elseif NOW > timestamp then
+		return MATCH_STATUS_TO_ICON.live
+	else
+		return MATCH_STATUS_TO_ICON.upcoming
+	end
 end
 
 function CustomMatchSummary._gameCountdown(game)
