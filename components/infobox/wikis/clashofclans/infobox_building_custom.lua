@@ -19,7 +19,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local modeAvailability = {
+local MODE_AVAILABILITY = {
 	home 	= {order = 1, name = 'Home Village'},
 	builder = {order = 2, name = 'Builder Base'},
 	clan 	= {order = 3, name = 'Clan Capital'},
@@ -41,7 +41,6 @@ function CustomBuilding.run(frame)
 	_args = building.args
 	_args.informationType = 'Building'
 
-	building.getWikiCategories = CustomBuilding.getWikiCategories
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
 
@@ -60,10 +59,10 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Release Date', content = {_args.releasedate}}
 	)
 
-	if Table.any(_args, function(key) return modeAvailability[key] end) then
+	if Table.any(_args, function(key) return MODE_AVAILABILITY[key] end) then
 		table.insert(widgets, Title{name = 'Mode Availability'})
-		local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-		for key, item in Table.iter.spairs(modeAvailability, modeAvailabilityOrder) do
+		local MODE_AVAILABILITYOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
+		for key, item in Table.iter.spairs(MODE_AVAILABILITY, MODE_AVAILABILITYOrder) do
 			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
 		end
 	end
@@ -74,16 +73,6 @@ end
 ---@return WidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
-end
-
----@param args table
----@return string[]
-function CustomBuilding:getWikiCategories(args)
-	local categories = {}
-	if Namespace.isMain() then
-		categories = {'Buildings'}
-	end
-	return categories
 end
 
 ---@param args table
