@@ -90,10 +90,10 @@ end
 function CustomBuilding:setLpdbData(args)
 	local lpdbData = {
 		type = 'building',
-		name = args.name or _pagename,
+		name = args.name or PAGENAME,
 		image = args.image
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('building' .. (args.name or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('building' .. (args.name or PAGENAME), lpdbData)
 end
 
 return CustomBuilding
