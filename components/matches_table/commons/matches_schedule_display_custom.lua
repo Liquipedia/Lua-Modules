@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchesTable/Custom
+-- page=Module:MatchesScheduleDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
