@@ -273,6 +273,7 @@ function MatchesTable._buildOpponent(opponent, flip, side)
 		opponent = opponent,
 		teamStyle = 'short',
 		flip = flip,
+		abbreviateTbd = true,
 	})
 end
 
