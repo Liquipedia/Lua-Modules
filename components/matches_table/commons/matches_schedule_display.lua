@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchesTable
+-- page=Module:MatchesTabl
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
