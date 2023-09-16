@@ -60,8 +60,8 @@ function CustomInjector:addCustomCells(widgets)
 
 	if Table.any(_args, function(key) return MODE_AVAILABILITY[key] end) then
 		table.insert(widgets, Title{name = 'Mode Availability'})
-		local MODE_AVAILABILITYOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-		for key, item in Table.iter.spairs(MODE_AVAILABILITY, MODE_AVAILABILITYOrder) do
+		local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
+		for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
 			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
 		end
 	end
