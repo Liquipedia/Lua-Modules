@@ -125,14 +125,12 @@ function StatisticsPortal.topEarningsChart(args)
 		topEarningsList = StatisticsPortal._getTeams(
 			args.limit,
 			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
+			'earnings desc')
 	elseif config.opponentType == Opponent.solo then
 		topEarningsList = StatisticsPortal._getPlayers(
 			args.limit,
 			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
+			'earnings desc')
 	end
 
 	local yearSeriesData = Array.map(Array.range(config.startYear, CURRENT_YEAR), function(year)
