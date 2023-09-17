@@ -90,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {_args.history_odl}})
 		end
 		if not String.isEmpty(_args.history_irc) then
-			table.insert(widgets, Title{name = '[[Italian Rocket Championship|Italian Rocket Championship]] History'})
+			table.insert(widgets, Title{name = '[[Italian Rocket Championship]] History'})
 			table.insert(widgets, Center{content = {_args.history_irc}})
 		end
 		if not String.isEmpty(_args.history_elite_series) then
