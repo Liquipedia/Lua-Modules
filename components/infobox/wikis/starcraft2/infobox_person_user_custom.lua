@@ -11,8 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -26,16 +25,14 @@ local CustomInjector = Class.new(Injector)
 local _args
 
 function CustomUser.run(frame)
-	local user = User(frame)
+	local user = CustomPerson(frame)
 	user.args.informationType = user.args.informationType or 'User'
+	_user = user
 	_args = user.args
-	PersonSc2.setArgs(_args)
 
 	user.shouldStoreData = CustomUser.shouldStoreData
 	user.getStatusToStore = CustomUser.getStatusToStore
 	user.getPersonType = CustomUser.getPersonType
-
-	user.nameDisplay = PersonSc2.nameDisplay
 
 	user.createWidgetInjector = CustomUser.createWidgetInjector
 
@@ -45,7 +42,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
-			Cell{name = 'Race', content = {PersonSc2.getRaceData(_args.race or 'unknown')}}
+			Cell{name = 'Race', content = {_user:getRaceData(_args.race or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -78,7 +75,7 @@ function CustomInjector:addCustomCells()
 end
 
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = self:getAllArgsForBase(_args, 'fav-team-')
+	local foundArgs = _user:getAllArgsForBase(_args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do
@@ -90,7 +87,7 @@ function CustomUser:_getFavouriteTeams()
 end
 
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = self:getAllArgsForBase(_args, base)
+	local foundArgs = _user:getAllArgsForBase(_args, base)
 	table.insert(foundArgs, _args[default])
 	return foundArgs
 end
