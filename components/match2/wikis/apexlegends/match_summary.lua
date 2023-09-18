@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Ordinal = require('Module:Ordinal')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
@@ -149,7 +150,7 @@ local matchstuff = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.placement
+				return Ordinal.toOrdinal(opponent.placement)
 			end,
 		},
 	},
@@ -252,7 +253,7 @@ local gamestuff = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.placement
+				return Ordinal.toOrdinal(opponent.placement)
 			end,
 		},
 	},
