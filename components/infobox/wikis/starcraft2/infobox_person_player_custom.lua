@@ -561,7 +561,7 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, faction .. ' Players')
 	end
 
-	table.insert(categories, self:military(military).category)
+	table.insert(categories, self:military(_args.military).category)
 
 	return categories
 end
