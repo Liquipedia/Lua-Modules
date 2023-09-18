@@ -85,10 +85,10 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 		-- TODO: Trophy Icon for 1st to 3rd place
 		local title
 		if Table.size(placements) == 1 then
-			title = Array.extractKeys(placements)[1]
+			title = CustomMatchSummary._displayRank(Array.extractKeys(placements)[1])
 		else
 			local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-			title = placementRange[1] .. ' - ' .. placementRange[#placementRange]
+			title = CustomMatchSummary._displayRank(placementRange[1], placementRange[#placementRange])
 		end
 		pointsList:node(createItem('', title, point .. ' placement points'))
 	end
@@ -150,7 +150,7 @@ local matchstuff = {
 		},
 		row = {
 			value = function (opponent)
-				return Ordinal.toOrdinal(opponent.placement)
+				return CustomMatchSummary._displayRank(opponent.placement)
 			end,
 		},
 	},
@@ -253,7 +253,7 @@ local gamestuff = {
 		},
 		row = {
 			value = function (opponent)
-				return Ordinal.toOrdinal(opponent.placement)
+				return CustomMatchSummary._displayRank(opponent.placement)
 			end,
 		},
 	},
@@ -349,6 +349,19 @@ function CustomMatchSummary._gameCountdown(game)
 	})
 	return mw.html.create('div'):addClass('panel-content__game-schedule__countdown'):addClass('match-countdown-block')
 		:node(require('Module:Countdown')._create(stream))
+end
+
+---@param placementStart string|number|nil
+---@param placementEnd string|number|nil
+---@return string?
+function CustomMatchSummary._displayRank(placementStart, placementEnd)
+
+	local start = Ordinal.toOrdinal(placementStart)
+	if placementEnd and placementEnd > placementStart then
+		return start .. ' - ' .. Ordinal.toOrdinal(placementEnd)
+	end
+
+	return start
 end
 
 return CustomMatchSummary
