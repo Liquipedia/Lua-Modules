@@ -22,7 +22,7 @@ local MODE_AVAILABILITY = {
 	home 	= {order = 1, name = 'Home Village'},
 	builder = {order = 2, name = 'Builder Base'},
 	clan 	= {order = 3, name = 'Clan Capital'},
-	}
+}
 
 ---@class CustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
