@@ -134,7 +134,7 @@ function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	extradata.teamname = args.team
 	extradata.role = args.role
 	extradata.role2 = args.role2
-	extradata.militaryservice = self:military(military).storeValue
+	extradata.militaryservice = self:military(args.military).storeValue
 	extradata.activeplayer = not CustomPerson:getStatusToStore(args)
 		and CustomPerson._isPlayer(args)
 		and Variables.varDefault('isActive', '') or ''
