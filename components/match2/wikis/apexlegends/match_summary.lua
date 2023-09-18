@@ -207,11 +207,12 @@ function CustomMatchSummary._createOverallStandings(match)
 	for _, column in ipairs(matchstuff) do
 		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
-	for _, game in ipairs(match.games) do
+	for idx, game in ipairs(match.games) do
 		local gameHeader = header:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 		gameHeader:tag('div'):addClass('panel-table__cell-game'):addClass('cell--game-details')
-				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game Num'):done()
-				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date'):wikitext('Date'):done()
+				:tag('i'):addClass(CustomMatchSummary._countdownIcon(game)):addClass('cell--game-details-icon'):done()
+				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game ', idx):done()
+				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date'):node(CustomMatchSummary._gameCountdown(game)):done()
 		for _, column in ipairs(matchstuff.game) do
 			gameHeader:tag('div'):wikitext(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
 		end
