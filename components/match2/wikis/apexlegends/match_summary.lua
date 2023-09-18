@@ -12,7 +12,9 @@ local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
@@ -24,6 +26,13 @@ local MATCH_STATUS_TO_ICON = {
 	finished = 'fas fa-check icon--green',
 	live = 'fas fa-circle icon--red',
 	upcoming = 'fa-clock',
+}
+
+local PLACEMENT_BACKGROUND = {
+	'#FFF7D6',
+	'#E7EDEE',
+	'#EFEEE6',
+	'#FFEFD6',
 }
 
 function CustomMatchSummary.getByMatchId(args)
@@ -41,18 +50,19 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 function CustomMatchSummary._createHeader(match)
-	local function createHeader(title)
+	local function createHeader(title, icon)
 		return mw.html.create('li')
 				:addClass('panel-tabs__list-item')
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
-				:node(mw.html.create('h4'):addClass('panel-tabs__title'):wikitext(title))
+				:tag('i'):addClass(icon):done()
+				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
 	end
 	local header = mw.html.create('ul'):addClass('panel-tabs__list'):attr('role', 'tablist')
-	header:node(createHeader('Overall standings'))
+	header:node(createHeader('Overall standings', 'fad fa-list-ol '))
 
-	for idx in ipairs(match.games) do
-		header:node(createHeader('Game '.. idx))
+	for idx, game in ipairs(match.games) do
+		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game)))
 	end
 
 	return mw.html.create('div'):addClass('panel-tabs'):attr('role', 'tabpanel'):node(header)
@@ -82,7 +92,7 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 	for point, placements in Table.iter.spairs(points, function (_, a, b)
 		return a > b
 	end) do
-		-- TODO: Trophy Icon for 1st to 3rd place
+		-- TODO: Trophy Icon for 1st to 4th place
 		local title
 		if Table.size(placements) == 1 then
 			title = CustomMatchSummary._displayRank(Array.extractKeys(placements)[1])
@@ -121,9 +131,15 @@ function CustomMatchSummary._createGameTab(match, idx)
 	infoArea:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Game Details')
 	local gameDetails = infoArea:tag('div')
 	gameDetails:addClass('panel-content__container'):attr('id', 'panelContent1'):attr('role', 'tabpanel')
-	gameDetails:tag('div'):wikitext('Game ', idx, ': '):node(CustomMatchSummary._gameCountdown(game))
-	gameDetails:tag('div'):node(CustomMatchSummary._gameCountdown(game))
-	gameDetails:tag('div'):wikitext(game.map)
+	gameDetails:tag('div')
+			:tag('span')
+				:tag('i'):addClass(CustomMatchSummary._countdownIcon(game)):addClass('panel-content__game-schedule__icon'):done()
+				:wikitext('Game ', idx, ': '):done()
+			:node(CustomMatchSummary._gameCountdown(game))
+	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
+		gameDetails:tag('div'):node(CustomMatchSummary._gameCountdown(game))
+	end
+	gameDetails:tag('div'):wikitext(Page.makeInternalLink(game.map))
 
 	-- Help Text
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
@@ -183,6 +199,9 @@ local matchstuff = {
 				value = 'P',
 			},
 			row = {
+				class = function (opponent)
+					return PLACEMENT_BACKGROUND[opponent.placement]
+				end,
 				value = function (opponent)
 					return opponent.placement
 				end,
@@ -227,7 +246,7 @@ function CustomMatchSummary._createOverallStandings(match)
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 			for _, column in ipairs(matchstuff.game) do
-				gameRow:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell-game'):addClass(column.class)
+				gameRow:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell-game'):addClass(column.class):css('background', column.row.class and column.row.class(opponent))
 			end
 		end
 	end
@@ -320,17 +339,32 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	return wrapper
 end
 
-function CustomMatchSummary._countdownIcon(game)
+function CustomMatchSummary._isUpcoming(game)
 	local timestamp = Date.readTimestamp(game.date)
 	if not timestamp then
-		return
+		return false
 	end
+	return NOW < timestamp
+end
 
-	if game.winner then
+function CustomMatchSummary._isLive(game)
+	local timestamp = Date.readTimestamp(game.date)
+	if not timestamp then
+		return false
+	end
+	return not CustomMatchSummary._isFinished(game) and NOW >= timestamp
+end
+
+function CustomMatchSummary._isFinished(game)
+	return game.winner ~= nil
+end
+
+function CustomMatchSummary._countdownIcon(game)
+	if CustomMatchSummary._isFinished(game) then
 		return MATCH_STATUS_TO_ICON.finished
-	elseif NOW > timestamp then
+	elseif CustomMatchSummary._isLive(game) then
 		return MATCH_STATUS_TO_ICON.live
-	else
+	elseif CustomMatchSummary._isUpcoming(game) then
 		return MATCH_STATUS_TO_ICON.upcoming
 	end
 end
@@ -355,13 +389,23 @@ end
 ---@param placementEnd string|number|nil
 ---@return string?
 function CustomMatchSummary._displayRank(placementStart, placementEnd)
+	local places = {}
 
-	local start = Ordinal.toOrdinal(placementStart)
-	if placementEnd and placementEnd > placementStart then
-		return start .. ' - ' .. Ordinal.toOrdinal(placementEnd)
+	if placementStart then
+		table.insert(places, Ordinal.toOrdinal(placementStart))
 	end
 
-	return start
+	if placementStart and placementEnd and placementEnd > placementStart then
+		table.insert(places, Ordinal.toOrdinal(placementEnd))
+	end
+
+	--- Medal stuff should be a FA-icon instead, and not located here
+	local medal
+	if placementStart then
+		medal = MatchPlacement.MedalIcon{range = {placementStart, placementEnd}}
+	end
+
+	return (medal and tostring(medal) or '') .. table.concat(places, ' - ')
 end
 
 return CustomMatchSummary
