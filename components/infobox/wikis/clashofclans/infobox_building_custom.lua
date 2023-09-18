@@ -31,7 +31,6 @@ local CustomBuilding = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local PAGENAME = mw.title.getCurrentTitle().text
 
 ---@param frame Frame
 ---@return Html
