@@ -11,8 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -23,23 +22,18 @@ local CustomMapMaker = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _map_maker
 
 function CustomMapMaker.run(frame)
-	local player = Person(frame)
-	_args = player.args
-	PersonSc2.setArgs(_args)
+	local mapMaker = CustomPerson(frame)
+	_map_maker = mapMaker
+	_args = mapMaker.args
 
-	player.shouldStoreData = PersonSc2.shouldStoreData
-	player.getStatusToStore = PersonSc2.getStatusToStore
-	player.adjustLPDB = PersonSc2.adjustLPDB
-	player.getPersonType = PersonSc2.getPersonType
-	player.nameDisplay = PersonSc2.nameDisplay
+	mapMaker.calculateEarnings = CustomMapMaker.calculateEarnings
+	mapMaker.createBottomContent = CustomMapMaker.createBottomContent
+	mapMaker.createWidgetInjector = CustomMapMaker.createWidgetInjector
 
-	player.calculateEarnings = CustomMapMaker.calculateEarnings
-	player.createBottomContent = CustomMapMaker.createBottomContent
-	player.createWidgetInjector = CustomMapMaker.createWidgetInjector
-
-	return player:createInfobox()
+	return mapMaker:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -47,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown')}
+				content = {_map_maker:getRaceData(_args.race or 'unknown')}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -75,7 +69,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	return {
-		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Military Service', content = {_args.military}},
 	}
 end
 
