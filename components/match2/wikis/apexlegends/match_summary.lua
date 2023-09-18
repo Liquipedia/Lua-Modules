@@ -12,13 +12,15 @@ local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
 local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
@@ -28,11 +30,18 @@ local MATCH_STATUS_TO_ICON = {
 	upcoming = 'fa-clock',
 }
 
-local PLACEMENT_BACKGROUND = {
-	'#FFF7D6',
-	'#E7EDEE',
-	'#EFEEE6',
-	'#FFEFD6',
+local PLACEMENT_BG = {
+	'cell--gold',
+	'cell--silver',
+	'cell--bronze',
+	'cell--copper',
+}
+
+local TROPHY_COLOR = {
+	'icon--gold',
+	'icon--silver',
+	'icon--bronze',
+	'icon--copper',
 }
 
 function CustomMatchSummary.getByMatchId(args)
@@ -73,9 +82,9 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 	local scoring = Table.copy(match.extradata.scoring)
 	wrapper:tag('h5'):addClass('panel-content__button'):addClass('is--collapsed'):attr('tabindex', 0):wikitext('Points Distribution')
 
-	local function createItem(icon, title, desc)
+	local function createItem(icon, iconColor, title, desc)
 		return mw.html.create('li'):addClass('panel-content__points-distribution__list-item')
-				:tag('span'):addClass('panel-content__points-distribution__icon'):tag('i'):addClass(icon):allDone()
+				:tag('span'):addClass('panel-content__points-distribution__icon'):addClass(iconColor):tag('i'):addClass(icon):allDone()
 				:tag('span'):addClass('panel-content__points-distribution__title'):wikitext(title):allDone()
 				:tag('span'):wikitext(desc):allDone()
 	end
@@ -92,15 +101,17 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 	for point, placements in Table.iter.spairs(points, function (_, a, b)
 		return a > b
 	end) do
-		-- TODO: Trophy Icon for 1st to 4th place
-		local title
+		local title, icon, iconColor
 		if Table.size(placements) == 1 then
-			title = CustomMatchSummary._displayRank(Array.extractKeys(placements)[1])
+			local place = Array.extractKeys(placements)[1]
+			title = CustomMatchSummary._displayRank(place)
+			icon, iconColor = CustomMatchSummary._getIcon(place)
 		else
 			local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
 			title = CustomMatchSummary._displayRank(placementRange[1], placementRange[#placementRange])
+			icon, iconColor = CustomMatchSummary._getIcon(placementRange[1])
 		end
-		pointsList:node(createItem('', title, point .. ' placement points'))
+		pointsList:node(createItem(icon, iconColor, title, point .. ' placement points'))
 	end
 	return wrapper
 end
@@ -166,7 +177,10 @@ local matchstuff = {
 		},
 		row = {
 			value = function (opponent)
-				return CustomMatchSummary._displayRank(opponent.placement)
+				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+				return mw.html.create()
+						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
+						:tag('span'):addClass('panel-table__cell-rank__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},
@@ -177,7 +191,7 @@ local matchstuff = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.name
+				return CustomMatchSummary._displayTeam(opponent)
 			end,
 		},
 	},
@@ -200,10 +214,13 @@ local matchstuff = {
 			},
 			row = {
 				class = function (opponent)
-					return PLACEMENT_BACKGROUND[opponent.placement]
+					return PLACEMENT_BG[opponent.placement]
 				end,
 				value = function (opponent)
-					return opponent.placement
+					local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+					return mw.html.create()
+							:tag('i'):addClass('panel-table__cell-game__icon'):addClass(icon):addClass(color):done()
+							:tag('span'):addClass('panel-table__cell-game__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 				end,
 			},
 		},
@@ -234,19 +251,23 @@ function CustomMatchSummary._createOverallStandings(match)
 				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game ', idx):done()
 				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date'):node(CustomMatchSummary._gameCountdown(game)):done()
 		for _, column in ipairs(matchstuff.game) do
-			gameHeader:tag('div'):wikitext(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
+			gameHeader:tag('div'):node(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
 		end
 	end
 	for opponentIdx, opponentMatch in ipairs(match.opponents) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 		for _, column in ipairs(matchstuff) do
-			row:tag('div'):wikitext(column.row.value(opponentMatch)):addClass('panel-table__cell'):addClass(column.class)
+			row:tag('div'):node(column.row.value(opponentMatch)):addClass('panel-table__cell'):addClass(column.class)
 		end
 		for _, game in ipairs(match.games) do
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 			for _, column in ipairs(matchstuff.game) do
-				gameRow:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell-game'):addClass(column.class):css('background', column.row.class and column.row.class(opponent))
+				gameRow:tag('div')
+						:node(column.row.value(opponent))
+						:addClass('panel-table__cell-game')
+						:addClass(column.class)
+						:addClass(column.row.class and column.row.class(opponent) or nil)
 			end
 		end
 	end
@@ -272,7 +293,10 @@ local gamestuff = {
 		},
 		row = {
 			value = function (opponent)
-				return CustomMatchSummary._displayRank(opponent.placement)
+				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+				return mw.html.create()
+						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
+						:tag('span'):addClass('panel-table__cell-rank__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},
@@ -283,7 +307,7 @@ local gamestuff = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.name
+				return CustomMatchSummary._displayTeam(opponent)
 			end,
 		},
 	},
@@ -327,13 +351,13 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	local wrapper = mw.html.create('div'):addClass('panel-table')
 	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
 	for _, column in ipairs(gamestuff) do
-		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
+		header:tag('div'):node(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
 	for opponentIdx, opponentMatch in ipairs(match.opponents) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 		local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 		for _, column in ipairs(gamestuff) do
-			row:tag('div'):wikitext(column.row.value(opponent)):addClass('panel-table__cell'):addClass(column.class)
+			row:tag('div'):node(column.row.value(opponent)):addClass('panel-table__cell'):addClass(column.class)
 		end
 	end
 	return wrapper
@@ -399,13 +423,22 @@ function CustomMatchSummary._displayRank(placementStart, placementEnd)
 		table.insert(places, Ordinal.toOrdinal(placementEnd))
 	end
 
-	--- Medal stuff should be a FA-icon instead, and not located here
-	local medal
-	if placementStart then
-		medal = MatchPlacement.MedalIcon{range = {placementStart, placementEnd}}
-	end
+	return table.concat(places, ' - ')
+end
 
-	return (medal and tostring(medal) or '') .. table.concat(places, ' - ')
+function CustomMatchSummary._getIcon(place)
+	if TROPHY_COLOR[place] then
+		return 'fas fa-trophy', TROPHY_COLOR[place]
+	end
+end
+
+function CustomMatchSummary._displayTeam(opponent)
+	return OpponentDisplay.BlockOpponent{
+		opponent = opponent,
+		showLink = true,
+		overflow = 'ellipsis',
+		teamStyle = 'hybrid',
+	}
 end
 
 return CustomMatchSummary
