@@ -38,7 +38,6 @@ local PAGENAME = mw.title.getCurrentTitle().text
 function CustomBuilding.run(frame)
 	local building = Building(frame)
 	_args = building.args
-	_args.informationType = 'Building'
 
 	building.setLpdbData = CustomBuilding.setLpdbData
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
@@ -76,12 +75,13 @@ end
 
 ---@param args table
 function CustomBuilding:setLpdbData(args)
+	local name = args.name or mw.title.getCurrentTitle().text
 	local lpdbData = {
 		type = 'building',
-		name = args.name or PAGENAME,
+		name = name,
 		image = args.image
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('building' .. (args.name or PAGENAME), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('building' .. name, lpdbData)
 end
 
 return CustomBuilding
