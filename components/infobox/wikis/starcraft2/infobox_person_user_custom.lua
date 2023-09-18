@@ -18,11 +18,12 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
-local CustomUser = Class.new(User)
+local CustomUser = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _user
 
 function CustomUser.run(frame)
 	local user = CustomPerson(frame)
