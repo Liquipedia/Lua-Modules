@@ -172,7 +172,7 @@ function MatchFunctions.parseSetting(match)
 	}
 
 	Table.mergeInto(match.scoreSettings, Array.mapIndexes(function(idx)
-		return tonumber(match['p' .. idx])
+		return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 	end))
 
 	-- Up/Down colors and 
