@@ -25,6 +25,7 @@ function Class.new(base, init)
 
 	if not init and type(base) == 'function' then
 		init = base
+		base = nil
 	elseif type(base) == 'table' then
 		for index, value in pairs(base) do
 			instance[index] = value
@@ -37,16 +38,23 @@ function Class.new(base, init)
 	local metatable = {}
 
 	metatable.__call = function(class_tbl, ...)
-		local varArgs = {n = select('#', ...), ...}
 		local object = {}
 		setmetatable(object, instance)
 
-		Class.construct(instance, object, varArgs)
+		instance.init(object, ...)
 
 		return object
 	end
 
-	instance.init = init
+	instance.init = function(object, ...)
+		if base and base.init then
+			base.init(object, ...)
+		end
+		if init then
+			init(object, ...)
+		end
+	end
+
 	instance.export = function(options)
 		return Class.export(instance, options)
 	end
@@ -63,19 +71,6 @@ function Class.new(base, init)
 	end
 	setmetatable(instance, metatable)
 	return instance
-end
-
----Calls constructors recursively
----@param instance table
----@param object table
----@param varArgs table
-function Class.construct(instance, object, varArgs)
-	if instance._base then
-		Class.construct(instance._base, object, varArgs)
-	end
-	if instance.init then
-		instance.init(object, unpack(varArgs))
-	end
 end
 
 ---@generic T
