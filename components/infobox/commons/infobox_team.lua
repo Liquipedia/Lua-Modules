@@ -173,11 +173,12 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.created or args.disbanded then
+						if args.created or args.disbanded or args.reformed then
 							return {
 								Title{name = 'History'},
 								Cell{name = 'Created', content = {args.created}},
-								Cell{name = 'Disbanded', content = {args.disbanded}}
+								Cell{name = 'Disbanded', content = {args.disbanded}},
+								Cell{name = 'Reformed', content = {args.reformed}},
 							}
 						end
 					end
