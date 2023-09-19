@@ -47,7 +47,7 @@ function Class.new(base, init)
 	end
 
 	instance.init = function(object, ...)
-		if base and base.init then
+		if base then
 			base.init(object, ...)
 		end
 		if init then
