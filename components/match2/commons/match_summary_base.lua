@@ -9,7 +9,12 @@
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local VodLink = require('Module:VodLink')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -39,12 +44,12 @@ function Header:leftOpponent(content)
 end
 
 function Header:leftScore(content)
-	self.leftScore = content:addClass('brkts-popup-header-opponent-score-left')
+	self.leftScoreElement = content:addClass('brkts-popup-header-opponent-score-left')
 	return self
 end
 
 function Header:rightScore(content)
-	self.rightScore = content:addClass('brkts-popup-header-opponent-score-right')
+	self.rightScoreElement = content:addClass('brkts-popup-header-opponent-score-right')
 	return self
 end
 
@@ -89,9 +94,9 @@ end
 function Header:create()
 	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElement)
-		:node(self.leftScore or '')
+		:node(self.leftScoreElement or '')
 	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-		:node(self.rightScore or '')
+		:node(self.rightScoreElement or '')
 		:node(self.rightElement)
 	return self.root
 end
@@ -290,77 +295,38 @@ function Casters:create()
 		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
 end
 
-local MatchSummary = Class.new()
-MatchSummary.Header = Header
-MatchSummary.Body = Body
-MatchSummary.Comment = Comment
-MatchSummary.Row = Row
-MatchSummary.Footer = Footer
-MatchSummary.Break = Break
-MatchSummary.Mvp = Mvp
-MatchSummary.Casters = Casters
+local Match = Class.new(
+	function(self)
+		self.root = mw.html.create()
+	end
+)
 
-function MatchSummary:init(width)
-	self.root = mw.html.create('div')
-	self.root
-		:addClass('brkts-popup')
-		:css('width', width)
-	return self
-end
-
-function MatchSummary:header(header)
+function Match:header(header)
 	self.headerElement = header:create()
 	return self
 end
 
-function MatchSummary:body(body)
+function Match:body(body)
 	self.bodyElement = body:create()
 	return self
 end
 
-function MatchSummary:resetBody(resetBody)
-	self.resetBodyElement = resetBody:create()
-	return self
-end
-
-function MatchSummary:resetHeader(resetHeader)
-	self.resetHeaderNode = resetHeader:create()
-		:addClass('brkts-popup-header-reset')
-	return self
-end
-
-function MatchSummary:comment(comment)
+function Match:comment(comment)
 	self.commentElement = comment:create()
 	return self
 end
 
-function MatchSummary:footer(footer)
+function Match:footer(footer)
 	self.footerElement = footer:create()
 	return self
 end
 
-function MatchSummary._fallbackResetHeader()
-	return mw.html.create('div')
-		:addClass('brkts-popup-body-element brkts-popup-header-reset')
-		:css('margin','auto')
-		:css('font-weight', 'bold')
-		:wikitext('Reset match')
-end
-
-function MatchSummary:create()
+function Match:create()
 	self.root
 		:node(self.headerElement)
 		:node(Break():create())
 		:node(self.bodyElement)
 		:node(Break():create())
-
-	if self.resetBodyElement then
-		self.root
-			:node(self.resetHeaderNode or MatchSummary._fallbackResetHeader())
-			:node(Break():create())
-			:node(self.resetBodyElement)
-			:node(Break():create())
-	end
 
 	if self.commentElement ~= nil then
 		self.root
@@ -373,6 +339,157 @@ function MatchSummary:create()
 	end
 
 	return self.root
+end
+
+local MatchSummary = Class.new()
+MatchSummary.Header = Header
+MatchSummary.Body = Body
+MatchSummary.Comment = Comment
+MatchSummary.Row = Row
+MatchSummary.Footer = Footer
+MatchSummary.Break = Break
+MatchSummary.Mvp = Mvp
+MatchSummary.Casters = Casters
+MatchSummary.Match = Match
+
+function MatchSummary:init(width)
+	self.matches = {}
+	self.root = mw.html.create('div')
+		:addClass('brkts-popup')
+		:css('width', width)
+	return self
+end
+
+function MatchSummary:header(header)
+	self.headerElement = header:create()
+	return self
+end
+
+function MatchSummary:addMatch(match)
+	if not match then return self end
+
+	table.insert(self.matches, match:create())
+
+	return self
+end
+
+function MatchSummary:create()
+	self.root:node(self.headerElement)
+
+	for _, match in ipairs(self.matches) do
+		self.root:node(match)
+	end
+
+	return self.root
+end
+
+---Default header function
+---@param match table
+---@param options {noScore: boolean?}?
+---@return MatchSummaryHeader
+function MatchSummary.createDefaultHeader(match, options)
+	options = options or {}
+
+	local header = MatchSummary.Header()
+
+	if options.noScore then
+		return header
+			:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+			:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+	end
+
+	return header
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+		:leftScore(header:createScore(match.opponents[1]))
+		:rightScore(header:createScore(match.opponents[2]))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+end
+
+---Creates a match footer with vods if vods are set
+---@param match table
+---@return MatchSummaryFooter?
+function MatchSummary.createVodFooter(match)
+	local vods = {}
+	for index, game in ipairs(match.games) do
+		if game.vod then
+			vods[index] = game.vod
+		end
+	end
+
+	if Table.isEmpty(vods) and not match.vod then
+		return
+	end
+
+	local footer = MatchSummary.Footer()
+	if match.vod then
+		footer:addElement(VodLink.display{
+			vod = match.vod,
+		})
+	end
+	for index, vod in pairs(vods) do
+		footer:addElement(VodLink.display{
+			gamenum = index,
+			vod = vod,
+		})
+	end
+
+	return footer
+end
+
+---Default createMatch function for usage in Custom MatchSummary
+---@param matchData table
+---@param CustomMatchSummary table
+---@return MatchSummaryMatch?
+function MatchSummary.createMatch(matchData, CustomMatchSummary)
+	if not matchData then
+		return
+	end
+
+	local match = Match()
+
+	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
+	match:header(createHeader(matchData))
+
+	match:body(CustomMatchSummary.createBody(matchData))
+
+	if matchData.comment then
+		local comment = MatchSummary.Comment():content(matchData.comment)
+		match:comment(comment)
+	end
+	local createFooter = CustomMatchSummary.createFooter or MatchSummary.createVodFooter
+	local footer = createFooter(matchData)
+	if footer then
+		match:footer(footer)
+	end
+
+	return match
+end
+
+---Default getByMatchId function for usage in Custom MatchSummary
+---@param CustomMatchSummary table
+---@param args table
+---@return Html
+function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
+
+	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+
+	local matchSummary = MatchSummary():init()
+
+	--additional header for when martin adds the the css and buttons for switching between match and reset match
+	--if bracketResetMatch then
+		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
+		--matchSummary:header(createHeader(match, {noScore = true}))
+		--here martin can add the buttons for switching between match and reset match
+	--end
+
+	local createMatch = CustomMatchSummary.createMatch or function(matchData)
+		return MatchSummary.createMatch(matchData, CustomMatchSummary)
+	end
+	matchSummary:addMatch(createMatch(match))
+	matchSummary:addMatch(createMatch(bracketResetMatch))
+
+	return matchSummary:create()
 end
 
 return MatchSummary
