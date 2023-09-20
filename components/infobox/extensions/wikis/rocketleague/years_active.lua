@@ -25,8 +25,6 @@ local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEna
 CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 6
 CustomActiveYears.additionalConditions = ''
 
-local _TALENT_POSITIONS = mw.loadData('Module:BroadcastPositions').TalentPositions
-
 -- legacy entry point
 function CustomActiveYears.get(input)
 	-- if invoked directly input == args
@@ -38,7 +36,7 @@ end
 
 function CustomActiveYears.getTalent(talent)
 	return CustomActiveYears._getBroadcaster(
-		CustomActiveYears._getBroadcastConditions(talent, _TALENT_POSITIONS)
+		CustomActiveYears._getBroadcastConditions(talent)
 	)
 end
 
@@ -46,11 +44,14 @@ function CustomActiveYears._getBroadcastConditions(broadcaster, positions)
 	broadcaster = mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster)
 
 	-- Add a condition for each broadcaster position
-	local positionTree = ConditionTree(BooleanOperator.any)
-	for _, position in pairs(positions) do
-		positionTree:add(
-			ConditionNode(ColumnName('position'), Comparator.eq, position)
-		)
+	local positionTree
+	if positions then
+		positionTree = ConditionTree(BooleanOperator.any)
+		for _, position in pairs(positions) do
+			positionTree:add(
+				ConditionNode(ColumnName('position'), Comparator.eq, position)
+			)
+		end
 	end
 
 	local tree = ConditionTree(BooleanOperator.all):add({
