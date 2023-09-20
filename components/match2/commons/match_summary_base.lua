@@ -20,6 +20,9 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+---just a base class to avoid anno warnings
+---@class MatchSummaryRowInterfance
+---@field create fun(self): Html
 
 ---@class MatchSummaryBreak
 ---@operator call: MatchSummaryBreak
@@ -130,7 +133,7 @@ function Header:create()
 			:done()
 end
 
----@class MatchSummaryRow
+---@class MatchSummaryRow: MatchSummaryRowInterfance
 ---@operator call: MatchSummaryRow
 ---@field root Html
 ---@field elements Html[]
@@ -173,7 +176,7 @@ function Row:create()
 	return self.root
 end
 
----@class MatchSummaryMvp
+---@class MatchSummaryMvp: MatchSummaryRowInterfance
 ---@operator call: MatchSummaryMvp
 ---@field root Html
 ---@field players Html[]
@@ -235,9 +238,8 @@ local Body = Class.new(
 	end
 )
 
----@param row MatchSummaryRow
+---@param row MatchSummaryRowInterfance
 ---@return MatchSummaryBody
----@overload fun(any): MatchSummaryBody #for Mvp, Casters and wiki custom classes to be put into `:addRow`
 function Body:addRow(row)
 	self.root:node(row:create())
 	return self
@@ -342,7 +344,7 @@ function Footer:create()
 end
 
 ---MatchSummary Casters Class
----@class MatchSummaryCasters
+---@class MatchSummaryCasters: MatchSummaryRowInterfance
 ---@operator call: MatchSummaryCasters
 ---@field root Html
 ---@field casters string[]
