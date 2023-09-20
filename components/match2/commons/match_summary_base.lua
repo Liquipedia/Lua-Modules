@@ -21,7 +21,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---just a base class to avoid anno warnings
----@class MatchSummaryRowInterfance
+---@class MatchSummaryRowInterface
 ---@field create fun(self): Html
 
 ---@class MatchSummaryBreak
@@ -133,7 +133,7 @@ function Header:create()
 			:done()
 end
 
----@class MatchSummaryRow: MatchSummaryRowInterfance
+---@class MatchSummaryRow: MatchSummaryRowInterface
 ---@operator call: MatchSummaryRow
 ---@field root Html
 ---@field elements Html[]
@@ -176,7 +176,7 @@ function Row:create()
 	return self.root
 end
 
----@class MatchSummaryMvp: MatchSummaryRowInterfance
+---@class MatchSummaryMvp: MatchSummaryRowInterface
 ---@operator call: MatchSummaryMvp
 ---@field root Html
 ---@field players Html[]
@@ -238,7 +238,7 @@ local Body = Class.new(
 	end
 )
 
----@param row MatchSummaryRowInterfance
+---@param row MatchSummaryRowInterface
 ---@return MatchSummaryBody
 function Body:addRow(row)
 	self.root:node(row:create())
@@ -344,7 +344,7 @@ function Footer:create()
 end
 
 ---MatchSummary Casters Class
----@class MatchSummaryCasters: MatchSummaryRowInterfance
+---@class MatchSummaryCasters: MatchSummaryRowInterface
 ---@operator call: MatchSummaryCasters
 ---@field root Html
 ---@field casters string[]

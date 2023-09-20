@@ -43,7 +43,7 @@ local CustomMatchSummary = {}
 
 
 -- Brawler Pick/Ban Class
----@class BrawlstarsMatchSummaryBrawler: MatchSummaryRowInterfance
+---@class BrawlstarsMatchSummaryBrawler: MatchSummaryRowInterface
 ---@operator call: BrawlstarsMatchSummaryBrawler
 ---@field root Html
 ---@field table Html
