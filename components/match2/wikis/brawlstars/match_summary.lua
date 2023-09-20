@@ -43,6 +43,11 @@ local CustomMatchSummary = {}
 
 
 -- Brawler Pick/Ban Class
+---@class BrawlstarsMatchSummaryBrawler: MatchSummaryRowInterfance
+---@operator call: BrawlstarsMatchSummaryBrawler
+---@field root Html
+---@field table Html
+---@field isBan boolean?
 local Brawler = Class.new(
 	function(self, options)
 		options = options or {}
@@ -54,6 +59,7 @@ local Brawler = Class.new(
 	end
 )
 
+---@return BrawlstarsMatchSummaryBrawler
 function Brawler:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','35%'):wikitext(''):done()
@@ -64,6 +70,12 @@ function Brawler:createHeader()
 	return self
 end
 
+---@param brawlerData {[1]: table<integer, string>, [2]: table<integer, string>, numberOfPicks: integer}
+---@param gameNumber integer
+---@param numberBrawlers integer
+---@param date string
+---@param firstPick integer?
+---@return BrawlstarsMatchSummaryBrawler
 function Brawler:row(brawlerData, gameNumber, numberBrawlers, date, firstPick)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
@@ -86,6 +98,9 @@ function Brawler:row(brawlerData, gameNumber, numberBrawlers, date, firstPick)
 	return self
 end
 
+---@param firstPick integer?
+---@param side integer
+---@return string?
 function Brawler._firstPick(firstPick, side)
 	if firstPick ~= side then
 		return nil
@@ -94,6 +109,11 @@ function Brawler._firstPick(firstPick, side)
 	return side == LEFT_SIDE and ARROW_LEFT or ARROW_RIGHT
 end
 
+---@param brawlerData table<integer, string>
+---@param numberOfBrawlers integer
+---@param flip boolean
+---@param date string
+---@return Html
 function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, date)
 	local opponentBrawlerDisplay = {}
 
@@ -131,14 +151,20 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 	return display
 end
 
+---@return Html
 function Brawler:create()
 	return self.root
 end
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
+---@param match table
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
@@ -147,6 +173,8 @@ function CustomMatchSummary.addToFooter(match, footer)
 	return footer:addLinks(LINK_DATA, match.links)
 end
 
+---@param match table
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
@@ -241,11 +269,16 @@ function CustomMatchSummary.createBody(match)
 	return body
 end
 
+---@param game table
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
 	return htmlCreate('div'):wikitext(score)
 end
 
+---@param game table
+---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
@@ -298,14 +331,19 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
+---@param game table
+---@return string
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 	if String.isNotEmpty(game.extradata.maptype) then
-		mapDisplay = MapTypeIcon.display(game.extradata.maptype) .. mapDisplay
+		return MapTypeIcon.display(game.extradata.maptype) .. mapDisplay
 	end
 	return mapDisplay
 end
 
+---@param showIcon boolean
+---@param iconType string
+---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = htmlCreate('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
