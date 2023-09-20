@@ -213,14 +213,15 @@ end
 local Footer = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-footer')
+			:addClass('brkts-popup-footer')
 		self.inner = mw.html.create('div')
-		self.inner:addClass('brkts-popup-spaced vodlink')
+			:addClass('brkts-popup-spaced vodlink')
+		self.elements = {}
 	end
 )
 
 function Footer:addElement(element)
-	self.inner:node(element)
+	table.insert(self.elements, element)
 	return self
 end
 
@@ -233,7 +234,7 @@ function Footer:addLink(link, icon, iconDark, text)
 			.. '[['..iconDark..'|link='..link..'|32px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
 	end
 
-	self.inner:wikitext(content)
+	table.insert(self.elements, content)
 	return self
 end
 
@@ -251,6 +252,12 @@ function Footer:addLinks(linkData, links)
 end
 
 function Footer:create()
+	if Table.isEmpty(self.elements) then
+		return
+	end
+	for _, element in ipairs(self.elements) do
+		self.inner:node(element)
+	end
 	self.root:node(self.inner)
 	return self.root
 end
@@ -407,8 +414,9 @@ end
 
 ---Creates a match footer with vods if vods are set
 ---@param match table
+---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter?
-function MatchSummary.createVodFooter(match)
+function MatchSummary.addVodsToFooter(match, footer)
 	local vods = {}
 	for index, game in ipairs(match.games) do
 		if game.vod then
@@ -416,11 +424,6 @@ function MatchSummary.createVodFooter(match)
 		end
 	end
 
-	if Table.isEmpty(vods) and not match.vod then
-		return
-	end
-
-	local footer = MatchSummary.Footer()
 	if match.vod then
 		footer:addElement(VodLink.display{
 			vod = match.vod,
@@ -456,11 +459,8 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary)
 		local comment = MatchSummary.Comment():content(matchData.comment)
 		match:comment(comment)
 	end
-	local createFooter = CustomMatchSummary.createFooter or MatchSummary.createVodFooter
-	local footer = createFooter(matchData)
-	if footer then
-		match:footer(footer)
-	end
+	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.addVodsToFooter
+	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
 	return match
 end

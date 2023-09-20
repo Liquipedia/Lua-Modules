@@ -139,16 +139,10 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
-function CustomMatchSummary.createFooter(match)
-	local footer = MatchSummary.createVodFooter(match)
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	match.links.lrthread = match.lrthread
-
-	if Table.isEmpty(match.links) then
-		return footer
-	end
-
-	footer = footer or MatchSummary.Footer()
+	match.links.lrthread = match.links.lrthread or match.lrthread
 
 	return footer:addLinks(LINK_DATA, match.links)
 end
