@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Matches = require('Module:Matches_Player')
 local Namespace = require('Module:Namespace')
@@ -52,14 +53,11 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
-function CustomInjector:_parseActive(manualInput, autoFunction, autoFunctionParam)
-	if String.isEmpty(manualInput) then
-		return autoFunction(autoFunctionParam)
-	elseif manualInput:lower() == 'hide' then
-		return
-	else
-		return manualInput
+function CustomInjector:_parseActive(manualInput, varName, autoFunction, autoFunctionParam)
+	if String.isNotEmpty(manualInput) then
+		return manualInput:lower() ~= 'hide' and manualInput or nil
 	end
+	return Logic.readBool(Variables.varDefault(varName)) and autoFunction(autoFunctionParam) or nil
 end
 
 function CustomInjector:parse(id, widgets)
@@ -68,13 +66,13 @@ function CustomInjector:parse(id, widgets)
 
 		-- Years active
 		local yearsActive = CustomInjector:_parseActive(
-			_args.years_active, YearsActive.get, {player = _base_page_name}
+			_args.years_active, 'role_player', YearsActive.get, {player = _args.id}
 		)
 		local yearsActiveCoach = CustomInjector:_parseActive(
-			_args.years_active_coach, YearsActive.get, {player = _base_page_name, prefix = 'c'}
+			_args.years_active_coach, 'role_coach', YearsActive.get, {player = _args.id, prefix = 'c'}
 		)
 		local yearsActiveTalent = CustomInjector:_parseActive(
-			_args.years_active_talent, YearsActive.getTalent, _base_page_name
+			_args.years_active_talent, 'role_talent', YearsActive.getTalent, _args.id
 		)
 
 		return {
