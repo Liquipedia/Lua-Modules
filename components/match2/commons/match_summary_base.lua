@@ -20,44 +20,68 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+
+---@class MatchSummaryBreak
+---@operator call: MatchSummaryBreak
+---@field root Html
 local Break = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-break')
 	end
 )
 
+---@return Html
 function Break:create()
 	return self.root
 end
 
+---@class MatchSummaryHeader
+---@operator call: MatchSummaryHeader
+---@field root Html
+---@field leftElement string|Html|number|nil
+---@field leftScoreElement Html?
+---@field rightElement string|Html|number|nil
+---@field rightScoreElement Html?
 local Header = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-header-dev')
-		self.root:css('justify-content', 'center')
+			:addClass('brkts-popup-header-dev')
+			:css('justify-content', 'center')
 	end
 )
 
+---@param content string|Html|number|nil
+---@return MatchSummaryHeader
 function Header:leftOpponent(content)
 	self.leftElement = content
 	return self
 end
 
+---@param content Html
+---@return MatchSummaryHeader
 function Header:leftScore(content)
 	self.leftScoreElement = content:addClass('brkts-popup-header-opponent-score-left')
 	return self
 end
 
+---@param content Html
+---@return MatchSummaryHeader
 function Header:rightScore(content)
 	self.rightScoreElement = content:addClass('brkts-popup-header-opponent-score-right')
 	return self
 end
 
+---@param content string|Html|number|nil
+---@return MatchSummaryHeader
 function Header:rightOpponent(content)
 	self.rightElement = content
 	return self
 end
 
+---@param opponent standardOpponent
+---@param side 'left'|'right'
+---@param style teamStyle?
+---@return Html
 function Header:createOpponent(opponent, side, style)
 	local showLink = not Opponent.isTbd(opponent) and true or false
 	return OpponentDisplay.BlockOpponent{
@@ -69,6 +93,8 @@ function Header:createOpponent(opponent, side, style)
 	}
 end
 
+---@param opponent standardOpponent
+---@return Html
 function Header:createScore(opponent)
 	local isWinner, scoreText
 	if opponent.placement2 then
@@ -91,16 +117,22 @@ function Header:createScore(opponent)
 	}
 end
 
+---@return Html
 function Header:create()
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-		:node(self.leftElement)
-		:node(self.leftScoreElement or '')
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-		:node(self.rightScoreElement or '')
-		:node(self.rightElement)
 	return self.root
+		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
+			:node(self.leftElement)
+			:node(self.leftScoreElement or '')
+			:done()
+		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
+			:node(self.rightScoreElement or '')
+			:node(self.rightElement)
 end
 
+---@class MatchSummaryRow
+---@operator call: MatchSummaryRow
+---@field root Html
+---@field elements Html[]
 local Row = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -109,21 +141,29 @@ local Row = Class.new(
 	end
 )
 
+---@param class string?
+---@return MatchSummaryRow
 function Row:addClass(class)
 	self.root:addClass(class)
 	return self
 end
 
+---@param name string
+---@param value string|number|nil
+---@return MatchSummaryRow
 function Row:css(name, value)
 	self.root:css(name, value)
 	return self
 end
 
+---@param element Html
+---@return MatchSummaryRow
 function Row:addElement(element)
 	table.insert(self.elements, element)
 	return self
 end
 
+---@return Html
 function Row:create()
 	for _, element in pairs(self.elements) do
 		self.root:node(element)
@@ -132,6 +172,10 @@ function Row:create()
 	return self.root
 end
 
+---@class MatchSummaryMvp
+---@operator call: MatchSummaryMvp
+---@field root Html
+---@field players Html[]
 local Mvp = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
@@ -139,6 +183,8 @@ local Mvp = Class.new(
 	end
 )
 
+---@param player table
+---@return MatchSummaryMvp
 function Mvp:addPlayer(player)
 	local playerDisplay
 	if Logic.isEmpty(player) then
@@ -157,6 +203,8 @@ function Mvp:addPlayer(player)
 	return self
 end
 
+---@param points number
+---@return MatchSummaryMvp
 function Mvp:setPoints(points)
 	if Logic.isNumeric(points) then
 		self.points = points
@@ -164,6 +212,7 @@ function Mvp:setPoints(points)
 	return self
 end
 
+---@return Html
 function Mvp:create()
 	local span = mw.html.create('span')
 	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
@@ -175,6 +224,9 @@ function Mvp:create()
 	return self.root
 end
 
+---@class MatchSummaryBody
+---@operator call: MatchSummaryBody
+---@field root Html
 local Body = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -182,34 +234,47 @@ local Body = Class.new(
 	end
 )
 
+---@param row MatchSummaryRow
+---@return MatchSummaryBody
 function Body:addRow(row)
 	self.root:node(row:create())
 	return self
 end
 
+---@return Html
 function Body:create()
 	return self.root
 end
 
+---@class MatchSummaryComment
+---@operator call: MatchSummaryComment
+---@field root Html
 local Comment = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
-		self.root
 			:addClass('brkts-popup-comment')
 			:css('white-space', 'normal')
 			:css('font-size', '85%')
 	end
 )
 
+---@param content Html|string|number
+---@return MatchSummaryComment
 function Comment:content(content)
 	self.root:node(content):node(Break():create())
 	return self
 end
 
+---@return Html
 function Comment:create()
 	return self.root
 end
 
+---@class MatchSummaryFooter
+---@operator call: MatchSummaryFooter
+---@field root Html
+---@field inner Html
+---@field elements (Html|string)[]
 local Footer = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -220,24 +285,35 @@ local Footer = Class.new(
 	end
 )
 
+---@param element Html
+---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
 	return self
 end
 
+---@param link string
+---@param icon string
+---@param iconDark string?
+---@param text string
+---@return MatchSummaryFooter
 function Footer:addLink(link, icon, iconDark, text)
 	local content
 	if String.isEmpty(iconDark) then
-		content = '[['..icon..'|link='..link..'|32px|'..text..'|alt=' .. link .. ']]'
+		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. ']]'
 	else
-		content = '[['..icon..'|link='..link..'|32px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
-			.. '[['..iconDark..'|link='..link..'|32px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
+		---@cast iconDark -nil
+		content = '[[' .. icon .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-light-mode]]'
+			.. '[[' .. iconDark .. '|link=' .. link .. '|32px|' .. text .. '|alt=' .. link .. '|class=show-when-dark-mode]]'
 	end
 
 	table.insert(self.elements, content)
 	return self
 end
 
+---@param linkData table<string, {icon: string, text: string, iconDark: string?}>
+---@param links table<string, string>
+---@return MatchSummaryFooter
 function Footer:addLinks(linkData, links)
 	for linkType, link in pairs(links) do
 		local currentLinkData = linkData[linkType]
@@ -251,6 +327,7 @@ function Footer:addLinks(linkData, links)
 	return self
 end
 
+---@return Html?
 function Footer:create()
 	if Table.isEmpty(self.elements) then
 		return
@@ -302,32 +379,48 @@ function Casters:create()
 		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
 end
 
+---@class MatchSummaryMatch
+---@operator call: MatchSummaryMatch
+---@field root Html
+---@field headerElement Html?
+---@field bodyElement Html?
+---@field commentElement Html?
+---@field footerElement Html?
 local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
 )
 
+---@param header MatchSummaryHeader
+---@return MatchSummaryMatch
 function Match:header(header)
 	self.headerElement = header:create()
 	return self
 end
 
+---@param body MatchSummaryBody
+---@return MatchSummaryMatch
 function Match:body(body)
 	self.bodyElement = body:create()
 	return self
 end
 
+---@param comment MatchSummaryComment
+---@return MatchSummaryMatch
 function Match:comment(comment)
 	self.commentElement = comment:create()
 	return self
 end
 
+---@param footer MatchSummaryFooter
+---@return MatchSummaryMatch
 function Match:footer(footer)
 	self.footerElement = footer:create()
 	return self
 end
 
+---@return Html
 function Match:create()
 	self.root
 		:node(self.headerElement)
@@ -348,6 +441,19 @@ function Match:create()
 	return self.root
 end
 
+---@class MatchSummary
+---@field Header MatchSummaryHeader
+---@field Body MatchSummaryBody
+---@field Comment MatchSummaryComment
+---@field Row MatchSummaryRow
+---@field Footer MatchSummaryFooter
+---@field Break MatchSummaryBreak
+---@field Mvp MatchSummaryMvp
+---@field Casters MatchSummaryCasters
+---@field Match MatchSummaryMatch
+---@field matches Html[]?
+---@field headerElement Html?
+---@field root Html?
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
 MatchSummary.Body = Body
@@ -359,6 +465,8 @@ MatchSummary.Mvp = Mvp
 MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 
+---@param width string
+---@return MatchSummary
 function MatchSummary:init(width)
 	self.matches = {}
 	self.root = mw.html.create('div')
@@ -367,11 +475,15 @@ function MatchSummary:init(width)
 	return self
 end
 
+---@param header MatchSummaryHeader
+---@return MatchSummary
 function MatchSummary:header(header)
 	self.headerElement = header:create()
 	return self
 end
 
+---@param match MatchSummaryMatch
+---@return MatchSummary
 function MatchSummary:addMatch(match)
 	if not match then return self end
 
@@ -380,6 +492,7 @@ function MatchSummary:addMatch(match)
 	return self
 end
 
+---@return Html
 function MatchSummary:create()
 	self.root:node(self.headerElement)
 
@@ -415,7 +528,7 @@ end
 ---Creates a match footer with vods if vods are set
 ---@param match table
 ---@param footer MatchSummaryFooter
----@return MatchSummaryFooter?
+---@return MatchSummaryFooter
 function MatchSummary.addVodsToFooter(match, footer)
 	local vods = {}
 	for index, game in ipairs(match.games) do
