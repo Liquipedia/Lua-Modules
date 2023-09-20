@@ -41,7 +41,7 @@ function CustomActiveYears.getTalent(talent)
 end
 
 function CustomActiveYears._getBroadcastConditions(broadcaster, positions)
-	broadcaster = mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster)
+	broadcaster = mw.ext.TeamLiquidIntegration.resolve_redirect(broadcaster):gsub(' ', '_')
 
 	-- Add a condition for each broadcaster position
 	local positionTree
