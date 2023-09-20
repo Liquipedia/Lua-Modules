@@ -127,6 +127,7 @@ function Header:create()
 		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 			:node(self.rightScoreElement or '')
 			:node(self.rightElement)
+			:done()
 end
 
 ---@class MatchSummaryRow
