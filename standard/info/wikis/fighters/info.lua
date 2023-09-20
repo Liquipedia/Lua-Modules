@@ -1640,4 +1640,6 @@ return {
 	defaultGame = 'fighters',
 	defaultTeamLogo = 'Fighters default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Fighters default darkmode.png', ---@deprecated
+	opponentLibrary = 'Opponent/Custom',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
