@@ -55,7 +55,7 @@ end
 
 function CustomInjector:_parseActive(manualInput, varName, autoFunction, autoFunctionParam)
 	if String.isNotEmpty(manualInput) then
-		return manualInput:lower() ~= 'hide' and manualInput or nil
+		return manualInput:upper() ~= 'N/A' and manualInput or nil
 	end
 	return Logic.readBool(Variables.varDefault(varName)) and autoFunction(autoFunctionParam) or nil
 end
