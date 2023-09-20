@@ -236,6 +236,7 @@ local Body = Class.new(
 
 ---@param row MatchSummaryRow
 ---@return MatchSummaryBody
+---@overload fun(any): MatchSummaryBody #for Mvp, Casters and wiki custom classes to be put into `:addRow`
 function Body:addRow(row)
 	self.root:node(row:create())
 	return self
