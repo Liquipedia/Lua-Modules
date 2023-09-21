@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+-- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
+local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
