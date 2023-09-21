@@ -6,16 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
+local AnOrA = require('Module:A or an')
+local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Games = mw.loadData('Module:Games')
-local Variables = require('Module:Variables')
-local StringUtils = require('Module:StringUtils')
-local Class = require('Module:Class')
-local AnOrA = require('Module:A or an')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Tier = require('Module:Tier/Utils')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
+
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
 
 local MetadataGenerator = {}
 
@@ -64,12 +66,8 @@ function MetadataGenerator.tournament(args)
 	end
 
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
-	local prizepool = prizepoolusd or (
-		args.prizepool and args.localcurrency and (
-			Variables.varDefault('localcurrencysymbol', '') .. args.prizepool ..
-			Variables.varDefault('localcurrencysymbolafter', '') .. ' ' ..
-			Variables.varDefault('localcurrencycode', '')
-		)
+	local prizepool = prizepoolusd or (args.prizepool and args.localcurrency and
+		Currency.display(args.localcurrency, args.prizepool, {formatValue = true, useHtmlStyling = false})
 	)
 	local charity = args.charity == 'true'
 	local dateVerb = (tense == TIME_PAST and 'took place ')
@@ -81,7 +79,7 @@ function MetadataGenerator.tournament(args)
 		(tense == TIME_FUTURE and ' which will take place ') or
 		' taking place '
 
-	output = StringUtils.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
+	output = String.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
 		a = AnOrA._main{
 			tournamentType or locality or game or (charity and 'charity' or nil) or tierType,
@@ -102,12 +100,12 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. StringUtils.interpolate('This ${tier}${tierType} ', {
+	output = output .. String.interpolate('This ${tier}${tierType} ', {
 		tier = tierType ~= tier and (tier .. ' ') or '',
 		tierType = tierType
 	})
 	if not String.isEmpty(publisher) then
-		output = output .. StringUtils.interpolate('is a ${publisher}${tense}', {
+		output = output .. String.interpolate('is a ${publisher}${tense}', {
 			publisher = publisher,
 			tense = ((date and dateVerbPublisher) or ((teams or players or prizepool) and ' featuring '))
 		})
@@ -127,7 +125,7 @@ function MetadataGenerator.tournament(args)
 			(prizepool and ' ' or '')
 	end
 	if prizepool then
-		output = output .. StringUtils.interpolate('${competing}a total ${charity}prize pool of ${prizepool}', {
+		output = output .. String.interpolate('${competing}a total ${charity}prize pool of ${prizepool}', {
 			competing = (teams or players) and 'competing over ' or '',
 			charity = charity and 'charity ' or '',
 			prizepool = prizepool
