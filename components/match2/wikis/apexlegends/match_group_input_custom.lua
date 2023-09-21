@@ -377,20 +377,21 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 		if not teamData then
 			break
 		end
-		local score = NO_SCORE
 		local scoreBreakdown = {}
-		if Logic.isNumeric(teamData[1]) and Logic.isNumeric(teamData[2]) then
-			scoreBreakdown.placePoints = (scoreSettings[tonumber(teamData[1])] or 0)
-			scoreBreakdown.killPoints = tonumber(teamData[2]) * scoreSettings.kill
-			scoreBreakdown.kills = tonumber(teamData[2])
-			score = scoreBreakdown.placePoints + scoreBreakdown.killPoints
+		local placement, kills = tonumber(teamData[1]), tonumber(teamData[2])
+		if scoreBreakdown and kills then
+			scoreBreakdown.placePoints = scoreSettings[placement] or 0
+			scoreBreakdown.killPoints = kills * scoreSettings.kill
+			scoreBreakdown.kills = kills
+			scoreBreakdown.totalPoints = scoreBreakdown.placePoints + scoreBreakdown.killPoints
 		end
 		local opponent = {
 			status = STATUS_SCORE,
-			score = score,
 			scoreBreakdown = scoreBreakdown,
+			placement = placement,
+			score = scoreBreakdown.totalPoints,
 		}
-		table.insert(map.scores, score)
+		table.insert(map.scores, scoreBreakdown.totalPoints)
 		indexedScores[scoreIndex] = opponent
 	end
 
