@@ -49,7 +49,7 @@ CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDi
 })
 
 ---@class WarcraftBlockOpponentProps: BlockOpponentProps
----@field opponent StarcraftStandardOpponent
+---@field opponent WarcraftStandardOpponent
 ---@field showRace boolean?
 
 ---@param props WarcraftBlockOpponentProps
