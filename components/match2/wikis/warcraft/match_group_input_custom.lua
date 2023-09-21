@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
 local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -25,11 +24,11 @@ local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
-local MAX_NUM_MAPS = 99
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
+local MAX_NUM_PLAYERS = 20
 local DEFAULT_BEST_OF = 99
 local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap', 'lrthread'}
 local MODE_MIXED = 'mixed'
@@ -125,8 +124,6 @@ function CustomMatchGroupInput._getExtraData(match)
 
 	Table.mergeInto(match.extradata, Table.filterByKey(match, function(key, value)
 		return key:match('subgroup%d+header') end))
-
-	match.extradata = extradata
 end
 
 function CustomMatchGroupInput._adjustData(match)
@@ -271,8 +268,6 @@ end
 --OpponentInput functions
 
 function CustomMatchGroupInput._opponentInput(match)
-	local opponentIndex = 1
-	local opponent = match['opponent' .. opponentIndex]
 	local opponentTypes = {}
 
 	for opponentKey, opponent, opponentIndex in Table.iter.pairsByPrefix(match, 'opponent') do
@@ -318,7 +313,7 @@ function CustomMatchGroupInput._opponentInput(match)
 	assert(#opponentTypes <= MAX_NUM_OPPONENTS, 'Too many opponents')
 
 	match.mode = Array.all(opponentTypes, function(opponentType) return opponentType == opponentTypes[1] end)
-		and opponentTypes[1] or MODE_MIXEDMODE_MIXED
+		and opponentTypes[1] or MODE_MIXED
 
 	match.isTeamMatch = Array.any(opponentTypes, function(opponentType) return opponentType == Opponent.team end)
 
@@ -595,7 +590,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 	local playerData = {}
 
 	local numberOfPlayers = 0
-	for prefix, playerInput, index in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
 		numberOfPlayers = numberOfPlayers + 1
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
