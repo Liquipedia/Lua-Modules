@@ -16,6 +16,7 @@ local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
+local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -409,19 +410,21 @@ function CustomMatchSummary._countdownIcon(game)
 end
 
 function CustomMatchSummary._gameCountdown(game)
-	--- TODO Add VOD for completed games
 	local timestamp = Date.readTimestamp(game.date)
 	if not timestamp then
 		return
 	end
+	-- TODO Use local TZ
 	local dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. Timezone.getTimezoneString('UTC')
 
 	local stream = Table.merge(game.stream, {
 		date = dateString,
-		finished = game.finished and 'true' or nil,
+		finished = CustomMatchSummary._isFinished and 'true' or nil,
 	})
+
 	return mw.html.create('div'):addClass('panel-content__game-schedule__countdown'):addClass('match-countdown-block')
-		:node(require('Module:Countdown')._create(stream))
+			:node(require('Module:Countdown')._create(stream))
+			:node(game.vod and VodLink.display{vod = game.vod} or nil)
 end
 
 ---@param placementStart string|number|nil
