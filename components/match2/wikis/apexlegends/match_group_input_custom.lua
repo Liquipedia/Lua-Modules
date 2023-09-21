@@ -12,7 +12,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -175,7 +174,7 @@ function MatchFunctions.parseSetting(match)
 		return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 	end))
 
-	-- Up/Down colors and 
+	-- Up/Down colors and status
 	match.statusSettings = {
 		advTitle = match.advtitle,
 		outTitle = match.outtitle,

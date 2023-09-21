@@ -78,19 +78,28 @@ function CustomMatchSummary._createHeader(match)
 end
 
 function CustomMatchSummary._createPointsDistributionTable(match)
-	local wrapper = mw.html.create(nil)
 	local scoring = Table.copy(match.extradata.scoring)
-	wrapper:tag('h5'):addClass('panel-content__button'):addClass('is--collapsed'):attr('tabindex', 0):wikitext('Points Distribution')
+	local wrapper = mw.html.create()
+	wrapper:tag('h5')
+			:addClass('panel-content__button')
+			:addClass('is--collapsed')
+			:attr('tabindex', 0)
+			:wikitext('Points Distribution')
 
 	local function createItem(icon, iconColor, title, desc)
 		return mw.html.create('li'):addClass('panel-content__points-distribution__list-item')
-				:tag('span'):addClass('panel-content__points-distribution__icon'):addClass(iconColor):tag('i'):addClass(icon):allDone()
+				:tag('span'):addClass('panel-content__points-distribution__icon'):addClass(iconColor)
+						:tag('i'):addClass(icon):allDone()
 				:tag('span'):addClass('panel-content__points-distribution__title'):wikitext(title):allDone()
 				:tag('span'):wikitext(desc):allDone()
 	end
 
 	local pointDist = wrapper:tag('div')
-	pointDist:addClass('panel-content__container'):addClass('is--hidden'):attr('id', 'panelContent1'):attr('role', 'tabpanel'):attr('hidden')
+			:addClass('panel-content__container')
+			:addClass('is--hidden')
+			:attr('id', 'panelContent1')
+			:attr('role', 'tabpanel')
+			:attr('hidden')
 
 	local pointsList = pointDist:tag('ul'):addClass('panel-content__points-distribution')
 	pointsList:node(createItem('fas fa-skull', '1 kill', (Table.extract(scoring, 'kill') or '') .. ' kill point'))
@@ -180,7 +189,8 @@ local matchstuff = {
 				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
-						:tag('span'):addClass('panel-table__cell-rank__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('span'):addClass('panel-table__cell-rank__text')
+								:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},
@@ -220,7 +230,8 @@ local matchstuff = {
 					local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 					return mw.html.create()
 							:tag('i'):addClass('panel-table__cell-game__icon'):addClass(icon):addClass(color):done()
-							:tag('span'):addClass('panel-table__cell-game__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+							:tag('span'):addClass('panel-table__cell-game__text')
+									:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 				end,
 			},
 		},
@@ -249,7 +260,8 @@ function CustomMatchSummary._createOverallStandings(match)
 		gameHeader:tag('div'):addClass('panel-table__cell-game'):addClass('cell--game-details')
 				:tag('i'):addClass(CustomMatchSummary._countdownIcon(game)):addClass('cell--game-details-icon'):done()
 				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game ', idx):done()
-				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date'):node(CustomMatchSummary._gameCountdown(game)):done()
+				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date')
+						:node(CustomMatchSummary._gameCountdown(game)):done()
 		for _, column in ipairs(matchstuff.game) do
 			gameHeader:tag('div'):node(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
 		end
@@ -296,7 +308,8 @@ local gamestuff = {
 				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
-						:tag('span'):addClass('panel-table__cell-rank__text'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('span'):addClass('panel-table__cell-rank__text')
+								:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},

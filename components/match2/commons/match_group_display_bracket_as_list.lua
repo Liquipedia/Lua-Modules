@@ -12,6 +12,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
@@ -107,12 +108,17 @@ function BracketListDisplay.Bracket(props)
 end
 
 function BracketListDisplay.computeHeaders(bracket, config)
+	local matchOrdering = function(match1, match2)
+		if match1.coordinates.roundIndex == match2.coordinates.roundIndex then
+			return match1.coordinates.matchIndexInRound < match2.coordinates.matchIndexInRound
+		end
+		return match1.coordinates.roundIndex < match2.coordinates.roundIndex
+	end
 	-- Group the inheritedHeader (Round followed by MatchInRound)
-	local headers = Array.groupAdjacentBy(Array.sortBy(Array.extractValues(bracket.bracketDatasById), FnUtil.identity, function (m1, m2)
-		return m1.coordinates.roundIndex == m2.coordinates.roundIndex and m1.coordinates.matchIndexInRound < m2.coordinates.matchIndexInRound or m1.coordinates.roundIndex < m2.coordinates.roundIndex
-	end), function (match)
-		return match.inheritedHeader
-	end)
+	local headers = Array.groupAdjacentBy(
+			Array.sortBy(Array.extractValues(bracket.bracketDatasById), FnUtil.identity, matchOrdering),
+			Operator.property('inheritedHeader')
+	)
 
 	-- Suffix headers with multiple match with indication which match is it
 	headers = Array.map(headers, function(headerGroup)
@@ -170,7 +176,11 @@ Display component for a match
 ]]
 function BracketListDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, BracketListDisplay.propTypes.Match)
-	local matchNode = mw.html.create('div'):addClass('navigation-content'):attr('id', 'navigationContent' .. props.index):addClass(props.index > 1 and 'is--hidden' or nil)
+	local matchNode = mw.html.create('div')
+			:addClass('navigation-content')
+			:attr('id', 'navigationContent' .. props.index)
+			:addClass(props.index > 1 and 'is--hidden' or nil)
+
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
