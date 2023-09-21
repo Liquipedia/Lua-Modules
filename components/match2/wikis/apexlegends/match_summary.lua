@@ -65,7 +65,7 @@ function CustomMatchSummary._createHeader(match)
 				:addClass('panel-tabs__list-item')
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
-				:tag('i'):addClass(icon):done()
+				:tag('i'):addClass('panel-tabs__list-icon'):addClass(icon):done()
 				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
 	end
 	local header = mw.html.create('ul'):addClass('panel-tabs__list'):attr('role', 'tablist')
@@ -103,7 +103,7 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 			:attr('hidden')
 
 	local pointsList = pointDist:tag('ul'):addClass('panel-content__points-distribution')
-	pointsList:node(createItem('fas fa-skull', '1 kill', (Table.extract(scoring, 'kill') or '') .. ' kill point'))
+	pointsList:node(createItem('fas fa-skull', '', '1 kill', (Table.extract(scoring, 'kill') or '') .. ' kill point'))
 
 	local points = Table.groupBy(scoring, function (_, value)
 		return value
