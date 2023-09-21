@@ -27,6 +27,8 @@ local Center = Widgets.Center
 
 local _BANNED = mw.loadData('Module:Banned')
 
+local _NOT_APPLICABLE = 'N/A'
+
 local _title = mw.title.getCurrentTitle()
 local _pagename = _title.prefixedText
 local _base_page_name = _title.baseText
@@ -53,9 +55,9 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
-function CustomInjector:_parseActive(manualInput, varName, autoFunction, autoFunctionParam)
+function CustomPlayer:_parseActive(manualInput, varName, autoFunction, autoFunctionParam)
 	if String.isNotEmpty(manualInput) then
-		return manualInput:upper() ~= 'N/A' and manualInput or nil
+		return manualInput:upper() ~= _NOT_APPLICABLE and manualInput or nil
 	end
 	return Logic.readBool(Variables.varDefault(varName)) and autoFunction(autoFunctionParam) or nil
 end
@@ -65,14 +67,14 @@ function CustomInjector:parse(id, widgets)
 		local statusContents = CustomPlayer._getStatusContents()
 
 		-- Years active
-		local yearsActive = CustomInjector:_parseActive(
-			_args.years_active, 'role_player', YearsActive.get, {player = _args.id}
+		local yearsActive = CustomPlayer:_parseActive(
+			_args.years_active, 'role_player', YearsActive.get, {player = _base_page_name}
 		)
-		local yearsActiveCoach = CustomInjector:_parseActive(
-			_args.years_active_coach, 'role_coach', YearsActive.get, {player = _args.id, prefix = 'c'}
+		local yearsActiveCoach = CustomPlayer:_parseActive(
+			_args.years_active_coach, 'role_coach', YearsActive.get, {player = _base_page_name, prefix = 'c'}
 		)
-		local yearsActiveTalent = CustomInjector:_parseActive(
-			_args.years_active_talent, 'role_talent', YearsActive.getTalent, _args.id
+		local yearsActiveTalent = CustomPlayer:_parseActive(
+			_args.years_active_talent, 'role_talent', YearsActive.getTalent, _base_page_name
 		)
 
 		return {
