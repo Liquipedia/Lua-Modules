@@ -294,7 +294,7 @@ local gamestuff = {
 		},
 		row = {
 			value = function (opponent)
-				return '\\/'
+				return ''
 			end,
 		},
 	},
@@ -366,7 +366,9 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	for _, column in ipairs(gamestuff) do
 		header:tag('div'):node(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
-	for opponentIdx, opponentMatch in ipairs(match.opponents) do
+	for opponentIdx, opponentMatch in Table.iter.spairs(match.opponents, function (_, a, b)
+		return game.extradata.opponents[a].placement < game.extradata.opponents[b].placement
+	end) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 		local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 		for _, column in ipairs(gamestuff) do

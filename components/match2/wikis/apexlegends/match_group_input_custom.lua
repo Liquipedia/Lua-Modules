@@ -371,9 +371,9 @@ end
 function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	map.scores = {}
 	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
-		local teamData = map['t' .. scoreIndex .. 'data']
+		local teamData = map['t' .. opponentIndex .. 'data']
 		if not teamData then
 			break
 		end
@@ -392,7 +392,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			score = scoreBreakdown.totalPoints,
 		}
 		table.insert(map.scores, scoreBreakdown.totalPoints)
-		indexedScores[scoreIndex] = opponent
+		indexedScores[opponentIndex] = opponent
 	end
 
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
