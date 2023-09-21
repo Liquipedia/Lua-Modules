@@ -289,8 +289,8 @@ return {
 			name = 'Call of Duty: Warzone',
 			link = 'Call of Duty: Warzone',
 			logo = {
-				darkMode = 'COD_Warzone_1.0_default_darkmode.png',
-				lightMode = 'COD_Warzone_1.0_default_lightmode.png',
+				darkMode = 'COD Warzone 1.0 default darkmode.png',
+				lightMode = 'COD Warzone 1.0 default lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -302,8 +302,8 @@ return {
 			name = 'Call of Duty: Warzone 2.0',
 			link = 'Call of Duty: Warzone 2.0',
 			logo = {
-				darkMode = 'COD_Warzone_2.0_default_allmode.png',
-				lightMode = 'COD_Warzone_2.0_default_allmode.png',
+				darkMode = 'COD Warzone 2.0 default allmode.png',
+				lightMode = 'COD Warzone 2.0 default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -315,8 +315,8 @@ return {
 			name = 'Call of Duty: Warzone Mobile',
 			link = 'Call of Duty: Warzone Mobile',
 			logo = {
-				darkMode = 'COD_Warzone_Mobile_default_darkmode.png',
-				lightMode = 'COD_Warzone_Mobile_default_lightmode.png',
+				darkMode = 'COD Warzone Mobile default darkmode.png',
+				lightMode = 'COD Warzone Mobile default lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
