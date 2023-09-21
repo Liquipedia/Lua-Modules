@@ -117,7 +117,10 @@ end
 
 function BracketListDisplay.computeHeaders(bracket, config)
 	-- Group by inheritedHeader
-	local headers = Array.groupAdjacentBy(Array.map(BracketListDisplay._sortMatches(bracket), Operator.property(2)), Operator.property('inheritedHeader'))
+	local headers = Array.groupAdjacentBy(
+		Array.map(BracketListDisplay._sortMatches(bracket), Operator.property(2)),
+		Operator.property('inheritedHeader')
+	)
 
 	-- Suffix headers with multiple match with indication which match is it
 	headers = Array.map(headers, function(headerGroup)
