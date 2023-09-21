@@ -18,7 +18,7 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnable
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom', {requireDevIfEnabled = true})
 
-local CustomOpponentDisplay = {propTypes = {}, types={}}
+local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, types={}})
 
 CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.InlineOpponent, {
 	opponent = MatchGroupUtil.types.GameOpponent,
