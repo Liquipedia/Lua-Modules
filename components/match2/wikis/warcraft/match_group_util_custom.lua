@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -15,6 +16,10 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+
+local TEAM_DISPLAY_MODE = 'team'
+local UNIFORM_DISPLAY_MODE = 'uniform'
+local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
@@ -31,7 +36,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	score = 'number?',
 })
 
-
 function CustomMatchGroupUtil.matchFromRecord(record)
 	local match = MatchGroupUtil.matchFromRecord(record)
 
@@ -44,11 +48,12 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Determine whether the match is a team match with different players each game
-	match.opponentMode = match.mode:match('team') and 'team' or 'uniform'
+	match.opponentMode = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
+		and TEAM_DISPLAY_MODE or UNIFORM_DISPLAY_MODE
 
 	local extradata = match.extradata
 	---@cast extradata table
-	if match.opponentMode == 'team' then
+	if match.opponentMode == TEAM_DISPLAY_MODE then
 		-- Compute submatches
 		match.submatches = Array.map(
 			CustomMatchGroupUtil.groupBySubmatch(match.games),
@@ -57,7 +62,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 		-- Extract submatch headers from extradata
 		for _, submatch in pairs(match.submatches) do
-			submatch.header = Table.extract(extradata, 'subGroup' .. submatch.subgroup .. 'header')
+			submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
 		end
 	end
 
@@ -74,7 +79,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	-- Misc
 	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
 	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
@@ -85,29 +89,19 @@ function CustomMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
 	for _, opponent in ipairs(opponents) do
-		opponent.isArchon = Logic.readBool(Table.extract(opponent.extradata, 'isarchon'))
 		opponent.placement2 = tonumber(Table.extract(opponent.extradata, 'placement2'))
 		opponent.score2 = tonumber(Table.extract(opponent.extradata, 'score2'))
-		opponent.status2 = opponent.score2 and 'S' or nil
+		opponent.status2 = opponent.score2 and SCORE_STATUS or nil
 
 		for _, player in ipairs(opponent.players) do
 			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
-
-		if opponent.template == 'default' then
-			opponent.team = {
-				bracketName = Table.extract(opponent.extradata, 'bracket'),
-				displayName = Table.extract(opponent.extradata, 'display'),
-				pageName = opponent.name,
-				shortName = Table.extract(opponent.extradata, 'short'),
-			}
-		end
 	end
 
 	if #opponents == 2 and opponents[1].score2 and opponents[2].score2 then
-		local d = opponents[1].score2 - opponents[2].score2
-		opponents[1].placement2 = d > 0 and 1 or 2
-		opponents[2].placement2 = d < 0 and 1 or 2
+		local scoreDiff = opponents[1].score2 - opponents[2].score2
+		opponents[1].placement2 = scoreDiff > 0 and 1 or 2
+		opponents[2].placement2 = scoreDiff < 0 and 1 or 2
 	end
 end
 
@@ -154,8 +148,6 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	local opponents = {}
 	for opponentIx = 1, #modeParts do
 		local opponent = {
-			isArchon = modeParts[opponentIx] == 'Archon',
-			isSpecialArchon = modeParts[opponentIx]:match('^%dS$'),
 			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIx)),
 			players = opponentPlayers[opponentIx] or {},
 			score = game.scores[opponentIx],
@@ -168,17 +160,10 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 
 	-- Sort players in game opponents
 	for _, opponent in pairs(opponents) do
-		if opponent.isSpecialArchon then
-			-- Team melee: Sort players by the order they were inputted
-			table.sort(opponent.players, function(a, b)
-				return a.position < b.position
-			end)
-		else
-			-- Sort players by the order they appear in the match opponent players list
-			table.sort(opponent.players, function(a, b)
-				return a.matchPlayerIx < b.matchPlayerIx
-			end)
-		end
+		-- Sort players by the order they appear in the match opponent players list
+		table.sort(opponent.players, function(a, b)
+			return a.matchPlayerIx < b.matchPlayerIx
+		end)
 	end
 
 	return opponents
