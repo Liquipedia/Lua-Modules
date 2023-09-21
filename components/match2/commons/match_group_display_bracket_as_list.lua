@@ -76,11 +76,9 @@ function BracketListDisplay.Bracket(props)
 		OpponentEntry = propsConfig.OpponentEntry or OpponentDisplay.BracketOpponentEntry,
 		forceShortName = propsConfig.forceShortName or defaultConfig.forceShortName,
 	}
-	local headers = BracketListDisplay.computeHeaders(props.bracket, config)
-
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
-	for idx, header in ipairs(headers) do
+	for idx, header in ipairs(BracketListDisplay.computeHeaders(props.bracket, config)) do
 		local nodeProps = {
 			config = config,
 			header = header,
@@ -91,12 +89,13 @@ function BracketListDisplay.Bracket(props)
 	local bracketNode = mw.html.create('div'):addClass('navigation-tabs'):attr('role', 'tabpanel'):node(list)
 
 	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
-	for idx, matchId in ipairs(Array.extractKeys(props.bracket.matchesById)) do
+	for idx, match in ipairs(BracketListDisplay._sortMatches(props.bracket)) do
 		local matchProps = {
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
 			forceShortName = config.forceShortName,
-			match = props.bracket.matchesById[matchId],
+			match = match[2],
+			matchId = match[1],
 			index = idx,
 		}
 		matchNode:node(BracketListDisplay.Match(matchProps))
@@ -105,18 +104,20 @@ function BracketListDisplay.Bracket(props)
 	return mw.html.create('div'):addClass('brkts-br-wrapper'):node(bracketNode):node(matchNode)
 end
 
-function BracketListDisplay.computeHeaders(bracket, config)
-	local matchOrdering = function(match1, match2)
-		if match1.coordinates.roundIndex == match2.coordinates.roundIndex then
-			return match1.coordinates.matchIndexInRound < match2.coordinates.matchIndexInRound
+function BracketListDisplay._sortMatches(bracket)
+	local matchOrder = function(match1, match2)
+		if match1[2].coordinates.roundIndex == match2[2].coordinates.roundIndex then
+			return match1[2].coordinates.matchIndexInRound < match2[2].coordinates.matchIndexInRound
 		end
-		return match1.coordinates.roundIndex < match2.coordinates.roundIndex
+		return match1[2].coordinates.roundIndex < match2[2].coordinates.roundIndex
 	end
-	-- Group the inheritedHeader (Round followed by MatchInRound)
-	local headers = Array.groupAdjacentBy(
-			Array.sortBy(Array.extractValues(bracket.bracketDatasById), FnUtil.identity, matchOrdering),
-			Operator.property('inheritedHeader')
-	)
+
+	return Array.sortBy(Table.entries(bracket.bracketDatasById), FnUtil.identity, matchOrder)
+end
+
+function BracketListDisplay.computeHeaders(bracket, config)
+	-- Group by inheritedHeader
+	local headers = Array.groupAdjacentBy(Array.map(BracketListDisplay._sortMatches(bracket), Operator.property(2)), Operator.property('inheritedHeader'))
 
 	-- Suffix headers with multiple match with indication which match is it
 	headers = Array.map(headers, function(headerGroup)
@@ -165,6 +166,7 @@ BracketListDisplay.propTypes.Match = {
 	OpponentEntry = 'function',
 	MatchSummaryContainer = 'function',
 	match = MatchGroupUtil.types.Match,
+	matchId = 'string',
 	forceShortName = 'boolean',
 	matchHasDetails = 'function',
 }
@@ -180,8 +182,8 @@ function BracketListDisplay.Match(props)
 			:addClass(props.index > 1 and 'is--hidden' or nil)
 
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
-		matchId = props.match.matchId,
+		bracketId = props.matchId:match('^(.*)_'), -- everything up to the final '_'
+		matchId = props.matchId,
 	})
 	matchNode:node(matchSummaryNode)
 
