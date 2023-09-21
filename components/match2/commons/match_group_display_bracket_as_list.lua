@@ -76,8 +76,6 @@ function BracketListDisplay.Bracket(props)
 		OpponentEntry = propsConfig.OpponentEntry or OpponentDisplay.BracketOpponentEntry,
 		forceShortName = propsConfig.forceShortName or defaultConfig.forceShortName,
 	}
-	mw.logObject(props.bracket)
-
 	local headers = BracketListDisplay.computeHeaders(props.bracket, config)
 
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
