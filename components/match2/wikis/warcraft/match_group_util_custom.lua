@@ -117,6 +117,7 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 				matchPlayerIx = matchPlayerIx,
 				race = participant.faction,
 				position = tonumber(participant.position),
+				heroes = participant.heroes,
 			})
 		else
 			return {
