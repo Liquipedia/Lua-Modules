@@ -63,14 +63,21 @@ function CustomMatchSummary.getByMatchId(args)
 	addNode(CustomMatchSummary._createOverallPage(match))
 	Array.forEach(Array.map(match.games, CustomMatchSummary._createGameTab), addNode)
 
+	addNode(CustomMatchSummary._createFooter(match))
+
 	return tostring(matchSummary)
 end
 
 function CustomMatchSummary._opponents(match)
-	-- Add match opponent data to game opponent
+	-- Add match opponent data to game opponent and the other way around
 	Array.forEach(match.games, function (game)
 		game.extradata.opponents = Array.map(game.extradata.opponents, function (opponent, opponentIdx)
 			return Table.merge(match.opponents[opponentIdx], opponent)
+		end)
+	end)
+	Array.forEach(match.opponents, function (opponent, idx)
+		opponent.games = Array.map(match.games, function (game)
+			return game.extradata.opponents[idx]
 		end)
 	end)
 
@@ -283,6 +290,12 @@ local gameStandingsColumns = {
 
 ---@param match table
 ---@return Html
+function CustomMatchSummary._createFooter(match)
+	return mw.html.create('div')
+end
+
+---@param match table
+---@return Html
 function CustomMatchSummary._createHeader(match)
 	local function createHeader(title, icon)
 		return mw.html.create('li')
@@ -480,7 +493,7 @@ function CustomMatchSummary._createMatchStandings(match)
 		end)
 	end)
 
-	Array.forEach(match.opponents, function (opponentMatch, opponentIdx)
+	Array.forEach(match.opponents, function (opponentMatch)
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 
 		Array.forEach(matchStandingsColumns, function(column)
@@ -490,10 +503,8 @@ function CustomMatchSummary._createMatchStandings(match)
 					:node(column.row.value(opponentMatch))
 		end)
 
-		Array.forEach(match.games, function(game)
+		Array.forEach(opponentMatch.games, function(opponent)
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
-
-			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 
 			Array.forEach(matchStandingsColumns.game, function(column)
 				gameRow:tag('div')
