@@ -118,7 +118,7 @@ function CustomMatchGroupInput._getExtraData(match)
 	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
-		match.extradata[prefix] = mapVeto
+		match.extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
 		match.extradata[prefix .. 'by'] = match[prefix .. 'by']
 	end
 
