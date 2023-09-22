@@ -27,7 +27,6 @@ function CustomBracketDisplay.BracketContainer(props)
 	return BracketDisplay.Bracket({
 		bracket = bracket,
 		config = Table.merge(props.config, {
-			MatchSummaryContainer = MatchSummary.MatchSummaryContainer,
 			OpponentEntry = CustomBracketDisplay.OpponentEntry,
 			matchHasDetails = CustomMatchGroupUtil.matchHasDetails,
 		})
