@@ -640,10 +640,11 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName)
 
 	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
 	return Array.map(heroes, function(hero)
-		local lowerCasedHero = hero:lower()
-		local heroData = HeroData[lowerCasedHero]
+		local heroData = HeroData[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
-		assert(faction == Faction.defaultFaction or faction == heroData.faction or heroData.faction == NEUTRAL_FACTION,
+
+		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
+		assert(not isCoreFaction or faction == heroData.faction or heroData.faction == NEUTRAL_FACTION,
 			'Invalid hero input "' .. hero .. '" for race "' .. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
 
 		return heroData.name
