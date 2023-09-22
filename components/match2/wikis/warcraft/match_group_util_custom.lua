@@ -81,7 +81,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	-- Misc
 	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
+	match.casters = Table.extract(extradata, 'casters')
 
 	return match
 end
