@@ -171,7 +171,7 @@ end
 ---@return MatchSummaryRow
 function Row:addElements(elements)
 	for _, element in ipairs(elements) do
-		Row:addElement(element)
+		self:addElement(element)
 	end
 	return self
 end
