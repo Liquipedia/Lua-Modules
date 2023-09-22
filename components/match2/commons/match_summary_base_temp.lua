@@ -362,6 +362,7 @@ end
 ---MatchSummary Casters Class
 ---@class MatchSummaryCasters: MatchSummaryRowInterface
 ---@operator call: MatchSummaryCasters
+---@field root Html
 ---@field casters string[]
 local Casters = Class.new(
 	function(self)
