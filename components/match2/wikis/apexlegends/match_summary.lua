@@ -145,6 +145,7 @@ local matchStandingsColumns = {
 	},
 	{
 		class = 'cell--rank',
+		iconClass = 'fas fa-hashtag',
 		header = {
 			value = 'Rank',
 		},
@@ -160,6 +161,7 @@ local matchStandingsColumns = {
 	},
 	{
 		class = 'cell--team',
+		iconClass = 'fas fa-users',
 		header = {
 			value = 'Team',
 		},
@@ -171,6 +173,7 @@ local matchStandingsColumns = {
 	},
 	{
 		class = 'cell--total-points',
+		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
 		},
@@ -229,6 +232,7 @@ local gameStandingsColumns = {
 	},
 	{
 		class = 'cell--rank',
+		iconClass = 'fas fa-hashtag',
 		header = {
 			value = 'Rank',
 		},
@@ -244,6 +248,7 @@ local gameStandingsColumns = {
 	},
 	{
 		class = 'cell--team',
+		iconClass = 'fas fa-users',
 		header = {
 			value = 'Team',
 		},
@@ -255,6 +260,7 @@ local gameStandingsColumns = {
 	},
 	{
 		class = 'cell--total-points',
+		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
 		},
@@ -266,6 +272,7 @@ local gameStandingsColumns = {
 	},
 	{
 		class = 'cell--placements',
+		iconClass = 'fas fa-trophy-alt',
 		header = {
 			value = 'Placement Points',
 		},
@@ -277,6 +284,7 @@ local gameStandingsColumns = {
 	},
 	{
 		class = 'cell--kills',
+		iconClass = 'fas fa-skull',
 		header = {
 			value = 'Kill Points',
 		},
@@ -454,7 +462,16 @@ function CustomMatchSummary._createMatchStandings(match)
 					:done()
 
 	Array.forEach(matchStandingsColumns, function(column)
-		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
+		header:tag('div')
+				:addClass('panel-table__cell')
+				:addClass(column.class)
+				:tag('i')
+						:addClass('panel-table__cell-icon')
+						:addClass(column.iconClass)
+						:done()
+				:tag('span')
+						:wikitext(column.header.value)
+						:done()
 	end)
 
 	Array.forEach(match.games, function (game, idx)
@@ -471,7 +488,8 @@ function CustomMatchSummary._createMatchStandings(match)
 								:addClass('panel-table__cell-icon')
 								:done()
 						:tag('span')
-								:addClass('panel-table__cell-text'):wikitext('Game ', idx)
+								:addClass('panel-table__cell-text')
+								:wikitext('Game ', idx)
 								:done()
 						:done()
 				:tag('p')
@@ -484,8 +502,8 @@ function CustomMatchSummary._createMatchStandings(match)
 			gameDetails:tag('div')
 					:addClass(column.class)
 					:tag('i')
-							:addClass(column.iconClass)
 							:addClass('panel-table__cell-icon')
+							:addClass(column.iconClass)
 							:done()
 					:tag('span')
 							:wikitext(column.header.value)
@@ -530,6 +548,10 @@ function CustomMatchSummary._createGameStandings(game)
 		header:tag('div')
 			:addClass('panel-table__cell')
 			:addClass(column.class)
+			:tag('i')
+					:addClass('panel-table__cell-icon')
+					:addClass(column.iconClass)
+					:done()
 			:node(column.header.value)
 	end)
 
