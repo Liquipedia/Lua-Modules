@@ -168,7 +168,7 @@ function CustomMatchSummary._createGameTab(match, idx)
 	return tostring(infoArea) .. tostring(CustomMatchSummary._createGameStandings(match, idx))
 end
 
-local matchstuff = {
+local matchStandingsColumns = {
 	{
 		class = 'cell--status',
 		header = {
@@ -253,7 +253,7 @@ local matchstuff = {
 function CustomMatchSummary._createOverallStandings(match)
 	local wrapper = mw.html.create('div'):addClass('panel-table')
 	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
-	for _, column in ipairs(matchstuff) do
+	for _, column in ipairs(matchStandingsColumns) do
 		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
 	for idx, game in ipairs(match.games) do
@@ -263,19 +263,21 @@ function CustomMatchSummary._createOverallStandings(match)
 				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-title'):wikitext('Game ', idx):done()
 				:tag('p'):addClass('panel-table__cell-game'):addClass('cell--game-details-date')
 						:node(CustomMatchSummary._gameCountdown(game)):done()
-		for _, column in ipairs(matchstuff.game) do
+		for _, column in ipairs(matchStandingsColumns.game) do
 			gameHeader:tag('div'):node(column.header.value):addClass('panel-table__cell-game'):addClass(column.class)
 		end
 	end
-	for opponentIdx, opponentMatch in ipairs(match.opponents) do
+	for opponentIdx, opponentMatch in Table.iter.spairs(match.opponents, function (tbl, a, b)
+		return tbl[a].placement < tbl[b].placement
+	end) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
-		for _, column in ipairs(matchstuff) do
+		for _, column in ipairs(matchStandingsColumns) do
 			row:tag('div'):node(column.row.value(opponentMatch)):addClass('panel-table__cell'):addClass(column.class)
 		end
 		for _, game in ipairs(match.games) do
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
-			for _, column in ipairs(matchstuff.game) do
+			for _, column in ipairs(matchStandingsColumns.game) do
 				gameRow:tag('div')
 						:node(column.row.value(opponent))
 						:addClass('panel-table__cell-game')
@@ -287,7 +289,7 @@ function CustomMatchSummary._createOverallStandings(match)
 	return wrapper
 end
 
-local gamestuff = {
+local gameStandingsColumns = {
 	{
 		class = 'cell--button',
 		header = {
@@ -364,7 +366,7 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	local game = match.games[idx]
 	local wrapper = mw.html.create('div'):addClass('panel-table')
 	local header = wrapper:tag('div'):addClass('panel-table__row'):addClass('row--header')
-	for _, column in ipairs(gamestuff) do
+	for _, column in ipairs(gameStandingsColumns) do
 		header:tag('div'):node(column.header.value):addClass('panel-table__cell'):addClass(column.class)
 	end
 	for opponentIdx, opponentMatch in Table.iter.spairs(match.opponents, function (_, a, b)
@@ -372,7 +374,7 @@ function CustomMatchSummary._createGameStandings(match, idx)
 	end) do
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 		local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
-		for _, column in ipairs(gamestuff) do
+		for _, column in ipairs(gameStandingsColumns) do
 			row:tag('div'):node(column.row.value(opponent)):addClass('panel-table__cell'):addClass(column.class)
 		end
 	end
