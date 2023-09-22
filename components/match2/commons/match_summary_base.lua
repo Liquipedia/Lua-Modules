@@ -238,6 +238,13 @@ local Body = Class.new(
 	end
 )
 
+---@param cssClass string?
+---@return MatchSummaryBody
+function Body:addClass(cssClass)
+	self.root:addClass(cssClass)
+	return self
+end
+
 ---@param row MatchSummaryRowInterface
 ---@return MatchSummaryBody
 function Body:addRow(row)
@@ -476,6 +483,13 @@ function MatchSummary:init(width)
 	self.root = mw.html.create('div')
 		:addClass('brkts-popup')
 		:css('width', width)
+	return self
+end
+
+---@param cssClass string?
+---@return MatchSummary
+function MatchSummary:addClass(cssClass)
+	self.root:addClass(cssClass)
 	return self
 end
 
