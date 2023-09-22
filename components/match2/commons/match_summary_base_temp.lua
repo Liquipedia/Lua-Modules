@@ -615,7 +615,7 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 
 	options = options or {}
 
-	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
 
 	local matchSummary = MatchSummary():init(options.width)
 
