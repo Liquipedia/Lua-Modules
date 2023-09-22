@@ -49,17 +49,19 @@ local TROPHY_COLOR = {
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	match = CustomMatchSummary._opponents(match)
-
 	match.scoringTable = CustomMatchSummary._createScoringData(match)
+	Array.forEach(match.games, function(game)
+		game.scoringTable = match.scoringTable
+	end)
+
+	match = CustomMatchSummary._opponents(match)
 
 	local matchSummary = mw.html.create('div'):addClass('navigation-content-container')
 
-	matchSummary:node(CustomMatchSummary._createHeader(match))
-	matchSummary:node(CustomMatchSummary._createOverallPage(match))
-	for idx in ipairs(match.games) do
-		matchSummary:node(CustomMatchSummary._createGameTab(match, idx))
-	end
+	local addNode = FnUtil.curry(matchSummary.node, matchSummary)
+	addNode(CustomMatchSummary._createHeader(match))
+	addNode(CustomMatchSummary._createOverallPage(match))
+	Array.forEach(Array.map(match.games, CustomMatchSummary._createGameTab), addNode)
 
 	return tostring(matchSummary)
 end
@@ -82,11 +84,11 @@ function CustomMatchSummary._opponents(match)
 	end)
 
 	-- Sort game level based on placement
-	for _, game in ipairs(match.games) do
+	Array.forEach(match.games, function (game)
 		table.sort(game.extradata.opponents, function (a, b)
 			return a.placement < b.placement
 		end)
-	end
+	end)
 
 	return match
 end
@@ -295,9 +297,9 @@ function CustomMatchSummary._createHeader(match)
 			:attr('role', 'tablist')
 			:node(createHeader('Overall standings', 'fad fa-list-ol '))
 
-	for idx, game in ipairs(match.games) do
+	Array.forEach(match.games, function (game, idx)
 		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game)))
-	end
+	end)
 
 	return mw.html.create('div')
 			:addClass('panel-tabs')
@@ -364,7 +366,7 @@ function CustomMatchSummary._createOverallPage(match)
 			:tag('ul')
 					:addClass('panel-content__game-schedule')
 
-	for idx, game in ipairs(match.games) do
+	Array.forEach(match.games, function (game, idx)
 		scheduleList:tag('li')
 				:tag('i')
 						:addClass(CustomMatchSummary._countdownIcon(game))
@@ -375,7 +377,7 @@ function CustomMatchSummary._createOverallPage(match)
 						:wikitext('Game ', idx, ':')
 						:done()
 				:node(CustomMatchSummary._gameCountdown(game))
-	end
+	end)
 
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
 
@@ -384,12 +386,10 @@ function CustomMatchSummary._createOverallPage(match)
 			:node(CustomMatchSummary._createOverallStandings(match))
 end
 
----@param match table
+---@param game table
 ---@param idx integer
 ---@return Html
-function CustomMatchSummary._createGameTab(match, idx)
-	local game = match.games[idx]
-
+function CustomMatchSummary._createGameTab(game, idx)
 	local infoArea = mw.html.create('div')
 			:addClass('panel-content')
 			:attr('id', 'panel1')
@@ -419,11 +419,11 @@ function CustomMatchSummary._createGameTab(match, idx)
 	end
 	gameDetails:tag('div'):wikitext(Page.makeInternalLink(game.map))
 
-	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
+	infoArea:node(CustomMatchSummary._createPointsDistributionTable(game))
 
 	return mw.html.create()
 			:node(infoArea)
-			:node(CustomMatchSummary._createGameStandings(match, idx))
+			:node(CustomMatchSummary._createGameStandings(game))
 end
 
 ---@param match table
@@ -436,11 +436,11 @@ function CustomMatchSummary._createOverallStandings(match)
 			:addClass('panel-table__row')
 			:addClass('row--header')
 
-	for _, column in ipairs(matchStandingsColumns) do
+	Array.forEach(matchStandingsColumns, function(column)
 		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
-	end
+	end)
 
-	for idx, game in ipairs(match.games) do
+	Array.forEach(match.games, function (game, idx)
 		local gameContainer = header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass('cell--game')
@@ -463,7 +463,7 @@ function CustomMatchSummary._createOverallStandings(match)
 						:done()
 
 		local gameDetails = gameContainer:tag('div'):addClass('panel-table__cell__game-details')
-		for _, column in ipairs(matchStandingsColumns.game) do
+		Array.forEach(matchStandingsColumns.game, function(column)
 			gameDetails:tag('div')
 					:addClass(column.class)
 					:tag('i')
@@ -473,61 +473,59 @@ function CustomMatchSummary._createOverallStandings(match)
 					:tag('span')
 							:wikitext(column.header.value)
 							:done()
-		end
-	end
+		end)
+	end)
 
 	Array.forEach(match.opponents, function (opponentMatch, opponentIdx)
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 
-		for _, column in ipairs(matchStandingsColumns) do
+		Array.forEach(matchStandingsColumns, function(column)
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
 					:node(column.row.value(opponentMatch))
-		end
+		end)
 
 		Array.forEach(match.games, function(game)
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 
 			local opponent = Table.merge(opponentMatch, game.extradata.opponents[opponentIdx])
 
-			for _, column in ipairs(matchStandingsColumns.game) do
+			Array.forEach(matchStandingsColumns.game, function(column)
 				gameRow:tag('div')
 						:node(column.row.value(opponent))
 						:addClass(column.class)
 						:addClass(column.row.class and column.row.class(opponent) or nil)
-			end
+			end)
 		end)
 	end)
 
 	return wrapper
 end
 
----@param match table
----@param idx integer
+---@param game table
 ---@return Html
-function CustomMatchSummary._createGameStandings(match, idx)
-	local game = match.games[idx]
+function CustomMatchSummary._createGameStandings(game)
 	local wrapper = mw.html.create('div'):addClass('panel-table')
 	local header = wrapper:tag('div')
 			:addClass('panel-table__row')
 			:addClass('row--header')
 
-	for _, column in ipairs(gameStandingsColumns) do
+	Array.forEach(gameStandingsColumns, function(column)
 		header:tag('div')
 			:addClass('panel-table__cell')
 			:addClass(column.class)
 			:node(column.header.value)
-	end
+	end)
 
 	Array.forEach(game.extradata.opponents, function (opponent)
 		local row = wrapper:tag('div'):addClass('panel-table__row')
-		for _, column in ipairs(gameStandingsColumns) do
+		Array.forEach(gameStandingsColumns, function(column)
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
 					:node(column.row.value(opponent))
-		end
+		end)
 	end)
 	return wrapper
 end
