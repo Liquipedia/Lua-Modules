@@ -325,17 +325,16 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 				:tag('span'):wikitext(score, ' ', type, ' ', 'point', (score ~= 1) and 's' or nil):allDone()
 	end
 
-	local pointDist = wrapper:tag('div')
+	local pointsList = wrapper:tag('div')
 			:addClass('panel-content__container')
 			:addClass('is--hidden')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
 			:attr('hidden')
+			:tag('ul')
+					:addClass('panel-content__points-distribution')
 
-	local pointsList = pointDist:tag('ul')
-			:addClass('panel-content__points-distribution')
-
-	pointsList:node(createItem('fas fa-skull', '', '1 kill', match.scoringTable.kill, 'kill'))
+	pointsList:node(createItem('fas fa-skull', nil, '1 kill', match.scoringTable.kill, 'kill'))
 
 	Array.forEach(match.scoringTable.placement, function (slot)
 		local title = CustomMatchSummary._displayRank(slot.rangeStart, slot.rangeEnd)
@@ -383,7 +382,7 @@ function CustomMatchSummary._createOverallPage(match)
 
 	return mw.html.create()
 			:node(infoArea)
-			:node(CustomMatchSummary._createOverallStandings(match))
+			:node(CustomMatchSummary._createMatchStandings(match))
 end
 
 ---@param game table
@@ -428,13 +427,18 @@ end
 
 ---@param match table
 ---@return Html
-function CustomMatchSummary._createOverallStandings(match)
+function CustomMatchSummary._createMatchStandings(match)
 	local wrapper = mw.html.create('div')
 			:addClass('panel-table')
 
 	local header = wrapper:tag('div')
 			:addClass('panel-table__row')
 			:addClass('row--header')
+			:tag('div')
+					:addClass('panel-table__navigate')
+					:addClass('navigate--right')
+					:wikitext('>')
+					:done()
 
 	Array.forEach(matchStandingsColumns, function(column)
 		header:tag('div'):wikitext(column.header.value):addClass('panel-table__cell'):addClass(column.class)
