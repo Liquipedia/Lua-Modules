@@ -476,7 +476,7 @@ MatchSummary.Mvp = Mvp
 MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 
----@param width string
+---@param width string?
 ---@return MatchSummary
 function MatchSummary:init(width)
 	self.matches = {}
