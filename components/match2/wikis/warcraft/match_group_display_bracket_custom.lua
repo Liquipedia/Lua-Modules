@@ -12,7 +12,6 @@ local Table = require('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
 local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
