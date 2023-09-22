@@ -118,9 +118,6 @@ function StatisticsPortal.topEarningsChart(args)
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
-
 	local topEarningsList = StatisticsPortal._getOpponentEarningsData(args, config)
 
 	local yearSeriesData = Array.map(Array.range(config.startYear, tonumber(args.year) or CURRENT_YEAR), function(year)
