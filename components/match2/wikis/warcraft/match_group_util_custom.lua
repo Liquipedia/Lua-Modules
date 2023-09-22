@@ -302,9 +302,7 @@ function CustomMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
 		local referencePlayer = referenceOpponent.players[playerIx]
 		table.insert(gameRaces, gamePlayer.race)
-		if gamePlayer.race ~= referencePlayer.race then
-			hasOffrace = true
-		end
+		hasOffrace = hasOffrace or gamePlayer.race ~= referencePlayer.race
 	end
 	return hasOffrace and gameRaces or nil
 end
