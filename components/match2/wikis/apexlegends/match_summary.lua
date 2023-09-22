@@ -431,13 +431,23 @@ function CustomMatchSummary._createGameTab(game, idx)
 									:done()
 							:wikitext('Game ', idx, ': ')
 							:done()
+					:node(CustomMatchSummary._gameCountdown(game))
 					:done()
-			:node(CustomMatchSummary._gameCountdown(game))
 
 	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
-		gameDetails:tag('div'):node(CustomMatchSummary._gameCountdown(game))
+		gameDetails:tag('div')
+				:tag('i')
+						:addClass('far fa-clock')
+						:done()
+				:node(CustomMatchSummary._gameCountdown(game))
 	end
-	gameDetails:tag('div'):wikitext(Page.makeInternalLink(game.map))
+
+	gameDetails:tag('div')
+			:tag('i')
+					:addClass('far fa-map')
+					:done()
+			:tag('span')
+					:wikitext(Page.makeInternalLink(game.map))
 
 	infoArea:node(CustomMatchSummary._createPointsDistributionTable(game))
 
