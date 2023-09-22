@@ -599,13 +599,16 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
+---@param options table?
 ---@return Html
-function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
+
+	options = options or {}
 
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
-	local matchSummary = MatchSummary():init()
+	local matchSummary = MatchSummary():init(options.width)
 
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then
