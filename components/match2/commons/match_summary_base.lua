@@ -167,6 +167,15 @@ function Row:addElement(element)
 	return self
 end
 
+---@param element (Html|string)[]
+---@return MatchSummaryRow
+function Row:addElements(elements)
+	for _, element in ipairs(elements) do
+		Row:addElement(element)
+	end
+	return self
+end
+
 ---@return Html
 function Row:create()
 	for _, element in pairs(self.elements) do
