@@ -569,7 +569,7 @@ end
 function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponentIndex, participants)
 	local prefix = 't' .. opponentIndex .. 'p'
 	map[prefix .. '1race'] = Logic.emptyOr(map[prefix .. '1race'], map['race' .. opponentIndex])
-	map[prefix .. '1heroes'] = Logic.emptyOr(map[prefix .. '1race'], map['heroes' .. opponentIndex])
+	map[prefix .. '1heroes'] = Logic.emptyOr(map[prefix .. '1heroes'], map['heroes' .. opponentIndex])
 
 	for playerIndex, player in pairs(players) do
 		local faction = Logic.emptyOr(map[prefix .. playerIndex .. 'race'], player.extradata.faction, Faction.defaultFaction)
