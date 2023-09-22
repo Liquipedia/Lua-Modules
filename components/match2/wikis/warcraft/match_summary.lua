@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
@@ -216,7 +215,7 @@ function CustomMatchSummary.Game(game, hasHeroes)
 	local gameNodes = {CustomMatchSummary.GameHeader(game.header)}
 
 	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game, config))
+		:wikitext(DisplayHelper.MapAndStatus(game))
 
 	table.insert(gameNodes, mw.html.create('div')
 		:addClass('brkts-popup-sc-game-body')
