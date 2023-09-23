@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
@@ -44,26 +45,56 @@ LINKS_DATA.recap = LINKS_DATA.review
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
 
+---Custom Class for displaying game details in submatches
+---@class WarcraftMatchSummarySubmatchCollapsible
+---@operator call: WarcraftMatchSummarySubmatchCollapsible
+---@field root Html
+---@field table Html
+local SubmatchCollapsible = Class.new(
+	function(self, header)
+		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto'):css('width', '100%')
+			:css('margin-bottom', '-8px')
+		self.table = self.root:tag('table'):addClass('inherit-bg collapsible collapsed')
+
+		self.table
+			:tag('tr'):tag('th'):wikitext('Submatch Details')
+	end
+)
+
+---@param gameNodes Html[]
+---@return self
+function SubmatchCollapsible:game(gameNodes)
+	self.table:tag('tr'):tag('td'):node(MatchSummary.Row():addClass('brkts-popup-sc-game'):addClass('inherit-bg')
+		:addElements(gameNodes):create())
+
+	return self
+end
+
+---@return Html
+function SubmatchCollapsible:create()
+	return self.root
+end
+
 local CustomMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
-	local match, bracketResetMatch =
-		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
+	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	if match.isFfa then
 		error('FFA is not yet supported in warcraft match2')
 		--later call ffa matchsummary from here
 	end
 
-	local matchSummary = MatchSummary():init(match.opponentMode == UNIFORM_MATCH and '400px' or '500px')
+	local matchSummary = MatchSummary():init('400px')
 		:addClass('brkts-popup-sc')
 
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then
-		--matchSummary:header(MatchSummary.createDefaultHeader(match, {noScore = true}))
+		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
+		--matchSummary:header(createHeader(match, {noScore = true}))
 		--here martin can add the buttons for switching between match and reset match
 	--end
 
@@ -122,15 +153,8 @@ function CustomMatchSummary.createBody(match)
 			body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game')
 				:addElements(CustomMatchSummary.Game(game, hasHeroes))) end)
 	else -- team games
-		--Show the submatch score if any submatch consists of > 1 game
-		--or if the 'map' name starts with 'Submatch' (and the submatch has a game)
-		local showScore = Array.any(match.submatches, function(submatch)
-			return #submatch.games > 1
-				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
-		end)
-
 		Array.forEach(match.submatches, function(submatch)
-			body:addRow(CustomMatchSummary.TeamSubmatch{submatch = submatch, showScore = showScore}) end)
+			body:addRow(CustomMatchSummary.TeamSubmatch(submatch)) end)
 	end
 
 	if Table.isNotEmpty(match.vetoes) then
@@ -208,7 +232,7 @@ end
 
 ---@param game table
 ---@param hasHeroes boolean
----@return Html|string[]
+---@return (Html|string)[]
 function CustomMatchSummary.Game(game, hasHeroes)
 	local getWinnerIcon = function(opponentIndex)
 		return CustomMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
@@ -310,16 +334,74 @@ function CustomMatchSummary.DispalyHeroes(opponent, hasHeroes, flip)
 	return rowsDisplay
 end
 
----@param props {submatch: table, showScore: boolean}
+---@param submatch table
 ---@return MatchSummaryRow
-function CustomMatchSummary.TeamSubmatch(props)
-	local row = MatchSummary.Row()
-		:addElement('Currently no support for team match matchSummary display')
+function CustomMatchSummary.TeamSubmatch(submatch)
+	local submatchDisplay = MatchSummary.Row():addElement(CustomMatchSummary._submatchHeader(submatch))
+	if not CustomMatchSummary._submatchHasDetails(submatch) then
+		return submatchDisplay
+	end
 
-	--no idea yet how to display this
+	local details = SubmatchCollapsible()
+	for _, game in ipairs(submatch.games) do
+		details:game(CustomMatchSummary.Game(game, true))
+	end
 
+	return submatchDisplay:addElement(details:create()):css('margin-bottom', '4px')
+end
 
-	return row
+---@param submatch table
+---@return boolean
+function CustomMatchSummary._submatchHasDetails(submatch)
+	return #submatch.games > 0 and Array.any(submatch.games, function(game)
+		return String.isNotEmpty(game.map) and game.map:upper() ~= TBD and not string.find(game.map, '^[sS]ubmatch %d+$')
+			or Array.any(game.opponents, function(opponent) return Array.any(opponent.players, function(player)
+				return Table.isNotEmpty(player.heroes) end) end)
+	end)
+end
+
+---@param submatch table
+---@return Html
+function CustomMatchSummary._submatchHeader(submatch)
+	local opponents = submatch.opponents or {{}, {}}
+
+	local createOpponent = function(opponentIndex)
+		local players = (opponents[opponentIndex] or {}).players or {}
+		if Table.isEmpty(players) then
+			players = Opponent.tbd(Opponent.solo).players
+		end
+		return OpponentDisplay.BlockOpponent{
+			flip = opponentIndex == 1,
+			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			showLink = true,
+			overflow = 'ellipsis',
+		}
+	end
+
+	local createScore = function(opponentIndex)
+		local isWinner = opponentIndex == submatch.winner
+		if submatch.resultType == 'default' then
+			return OpponentDisplay.BlockScore{
+				isWinner = isWinner,
+				scoreText = isWinner and 'W' or submatch.walkover,
+			}
+		end
+		return OpponentDisplay.BlockScore{
+			isWinner = isWinner,
+			scoreText = (submatch.scores or {})[opponentIndex] or '',
+		}
+	end
+
+	return mw.html.create('div')
+		:css('justify-content', 'center'):addClass('brkts-popup-header-dev')
+		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
+			:node(createOpponent(1))
+			:node(createScore(1):addClass('brkts-popup-header-opponent-score-left'))
+			:done()
+		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
+			:node(createScore(2):addClass('brkts-popup-header-opponent-score-right'))
+			:node(createOpponent(2))
+			:done()
 end
 
 ---@param veto {map: string, by: number}
