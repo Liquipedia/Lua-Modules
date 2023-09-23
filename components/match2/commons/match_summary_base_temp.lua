@@ -557,23 +557,19 @@ end
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function MatchSummary.addVodsToFooter(match, footer)
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
 	if match.vod then
 		footer:addElement(VodLink.display{
 			vod = match.vod,
 		})
 	end
-	for index, vod in pairs(vods) do
-		footer:addElement(VodLink.display{
-			gamenum = index,
-			vod = vod,
-		})
+
+	for gameIndex, game in ipairs(match.games) do
+		if game.vod then
+			footer:addElement(VodLink.display{
+				gamenum = gameIndex,
+				vod = game.vod,
+			})
+		end
 	end
 
 	return footer
