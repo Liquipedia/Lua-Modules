@@ -740,7 +740,8 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
-		assert(ignoreFactionHeroCheck or not isCoreFaction or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
+		assert(ignoreFactionHeroCheck or not isCoreFaction
+			or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
 			'Invalid hero input "' .. hero .. '" for race "' .. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
 
 		return heroData.name
