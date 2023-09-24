@@ -653,7 +653,12 @@ function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponent
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			faction = faction,
 			player = player.name,
-			heroes = CustomMatchGroupInput._readHeroes(map[prefix .. playerIndex .. 'heroes'], faction, player.name),
+			heroes = CustomMatchGroupInput._readHeroes(
+				map[prefix .. playerIndex .. 'heroes'],
+				faction,
+				player.name,
+				Logic.readBool(map[prefix .. playerIndex .. 'heroesNoCheck'])
+			),
 		}
 	end
 
@@ -682,6 +687,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				faction = Faction.read(map[prefix .. 'race']),
 				position = playerIndex,
 				heroes = map[prefix .. 'heroes'],
+				heroesCheckDisabled = Logic.readBool(map[prefix .. 'heroesNoCheck']),
 			}
 		end
 	end
@@ -696,7 +702,12 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				player = player.name,
 				position = currentPlayer.position,
 				flag = Flags.CountryName(player.flag),
-				heroes = CustomMatchGroupInput._readHeroes(currentPlayer.heroes, faction, player.name),
+				heroes = CustomMatchGroupInput._readHeroes(
+					currentPlayer.heroes,
+					faction,
+					player.name,
+					currentPlayer.heroesCheckDisabled
+				),
 			}
 		end
 	end
@@ -717,7 +728,7 @@ end
 ---@param faction string?
 ---@param playerName string
 ---@return string[]?
-function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName)
+function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ignoreFactionHeroCheck)
 	if String.isEmpty(heroesInput) then
 		return
 	end
@@ -729,7 +740,7 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName)
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
-		assert(not isCoreFaction or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
+		assert(ignoreFactionHeroCheck or not isCoreFaction or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
 			'Invalid hero input "' .. hero .. '" for race "' .. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
 
 		return heroData.name
