@@ -479,13 +479,40 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 	end
 end
 
-function BasePrizePool:build(isAward)
-	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
+function BasePrizePool:build(isAward, adjacentContent)
+	local wrapper
+	if self.options.exchangeInfo or self:_shouldDisplayPrizeSummary() or Logic.isNotEmpty(adjacentContent) then
+		wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
 
-	if self:_shouldDisplayPrizeSummary() then
-		wrapper:wikitext(self:_getPrizeSummaryText())
+		if self:_shouldDisplayPrizeSummary() then
+			wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
+		end
+
+		local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables')
+
+		tablesWrapper:node(self:_buildTable(isAward))
+
+		if Logic.isNotEmpty(adjacentContent) then
+			tablesWrapper:tag('div'):css('overflow-x', 'auto'):wikitext(adjacentContent)
+		end
+
+		wrapper:node(tablesWrapper)
+
+		if self.options.exchangeInfo then
+			wrapper:wikitext(self:_currencyExchangeInfo())
+		end
+	else
+		wrapper = self:_buildTable(isAward)
 	end
 
+	if self.options.storeLpdb then
+		self:storeData()
+	end
+
+	return wrapper
+end
+
+function BasePrizePool:_buildTable(isAward)
 	local tbl = WidgetTable{
 		classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
 		css = {width = 'max-content'},
@@ -502,19 +529,12 @@ function BasePrizePool:build(isAward)
 	end
 
 	tbl:setContext{self._widgetInjector}
+	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
-		wrapper:node(node)
+		tableNode:node(node)
 	end
-
-	if self.options.exchangeInfo then
-		wrapper:wikitext(self:_currencyExchangeInfo())
-	end
-
-	if self.options.storeLpdb then
-		self:storeData()
-	end
-
-	return wrapper
+	
+	return tableNode
 end
 
 function BasePrizePool:_buildHeader(isAward)
@@ -668,7 +688,7 @@ function BasePrizePool:_currencyExchangeInfo()
 
 		local wrapper = mw.html.create('small')
 
-		wrapper:wikitext('<br><i>(')
+		wrapper:wikitext('<i>(')
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
