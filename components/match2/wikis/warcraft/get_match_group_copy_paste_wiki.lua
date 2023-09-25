@@ -29,13 +29,13 @@ local MODE_CONVERSION = {
 }
 MODE_CONVERSION.default = MODE_CONVERSION['1v1']
 
-local wikiCopyPaste = Table.copy(CopyPaste)
+local WikiCopyPaste = Table.copy(CopyPaste)
 
 ---Returns the cleaned opponent type
 ---@param mode string
 ---@return {[1]: OpponentType, isTeamMatch: boolean?}
 ---@diagnostic disable-next-line: inject-field
-function wikiCopyPaste.getMode(mode)
+function WikiCopyPaste.getMode(mode)
 	return MODE_CONVERSION[string.lower(mode or '')] or MODE_CONVERSION.default
 end
 
@@ -47,7 +47,7 @@ end
 ---@param args table
 ---@return string
 ---@diagnostic disable-next-line: inject-field
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if bestof == 0 then
 		args.score = true
 	end
@@ -61,7 +61,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for opponentIndex = 1, opponents do
-		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. wikiCopyPaste._getOpponent(mode, score))
+		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, score))
 	end
 
 	if bestof > 0 then
@@ -74,7 +74,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 				subgroup = '|subgroup='
 			end
 			table.insert(lines, INDENT .. '|map' .. gameIndex .. '={{Map|map=|winner=' .. subgroup
-				.. wikiCopyPaste._mapDetails(opponents, mode))
+				.. WikiCopyPaste._mapDetails(opponents, mode))
 		end)
 	end
 
@@ -95,7 +95,7 @@ end
 ---@param mode {[1]: OpponentType, isTeamMatch: boolean?}
 ---@return string
 ---@diagnostic disable-next-line: inject-field
-function wikiCopyPaste._mapDetails(opponents, mode)
+function WikiCopyPaste._mapDetails(opponents, mode)
 	if mode[1] == Opponent.literal then return '' end
 	local lines = {''}
 
@@ -117,7 +117,7 @@ end
 ---@param score string
 ---@return string
 ---@diagnostic disable-next-line: inject-field
-function wikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, score)
 	if mode.isTeamMatch then
 		return '{{TeamOpponent|template=' .. score .. '}}'
 	elseif mode[1] == Opponent.literal then
@@ -132,4 +132,4 @@ function wikiCopyPaste._getOpponent(mode, score)
 	return '{{' .. mw.getContentLanguage():ucfirst(mode[1]) .. 'Opponent' .. players .. score .. '}}'
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
