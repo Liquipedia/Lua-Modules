@@ -153,9 +153,8 @@ local matchStandingsColumns = {
 			value = function (opponent)
 				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 				return mw.html.create()
-						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
-						:tag('span'):addClass('panel-table__cell-rank__text')
-								:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
+						:tag('span'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},
@@ -197,7 +196,7 @@ local matchStandingsColumns = {
 				value = function (opponent)
 					local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 					return mw.html.create()
-							:tag('i'):addClass('panel-table__cell-game__icon'):addClass(icon):addClass(color):done()
+							:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
 							:tag('span'):addClass('panel-table__cell-game__text')
 									:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 				end,
@@ -240,9 +239,8 @@ local gameStandingsColumns = {
 			value = function (opponent)
 				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 				return mw.html.create()
-						:tag('i'):addClass('panel-table__cell-rank__icon'):addClass(icon):addClass(color):done()
-						:tag('span'):addClass('panel-table__cell-rank__text')
-								:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
+						:tag('span'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 			end,
 		},
 	},
@@ -475,13 +473,14 @@ function CustomMatchSummary._createMatchStandings(match)
 		header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass(column.class)
-				:tag('i')
-						:addClass('panel-table__cell-icon')
-						:addClass(column.iconClass)
-						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
+				:tag('div'):addClass('panel-table__cell-grouped')
+						:tag('i')
+								:addClass('panel-table__cell-icon')
+								:addClass(column.iconClass)
+								:done()
+						:tag('span')
+								:wikitext(column.header.value)
+								:done()
 	end)
 
 	Array.forEach(match.games, function (game, idx)
