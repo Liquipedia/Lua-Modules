@@ -13,7 +13,7 @@ local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {re
 
 ---@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return Lua.import('Module:MatchGroup/Display/BracketAsList', {requireDevIfEnabled = true}).BracketContainer
+	return Lua.import('Module:MatchGroup/Display/Horizontallist', {requireDevIfEnabled = true}).BracketContainer
 end
 
 return WikiSpecific
