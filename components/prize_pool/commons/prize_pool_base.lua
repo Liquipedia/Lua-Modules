@@ -351,6 +351,8 @@ function BasePrizePool:init(args)
 
 	self.usedAutoConvertedCurrency = false
 
+	self.adjacentContent = Logic.emptyOr(args.adjacentContent)
+
 	return self
 end
 
@@ -479,9 +481,9 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 	end
 end
 
-function BasePrizePool:build(isAward, adjacentContent)
+function BasePrizePool:build(isAward)
 	local wrapper
-	if self.options.exchangeInfo or self:_shouldDisplayPrizeSummary() or Logic.isNotEmpty(adjacentContent) then
+	if self.options.exchangeInfo or self.adjacentContent or self:_shouldDisplayPrizeSummary() then
 		wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
 
 		if self:_shouldDisplayPrizeSummary() then
@@ -492,8 +494,8 @@ function BasePrizePool:build(isAward, adjacentContent)
 
 		tablesWrapper:node(self:_buildTable(isAward))
 
-		if Logic.isNotEmpty(adjacentContent) then
-			tablesWrapper:tag('div'):css('overflow-x', 'auto'):wikitext(adjacentContent)
+		if self.adjacentContent then
+			tablesWrapper:wikitext(self.adjacentContent)
 		end
 
 		wrapper:node(tablesWrapper)
@@ -533,7 +535,7 @@ function BasePrizePool:_buildTable(isAward)
 	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
 		tableNode:node(node)
 	end
-	
+
 	return tableNode
 end
 
