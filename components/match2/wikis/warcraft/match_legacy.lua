@@ -89,7 +89,8 @@ end
 function MatchLegacy._convertParameters(match2)
 	local bracketData = match2.match2bracketdata or {}
 
-	local match = Table.filterByKey(match2, function(key, entry) return not String.startsWith(key, 'match2') end) --[[@as table]]
+	local match = Table.filterByKey(match2, function(key, entry) return not String.startsWith(key, 'match2') end)
+	---@cast match table
 	match.type = match.type and string.lower(match.type) or nil
 	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader, ''))[1]
 	match.tickername = Variables.varDefault('tournament_tickername', Variables.varDefault('tournament_ticker_name'))
@@ -145,8 +146,7 @@ function MatchLegacy._opponentToLegacy(object, opponentData)
 		object[prefix .. 'flag'] = player.flag
 		object.extradata[prefix .. 'name'] = player.displayname
 
-		local playerExtradata = player.extradata or {}
-		object.extradata[prefix .. 'race'] = player.extradata.faction
+		object.extradata[prefix .. 'race'] = (player.extradata or {}).faction
 	end)
 end
 
