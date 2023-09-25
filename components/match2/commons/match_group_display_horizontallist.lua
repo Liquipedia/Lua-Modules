@@ -107,7 +107,7 @@ end
 function HorizontallistDisplay._sortMatches(bracket)
 	local matchOrder = function(match1, match2)
 		if not match1[2].coordinates then
-			return match1[2].matchId < match2[2].matchId
+			return match1[2].matchIndex < match2[2].matchIndex
 		end
 		if match1[2].coordinates.roundIndex == match2[2].coordinates.roundIndex then
 			return match1[2].coordinates.matchIndexInRound < match2[2].coordinates.matchIndexInRound
@@ -115,8 +115,7 @@ function HorizontallistDisplay._sortMatches(bracket)
 		return match1[2].coordinates.roundIndex < match2[2].coordinates.roundIndex
 	end
 
-	mw.logObject(bracket)
-	return Array.sortBy(Table.entries(bracket.bracketDatasById or bracket.matchesById), FnUtil.identity, matchOrder)
+	return Array.sortBy(Table.entries(bracket.bracketDatasById), FnUtil.identity, matchOrder)
 end
 
 function HorizontallistDisplay.computeHeaders(bracket, config)
@@ -128,12 +127,11 @@ function HorizontallistDisplay.computeHeaders(bracket, config)
 
 	-- Suffix headers with multiple match with indication which match is it
 	headers = Array.map(headers, function(headerGroup)
-		mw.logObject(headerGroup)
 		if #headerGroup == 1 then
-			return DisplayHelper.expandHeader(headerGroup[1].inheritedHeader or headerGroup[1].bracketData.header)[1]
+			return DisplayHelper.expandHeader(headerGroup[1].inheritedHeader)[1]
 		end
 		return Array.map(headerGroup, function (match, index)
-			return DisplayHelper.expandHeader(match.inheritedHeader or match.bracketData.header)[1] .. ' #' .. index
+			return DisplayHelper.expandHeader(match.inheritedHeader)[1] .. ' #' .. index
 		end)
 	end)
 
