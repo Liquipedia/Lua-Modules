@@ -482,33 +482,32 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 function BasePrizePool:build(isAward)
-	local wrapper
-	if self.options.exchangeInfo or self.adjacentContent or self:_shouldDisplayPrizeSummary() then
-		wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
-
-		if self:_shouldDisplayPrizeSummary() then
-			wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
-		end
-
-		local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables')
-
-		tablesWrapper:node(self:_buildTable(isAward))
-
-		if self.adjacentContent then
-			tablesWrapper:wikitext(self.adjacentContent)
-		end
-
-		wrapper:node(tablesWrapper)
-
-		if self.options.exchangeInfo then
-			wrapper:wikitext(self:_currencyExchangeInfo())
-		end
-	else
-		wrapper = self:_buildTable(isAward)
-	end
+	local prizePoolTable = self:_buildTable(isAward)
 
 	if self.options.storeLpdb then
 		self:storeData()
+	end
+
+	if not (self.options.exchangeInfo or self.adjacentContent or self:_shouldDisplayPrizeSummary()) then
+		return prizePoolTable
+	end
+
+	local wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
+
+	if self:_shouldDisplayPrizeSummary() then
+		wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
+	end
+
+	local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables'):node(prizePoolTable)
+
+	if self.adjacentContent then
+		tablesWrapper:wikitext(self.adjacentContent)
+	end
+
+	wrapper:node(tablesWrapper)
+
+	if self.options.exchangeInfo then
+		wrapper:wikitext(self:_currencyExchangeInfo())
 	end
 
 	return wrapper
