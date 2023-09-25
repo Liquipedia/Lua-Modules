@@ -168,7 +168,6 @@ end
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	match.links.lrthread = match.links.lrthread or match.lrthread
 
 	return footer:addLinks(LINK_DATA, match.links)
 end
