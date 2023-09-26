@@ -20,7 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
 ]]
-local StarcraftMatchGroupUtil = {}
+local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 StarcraftMatchGroupUtil.types = {}
 
@@ -34,6 +34,12 @@ StarcraftMatchGroupUtil.types.Opponent = TypeUtil.extendStruct(MatchGroupUtil.ty
 	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	team = TypeUtil.optional(MatchGroupUtil.types.Team),
 })
+---@class StarcraftMatchGroupUtilGameOpponent
+---@field isArchon boolean
+---@field isSpecialArchon boolean
+---@field placement number?
+---@field players StarcraftStandardPlayer[]
+---@field score number?
 StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	isArchon = 'boolean',
 	isSpecialArchon = 'boolean',
@@ -41,13 +47,29 @@ StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	score = 'number?',
 })
+
+---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
+---@field opponents StarcraftMatchGroupUtilGameOpponent[]
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
 })
+---@class StarcraftMatchGroupUtilVeto
+---@field by number?
+---@field map string
 StarcraftMatchGroupUtil.types.MatchVeto = TypeUtil.struct({
 	by = 'number',
 	map = 'string',
 })
+---@class StarcraftMatchGroupUtilSubmatch
+---@field games StarcraftMatchGroupUtilGame[]
+---@field mode string
+---@field opponents StarcraftMatchGroupUtilGameOpponent[]
+---@field resultType ResultType
+---@field scores table<number, number>
+---@field subgroup number
+---@field walkover WalkoverType
+---@field winner number?
+---@field header string?
 StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	mode = 'string',
@@ -58,6 +80,16 @@ StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
 })
+---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games StarcraftMatchGroupUtilGame[]
+---@field headToHead boolean
+---@field isFfa boolean
+---@field noScore boolean?
+---@field opponentMode 'uniform'|'team'
+---@field opponents StarcraftStandardOpponent[]
+---@field vetoes StarcraftMatchGroupUtilVeto[]
+---@field submatches StarcraftMatchGroupUtilSubmatch[]?
+---@field casters string?
 StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types.Match, {
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	headToHead = 'boolean',
@@ -68,9 +100,10 @@ StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types
 	vetoes = TypeUtil.array(StarcraftMatchGroupUtil.types.MatchVeto),
 })
 
-
+---@param record table
+---@return StarcraftMatchGroupUtilMatch
 function StarcraftMatchGroupUtil.matchFromRecord(record)
-	local match = MatchGroupUtil.matchFromRecord(record)
+	local match = MatchGroupUtil.matchFromRecord(record)--[[@as StarcraftMatchGroupUtilMatch]]
 
 	-- Add additional fields to opponents
 	StarcraftMatchGroupUtil.populateOpponents(match)
@@ -117,7 +150,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	return match
 end
 
--- Move additional fields from extradata to struct
+---Move additional fields from extradata to struct
+---@param match StarcraftMatchGroupUtilMatch
 function StarcraftMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
@@ -130,15 +164,6 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		for _, player in ipairs(opponent.players) do
 			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
-
-		if opponent.template == 'default' then
-			opponent.team = {
-				bracketName = Table.extract(opponent.extradata, 'bracket'),
-				displayName = Table.extract(opponent.extradata, 'display'),
-				pageName = opponent.name,
-				shortName = Table.extract(opponent.extradata, 'short'),
-			}
-		end
 	end
 
 	if #opponents == 2 and opponents[1].score2 and opponents[2].score2 then
@@ -148,8 +173,10 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 	end
 end
 
--- Computes game.opponents by looking up matchOpponents.players on each
--- participant.
+---Computes game.opponents by looking up matchOpponents.players on each participant.
+---@param game StarcraftMatchGroupUtilGame
+---@param matchOpponents StarcraftStandardOpponent[]
+---@return StarcraftMatchGroupUtilGameOpponent[]
 function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	local function playerFromParticipant(opponentIx, matchPlayerIx, participant)
 		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
@@ -221,7 +248,9 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return opponents
 end
 
--- Group games on the subgroup field to form submatches
+---Group games on the subgroup field to form submatches
+---@param matchGames StarcraftMatchGroupUtilGame[]
+---@return StarcraftMatchGroupUtilGame[][]
 function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 	-- Group games on adjacent subgroups
 	local previousSubgroup = nil
@@ -239,7 +268,10 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 	return submatchGames
 end
 
---Constructs a submatch object whose properties are aggregated from that of its games.
+---Constructs a submatch object whose properties are aggregated from that of its games.
+---@param games StarcraftMatchGroupUtilGame[]
+---@param match StarcraftMatchGroupUtilMatch
+---@return StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
@@ -327,25 +359,27 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	}
 end
 
--- Determine if a match has details that should be displayed via popup
+---Determine if a match has details that should be displayed via popup
+---@param match StarcraftMatchGroupUtilMatch
+---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
 	return match.dateIsExact
-		or match.vod
+		or String.isNotEmpty(match.vod)
 		or not Table.isEmpty(match.links)
-		or match.comment
-		or match.casters
+		or String.isNotEmpty(match.comment)
+		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes
 		or Array.any(match.games, function(game)
 			return game.map and game.map ~= 'TBD'
-				or game.winner
+				or Logic.isNumeric(game.winner)
 		end)
 end
 
---[[
-Determines if any players in an opponent are not playing their main race by
-comparing them to a reference opponent. Returns the races played if at least
-one player chose an offrace or nil if otherwise.
-]]
+---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
+---Returns the races played if at least one player chose an offrace or nil if otherwise.
+---@param gameOpponent StarcraftMatchGroupUtilGameOpponent
+---@param referenceOpponent StarcraftStandardOpponent
+---@return string[]?
 function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	local gameRaces = {}
 	local hasOffrace = false
@@ -359,6 +393,8 @@ function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent
 	return hasOffrace and gameRaces or nil
 end
 
+---@param record table
+---@return StarcraftStandardPlayer
 function StarcraftMatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -369,17 +405,6 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		pageName = record.name,
 		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
-end
-
--- merge submatches for reset matches
-function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
-	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
-		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
-		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
-		Array.extendWith(match.submatches, bracketResetMatch.submatches)
-	end
-
-	return match.submatches
 end
 
 return StarcraftMatchGroupUtil
