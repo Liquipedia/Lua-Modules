@@ -250,11 +250,11 @@ function CustomMatchSummary._opponents(match)
 	end
 
 	-- Sort match level based on score (placement works too)
-	Array.sortInplace(match.opponents, Operator.property('placement'))
+	Array.sortInPlaceBy(match.opponents, Operator.property('placement'))
 
 	-- Sort game level based on placement
 	Array.forEach(match.games, function (game)
-		Array.sortInplace(game.extradata.opponents, Operator.property('placement'))
+		Array.sortInPlaceBy(game.extradata.opponents, Operator.property('placement'))
 	end)
 
 	return match

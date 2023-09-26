@@ -70,9 +70,7 @@ end
 
 function MatchFunctions.adjustMapData(match)
 	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
-	local mapIndex = 1
-	while match['map' .. mapIndex] do
-		local map = match['map' .. mapIndex]
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local scores
 		Table.mergeInto(map, MatchFunctions.readDate(map))
 		map = MapFunctions.getParticipants(map, opponents)
@@ -81,8 +79,7 @@ function MatchFunctions.adjustMapData(match)
 		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
 
-		match['map' .. mapIndex] = map
-		mapIndex = mapIndex + 1
+		match[key] = map
 	end
 
 	return match
