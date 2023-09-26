@@ -373,12 +373,12 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	local indexedScores = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read scores
-		local teamData = map['t' .. opponentIndex .. 'data']
-		if not teamData then
+		local opponentData = map['t' .. opponentIndex .. 'data']
+		if not opponentData then
 			break
 		end
 		local scoreBreakdown = {}
-		local placement, kills = tonumber(teamData[1]), tonumber(teamData[2])
+		local placement, kills = tonumber(opponentData[1]), tonumber(opponentData[2])
 		if scoreBreakdown and kills then
 			scoreBreakdown.placePoints = scoreSettings[placement] or 0
 			scoreBreakdown.killPoints = kills * scoreSettings.kill

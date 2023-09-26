@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
@@ -44,94 +45,7 @@ local TROPHY_COLOR = {
 	'icon--copper',
 }
 
----@param args table
----@return string
-function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	match.scoringTable = CustomMatchSummary._createScoringData(match)
-	Array.forEach(match.games, function(game)
-		game.scoringTable = match.scoringTable
-	end)
-
-	match = CustomMatchSummary._opponents(match)
-
-	local matchSummary = mw.html.create('div'):addClass('navigation-content-container')
-
-	local addNode = FnUtil.curry(matchSummary.node, matchSummary)
-	addNode(CustomMatchSummary._createHeader(match))
-	addNode(CustomMatchSummary._createOverallPage(match))
-	Array.forEach(Array.map(match.games, CustomMatchSummary._createGameTab), addNode)
-
-	addNode(CustomMatchSummary._createFooter(match))
-
-	return tostring(matchSummary)
-end
-
-function CustomMatchSummary._opponents(match)
-	-- Add match opponent data to game opponent and the other way around
-	Array.forEach(match.games, function (game)
-		game.extradata.opponents = Array.map(game.extradata.opponents, function (opponent, opponentIdx)
-			return Table.merge(match.opponents[opponentIdx], opponent)
-		end)
-	end)
-	Array.forEach(match.opponents, function (opponent, idx)
-		opponent.games = Array.map(match.games, function (game)
-			return game.extradata.opponents[idx]
-		end)
-	end)
-
-	if not CustomMatchSummary._isFinished(match) then
-		return match
-	end
-
-	-- Sort match level based on score (placement works too)
-	table.sort(match.opponents, function (a, b)
-		return a.placement < b.placement
-	end)
-
-	-- Sort game level based on placement
-	Array.forEach(match.games, function (game)
-		table.sort(game.extradata.opponents, function (a, b)
-			return a.placement < b.placement
-		end)
-	end)
-
-	return match
-end
-
----@param match table
----@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
-function CustomMatchSummary._createScoringData(match)
-	local scoreSettings = match.extradata.scoring
-
-	local scoreKill = Table.extract(scoreSettings, 'kill')
-	local scorePlacement = {}
-
-	local points = Table.groupBy(scoreSettings, function (_, value)
-		return value
-	end)
-
-	for point, placements in Table.iter.spairs(points, function (_, a, b)
-		return a > b
-	end) do
-		local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-		table.insert(scorePlacement, {
-			rangeStart = placementRange[1],
-			rangeEnd = placementRange[#placementRange],
-			score = point,
-		})
-	end
-
-	match.extradata.scoring = nil
-
-	return {
-		kill = scoreKill,
-		placement = scorePlacement,
-	}
-end
-
-local matchStandingsColumns = {
+local MATCH_STANDING_COLUMNS = {
 	{
 		class = 'cell--status',
 		header = {
@@ -166,7 +80,7 @@ local matchStandingsColumns = {
 		},
 		row = {
 			value = function (opponent)
-				return CustomMatchSummary._displayTeam(opponent)
+				return CustomMatchSummary._displayOpponent(opponent)
 			end,
 		},
 	},
@@ -217,7 +131,7 @@ local matchStandingsColumns = {
 	}
 }
 
-local gameStandingsColumns = {
+local GAME_STANDINGS_COLUMNS = {
 	{
 		class = 'cell--button',
 		header = {
@@ -252,7 +166,7 @@ local gameStandingsColumns = {
 		},
 		row = {
 			value = function (opponent)
-				return CustomMatchSummary._displayTeam(opponent)
+				return CustomMatchSummary._displayOpponent(opponent)
 			end,
 		},
 	},
@@ -293,6 +207,87 @@ local gameStandingsColumns = {
 		},
 	},
 }
+
+---@param args table
+---@return string
+function CustomMatchSummary.getByMatchId(args)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+
+	match.scoringTable = CustomMatchSummary._createScoringData(match)
+	Array.forEach(match.games, function(game)
+		game.scoringTable = match.scoringTable
+	end)
+
+	match = CustomMatchSummary._opponents(match)
+
+	local matchSummary = mw.html.create('div'):addClass('navigation-content-container')
+
+	local addNode = FnUtil.curry(matchSummary.node, matchSummary)
+	addNode(CustomMatchSummary._createHeader(match))
+	addNode(CustomMatchSummary._createOverallPage(match))
+	Array.forEach(Array.map(match.games, CustomMatchSummary._createGameTab), addNode)
+
+	addNode(CustomMatchSummary._createFooter(match))
+
+	return tostring(matchSummary)
+end
+
+function CustomMatchSummary._opponents(match)
+	-- Add match opponent data to game opponent and the other way around
+	Array.forEach(match.games, function (game)
+		game.extradata.opponents = Array.map(game.extradata.opponents, function (opponent, opponentIdx)
+			return Table.merge(match.opponents[opponentIdx], opponent)
+		end)
+	end)
+	Array.forEach(match.opponents, function (opponent, idx)
+		opponent.games = Array.map(match.games, function (game)
+			return game.extradata.opponents[idx]
+		end)
+	end)
+
+	if not CustomMatchSummary._isFinished(match) then
+		return match
+	end
+
+	-- Sort match level based on score (placement works too)
+	Array.sortInplace(match.opponents, Operator.property('placement'))
+
+	-- Sort game level based on placement
+	Array.forEach(match.games, function (game)
+		Array.sortInplace(game.extradata.opponents, Operator.property('placement'))
+	end)
+
+	return match
+end
+
+---@param match table
+---@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
+function CustomMatchSummary._createScoringData(match)
+	local scoreSettings = match.extradata.scoring
+
+	local scoreKill = Table.extract(scoreSettings, 'kill')
+	local scorePlacement = {}
+
+	local points = Table.groupBy(scoreSettings, function (_, value)
+		return value
+	end)
+
+	for point, placements in Table.iter.spairs(points, function (_, a, b)
+		return a > b
+	end) do
+		local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
+		table.insert(scorePlacement, {
+			rangeStart = placementRange[1],
+			rangeEnd = placementRange[#placementRange],
+			score = point,
+		})
+	end
+
+	return {
+		kill = scoreKill,
+		placement = scorePlacement,
+	}
+end
 
 ---@param match table
 ---@return Html
@@ -470,7 +465,7 @@ function CustomMatchSummary._createMatchStandings(match)
 					:wikitext('>')
 					:done()
 
-	Array.forEach(matchStandingsColumns, function(column)
+	Array.forEach(MATCH_STANDING_COLUMNS, function(column)
 		header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass(column.class)
@@ -512,7 +507,7 @@ function CustomMatchSummary._createMatchStandings(match)
 						:done()
 
 		local gameDetails = gameContainer:tag('div'):addClass('panel-table__cell__game-details')
-		Array.forEach(matchStandingsColumns.game, function(column)
+		Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
 			gameDetails:tag('div')
 					:addClass(column.class)
 					:tag('i')
@@ -528,7 +523,7 @@ function CustomMatchSummary._createMatchStandings(match)
 	Array.forEach(match.opponents, function (opponentMatch)
 		local row = wrapper:tag('div'):addClass('panel-table__row')
 
-		Array.forEach(matchStandingsColumns, function(column)
+		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
@@ -538,7 +533,7 @@ function CustomMatchSummary._createMatchStandings(match)
 		Array.forEach(opponentMatch.games, function(opponent)
 			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 
-			Array.forEach(matchStandingsColumns.game, function(column)
+			Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
 				gameRow:tag('div')
 						:node(column.row.value(opponent))
 						:addClass(column.class)
@@ -558,7 +553,7 @@ function CustomMatchSummary._createGameStandings(game)
 			:addClass('panel-table__row')
 			:addClass('row--header')
 
-	Array.forEach(gameStandingsColumns, function(column)
+	Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
 		header:tag('div')
 			:addClass('panel-table__cell')
 			:addClass(column.class)
@@ -574,7 +569,7 @@ function CustomMatchSummary._createGameStandings(game)
 
 	Array.forEach(game.extradata.opponents, function (opponent)
 		local row = wrapper:tag('div'):addClass('panel-table__row')
-		Array.forEach(gameStandingsColumns, function(column)
+		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
@@ -672,7 +667,7 @@ end
 
 ---@param opponent standardOpponent
 ---@return Html
-function CustomMatchSummary._displayTeam(opponent)
+function CustomMatchSummary._displayOpponent(opponent)
 	return OpponentDisplay.BlockOpponent{
 		opponent = opponent,
 		showLink = true,
