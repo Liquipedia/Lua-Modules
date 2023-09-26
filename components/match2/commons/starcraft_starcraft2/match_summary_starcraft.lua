@@ -74,6 +74,8 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
 	local match, bracketResetMatch =
 		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
+	---@cast match StarcraftMatchGroupUtilMatch
+	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
 	if match.isFfa then
 		return Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary{
@@ -100,13 +102,11 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 	return matchSummary:create()
 end
 
----@param match table
+---@param match StarcraftMatchGroupUtilMatch
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function StarcraftMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	match.links.lrthread = match.links.lrthread or match.lrthread
 
 	if not match.headToHead or #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
@@ -125,7 +125,7 @@ function StarcraftMatchSummary.addToFooter(match, footer)
 	return footer:addLinks(LINKS_DATA, match.links)
 end
 
----@param match table
+---@param match StarcraftMatchGroupUtilMatch
 ---@return MatchSummaryBody
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffraces(match)
@@ -174,7 +174,7 @@ function StarcraftMatchSummary.createBody(match)
 	return body
 end
 
----@param match table
+---@param match StarcraftMatchGroupUtilMatch
 function StarcraftMatchSummary.computeOffraces(match)
 	if match.opponentMode == UNIFORM_MATCH then
 		StarcraftMatchSummary.computeMatchOffraces(match)
@@ -185,7 +185,7 @@ function StarcraftMatchSummary.computeOffraces(match)
 	end
 end
 
----@param match table
+---@param match StarcraftMatchGroupUtilMatch|StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchSummary.computeMatchOffraces(match)
 	for _, game in ipairs(match.games) do
 		game.offraces = {}
@@ -218,7 +218,7 @@ function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
 end
 
----@param game table
+---@param game StarcraftMatchGroupUtilGame
 ---@param options {noLink: boolean}?
 ---@return (Html|string)[]
 function StarcraftMatchSummary.Game(game, options)
@@ -291,7 +291,7 @@ function StarcraftMatchSummary.GameHeader(header)
 		:wikitext(header)
 end
 
----@param props {submatch: table, showScore: boolean}
+---@param props {submatch: StarcraftMatchGroupUtilSubmatch, showScore: boolean}
 ---@return StarcraftMatchSummarySubmatchRow
 function StarcraftMatchSummary.TeamSubmatch(props)
 	local submatch = props.submatch

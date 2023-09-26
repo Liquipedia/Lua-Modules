@@ -50,6 +50,7 @@ StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
+---@field offraces table<integer, string[]>?
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
 })
@@ -378,7 +379,7 @@ end
 ---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
 ---Returns the races played if at least one player chose an offrace or nil if otherwise.
 ---@param gameOpponent StarcraftMatchGroupUtilGameOpponent
----@param referenceOpponent StarcraftStandardOpponent
+---@param referenceOpponent StarcraftStandardOpponent|StarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
 function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	local gameRaces = {}
