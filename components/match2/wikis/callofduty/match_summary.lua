@@ -8,13 +8,13 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MapModes = require('Module:MapModes')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
-local String = require('Module:StringUtils')
-local MapModes = require('Module:MapModes')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
@@ -31,48 +31,10 @@ local LINK_DATA = {
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-		:body(CustomMatchSummary._createBody(match))
-
-	-- comment
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	-- footer
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.lrthread = match.links.lrthread or match.lrthread
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		footer:addLinks(LINK_DATA, match.links)
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 function CustomMatchSummary._createHeader(match)
@@ -86,7 +48,18 @@ function CustomMatchSummary._createHeader(match)
 	return header
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
+
+	return footer:addLinks(LINK_DATA, match.links)
+end
+
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -122,11 +95,16 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
 	return mw.html.create('div'):wikitext(score)
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
@@ -179,6 +157,8 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
+---@param game MatchGroupUtilGame
+---@return string
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 	if String.isNotEmpty(game.mode) then
@@ -187,6 +167,8 @@ function CustomMatchSummary._getMapDisplay(game)
 	return mapDisplay
 end
 
+---@param showIcon boolean?
+---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
