@@ -202,6 +202,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 ---@field vod string?
 ---@field walkover WalkoverType?
 ---@field winner integer?
+---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
 	game = 'string?',
@@ -217,6 +218,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	vod = 'string?',
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
+	extradata = 'table?',
 })
 
 ---@class MatchGroupUtilMatch
@@ -256,6 +258,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	vod = 'string?',
 	walkover = 'string?',
 	winner = 'number?',
+	extradata = 'table?',
 })
 
 ---@class standardTeamProps
