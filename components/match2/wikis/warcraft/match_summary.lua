@@ -81,7 +81,8 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
-	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
+	local match, bracketResetMatch =
+		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
 
 	if match.isFfa then
 		error('FFA is not yet supported in warcraft match2')
