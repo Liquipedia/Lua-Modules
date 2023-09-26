@@ -220,7 +220,7 @@ function CustomMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 	local infoType = Logic.isNumeric(extradata.advantage) and 'advantage' or 'penalty'
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
-	body:adddRow(MatchSummary.Row():addClass('brkts-popup-sc-game-center')
+	body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-center')
 		:addElement(mw.html.create():node(OpponentDisplay.InlineOpponent{
 			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
 			showFlag = false,
