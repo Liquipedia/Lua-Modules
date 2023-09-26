@@ -836,7 +836,7 @@ end
 function StatisticsPortal._getOpponentEarningsData(args, config)
 	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
 	local queryFields
-	if opponentType == 'team' then
+	if opponentType == Opponent.team then
 		queryFields = 'pagename, name, template, earnings, extradata'
 	else
 		queryFields = 'pagename, id, nationality, earnings, extradata, birthdate, team'
