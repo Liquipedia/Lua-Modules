@@ -451,7 +451,7 @@ end
 ---popup expects that the finals match also include results from the bracket reset match.
 ---@param bracketId string
 ---@param matchId string
----@param options {mergeBracketResetMatch: boolean?, returnBoth: boolean?}
+---@param options {mergeBracketResetMatch: boolean?, returnBoth: boolean?}?
 ---@return MatchGroupUtilMatch, MatchGroupUtilMatch?
 function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 	options = options or {}
