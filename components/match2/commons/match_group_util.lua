@@ -130,11 +130,13 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field flag string?
 ---@field pageName string?
 ---@field team string?
+---@field extradata table?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
+	extradata = 'table?',
 })
 
 ---@class standardOpponent
