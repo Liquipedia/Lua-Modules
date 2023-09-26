@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
+local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -43,6 +43,28 @@ LINKS_DATA.recap = LINKS_DATA.review
 
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
+
+---Custom Class for displaying game details in submatches
+---@class StarcraftMatchSummarySubmatchRow: MatchSummaryRowInterface
+---@operator call: StarcraftMatchSummarySubmatchRow
+---@field root Html
+local StarcraftMatchSummarySubmatchRow = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-sc-submatch')
+	end
+)
+
+---@param element Html|string|nil
+---@return StarcraftMatchSummarySubmatchRow
+function StarcraftMatchSummarySubmatchRow:addElement(element)
+	self.root:node(element)
+	return self
+end
+
+---@return Html
+function StarcraftMatchSummarySubmatchRow:create()
+	return self.root
+end
 
 local StarcraftMatchSummary = {}
 
@@ -168,7 +190,7 @@ function StarcraftMatchSummary.computeMatchOffraces(match)
 	for _, game in ipairs(match.games) do
 		game.offraces = {}
 		for opponentIndex, gameOpponent in pairs(game.opponents) do
-			game.offraces[opponentIndex] = MatchGroupUtil.computeOffraces(
+			game.offraces[opponentIndex] = MatchGroupUtilStarcraft.computeOffraces(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
@@ -197,8 +219,9 @@ function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 end
 
 ---@param game table
+---@param options {noLink: boolean}?
 ---@return (Html|string)[]
-function StarcraftMatchSummary.Game(game)
+function StarcraftMatchSummary.Game(game, options)
 	local getWinnerIcon = function(opponentIndex)
 		return StarcraftMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
 			or game.winner == opponentIndex and 'greenCheck')
@@ -223,7 +246,7 @@ function StarcraftMatchSummary.Game(game)
 	local gameNodes = {StarcraftMatchSummary.GameHeader(game.header)}
 
 	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game))
+		:wikitext(DisplayHelper.MapAndStatus(game, options))
 
 	table.insert(gameNodes, mw.html.create('div')
 		:addClass('brkts-popup-sc-game-body')
@@ -268,15 +291,72 @@ function StarcraftMatchSummary.GameHeader(header)
 		:wikitext(header)
 end
 
----@param submatch {submatch: table, showScore: boolean}
----@return MatchSummaryRow
-function StarcraftMatchSummary.TeamSubmatch(submatch)
-	--todo
+---@param props {submatch: table, showScore: boolean}
+---@return StarcraftMatchSummarySubmatchRow
+function StarcraftMatchSummary.TeamSubmatch(props)
+	local submatch = props.submatch
 
+	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-submatch-center')
+	Array.forEach(submatch.games, function(game)
+		if not game.map and not game.winner then return end
+		for _, node in ipairs(StarcraftMatchSummary.Game(game, {noLink = String.startsWith(game.map or '', 'Submatch')})) do
+			centerNode:node(node)
+		end
+	end)
 
+	local renderOpponent = function(opponentIndex)
+		local opponent = submatch.opponents[opponentIndex]
+		local node = opponent
+			and OpponentDisplay.BlockOpponent({
+				opponent = opponent,
+				flip = opponentIndex == 1,
+			})
+			or mw.html.create('div'):wikitext('&nbsp;')
+		return node:addClass('brkts-popup-sc-submatch-opponent')
+	end
 
+	local renderScore = function(opponentIndex)
+		local isWinner = opponentIndex == submatch.winner
+		local text
+		if submatch.resultType == 'default' then
+			text = isWinner and 'W' or submatch.walkover
+		else
+			local score = submatch.scores[opponentIndex]
+			text = score and tostring(score) or ''
+		end
+		return mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-score')
+			:wikitext(text)
+	end
 
+	local renderSide = function(opponentIndex)
+		local sideNode = mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-side')
+			:addClass(opponentIndex == 1 and 'brkts-popup-left' or 'brkts-popup-right')
+			:addClass(opponentIndex == submatch.winner and 'bg-win' or nil)
+			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
+			:node(opponentIndex == 1 and renderOpponent(1) or nil)
+			:node(props.showScore and renderScore(opponentIndex) or nil)
+			:node(opponentIndex == 2 and renderOpponent(2) or nil)
 
+		return sideNode
+	end
+
+	local bodyNode = mw.html.create('div')
+		:addClass('brkts-popup-sc-submatch-body')
+		:addClass(props.showScore and 'brkts-popup-sc-submatch-has-score' or nil)
+		:node(renderSide(1))
+		:node(centerNode)
+		:node(renderSide(2))
+
+	local headerNode
+	if submatch.header then
+		headerNode = mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-header')
+			:wikitext(submatch.header)
+	end
+
+	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
 end
 
 ---@param veto {map: string, by: number}
