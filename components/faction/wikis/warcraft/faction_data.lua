@@ -8,42 +8,42 @@
 
 local factionProps = {
 	h = {
-		bgClass = '',--to be created
+		bgClass = 'warcraft-human',
 		index = 1,
 		name = 'Human',
 		pageName = 'Human',
 		faction = 'h',
 	},
 	o = {
-		bgClass = '',--to be created
+		bgClass = 'warcraft-orc',
 		index = 2,
 		name = 'Orc',
 		pageName = 'Orc',
 		faction = 'o',
 	},
 	n = {
-		bgClass = '',--to be created
+		bgClass = 'warcraft-nightelf',
 		index = 3,
 		name = 'Nightelf',
 		pageName = 'Nightelf',
 		faction = 'n',
 	},
 	u = {
-		bgClass = '',--to be created
+		bgClass = 'warcraft-undead',
 		index = 4,
 		name = 'Undead',
 		pageName = 'Undead',
 		faction = 'u',
 	},
 	r = {
-		bgClass = '',--to be created
+		bgClass = 'Random',
 		index = 5,
 		name = 'Random',
 		pageName = 'Random',
 		faction = 'r',
 	},
 	m = {
-		bgClass = '',--to be created
+		bgClass = 'warcraft-multirace',
 		index = 6,
 		name = 'Multiple',
 		pageName = 'Multiple',
