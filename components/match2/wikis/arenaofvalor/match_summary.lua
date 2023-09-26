@@ -8,27 +8,27 @@
 
 local CustomMatchSummary = {}
 
+local Array = require('Module:Array')
+local ChampionIcon = require('Module:HeroIcon')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local ExternalLinks = require('Module:ExternalLinks')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ChampionIcon = require('Module:HeroIcon')
-local Table = require('Module:Table')
-local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
-local Array = require('Module:Array')
+local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
-local _MAX_NUM_BANS = 5
-local _NUM_CHAMPIONS_PICK = 5
+local MAX_NUM_BANS = 5
+local NUM_CHAMPIONS_PICK = 5
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Champion Ban Class
 local ChampionBan = Class.new(
@@ -123,7 +123,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -160,7 +160,7 @@ function CustomMatchSummary._createBody(match)
 		local extradata = game.extradata
 		local banData = {{}, {}}
 		local numberOfBans = 0
-		for index = 1, _MAX_NUM_BANS do
+		for index = 1, MAX_NUM_BANS do
 			if String.isNotEmpty(extradata['team1ban' .. index]) then
 				numberOfBans = index
 				banData[1][index] = extradata['team1ban' .. index]
@@ -199,7 +199,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	local championsData = {{}, {}}
 	local championsDataIsEmpty = true
-	for champIndex = 1, _NUM_CHAMPIONS_PICK do
+	for champIndex = 1, NUM_CHAMPIONS_PICK do
 		if String.isNotEmpty(extradata['team1champion' .. champIndex]) then
 			championsData[1][champIndex] = extradata['team1champion' .. champIndex]
 			championsDataIsEmpty = false
@@ -224,7 +224,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:css('font-size', '85%')
 		:css('overflow', 'hidden')
 
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], _NUM_CHAMPIONS_PICK, date, false))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], NUM_CHAMPIONS_PICK, date, false))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -234,7 +234,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], _NUM_CHAMPIONS_PICK, date, true))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -256,9 +256,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		:css('margin-right', '3%')
 
 	if isWinner then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
