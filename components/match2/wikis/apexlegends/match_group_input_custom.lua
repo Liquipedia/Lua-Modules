@@ -126,7 +126,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	--set it as finished if we have a winner
-	if not Logic.isEmpty(data.winner) then
+	if Logic.isNotEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -252,7 +252,7 @@ function MatchFunctions.getOpponents(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
+		if Logic.isNotEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- Retrieve icon for team
@@ -273,7 +273,7 @@ function MatchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
-				if not Logic.isEmpty(opponent.name) then
+				if Logic.isNotEmpty(opponent.name) then
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 						resolveRedirect = true,
 						applyUnderScores = true,
@@ -300,7 +300,7 @@ function MatchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if not Logic.isEmpty(match.winner) or Logic.readBool(match.finished) then
+	if Logic.isNotEmpty(match.winner) or Logic.readBool(match.finished) then
 		match.finished = true
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end

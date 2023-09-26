@@ -78,25 +78,25 @@ function HorizontallistDisplay.Bracket(props)
 	}
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
-	for idx, header in ipairs(HorizontallistDisplay.computeHeaders(props.bracket, config)) do
+	for headerIndex, header in ipairs(HorizontallistDisplay.computeHeaders(props.bracket, config)) do
 		local nodeProps = {
 			config = config,
 			header = header,
-			index = idx,
+			index = headerIndex,
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
 	local bracketNode = mw.html.create('div'):addClass('navigation-tabs'):attr('role', 'tabpanel'):node(list)
 
 	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
-	for idx, match in ipairs(HorizontallistDisplay._sortMatches(props.bracket)) do
+	for matchIndex, match in ipairs(HorizontallistDisplay._sortMatches(props.bracket)) do
 		local matchProps = {
 			MatchSummaryContainer = config.MatchSummaryContainer,
 			OpponentEntry = config.OpponentEntry,
 			forceShortName = config.forceShortName,
 			match = match[2],
 			matchId = match[1],
-			index = idx,
+			index = matchIndex,
 		}
 		matchNode:node(HorizontallistDisplay.Match(matchProps))
 	end
@@ -125,7 +125,7 @@ function HorizontallistDisplay.computeHeaders(bracket, config)
 		Operator.property('inheritedHeader')
 	)
 
-	-- Suffix headers with multiple match with indication which match is it
+	-- Suffix when there multiple matches with the same header, in order to make a distiction between them
 	headers = Array.map(headers, function(headerGroup)
 		if #headerGroup == 1 then
 			return DisplayHelper.expandHeader(headerGroup[1].inheritedHeader)[1]
