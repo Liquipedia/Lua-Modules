@@ -289,65 +289,24 @@ end
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-	local frame = mw.getCurrentFrame()
-
-	local matchSummary = MatchSummary():init('480px')
-	matchSummary:header(CustomMatchSummary._createHeader(frame, match))
-				:body(CustomMatchSummary._createBody(frame, match))
-
-	if match.comment then
-		matchSummary:comment(MatchSummary.Comment():content(match.comment))
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		-- Match Vod + other links
-		local buildLink = function (linktype, link)
-			local icon, text = LINK_DATA[linktype].icon, LINK_DATA[linktype].text
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linktype, link in pairs(match.links) do
-			footer:addElement(buildLink(linktype,link))
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
 end
 
-function CustomMatchSummary._createHeader(frame, match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
-
-	return header
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createBody(frame, match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -360,7 +319,7 @@ function CustomMatchSummary._createBody(frame, match)
 
 	for _, game in ipairs(match.games) do
 		if game.map then
-			body:addRow(CustomMatchSummary._createMap(frame, game))
+			body:addRow(CustomMatchSummary._createMap(game))
 		end
 	end
 
@@ -403,7 +362,9 @@ function CustomMatchSummary._createBody(frame, match)
 	return body
 end
 
-function CustomMatchSummary._createMap(frame, game)
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
+function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 
 	local team1Agents, team2Agents
@@ -430,7 +391,7 @@ function CustomMatchSummary._createMap(frame, game)
 
 	local score1, score2
 
-	local extradata = game.extradata
+	local extradata = game.extradata or {}
 	score1 = Score():setLeft()
 	score2 = Score():setRight()
 
@@ -494,6 +455,8 @@ function CustomMatchSummary._createMap(frame, game)
 	return row
 end
 
+---@param side string
+---@return string
 function CustomMatchSummary._getOppositeSide(side)
 	if side == 'atk' then
 		return 'def'
@@ -501,6 +464,8 @@ function CustomMatchSummary._getOppositeSide(side)
 	return 'atk'
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced')
