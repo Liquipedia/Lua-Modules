@@ -57,6 +57,10 @@ local LINK_DATA = {
 }
 
 -- Operator Bans Class
+---@class R6OperatorBan
+---@operator call: R6OperatorBan
+---@field root Html
+---@field text string
 local OperatorBans = Class.new(
 	function(self)
 		self.root = mw.html.create('table')
@@ -64,6 +68,7 @@ local OperatorBans = Class.new(
 	end
 )
 
+---@return R6OperatorBan
 function OperatorBans:setLeft()
 	self.root
 		:addClass('brkts-popup-body-operator-bans')
@@ -72,6 +77,7 @@ function OperatorBans:setLeft()
 	return self
 end
 
+---@return R6OperatorBan
 function OperatorBans:setRight()
 	self.root
 		:addClass('brkts-popup-body-operator-bans')
@@ -80,6 +86,8 @@ function OperatorBans:setRight()
 	return self
 end
 
+---@param operator string?
+---@return R6OperatorBan
 function OperatorBans:add(operator)
 	if Logic.isEmpty(operator) then
 		return self
@@ -93,13 +101,19 @@ function OperatorBans:add(operator)
 	return self
 end
 
+---@return Html
 function OperatorBans:create()
 	self.root:wikitext(self.text)
 	return self.root
 end
 
 -- Score Class, both for the "big" score, and the halfs scores
-
+---@class R6Score
+---@operator call: R6Score
+---@field root Html
+---@field table Html
+---@field top Html
+---@field bottom Html
 local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):css('width','70px'):css('text-align', 'center')
@@ -109,6 +123,7 @@ local Score = Class.new(
 	end
 )
 
+---@return R6Score
 function Score:setLeft()
 	self.table
 		:css('float', 'left')
@@ -116,6 +131,7 @@ function Score:setLeft()
 	return self
 end
 
+---@return R6Score
 function Score:setRight()
 	self.table
 		:css('float', 'right')
@@ -123,6 +139,8 @@ function Score:setRight()
 	return self
 end
 
+---@param score string|number|nil
+---@return R6Score
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -136,66 +154,95 @@ function Score:setMapScore(score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@param position integer
+---@return R6Score
 function Score:setFirstRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
+	local leftElement, RightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		icon, score = score, icon
+		leftElement, RightElement = score, icon
+	else
+		leftElement, RightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins')
-				:wikitext(icon)
-				:wikitext(score or '')
+				:wikitext(leftElement)
+				:wikitext(RightElement)
 
 	self.top:node(roundScore)
 	return self
 end
 
+---@param side string
+---@param score number
+---@param position integer
+---@return R6Score
 function Score:setSecondRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
+	local leftElement, RightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		icon, score = score, icon
+		leftElement, RightElement = score, icon
+	else
+		leftElement, RightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins')
-				:wikitext(icon)
-				:wikitext(score or '')
+				:wikitext(leftElement)
+				:wikitext(RightElement)
 
 	self.bottom:node(roundScore)
 	return self
 end
 
+---@param side string
+---@param score number
+---@param position integer
+---@return R6Score
 function Score:setFirstOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot'..side]
+	local leftElement, RightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		icon, score = score, icon
+		leftElement, RightElement = score, icon
+	else
+		leftElement, RightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
-				:wikitext(icon)
-				:wikitext(score or '')
+				:wikitext(leftElement)
+				:wikitext(RightElement)
 
 	self.top:node(roundScore)
 	return self
 end
 
+---@param side string
+---@param score number
+---@param position integer
+---@return R6Score
 function Score:setSecondOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot'..side]
+	local leftElement, RightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		icon, score = score, icon
+		leftElement, RightElement = score, icon
+	else
+		leftElement, RightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
-				:wikitext(icon)
-				:wikitext(score or '')
+				:wikitext(leftElement)
+				:wikitext(RightElement)
 
 	self.bottom:node(roundScore)
 	return self
 end
 
+---@return R6Score
 function Score:addEmptyOvertime()
 	local roundScore = mw.html.create('td'):css('width','20px')
 	self.top:node(roundScore)
@@ -203,12 +250,17 @@ function Score:addEmptyOvertime()
 	return self
 end
 
+---@return Html
 function Score:create()
 	self.table:node(self.top):node(self.bottom)
 	return self.root
 end
 
 -- Map Veto Class
+---@class R6MapVeto: MatchSummaryRowInterface
+---@operator call: R6MapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -218,6 +270,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return R6MapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -226,6 +279,8 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return R6MapVeto
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -244,6 +299,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return R6MapVeto
 function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
@@ -260,6 +317,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return R6MapVeto
 function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
@@ -296,6 +357,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return R6MapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -305,11 +370,15 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string
+---@return R6MapVeto
 function MapVeto:addColumnVetoMap(row,map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
@@ -337,7 +406,6 @@ function CustomMatchSummary.getByMatchId(args)
 		end
 	end
 
-	match.links.lrthread = match.lrthread
 	match.links.vod = match.vod
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
 		local footer = MatchSummary.Footer()
