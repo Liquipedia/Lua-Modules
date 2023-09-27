@@ -294,7 +294,7 @@ end
 ---@operator call: MatchSummaryFooter
 ---@field root Html
 ---@field inner Html
----@field elements (Html|string)[]
+---@field elements (Html|string|number)[]
 local Footer = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -305,7 +305,7 @@ local Footer = Class.new(
 	end
 )
 
----@param element Html
+---@param element Html|string|number|nil
 ---@return MatchSummaryFooter
 function Footer:addElement(element)
 	table.insert(self.elements, element)
