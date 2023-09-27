@@ -225,6 +225,9 @@ function MapVeto:create()
 	return self.root
 end
 
+---@class CounterstrikeMatchStatus: MatchSummaryRowInterface
+---@operator call: CounterstrikeMatchStatus
+---@field root Html
 local MatchStatus = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -235,11 +238,14 @@ local MatchStatus = Class.new(
 	end
 )
 
+---@param content string|number|Html|nil
+---@return CounterstrikeMatchStatus
 function MatchStatus:content(content)
 	self.root:node(content):node(MatchSummary.Break():create())
 	return self
 end
 
+---@return Html
 function MatchStatus:create()
 	return self.root
 end
