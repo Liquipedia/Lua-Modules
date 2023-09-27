@@ -35,6 +35,11 @@ local EXPERIENCE = mw.loadData('Module:Experience')
 local CRITTERS = 'critters'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
 local GOLD = '[[File:Gold WC3 Icon.gif|15px|link=Gold]]'
+local ADDITIONAL_UNIT_RACES = {
+	creeps = 'Creeps',
+	neutral = 'Creeps',
+	c = 'Creeps',
+}
 
 local _args
 
@@ -63,9 +68,10 @@ function CustomInjector:addCustomCells(widgets)
 	local mana = Shared.manaValues(_args)
 	local acquisitionRange = tonumber(_args.acq_range) or 0
 	local level = tonumber(_args.level) or 0
+	local race = Faction.toName(Faction.read(_args.race)) or ADDITIONAL_UNIT_RACES[string.lower(_args.race or '')]
 
 	Array.appendWith(widgets,
-		Cell{name = '[[Race|Race]]', content = {'[['.. Faction.toName(Faction.read(_args.race)) ..']]'}},
+		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or _args.race}},
 		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
 			_args.class and String.convertWikiListToHtmlList(_args.class) or nil}},
 		Cell{name = 'Bounty Awarded', content = {CustomUnit._bounty(_args)}},
