@@ -252,20 +252,41 @@ end
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
+end
 
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
-		matchSummary:comment(comment)
+---CreateMatch cs specific overwrite due to altered styles for match comment
+---@param matchData table
+---@return MatchSummaryMatch?
+function CustomMatchSummary.createMatch(matchData)
+	if not matchData then
+		return
 	end
 
+	local match = MatchSummary.Match()
+
+	match
+		:header(MatchSummary.createDefaultHeader(matchData))
+		:body(CustomMatchSummary.createBody(matchData))
+
+	if matchData.comment then
+		local comment = MatchSummary.Comment():content(matchData.comment)
+		comment.root:css('display', 'block'):css('text-align', 'center')
+		match:comment(comment)
+	end
+
+	match:footer(CustomMatchSummary.addToFooter(matchData, MatchSummary.Footer()))
+
+	return match
+end
+
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
 	local vods = {}
 	local secondVods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
@@ -282,24 +303,15 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		matchSummary:footer(CustomMatchSummary._createFooter(match, vods, secondVods))
+		return CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
-	return matchSummary:create()
+	return footer
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -353,6 +365,10 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param match MatchGroupUtilMatch
+---@param vods table<integer, string>
+---@param secondVods table<integer, table>
+---@return MatchSummaryFooter
 function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local footer = MatchSummary.Footer()
 
@@ -467,6 +483,8 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -533,6 +551,8 @@ function CustomMatchSummary._createMap(game)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
@@ -546,6 +566,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
+---@param map string?
+---@param game string?
+---@return string
 function CustomMatchSummary._createMapLink(map, game)
 	if Logic.isNotEmpty(map) then
 		if Logic.isNotEmpty(game) then
