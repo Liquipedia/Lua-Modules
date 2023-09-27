@@ -18,22 +18,22 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
-local _POSITION_LEFT = 1
-local _POSITION_RIGHT = 2
+local POSITION_LEFT = 1
+local POSITION_RIGHT = 2
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _ROUND_ICONS = {
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local ROUND_ICONS = {
 	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',
 	def = '[[File:R6S Para Bellum def logo.png|14px|link=]]',
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
-local _LINK_DATA = {
+local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
@@ -57,7 +57,6 @@ local _LINK_DATA = {
 }
 
 -- Operator Bans Class
-
 local OperatorBans = Class.new(
 	function(self)
 		self.root = mw.html.create('table')
@@ -138,8 +137,8 @@ function Score:setMapScore(score)
 end
 
 function Score:setFirstRoundScore(side, score, position)
-	local icon = _ROUND_ICONS[side]
-	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
+	local icon = ROUND_ICONS[side]
+	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -153,8 +152,8 @@ function Score:setFirstRoundScore(side, score, position)
 end
 
 function Score:setSecondRoundScore(side, score, position)
-	local icon = _ROUND_ICONS[side]
-	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
+	local icon = ROUND_ICONS[side]
+	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -168,8 +167,8 @@ function Score:setSecondRoundScore(side, score, position)
 end
 
 function Score:setFirstOvertimeRoundScore(side, score, position)
-	local icon = _ROUND_ICONS['ot'..side]
-	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
+	local icon = ROUND_ICONS['ot'..side]
+	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -183,8 +182,8 @@ function Score:setFirstOvertimeRoundScore(side, score, position)
 end
 
 function Score:setSecondOvertimeRoundScore(side, score, position)
-	local icon = _ROUND_ICONS['ot'..side]
-	if position == _POSITION_RIGHT then -- For right side, swap order of score and icon
+	local icon = ROUND_ICONS['ot'..side]
+	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
 		icon, score = score, icon
 	end
 
@@ -233,9 +232,9 @@ function MapVeto:vetoStart(firstVeto)
 	local textRight
 	if firstVeto == 1 then
 		textLeft = '<b>Start Map Veto</b>'
-		textCenter = _ARROW_LEFT
+		textCenter = ARROW_LEFT
 	elseif firstVeto == 2 then
-		textCenter = _ARROW_RIGHT
+		textCenter = ARROW_RIGHT
 		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
@@ -352,7 +351,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		footer:addLinks(_LINK_DATA, match.links)
+		footer:addLinks(LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
@@ -466,27 +465,27 @@ function CustomMatchSummary._createMap(game)
 
 	if not Logic.isEmpty(firstSide) then
 		-- Regular Time for Team 1
-		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], _POSITION_LEFT)
-		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], _POSITION_LEFT)
+		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], POSITION_LEFT)
+		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], POSITION_LEFT)
 
 		-- Overtime for both, if applicable
 		local firstSideOvertime = firstSides.ot
 		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
 
 		if not Logic.isEmpty(firstSideOvertime) then
-			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], _POSITION_LEFT)
-			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], _POSITION_LEFT)
+			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], POSITION_LEFT)
+			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], POSITION_LEFT)
 
-			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], _POSITION_RIGHT)
-			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], _POSITION_RIGHT)
+			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], POSITION_RIGHT)
+			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], POSITION_RIGHT)
 		else
 			team1Score:addEmptyOvertime()
 			team2Score:addEmptyOvertime()
 		end
 
 		-- Regular Time for Team 2
-		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], _POSITION_RIGHT)
-		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], _POSITION_RIGHT)
+		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], POSITION_RIGHT)
+		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], POSITION_RIGHT)
 	end
 
 	-- Score Team 2
@@ -508,7 +507,7 @@ function CustomMatchSummary._createMap(game)
 	if team1OperatorBans ~= nil then
 		row:addElement(team1OperatorBans:create())
 	end
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, _POSITION_LEFT))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, POSITION_LEFT))
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
@@ -524,7 +523,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addElement(centerNode)
 	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, _POSITION_RIGHT))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, POSITION_RIGHT))
 	if team2OperatorBans ~= nil then
 		row:addElement(team2OperatorBans:create())
 	end
@@ -566,14 +565,14 @@ function CustomMatchSummary._createCheckMark(isWinner, position)
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if isWinner then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
-	if position == _POSITION_LEFT then
+	if position == POSITION_LEFT then
 		container:css('margin-left', '3%')
-	elseif position == _POSITION_RIGHT then
+	elseif position == POSITION_RIGHT then
 		container:css('margin-right', '3%')
 	end
 
