@@ -241,6 +241,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field winner string?
 ---@field extradata table?
 ---@field timestamp number
+---@field bestof number?
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
