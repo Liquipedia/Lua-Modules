@@ -25,7 +25,6 @@ local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	esl = {
