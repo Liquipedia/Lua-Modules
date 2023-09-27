@@ -29,6 +29,12 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TBD = 'TBD'
 
 -- Score Class
+---@class CounterstrikeScore
+---@operator call: CounterstrikeScore
+---@field root Html
+---@field table Html
+---@field top Html
+---@field bottom Html
 local Score = Class.new(
 	function(self, direction)
 		self.root = mw.html.create('div')
@@ -41,16 +47,20 @@ local Score = Class.new(
 	end
 )
 
+---@return CounterstrikeScore
 function Score:setLeft()
 	self.table:css('float', 'left')
 	return self
 end
 
+---@return CounterstrikeScore
 function Score:setRight()
 	self.table:css('float', 'right')
 	return self
 end
 
+---@param score string|number|nil
+---@return CounterstrikeScore
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -64,6 +74,9 @@ function Score:setMapScore(score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return CounterstrikeScore
 function Score:setFirstHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -75,6 +88,9 @@ function Score:setFirstHalfScore(score, side)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return CounterstrikeScore
 function Score:setSecondHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -86,6 +102,7 @@ function Score:setSecondHalfScore(score, side)
 	return self
 end
 
+---@return Html
 function Score:create()
 	self.table:node(self.top):node(self.bottom)
 	return self.root
