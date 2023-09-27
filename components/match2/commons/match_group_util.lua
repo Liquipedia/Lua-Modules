@@ -240,6 +240,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field walkover WalkoverType?
 ---@field winner string?
 ---@field extradata table?
+---@field timestamp number
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
@@ -494,6 +495,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		bracketData.lowerEdges = bracketData.lowerEdges
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
+	---@cast extradata table
 
 	return {
 		bestof = tonumber(record.bestof) or 0,
@@ -589,6 +591,7 @@ end
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	---@cast extradata table
 	return {
 		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
 		advances = Logic.readBoolOrNil(Table.extract(extradata, 'advances')),
@@ -636,6 +639,7 @@ end
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	---@cast extradata table
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
