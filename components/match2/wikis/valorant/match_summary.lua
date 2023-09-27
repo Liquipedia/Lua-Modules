@@ -15,22 +15,25 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local _ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local _ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+local LINK_DATA = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
 }
 
+---@class ValorantAgents
+---@operator call: ValorantAgents
+---@field root Html
+---@field text string
 local Agents = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -39,6 +42,7 @@ local Agents = Class.new(
 	end
 )
 
+---@return ValorantAgents
 function Agents:setLeft()
 	self.root	:css('float', 'left')
 				:css('margin-left', '10px')
@@ -46,6 +50,7 @@ function Agents:setLeft()
 	return self
 end
 
+---@return ValorantAgents
 function Agents:setRight()
 	self.root	:css('float', 'right')
 				:css('margin-right', '10px')
@@ -53,7 +58,9 @@ function Agents:setRight()
 	return self
 end
 
-function Agents:add(frame, agent)
+---@param agent string
+---@return ValorantAgents
+function Agents:add(agent)
 	if Logic.isEmpty(agent) then
 		return self
 	end
@@ -62,11 +69,18 @@ function Agents:add(frame, agent)
 	return self
 end
 
+---@return Html
 function Agents:create()
 	self.root:wikitext(self.text)
 	return self.root
 end
 
+---@class ValorantScore
+---@operator call: ValorantScore
+---@field root Html
+---@field table Html
+---@field top Html
+---@field bottom Html
 local Score = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -76,6 +90,7 @@ local Score = Class.new(
 	end
 )
 
+---@return ValorantScore
 function Score:setLeft()
 	self.root	:css('float', 'left')
 				:css('margin-left', '4px')
@@ -83,6 +98,7 @@ function Score:setLeft()
 	return self
 end
 
+---@return ValorantScore
 function Score:setRight()
 	self.root	:css('float', 'right')
 				:css('margin-right', '4px')
@@ -90,6 +106,8 @@ function Score:setRight()
 	return self
 end
 
+---@param score string|number|nil
+---@return ValorantScore
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore:attr('rowspan', '2')
@@ -101,6 +119,9 @@ function Score:setMapScore(score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return ValorantScore
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
@@ -111,6 +132,9 @@ function Score:addTopRoundScore(side, score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return ValorantScore
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
@@ -121,6 +145,8 @@ function Score:addBottomRoundScore(side, score)
 	return self
 end
 
+---@param side string
+---@return string?
 function Score:_getSideColor(side)
 	if side == 'atk' then
 		return '#c04845'
@@ -129,12 +155,16 @@ function Score:_getSideColor(side)
 	end
 end
 
+---@return Html
 function Score:create()
 	self.table:node(self.top):node(self.bottom)
 	return self.root
 end
-
 -- Map Veto Class
+---@class ValorantMapVeto: MatchSummaryRowInterface
+---@operator call: ValorantMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -144,6 +174,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return ValorantMapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -152,15 +183,17 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return ValorantMapVeto
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
 		textLeft = '<b>Start Map Veto</b>'
-		textCenter = _ARROW_LEFT
+		textCenter = ARROW_LEFT
 	elseif firstVeto == 2 then
-		textCenter = _ARROW_RIGHT
+		textCenter = ARROW_RIGHT
 		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
@@ -170,6 +203,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return ValorantMapVeto
 function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
@@ -186,6 +221,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return ValorantMapVeto
 function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
@@ -222,6 +261,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return ValorantMapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -231,11 +274,15 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
-function MapVeto:addColumnVetoMap(row,map)
+---@param row Html
+---@param map string
+---@return ValorantMapVeto
+function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
@@ -275,7 +322,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Match Vod + other links
 		local buildLink = function (linktype, link)
-			local icon, text = _LINK_DATA[linktype].icon, _LINK_DATA[linktype].text
+			local icon, text = LINK_DATA[linktype].icon, LINK_DATA[linktype].text
 			return '[['..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
@@ -303,7 +350,7 @@ end
 function CustomMatchSummary._createBody(frame, match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -368,14 +415,14 @@ function CustomMatchSummary._createMap(frame, game)
 		for player = 1, 5 do
 			local playerStats = game.participants['1_' .. player]
 			if playerStats ~= nil then
-				team1Agents:add(frame, playerStats['agent'])
+				team1Agents:add(playerStats['agent'])
 			end
 		end
 
 		for player = 1, 5 do
 			local playerStats = game.participants['2_' .. player]
 			if playerStats ~= nil then
-				team2Agents:add(frame, playerStats['agent'])
+				team2Agents:add(playerStats['agent'])
 			end
 		end
 
@@ -459,9 +506,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	container:addClass('brkts-popup-spaced')
 
 	if isWinner then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
