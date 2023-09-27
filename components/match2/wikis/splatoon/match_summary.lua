@@ -370,7 +370,6 @@ function CustomMatchSummary._opponentWeaponsDisplay(props)
 	local displayElements = Array.map(props.data, function(weapon)
 		return mw.html.create('div')
 			:addClass('brkts-champion-icon')
-			:css('float', flip and 'right' or 'left')
 			:node(WeaponIcon._getImage{
 				weapon = weapon,
 				game = props.game,
@@ -384,6 +383,7 @@ function CustomMatchSummary._opponentWeaponsDisplay(props)
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 
 	for _, item in ipairs(displayElements) do
 		display:node(item)
