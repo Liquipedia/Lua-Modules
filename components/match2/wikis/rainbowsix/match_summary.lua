@@ -203,7 +203,7 @@ end
 ---@param position integer
 ---@return R6Score
 function Score:setFirstOvertimeRoundScore(side, score, position)
-	local icon = ROUND_ICONS['ot'..side]
+	local icon = ROUND_ICONS['ot' .. side]
 	local leftElement, RightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
 		leftElement, RightElement = score, icon
@@ -305,7 +305,7 @@ function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
 	else
-		map = '[['..map..'/siege|'..map..']]'
+		map = '[[' .. map .. '/siege|' .. map .. ']]'
 	end
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
@@ -325,12 +325,12 @@ function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
 	else
-		map1 = '[['..map1..'/siege|'..map1..']]'
+		map1 = '[[' .. map1 .. '/siege|' .. map1 .. ']]'
 	end
 	if Logic.isEmpty(map2) then
 		map2 = 'TBD'
 	else
-		map2 = '[['..map2..'/siege|'..map2..']]'
+		map2 = '[[' .. map2 .. '/siege|' .. map2 .. ']]'
 	end
 	local class
 	local vetoText
@@ -385,60 +385,24 @@ end
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		footer:addLinks(LINK_DATA, match.links)
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
@@ -512,6 +476,8 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -541,11 +507,11 @@ function CustomMatchSummary._createMap(game)
 		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
 
 		if not Logic.isEmpty(firstSideOvertime) then
-			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot'..firstSideOvertime], POSITION_LEFT)
-			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot'..oppositeSideOvertime], POSITION_LEFT)
+			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot' .. firstSideOvertime], POSITION_LEFT)
+			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot' .. oppositeSideOvertime], POSITION_LEFT)
 
-			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot'..oppositeSideOvertime], POSITION_RIGHT)
-			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot'..firstSideOvertime], POSITION_RIGHT)
+			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot' .. oppositeSideOvertime], POSITION_RIGHT)
+			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot' .. firstSideOvertime], POSITION_RIGHT)
 		else
 			team1Score:addEmptyOvertime()
 			team2Score:addEmptyOvertime()
@@ -621,6 +587,8 @@ function CustomMatchSummary._createMap(game)
 	return row
 end
 
+---@param side string
+---@return string
 function CustomMatchSummary._getOppositeSide(side)
 	if side == 'atk' then
 		return 'def'
@@ -628,6 +596,9 @@ function CustomMatchSummary._getOppositeSide(side)
 	return 'atk'
 end
 
+---@param isWinner boolean?
+---@param position integer
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner, position)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
