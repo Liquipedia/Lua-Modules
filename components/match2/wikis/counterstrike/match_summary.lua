@@ -16,7 +16,7 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -109,6 +109,10 @@ function Score:create()
 end
 
 -- Map Veto Class
+---@class CounterstrikeMapVeto: MatchSummaryRowInterface
+---@operator call: CounterstrikeMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -118,6 +122,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return CounterstrikeMapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -126,6 +131,8 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return CounterstrikeMapVeto
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -144,6 +151,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return CounterstrikeMapVeto
 function MapVeto:addDecider(map)
 	map = Logic.emptyOr(map, TBD)
 
@@ -157,6 +166,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return CounterstrikeMapVeto
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = Logic.emptyOr(map1, TBD)
 	map2 = Logic.emptyOr(map2, TBD)
@@ -186,6 +199,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return CounterstrikeMapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -195,11 +212,15 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string?
+---@return CounterstrikeMapVeto
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
