@@ -131,6 +131,17 @@ function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffraces(match)
 
 	local body = MatchSummary.Body()
+
+	--this if can be removed once the "switching between match and reset match" stuff has been implemented
+	if String.endsWith(match.matchId, '_RxMBR') then
+		body:addRow(MatchSummary.Row()
+			:addClass('brkts-popup-sc-veto-center')
+			:css('line-height', '80%')
+			:css('font-weight', 'bold')
+			:addElement('Reset match')
+		)
+	end
+
 	-- Stream, date, and countdown
 	if match.dateIsExact then
 		body:addRow(MatchSummary.Row():addElement(
