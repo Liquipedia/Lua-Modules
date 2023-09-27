@@ -254,7 +254,7 @@ function CustomBuilding:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. (args.name or ''), {
 		type = 'building',
 		name = args.name or self.pagename,
-		image = args.image and ('Wc3BTN' .. args.icon .. '.png') or nil,
+		image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil,
 		information = CustomBuilding.getBuildingType(args),
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
 	})
