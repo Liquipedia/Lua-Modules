@@ -10,13 +10,10 @@ local Abbreviation = require('Module:Abbreviation')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
 local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
@@ -26,62 +23,15 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset')
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if not Logic.isEmpty(game.vod) then
-			vods[index] = game.vod
-		end
-	end
-
-	if not Table.isEmpty(vods) or String.isNotEmpty(match.vod) then
-		local footer = MatchSummary.Footer()
-
-		if match.vod then
-			footer:addElement(VodLink.display{
-				vod = match.vod,
-			})
-		end
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-			})
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.timestamp ~= DateExt.epochZero) then
@@ -121,6 +71,8 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param row MatchSummaryRow
+---@param game MatchGroupUtilGame
 function CustomMatchSummary._createGame(row, game)
 	row
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
@@ -133,6 +85,9 @@ function CustomMatchSummary._createGame(row, game)
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 end
 
+---@param row MatchSummaryRow
+---@param game MatchGroupUtilGame
+---@param match MatchGroupUtilMatch
 function CustomMatchSummary._createSubMatch(row, game, match)
 	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
 
@@ -155,6 +110,9 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
 end
 
+---@param game MatchGroupUtilGame
+---@param match MatchGroupUtilMatch
+---@return table[][]
 function CustomMatchSummary._extractPlayersFromGame(game, match)
 	local players = {{}, {}}
 
@@ -178,6 +136,9 @@ function CustomMatchSummary._extractPlayersFromGame(game, match)
 	return players
 end
 
+---@param winner integer
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -190,6 +151,8 @@ function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 		)
 end
 
+---@param score number|string|nil
+---@return Html?
 function CustomMatchSummary._score(score)
 	if not score then return end
 
@@ -198,6 +161,9 @@ function CustomMatchSummary._score(score)
 		:wikitext(score)
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return string
 function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 	local scores = (game.extradata or {}).penaltyscores
 
@@ -206,9 +172,13 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 	return Abbreviation.make(
 		'(' .. (scores[opponentIndex] or 0) .. ')',
 		'Penalty shoot-out'
-	)
+	)--[[@as string]]
 end
 
+---@param players table[]
+---@param opponentIndex integer
+---@param winner integer
+---@return Html
 function CustomMatchSummary._players(players, opponentIndex, winner)
 	local flip = opponentIndex == 1
 
