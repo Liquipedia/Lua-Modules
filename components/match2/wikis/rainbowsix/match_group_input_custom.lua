@@ -6,12 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -22,12 +22,11 @@ local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 9
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local NOW = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -37,19 +36,16 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.removeUnsetMaps(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, matchFunctions.readDate(match))
 	match = matchFunctions.getOpponents(match)
-	match = matchFunctions.getTournamentVars(match)
+	match = CustomMatchGroupInput.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
 
@@ -60,7 +56,7 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
+	map = CustomMatchGroupInput.getTournamentVars(map)
 
 	return map
 end
@@ -82,7 +78,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			NOW
 		)
 	end
 
@@ -118,7 +114,7 @@ end
 -- Set the placementWinner field to the winner, and placementLoser to the other team
 -- Special cases:
 -- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
--- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will gt placementLoser
+-- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
 function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
 	if opponents and #opponents == 2 then
 		local loserIdx
@@ -151,6 +147,12 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, 
 	return opponents
 end
 
+--- Fetch information about the tournament
+function CustomMatchGroupInput.getTournamentVars(data)
+	data.mode = Logic.emptyOr(data.mode, Variables.varDefault('tournament_mode', 'team'))
+	return MatchGroupInput.getCommonTournamentVars(data)
+end
+
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if data.finished == 'skip' or data.finished == 'np' or data.finished == 'cancelled' or data.finished == 'canceled' then
@@ -176,7 +178,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		else
 			--R6 only has exactly 2 opponents, neither more or less
 			if #indexedScores ~= 2 then
-				error('Unexpected number of opponents when calculating map winner')
+				error('Unexpected number of opponents when calculating winner')
 			end
 			if tonumber(indexedScores[1].score) > tonumber(indexedScores[2].score) then
 				data.winner = 1
@@ -224,15 +226,7 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	local mapCount = 0
-	for i = 1, MAX_NUM_MAPS do
-		if match['map'..i] then
-			mapCount = mapCount + 1
-		else
-			break
-		end
-	end
-	match.bestof = mapCount
+	match.bestof = #Array.filter(Array.range(1, MAX_NUM_MAPS), function(idx) return match['map'.. idx] end)
 	return match
 end
 
@@ -300,105 +294,41 @@ function matchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 			timestamp = DateExt.epochZero,
 		}
 	end
 end
 
-function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(match)
-end
-
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
+	match.links = {
+		preview = match.preview,
+		stats = match.stats,
+		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
+		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,
+		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
+		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
+		lpl = match.lpl and 'https://letsplay.live/match/' .. match.lpl or nil,
+		r6esports = match.r6esports
+			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
+		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,
+		ebattle = match.ebattle and 'https://www.ebattle.gg/turnier/match/' .. match.ebattle or nil,
+	}
 
-	match.links = {}
-	local links = match.links
-	if match.preview then links.preview = match.preview end
-	if match.siegegg then links.siegegg = 'https://siege.gg/matches/' .. match.siegegg end
-	if match.opl then links.opl = 'https://www.opleague.eu/match/' .. match.opl end
-	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.faceit then links.faceit = 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit end
-	if match.lpl then links.lpl = 'https://letsplay.live/match/' .. match.lpl end
-	if match.r6esports then links.r6esports = 'https://www.r6esports.com.br/en/match/' .. match.r6esports end
-	if match.challengermode then links.challengermode = 'https://www.challengermode.com/games/' .. match.challengermode end
-	if match.stats then links.stats = match.stats end
-
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
 	return match
 end
 
 function matchFunctions.getExtraData(match)
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-
 	match.extradata = {
-		lastgame = Variables.varDefault('last_game'),
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
-		isconverted = 0,
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+		mvp = MatchGroupInput.readMvp(match),
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 	return match
-end
-
-function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
-	if String.isEmpty(flag) then
-		flag = Variables.varDefault(name .. '_flag')
-	end
-	if String.isEmpty(displayName) then
-		displayName = Variables.varDefault(name .. '_dn')
-	end
-	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
-		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
-			query = 'flag, id',
-			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
-		end
-	end
-	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
-	end
-	if String.isEmpty(displayName) then
-		displayName = name
-	end
-	if String.isNotEmpty(displayName) then
-		Variables.varDefine(name .. '_dn', displayName)
-	end
-	return {
-		name = name,
-		displayName = displayName,
-		flag = flag,
-	}
 end
 
 -- Parse the mapVeto input
@@ -407,13 +337,13 @@ function matchFunctions.getMapVeto(match)
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
-	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
+	local vetoTypes = mw.text.split(match.mapveto.types or '', ',')
 	local deciders = mw.text.split(match.mapveto.decider or '', ',')
-	local vetostart = match.mapveto.firstpick or ''
+	local vetoStart = match.mapveto.firstpick or ''
 	local deciderIndex = 1
 
 	local data = {}
-	for index, vetoType in ipairs(vetotypes) do
+	for index, vetoType in ipairs(vetoTypes) do
 		vetoType = mw.text.trim(vetoType):lower()
 		if not Table.includes(ALLOWED_VETOES, vetoType) then
 			return nil -- Any invalid input will not store (ie hide) all vetoes.
@@ -426,25 +356,9 @@ function matchFunctions.getMapVeto(match)
 		end
 	end
 	if data[1] then
-		data[1].vetostart = vetostart
+		data[1].vetostart = vetoStart
 	end
 	return data
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return nil end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -474,47 +388,25 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
-		local currentUnixTime = os.time(os.date('!*t'))
 		local threshold = match.dateexact and 30800 or 86400
-		if match.timestamp + threshold < currentUnixTime then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(match.finished) then
-		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
-	end
+	match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		player = Json.parseIfString(player)
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end
@@ -526,11 +418,7 @@ end
 -- Check if a map should be discarded due to being redundant
 -- DUMMY_MAP_NAME needs the match the default value in Template:Map
 function mapFunctions.discardMap(map)
-	if map.map == DUMMY_MAP_NAME then
-		return true
-	else
-		return false
-	end
+	return map.map == DUMMY_MAP_NAME
 end
 
 -- Parse extradata information, particularally info about halfs and operator bans
@@ -579,11 +467,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --

@@ -29,12 +29,11 @@ function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
 
-	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -62,22 +61,15 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function League:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = Logic.readBool(args.riotpremier) and 'true' or nil
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_patch', args.patch)
+	Variables.varDefine('tournament_endpatch', args.epatch)
 
-	return lpdbData
-end
-
-function League:defineCustomPageVariables()
-	Variables.varDefine('tournament_patch', _args.patch)
-	Variables.varDefine('tournament_endpatch', _args.epatch)
-
-	Variables.varDefine('tournament_publishertier', _args['riotpremier'])
+	Variables.varDefine('tournament_publishertier', Logic.readBool(args.riotpremier) and 'true' or nil)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-	Variables.varDefine('tournament_riot_premier', _args['riotpremier'])
+	Variables.varDefine('tournament_riot_premier', args.riotpremier)
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)

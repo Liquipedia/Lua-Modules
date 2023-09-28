@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CleanRace = mw.loadData('Module:CleanRace2')
+local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -33,40 +33,32 @@ local _RACE_MATCHUPS = {
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomStrategy.run(frame)
 	local customStrategy = Strategy(frame)
 	_strategy = customStrategy
 	_args = customStrategy.args
 	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
-	return customStrategy:createInfobox(frame)
+	return customStrategy:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomStrategy:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Matchups',
-		content = {_args.matchups or 'All'}
-	})
-	table.insert(widgets, Cell{
-		name = 'Type',
-		content = {_args.type or 'Opening'}
-	})
-	table.insert(widgets, Cell{
-		name = 'Popularized by',
-		content = {_args.popularized},
-		options = {makeLink = true}
-	})
-	table.insert(widgets, Cell{
-		name = 'Converted Form',
-		content = {_args.convert}
-	})
-	table.insert(widgets, Cell{
-		name = 'TL-Article',
-		content = {CustomStrategy:_getTLarticle(_args.tlarticle)}
-	})
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Matchups', content = {_args.matchups or 'All'}},
+		Cell{name = 'Type', content = {_args.type or 'Opening'}},
+		Cell{name = 'Popularized by', content = {_args.popularized}, options = {makeLink = true}},
+		Cell{name = 'Converted Form', content = {_args.convert}},
+		Cell{name = 'TL-Article', content = {CustomStrategy:_getTLarticle(_args.tlarticle)}}
+	)
 
 	if Namespace.isMain() then
 		local categories = CustomStrategy:_getCategories(_args.race, _args.matchups)
@@ -76,23 +68,26 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		return {
-			Header{
-				name = CustomStrategy:_getNameDisplay(),
-				image = _args.image
-			},
+			Header{name = CustomStrategy:_getNameDisplay(), image = _args.image},
 		}
 	end
 	return widgets
 end
 
+---@return string
 function CustomStrategy:_getNameDisplay()
-	local race = RaceIcon._getBigIcon({'alt_' .. (_args.race or '')}) or ''
+	local race = Faction.Icon{size = 'large', faction = _args.race} or ''
 	return race .. (_args.name or mw.title.getCurrentTitle().text)
 end
 
+---@param tlarticle string?
+---@return string?
 function CustomStrategy:_getTLarticle(tlarticle)
 	if not String.isEmpty(tlarticle) then
 		return '[[File:TL Strategy presents.png|left|95px]] ' ..
@@ -101,14 +96,21 @@ function CustomStrategy:_getTLarticle(tlarticle)
 	end
 end
 
+---@param race string?
+---@param matchups string?
+---@return table
 function CustomStrategy:_getCategories(race, matchups)
-	if String.isEmpty(matchups) then
-		return {}
-	end
-
 	local categories = {}
-	race = string.lower(race or '')
-	race = CleanRace[race] or ''
+
+	if String.isEmpty(matchups) then
+		return categories
+	end
+	---@cast matchups -nil
+
+	race = Faction.toName(Faction.read(race))
+	if not race then
+		return categories
+	end
 
 	local informationType = _args.informationType
 	if informationType == 'Strategy' then

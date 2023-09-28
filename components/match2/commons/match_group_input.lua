@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -23,6 +22,8 @@ local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local globalVars = PageVariableNamespace({cached = true})
+
+local DEFAULT_MAX_NUM_PLAYERS = 10
 
 local MatchGroupInput = {}
 
@@ -101,7 +102,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
 		:catch(function(message)
-			if FeatureFlag.get('prompt_purge_bracket_template') and String.endsWith(message, 'does not exist') then
+			if String.endsWith(message, 'does not exist') then
 				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
@@ -139,6 +140,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
+		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		match.parent = context.tournamentParent
@@ -335,7 +337,8 @@ namespace.
 ]]
 MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = '[[namespace::130]] AND [[match2bracketid::'.. bracketId .. ']]'
+		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
+		limit = 5000,
 	})
 end)
 
@@ -384,7 +387,7 @@ end
 function MatchGroupInput.getCommonTournamentVars(obj)
 	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault("tournament_icondark"))
+	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
@@ -410,7 +413,7 @@ function MatchGroupInput.readMvp(match)
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
 		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
-			for _, lookUpPlayer in pairs(opponent.match2players) do
+			for _, lookUpPlayer in pairs(opponent.match2players or {}) do
 				if link == lookUpPlayer.name then
 					return Table.merge(lookUpPlayer,
 						{team = opponent.name, template = opponent.template, comment = match['mvp' .. playerIndex .. 'comment']})
@@ -427,6 +430,117 @@ function MatchGroupInput.readMvp(match)
 	end)
 
 	return {players = parsedPlayers, points = mvppoints}
+end
+
+---@class MatchGroupInputReadPlayersOfTeamOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field applyUnderScores boolean?
+
+---reads the players of a team from input and wiki variables
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@param options MatchGroupInputReadPlayersOfTeamOptions?
+---@return table
+function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
+	options = options or {}
+
+	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
+	local opponent = match['opponent' .. opponentIndex]
+	local playersData = Json.parseIfString(opponent.players) or {}
+
+	local players = {}
+
+	for playerIndex = 1, maxNumPlayers do
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+
+		player.name = player.name or playersData['p' .. playerIndex]
+			or Variables.varDefault(teamName .. '_p' .. playerIndex)
+
+		player.name = player.name and options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			or player.name
+
+		player.name = player.name and options.applyUnderScores and player.name:gsub(' ', '_') or player.name
+
+		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+
+		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+
+		if Table.isNotEmpty(player) then
+			table.insert(players, player)
+		end
+	end
+
+	opponent.match2players = players
+
+	return match
+end
+
+---reads the caster input of a match
+---@param match table
+---@param options {noSort: boolean?}?
+---@return string?
+function MatchGroupInput.readCasters(match, options)
+	options = options or {}
+	local casters = {}
+	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, MatchGroupInput._getCasterInformation(
+			casterName,
+			match[casterKey .. 'flag'],
+			match[casterKey .. 'name']
+		))
+	end
+
+	if not options.noSort then
+		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
+	end
+
+	return Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+end
+
+---fills in missing information for a given caster
+---@param name string
+---@param flag string?
+---@param displayName string?
+---@return {name:string, displayName: string, flag: string?}
+function MatchGroupInput._getCasterInformation(name, flag, displayName)
+	flag = Logic.emptyOr(flag, Variables.varDefault(name .. '_flag'))
+	displayName = Logic.emptyOr(displayName, Variables.varDefault(name .. 'dn'))
+
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	Variables.varDefine(name .. '_dn', displayName)
+
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
 end
 
 return MatchGroupInput

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -19,9 +20,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getTinyIcon = function(_) end,
-}
 
 local html = mw.html
 
@@ -125,7 +123,7 @@ function StarcraftMatchSummary.Header(props)
 		if not flip then
 			opponentDisplay = Array.reverse(opponentDisplay)
 		end
-		Array.extendWith(display.nodes, opponentDisplay)
+		Array.forEach(opponentDisplay, function(opponentNode) display:node(opponentNode) end)
 
 		return display
 	end
@@ -489,7 +487,7 @@ function StarcraftMatchSummary.OffraceIcons(races)
 	local racesNode = html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
 	for _, race in ipairs(races) do
-		racesNode:node(RaceIcon.getTinyIcon({race}))
+		racesNode:node(Faction.Icon{size = 'tiny', faction = race})
 	end
 
 	return racesNode

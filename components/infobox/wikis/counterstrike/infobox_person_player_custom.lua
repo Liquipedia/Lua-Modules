@@ -15,6 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -52,14 +53,6 @@ _ROLES.lurk = _ROLES.lurker
 _ROLES.entryfragger = _ROLES.entry
 _ROLES.rifle = _ROLES.rifler
 
-local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS', order = 1},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ', order = 2},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS', order = 3},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO', order = 4},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO', order = 5},
-}
-
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
@@ -70,20 +63,26 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = player.args.team_history
-	player.args.steamalternative = player.args.steam
-	player.args.steam = nil
+
+	for steamKey, steamInput, steamIndex in Table.iter.pairsByPrefix(player.args, 'steam', {requireIndex = false}) do
+		player.args['steamalternative' .. steamIndex] = steamInput
+		player.args[steamKey] = nil
+	end
 
 	player.args.informationType = player.args.informationType or 'Player'
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 
+	player.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+			return player.args[gameIdentifier]
+		end)
+
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -96,7 +95,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
 			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
-
 	elseif id == 'role' then
 		local role = CustomPlayer._createRole('role', _args.role)
 		local role2 = CustomPlayer._createRole('role2', _args.role2)
@@ -104,6 +102,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
 		}
+	elseif id == 'region' then
+		return {}
 	end
 
 	return widgets
@@ -113,9 +113,9 @@ function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell {
 			name = 'Games',
-			content = Array.map(CustomPlayer._getGames(), function (gameData)
-				return Page.makeInternalLink({}, gameData.name, gameData.link)
-			end)
+			content = Array.map(_args.gamesList, function (gameIdentifier)
+					return Game.text{game = gameIdentifier}
+				end)
 		}
 	}
 end
@@ -138,15 +138,6 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	return lpdbData
 end
 
-function CustomPlayer._getGames()
-	return Array.sortBy(Array.extractValues(Table.map(GAMES, function (key, data)
-		if _args[key] then
-			return key, data
-		end
-		return key, nil
-	end)), function(gameData) return gameData.order end)
-end
-
 function CustomPlayer._getStatusContents()
 	local statusContents = {}
 
@@ -162,10 +153,10 @@ function CustomPlayer._getStatusContents()
 		end
 
 		Array.extendWith(statusContents, Array.map(Player:getAllArgsForBase(_args, 'banned'),
-			function(item)
-				return _BANNED[string.lower(item)]
-			end
-		))
+				function(item)
+					return _BANNED[string.lower(item)]
+				end
+			))
 	end
 
 	return statusContents
@@ -173,19 +164,18 @@ end
 
 function CustomPlayer:getWikiCategories(categories)
 	local typeCategory = self:getPersonType(_args).category
-	local games = CustomPlayer._getGames()
 
-	Array.extendWith(categories, Array.map(games, function (gameData)
-		return gameData.category .. ' ' .. typeCategory .. 's'
-	end))
+	Array.forEach(_args.gamesList, function (gameIdentifier)
+			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
+			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
+		end)
 
-	if #games == 0 then
+	if Table.isEmpty(_args.gamesList) then
 		table.insert(categories, 'Gameless Players')
 	end
 
 	return categories
 end
-
 
 function CustomPlayer._createRole(key, role)
 	if String.isEmpty(role) then
@@ -222,26 +212,15 @@ function CustomPlayer._isNotPlayer(role)
 	return roleData and (roleData.talent or roleData.management or roleData.coach)
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
-end
-
 function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.coach then
-			return { store = 'Staff', category = 'Coache' }
+			return { store = 'Coach', category = 'Coache' }
 		elseif roleData.management then
 			return { store = 'Staff', category = 'Manager' }
 		elseif roleData.talent then
-			return { store = '', category = 'Talent' }
+			return { store = 'Talent', category = 'Talent' }
 		end
 	end
 	return { store = 'Player', category = 'Player' }

@@ -10,9 +10,10 @@ local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
-local Opponent = require('Module:Opponent/Custom')
+
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -22,13 +23,14 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
+local PRIZE_TYPE_POINTS = 'POINTS'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
-	args.opponentLibrary = 'Opponent/Custom'
 	args.syncPlayers = true
+	args.import = false
 
 	local prizePool = PrizePool(args)
 		:create()
@@ -59,8 +61,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement.prizeRewards.POINTS1
-	lpdbData.extradata.points2 = placement.prizeRewards.POINTS2
+	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
+	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)
 		return prize.type == PRIZE_TYPE_QUALIFIES
@@ -78,7 +82,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 end
 
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

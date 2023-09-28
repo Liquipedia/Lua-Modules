@@ -10,6 +10,8 @@ local Class = require('Module:Class')
 
 local ReferenceCleaner = {}
 
+---@param dateWithRef string?
+---@return string
 function ReferenceCleaner.clean(dateWithRef)
 	if dateWithRef == nil then
 		return ''
@@ -27,6 +29,8 @@ function ReferenceCleaner.clean(dateWithRef)
 	return ''
 end
 
+---@param numberWithRef string?
+---@return string
 function ReferenceCleaner.cleanNumber(numberWithRef)
 	if numberWithRef == nil then
 		return ''

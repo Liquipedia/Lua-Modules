@@ -25,7 +25,6 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
 local _ROLES = {
 	-- Staff and Talents
@@ -61,26 +60,22 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.createBottomContent = CustomPlayer.createBottomContent
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
 			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
@@ -115,7 +110,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
@@ -158,18 +153,17 @@ function CustomPlayer:createBottomContent(infobox)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
-	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
-	end
-	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
+function CustomPlayer._isPlayerOrStaff()
+local roleData
+if String.isNotEmpty(_args.role) then
+	roleData = _ROLES[_args.role:lower()]
+end
+-- If the role is missing, assume it is a player
+if roleData and roleData.isplayer == false then
+	return 'staff'
+else
+	return 'player'
+end
 end
 
 return CustomPlayer

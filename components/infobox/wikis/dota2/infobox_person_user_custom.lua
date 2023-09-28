@@ -36,7 +36,7 @@ function CustomUser.run(frame)
 
 	user.createWidgetInjector = CustomUser.createWidgetInjector
 
-	return user:createInfobox(frame)
+	return user:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)

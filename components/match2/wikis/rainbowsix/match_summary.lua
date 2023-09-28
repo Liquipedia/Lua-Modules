@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -39,7 +38,7 @@ local _LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-	opl = {icon = 'File:OPL_icon_lightmode.png', iconDark = 'File:OPL_icon_darkmode.png', text = 'OPL Match Page'},
+	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
 	esl = {
 		icon = 'File:ESL_2019_icon_lightmode.png',
 		iconDark = 'File:ESL_2019_icon_darkmode.png',
@@ -47,9 +46,14 @@ local _LINK_DATA = {
 	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
-	r6esports = {icon = 'File:Copa Elite Six icon.png', text = 'R6 Esports LATAM Match Page'},
+	r6esports = {
+		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
+		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
+		text = 'R6 Esports Match Page'
+	},
 	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
+	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
 }
 
 -- Operator Bans Class
@@ -228,11 +232,11 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = '\'\'\'Start Map Veto\'\'\''
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = _ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = _ARROW_RIGHT
-		textRight = '\'\'\'Start Map Veto\'\'\''
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
@@ -311,43 +315,12 @@ function MapVeto:create()
 	return self.root
 end
 
--- Custom Caster Class
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster.flag) .. ' ' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-	return self
-end
-
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
-end
-
 local CustomMatchSummary = {}
-
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset') -- temporary workaround to fix height, taken from RL
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -440,7 +413,7 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = Casters()
+		local casterRow = MatchSummary.Casters()
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end

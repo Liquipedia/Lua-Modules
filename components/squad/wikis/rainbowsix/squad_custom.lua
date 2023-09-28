@@ -6,15 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local SquadAutoRefs = require('Module:SquadAuto/References')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
 function CustomSquad.run(frame)
-	error("R6 wiki doesn't support manual Squad Tables")
+	error('R6 wiki doesn\'t support manual Squad Tables')
 end
 
 function CustomSquad.runAuto(playerList, squadType)
@@ -44,7 +46,8 @@ function CustomSquad._playerRow(player, squadType)
 	local joinText = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
 	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 
-	local row = SquadRow(mw.getCurrentFrame(), player.thisTeam.role)
+	local row = SquadRow()
+	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
@@ -52,6 +55,7 @@ function CustomSquad._playerRow(player, squadType)
 		captain = player.captain,
 		role = player.thisTeam.role,
 		team = player.thisTeam.role == 'Loan' and player.oldTeam.team,
+		date = player.leavedate or player.inactivedate or player.leavedate,
 	})
 	row:name({name = player.name})
 	row:role({role = player.thisTeam.role})
@@ -69,7 +73,11 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. player.joindate)
+	return row:create(
+		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_'
+		.. player.joindate .. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
+	)
 end
 
 return CustomSquad

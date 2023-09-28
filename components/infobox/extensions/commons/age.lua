@@ -16,7 +16,7 @@ local _EPOCH_DATE = { year = 1970, month = 1, day = 1 }
 local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 local _MAXIMUM_DAYS_IN_FEBRUARY = 29
 local _MONTH_DECEMBER = 12
-local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y'))
+local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y')) --[[@as integer]]
 
 local NON_BREAKING_SPACE = '&nbsp;'
 

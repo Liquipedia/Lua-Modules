@@ -6,23 +6,32 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
 
+---@class Infobox
+---@field frame Frame?
+---@field root Html?
+---@field adbox Html?
+---@field content Html?
+---@field injector WidgetInjector?
 local Infobox = Class.new()
 
 --- Inits the Infobox instance
+---@param frame Frame
+---@param gameName string
+---@param forceDarkMode boolean?
+---@return self
 function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
 	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:addClass('wiki-bordercolor-light')
 										:node(self.frame:preprocess('<adbox />'))
 	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-											:addClass('wiki-bordercolor-light')
 	self.root	:addClass('fo-nttax-infobox-wrapper')
 				:addClass('infobox-' .. gameName:lower())
 	if forceDarkMode then
@@ -33,32 +42,37 @@ function Infobox:create(frame, gameName, forceDarkMode)
 	return self
 end
 
+---Adds categories
+---@param ... string?
+---@return self
 function Infobox:categories(...)
-	local input = {...}
-	for i = 1, #input do
-		local category = input[i]
-		if category ~= nil and category ~= '' then
-			self.root:wikitext('[[Category:' .. category .. ']]')
-		end
-	end
+	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
 	return self
 end
 
+---Sets the widgetInjector
+---@param injector WidgetInjector?
+---@return self
 function Infobox:widgetInjector(injector)
 	self.injector = injector
 	return self
 end
 
+---Adds a custom widgets to the bottom of the infobox
+---@param wikitext string|number|Html|nil
+---@return self
 function Infobox:bottom(wikitext)
 	self.bottomContent = wikitext
 	return self
 end
 
 --- Returns completed infobox
+---@param widgets Widget[]
+---@return Html
 function Infobox:build(widgets)
 	for _, widget in ipairs(widgets) do
 		if widget == nil or widget['is_a'] == nil then
-			return error('Infobox:build can only accept Widgets')
+			error('Infobox:build can only accept Widgets')
 		end
 		widget:setContext({injector = self.injector})
 

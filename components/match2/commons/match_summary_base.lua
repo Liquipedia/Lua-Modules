@@ -7,12 +7,13 @@
 --
 
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Break = Class.new(
 	function(self)
@@ -221,10 +222,10 @@ end
 function Footer:addLink(link, icon, iconDark, text)
 	local content
 	if String.isEmpty(iconDark) then
-		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. ']]'
+		content = '[['..icon..'|link='..link..'|32px|'..text..'|alt=' .. link .. ']]'
 	else
-		content = '[['..icon..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
-			.. '[['..iconDark..'|link='..link..'|15px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
+		content = '[['..icon..'|link='..link..'|32px|'..text..'|alt=' .. link .. '|class=show-when-light-mode]]'
+			.. '[['..iconDark..'|link='..link..'|32px|'..text..'|alt=' .. link .. '|class=show-when-dark-mode]]'
 	end
 
 	self.inner:wikitext(content)
@@ -249,6 +250,36 @@ function Footer:create()
 	return self.root
 end
 
+local Casters = Class.new(
+	function(self)
+		self.root = mw.html.create('div')
+			:addClass('brkts-popup-comment')
+			:css('white-space','normal')
+			:css('font-size','85%')
+		self.casters = {}
+	end
+)
+
+function Casters:addCaster(caster)
+	if Logic.isNotEmpty(caster) then
+		---@cast caster -nil
+		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
+		if caster.flag then
+			table.insert(self.casters, Flags.Icon(caster.flag) .. '&nbsp;' .. nameDisplay)
+		else
+			table.insert(self.casters, nameDisplay)
+		end
+	end
+
+	return self
+end
+
+function Casters:create()
+	return self.root
+		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
+		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
+end
+
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
 MatchSummary.Body = Body
@@ -257,6 +288,7 @@ MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
 MatchSummary.Mvp = Mvp
+MatchSummary.Casters = Casters
 
 function MatchSummary:init(width)
 	self.root = mw.html.create('div')
@@ -282,7 +314,7 @@ function MatchSummary:resetBody(resetBody)
 end
 
 function MatchSummary:resetHeader(resetHeader)
-	self.resetHeader = resetHeader:create()
+	self.resetHeaderNode = resetHeader:create()
 		:addClass('brkts-popup-header-reset')
 	return self
 end
@@ -314,7 +346,7 @@ function MatchSummary:create()
 
 	if self.resetBodyElement then
 		self.root
-			:node(self.resetHeader or MatchSummary._fallbackResetHeader())
+			:node(self.resetHeaderNode or MatchSummary._fallbackResetHeader())
 			:node(Break():create())
 			:node(self.resetBodyElement)
 			:node(Break():create())

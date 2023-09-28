@@ -8,16 +8,17 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Matches = require('Module:Matches_Player')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
-local YearsActive = require('Module:YearsActive')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local YearsActive = Lua.import('Module:YearsActive', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -25,6 +26,8 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local _BANNED = mw.loadData('Module:Banned')
+
+local _NOT_APPLICABLE = 'N/A'
 
 local _title = mw.title.getCurrentTitle()
 local _pagename = _title.prefixedText
@@ -49,32 +52,36 @@ function CustomPlayer.run(frame)
 	player.getCategories = CustomPlayer.getCategories
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
+end
+
+function CustomPlayer:_parseActive(manualInput, varName, autoFunction, autoFunctionParam)
+	if String.isNotEmpty(manualInput) then
+		return manualInput:upper() ~= _NOT_APPLICABLE and manualInput or nil
+	end
+	return Logic.readBool(Variables.varDefault(varName)) and autoFunction(autoFunctionParam) or nil
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		local statusContents = CustomPlayer._getStatusContents()
 
-		local yearsActive = _args.years_active
-		if String.isEmpty(yearsActive) then
-			yearsActive = YearsActive.get({player = _base_page_name})
-		else
-			yearsActive = Page.makeInternalLink({onlyIfExists = true}, yearsActive)
-		end
-
-		local yearsActiveOrg = _args.years_active_manage
-		if not String.isEmpty(yearsActiveOrg) then
-			yearsActiveOrg = Page.makeInternalLink({onlyIfExists = true}, yearsActiveOrg)
-		end
+		-- Years active
+		local yearsActive = CustomPlayer:_parseActive(
+			_args.years_active, 'role_player', YearsActive.get, {player = _base_page_name}
+		)
+		local yearsActiveCoach = CustomPlayer:_parseActive(
+			_args.years_active_coach, 'role_coach', YearsActive.get, {player = _base_page_name, prefix = 'c'}
+		)
+		local yearsActiveTalent = CustomPlayer:_parseActive(
+			_args.years_active_talent, 'role_talent', YearsActive.getTalent, _base_page_name
+		)
 
 		return {
 			Cell{name = 'Status', content = statusContents},
 			Cell{name = 'Years Active (Player)', content = {yearsActive}},
-			Cell{name = 'Years Active (Org)', content = {yearsActiveOrg}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
+			Cell{name = 'Years Active (Coach)', content = {yearsActiveCoach}},
+			Cell{name = 'Years Active (Talent)', content = {yearsActiveTalent}},
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(_args.history_iwo) then
@@ -88,6 +95,14 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(_args.history_odl) then
 			table.insert(widgets, Title{name = '[[Oceania Draft League|Oceania Draft League]] History'})
 			table.insert(widgets, Center{content = {_args.history_odl}})
+		end
+		if String.isNotEmpty(_args.history_irc) then
+			table.insert(widgets, Title{name = '[[Italian Rocket Championship]] History'})
+			table.insert(widgets, Center{content = {_args.history_irc}})
+		end
+		if String.isNotEmpty(_args.history_elite_series) then
+			table.insert(widgets, Title{name = '[[Elite Series]] History'})
+			table.insert(widgets, Center{content = {_args.history_elite_series}})
 		end
 	elseif id == 'role' then
 		return {
@@ -114,8 +129,8 @@ function CustomInjector:addCustomCells(widgets)
 	if not String.isEmpty(_args.mmr) then
 		mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 		if not String.isEmpty(_args.mmrdate) then
-			mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'('
-				.. _args.mmrdate .. ')\'\'</small>'
+			mmrDisplay = mmrDisplay .. '&nbsp;<small><i>('
+				.. _args.mmrdate .. ')</i></small>'
 		end
 	end
 
@@ -224,18 +239,17 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
 	lpdbData.extradata.role = _args.role
-	lpdbData.extradata.birthmonthandday = Variables.varDefault('birth_monthandday')
+
+	local birthMonthAndDay = string.match(_args.birth_date or '', '%-%d%d?%-%d%d?$')
+	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
+
+	lpdbData.extradata.birthmonthandday = birthMonthAndDay
 
 	return lpdbData
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('id', args.id or _pagename)
-
-	--retrieve birth month + day for storage in smw
-	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
-	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
-	Variables.varDefine('birth_monthandday', birthMonthAndDay)
 end
 
 function CustomPlayer:createBottomContent(infobox)

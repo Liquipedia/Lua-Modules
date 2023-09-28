@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local ItemIcon = require('Module:ItemIcon')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -41,6 +42,8 @@ local _CATEGORY_DISPLAY = {
 
 local _DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 
+---@param frame Frame
+---@return Html
 function CustomItem.run(frame)
 	local item = Item(frame)
 	_args = item.args
@@ -49,9 +52,12 @@ function CustomItem.run(frame)
 	item.getWikiCategories = CustomItem.getWikiCategories
 	item.createWidgetInjector = CustomItem.createWidgetInjector
 
-	return item:createInfobox(frame)
+	return item:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if String.isNotEmpty(_args.itemcost) then
@@ -156,21 +162,24 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomItem:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomItem.getWikiCategories()
+---@param args table
+---@return string[]
+function CustomItem:getWikiCategories(args)
 	if Namespace.isMain() then
 		if
-			String.isNotEmpty(_args.str) or
-			String.isNotEmpty(_args.agi) or
-			String.isNotEmpty(_args.int)
+			String.isNotEmpty(args.str) or
+			String.isNotEmpty(args.agi) or
+			String.isNotEmpty(args.int)
 		then
 			table.insert(_categories, 'Attribute Items')
 		end
 
-		if String.isNotEmpty(_args.movespeed) or String.isNotEmpty(_args.movespeedmult) then
+		if String.isNotEmpty(args.movespeed) or String.isNotEmpty(args.movespeedmult) then
 			table.insert(_categories, 'Movement Speed Items')
 		end
 
@@ -190,19 +199,24 @@ function CustomItem.getWikiCategories()
 			['Items with Passive Abilities'] = 'passive',
 		}
 		for category, requiredArg in pairs(possibleCategories) do
-			if String.isNotEmpty(_args[requiredArg]) then
+			if String.isNotEmpty(args[requiredArg]) then
 				table.insert(_categories, category)
 			end
 		end
 
 		return _categories
 	end
+
+	return {}
 end
 
-function CustomItem.nameDisplay()
-	return _args.itemname
+---@param args table
+---@return string?
+function CustomItem.nameDisplay(args)
+	return args.itemname
 end
 
+---@return string[]
 function CustomItem._getCostDisplay()
 	local costs = Item:getAllArgsForBase(_args, 'itemcost')
 
@@ -222,6 +236,8 @@ function CustomItem._getCostDisplay()
 	return {display}
 end
 
+---@param text string|number|nil
+---@return Html
 function CustomItem._costInnerDiv(text)
 	return mw.html.create('div')
 		:css('display', 'inline-block')
@@ -231,13 +247,18 @@ function CustomItem._costInnerDiv(text)
 		:wikitext(text)
 end
 
+---@param base string?
+---@return string?
 function CustomItem._positiveConcatedArgsForBase(base)
 	if String.isNotEmpty(_args[base]) then
+		---@cast base -nil
 		local foundArgs = Item:getAllArgsForBase(_args, base)
 		return '+ ' .. table.concat(foundArgs, '&nbsp;/&nbsp;')
 	end
 end
 
+---@param base string?
+---@return string?
 function CustomItem._positivePercentDisplay(base)
 	if String.isNotEmpty(_args[base]) then
 		local number = tonumber(_args[base])
@@ -249,11 +270,12 @@ function CustomItem._positivePercentDisplay(base)
 	end
 end
 
+---@return string?
 function CustomItem._movementSpeedDisplay()
 	local display
 	if String.isNotEmpty(_args.movespeed) then
 		display = _args.movespeed
-	elseif String.isNotEmpty(tonumber(_args.movespeedmult or '')) then
+	elseif Logic.isNumeric(_args.movespeedmult) then
 		display = (tonumber(_args.movespeedmult) + 100) .. '%'
 	end
 	if String.isNotEmpty(display) then
@@ -261,6 +283,7 @@ function CustomItem._movementSpeedDisplay()
 	end
 end
 
+---@return string?
 function CustomItem._categoryDisplay()
 	local display = _CATEGORY_DISPLAY[string.lower(_args.category or '')]
 	if display then
@@ -270,6 +293,8 @@ function CustomItem._categoryDisplay()
 	end
 end
 
+---@param attributeCells {name: string, parameter: string?, funct: string?}[]
+---@return table
 function CustomItem._getAttributeCells(attributeCells)
 	local widgets = {}
 	for _, attribute in ipairs(attributeCells) do

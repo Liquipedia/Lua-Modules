@@ -11,7 +11,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchGroupWorkaround = require('Module:MatchGroup/Workaround')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -52,6 +51,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	qualLoseLiteral = 'string?',
 	qualSkip = 'number?',
 	qualWin = 'boolean?',
+	qualifiedHeader = 'boolean?',
 	qualWinLiteral = 'string?',
 	skipRound = 'number?',
 	thirdPlaceMatchId = 'string?',
@@ -82,6 +82,11 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 	MatchGroupUtil.types.BracketBracketData
 )
 
+---@class standardPlayer
+---@field displayName string?
+---@field flag string?
+---@field pageName string?
+---@field team string?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -89,6 +94,21 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 	team = 'string?',
 })
 
+---@class standardOpponent
+---@field advanceBg string?
+---@field advances boolean?
+---@field icon string?
+---@field name string?
+---@field placement number?
+---@field placement2 number?
+---@field players standardPlayer[]
+---@field score number?
+---@field score2 number?
+---@field status string?
+---@field status2 string?
+---@field template string?
+---@field type string
+---@field team string?
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
 	advances = 'boolean?',
@@ -105,6 +125,11 @@ MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	type = 'string',
 })
 
+---@class GameOpponent
+---@field name string?
+---@field players standardPlayer[]
+---@field template string?
+---@field type string
 MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	name = 'string?',
 	players = TypeUtil.optional(TypeUtil.array(MatchGroupUtil.types.Player)),
@@ -151,6 +176,11 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	winner = 'number?',
 })
 
+---@class standardTeamProps
+---@field bracketName string
+---@field displayName string
+---@field pageName string?
+---@field shortName string
 MatchGroupUtil.types.Team = TypeUtil.struct({
 	bracketName = 'string',
 	displayName = 'string',
@@ -190,7 +220,7 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 	if varData then
 		return Json.parse(varData)
 	else
-		local matchRecords = mw.ext.LiquipediaDB.lpdb(
+		return mw.ext.LiquipediaDB.lpdb(
 			'match2',
 			{
 				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
@@ -198,10 +228,6 @@ function MatchGroupUtil.fetchMatchRecords(bracketId)
 				limit = 5000,
 			}
 		)
-		for _, matchRecord in ipairs(matchRecords) do
-			MatchGroupWorkaround.applyPlayerBugWorkaround(matchRecord)
-		end
-		return matchRecords
 	end
 end
 
@@ -342,6 +368,12 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 		if bracketResetMatch then
 			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 		end
+	elseif options.returnBoth then
+		local bracketResetMatch = match
+			and match.bracketData.bracketResetMatchId
+			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		return match, bracketResetMatch
 	end
 
 	return match
@@ -379,11 +411,15 @@ function MatchGroupUtil.matchFromRecord(record)
 		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
+		liquipediatier = record.liquipediatier,
+		liquipediatiertype = record.liquipediatiertype,
 		mode = record.mode,
 		opponents = opponents,
+		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
 		walkover = nilIfEmpty(record.walkover),
@@ -392,6 +428,9 @@ function MatchGroupUtil.matchFromRecord(record)
 end
 
 function MatchGroupUtil.bracketDataFromRecord(data)
+	if not data then
+		return {}
+	end
 	if data.type == 'bracket' then
 		local advanceSpots = data.advancespots or MatchGroupUtil.computeAdvanceSpots(data)
 		return {
@@ -401,6 +440,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			header = nilIfEmpty(data.header),
 			lowerEdges = data.loweredges and Array.map(data.loweredges, MatchGroupUtil.indexTableFromRecord),
 			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
+			qualifiedHeader = nilIfEmpty(data.qualifiedheader),
 			qualLose = advanceSpots[2] and advanceSpots[2].type == 'qualify',
 			qualLoseLiteral = nilIfEmpty(data.qualloseLiteral),
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,

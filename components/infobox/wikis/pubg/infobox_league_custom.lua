@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
@@ -27,6 +28,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _game
 
+local NONE_BREAKING_SPACE = '&nbsp;'
+local DASH = '&ndash;'
 local _GAME = mw.loadData('Module:GameVersion')
 
 local _MODES = {
@@ -73,7 +76,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -83,18 +86,10 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}
-			},
-			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
-				}
-			},
-			Cell{name = 'Platform', content = {
-					CustomLeague:_getPlatform()
-				}
-			},
+			Cell{name = 'Game version', content = {CustomLeague._getGameVersion()}},
+			Cell{name = 'Game mode', content = {CustomLeague:_getGameMode()}},
+			Cell{name = 'Patch', content = {CustomLeague._getPatchVersion()}},
+			Cell{name = 'Platform', content = {CustomLeague:_getPlatform()}},
 		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
@@ -113,17 +108,14 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = _game or args.game
-	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args['pubgpremier'])
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_game', _game or args.game)
+	Variables.varDefine('tournament_publishertier', args.pubgpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
@@ -168,6 +160,17 @@ function CustomLeague:_getPlatform()
 	local platform = string.lower(_args.platform or '')
 
 	return _PLATFORMS[platform] or _PLATFORMS['default']
+end
+
+function CustomLeague._getPatchVersion()
+	if String.isEmpty(_args.patch) then return nil end
+	local content = PageLink.makeInternalLink(_args.patch, 'Patch ' .. _args.patch)
+	if String.isNotEmpty(_args.epatch) then
+		return content .. NONE_BREAKING_SPACE .. DASH .. NONE_BREAKING_SPACE
+			.. PageLink.makeInternalLink(_args.epatch, 'Patch ' .. _args.epatch)
+	end
+
+	return content
 end
 
 return CustomLeague

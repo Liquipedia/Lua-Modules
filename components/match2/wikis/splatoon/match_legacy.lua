@@ -22,7 +22,7 @@ function MatchLegacy.storeMatch(match2, options)
 		match.games = MatchLegacy.storeGames(match, match2)
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	end
@@ -77,9 +77,7 @@ function MatchLegacy._convertParameters(match2)
 
 	-- Handle extradata fields
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata = {
-		mvp = extradata.mvp,
-	}
+	match.extradata = {}
 
 	for index, map in pairs(match2.match2games or {}) do
 		match.extradata['vodgame' .. index] = map.vod

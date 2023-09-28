@@ -13,19 +13,15 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Faction = Lua.import('Module:Faction', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
-local RaceIcon = Lua.requireIfExists('Module:RaceIcon') or {
-	getBigIcon = function(_) end,
-}
 
 local html = mw.html
 
---[[
-Display components for opponents used by the starcraft and starcraft 2 wikis
-]]
+--Display components for opponents used by the starcraft and starcraft 2 wikis
 local StarcraftOpponentDisplay = {propTypes = {}, types={}}
 
 StarcraftOpponentDisplay.propTypes.InlineOpponent = {
@@ -37,10 +33,13 @@ StarcraftOpponentDisplay.propTypes.InlineOpponent = {
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 }
 
---[[
-Displays an opponent as an inline element. Useful for describing opponents in
-prose.
-]]
+---@class StarcraftInlineOpponentProps: InlineOpponentProps
+---@field opponent StarcraftStandardOpponent
+---@field showRace boolean?
+
+---Displays an opponent as an inline element. Useful for describing opponents in prose.
+---@param props StarcraftInlineOpponentProps
+---@return Html|string|nil
 function StarcraftOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
@@ -73,10 +72,16 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	abbreviateTbd = 'boolean?',
 }
 
+---@class StarcraftBlockOpponentProps: BlockOpponentProps
+---@field opponent StarcraftStandardOpponent
+---@field showRace boolean?
+
 --[[
 Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
+---@param props StarcraftBlockOpponentProps
+---@return Html
 function StarcraftOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
@@ -107,12 +112,21 @@ function StarcraftOpponentDisplay.BlockOpponent(props)
 	end
 end
 
+---Displays a team as an inline element. The team is specified by a template.
+---@param props {flip: boolean?, template: string, style: teamStyle?}
+---@return string?
 function StarcraftOpponentDisplay.InlineTeamContainer(props)
 	return props.template == 'default'
-		and OpponentDisplay.InlineTeam(props)
+		and OpponentDisplay.InlineTeam({flip = props.flip, template = props.template, teamStyle = props.style})
 		or OpponentDisplay.InlineTeamContainer(props)
 end
 
+--[[
+Displays a team as a block element. The width of the component is determined by
+its layout context, and not of the team name. The team is specified by template.
+]]
+---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
+---@return Html
 function StarcraftOpponentDisplay.BlockTeamContainer(props)
 	return props.template == 'default'
 		and OpponentDisplay.BlockTeam(Table.merge(props, {
@@ -121,9 +135,9 @@ function StarcraftOpponentDisplay.BlockTeamContainer(props)
 		or OpponentDisplay.BlockTeamContainer(props)
 end
 
---[[
-Displays a player opponent (solo, duo, trio, or quad) as an inline element.
-]]
+---Displays a player opponent (solo, duo, trio, or quad) as an inline element.
+---@param props StarcraftInlineOpponentProps
+---@return Html
 function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 	local showRace = props.showRace ~= false
 	local opponent = props.opponent
@@ -148,7 +162,7 @@ function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 
 	local archonRaceNode
 	if showRace and opponent.isArchon then
-		archonRaceNode = StarcraftPlayerDisplay.Race(opponent.players[1].race)
+		archonRaceNode = Faction.Icon{faction = opponent.players[1].race}
 	end
 
 	return html.create('span')
@@ -157,9 +171,9 @@ function StarcraftOpponentDisplay.PlayerInlineOpponent(props)
 		:node(props.flip and archonRaceNode or nil)
 end
 
---[[
-Displays a player opponent (solo, duo, trio, or quad) as a block element.
-]]
+---Displays a player opponent (solo, duo, trio, or quad) as a block element.
+---@param props StarcraftBlockOpponentProps
+---@return Html
 function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false
@@ -183,9 +197,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		return playerNodes[1]
 
 	elseif showRace and opponent.isArchon then
-		local raceIcon = DisplayUtil.removeLinkFromWikiLink(
-			RaceIcon.getBigIcon({opponent.players[1].race})
-		)
+		local raceIcon = Faction.Icon{size = 'large', faction = opponent.players[1].race}
 		return StarcraftOpponentDisplay.BlockArchon({
 			flip = props.flip,
 			playerNodes = playerNodes,
@@ -200,9 +212,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryRace = opponent.players[2 * archonIx - 1].race
 			local secondaryRace = opponent.players[2 * archonIx].race
-			local primaryIcon = DisplayUtil.removeLinkFromWikiLink(
-				RaceIcon.getBigIcon({primaryRace})
-			)
+			local primaryIcon = Faction.Icon{size = 'large', faction = primaryRace}
 			local secondaryIcon
 			if primaryRace ~= secondaryRace then
 				secondaryIcon = html.create('div')
@@ -241,6 +251,9 @@ StarcraftOpponentDisplay.propTypes.BlockArchon = {
 	raceNode = 'any',
 }
 
+---Displays a block archon opponent
+---@param props {flip: boolean?, playerNodes: Html[], raceNode: Html}
+---@return Html
 function StarcraftOpponentDisplay.BlockArchon(props)
 	props.raceNode:addClass('starcraft-block-archon-race')
 
@@ -262,9 +275,9 @@ StarcraftOpponentDisplay.propTypes.BlockScore = {
 	scoreText = 'any',
 }
 
---[[
-Displays a score within the context of a block element.
-]]
+---Displays a score within the context of a block element.
+---@param props {isWinner: boolean?, scoreText: string|number?}
+---@return Html
 function StarcraftOpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, StarcraftOpponentDisplay.propTypes.BlockScore)
 
@@ -277,6 +290,9 @@ function StarcraftOpponentDisplay.BlockScore(props)
 		:wikitext(scoreText)
 end
 
+---Displays a score within the context of an inline element.
+---@param opponent StarcraftStandardOpponent
+---@return string
 function StarcraftOpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		local advantage = tonumber(opponent.extradata.advantage) or 0

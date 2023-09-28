@@ -20,8 +20,9 @@ end
 function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
 	-- ML has use case of same placement but has different earnings
 
-	if slot['usdprize' .. opponentIndex] then
-		opponentData.usdprize = slot['usdprize' .. opponentIndex]
+	local baseCurrencyPrize = PrizePoolLegacy.BASE_CURRENCY:lower() .. 'prize'
+	if slot[baseCurrencyPrize .. opponentIndex] then
+		opponentData[baseCurrencyPrize] = slot[baseCurrencyPrize .. opponentIndex]
 	end
 
 	if slot['localprize' .. opponentIndex] then

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
@@ -72,6 +73,26 @@ function suite:testMap()
 	end))
 end
 
+function suite:testMapArguments()
+	local args = {a1a = 1, a3a = 3, a4a = 4, 2, 5}
+
+	local function indexFromKey(key)
+		local index = key:match('^a(%d+)a$')
+		if index then
+			return tonumber(index)
+		else
+			return nil
+		end
+	end
+
+	local function mapFunction(key)
+		return args[key] * 2
+	end
+
+	self:assertDeepEquals({2, 4, 6, 8, 10}, Table.mapArguments(args, indexFromKey, mapFunction))
+	self:assertDeepEquals({2, [3] = 6, [4] = 8}, Table.mapArguments(args, indexFromKey, mapFunction, true))
+end
+
 function suite:testMapValues()
 	local a = {1, 2, 3}
 	self:assertDeepEquals({2, 4, 6}, Table.mapValues(a, function(x)
@@ -114,6 +135,84 @@ function suite:testIncludes()
 	self:assertTrue(Table.includes(b, 'testValue3'))
 	self:assertFalse(Table.includes(a, 'testValue4'))
 	self:assertFalse(Table.includes(b, 'testValue4'))
+end
+
+function suite:testFilterByKey()
+	local a = {a1a = 1, a3a = 3, a4a = 4, 2, 5, b1b = 'ttt', c1c = 'ddd'}
+
+	local function predicate1(key)
+		return not Logic.isEmpty(string.find(key, '^%l(%d+)%l$'))
+	end
+
+	local function predicate2(key, value)
+		return Logic.isNumeric(value) and not Logic.isEmpty(string.find(key, '^%l(%d+)%l$'))
+	end
+
+	self:assertDeepEquals({a1a = 1, a3a = 3, a4a = 4, b1b = 'ttt', c1c = 'ddd'}, Table.filterByKey(a, predicate1))
+	self:assertDeepEquals({a1a = 1, a3a = 3, a4a = 4,}, Table.filterByKey(a, predicate2))
+end
+
+function suite:testPairsByPrefix()
+	local args = {
+		p = 'a',
+		plink = 'b',
+		f1 = 'a2',
+		f1link = 'b2',
+		p2 = 'c',
+		p2link = 'd',
+		p3 = 'e',
+		p3link = 'f',
+		foo = {},
+		p10 = {},
+	}
+
+	local cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p') do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(0, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, {'p', 'f'}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+		if cnt == 1 then
+			self:assertEquals('f1', prefix)
+		else
+			self:assertEquals('p' .. cnt, prefix)
+		end
+	end
+	self:assertEquals(3, cnt)
+
+	args.p1, args.p1link = args.p, args.plink
+	args.p, args.plink = nil, nil
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p', {requireIndex = false}) do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
+
+	cnt = 0
+	for prefix in Table.iter.pairsByPrefix(args, 'p') do
+		cnt = cnt + 1
+		self:assertTrue(args[prefix])
+		self:assertTrue(args[prefix .. 'link'])
+	end
+	self:assertEquals(3, cnt)
 end
 
 return suite

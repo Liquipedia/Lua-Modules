@@ -8,13 +8,16 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
+
+local LANG = mw.getContentLanguage()
 
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
@@ -29,22 +32,22 @@ function CustomSquad.header(self)
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
-	headerRow	:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader('Position'))
-			:node(makeHeader('Join Date'))
+	headerRow:node(makeHeader('ID'))
+		:node(makeHeader())
+		:node(makeHeader('Name'))
+		:node(makeHeader('Position'))
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE then
-		headerRow	:node(makeHeader('Inactive Date'))
-				:node(makeHeader('Active Team'))
+		headerRow:node(makeHeader('Inactive Date'))
+			:node(makeHeader('Active Team'))
 	end
 	if self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow	:node(makeHeader('Inactive Date'))
-				:node(makeHeader('Last Active Team'))
+		headerRow:node(makeHeader('Inactive Date'))
+			:node(makeHeader('Last Active Team'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow	:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
+		headerRow:node(makeHeader('Leave Date'))
+			:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -73,8 +76,8 @@ function ExtendedSquadRow:position(args)
 
 	self.content:node(cell)
 
-	self.lpdbData['position'] = args.position
-	self.lpdbData['role'] = args.role
+	self.lpdbData.position = args.position
+	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
 end
@@ -105,18 +108,20 @@ function CustomSquad.run(frame)
 	local index = 1
 	while args['p' .. index] ~= nil or args[index] do
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		local row = ExtendedSquadRow(frame, player.role)
-		row	:id{
-				player.id,
-				flag = player.flag,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-				teamrole = player.teamrole,
-			}
+		local row = ExtendedSquadRow()
+		row:status(squad.type)
+		row:id{
+			player.id,
+			flag = player.flag,
+			link = player.link,
+			captain = player.captain,
+			role = player.role,
+			team = player.team,
+			teamrole = player.teamrole,
+			date = player.leavedate or player.inactivedate or player.leavedate,
+		}
 			:name{name = player.name}
-			:position{position = player.position, role = mw.language.new('en'):ucfirst(player.role or '')}
+			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
 		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
@@ -137,11 +142,13 @@ function CustomSquad.run(frame)
 			}
 		end
 
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
 		squad:row(row:create(
-			Variables.varDefault('squad_name',
-			mw.title.getCurrentTitle().prefixedText) ..
-				'_' .. player.id .. '_' ..
-				ReferenceCleaner.clean(player.joindate)
+			mw.title.getCurrentTitle().prefixedText
+			.. '_' .. link .. '_'
+			.. ReferenceCleaner.clean(player.joindate)
+			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 
 		index = index + 1

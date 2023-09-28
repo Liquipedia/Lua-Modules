@@ -24,7 +24,13 @@ local _PAGENAME = mw.title.getCurrentTitle().text
 
 local MvpTable = {}
 
+---Entry point for MvpTable.
+---Fetches mvpData for a given set of matchGroupIds or tournaments.
+---Displays the fetched data as a table.
+---@param args table
+---@return Html|string|nil
 function MvpTable.run(args)
+	args = args or {}
 	args = MvpTable._parseArgs(args)
 	local conditions = MvpTable._buildConditions(args)
 	local queryData = mw.ext.LiquipediaDB.lpdb('match2', {
@@ -33,11 +39,24 @@ function MvpTable.run(args)
 		limit = 5000,
 	})
 
-	if type(queryData) ~= 'table' or not queryData[1] then
-		return ''
+	local mvpList
+
+	if type(queryData) == 'table' and queryData[1] then
+		--catch errors on incompatible match2 data (when not yet using standard storage)
+		mvpList = Logic.tryCatch(
+			function() return MvpTable.processData(queryData) end,
+			function() return mw.logObject('MvpTable: match2 mvp data format invalid, querying match1 data instead') end
+		)
 	end
 
-	local mvpList = MvpTable.processData(queryData)
+	--in case we catch it and in case we did not get match2 results
+	if not mvpList then
+		mvpList = MvpTable._queryMatch1(conditions)
+	end
+
+	if not mvpList then
+		return
+	end
 
 	local output = mw.html.create('table')
 		:addClass('wikitable prizepooltable collapsed')
@@ -57,6 +76,17 @@ function MvpTable.run(args)
 	return output
 end
 
+---@class mvpTableParsedArgs
+---@field cutafter number
+---@field margin number
+---@field points boolean
+---@field title string?
+---@field matchGroupIds string[]
+---@field tournaments string[]
+
+---Parses the entered arguments to a table that can be used better further down the line
+---@param args table
+---@return mvpTableParsedArgs
 function MvpTable._parseArgs(args)
 	local parsedArgs = {
 		cutafter = tonumber(args.cutafter) or 5,
@@ -74,8 +104,7 @@ function MvpTable._parseArgs(args)
 		end
 	end
 
-	args.tournament1 = args.tournament or args.tournament1
-	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament') do
+	for _, tournament in Table.iter.pairsByPrefix(args, 'tournament', {requireIndex = false}) do
 		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament):gsub(' ', '_')
 		table.insert(parsedArgs.tournaments, tournament)
 	end
@@ -87,6 +116,8 @@ function MvpTable._parseArgs(args)
 	return parsedArgs
 end
 
+---@param args mvpTableParsedArgs
+---@return string
 function MvpTable._buildConditions(args)
 	local matchGroupIDConditions
 	if Table.isNotEmpty(args.matchGroupIds) then
@@ -101,6 +132,7 @@ function MvpTable._buildConditions(args)
 		tournamentConditions = ConditionTree(BooleanOperator.any)
 		for _, tournament in pairs(args.tournaments) do
 			local page = mw.title.new(tournament)
+			assert(page, 'Invalid page name "' .. tournament .. '"')
 			tournamentConditions:add{
 				ConditionTree(BooleanOperator.all):add{
 					ConditionNode(ColumnName('pagename'), Comparator.eq, mw.ustring.gsub(page.text, ' ', '_')),
@@ -118,6 +150,9 @@ function MvpTable._buildConditions(args)
 	return conditions:toString()
 end
 
+---Builds the main header of the MvpTable
+---@param args mvpTableParsedArgs
+---@return Html?
 function MvpTable._mainHeader(args)
 	if String.isEmpty(args.title) then
 		return nil
@@ -129,6 +164,9 @@ function MvpTable._mainHeader(args)
 		:tag('th'):wikitext(args.title):attr('colspan', colspan):done():done()
 end
 
+---Builds the sub header of the MvpTable
+---@param args mvpTableParsedArgs
+---@return Html
 function MvpTable._subHeader(args)
 	local header = mw.html.create('tr')
 		:tag('th'):wikitext('Player'):done()
@@ -141,6 +179,10 @@ function MvpTable._subHeader(args)
 	return header:done()
 end
 
+---Builds the display for a mvp row
+---@param item table
+---@param args mvpTableParsedArgs
+---@return Html
 function MvpTable._row(item, args)
 	local playerCell = mw.html.create('td')
 		:css('text-align', 'left')
@@ -155,14 +197,17 @@ function MvpTable._row(item, args)
 		:tag('td'):wikitext(item.mvp):done()
 
 	if args.points then
-		row = mw.html.create('tr')
-			:tag('td'):wikitext(item.points):done()
+		row:tag('td'):wikitext(item.points):done()
 	end
 
 	return row:done()
 end
 
+---
+-- Processes retrieved data
 -- overwritable function via /Custom
+---@param queryData table[]
+---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]
 function MvpTable.processData(queryData)
 	local playerList = {}
 	local mvpList = {}
@@ -194,10 +239,97 @@ function MvpTable.processData(queryData)
 	return mvpList
 end
 
+---
+-- Function to sort mvps
 -- exported so it can be used in /Custom
+---@param tbl table
+---@param a string
+---@param b string
+---@return boolean
 function MvpTable.sortFunction(tbl, a, b)
 	return tbl[a].mvp > tbl[b].mvp or
 		tbl[a].mvp == tbl[b].mvp and tbl[a].name < tbl[b].name
+end
+
+---
+-- Function to legacy query data from match1 and process it
+---@param conditions string
+---@return {points: number, mvp: number, displayName:string?, name:string, flag:string?, team:string?}[]?
+function MvpTable._queryMatch1(conditions)
+	local queryData = mw.ext.LiquipediaDB.lpdb('match', {
+		limit = 5000,
+		conditions = conditions,
+		order = 'date desc',
+		query = 'opponent1players, opponent2players, opponent1, opponent2, extradata',
+	})
+
+	if type(queryData) ~= 'table' or not queryData[1] then
+		return
+	end
+
+	local playerList = {}
+	local mvpList = {}
+
+	for _, match in pairs(queryData) do
+		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
+		if players and points then
+			for _, player in pairs(mw.text.split(players, ',')) do
+				if String.isNotEmpty(player) then
+					player = mw.text.trim(player)
+					local redirectResolvedPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
+					local identifier = redirectResolvedPlayer:gsub(' ', '_')
+
+					if not playerList[identifier] then
+						playerList[identifier] = MvpTable._findPlayerInfo(match, {
+							player:lower():gsub('_', ' '),
+							player:lower():gsub(' ', '_'),
+							redirectResolvedPlayer:lower(),
+							identifier:lower(),
+						}, identifier, player)
+					end
+
+					playerList[identifier].points = playerList[identifier].points + points
+					playerList[identifier].mvp = playerList[identifier].mvp + 1
+				end
+			end
+		end
+	end
+
+	for _, item in Table.iter.spairs(playerList, MvpTable.sortFunction) do
+		table.insert(mvpList, item)
+	end
+
+	return mvpList
+end
+
+---
+-- Function to find player info in match1 matches for a given lookup table
+---@param match table
+---@param lookupTable string[]
+---@param link string
+---@param displayName string
+---@return {points: number, mvp: number, displayName:string, name:string, flag:string?, team:string?}
+function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
+	--basic information obtainable from mvp field without any lookup in opponent player data
+	local playerData = {
+		name = link,
+		displayName = displayName,
+		points = 0,
+		mvp = 0,
+	}
+
+	for opponentIndex = 1, 2 do
+		for prefix, player in Table.iter.pairsByPrefix(match['opponent' .. opponentIndex .. 'players'], 'p') do
+			if String.isNotEmpty(player) and Table.includes(lookupTable, player:lower()) then
+				playerData.flag = match['opponent' .. opponentIndex .. 'players'][prefix .. 'flag']
+				playerData.displayName = match['opponent' .. opponentIndex .. 'players'][prefix .. 'dn'] or playerData.displayName
+				playerData.team = match['opponent' .. opponentIndex]
+				return playerData
+			end
+		end
+	end
+
+	return playerData
 end
 
 return Class.export(MvpTable)

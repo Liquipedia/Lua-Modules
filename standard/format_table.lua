@@ -11,6 +11,9 @@ local Table = require('Module:Table')
 
 local TableFormatter = {}
 
+---Converts a lua table to html display of the table for easy copy paste
+---@param inputTable table
+---@return Html
 function TableFormatter.toLuaCode(inputTable)
 	if type(inputTable) ~= 'table' then
 		error('TableFormatter.toLuaCode needs a table as input')

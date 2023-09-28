@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
@@ -112,11 +114,11 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = '\'\'\'Start Map Veto\'\'\''
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = ARROW_RIGHT
-		textRight = '\'\'\'Start Map Veto\'\'\''
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()
@@ -210,7 +212,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init()
-	matchSummary.root:css('flex-wrap', 'unset') -- workaround to fix height
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -226,7 +227,7 @@ function CustomMatchSummary.getByMatchId(args)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = link
+			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
 		end
 		match.links.vod2 = nil
 	end
@@ -301,7 +302,7 @@ function CustomMatchSummary._createBody(match)
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then
 		local matchStatus = MatchStatus()
-		matchStatus:content('\'\'\'Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '\'\'\'')
+		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
 		body:addRow(matchStatus)
 	end
 
@@ -349,18 +350,22 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	-- Match vod
-	if secondVods[0] then
+	if Table.isNotEmpty(secondVods[0]) then
 		addVodLink(nil, match.vod, 1)
-		addVodLink(nil, secondVods[0], 2)
+		Array.forEach(secondVods[0], function(vodlink, vodindex)
+				addVodLink(nil, vodlink, vodindex + 1)
+			end)
 	else
 		addVodLink(nil, match.vod, nil)
 	end
 
 	-- Game Vods
 	for index, vod in pairs(vods) do
-		if secondVods[index] then
+		if Table.isNotEmpty(secondVods[index]) then
 			addVodLink(index, vod, 1)
-			addVodLink(index, secondVods[index], 2)
+			Array.forEach(secondVods[index], function(vodlink, vodindex)
+				addVodLink(index, vodlink, vodindex + 1)
+			end)
 		else
 			addVodLink(index, vod, nil)
 		end

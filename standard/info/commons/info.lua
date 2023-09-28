@@ -9,6 +9,23 @@
 return {
 	wikiName = 'commons',
 	name = 'Commons',
-	defaultTeamLogo = 'Liquipedia_logo.png',
-	defaultTeamLogoDark = 'Liquipedia_logo.png',
+	games = {
+		commons = {
+			abbreviation = 'Commons',
+			name = 'Commons',
+			link = 'lpcommons:Main Page',
+			logo = {
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Liquipedia logo.png',
+				lightMode = 'Liquipedia logo.png',
+			},
+		},
+	},
+	defaultGame = 'commons',
+
+	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
 }

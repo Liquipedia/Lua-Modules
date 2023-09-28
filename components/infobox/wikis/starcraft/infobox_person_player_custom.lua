@@ -6,8 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
+local Faction = require('Module:Faction')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -16,11 +17,11 @@ local Lpdb = require('Module:Lpdb')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local Notability = require('Module:Notability')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -35,39 +36,24 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _CURRENT_YEAR = tonumber(os.date('%Y'))
-local _ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
-local _EARNING_MODES = {solo = '1v1', team = 'team'}
-local _OTHER_MODE = 'other'
-local _NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
-local _FIRST_DAY_OF_YEAR = '-01-01'
-local _LAST_DAY_OF_YEAR = '-12-31'
-local _KOREAN = 'South Korea'
-local _UNKNOWN_RACE = 'unknown'
+local CURRENT_YEAR = tonumber(os.date('%Y'))
+local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
+local EARNING_MODES = {solo = '1v1', team = 'team'}
+local OTHER_MODE = 'other'
+local NUMBER_OF_ALLOWED_ACHIEVEMENTS = 10
+local FIRST_DAY_OF_YEAR = '-01-01'
+local LAST_DAY_OF_YEAR = '-12-31'
+local KOREAN = 'South Korea'
+
+local BOT_INFORMATION_TYPE = 'Bot'
 
 -- race stuff
-local _AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
-local _RACE_FIELD_AS_CATEGORY_LINK = true
-local _RACE_DATA = {
-	p = {'Protoss'},
-	pt = {'Protoss', 'Terran'},
-	pz = {'Protoss', 'Zerg'},
-	t = {'Terran'},
-	tp = {'Terran', 'Protoss'},
-	tz = {'Terran', 'Zerg'},
-	z = {'Zerg'},
-	zt = {'Zerg', 'Terran'},
-	zp = {'Zerg', 'Protoss'},
-	r = {'Random'},
-	a = {'Protoss', 'Terran', 'Zerg'},
-}
-local _RACE_ALL = 'All'
-local _RACE_ALL_SHORT = 'a'
+local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
+local RACE_FIELD_AS_CATEGORY_LINK = true
 
 local _earningsGlobal = {}
 local _achievements = {}
 local _awardAchievements = {}
-local _raceData
 
 local CustomPlayer = Class.new()
 
@@ -81,6 +67,12 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	_player = player
 
+	_args.achievements = Achievements.player{noTemplate = true, baseConditions = {
+		'[[liquipediatiertype::]]',
+		'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+		'[[placement::1]]',
+	}}
+
 	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.nameDisplay = CustomPlayer.nameDisplay
@@ -88,8 +80,15 @@ function CustomPlayer.run(frame)
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 	player.getPersonType = CustomPlayer.getPersonType
+	player.shouldStoreData = CustomPlayer.shouldStoreData
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
+end
+
+function CustomPlayer:shouldStoreData(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		and args.informationType ~= BOT_INFORMATION_TYPE
 end
 
 function CustomInjector:parse(id, widgets)
@@ -97,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {CustomPlayer._getRaceData(_args.race, _RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {CustomPlayer._getRaceDisplay(_args.race, RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -115,11 +114,26 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
+	if _args.informationType == BOT_INFORMATION_TYPE then
+		return {
+			Cell{name = 'Programmer', content = {_args.programmer}},
+			Cell{name = 'Affiliation', content = {_args.affiliation}},
+			Cell{name = 'Bot Version', content = {_args.botversion}},
+			Cell{name = 'BWAPI Version', content = {_args.bwapiversion}},
+			Cell{name = 'Language', content = {_args.language}},
+			Cell{name = 'Wrapper', content = {_args.wrapper}},
+			Cell{name = 'Terrain Analysis', content = {_args.terrain_analysis}},
+			Cell{name = 'AI Techniques', content = {_args.aitechniques}},
+			Cell{name = 'Framework', content = {_args.framework}},
+			Cell{name = 'Strategies', content = {_args.strategies}},
+		}
+	end
+
 	-- switch to enable yearsActive once 1v1 matches have been converted to match2 storage
 	local yearsActive = Logic.readBool(_args.enableYearsActive)
 		and Namespace.isMain() and CustomPlayer._getMatchupData() or nil
 
-	local currentYearEarnings = _earningsGlobal[tostring(_CURRENT_YEAR)]
+	local currentYearEarnings = _earningsGlobal[tostring(CURRENT_YEAR)]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round{currentYearEarnings}
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
@@ -127,7 +141,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	return {
 		Cell{
-			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
+			name = 'Approx. Winnings ' .. CURRENT_YEAR,
 			content = {currentYearEarnings}
 		},
 		Cell{name = 'Years active', content = {yearsActive}}
@@ -135,55 +149,37 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPlayer.nameDisplay()
-	CustomPlayer._getRaceData(_args.race)
-	local raceIcon = RaceIcon.getNormalIcon{_raceData.race}
+	local factions = Faction.readMultiFaction(_args.race or Faction.defaultFaction, {alias = false})
+
+	local raceIcons = table.concat(Array.map(factions, function(faction)
+		return Faction.Icon{faction = faction, size = 'medium'}
+	end))
+
 	local name = _args.id or _player.pagename
 
-	return raceIcon .. '&nbsp;' .. name
+	return raceIcons .. '&nbsp;' .. name
 end
 
-function CustomPlayer._getRaceData(race, asCategory)
-	race = string.lower(race or _UNKNOWN_RACE)
-	race = CleanRace[race] or race
-	local raceTable = _RACE_DATA[race]
+function CustomPlayer._getRaceDisplay(race, asCategory)
+	local factionNames = Array.map(Faction.readMultiFaction(race, {alias = false}), Faction.toName)
 
-	local faction, faction2
-	if race == _RACE_ALL_SHORT then
-		faction = _RACE_ALL
-	else
-		faction = (raceTable or {})[1]
-		faction2 = (raceTable or {})[2]
-	end
-
-	local display
-	if not raceTable and race ~= _UNKNOWN_RACE then
-		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	elseif Table.isNotEmpty(raceTable) then
+	return table.concat(Array.map(factionNames or {}, function(factionName)
 		if asCategory then
-			for raceIndex, raceValue in ipairs(raceTable) do
-				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
-					.. '[[Category:' .. raceValue .. ' Players'
-			end
+			return '[[:Category:' .. factionName .. ' Players|' .. factionName .. ']]'
 		end
-		display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
-	end
-
-	_raceData = {
-		race = race,
-		faction = faction or '',
-		faction2 = faction2 or '',
-		display = display,
-	}
-
-	return display
+		return '[[' .. factionName .. ']]'
+	end) or {}, ',&nbsp;')
 end
 
 function CustomPlayer.adjustLPDB(_, lpdbData)
 	local extradata = lpdbData.extradata or {}
-	extradata.race = _raceData.race
-	extradata.faction = _raceData.faction
-	extradata.faction2 = _raceData.faction2
+
+	local factions = Faction.readMultiFaction(_args.race, {alias = false})
+
+	extradata.race = factions[1]
+	extradata.faction = Faction.toName(factions[1])
+	extradata.faction2 = Faction.toName(factions[2])
+
 	extradata.teamname = _args.team
 
 	if Variables.varDefault('racecount') then
@@ -192,11 +188,11 @@ function CustomPlayer.adjustLPDB(_, lpdbData)
 	end
 
 	-- Notability values per year
-	for year = Info.startYear, _CURRENT_YEAR do
+	for year = Info.startYear, CURRENT_YEAR do
 		extradata['notabilityin' .. year] = Notability.notabilityScore{
 			players = _player.pagename,
-			startdate = year .. _FIRST_DAY_OF_YEAR,
-			enddate = year .. _LAST_DAY_OF_YEAR,
+			startdate = year .. FIRST_DAY_OF_YEAR,
+			enddate = year .. LAST_DAY_OF_YEAR,
 			smmult = 0.5,
 		}
 	end
@@ -222,17 +218,19 @@ end
 
 function CustomPlayer._getMatchupData()
 	local yearsActive
-	local player = string.gsub(_player.pagename, '_', ' ')
+	local playerWithoutUnderscore = string.gsub(_player.pagename, '_', ' ')
+	local player = _player.pagename
 	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
+		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
+			'AND [[walkover::]] AND [[winner::>]]',
 		query = 'match2opponents, date',
 	}
 
 	local years = {}
 	local vs = {}
-	for _, item1 in pairs(_AVAILABLE_RACES) do
+	for _, item1 in pairs(AVAILABLE_RACES) do
 		vs[item1] = {}
-		for _, item2 in pairs(_AVAILABLE_RACES) do
+		for _, item2 in pairs(AVAILABLE_RACES) do
 			vs[item1][item2] = {['win'] = 0, ['loss'] = 0}
 		end
 	end
@@ -240,7 +238,7 @@ function CustomPlayer._getMatchupData()
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 	end
@@ -249,7 +247,7 @@ function CustomPlayer._getMatchupData()
 
 	if foundData then
 		local category
-		if years[_CURRENT_YEAR] or years[_CURRENT_YEAR - 1] or years[_CURRENT_YEAR - 2] then
+		if years[CURRENT_YEAR] or years[CURRENT_YEAR - 1] or years[CURRENT_YEAR - 2] then
 			Variables.varDefine('isActive', 'true')
 		else
 			category = 'Players with no matches in the last three years'
@@ -274,18 +272,18 @@ function CustomPlayer._getYearsActive(years)
 	local tempYear = nil
 	local firstYear = true
 
-	for i = Info.startYear, _CURRENT_YEAR do
+	for i = Info.startYear, CURRENT_YEAR do
 		if years[i] then
-			if (not tempYear) and (i ~= _CURRENT_YEAR) then
+			if (not tempYear) and (i ~= CURRENT_YEAR) then
 				if firstYear then
-					firstYear = nil
+					firstYear = false
 				else
 					yearsActive = yearsActive .. '<br/>'
 				end
 				yearsActive = yearsActive .. years[i]
 				tempYear = years[i]
 			end
-			if i == _CURRENT_YEAR then
+			if i == CURRENT_YEAR then
 				if tempYear then
 					yearsActive = yearsActive .. '&nbsp;-&nbsp;<b>Present</b>'
 				else
@@ -313,20 +311,22 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
 	local plIndex = 1
 	local vsIndex = 2
 	-- catch matches vs empty opponents
 	if opponents[1] and opponents[2] then
-		if opponents[2].name == player then
+		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
 			plIndex = 2
 			vsIndex = 1
 		end
 		local plOpp = opponents[plIndex]
 		local vsOpp = opponents[vsIndex]
 
-		local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
-		local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
+		local prace = Faction.read(plOpp.match2players[1].extradata.faction)
+		prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
+		local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+		orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
 
 		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score) or 0)
 		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score) or 0)
@@ -362,7 +362,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 	end
 
 	local placementConditions = ConditionTree(BooleanOperator.any)
-	for _, item in pairs(_ALLOWED_PLACES) do
+	for _, item in pairs(ALLOWED_PLACES) do
 		placementConditions:add{
 			ConditionNode(ColumnName('placement'), Comparator.eq, item),
 		}
@@ -420,7 +420,7 @@ function CustomPlayer._getEarningsMedalsData(player)
 end
 
 function CustomPlayer._addPlacementToEarnings(earnings, earningsTotal, data)
-	local mode = _EARNING_MODES[data.opponenttype] or _OTHER_MODE
+	local mode = EARNING_MODES[data.opponenttype] or OTHER_MODE
 	if not earnings[mode] then
 		earnings[mode] = {}
 	end
@@ -464,7 +464,7 @@ end
 function CustomPlayer._getPlacement(value)
 	if String.isNotEmpty(value) then
 		value = mw.text.split(value, '-')[1]
-		if Table.includes(_ALLOWED_PLACES, value) then
+		if Table.includes(ALLOWED_PLACES, value) then
 			return tonumber(value)
 		end
 	end
@@ -474,7 +474,7 @@ function CustomPlayer._setAchievements(data, place)
 	local tier = tonumber(data.liquipediatier)
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_awardAchievements, data)
-	elseif #_achievements < _NUMBER_OF_ALLOWED_ACHIEVEMENTS then
+	elseif #_achievements < NUMBER_OF_ALLOWED_ACHIEVEMENTS then
 		table.insert(_achievements, data)
 	end
 end
@@ -492,8 +492,25 @@ function CustomPlayer:getWikiCategories(categories)
 		table.insert(categories, 'SOSPA Players')
 	end
 
-	if _args.country ~= _KOREAN then
+	if _args.country ~= KOREAN then
 		table.insert(categories, 'Foreign Players')
+	end
+
+	for _, faction in pairs(Faction.readMultiFaction(_args.race, {alias = false})) do
+		table.insert(categories, faction .. ' Players')
+	end
+
+	local botCategoryKeys = {
+		'language',
+		'wrapper',
+		'terrain_analysis',
+		'aitechniques',
+		'framework',
+	}
+	for _, key in pairs(botCategoryKeys) do
+		if _args.informationType == BOT_INFORMATION_TYPE and _args[key] then
+			table.insert(categories, _args[key] .. ' bot')
+		end
 	end
 
 	return categories

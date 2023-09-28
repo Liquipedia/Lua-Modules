@@ -316,6 +316,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -332,28 +333,9 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if String.isEmpty(match.mvp) then
-		return nil
-	end
-
-	local mvpPoints = tonumber(match.mvppoints) or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players = players, points = mvpPoints}
 end
 
 -- Parse the mapVeto input
@@ -413,14 +395,14 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
@@ -437,20 +419,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-		end
 	end
 	return match
 end

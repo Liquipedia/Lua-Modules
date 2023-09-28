@@ -38,7 +38,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -55,24 +55,25 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Players',
 		content = {args.participants_number}
 	})
+	table.insert(widgets, Cell{
+		name = 'Version',
+		content = {CustomLeague:_createPatchCell(args)}
+	})
 	return widgets
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args.riotpremier) then
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if Logic.readBool(args.riotpremier) then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.riotpremier)
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.riotpremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.participants_number or args.team_number
-	lpdbData.publishertier = Logic.readBool(args.riotpremier) and '1' or ''
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
 
@@ -81,17 +82,17 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Custom Vars
-	Variables.varDefine('tournament_riot_premier', _args.riotpremier)
-	Variables.varDefine('tournament_publisher_major', _args.riotpremier)
-	Variables.varDefine('tournament_publishertier', Logic.readBool(_args.riotpremier) and '1' or nil)
+	Variables.varDefine('tournament_riot_premier', args.riotpremier)
+	Variables.varDefine('tournament_publisher_major', args.riotpremier)
+	Variables.varDefine('tournament_publishertier', Logic.readBool(args.riotpremier) and '1' or nil)
 
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
 	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
-	Variables.varDefine('tournament_mode', _args.mode or '')
+	Variables.varDefine('tournament_mode', args.mode or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -102,6 +103,18 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
+end
+
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+
+	local displayText = '[[Patch ' .. args.patch .. ']]'
+	if args.epatch then
+		displayText = displayText .. ' &ndash; [[Patch ' .. args.epatch .. ']]'
+	end
+	return displayText
 end
 
 return CustomLeague

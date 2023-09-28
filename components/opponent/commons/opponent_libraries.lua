@@ -6,8 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Info = require('Module:Info')
 local Lua = require('Module:Lua')
+
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 
 return {
 	Opponent = Lua.import('Module:'.. (Info.opponentLibrary or 'Opponent'), {requireDevIfEnabled = true}),

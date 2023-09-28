@@ -127,7 +127,7 @@ return {
 	{
 		name = '5earena',
 		icon = '5E Arena icon.png',
-		prefixLink = 'https://client1.5earenacdn.com/data/match/',
+		prefixLink = 'https://www.5earena.com/gamedata/matchboard/',
 		label = 'Stats on 5E Arena',
 		isMapStats = true
 	},

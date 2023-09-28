@@ -10,6 +10,22 @@ return {
 	startYear = 2019,
 	wikiName = 'autochess',
 	name = 'Auto Chess',
-	defaultTeamLogo = 'Auto_Chess_lightmode.png',
-	defaultTeamLogoDark = 'Auto_Chess_darkmode.png',
+	games = {
+		autochess = {
+			abbreviation = 'Auto Chess',
+			name = 'Auto Chess',
+			link = 'Auto Chess',
+			logo = {
+				darkMode = 'Logo filler event.png',
+				lightMode = 'Logo filler event.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Auto Chess lightmode.png',
+				lightMode = 'Auto Chess darkmode.png',
+			},
+		},
+	},
+	defaultGame = 'autochess',
+	defaultTeamLogo = 'Auto Chess lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Auto Chess darkmode.png', ---@deprecated
 }

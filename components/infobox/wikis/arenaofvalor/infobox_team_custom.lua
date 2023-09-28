@@ -8,6 +8,8 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local PlacementStats = require('Module:InfoboxPlacementStats')
+local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -21,13 +23,14 @@ function CustomTeam.run(frame)
 	_args = team.args
 
 	-- Automatic org people
-	team.args.coach = Template.expandTemplate(frame, 'Coach of')
-	team.args.manager = Template.expandTemplate(frame, 'Manager of')
-	team.args.captain = Template.expandTemplate(frame, 'Captain of')
+	team.args.coach = RoleOf.get{role = 'Coach'}
+	team.args.manager = RoleOf.get{role = 'Manager'}
+	team.args.captain = RoleOf.get{role = 'Captain'}
+
 
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:createBottomContent()
@@ -38,10 +41,7 @@ function CustomTeam:createBottomContent()
 		) .. Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of'
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Placement summary'
-		)
+		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
 	end
 end
 

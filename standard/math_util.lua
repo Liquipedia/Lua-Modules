@@ -15,6 +15,8 @@ Example:
 MathUtil.ilog2(8) -- Returns 3
 MathUtil.ilog2(24) -- Returns 4
 ]]
+---@param x number
+---@return integer
 function MathUtil.ilog2(x)
 	return math.floor(math.log(x) / math.log(2))
 end
@@ -26,6 +28,8 @@ Example:
 MathUtil.sum({3, 5, 4})
 -- Returns 12
 ]]
+---@param xs number[]
+---@return number
 function MathUtil.sum(xs)
 	local sum = 0
 	for _, x in ipairs(xs) do
@@ -42,6 +46,8 @@ Example:
 MathUtil.partialSums({3, 5, 4})
 -- Returns {0, 3, 8, 12}
 ]]
+---@param set number[]
+---@return number[]
 function MathUtil.partialSums(set)
 	local sum = 0
 	local sums = {0}
@@ -53,12 +59,15 @@ function MathUtil.partialSums(set)
 end
 
 --[[
-Returns the dot product of two vectors.
+Returns the (standard) dot product of two vectors.
 
 Example:
 MathUtil.dotProduct({3, 2, 4}, {5, 6, 7})
 -- Returns 55
 ]]
+---@param xs number[]
+---@param ys number[]
+---@return number
 function MathUtil.dotProduct(xs, ys)
 	local sum = 0
 	for i = 1, math.min(#xs, #ys) do

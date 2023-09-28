@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 
+--- @class SmwInjector
 local Injector = Class.new()
 
 function Injector:adjust(smwData, ...)

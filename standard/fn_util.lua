@@ -11,8 +11,13 @@
 --
 local FnUtil = {}
 
--- Creates a memoized copy of a 0 or 1 param function.
-function FnUtil.memoize(f)
+---@alias memoizableFunction fun(input: any): any
+
+---Creates a memoized copy of a 0 or 1 param function.
+---@generic T:memoizableFunction
+---@param func T
+---@return T
+function FnUtil.memoize(func)
 	local called = {}
 	local results = {}
 	local nilCalled = false
@@ -21,13 +26,13 @@ function FnUtil.memoize(f)
 		if x == nil then
 			if not nilCalled then
 				nilCalled = true
-				nilResult = f(x)
+				nilResult = func(x)
 			end
 			return nilResult
 		else
 			if not called[x] then
 				called[x] = true
-				results[x] = f(x)
+				results[x] = func(x)
 			end
 			return results[x]
 		end
@@ -46,9 +51,12 @@ local fibonacci = FnUtil.memoizeY(function(x, fibonacci)
 end)
 fibonacci(7) -- returns 13
 ]]
-function FnUtil.memoizeY(f)
+---@generic T
+---@param func fun(input: T, self: fun(input: T)):T
+---@return fun(input: T): T
+function FnUtil.memoizeY(func)
 	local yf
-	yf = FnUtil.memoize(function(x) return f(x, yf) end)
+	yf = FnUtil.memoize(function(x) return func(x, yf) end)
 	return yf
 end
 
@@ -60,6 +68,9 @@ Example:
 local parser = FnUtil.lazilyDefineFunction(function() return constructParserFromSpec(spec) end)
 parser('')
 ]]
+---@generic T:memoizableFunction
+---@param getf_ T
+---@return T
 function FnUtil.lazilyDefineFunction(getf_)
 	local getf = FnUtil.memoize(getf_)
 	return function(...)
@@ -67,7 +78,22 @@ function FnUtil.lazilyDefineFunction(getf_)
 	end
 end
 
--- The identity function
+--- The identity function
+---@generic T
+---@param x T
+---@return T
 function FnUtil.identity(x) return x end
+
+---Currying is a way to re-write a function with multiple arguments in such a way as it can be
+---called as a chain of functions each with a single argument
+---@generic T, V, R
+---@param func fun(x: T, ...: V):R
+---@param x T
+---@return fun(...:V):R
+function FnUtil.curry(func, x)
+	return function(...)
+		return func(x, ...)
+	end
+end
 
 return FnUtil

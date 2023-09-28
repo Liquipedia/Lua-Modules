@@ -13,6 +13,10 @@ local Table = require('Module:Table')
 local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class LinksWidget: Widget
+---@operator call({content: table<string, string>, variant: string?}): LinksWidget
+---@field links table<string, string>
+---@field variant string?
 local Links = Class.new(
 	Widget,
 	function(self, input)
@@ -21,25 +25,7 @@ local Links = Class.new(
 	end
 )
 
-local _ICON_KEYS_TO_RENAME = {
-	['bilibili-stream'] = 'bilibili',
-	daumcafe = 'cafe-daum',
-	['esea-d'] = 'esea-league',
-	['faceit-c'] = 'faceit',
-	['faceit-c2'] = 'faceit',
-	['faceit-hub'] = 'faceit',
-	['faceit-org'] = 'faceit',
-	matcherinolink = 'matcherino',
-	playlist = 'music',
-	privsteam = 'steam',
-	pubsteam = 'steam',
-	steamalternative = 'steam',
-	tlpdint = 'tlpd',
-	tlpdkr = 'tlpd-wol-korea',
-	tlpdsospa = 'tlpd-sospa',
-}
-
-local _PRIORITY_GROUPS = {
+local PRIORITY_GROUPS = {
 	core = {
 		'home',
 		'site',
@@ -71,12 +57,15 @@ local _PRIORITY_GROUPS = {
 		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
+		'nwc3l',
 		'royaleapi',
 		'siege-gg',
 		'sk',
+		'smashboards',
 		'sostronk',
 		'start-gg',
 		'stratz',
+		'tonamel',
 		'toornament',
 		'trackmania-io',
 		'vlr',
@@ -109,20 +98,30 @@ local _PRIORITY_GROUPS = {
 		'facebook-gaming',
 		'vidio',
 		'booyah',
+		'douyin',
 		'douyu',
 		'huyatv',
 		'zhangyutv',
 		'bilibili-stream',
 		'kuaishou',
+		'kick',
+		'cc',
+		'niconico',
+		'nimotv',
+		'openrec',
+		'steamtv',
+		'yandexefir',
+		'zhanqitv',
 	}
 }
 
+---@return {[1]: Html}
 function Links:make()
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
 					:addClass('infobox-icons')
 
-	for _, group in Table.iter.spairs(_PRIORITY_GROUPS) do
+	for _, group in Table.iter.spairs(PRIORITY_GROUPS) do
 		for _, key in ipairs(group) do
 			if self.links[key] ~= nil then
 				infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key]))
@@ -149,16 +148,13 @@ function Links:make()
 	}
 end
 
+---@param key string
+---@param value string?
+---@return string
 function Links:_makeLink(key, value)
-	key = self:_removeAppendedNumber(key)
+	key = UtilLinks.removeAppendedNumber(key)
 	return '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
-		' <i class="lp-icon lp-' .. (_ICON_KEYS_TO_RENAME[key] or key) .. '></i>]'
-end
-
---remove appended number
---needed because the link icons require e.g. 'esl' instead of 'esl2'
-function Links:_removeAppendedNumber(key)
-	return string.gsub(key, '%d$', '')
+		' ' .. UtilLinks.makeIcon(key) .. ']'
 end
 
 return Links

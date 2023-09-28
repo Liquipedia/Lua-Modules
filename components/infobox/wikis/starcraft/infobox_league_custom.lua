@@ -12,13 +12,13 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageLink = require('Module:Page')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -42,8 +42,9 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -64,16 +65,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch()}})
 	elseif id == 'customcontent' then
-		--player breakdown
-		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
-		--make playerNumber available for commons category check
-		_args.player_number = playerRaceBreakDown.playerNumber
-		local playerNumber = _args.player_number or 0
-		Variables.varDefine('tournament_playerNumber', playerNumber)
-		if playerNumber > 0 then
-			table.insert(widgets, Title{name = 'Player breakdown'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
-			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
+		local raceBreakdown = RaceBreakdown.run(_args)
+		if raceBreakdown then
+			Array.appendWith(widgets,
+				Title{name = 'Player Breakdown'},
+				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
+			)
 		end
 
 		--teams section
@@ -170,49 +168,7 @@ function CustomLeague._computeChronology()
 end
 
 function CustomLeague:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_SMW_storage', 'false')) and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
-end
-
-function CustomLeague._playerRaceBreakDown()
-	local playerBreakDown = {}
-	local playerNumber = tonumber(_args.player_number) or 0
-	local zergNumber = tonumber(_args.zerg_number) or 0
-	local terranNumbner = tonumber(_args.terran_number) or 0
-	local protossNumber = tonumber(_args.protoss_number) or 0
-	local randomNumber = tonumber(_args.random_number) or 0
-	if playerNumber == 0 then
-		playerNumber = zergNumber + terranNumbner + protossNumber + randomNumber
-	end
-
-	if playerNumber > 0 then
-		playerBreakDown.playerNumber = playerNumber
-		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
-			playerBreakDown.display = {}
-			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'p'})
-					.. ' ' .. protossNumber)
-			end
-			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'t'})
-					.. ' ' .. terranNumbner)
-			end
-			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'z'})
-					.. ' ' .. zergNumber)
-			end
-			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, RaceIcon.getSmallIcon({'r'})
-					.. ' ' .. randomNumber)
-			end
-		end
-	end
-	Variables.varDefine('nbnotableP', protossNumber)
-	Variables.varDefine('nbnotableT', terranNumbner)
-	Variables.varDefine('nbnotableZ', zergNumber)
-	Variables.varDefine('nbnotableR', randomNumber)
-	return playerBreakDown or {}
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 function CustomLeague:_makeBasedListFromArgs(prefix)
@@ -233,11 +189,11 @@ function CustomLeague:_makeBasedListFromArgs(prefix)
 	return {table.concat(foundArgs, '&nbsp;• ')}
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	local name = self.name
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or name)
+	Variables.varDefine('tournament_abbreviation', args.abbreviation or '')
 	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
 
 	--Legacy date vars
@@ -252,16 +208,16 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('lpdbtime', mw.getContentLanguage():formatDate('U', endDate))
 
 	--SC specific vars
-	Variables.varDefine('tournament_mode', _args.mode or '1v1')
-	Variables.varDefine('headtohead', _args.headtohead or 'true')
+	Variables.varDefine('tournament_mode', args.mode or '1v1')
+	Variables.varDefine('headtohead', args.headtohead or 'true')
 	--series number
-	local seriesNumber = _args.number or ''
+	local seriesNumber = args.number or ''
 	if String.isNotEmpty(seriesNumber) then
-		seriesNumber = string.format("%05i", seriesNumber)
+		seriesNumber = string.format('%05i', seriesNumber)
 	end
 	Variables.varDefine('tournament_series_number', seriesNumber)
 	--check if tournament is finished
-	local finished = Logic.readBool(_args.finished)
+	local finished = Logic.readBool(args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
 	if not finished and os.date('%Y-%m-%d') >= queryDate then
 		local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -280,27 +236,37 @@ function CustomLeague:defineCustomPageVariables()
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	Variables.varDefine('tournament_series', _args.series)
+	Variables.varDefine('tournament_series', args.series)
 end
 
-function CustomLeague:addToLpdb(lpdbData)
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.patch = Variables.varDefault('patch', '')
 	lpdbData.endpatch = Variables.varDefault('epatch', '')
-	local status = _args.status
+	local status = args.status
 		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = CustomLeague:_concatArgs('map')
-	lpdbData.participantsnumber = Variables.varDefault('tournament_playerNumber', _args.team_number or 0)
+	lpdbData.participantsnumber = (RaceBreakdown.run(args) or {}).total or args.team_number or 0
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
-	lpdbData.series = _args.series
+	lpdbData.series = args.series
+
+	lpdbData.extradata.female = Logic.readBool(args.female) or nil
 
 	return lpdbData
+end
+
+function CustomLeague:getWikiCategories(args)
+	if Logic.readBool(args.female) then
+		return {'Female Tournaments'}
+	end
+
+	return {}
 end
 
 function CustomLeague:_concatArgs(base)

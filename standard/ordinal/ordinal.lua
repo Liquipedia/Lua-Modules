@@ -16,11 +16,22 @@ local Ordinal = {}
 
 local DEFAULT_NEGATIVE_SIGN_TEXT = 'negative'
 
+---@class ordinalWrittenOptions
+---@field plural boolean?
+---@field negativeSignText string?
+---@field hyphenate boolean?
+---@field capitalize boolean?
+---@field concatWithAnd boolean?
+
+---@param valueInput string|number|nil
+---@param options ordinalWrittenOptions?
+---@return string?
 function Ordinal.written(valueInput, options)
 	local value = valueInput
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return
 	end
+	---@cast value -nil
 
 	-- clean value input
 	value = tonumber(string.match(value, '(%d*)%W*$'))
@@ -85,6 +96,10 @@ function Ordinal.written(valueInput, options)
 	return signText .. display
 end
 
+---@param value number
+---@param applyOrdinal boolean
+---@param concatText string
+---@return string, boolean
 function Ordinal._writtenBelowThousand(value, applyOrdinal, concatText)
 	if value == 0 then
 		return '', applyOrdinal
@@ -104,6 +119,9 @@ function Ordinal._writtenBelowThousand(value, applyOrdinal, concatText)
 	return display, false
 end
 
+---@param value number
+---@param applyOrdinal boolean
+---@return string
 function Ordinal._writtenBelowHundred(value, applyOrdinal)
 	local lookUp = {
 		ones = applyOrdinal and OrdinalData.positionOrdinal or OrdinalData.position,
@@ -119,10 +137,14 @@ function Ordinal._writtenBelowHundred(value, applyOrdinal)
 	end
 end
 
+---@param value string|number|nil
+---@param options {superScript: boolean?}?
+---@return string?
 function Ordinal.suffix(value, options)
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return
 	end
+	---@cast value -nil
 
 	-- clean value input
 	value = tonumber(string.match(value, '(%d*)%W*$'))
@@ -152,21 +174,35 @@ function Ordinal.suffix(value, options)
 	return suffix
 end
 
---Legacy entry points
-function Ordinal.ordinal(frame)
-	local args = Arguments.getArgs(frame)
-
-	return Ordinal._ordinal(args[1], nil, Logic.readBool(args['sup']))
-end
-
-function Ordinal._ordinal(value, _, superScript)
+---Builds the ordinal display of a given value
+---@param value string|number|nil
+---@param options {superScript: boolean?}?
+---@return string?
+function Ordinal.toOrdinal(value, options)
 	if Logic.isEmpty(value) then
 		return
 	end
 
-	return value .. (Ordinal.suffix(value, {
-		superScript = superScript,
-	}) or '')
+	return value .. (Ordinal.suffix(value, options) or '')
+end
+
+---Wiki entry point for `Ordinal.toOrdinal`
+---@param frame Frame
+---@return string?
+function Ordinal.ordinal(frame)
+	local args = Arguments.getArgs(frame)
+
+	return Ordinal.toOrdinal(args[1], {superScript = Logic.readBool(args['sup'])})
+end
+
+--Legacy entry point
+---@deprecated
+---@param value string|number|nil
+---@param _ nil
+---@param superScript boolean?
+---@return string?
+function Ordinal._ordinal(value, _, superScript)
+	return Ordinal.toOrdinal(value, {superScript = superScript})
 end
 
 return Ordinal

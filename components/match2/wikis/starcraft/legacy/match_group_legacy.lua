@@ -31,7 +31,7 @@ function Legacy.get(frame)
 
 	local storage = _args.store
 	if storage == '' or storage == nil then
-		storage = Variables.varDefault('disable_SMW_storage') == 'true' and 'false' or nil
+		storage = Variables.varDefault('disable_LPDB_storage') == 'true' and 'false' or nil
 	end
 	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
 		storage = 'false'

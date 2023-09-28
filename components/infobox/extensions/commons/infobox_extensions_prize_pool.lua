@@ -16,11 +16,23 @@ local Variables = require('Module:Variables')
 
 local PrizePoolCurrency = {}
 
-local NOW = os.date('!%F')
+local NOW = os.date('!%F') --[[@as string]]
 local USD = 'USD'
-local LANG = mw.language.new('en')
 local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 
+---@class InfoboxExtensionsPrizePoolArgs
+---@field currency string?
+---@field date string?
+---@field displayRoundPrecision number|string|nil
+---@field prizepool number|string|nil
+---@field prizepoolusd number|string|nil
+---@field rate string?
+---@field setvariables string?
+---@field text string?
+---@field varRoundPrecision string?
+
+---@param args InfoboxExtensionsPrizePoolArgs
+---@return string|number|nil
 function PrizePoolCurrency.display(args)
 	args = args or {}
 	local currency = string.upper(args.currency or USD)
@@ -30,13 +42,19 @@ function PrizePoolCurrency.display(args)
 	local prizepoolUsd = PrizePoolCurrency._cleanValue(args.prizepoolusd)
 	local currencyRate = tonumber(args.rate)
 	local setVariables = Logic.emptyOr(args.setvariables, true)
+	local varRoundPrecision = tonumber(args.varRoundPrecision) or (args.varRoundPrecision == 'full' and -1) or 2
+	local displayRoundPrecision = tonumber(args.displayRoundPrecision) or 0
+
+	if (varRoundPrecision ~= -1) and (varRoundPrecision < displayRoundPrecision) then
+		return PrizePoolCurrency._errorMessage('Display precision cannot be higher than Variable precious')
+	end
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			return (args.prizepool or args.prizepoolUsd or '')
+			return (args.prizepool or args.prizepoolusd or '')
 				.. '[[Category:Tournaments with invalid prize pool]]'
 		else
-			return (args.prizepool or args.prizepoolUsd or '')
+			return args.prizepool or args.prizepoolusd or ''
 		end
 	end
 
@@ -47,11 +65,9 @@ function PrizePoolCurrency.display(args)
 		date = NOW
 	end
 
-	if currency == USD and String.isEmpty(prizepoolUsd) then
+	if currency == USD and Logic.isEmpty(prizepoolUsd) then
 		return PrizePoolCurrency._errorMessage('Need valid currency')
-	elseif currency == USD then
-		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
-	else
+	elseif currency ~= USD then
 		local errorMessage
 		prizepool, prizepoolUsd, currencyRate, errorMessage = PrizePoolCurrency._exchange{
 			currency = currency,
@@ -66,45 +82,61 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
+	if varRoundPrecision ~= -1 then
+		prizepoolUsd = Math.round{prizepoolUsd, varRoundPrecision}
+	end
+
 	if setVariables then
 		if String.isNotEmpty(args.currency) then
 			Variables.varDefine('tournament_currency', currency:upper())
 		end
 
-		Variables.varDefine('tournament_currency_date', date)
+		Variables.varDefine('tournament_currency_date', date --[[@as string?]])
 		Variables.varDefine('tournament_currency_text', text)
-		Variables.varDefine('tournament_prizepoollocal', prizepool or '')
-
-		local prizepoolUsdValue = string.gsub(prizepoolUsd or '', ',', '')
-		Variables.varDefine('tournament_prizepoolusd', prizepoolUsdValue)
+		Variables.varDefine('tournament_prizepoollocal', prizepool)
+		Variables.varDefine('tournament_prizepoolusd', prizepoolUsd)
 
 		-- legacy compatibility
-		Variables.varDefine('tournament_currency_rate', currencyRate or '')
-		Variables.varDefine('tournament_prizepool_local', prizepool or '')
-		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd or '')
-		Variables.varDefine('currency', args.currency and currency or '')
-		Variables.varDefine('currency date', date)
+		Variables.varDefine('tournament_currency_rate', currencyRate)
+		Variables.varDefine('tournament_prizepool_local', prizepool)
+		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd)
+		Variables.varDefine('currency', args.currency and currency)
+		Variables.varDefine('currency date', date --[[@as string?]])
 		Variables.varDefine('currency rate', currencyRate)
-		Variables.varDefine('prizepool', prizepool or '')
-		Variables.varDefine('prizepool usd', prizepoolUsd or '')
-		Variables.varDefine('tournament_prizepool', prizepoolUsdValue)
+		Variables.varDefine('prizepool', prizepool)
+		Variables.varDefine('prizepool usd', prizepoolUsd)
+		Variables.varDefine('tournament_prizepool', prizepoolUsd)
 	end
 
-	local display = Currency.display(USD, prizepoolUsd, {setVariables = false})
-	if String.isNotEmpty(prizepool) then
-		display = Currency.display(currency, prizepool, {setVariables = true})
-			.. '<br>(≃ ' .. display .. ')'
+	local display = Currency.display(USD, prizepoolUsd, {
+			setVariables = false,
+			formatValue = true,
+			formatPrecision = displayRoundPrecision
+		})
+	if Logic.isNotEmpty(prizepool) then
+		display = Currency.display(currency, prizepool, {
+				setVariables = true,
+				formatValue = true,
+				formatPrecision = displayRoundPrecision
+			}) .. '<br>(≃ ' .. display .. ')'
 	end
 
 	return display
 end
 
+---@param props table
+---@return number?
+---@return number?
+---@return number?
+---@return string?
 function PrizePoolCurrency._exchange(props)
 	local prizepool = props.prizepool
 	local prizepoolUsd = props.prizepoolUsd
 	local currencyRate = Currency.getExchangeRate(props)
 
-	if not currencyRate then
+	if not currencyRate and Logic.isNumeric(prizepool) and Logic.isNumeric(prizepoolUsd) then
+		currencyRate = tonumber(prizepoolUsd) / tonumber(prizepool)
+	elseif not currencyRate then
 		local errorMessage = 'Need valid currency and exchange date or exchange rate'
 		return prizepool, prizepoolUsd, currencyRate, errorMessage
 	end
@@ -114,29 +146,31 @@ function PrizePoolCurrency._exchange(props)
 	end
 
 	if Logic.isNumeric(prizepool) then
-		prizepool = PrizePoolCurrency._format(prizepool)
+		prizepool = tonumber(prizepool)
 	end
 	if Logic.isNumeric(prizepoolUsd) then
-		prizepoolUsd = PrizePoolCurrency._format(prizepoolUsd)
+		prizepoolUsd = tonumber(prizepoolUsd)
 	end
 
 	return prizepool, prizepoolUsd, currencyRate, nil
 end
 
-function PrizePoolCurrency._format(value)
-	return LANG:formatNum(Math.round{value, 0})
-end
-
+---@param dateString string
+---@return string?
 function PrizePoolCurrency._cleanDate(dateString)
 	dateString = string.gsub(dateString, '[^%d%-]', '')
 	return string.match(dateString, '%d%d%d%d%-%d%d%-%d%d')
 end
 
+---@param valueString string|number|nil
+---@return number?
 function PrizePoolCurrency._cleanValue(valueString)
 	valueString = string.gsub(valueString or '', '[^%d%.?]', '')
 	return tonumber(valueString)
 end
 
+---@param message string
+---@return string
 function PrizePoolCurrency._errorMessage(message)
 	local category = ''
 	if Namespace.isMain() then

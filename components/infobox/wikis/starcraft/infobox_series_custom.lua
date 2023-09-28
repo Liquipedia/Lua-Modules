@@ -11,6 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local SeriesTotalPrize = require('Module:SeriesTotalPrize')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Class = require('Module:Class')
@@ -30,21 +31,28 @@ local CustomSeries = {}
 
 local _args
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
 
 	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+	_args.liquipediatier = _args.liquipediatier or _args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	series.addToLpdb = CustomSeries.addToLpdb
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Patch', content = {CustomSeries._getPatch()}})
 	table.insert(widgets, Cell{name = 'Server', content = {_args.server}})
@@ -68,6 +76,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return string?
 function CustomSeries._getSeriesPrizepools()
 	local seriesTotalPrizeInput = Json.parseIfString(_args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or _args.series or mw.title.getCurrentTitle().text
@@ -81,6 +90,7 @@ function CustomSeries._getSeriesPrizepools()
 	}
 end
 
+---@return string?
 function CustomSeries._getPatch()
 	local patch = _args.patch
 	local endPatch = _args.epatch
@@ -105,14 +115,15 @@ function CustomSeries._addCustomVariables()
 		Logic.readBool(_args.disable_lpdb) or
 		Logic.readBool(_args.disable_storage)
 	then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		--needed for e.g. External Cups Lists
 		local name = _args.name or mw.title.getCurrentTitle().text
 		Variables.varDefine('featured', _args.featured or '')
 		Variables.varDefine('headtohead', _args.headtohead or '')
-		Variables.varDefine('tournament_liquipediatier', _args.liquipediatier or '')
-		Variables.varDefine('tournament_liquipediatiertype', _args.liquipediatiertype or '')
+		local tier, tierType = Tier.toValue(_args.liquipediatier, _args.liquipediatiertype)
+		Variables.varDefine('tournament_liquipediatier', tier or '')
+		Variables.varDefine('tournament_liquipediatiertype', tierType or '')
 		Variables.varDefine('tournament_mode', _args.mode or '1v1')
 		Variables.varDefine('tournament_ticker_name', _args.tickername or name)
 		Variables.varDefine('tournament_shortname', _args.shortname or '')
@@ -124,12 +135,17 @@ function CustomSeries._addCustomVariables()
 	end
 end
 
-function Series:addToLpdb(lpdbData)
+---@param lpdbData table
+---@return table
+function CustomSeries:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
 	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
 	return lpdbData
 end
 
+---@param date string?
+---@param edate string?
+---@param sdate string?
 function CustomSeries._setDateMatchVar(date, edate, sdate)
 	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
 	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
@@ -139,6 +155,8 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
 
+---@param ... string
+---@return string?
 function CustomSeries._validDateOr(...)
 	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
 

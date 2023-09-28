@@ -40,18 +40,11 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
 	end
 
-	out = out .. '\n\t|date=|finished='
+	out = out .. '\n\t|date= |finished='
 
 	if streams then
 		table.insert(mapStats, 'vod')
-		out = out .. '\n\t|twitch=|youtube='
-	end
-
-	if #matchMatchpages > 0 then
-		out = out .. '\n\t'
-		for _, matchpage in ipairs(matchMatchpages) do
-			out = out .. '|' .. matchpage:lower() .. '='
-		end
+		out = out .. '\n\t|twitch='
 	end
 
 	for i = 1, bestof do
@@ -75,7 +68,14 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out .. '}}'
 	end
 
-	return out .. '\n}}'
+	if #matchMatchpages > 0 then
+		out = out .. '\n\t'
+		for _, matchpage in ipairs(matchMatchpages) do
+			out = out .. '|' .. matchpage:lower() .. '='
+		end
+	end
+
+	return out .. '\n\t}}'
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent

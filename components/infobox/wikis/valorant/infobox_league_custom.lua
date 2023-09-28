@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -43,9 +43,9 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	_args.liquipediatier = Tier.number[_args.liquipediatier]
+	_args.liquipediatier = Tier.toNumber(_args.liquipediatier)
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -76,6 +76,7 @@ function CustomInjector:parse(id, widgets)
 					Page.makeInternalLink({}, map, map .. game)
 				)))
 			end
+			table.sort(maps)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
@@ -102,14 +103,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	if Logic.readBool(args.riotpremier) then
-		lpdbData.publishertier = 'major'
-	elseif Logic.readBool(args['riot-sponsored']) then
-		lpdbData.publishertier = 'Sponsored'
-	end
-
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
@@ -118,12 +111,12 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args['riot-sponsored'])
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args['riot-highlighted'])
 end
 
 function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args['riot-sponsored']) then
+	if Logic.readBool(_args['riot-highlighted']) or Logic.readBool(_args['riot-sponsored']) then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
@@ -145,12 +138,19 @@ function CustomLeague:_createPatchCell(args)
 	return content
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki Custom
-	Variables.varDefine('female', _args.female or 'false')
-	Variables.varDefine('tournament_riot_premier', _args.riotpremier and 'true' or '')
-	Variables.varDefine('tournament_mode', (_args.individual or _args. player_number) and '1v1' or 'team')
-	Variables.varDefine('patch', _args.patch or '')
+	Variables.varDefine('female', args.female or 'false')
+	Variables.varDefine('tournament_riot_premier', args.riotpremier and 'true' or '')
+	Variables.varDefine('tournament_mode', (args.individual or args.player_number) and '1v1' or 'team')
+	Variables.varDefine('patch', args.patch or '')
+
+	-- Publishertier vars
+	if Logic.readBool(args['riot-highlighted']) then
+		Variables.varDefine('tournament_publishertier', 'highlighted')
+	elseif Logic.readBool(args['riot-sponsored']) then
+		Variables.varDefine('tournament_publishertier', 'sponsored')
+	end
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername', ''))

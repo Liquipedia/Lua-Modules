@@ -81,7 +81,7 @@ end
 function wikiCopyPaste._getMaps(lines, bestof, args, matchIndex, numberOfOpponents)
 	if bestof > 0 then
 		local map = '{{Map'
-			.. '\n' .. indent .. indent .. '|map=|maptype='
+			.. '\n' .. indent .. indent .. '|map=|maptype=|firstpick='
 			.. '\n' .. indent .. indent .. '|score1=|score2='
 
 		for _, item in ipairs(_CONVERT_PICK_BAN_ENTRY[args.pickBan or ''] or {}) do

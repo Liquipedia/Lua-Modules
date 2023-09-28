@@ -6,31 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local CleanRace = require('Module:CleanRace')
+local String = require('Module:StringUtils')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
 
 SquadRow.specialTeamsTemplateMapping = {
 	retirement = 'Team/retired',
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
 	military = 'Team/military',
-}
-
-local _FACTION1 = {
-	['p'] = 'Protoss', ['pt'] = 'Protoss', ['pz'] = 'Protoss',
-	['t'] = 'Terran', ['tp'] = 'Terran', ['tz'] = 'Terran',
-	['z'] = 'Zerg', ['zt'] = 'Zerg', ['zp'] = 'Zerg',
-	['r'] = 'Random', ['a'] = 'All'
-}
-local _FACTION2 = {
-	['pt'] = 'Terran', ['pz'] = 'Zerg',
-	['tp'] = 'Protoss', ['tz'] = 'Zerg',
-	['zt'] = 'Terran', ['zp'] = 'Protoss'
 }
 
 local CustomSquad = {}
@@ -52,20 +42,19 @@ function CustomSquad.run(frame)
 
 	local index = 1
 	while args['p' .. index] or args[index] do
-
 		local player = Json.parseIfString(args['p' .. index] or args[index])
-		player.race = string.lower(player.race)
-		player.race = CleanRace[player.race] or player.race
-		local row = SquadRow(frame, player.role, {useTemplatesForSpecialTeams = true})
-		row	:id({
-				player.id,
-				flag = player.flag,
-				race = player.race,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-			})
+		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		row:status(squad.type)
+		row:id({
+			player.id,
+			flag = player.flag,
+			race = Faction.read(player.race),
+			link = player.link,
+			captain = player.captain,
+			role = player.role,
+			team = player.team,
+			date = player.leavedate or player.inactivedate or player.leavedate,
+		})
 			:name({name = player.name})
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
@@ -90,15 +79,20 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		row.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			faction = _FACTION1[player.race],
-			faction2 = _FACTION2[player.race],
+		local factions = Faction.readMultiFaction(player.race, {alias = false})
+
+		row:setExtradata({
+			faction = Faction.toName(factions[1]),
+			faction2 = Faction.toName(factions[2]),
+			faction3 = Faction.toName(factions[3]),
 			squadname = squadName,
 			status = status
 		})
 
 		squad:row(row:create(
 			squadName .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
+			.. (player.role and '_' .. player.role or '')
+			.. '_' .. squad.type
 		))
 
 		index = index + 1

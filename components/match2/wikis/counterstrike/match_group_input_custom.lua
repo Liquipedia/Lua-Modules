@@ -23,7 +23,6 @@ local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NP_MATCH_STATUS = {'cancelled','canceled', 'postponed'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
@@ -41,7 +40,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getLinks(match)
@@ -500,7 +499,7 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -518,7 +517,7 @@ function matchFunctions.getOpponents(match)
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time(os.date('!*t'))
+			local currentUnixTime = os.time( --[[@as osdate]])
 			local lang = mw.getContentLanguage()
 			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 			local threshold = match.dateexact and 30800 or 86400
@@ -535,26 +534,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		player = Json.parseIfString(player)
-		local playerPrefix = teamName .. '_p' .. playerIndex
-		player.name = player.name or Variables.varDefault(playerPrefix)
-		player.flag = player.flag or Variables.varDefault(playerPrefix .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(playerPrefix .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end

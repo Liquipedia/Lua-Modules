@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -21,13 +22,17 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Breakdown = Widgets.Breakdown
 
+---@class UnofficialWorldChampionInfobox: BasicInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
+---@return Html
 function UnofficialWorldChampion:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -71,18 +76,10 @@ function UnofficialWorldChampion:createInfobox()
 		Customizable{id = 'defences', children = {
 				Builder{
 					builder = function()
-						local index = 1
-						local mostDefencesCells = {}
-						while not String.isEmpty(args['most defences against ' .. index]) do
-							table.insert(mostDefencesCells, Breakdown{
-									content = {
-										args['most defences against ' .. index]
-									}
-								}
-							)
-							index = index + 1
-						end
-						return mostDefencesCells
+						return Array.map(
+							self:getAllArgsForBase(args, 'most defences against '),
+							function (value) return Breakdown{content = {value}} end
+						)
 					end
 				},
 			}

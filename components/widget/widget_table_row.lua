@@ -10,6 +10,16 @@ local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
+---@class WidgetTableRowInput
+---@field cells WidgetTableCell[]?
+---@field classes string[]?
+---@field css {[string]: string|number|nil}[]?
+
+---@class WidgetTableRow:Widget
+---@operator call(WidgetTableRowInput): WidgetTableRow
+---@field cells WidgetTableCell[]
+---@field classes string[]
+---@field css {[string]: string|number|nil}[]
 local TableRow = Class.new(
 	Widget,
 	function(self, input)
@@ -19,20 +29,26 @@ local TableRow = Class.new(
 	end
 )
 
+---@param cell WidgetTableCell?
+---@return self
 function TableRow:addCell(cell)
 	table.insert(self.cells, cell)
 	return self
 end
 
+---@param class string|nil
+---@return self
 function TableRow:addClass(class)
 	table.insert(self.classes, class)
 	return self
 end
 
+---@return integer
 function TableRow:getCellCount()
 	return #self.cells
 end
 
+---@return {[1]: Html}
 function TableRow:make()
 	local row = mw.html.create('div'):addClass('csstable-widget-row')
 

@@ -11,7 +11,8 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+local TextSanitizer = require('Module:TextSanitizer')
+
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
@@ -22,10 +23,6 @@ local MatchLegacy = {}
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy.convertParameters(match2)
-
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match)
-	end
 
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
@@ -109,8 +106,27 @@ function MatchLegacy.convertParameters(match2)
 		local prefix = 'opponent' .. index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == Opponent.team then
-			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+		if opponent.type == Opponent.team or opponent.type == Opponent.literal then
+			if opponent.type == Opponent.team then
+				if String.isEmpty(opponent.template) then
+					match[prefix] = 'TBD'
+				elseif mw.ext.TeamTemplate.teamexists(opponent.template) then
+					match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+				else
+					match[prefix] = opponent.template
+				end
+			else
+				if String.isEmpty(opponent.name) or (TextSanitizer.stripHTML(opponent.name) ~= opponent.name)
+					or String.contains(opponent.name, 'winner') or String.contains(opponent.name, 'loser')
+				then
+					match[prefix] = 'TBD'
+				else
+					match[prefix] = opponent.name
+				end
+				if opponent.name == 'BYE' then
+					match.resulttype = 'l'
+				end
+			end
 			--When a match is overturned winner get score needed to win bestofx while loser gets score = 0
 			if isOverturned then
 				match[prefix .. 'score'] = tonumber(match.winner) == index and (math.floor(match2.bestof /2) + 1) or 0
@@ -141,12 +157,14 @@ function MatchLegacy.convertParameters(match2)
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == Opponent.solo then
-			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
-			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			match[prefix .. 'flag'] = player.flag
-		elseif opponent.type == Opponent.literal then
-			match[prefix] = 'TBD'
+			if String.isEmpty(opponent.name) then
+				match[prefix] = 'TBD'
+			else
+				local player = opponentmatch2players[1] or {}
+				match[prefix] = player.name
+				match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+				match[prefix .. 'flag'] = player.flag
+			end
 		end
 	end
 
@@ -211,34 +229,6 @@ function MatchLegacy.storeGames(match, match2)
 		games = games .. res
 	end
 	return games
-end
-
-function MatchLegacy.storeMatchSMW(match)
-	mw.smw.subobject({
-			['has team left'] = match.opponent1 or '',
-			['has team right'] = match.opponent2 or '',
-			['has map date'] = match.date or '',
-			['has tournament'] = mw.title.getCurrentTitle().prefixedText,
-			['has tournament tier'] = Variables.varDefault('tournament_tier'), -- Legacy support Infobox
-			['has tournament tier number'] = match.liquipediatier, -- or this ^
-			['has tournament icon'] = match.icon,
-			['has tournament name'] = match.tickername,
-			['is part of tournament series'] = match.series,
-			['has match vod'] = match.vod or '',
-			['is major game'] = match.publishertier == 'Major' and 'true' or nil,
-			['has tournament valve tier'] = match.publishertier,
-			['is finished'] = match.finished == 1 and 'true' or 'false',
-			['has team left score'] = match.opponent1score or '0',
-			['has team right score'] = match.opponent2score or '0',
-			['has exact time'] = Logic.readBool(match.dateexact) and 'true' or 'false',
-			['is hidden match'] = Logic.readBool(match.extradata.hidden) and 'true' or 'false'
-		}, 'Match_' .. match.opponent1 .. '_vs_' .. match.opponent2 .. '_at_' .. match.date
-	)
-	mw.smw.subobject({
-			['has teams'] = match.opponent1 .. ',' .. match.opponent2, '+sep=,',
-			['has teams page'] = match.opponent1 .. ',' .. match.opponent2, '+sep=,',
-		}, 'Match_' .. match.opponent1 .. '_vs_' .. match.opponent2 .. '_at_' .. (match.date and match.date or 'TBD')
-	)
 end
 
 return MatchLegacy

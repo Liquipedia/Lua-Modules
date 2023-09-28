@@ -58,16 +58,15 @@ function CustomPlayer.run(frame)
 		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
 	end
 
-	player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -120,11 +119,10 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	_args.hero1 = _args.hero1 or _args.hero
-	for _, hero, heroIndex in Table.iter.pairsByPrefix(_args, 'hero') do
+	for _, hero, heroIndex in Table.iter.pairsByPrefix(_args, 'hero', {requireIndex = false}) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = hero
 	end
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
@@ -160,17 +158,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

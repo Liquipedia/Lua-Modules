@@ -14,7 +14,6 @@ local VodLink = require('Module:VodLink')
 local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
 local String = require('Module:StringUtils')
-local Flags = require('Module:Flags')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
@@ -25,43 +24,14 @@ local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
 local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local _OCTANE_PREFIX = '[[File:Octane_gg.png|14x14px|link='
-local _OCTANE_SUFFIX = '|Octane matchpage]]'
+local _SHIFT_PREFIX = '[[File:ShiftRLE icon.png|14x14px|link='
+local _SHIFT_SUFFIX = '|ShiftRLE matchpage]]'
 local _BALLCHASING_PREFIX = '[[File:Ballchasing icon.png|14x14px|link='
 local _BALLCHASING_SUFFIX = '|Ballchasing replays]]'
 local _HEADTOHEAD_PREFIX = '[[File:Match Info Stats.png|14x14px|link='
 local _HEADTOHEAD_SUFFIX = '|Head to Head history]]'
 
 local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
--- Custom Caster Class
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-	return self
-end
-
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
-end
 
 -- Custom Header Class
 local Header = Class.new(
@@ -137,7 +107,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 
-	if String.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
+	if Logic.isNotEmpty(bestof) and bestof > 0 and isNotFinished then
 		return scoreBoardNode
 			:node(mw.html.create('span')
 				:css('line-height', '1.1')
@@ -236,13 +206,13 @@ function CustomMatchSummary.getByMatchId(args)
 	then
 		local footer = MatchSummary.Footer()
 
-		-- Octane
-		for _, octane in Table.iter.pairsByPrefix(match.links, 'octane') do
-			footer:addElement(_OCTANE_PREFIX .. octane .. _OCTANE_SUFFIX)
+		-- Shift
+		for _, shift in Table.iter.pairsByPrefix(match.links, 'shift', {requireIndex = false}) do
+			footer:addElement(_SHIFT_PREFIX .. shift .. _SHIFT_SUFFIX)
 		end
 
 		-- Ballchasing
-		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing') do
+		for _, ballchasing in Table.iter.pairsByPrefix(match.links, 'ballchasing', {requireIndex = false}) do
 			footer:addElement(_BALLCHASING_PREFIX .. ballchasing .. _BALLCHASING_SUFFIX)
 		end
 
@@ -308,7 +278,7 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = Casters()
+		local casterRow = MatchSummary.Casters()
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end
@@ -377,13 +347,13 @@ function CustomMatchSummary._createGame(game)
 	end
 
 	if
-		String.isNotEmpty(extradata.t1goals)
-		or String.isNotEmpty(extradata.t2goals)
-		or String.isNotEmpty(game.comment)
+		Logic.isNotEmpty(extradata.t1goals)
+		or Logic.isNotEmpty(extradata.t2goals)
+		or Logic.isNotEmpty(game.comment)
 	then
 		row:addElement(MatchSummary.Break():create())
 	end
-	if String.isNotEmpty(extradata.t1goals) then
+	if Logic.isNotEmpty(extradata.t1goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))
 	end
 	if String.isNotEmpty(game.comment) then
@@ -393,7 +363,7 @@ function CustomMatchSummary._createGame(game)
 			:node(game.comment)
 		)
 	end
-	if String.isNotEmpty(extradata.t2goals) then
+	if Logic.isNotEmpty(extradata.t2goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 

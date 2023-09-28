@@ -43,7 +43,7 @@ local mapFunctions = {}
 local opponentFunctions = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
 		matchFunctions.readDate(match)
@@ -174,16 +174,6 @@ function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
-
 	local showh2h = Logic.readBool(match.showh2h)
 		and opponent1.type == Opponent.team
 		and opponent2.type == Opponent.team
@@ -195,7 +185,10 @@ function matchFunctions.getExtraData(match)
 		isconverted = 0,
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		casters = MatchGroupInput.readCasters(match),
+		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
+		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
+		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 	return match
 end
@@ -203,58 +196,17 @@ end
 function matchFunctions.getLinks(match)
 	match.links = {}
 
-	-- Octane
-	match.octane1 = match.octane1 or match.octane
-	for key, octane in Table.iter.pairsByPrefix(match, 'octane') do
-		match.links[key] = 'https://octane.gg/matches/' .. octane
+	-- Shift (formerly Octane)
+	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
+		match.links[key] = 'https://www.shiftrle.gg/matches/' .. shift
 	end
 
 	-- Ballchasing
-	match.ballchasing1 = match.ballchasing1 or match.ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing') do
+	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
 		match.links[key] = 'https://ballchasing.com/group/' .. ballchasing
 	end
 
 	return match
-end
-
-function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
-	if String.isEmpty(flag) then
-		flag = Variables.varDefault(name .. '_flag')
-	end
-	if String.isEmpty(displayName) then
-		displayName = Variables.varDefault(name .. '_dn')
-	end
-	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
-		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
-			query = 'flag, id',
-			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
-		end
-	end
-	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
-	end
-	if String.isEmpty(displayName) then
-		displayName = name
-	end
-	if String.isNotEmpty(displayName) then
-		Variables.varDefine(name .. '_dn', displayName)
-	end
-	return {
-		name = name,
-		displayName = displayName,
-		flag = flag,
-	}
 end
 
 function matchFunctions.isFeatured(match)
@@ -333,7 +285,7 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -346,7 +298,7 @@ function matchFunctions.getOpponents(args)
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t'))
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
@@ -411,19 +363,6 @@ function matchFunctions.getOpponents(args)
 		args.winner = 0
 	end
 	return args
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-		end
-	end
-	return match
 end
 
 --

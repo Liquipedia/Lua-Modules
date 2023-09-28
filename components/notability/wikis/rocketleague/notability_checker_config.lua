@@ -221,9 +221,9 @@ end
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
 	local modeMod = 1
-	if mode == "2v2" then
+	if mode == '2v2' then
 		modeMod = 0.5
-	elseif mode == "1v1" then
+	elseif mode == '1v1' then
 		modeMod = 0.25
 	end
 	return score * modeMod

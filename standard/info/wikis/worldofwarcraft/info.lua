@@ -9,7 +9,23 @@
 return {
 	startYear = 2007,
 	wikiName = 'worldofwarcraft',
-	name = 'World of Warcraft Wiki',
-	defaultTeamLogo = 'WoWlogo_Default_allmode.png',
-	defaultTeamLogoDark = 'WoWlogo_Default_allmode.png',
+	name = 'World of Warcraft',
+	games = {
+		wow = {
+			abbreviation = 'WoW',
+			name = 'World of Warcraft',
+			link = 'World of Warcraft',
+			logo = {
+				darkMode = 'WoWlogo Default allmode.png',
+				lightMode = 'WoWlogo Default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WoWlogo Default allmode.png',
+				lightMode = 'WoWlogo Default allmode.png',
+			},
+		},
+	},
+	defaultGame = 'wow',
+	defaultTeamLogo = 'WoWlogo Default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'WoWlogo Default allmode.png', ---@deprecated
 }

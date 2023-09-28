@@ -19,7 +19,7 @@ local NAME_SANITIZER = {
 ---Removes all html tags and their attributes.
 ---@param name string?
 ---@return string?
-function TextSanitizer.tournamentName(name)
+function TextSanitizer.stripHTML(name)
 	if not name then
 		return
 	end

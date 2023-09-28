@@ -64,9 +64,9 @@ function StarcraftFfaInput.adjustData(match)
 	local subgroup = 0
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 		if
-			String.isNotEmpty(map.opponent1placement) or String.isNotEmpty(map.placement1)
-			or String.isNotEmpty(map.points1) or String.isNotEmpty(map.opponent1points)
-			or String.isNotEmpty(map.score1) or String.isNotEmpty(map.opponent1score)
+			Logic.isNotEmpty(map.opponent1placement) or Logic.isNotEmpty(map.placement1)
+			or Logic.isNotEmpty(map.points1) or Logic.isNotEmpty(map.opponent1points)
+			or Logic.isNotEmpty(map.score1) or Logic.isNotEmpty(map.opponent1score)
 			or String.isNotEmpty(map.map)
 		then
 			match, subgroup = StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, numberOfOpponents)
@@ -171,23 +171,23 @@ Match Winner, Walkover, Placement, Resulttype, Status functions
 
 ]]--
 function StarcraftFfaInput._matchWinnerProcessing(match, numberOfOpponents, noscore)
-	local bestof = tonumber(match.firstto or '') or tonumber(match.bestof or '') or _BESTOF_DUMMY
+	local bestof = tonumber(match.firstto) or tonumber(match.bestof) or _BESTOF_DUMMY
 	match.bestof = bestof
-	local walkover = match.walkover or ''
+	local walkover = match.walkover
 	local IndScore = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
 		--determine opponent scores, status
 		--determine MATCH winner, resulttype and walkover
-		if walkover ~= '' then
+		if walkover then
 			if Logic.isNumeric(walkover) then
-				walkover = tonumber(walkover)
-				if walkover == opponentIndex then
+				local numericWalkover = tonumber(walkover)
+				if numericWalkover == opponentIndex then
 					match.winner = opponentIndex
 					match.walkover = 'L'
 					opponent.status = 'W'
 					IndScore[opponentIndex] = _DEFAULT_WIN_SCORE_VALUE
-				elseif walkover == 0 then
+				elseif numericWalkover == 0 then
 					match.winner = 0
 					match.walkover = 'L'
 					opponent.status = 'L'
@@ -257,7 +257,7 @@ end
 function StarcraftFfaInput._matchPlacements(match, numberOfOpponents, noscore, IndScore)
 	local counter = 0
 	local temp = {}
-	match.finished = String.isNotEmpty(match.finished)
+	match.finished = Logic.isNotEmpty(match.finished)
 		and match.finished ~= 'false' and match.finished ~= '0'
 		and 'true' or nil
 
@@ -265,7 +265,7 @@ function StarcraftFfaInput._matchPlacements(match, numberOfOpponents, noscore, I
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput._placementSortFunction) do
 			local opponent = match['opponent' .. scoreIndex]
 			counter = counter + 1
-			if counter == 1 and String.isEmpty(match.winner) then
+			if counter == 1 and Logic.isEmpty(match.winner) then
 				if match.finished or score >= match.bestof then
 					match.winner = scoreIndex
 					match.finished = 'true'
@@ -351,7 +351,7 @@ function StarcraftFfaInput._opponentInput(match, noscore)
 				advances = opponent.advances
 			end
 		end
-		advances = String.isNotEmpty(advances) and advances ~= 'false' and advances ~= '0'
+		advances = Logic.isNotEmpty(advances) and advances ~= 'false' and advances ~= '0'
 
 		--opponent processing (first part)
 		--sort out extradata
@@ -431,7 +431,6 @@ function StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, numberOfO
 	map.extradata = {
 		comment = map.comment or '',
 		header = map.header or '',
-		isSubMatch = 'false',
 		noQuery = match.noQuery,
 	}
 
@@ -512,7 +511,7 @@ function StarcraftFfaInput._mapScoreProcessing(map, numberOfOpponents, noscore)
 			local temp = {}
 			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput._placementSortFunction) do
 				counter = counter + 1
-				if counter == 1 and String.isEmpty(map.winner) then
+				if counter == 1 and Logic.isEmpty(map.winner) then
 					map.winner = scoreIndex
 					map.extradata['placement' .. scoreIndex] = tonumber(map['placement' .. scoreIndex] or '') or
 						tonumber(map['opponent' .. scoreIndex .. 'placement'] or '') or counter

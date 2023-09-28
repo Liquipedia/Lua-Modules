@@ -37,10 +37,14 @@ local PLACEMENT_CLASSES = {
 	['129'] = 'placement-darkgrey',
 	['q'] = 'placement-win',
 	['w'] = 'placement-win',
-	['d'] = 'placement-draw',
 	['l'] = 'placement-lose',
 	['dq'] = 'placement-lose',
+	['dnf'] = 'placement-dnp',
+	['dns'] = 'placement-dnp',
+	['dnpq'] = 'placement-dnp',
 	['dnp'] = 'placement-dnp',
+	['dnq'] = 'placement-dnp',
+	['nc'] = 'placement-dnp',
 	['proceeded'] = 'placement-up',
 	['stay'] = 'placement-stay',
 	['relegated'] = 'placement-down',
@@ -56,9 +60,14 @@ local CUSTOM_SORTS = {
 	['l'] = '1030',
 	['relegated'] = '1031',
 	['dnp'] = '1032',
-	['dq'] = '1033',
-	['div'] = '1034',
-	[''] = '1035',
+	['dnpq'] = '1033',
+	['dnf'] = '1034',
+	['dns'] = '1035',
+	['dnq'] = '1036',
+	['nc'] = '1037',
+	['dq'] = '1038',
+	['div'] = '1039',
+	[''] = '1040',
 }
 
 local prizepoolClasses = {
@@ -68,9 +77,24 @@ local prizepoolClasses = {
 	'background-color-fourth-place',
 	w = 'bg-win',
 	q = 'bg-win',
-	d = 'bg-draw',
 	l = 'bg-lose',
 	dq = 'bg-dq',
+	dnq = 'bg-dq',
+	dns = 'bg-dq',
+	dnf = 'bg-dq',
+	dnp = 'bg-dq',
+	dnpq = 'bg-dq',
+	nc = 'bg-dq',
+}
+
+local USE_BLACK_TEXT = {
+	'dnf',
+	'dns',
+	'dnpq',
+	'dnp',
+	'dnq',
+	'dq',
+	'nc',
 }
 
 ---Processes a placement text input into raw data.
@@ -84,9 +108,7 @@ function Placement.raw(placement)
 	raw.placement = mw.text.split(string.lower(placement or ''), '-', true)
 
 	-- Identify appropriate background class
-	if raw.placement[1] == '3' and raw.placement[2] then
-		raw.backgroundClass = PLACEMENT_CLASSES['d']
-	elseif PLACEMENT_CLASSES[raw.placement[1]] then
+	if PLACEMENT_CLASSES[raw.placement[1]] then
 		raw.backgroundClass = PLACEMENT_CLASSES[raw.placement[1]]
 	elseif Logic.isNumeric(raw.placement[1]) and tonumber(raw.placement[1]) <= 128 then
 		raw.backgroundClass = PLACEMENT_CLASSES['17']
@@ -114,7 +136,7 @@ function Placement.raw(placement)
 	end
 
 	-- Determine any black text placements
-	raw.blackText = (raw.placement[1] == 'dnp')
+	raw.blackText = Table.includes(USE_BLACK_TEXT, raw.placement[1])
 
 	return raw
 end
@@ -125,7 +147,7 @@ end
 function Placement._makeOrdinal(placement)
 	return Table.mapValues(placement,
 		function(place)
-			return Ordinal._ordinal(place)
+			return Ordinal.toOrdinal(place)
 		end
 	)
 end

@@ -9,14 +9,17 @@
 local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local HeroIcon = require('Module:ChampionIcon')
+local MatchLinks = mw.loadData('Module:MatchLinks')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local VodLink = require('Module:VodLink')
 
+local BigMatch = Lua.import('Module:BigMatch', {requireDevIfEnabled = true})
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -27,19 +30,6 @@ local _NUM_HEROES_PICK_TEAM = 5
 local _NUM_HEROES_PICK_SOLO = 1
 local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local _NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	reddit = {icon = 'File:Reddit-icon.png', text = 'Head-to-head statistics'},
-	gol = {icon = 'File:Gol.gg_allmode.png', text = 'GolGG Match Report'},
-	factor = {icon = 'File:Factor.gg lightmode.png', text = 'FactorGG Match Report'},
-}
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -84,7 +74,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('400px')
-	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -107,14 +96,14 @@ function CustomMatchSummary.getByMatchId(args)
 
 		-- Match Vod + other links
 		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
+			return '[[File:'..icon..'|link='..link..'|15px|'..text..']]'
 		end
 
 		for linkType, link in pairs(match.links) do
-			if not _LINK_DATA[linkType] then
+			if not MatchLinks[linkType] then
 				mw.log('Unknown link: ' .. linkType)
 			else
-				footer:addElement(buildLink(link, _LINK_DATA[linkType].icon, _LINK_DATA[linkType].text))
+				footer:addElement(buildLink(link, MatchLinks[linkType].icon, MatchLinks[linkType].text))
 			end
 		end
 
@@ -147,7 +136,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -155,9 +144,17 @@ function CustomMatchSummary._createBody(match)
 		))
 	end
 
+	if BigMatch.isEnabledFor(match) then
+		local matchPageElement = mw.html.create('center')
+		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+						:css('display', 'block')
+						:css('margin', 'auto')
+		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement):addClass('brkts-popup-mvp'))
+	end
+
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
+		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
 		body:addRow(rowDisplay)
 	end
 
@@ -218,7 +215,7 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createGame(game, gameIndex)
+function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -244,7 +241,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		:css('padding', '4px')
 		:css('min-height', '32px')
 
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false, date))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -254,7 +251,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -295,8 +292,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
-			:addClass('brkts-champion-icon')
-			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
 		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
 			if flip then
@@ -314,6 +309,8 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
+		:addClass('brkts-champion-icon')
 
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)

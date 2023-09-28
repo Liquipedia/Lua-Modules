@@ -40,6 +40,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		Variables.varDefault('tournament_liquipediatiertype')
 	)
 
+	Variables.varDefine(mw.ustring.lower(lpdbData.participant) .. '_prizepoints', lpdbData.extradata.prizepoints)
+
 	return lpdbData
 end
 

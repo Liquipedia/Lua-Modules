@@ -35,7 +35,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -72,16 +72,14 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = CustomLeague._getGameVersion() or args.game
-	lpdbData.publishertier = args.cfpremier
-	lpdbData.participantsnumber = args.player_number or args.team_number
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', CustomLeague._getGameVersion() or _args.game)
-	Variables.varDefine('tournament_publishertier', _args.cfpremier)
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_game', CustomLeague._getGameVersion() or args.game)
+	Variables.varDefine('tournament_publishertier', args.cfpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))

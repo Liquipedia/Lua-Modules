@@ -23,49 +23,44 @@ local _args
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomPatch.run(frame)
 	local customPatch = Patch(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
-	return customPatch:createInfobox(frame)
+	customPatch.setLpdbData = CustomPatch.setLpdbData
+	return customPatch:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomPatch:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'release' then
 		return {
-			Cell{
-				name = 'SEA Release Date',
-				content = {_args.searelease}
-			},
-			Cell{
-				name = 'NA Release Date',
-				content = {_args.narelease}
-			},
-			Cell{
-				name = 'EU Release Date',
-				content = {_args.eurelease}
-			},
-			Cell{
-				name = 'KR Release Date',
-				content = {_args.korrelease}
-			},
+			Cell{name = 'SEA Release Date', content = {_args.searelease}},
+			Cell{name = 'NA Release Date', content = {_args.narelease}},
+			Cell{name = 'EU Release Date', content = {_args.eurelease}},
+			Cell{name = 'KR Release Date', content = {_args.korrelease}},
 		}
 	end
 	return widgets
 end
 
-function CustomPatch:addToLpdb()
+---@param args table
+function CustomPatch:setLpdbData(args)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		local date = _args.narelease or _args.eurelease
+		local date = args.narelease or args.eurelease
 		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
 		mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-			name = _args.name,
+			name = args.name,
 			type = 'patch',
 			information = monthAndDay,
 			date = date,
@@ -73,27 +68,29 @@ function CustomPatch:addToLpdb()
 	end
 end
 
-function CustomPatch:getChronologyData()
+---@param args table
+---@return {previous: string?, previous2: string, next: string?, next2: string?}
+function CustomPatch:getChronologyData(args)
 	local data = {}
-	if _args.previous == nil and _args.next == nil then
-		if _args.previoushbu then
-			data.previous = 'Balance Update ' .. _args.previoushbu .. '|#' .. _args.previoushbu
+	if args.previous == nil and args.next == nil then
+		if args.previoushbu then
+			data.previous = 'Balance Update ' .. args.previoushbu .. '|#' .. args.previoushbu
 		end
-		if _args.nexthbu then
-			data.next = 'Balance Update ' .. _args.nexthbu .. '|#' .. _args.nexthbu
+		if args.nexthbu then
+			data.next = 'Balance Update ' .. args.nexthbu .. '|#' .. args.nexthbu
 		end
 	else
-		if _args.previous then
-			data.previous = 'Patch ' .. _args.previous .. '|' .. _args.previous
+		if args.previous then
+			data.previous = 'Patch ' .. args.previous .. '|' .. args.previous
 		end
-		if _args.next then
-			data.next = 'Patch ' .. _args.next .. '|' .. _args.next
+		if args.next then
+			data.next = 'Patch ' .. args.next .. '|' .. args.next
 		end
-		if _args.previoushbu then
-			data.previous2 = 'Balance Update ' .. _args.previoushbu .. '|#' .. _args.previoushbu
+		if args.previoushbu then
+			data.previous2 = 'Balance Update ' .. args.previoushbu .. '|#' .. args.previoushbu
 		end
-		if _args.nexthbu then
-			data.next2 = 'Balance Update ' .. _args.nexthbu .. '|#' .. _args.nexthbu
+		if args.nexthbu then
+			data.next2 = 'Balance Update ' .. args.nexthbu .. '|#' .. args.nexthbu
 		end
 	end
 

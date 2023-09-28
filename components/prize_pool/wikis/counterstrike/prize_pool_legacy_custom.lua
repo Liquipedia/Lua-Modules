@@ -20,7 +20,9 @@ end
 
 function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	newArgs.qualifier = header.qualifier
-	newArgs.points1link = header['points-link']
+	newArgs['tournamentName'] = header['tournament name']
+	newArgs['points1link'] = header['points-link']
+	newArgs['resultName'] = header['custom-name']
 
 	return newArgs
 end
@@ -44,8 +46,9 @@ end
 function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
 	-- CS didn't support multiple points (etc), however they supported points (etc) per opponent
 
-	if slot['usdprize' .. opponentIndex] then
-		opponentData.usdprize = slot['usdprize' .. opponentIndex]
+	local baseCurrencyPrize = PrizePoolLegacy.BASE_CURRENCY:lower() .. 'prize'
+	if slot[baseCurrencyPrize .. opponentIndex] then
+		opponentData[baseCurrencyPrize] = slot[baseCurrencyPrize .. opponentIndex]
 	end
 
 	if slot['points' .. opponentIndex] then

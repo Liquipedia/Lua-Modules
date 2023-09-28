@@ -12,6 +12,12 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 
 local Template = {}
 
+---@param frame Frame
+---@param title string
+---@param args table?
+---@param defaultTemplate any?
+---@return string
+---@overload fun(frame: Frame, title: string, args: table?, defaultTemplate: any): any|string
 function Template.safeExpand(frame, title, args, defaultTemplate)
 	local result, value = pcall(frame.expandTemplate, frame, {title = title, args = args})
 	if result then
@@ -22,8 +28,12 @@ function Template.safeExpand(frame, title, args, defaultTemplate)
 	end
 end
 
+---@param frame Frame
+---@param title string
+---@param args table?
+---@return string?
 function Template.expandTemplate(frame, title, args)
-	return frame:expandTemplate {title = title, args = args}
+	return frame:expandTemplate{title = title, args = args}
 end
 
 --[[
@@ -31,6 +41,9 @@ Stores a value that a function would otherwise return in a place to be later
 retrieved by Template.retrieveReturnValues. Used to return values across
 template boundaries.
 ]]
+---@param value table
+---@param namespace string
+---@return string
 function Template.stashReturnValue(value, namespace)
 	local pageVars = PageVariableNamespace(namespace or 'Template.return')
 	local count = tonumber(pageVars:get('count')) or 0
@@ -40,9 +53,9 @@ function Template.stashReturnValue(value, namespace)
 	return ''
 end
 
---[[
-Retrieves all values stashed by Template.stashReturnValue.
-]]
+---Retrieves all values stashed by Template.stashReturnValue.
+---@param namespace string
+---@return table[]
 function Template.retrieveReturnValues(namespace)
 	local pageVars = PageVariableNamespace(namespace or 'Template.return')
 
@@ -70,6 +83,8 @@ Usage:
 will make {foo = '3'} available for retrival via Template.retrieveReturnValues('Magpie') .
 
 ]]
+---@param frame Frame
+---@return string
 function Template.stashArgs(frame)
 	local args = Arguments.getArgs(frame)
 	local namespace = args.namespace

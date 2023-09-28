@@ -21,18 +21,23 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomCharacter.run(frame)
 	local character = Character(frame)
 	_args = character.args
 	character.addToLpdb = CustomCharacter.addToLpdb
 	character.createWidgetInjector = CustomCharacter.createWidgetInjector
-	return character:createInfobox(frame)
+	return character:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomCharacter:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Age',
@@ -69,8 +74,11 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomCharacter:addToLpdb(lpdbData)
-	lpdbData.extradata.class = _args.legendtype
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomCharacter:addToLpdb(lpdbData, args)
+	lpdbData.extradata.class = args.legendtype
 	return lpdbData
 end
 

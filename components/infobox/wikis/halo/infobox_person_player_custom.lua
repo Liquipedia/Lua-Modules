@@ -26,7 +26,6 @@ local Center = Widgets.Center
 local _pagename = mw.title.getCurrentTitle().prefixedText
 local _role
 local _role2
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
 
 local CustomPlayer = Class.new()
 
@@ -50,22 +49,18 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
 			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
@@ -101,10 +96,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = _role.role
 	lpdbData.extradata.role2 = _role2.role
 
-	local region = Region.run({region = _args.region, country = _args.country})
-	if type(region) == 'table' then
-		lpdbData.region = region.region
-	end
+	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
 
 	return lpdbData
 end

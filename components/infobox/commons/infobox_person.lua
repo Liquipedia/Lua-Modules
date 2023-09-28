@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -133,10 +134,10 @@ function Person:createInfobox()
 			Builder{builder = function()
 				local teams = {
 					self:_createTeam(args.team, args.teamlink),
-					self:_createTeam(args.team2, args.teamlink2),
-					self:_createTeam(args.team3, args.teamlink3),
-					self:_createTeam(args.team4, args.teamlink4),
-					self:_createTeam(args.team5, args.teamlink5)
+					self:_createTeam(args.team2, args.team2link),
+					self:_createTeam(args.team3, args.team3link),
+					self:_createTeam(args.team4, args.team4link),
+					self:_createTeam(args.team5, args.team5link)
 				}
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
@@ -144,7 +145,13 @@ function Person:createInfobox()
 				}}
 			end}
 		}},
-		Cell{name = 'Alternate IDs', content = {args.ids or args.alternateids}},
+		Cell{name = 'Alternate IDs', content = {
+				table.concat(
+					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), String.trim),
+					', '
+				)
+			}
+		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
 		Builder{
 			builder = function()
@@ -267,6 +274,14 @@ function Person:_setLpdbData(args, links, status, personType)
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
 	end
 
+	-- Store additional team-templates in extradata
+	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
+		if teamIndex > 1 then
+			otherTeam = args[teamKey .. 'link'] or otherTeam
+			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+		end
+	end
+
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
@@ -288,7 +303,7 @@ function Person:getStandardNationalityValue(nationality)
 			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
-		nationalityToStore = nil
+		return nil
 	end
 
 	return nationalityToStore
@@ -321,7 +336,8 @@ end
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
 function Person:shouldStoreData(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
@@ -353,26 +369,17 @@ end
 
 --- Allows for overriding this functionality
 function Person:calculateEarnings(args)
-	local totalEarnings, earningsPerYear = Earnings.calculateForPlayer{
+	return Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-
-	-- store earnings values in wiki variables for storage in smw
-	for year, earningsOfYear in pairs(earningsPerYear) do
-		Variables.varDefine('earningsin' .. year, earningsOfYear)
-	end
-	Variables.varDefine('earnings', totalEarnings)
-
-	return totalEarnings, earningsPerYear
 end
 
 function Person:_createRegion(region, country)
-	region = Region.run({region = region, country = country})
-	if type(region) == 'table' then
-		_region = region.region
-		return region.display
-	end
+	local regionData = Region.run({region = region, country = country})
+	_region = regionData.region
+
+	return regionData.display
 end
 
 function Person:_createLocations(args, personType)

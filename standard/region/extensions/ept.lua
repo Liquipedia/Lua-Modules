@@ -46,6 +46,8 @@ EptRegion.getRegion = FnUtil.memoize(function(name)
 	end)
 end)
 
+---@param flag string
+---@return {name: string, countries: table}
 function EptRegion.getByFlag(flag)
 	local name = EptRegion.getRegionNamesByFlag()[flag]
 	return EptRegion.getRegion(name)

@@ -37,6 +37,7 @@ function CustomLeague.run(frame)
 	-- Override links to allow one param to set multiple links
 	league.args.datdota = league.args.leagueid
 	league.args.dotabuff = league.args.leagueid
+	league.args.stratz = league.args.leagueid
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -47,7 +48,7 @@ function CustomLeague.run(frame)
 	_league = league
 	_args = _league.args
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -76,10 +77,10 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Dota TV Ticket',
 		content = {args.dotatv}
 	})
-	if args.points then
+	if Logic.isNumeric(args.points) then
 		table.insert(widgets, Cell{
 			name = 'Pro Circuit Points',
-			content = {mw.language.new('en'):formatNum(tonumber(args.points))}
+			content = {mw.language.new('en'):formatNum(tonumber(args.points) --[[@as number]])}
 		})
 	end
 	return widgets
@@ -104,21 +105,19 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if String.isEmpty(_args.pctier) and Logic.readBool(_args.valvepremier) then
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if String.isEmpty(args.pctier) and Logic.readBool(args.valvepremier) then
 		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
 	end
 	return ''
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.valvepremier)
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.valvepremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = string.lower(args.game or 'dota2')
-	lpdbData.publishertier = args.pctier
-	lpdbData.participantsnumber = args.team_number or args.player_number
 
 	lpdbData.extradata.valvepremier = String.isNotEmpty(args.valvepremier) and '1' or '0'
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
@@ -127,23 +126,23 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	-- Custom Vars
-	Variables.varDefine('tournament_pro_circuit_points', _args.points or '')
-	local isIndividual = String.isNotEmpty(_args.individual) or String.isNotEmpty(_args.player_number)
+	Variables.varDefine('tournament_pro_circuit_points', args.points or '')
+	local isIndividual = String.isNotEmpty(args.individual) or String.isNotEmpty(args.player_number)
 	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
-	Variables.varDefine('tournament_valve_premier', _args.valvepremier)
-	Variables.varDefine('tournament_publisher_major', _args.valvepremier)
-	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier)
-	Variables.varDefine('tournament_publishertier', _args.pctier)
-	Variables.varDefine('tournament_game', string.lower(_args.game or 'dota2'))
+	Variables.varDefine('tournament_valve_premier', args.valvepremier)
+	Variables.varDefine('tournament_publisher_major', args.valvepremier)
+	Variables.varDefine('tournament_pro_circuit_tier', args.pctier)
+	Variables.varDefine('tournament_publishertier', args.pctier)
+	Variables.varDefine('tournament_game', string.lower(args.game or 'dota2'))
 
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', _args.liquipediatiertype)
-	Variables.varDefine('tournament_prizepool', _args.prizepool or '')
-	Variables.varDefine('tournament_mode', _args.mode or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
+	Variables.varDefine('tournament_tier_type', args.liquipediatiertype)
+	Variables.varDefine('tournament_prizepool', args.prizepool or '')
+	Variables.varDefine('tournament_mode', args.mode or '')
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')

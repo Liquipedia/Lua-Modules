@@ -24,13 +24,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class SceneInfobox: BasicInfobox
 local Scene = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Scene.run(frame)
 	local scene = Scene(frame)
 	return scene:createInfobox()
 end
 
+---@return Html
 function Scene:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -79,6 +83,8 @@ function Scene:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string
 function Scene:createNameDisplay(args)
 	local name = args.name
 	local country = Flags.CountryName(args.country or args.scene)

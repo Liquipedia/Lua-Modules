@@ -96,6 +96,7 @@ function DisplayUtil.try(f)
 	return result, errorNode
 end
 
+---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
 
 --[[

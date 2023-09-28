@@ -79,7 +79,7 @@ function PointsDivTable:create()
 	self:row(headerRow)
 
 	local limit = self.limit
-	Table.iter.forEachIndexed(self.pointsData, function(index, teamPointsData)
+	Array.forEach(self.pointsData, function(teamPointsData, index)
 		if index > limit then return end
 		local positionBackground = self.positionBackgrounds[index]
 		self:row(TableRow(teamPointsData, self.tournaments, positionBackground))
@@ -98,7 +98,7 @@ function TableRow:create()
 	self:nameCell(self.team)
 	self:totalCell(self.pointsData.totalPoints)
 	-- variable cells
-	Table.iter.forEachIndexed(self.pointsData, function(index, points)
+	Array.forEach(self.pointsData, function(points, index)
 		local tournament = self.tournaments[index]
 		self:pointsCell(points, tournament)
 		if tournament.shouldDeductionsBeVisible then
@@ -202,9 +202,9 @@ function TableHeaderRow:create()
 	}, {
 		text = 'Total Points'
 	}}
-	Table.iter.forEach(headers, function(h) self:headerCell(h) end)
+	Array.forEach(headers, function(h) self:headerCell(h) end)
 	-- variable headers (according to tournaments in given in module arguments)
-	Table.iter.forEach(self.tournaments,
+	Array.forEach(self.tournaments,
 		function(tournament)
 			self:headerCell({
 				text = tournament.display and tournament.display or tournament.name

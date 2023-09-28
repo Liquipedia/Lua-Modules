@@ -10,8 +10,23 @@ return {
 	startYear = 2018,
 	wikiName = 'fortnite',
 	name = 'Fortnite',
-	defaultTeamLogo = 'Fortnite logo.png',
-	defaultTeamLogoDark = 'Fortnite logo.png',
-	opponentLibrary = 'Opponent/Custom',
+	games = {
+		fortnite = {
+			abbreviation = 'Fortnite',
+			name = 'Fortnite',
+			link = 'Fortnite',
+			logo = {
+				darkMode = 'Fortnite logo.png',
+				lightMode = 'Fortnite logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Fortnite logo.png',
+				lightMode = 'Fortnite logo.png',
+			},
+		},
+	},
+	defaultGame = 'fortnite',
+	defaultTeamLogo = 'Fortnite logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Fortnite logo.png', ---@deprecated
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

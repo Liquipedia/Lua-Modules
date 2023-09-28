@@ -8,6 +8,8 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
@@ -38,6 +40,12 @@ local _LINK_VARIANT = 'team'
 local Language = mw.language.new('en')
 local _defaultEarningsFunctionUsed = false
 
+---@enum statuses
+local Status = {
+	ACTIVE = 'active',
+	DISBANDED = 'disbanded',
+}
+
 local _warnings = {}
 
 function Team.run(frame)
@@ -48,20 +56,33 @@ end
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
-	-- Need links in LPDB, so declare them outside of display code
+
+	--- Transform data
+	-- Links
 	local links = Links.transform(args)
 
+	-- Team Information
+	local team = args.teamtemplate or self.pagename
+	self.teamTemplate = mw.ext.TeamTemplate.raw(team) or {}
+
+	args.imagedark = args.imagedark or args.imagedarkmode or args.image or self.teamTemplate.imagedark
+	args.image = args.image or self.teamTemplate.image
+	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
+	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
+
+	-- Display
 	local widgets = {
 		Header{
 			name = args.name,
-			image = args.image,
+			image = not Game.isDefaultTeamLogo{logo = args.image} and args.image or nil,
 			imageDefault = args.default,
-			imageDark = args.imagedark or args.imagedarkmode,
+			imageDark = not Game.isDefaultTeamLogo{logo = args.imagedark} and args.imagedark or nil,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Team Information'},
+		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
 			content = {
@@ -99,19 +120,23 @@ function Team:createInfobox()
 						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
 							team = self.pagename or self.name,
 							perYear = true,
-							queryHistorical = args.queryEarningsHistorical
+							queryHistorical = args.queryEarningsHistorical,
+							doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
 						}
-						Variables.varDefine('earnings', self.totalEarnings) -- needed for SMW
 						local totalEarningsDisplay
 						if self.totalEarnings > 0 then
 							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
 						end
 						return {
-							Cell{name = Abbreviation.make(
-									'Approx. Total Winnings',
-									'Includes individual player earnings won&#10;while representing this team'
-								),
-								content = {totalEarningsDisplay}}
+							Customizable{id = 'earningscell',
+								children = {
+									Cell{name = Abbreviation.make(
+										'Approx. Total Winnings',
+										'Includes individual player earnings won&#10;while representing this team'
+									),
+									content = {totalEarningsDisplay}}
+								}
+							}
 						}
 					end
 				}
@@ -173,6 +198,7 @@ function Team:createInfobox()
 	}
 	infobox:bottom(self:createBottomContent())
 
+	-- Categories
 	if self:shouldStore(args) then
 		infobox:categories('Teams')
 		infobox:categories(unpack(self:getWikiCategories(args)))
@@ -180,6 +206,7 @@ function Team:createInfobox()
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
+	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
 		self:defineCustomPageVariables(args)
@@ -189,16 +216,16 @@ function Team:createInfobox()
 end
 
 function Team:_createRegion(region)
-	if region == nil or region == '' then
-		return ''
+	if String.isEmpty(region) then
+		return
 	end
 
 	return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
 function Team:_createLocation(location)
-	if location == nil or location == '' then
-		return ''
+	if String.isEmpty(location)then
+		return
 	end
 
 	local locationDisplay = self:getStandardLocationValue(location)
@@ -209,20 +236,18 @@ function Team:_createLocation(location)
 			.. '|' .. locationDisplay .. ']]'
 	end
 
-	local category
 	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
-		category = '[[Category:' .. demonym .. ' Teams]]'
+		self.infobox:categories(demonym .. ' Teams')
 	end
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
-			(category or '') ..
 			(locationDisplay or '')
 end
 
 function Team:getStandardLocationValue(location)
 	if String.isEmpty(location) then
-		return nil
+		return
 	end
 
 	local locationToStore = Flags.CountryName(location)
@@ -232,7 +257,7 @@ function Team:getStandardLocationValue(location)
 			_warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
-		locationToStore = nil
+		return
 	end
 
 	return locationToStore
@@ -242,31 +267,23 @@ function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 	local earnings = self.totalEarnings
 
-	local team = args.teamtemplate or self.pagename
-	local teamTemplate
-	local textlessImage, textlessImageDark
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		teamTemplate = teamRaw.historicaltemplate or teamRaw.templatename
-		textlessImage, textlessImageDark = teamRaw.image, teamRaw.imagedark
-	end
-
 	local lpdbData = {
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
 		region = args.region,
 		locations = Locale.formatLocations(args),
-		logo = args.image or textlessImage,
-		logodark = args.imagedark or args.imagedarkmode or args.image or textlessImageDark,
-		textlesslogo = textlessImage or args.teamcardimage,
-		textlesslogodark = textlessImageDark or args.teamcardimagedark or args.teamcardimage,
+		logo = args.image,
+		logodark = args.imagedark,
+		textlesslogo = args.teamcardimage,
+		textlesslogodark = args.teamcardimagedark,
 		earnings = earnings,
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
-		coach = args.coaches,
+		coach = args.coaches or args.coach,
 		manager = args.manager,
-		template = teamTemplate,
+		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
+		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {}, 'team')
 		),
@@ -275,8 +292,6 @@ function Team:_setLpdbData(args, links)
 
 	for year, earningsOfYear in pairs(self.earnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		--make these values available for smw storage
-		Variables.varDefine('earningsin' .. year, earningsOfYear)
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
@@ -299,7 +314,8 @@ function Team:addToLpdb(lpdbData, args)
 end
 
 function Team:shouldStore(args)
-	return Namespace.isMain()
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Team

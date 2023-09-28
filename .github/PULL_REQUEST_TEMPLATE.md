@@ -18,5 +18,4 @@
 
   - Does this break LPDB on any of the wikis?
   - Are all needed page variables still set?
-  - Does this break SMW on any of the wikis?
 -->

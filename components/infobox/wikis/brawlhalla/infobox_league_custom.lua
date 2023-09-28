@@ -33,7 +33,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -72,8 +72,7 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData['patch'] = args.patch
-	lpdbData['participantsnumber'] = args.team_number or args.player_number
+	lpdbData.patch = args.patch
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.mode = args.mode
 

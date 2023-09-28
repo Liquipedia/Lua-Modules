@@ -8,11 +8,11 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -26,22 +26,26 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	_args = unofficialWorldChampion.args
 	unofficialWorldChampion.createWidgetInjector = CustomUnofficialWorldChampion.createWidgetInjector
-	return unofficialWorldChampion:createInfobox(frame)
+	return unofficialWorldChampion:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Builder{
 			builder = function()
-				local raceBreakDown = CustomUnofficialWorldChampion.raceBreakDown()
-				if raceBreakDown.playernumber then
+				local raceBreakdown = RaceBreakdown.run(_args)
+				if raceBreakdown then
 					return {
 						Title{name = 'Racial Distribution of Champions'},
-						Breakdown{content = raceBreakDown.display, classes = { 'infobox-center' }}
+						Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
 					}
 				end
 			end
@@ -73,6 +77,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'defences' then
 		local index = 1
@@ -91,10 +98,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnofficialWorldChampion:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param base string
+---@return Widget[]
 function CustomUnofficialWorldChampion.getCellsFromBasedArgs(base)
 	local foundCells = {}
 	local index = 1
@@ -108,42 +118,6 @@ function CustomUnofficialWorldChampion.getCellsFromBasedArgs(base)
 		index = index + 1
 	end
 	return foundCells
-end
-
-function CustomUnofficialWorldChampion.raceBreakDown()
-	local playerBreakDown = {}
-	local playernumber = tonumber(_args.player_number or 0) or 0
-	local zergnumber = tonumber(_args.zerg_number or 0) or 0
-	local terrannumbner = tonumber(_args.terran_number or 0) or 0
-	local protossnumber = tonumber(_args.protoss_number or 0) or 0
-	local randomnumber = tonumber(_args.random_number or 0) or 0
-	if playernumber == 0 then
-		playernumber = zergnumber + terrannumbner + protossnumber + randomnumber
-	end
-
-	if playernumber > 0 then
-		playerBreakDown.playernumber = playernumber
-		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
-			playerBreakDown.display = {}
-			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'p'}) .. ' ' .. protossnumber
-			end
-			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'t'}) .. ' ' .. terrannumbner
-			end
-			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'z'}) .. ' ' .. zergnumber
-			end
-			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1]
-					= RaceIcon.getSmallIcon({'r'}) .. ' ' .. randomnumber
-			end
-		end
-	end
-	return playerBreakDown
 end
 
 return CustomUnofficialWorldChampion

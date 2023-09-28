@@ -10,8 +10,8 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -22,7 +22,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
-local TIER_VALUE = {10, 6, 4, 2}
+local TIER_VALUE = {10, 6, 4, 2, 1, 2}
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
 local HEADER_DATA = {}
@@ -35,29 +35,27 @@ function CustomPrizePool.run(frame)
 
 	-- Turn off automations
 	prizePool:setConfigDefault('prizeSummary', false)
-	prizePool:setConfigDefault('autoUSD', false)
+	prizePool:setConfigDefault('autoExchange', false)
 	prizePool:setConfigDefault('exchangeInfo', false)
 
 	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
-	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_SMW_storage')) then
-		prizePool:setConfig('storeSmw', false)
+	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		prizePool:setConfig('storeLpdb', false)
 	end
 
-	HEADER_DATA.tournamentName = args['tournament name']
-	HEADER_DATA.resultName = args['custom-name']
+	HEADER_DATA.tournamentName = args['tournamentName']
+	HEADER_DATA.resultName = args['resultName']
+
+	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
 	if Logic.readBool(args.qualifier) then
+		local extradata = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
+		extradata.qualifier = '1' -- This is the new field, rest are just what Infobox League sets
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-				prizepoollocal = Variables.varDefault('prizepoollocal', ''),
-				startdate_raw = Variables.varDefault('raw_sdate', ''),
-				enddate_raw = Variables.varDefault('raw_edate', ''),
-				qualifier = '1', -- This is the new field, rest are just what Infobox League sets
-			}
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 		})
 	end
 
@@ -95,7 +93,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if placement.args.forceQualified ~= nil then
 		lpdbData.qualified = Logic.readBool(placement.args.forceQualified) and 1 or 0
 	else
-		lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, "QUALIFIES1") and 1 or 0
+		lpdbData.qualified = placement:getPrizeRewardForOpponent(opponent, 'QUALIFIES1') and 1 or 0
 	end
 
 	if lpdbData.opponenttype == Opponent.solo then
@@ -112,13 +110,14 @@ end
 ---@param type string
 ---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
-	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) / place
+	return tierValue * math.max(prizeMoney, 0.1) * (TYPE_MODIFIER[type:lower()] or TYPE_MODIFIER.default) /
+		(prizeMoney > 0 and place or 1)
 end
 
 return CustomPrizePool

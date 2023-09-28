@@ -12,7 +12,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local _GAME_EXTRADATA_CONVERTER = {
 	ban = 'b',
@@ -22,15 +21,11 @@ local _GAME_EXTRADATA_CONVERTER = {
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match, match2)
-	end
-
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
 
 		return mw.ext.LiquipediaDB.lpdb_match(
-			"legacymatch_" .. match2.match2id,
+			'legacymatch_' .. match2.match2id,
 			match
 		)
 	end
@@ -45,7 +40,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if String.isNotEmpty(match.walkover) then
+	if Logic.isNotEmpty(match.walkover) then
 		match.resulttype = match.walkover
 		match.walkover = match.winner
 	end
@@ -58,7 +53,6 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.mvpteam = extradata.mvpteam
-	match.extradata.mvp = extradata.mvp
 	match.extradata.comment = extradata.comment
 
 	local opponents = match2.match2opponents or {}
@@ -149,43 +143,6 @@ function MatchLegacy.storeGames(match, match2)
 		games = games .. res
 	end
 	return games
-end
-
-function MatchLegacy.storeMatchSMW(match, match2)
-	local data = {
-		'legacymatch_' .. match2.match2id,
-		'is map number=1',
-		'has team left=' .. (match.opponent1 or ''),
-		'has team right=' .. (match.opponent2 or ''),
-		'Has map date=' .. (match.date or ''),
-		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
-		'Has tournament tier=' .. (match.liquipediatier or ''),
-		'Has tournament name=' .. Logic.emptyOr(
-			match.tickername,
-			match.name,
-			Variables.varDefault('tournament_name', mw.title.getCurrentTitle().prefixedText)
-		),
-		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
-		'Has winner=' .. (match.winner or ''),
-		'Has team left score=' .. (String.isEmpty(match.opponent1score) and '0' or match.opponent1score),
-		'Has team right score=' .. (String.isEmpty(match.opponent2score) and '0' or match.opponent2score),
-		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
-		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-		'Has teams=' .. (match.opponent1 or ''),
-		'Has teams=' .. (match.opponent2 or ''),
-		'Has teams name=' .. (match.opponent1 or ''),
-		'Has teams name=' .. (match.opponent2 or ''),
-	}
-
-	local streams = match.stream or {}
-	streams = Json.parseIfString(streams)
-	for key, item in pairs(streams) do
-		table.insert(
-			data,
-			'Has match ' .. key .. '=' .. item
-		)
-	end
-	mw.smw.subobject(data)
 end
 
 return MatchLegacy

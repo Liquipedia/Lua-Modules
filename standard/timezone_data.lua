@@ -27,6 +27,14 @@ return {
 		name = 'Australian Eastern Standard Time',
 		offset = {10, 0},
 	},
+	AKST = {
+		name = 'Alaska Standard Time',
+		offset = {-9, 0},
+	},
+	AKDT = {
+		name = 'Alaska Daylight Time',
+		offset = {-8, 0},
+	},
 	ALMT = {
 		name = 'Alma-Ata Time',
 		offset = {6, 0},
@@ -276,6 +284,10 @@ return {
 	UZT = {
 		name = 'Uzbekistan Time',
 		offset = {5, 0},
+	},
+	VET = {
+		name = 'Venezuelan Standard Time',
+		offset = {-4, 0},
 	},
 	VLAT = {
 		name = 'Vladivostok Time',

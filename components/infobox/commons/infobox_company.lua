@@ -27,15 +27,19 @@ local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
+---@class CompanyInfobox: BasicInfobox
 local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
+---@param frame Frame
+---@return Html
 function Company.run(frame)
 	local company = Company(frame)
-	return company:createInfobox(frame)
+	return company:createInfobox()
 end
 
+---@return Html
 function Company:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -49,18 +53,24 @@ function Company:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Company Information'},
-		Cell{
-			name = 'Parent Company',
-			content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
-		},
-		Cell{name = 'Founded', content = {args.foundeddate},},
-		Cell{name = 'Defunct', content = {args.defunctdate},},
+		Customizable{id = 'parent', children = {
+			Cell{
+				name = 'Parent Company',
+				content = self:getAllArgsForBase(args, 'parent', {makeLink = true}),
+			}
+		}},
+		Customizable{id = 'dates', children = {
+			Cell{name = 'Founded', content = {args.foundeddate or args.founded}},
+			Cell{name = 'Defunct', content = {args.defunctdate or args.defunct}},
+		}},
 		Cell{
 			name = 'Location',
 			content = {self:_createLocation(args.location)},
 		},
 		Cell{name = 'Headquarters', content = {args.headquarters}},
-		Cell{name = 'Employees', content = {args.employees}},
+		Customizable{id = 'employees', children = {
+			Cell{name = 'Employees', content = {args.employees}},
+		}},
 		Cell{name = 'Trades as', content = {args.tradedas}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
@@ -119,6 +129,8 @@ function Company:createInfobox()
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
+---@param location string?
+---@return string
 function Company:_createLocation(location)
 	if location == nil then
 		return ''
@@ -128,8 +140,9 @@ function Company:_createLocation(location)
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
+---@return string?
 function Company:_getOrganizerPrizepools()
-	local prizemoney = mw.ext.LiquipediaDB.lpdb('tournament', {
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =
 			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
 			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
@@ -139,7 +152,7 @@ function Company:_getOrganizerPrizepools()
 		query = 'sum::prizepool'
 	})
 
-	prizemoney = tonumber(prizemoney[1]['sum_prizepool'])
+	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
 
 	if prizemoney == nil or prizemoney == 0 then
 		return nil

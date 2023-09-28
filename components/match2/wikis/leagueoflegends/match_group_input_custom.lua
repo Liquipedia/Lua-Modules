@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
+local HeroNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
-local HeroNames = mw.loadData('Module:ChampionNames')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -35,18 +37,17 @@ local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 15
 local _MAX_NUM_GAMES = 7
 local _DEFAULT_MODE = 'team'
-local _DEFAULT_GAME = ''
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
-local _SECONDS_UNTIL_FINISHED_EXACT = 30800
-local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
+local SECONDS_UNTIL_FINISHED_EXACT = 30800
+local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local _CURRENT_TIME_UNIX = os.time(os.date('!*t'))
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -56,7 +57,8 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
+	options = options or {}
 	-- process match
 	Table.mergeInto(
 		match,
@@ -72,6 +74,10 @@ function CustomMatchGroupInput.processMatch(match)
 
 	-- Adjust map data, especially set participants data
 	match = matchFunctions.adjustMapData(match)
+
+	if not options.isStandalone then
+		match = matchFunctions.mergeWithStandalone(match)
+	end
 
 	return match
 end
@@ -101,7 +107,7 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -110,15 +116,15 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
+	local teamTemplateDate = timestamp
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == DateExt.epochZero then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			CURRENT_TIME_UNIX
 		)
 	end
 
@@ -184,7 +190,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	-- set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if not Logic.isEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -209,7 +215,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local lastPlacement = _NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score or '') or ''
+			local score = tonumber(opp.score)
 			counter = counter + 1
 			if counter == 1 and (winner or '') == '' then
 				if finished then
@@ -221,7 +227,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
 				lastPlacement = counter
-				lastScore = score
+				lastScore = score or _NO_SCORE
 			end
 		end
 	end
@@ -299,8 +305,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
-		if matchUnixTime <= _CURRENT_TIME_UNIX then
+		if match.timestamp <= CURRENT_TIME_UNIX then
 			setScores = true
 		end
 	end
@@ -326,20 +331,19 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
+		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
+			timestamp = DateExt.epochZero,
 		}
 	end
 end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
+	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
 	return MatchGroupInput.getCommonTournamentVars(match)
@@ -361,13 +365,7 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getLinks(match)
-	match.links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		interview = match.interview,
-		review = match.review,
-		recap = match.recap,
-	}
+	match.links = {}
 	if match.reddit then match.links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.gol then match.links.gol = 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' end
 	if match.factor then match.links.factor = 'https://www.factor.gg/match/' .. match.factor end
@@ -390,7 +388,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- Retrieve icon for team
 			if opponent.type == Opponent.team then
@@ -411,7 +409,11 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
+					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+						resolveRedirect = true,
+						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
+					})
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -457,7 +459,7 @@ end
 
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
-	if String.isNotEmpty(match.winner) then
+	if Logic.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
@@ -484,12 +486,10 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	if isScoreSet and match.hasDate then
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
-			or _SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < _CURRENT_TIME_UNIX then
+	if isScoreSet and match.timestamp ~= DateExt.epochZero then
+		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
+			or SECONDS_UNTIL_FINISHED_NOT_EXACT
+		if match.timestamp + threshold < CURRENT_TIME_UNIX then
 			match.finished = true
 		end
 	end
@@ -505,28 +505,41 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	return opponents
 end
 
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+function matchFunctions.mergeWithStandalone(match)
+	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
+	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+	if not standaloneMatch then
+		return match
+	end
 
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
+	-- Update Opponents from the Stanlone Match
+	match.opponent1 = standaloneMatch.match2opponents[1]
+	match.opponent2 = standaloneMatch.match2opponents[2]
 
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
+	-- Update Maps from the Standalone Match
+	for index, game in ipairs(standaloneMatch.match2games) do
+		game.participants = Json.parseIfString(game.participants)
+		game.extradata = Json.parseIfString(game.extradata)
+		match['map' .. index] = game
+	end
+
+	-- Remove special keys (maps/games, opponents, bracketdata etc)
+	for key, _ in pairs(standaloneMatch) do
+		if String.startsWith(key, 'match2') then
+			standaloneMatch[key] = nil
 		end
 	end
-	match['opponent' .. oppIndex].match2players = players
+
+	-- Copy all match level records which have value
+	for key, value in pairs(standaloneMatch) do
+		if String.isNotEmpty(value) then
+			match[key] = value
+		end
+	end
+
 	return match
 end
+
 
 --
 -- map related functions
@@ -546,18 +559,26 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
 	for opponentIndex = 1, _MAX_NUM_OPPONENTS do
-		for playerIndex = 1, _MAX_NUM_PLAYERS do
-			local hero = map['t' .. opponentIndex .. 'c' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'champion' .. playerIndex] = HeroNames[hero and hero:lower()]
+		local teamShort = 't' .. opponentIndex
+		local team = 'team' .. opponentIndex
+		if not map[team] then
+			local picks, bans = {}, {}
+			for playerIndex = 1, _MAX_NUM_PLAYERS do
+				table.insert(picks, map[teamShort .. 'c' .. playerIndex])
+			end
+
+			for _, ban in Table.iter.pairsByPrefix(map, teamShort .. 'b') do
+				table.insert(bans, ban)
+			end
+			map[team] = {pick = picks, ban = bans}
 		end
 
-		local banIndex = 1
-		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while nextBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan:lower()]
-			banIndex = banIndex + 1
-			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		end
+		Array.forEach(map[team].pick, function (hero, idx)
+			heroData[team .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
+		end)
+		Array.forEach(map[team].ban, function (hero, idx)
+			heroData[team .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
+		end)
 	end
 
 	map.extradata = heroData
@@ -597,7 +618,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
+	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game'))
 	return MatchGroupInput.getCommonTournamentVars(map)
 end
 

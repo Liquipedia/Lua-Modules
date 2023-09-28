@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -23,7 +24,7 @@ local StarcraftMatchGroupUtil = {}
 
 StarcraftMatchGroupUtil.types = {}
 
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion('p', 't', 'z', 'r', 'u')
+StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,
@@ -74,9 +75,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Add additional fields to opponents
 	StarcraftMatchGroupUtil.populateOpponents(match)
 
-	-- Remove submatches from match.games because submatches will be computed later (even when fetching from lpdb)
-	match.games = Array.filter(match.games, function(game) return game.resultType ~= 'submatch' end)
-
 	-- Compute game.opponents by looking up game.participants in match.opponents
 	for _, game in ipairs(match.games) do
 		game.opponents = StarcraftMatchGroupUtil.computeGameOpponents(game, match.opponents)
@@ -85,6 +83,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Determine whether the match is a team match with different players each game
 	match.opponentMode = match.mode:match('team') and 'team' or 'uniform'
 
+	local extradata = match.extradata
+	---@cast extradata table
 	if match.opponentMode == 'team' then
 		-- Compute submatches
 		match.submatches = Array.map(
@@ -94,25 +94,25 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 		-- Extract submatch headers from extradata
 		for _, submatch in pairs(match.submatches) do
-			submatch.header = Table.extract(match.extradata, 'subGroup' .. submatch.subgroup .. 'header')
+			submatch.header = Table.extract(extradata, 'subGroup' .. submatch.subgroup .. 'header')
 		end
 	end
 
 	-- Add vetoes
 	match.vetoes = {}
 	for vetoIx = 1, math.huge do
-		local map = Table.extract(match.extradata, 'veto' .. vetoIx)
-		local by = tonumber(Table.extract(match.extradata, 'veto' .. vetoIx .. 'by'))
+		local map = Table.extract(extradata, 'veto' .. vetoIx)
+		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIx .. 'by'))
 		if not map then break end
 
 		table.insert(match.vetoes, {map = map, by = by})
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(match.extradata, 'headtohead'))
-	match.isFfa = Logic.readBool(Table.extract(match.extradata, 'ffa'))
-	match.noScore = Logic.readBoolOrNil(Table.extract(match.extradata, 'noscore'))
-	match.casters = String.nilIfEmpty(Table.extract(match.extradata, 'casters'))
+	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
+	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
+	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
+	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
 end
@@ -128,7 +128,7 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		opponent.status2 = opponent.score2 and 'S' or nil
 
 		for _, player in ipairs(opponent.players) do
-			player.race = Table.extract(player.extradata, 'faction') or 'u'
+			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
 
 		if opponent.template == 'default' then
@@ -163,7 +163,7 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 			return {
 				displayName = 'TBD',
 				matchPlayerIx = matchPlayerIx,
-				race = 'u',
+				race = Faction.defaultFaction,
 			}
 		end
 	end
@@ -173,6 +173,8 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	for key, participant in pairs(game.participants) do
 		local opponentIx, matchPlayerIx = key:match('(%d+)_(%d+)')
 		opponentIx = tonumber(opponentIx)
+		-- opponentIx can not be nil due to the format of the participants keys
+		---@cast opponentIx -nil
 		matchPlayerIx = tonumber(matchPlayerIx)
 
 		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)
@@ -231,6 +233,7 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 			table.insert(submatchGames, currentGames)
 			previousSubgroup = game.subgroup
 		end
+		---@cast currentGames -nil
 		table.insert(currentGames, game)
 	end
 	return submatchGames
@@ -258,7 +261,7 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 			player.race = Table.uniqueKey(playerRaces[playerIx])
 			if not player.race then
 				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
-				player.race = matchPlayer and matchPlayer.race or 'u'
+				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
 			end
 		end
 	end
@@ -347,7 +350,7 @@ function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent
 	local gameRaces = {}
 	local hasOffrace = false
 	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
-		local referencePlayer = referenceOpponent.players[playerIx]
+		local referencePlayer = referenceOpponent.players[playerIx] or {}
 		table.insert(gameRaces, gamePlayer.race)
 		if gamePlayer.race ~= referencePlayer.race then
 			hasOffrace = true
@@ -364,7 +367,7 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
 		pageIsResolved = true,
 		pageName = record.name,
-		race = Table.extract(record.extradata, 'faction') or 'u',
+		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
 end
 

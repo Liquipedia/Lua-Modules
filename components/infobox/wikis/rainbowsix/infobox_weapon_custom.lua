@@ -23,6 +23,8 @@ local _SIZE_OPERATOR = '25x25px'
 local _weapon
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
 	_weapon = weapon
@@ -30,13 +32,16 @@ function CustomWeapon.run(frame)
 
 	weapon.addToLpdb = CustomWeapon.addToLpdb
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomWeapon:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	-- Operators
 	table.insert(widgets,
@@ -60,6 +65,9 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomWeapon:addToLpdb(lpdbData, args)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		desc = args.desc,

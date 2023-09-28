@@ -10,6 +10,7 @@ local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ChampionIcon = require('Module:HeroIcon')
@@ -67,7 +68,6 @@ end
 function ChampionBan:create()
 	return self.root
 end
-
 
 function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
@@ -140,20 +140,29 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
 			end
+			mvp:setPoints(mvpData.points)
 
 			body:addRow(mvp)
 		end
 
+	end
+
+	-- casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = MatchSummary.Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
 	end
 
 	-- Pre-Process Champion Ban Data

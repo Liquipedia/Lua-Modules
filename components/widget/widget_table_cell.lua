@@ -10,6 +10,18 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Widget = require('Module:Infobox/Widget')
 
+---@class WidgetCellInput
+---@field content (string|number|table|Html)[]?
+---@field classes string[]?
+---@field css {[string]: string|number}[]?
+
+---@class WidgetTableCell:Widget
+---@operator call(WidgetCellInput): WidgetTableCell
+---@field content (string|number|table|Html)[]
+---@field classes string[]
+---@field css {[string]: string|number}[]
+---@field rowSpan integer?
+---@field colSpan integer?
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
@@ -19,16 +31,21 @@ local TableCell = Class.new(
 	end
 )
 
+---@param text string|number|table|nil
+---@return self
 function TableCell:addContent(text)
 	table.insert(self.content, text)
 	return self
 end
 
+---@param class string|nil
+---@return self
 function TableCell:addClass(class)
 	table.insert(self.classes, class)
 	return self
 end
 
+---@return {[1]: Html}
 function TableCell:make()
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
@@ -47,6 +64,7 @@ function TableCell:make()
 	return {cell}
 end
 
+---@return string|number
 function TableCell:_concatContent()
 	return table.concat(Array.map(self.content, function (content)
 		if type(content) == 'table' then

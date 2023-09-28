@@ -11,28 +11,42 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class BreakdownWidget: Widget
+---@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
+---@field contents (string|number)[]
+---@field classes string[]
+---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
 		self.contents = input.content
 		self.classes = input.classes
+		self.contentClasses = input.contentClasses or {}
 	end
 )
 
+---@return {[1]: Html?}
 function Breakdown:make()
-	return {Breakdown:_breakdown(self.contents, self.classes)}
+	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
 end
 
-function Breakdown:_breakdown(contents, classes)
+---@param contents (string|number)[]
+---@param classes string[]
+---@param contentClasses table<integer, string[]> --can have gaps in the outer table
+---@return Html?
+function Breakdown:_breakdown(contents, classes, contentClasses)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
 	end
 
 	local div = mw.html.create('div')
 	local number = #contents
-	for _, content in ipairs(contents) do
+	for contentIndex, content in ipairs(contents) do
 		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number)
 		for _, class in pairs(classes or {}) do
+			infoboxCustomCell:addClass(class)
+		end
+		for _, class in pairs(contentClasses['content' .. contentIndex] or {}) do
 			infoboxCustomCell:addClass(class)
 		end
 		infoboxCustomCell:wikitext(content)

@@ -18,14 +18,22 @@ local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEna
 
 local AwardsTable = Class.new(BaseResultsTable)
 
+---Builds the Header of the award table
+---@return Html
 function AwardsTable:buildHeader()
 	local header = mw.html.create('tr')
 		:tag('th'):css('width', '100px'):wikitext('Date'):done()
 		:tag('th'):css('min-width', '75px'):wikitext('Tier'):done()
-		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
-		:tag('th'):css('min-width', '225px'):wikitext('Award'):done()
 
-	if self.config.opponentType ~= Opponent.team then
+	if self.config.showType then
+		header:tag('th'):css('min-width', '50px'):wikitext('Type')
+	end
+
+	header
+		:tag('th'):css('width', '275px'):attr('colspan', 2):wikitext('Tournament'):done()
+		:tag('th'):css('min-width', '225px'):wikitext('Award')
+
+	if self.config.queryType ~= Opponent.team then
 		header:tag('th'):css('min-width', '70px'):wikitext('Team')
 	elseif self.config.playerResultsOfTeam then
 		header:tag('th'):css('min-width', '105px'):wikitext('Player')
@@ -36,13 +44,21 @@ function AwardsTable:buildHeader()
 	return header
 end
 
+---Builds a row of the award table
+---@param placement table
+---@return Html
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
+		:addClass(self:rowHighlight(placement))
 		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
 	row:tag('td'):attr('data-sort-value', tierSortValue):wikitext(tierDisplay)
+
+	if self.config.showType then
+		row:tag('td'):wikitext(placement.type)
+	end
 
 	local tournamentDisplayName = BaseResultsTable.tournamentDisplayName(placement)
 
@@ -62,16 +78,16 @@ function AwardsTable:buildRow(placement)
 
 	row:tag('td'):css('text-align', 'left'):wikitext(placement.extradata.award)
 
-	if self.config.playerResultsOfTeam or self.config.opponentType ~= Opponent.team then
-		row:tag('td'):css('text-align', 'right'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
+	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
+		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
 			placement,
-			{flip = true, teamForSolo = not self.config.playerResultsOfTeam}
+			{teamForSolo = not self.config.playerResultsOfTeam}
 		))
 	end
 
-	row:tag('td'):css('text-align', 'right'):wikitext('$' .. Currency.formatMoney(
-			self.config.opponentType ~= Opponent.team and placement.individualprizemoney
-			or placement.prizemoney
+	row:tag('td'):wikitext(Currency.display('USD',
+			self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney,
+			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 		))
 
 	return row

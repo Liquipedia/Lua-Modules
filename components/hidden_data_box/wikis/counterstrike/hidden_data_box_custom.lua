@@ -9,21 +9,27 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Tier = mw.loadData('Module:Tier')
+local HiddenMatches = mw.loadData('Module:HiddenMatchDetermination')
+local Table = require('Module:Table')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
+---@param args table
+---@return string
 function CustomHiddenDataBox.run(args)
 	args = args or {}
+	args.liquipediatier = Tier.toNumber(args.liquipediatier)
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	if args.liquipediatier and not Logic.isNumeric(args.liquipediatier) then
-		args.liquipediatier = Tier.number[args.liquipediatier]
-	end
+
 	return BasicHiddenDataBox.run(args)
 end
 
+---@param args table
+---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
@@ -33,13 +39,20 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate'))
 
-	Variables.varDefine('tournament_tier', Tier.text[tostring(Variables.varDefault('tournament_liquipediatier', ''))])
+	local tier = Tier.toName(Variables.varDefault('tournament_liquipediatier'))
+	Variables.varDefine('tournament_tier', tier)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
 	Variables.varDefine('match_featured_override', args.featured)
-	Variables.varDefine('tournament_valve_major', args.valvemajor or (args.valvetier == 'Major' and 'true') or 'false')
 	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
+
+	Variables.varDefine('match_hidden', tostring(
+		Logic.readBool(args.hidden)
+		or Table.includes(HiddenMatches, Variables.varDefault('tournament_name'))
+	))
+
+	Variables.varDefine('tournament_subpage', 'true')
 end
 
 return Class.export(CustomHiddenDataBox)

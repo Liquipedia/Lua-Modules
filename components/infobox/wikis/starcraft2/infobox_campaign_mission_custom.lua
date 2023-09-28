@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Game = require('Module:Game')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -17,29 +18,33 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
+---@class CustomMissionInfobox: BuildingInfobox
 local CustomMission = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _GAME_SWITCH = {
-	wol = 'Wings of Liberty',
-	hots = 'Heart of the Swarm',
-	lotv = 'Legacy of the Void',
+local NONE = 'None'
+
+--those are only needed for this module nowhere else
+local ADDITIONAL_GAME_NAMES = {
 	nco = 'Nova Covert Ops',
 	coop = 'Co-op Mission',
 }
-local _fullGameName
 
+---@param frame Frame
+---@return Html
 function CustomMission.run(frame)
 	local mission = Mission(frame)
 	_args = mission.args
 	mission.createWidgetInjector = CustomMission.createWidgetInjector
 	mission.getWikiCategories = CustomMission.getWikiCategories
-	return mission:createInfobox(frame)
+	return mission:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{ name = 'Credits Earned', content = {_args.credits}},
@@ -51,25 +56,28 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@return string?
 function CustomMission._getEvolution()
 	local evolution = _args.Evolution
 	if String.isEmpty(evolution) then
 		return nil
-	elseif evolution == 'None' then
+	elseif evolution == NONE then
 		return evolution
 	else
 		return '[[' .. evolution .. ' (Heart of the Swarm Campaign)|' .. evolution .. ']]'
 	end
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'header' then
-		--fallback for non main space
-		_fullGameName = _fullGameName or _GAME_SWITCH[_args.game] or 'Wings of Liberty'
+		local game = ADDITIONAL_GAME_NAMES[_args.game] or Game.name{game = _args.game, useDefault = true}
 
 		return {
 			Header{
-				name = _fullGameName,
+				name = game,
 				subHeader = _args.name,
 				image = _args.image,
 				imageDark = _args.imagedark or _args.imagedarkmode
@@ -79,14 +87,17 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomMission.getWikiCategories()
-	_fullGameName = _GAME_SWITCH[_args.game] or 'Wings of Liberty'
+---@param args table
+---@return table
+function CustomMission:getWikiCategories(args)
+	local game = ADDITIONAL_GAME_NAMES[args.game] or Game.name{game = args.game, useDefault = true}
 	return {
-		_fullGameName .. ' Missions',
-		_fullGameName .. ' Campaign',
+		game .. ' Missions',
+		game .. ' Campaign',
 	}
 end
 
+---@return WidgetInjector
 function CustomMission:createWidgetInjector()
 	return CustomInjector()
 end

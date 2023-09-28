@@ -10,6 +10,22 @@ return {
 	startYear = 2007,
 	wikiName = 'teamfortress',
 	name = 'Team Fortress',
-	defaultTeamLogo = 'Team_Fortress_logo.png',
-	defaultTeamLogoDark = 'Team_Fortress_logo.png',
+	games = {
+		tf2 = {
+			abbreviation = 'TF2',
+			name = 'Team Fortress 2',
+			link = 'Team Fortress 2',
+			logo = {
+				darkMode = 'Team Fortress logo.png',
+				lightMode = 'Team Fortress logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Team Fortress logo.png',
+				lightMode = 'Team Fortress logo.png',
+			},
+		},
+	},
+	defaultGame = 'tf2',
+	defaultTeamLogo = 'Team Fortress logo.png', ---@deprecated
+	defaultTeamLogoDark = 'Team Fortress logo.png', ---@deprecated
 }

@@ -20,19 +20,25 @@ local _args
 local CustomPatch = Class.new()
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomPatch.run(frame)
 	local customPatch = Patch(frame)
 	_args = customPatch.args
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
-	return customPatch:createInfobox(frame)
+	customPatch.setLpdbData = CustomPatch.setLpdbData
+	return customPatch:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomPatch:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'release' then
 		return {
@@ -53,27 +59,29 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomPatch:addToLpdb(lpdbData)
-	local date = _args.release or _args.pcrelease or _args.consolerelease
+---@param args table
+function CustomPatch:setLpdbData(args)
+	local date = args.release or args.pcrelease or args.consolerelease
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = _args.name,
+		name = args.name,
 		type = 'patch',
-		information = _args.game,
+		information = args.game,
 		date = date,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			version = _args.version,
+			version = args.version,
 		}
 	})
-	return lpdbData
 end
 
-function CustomPatch:getChronologyData()
+---@param args table
+---@return {previous: string?, next: string?}
+function CustomPatch:getChronologyData(args)
 	local data = {}
-	if _args.previous then
-		data.previous = _args.previous .. ' Patch|' .. _args.previous
+	if args.previous then
+		data.previous = args.previous .. ' Patch|' .. args.previous
 	end
-	if _args.next then
-		data.next = _args.next .. ' Patch|' .. _args.next
+	if args.next then
+		data.next = args.next .. ' Patch|' .. args.next
 	end
 	return data
 end

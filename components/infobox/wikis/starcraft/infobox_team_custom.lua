@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -14,13 +15,14 @@ local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -54,10 +56,12 @@ function CustomTeam.run(frame)
 	_team = team
 	_args = team.args
 
+	_args.achievements = Achievements.team()
+
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -87,11 +91,13 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Solo Achievements', content = {_args['solo achievements']}})
 		--need this ABOVE the history display and below the
 		--achievements display, hence moved it here
-		local playerBreakDown = CustomTeam.playerBreakDown(_args)
-		if playerBreakDown.playernumber then
-				table.insert(widgets, Title{name = 'Player Breakdown'})
-				table.insert(widgets, Cell{name = 'Number of players', content = {playerBreakDown.playernumber}})
-				table.insert(widgets, Breakdown{content = playerBreakDown.display, classes = {'infobox-center'}})
+		local raceBreakdown = RaceBreakdown.run(_args)
+		if raceBreakdown then
+			Array.appendWith(widgets,
+				Title{name = 'Player Breakdown'},
+				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
+			)
 		end
 	elseif id == 'history' then
 		local index = 1
@@ -115,14 +121,14 @@ function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
 
 	lpdbData.extradata.playerearnings = _team.totalEarningsWhileOnTeam
-	for year, playerEarningsOfYear  in pairs(_team.earningsWhileOnTeam or {}) do
+	for year, playerEarningsOfYear in pairs(_team.earningsWhileOnTeam or {}) do
 		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
 	end
 
 	return lpdbData
 end
 
-function CustomTeam.getWikiCategories()
+function CustomTeam:getWikiCategories()
 	local categories = {}
 	if String.isNotEmpty(_args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')
@@ -145,38 +151,6 @@ function CustomTeam._listSubTeams()
 	return Json.stringify(subTeamsToStore)
 end
 
-function CustomTeam.playerBreakDown(args)
-	local playerBreakDown = {}
-	local playernumber = tonumber(args.player_number) or 0
-	local zergnumber = tonumber(args.zerg_number) or 0
-	local terrannumbner = tonumber(args.terran_number) or 0
-	local protossnumber = tonumber(args.protoss_number) or 0
-	local randomnumber = tonumber(args.random_number) or 0
-	if playernumber == 0 then
-		playernumber = zergnumber + terrannumbner + protossnumber + randomnumber
-	end
-
-	if playernumber > 0 then
-		playerBreakDown.playernumber = playernumber
-		if zergnumber + terrannumbner + protossnumber + randomnumber > 0 then
-			playerBreakDown.display = {}
-			if protossnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'p'} .. ' ' .. protossnumber
-			end
-			if terrannumbner > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'t'} .. ' ' .. terrannumbner
-			end
-			if zergnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'z'} .. ' ' .. zergnumber
-			end
-			if randomnumber > 0 then
-				playerBreakDown.display[#playerBreakDown.display + 1] = RaceIcon.getSmallIcon{'r'} .. ' ' .. randomnumber
-			end
-		end
-	end
-	return playerBreakDown
-end
-
 function CustomTeam.calculateEarnings(args)
 	-- set default values for the non query case
 	_team.earnings = {}
@@ -188,11 +162,11 @@ function CustomTeam.calculateEarnings(args)
 		Logic.readBool(args.disable_smw) or
 		Logic.readBool(args.disable_lpdb) or
 		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_SMW_storage')) or
+		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
 		(not Namespace.isMain())
 	then
 		doStore = false
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		CustomTeam.getEarningsAndMedalsData(_team.pagename)
 		Variables.varDefine('earnings', _team.totalEarnings)

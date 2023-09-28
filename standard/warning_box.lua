@@ -10,6 +10,8 @@ local WarningBox = {}
 
 local Class = require('Module:Class')
 
+---@param text string|number
+---@return Html
 function WarningBox.display(text)
 	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper'
 		.. 'ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
@@ -20,6 +22,8 @@ function WarningBox.display(text)
 	return div:node(tbl)
 end
 
+---@param tbl (string|number)[]
+---@return string
 function WarningBox.displayAll(tbl)
 	local display = ''
 	for _, text in pairs(tbl) do

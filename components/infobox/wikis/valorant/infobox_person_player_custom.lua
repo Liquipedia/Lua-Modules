@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
 local String = require('Module:StringUtils')
+local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -52,17 +53,23 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	player.args.history = tostring(TeamHistoryAuto._results{convertrole = 'true'})
+	if String.isEmpty(player.args.team) then
+		player.args.team = PlayerTeamAuto._main{team = 'team'}
+	end
+
+	if String.isEmpty(player.args.team2) then
+		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
+	end
+	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
 	_player = player
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -72,6 +79,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
 			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
 	elseif id == 'role' then
 		return {
@@ -109,7 +117,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(_args.role) and 'false' or 'true'
 
 	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
 	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
@@ -151,25 +159,16 @@ function CustomPlayer._isNotPlayer(role)
 	return roleData and (roleData.talent or roleData.staff)
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
-end
-
 function CustomPlayer:getPersonType(args)
 	local roleData = _ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.staff then
-			return {store = 'Staff', category = 'Staff'}
+			return {store = 'staff', category = 'Staff'}
 		elseif roleData.talent then
-			return {store = 'Talent', category = 'Talent'}
+			return {store = 'talent', category = 'Talent'}
 		end
 	end
-	return {store = 'Player', category = 'Player'}
+	return {store = 'player', category = 'Player'}
 end
 
 return CustomPlayer

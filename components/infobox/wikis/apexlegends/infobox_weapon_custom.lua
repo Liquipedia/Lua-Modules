@@ -46,19 +46,24 @@ local DAMAGE_INFO = {
 }
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@param frame Frame
+---@return Html
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
 	_weapon = weapon
 	_args = _weapon.args
 	weapon.addToLpdb = CustomWeapon.addToLpdb
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomWeapon:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
@@ -181,8 +186,11 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param content string
+---@param index integer?
+---@param lookUpTable {text: string, bgClass: string, textBgClass: string?}[]?
+---@return string?
 function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTable)
-
 	if not lookUpTable then
 		local page = 'link=Portal:Attachments'
 		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'.. page ..'|class=show-when-light-mode]]'
@@ -222,10 +230,13 @@ function CustomWeapon:_createContextualNote(noteText)
 	return '<span style="font-size:80%">' .. noteText .. '</span>'
 end
 
-function CustomWeapon:addToLpdb(lpdbData)
-	lpdbData.extradata.class = _args.class
-	lpdbData.extradata.description = _args.desc
-	lpdbData.extradata.ammotype = _args.ammotype
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomWeapon:addToLpdb(lpdbData, args)
+	lpdbData.extradata.class = args.class
+	lpdbData.extradata.description = args.desc
+	lpdbData.extradata.ammotype = args.ammotype
 	return lpdbData
 end
 return CustomWeapon

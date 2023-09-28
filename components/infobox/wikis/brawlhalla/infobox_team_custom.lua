@@ -18,7 +18,7 @@ function CustomTeam.run(frame)
 	local team = Team(frame)
 	team.addToLpdb = CustomTeam.addToLpdb
 
-	return team:createInfobox(frame)
+	return team:createInfobox()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)

@@ -21,11 +21,11 @@ function Squad:init(frame)
 	self.frame = frame
 	self.args = Arguments.getArgs(frame)
 	self.root = mw.html.create('div')
-	self.root	:addClass('table-responsive')
-				-- TODO: is this needed?
-				:css('margin-bottom', '10px')
-				-- TODO: is this needed?
-				:css('padding-bottom', '0px')
+	self.root:addClass('table-responsive')
+	-- TODO: is this needed?
+		:css('margin-bottom', '10px')
+	-- TODO: is this needed?
+		:css('padding-bottom', '0px')
 
 	self.content = mw.html.create('table')
 	self.content:addClass('wikitable wikitable-striped roster-card')
@@ -63,14 +63,14 @@ function Squad:title()
 
 	local titleRow = mw.html.create('th')
 	titleRow:addClass('large-only')
-			:attr('colspan', '1')
-			:wikitext(titleText)
+		:attr('colspan', '1')
+		:wikitext(titleText)
 
 	local titleRow2 = mw.html.create('th')
 	titleRow2:addClass('large-only')
-			:attr('colspan', '10')
-			:addClass('roster-title-row2-border')
-			:wikitext(titleText)
+		:attr('colspan', '10')
+		:addClass('roster-title-row2-border')
+		:wikitext(titleText)
 
 	titleContainer:node(titleRow):node(titleRow2)
 	self.content:node(titleContainer)
@@ -91,14 +91,14 @@ function Squad:header()
 
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
-		headerRow	:node(makeHeader('ID'))
-					:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
-					:node(makeHeader('Name'))
-					:node(makeHeader()) -- "Role"
-					:node(makeHeader('Join Date'))
+	headerRow:node(makeHeader('ID'))
+		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
+		:node(makeHeader('Name'))
+		:node(makeHeader()) -- "Role"
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_FORMER then
-		headerRow	:node(makeHeader('Leave Date'))
-					:node(makeHeader('New Team'))
+		headerRow:node(makeHeader('Leave Date'))
+			:node(makeHeader('New Team'))
 	elseif self.type == Squad.TYPE_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end

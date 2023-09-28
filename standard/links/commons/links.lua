@@ -6,23 +6,31 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+
 local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
 
 local Links = {}
 
-local _PREFIXES = {
+local PREFIXES = {
 	['5ewin'] = {
 		'https://arena.5eplay.com/tournament/',
 		player = 'https://arena.5eplay.com/data/player/',
-		team = 'https://arena.5eplay.com/team/'
+		team = 'https://arena.5eplay.com/team/',
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
-	afreeca = {'http://afreecatv.com/'},
-	aoezone = {'https://aoezone.net/'},
+	afreeca = {
+		'http://afreecatv.com/',
+		stream = 'https://play.afreecatv.com/',
+	},
+	aoezone = {
+		'https://aoezone.net/',
+		player = 'https://aoezone.net/members/'
+	},
 	['ask-fm'] = {'https://ask.fm/'},
 	b5csgo = {
 		'',
@@ -30,15 +38,21 @@ local _PREFIXES = {
 		team = 'https://www.b5csgo.com/clan/'
 	},
 	battlefy = {'https://www.battlefy.com/'},
-	bilibili = {'https://space.bilibili.com/'},
+	bilibili = {
+		'https://space.bilibili.com/',
+		stream = 'https://live.bilibili.com/',
+	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
+	cc = {'https://cc.163.com/'},
 	challengermode = {'https://www.challengermode.com/tournaments/'},
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
+	corestrike = {'https://corestrike.gg/lookup/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -52,6 +66,7 @@ local _PREFIXES = {
 		player = 'https://www.dotabuff.com/esports/players/',
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
+	douyin = {'https://live.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -86,6 +101,7 @@ local _PREFIXES = {
 		team = 'https://csgo.gamersclub.gg/team/',
 		player = 'https://csgo.gamersclub.gg/jogador/',
 	},
+	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
@@ -96,38 +112,51 @@ local _PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	letsplaylive = {'https://letsplay.live/profile/'},
 	loco = {'https://loco.gg/streamers/'},
+	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
-	octane = {'https://octane.gg/events/'},
+	niconico = {'https://www.nicovideo.jp/'},
+	nimotv = {'https://www.nimo.tv/'},
+	['nwc3l'] = {
+		'',
+		team = 'https://nwc3l.com/team/',
+		player = 'https://nwc3l.com/profile/',
+	},
+	openrec = {'https://www.openrec.tv/live/'},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
 	royaleapi = {'https://royaleapi.com/player/'},
-	rulebook = {''},
-	rulebook2 = {''},
 	rules = {''},
-	rules2 = {''},
-	['siege-gg'] = {
+	shift = {'https://www.shiftrle.gg/events/'},
+	siegegg = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
-	site = {''},
 	sk = {'https://sk-gaming.com/member/'},
+	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
-	['start-gg'] = {'https://start.gg/'},
+	['start-gg'] = {
+		'https://start.gg/',
+		player = 'https://start.gg/user/',
+	},
 	steam = {'https://steamcommunity.com/id/'},
+	steamtv = {'https://steam.tv/'},
+	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
-		'',
-		player = 'https://stratz.com/player/'
+		'https://stratz.com/leagues/',
+		player = 'https://stratz.com/players/',
+		team = 'https://stratz.com/teams/'
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
@@ -150,6 +179,7 @@ local _PREFIXES = {
 	},
 	tlprofile = {'https://tl.net/forum/profile.php?user='},
 	tlstream = {'https://tl.net/video/streams/'},
+	tonamel = {'https://tonamel.com/competition/'},
 	toornament = {'https://www.toornament.com/tournaments/'},
 	['trackmania-io'] = {
 		'https://trackmania.io/#/competitions/comp/',
@@ -165,157 +195,120 @@ local _PREFIXES = {
 		team = 'https://www.vlr.gg/team/',
 		player = 'https://www.vlr.gg/player/'
 	},
-	website = {''},
+	vod = {''},
 	weibo = {'https://weibo.com/'},
+	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
+	zhanqitv = {'https://www.zhanqi.tv/'},
 }
 
-_PREFIXES = Table.merge(_PREFIXES, CustomData.prefixes or {})
+PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
-local _SUFFIXES = {
-	iccup = '.html',
-	['faceit-c'] = '/',
-	['faceit-hub'] = '/',
+local SUFFIXES = {
+	cntft = {'/1'},
+	esportal = {'/event/info'},
+	facebook = {
+		'',
+		stream = '/live',
+	},
+	iccup = {'.html'},
+	['faceit-c'] = {'/'},
+	['faceit-hub'] = {'/'},
+	vk = {
+		'',
+		stream = '/live',
+	},
 }
 
-_SUFFIXES = Table.merge(_SUFFIXES, CustomData.suffixes or {})
+SUFFIXES = Table.merge(SUFFIXES, CustomData.suffixes or {})
 
+local ALIASES = {
+	['ask-fm'] = {'afk.fm', 'askfm'},
+	douyu = {'douyutv'},
+	esl = {'eslgaming'},
+	['facebook-gaming'] = {'fbgg'},
+	home = {'website', 'web', 'site', 'url'},
+	huyatv = {'huya'},
+	letsplaylive = {'cybergamer'},
+	rules = {'rulebook'},
+	['start-gg'] = {'startgg', 'smashgg'},
+	yandexefir = {'yandex'},
+	zhanqitv = {'zhanqi'},
+}
+
+local ICON_KEYS_TO_RENAME = {
+	['bilibili-stream'] = 'bilibili',
+	daumcafe = 'cafe-daum',
+	['esea-d'] = 'esea-league',
+	['faceit-c'] = 'faceit',
+	['faceit-c2'] = 'faceit',
+	['faceit-hub'] = 'faceit',
+	['faceit-org'] = 'faceit',
+	matcherinolink = 'matcherino',
+	playlist = 'music',
+	privsteam = 'steam',
+	pubsteam = 'steam',
+	steamalternative = 'steam',
+	tlpdint = 'tlpd',
+	tlpdkr = 'tlpd-wol-korea',
+	tlpdsospa = 'tlpd-sospa',
+}
+
+---@param links {[string]: string}
+---@return {[string]: string}
 function Links.transform(links)
-	return {
-		['5ewin'] = links['5ewin'],
-		abiosgaming = links.abiosgaming,
-		apexlegendsstatus = links.apexlegendsstatus,
-		afreeca = links.afreeca,
-		afreeca2 = links.afreeca2,
-		aligulac = links.aligulac,
-		aligulac2 = links.aligulac2,
-		aoezone = links.aoezone,
-		aoezone2 = links.aoezone2,
-		aoezone3 = links.aoezone3,
-		aoezone4 = links.aoezone4,
-		aoezone5 = links.aoezone5,
-		['ask-fm'] = links.askfm,
-		battlefy = links.battlefy,
-		battlefy2 = links.battlefy2,
-		battlefy3 = links.battlefy3,
-		bilibili = links.bilibili,
-		['bilibili-stream'] = links['bilibili-stream'],
-		booyah = links.booyah,
-		bracket = links.bracket,
-		bracket2 = links.bracket2,
-		bracket3 = links.bracket3,
-		bracket4 = links.bracket4,
-		bracket5 = links.bracket5,
-		bracket6 = links.bracket6,
-		bracket7 = links.bracket7,
-		challengermode = links.challengermode,
-		challengermode2 = links.challengermode2,
-		challonge = links.challonge,
-		challonge2 = links.challonge2,
-		challonge3 = links.challonge3,
-		challonge4 = links.challonge4,
-		challonge5 = links.challonge5,
-		datdota = links.datdota,
-		daumcafe = links.daumcafe,
-		discord = links.discord,
-		dlive = links.dlive,
-		dotabuff = links.dotabuff,
-		douyu = links.douyu or links.douyutv,
-		esea = links.esea,
-		esea2 = links.esea2,
-		['esea-d'] = links['esea-d'],
-		esl = links.eslgaming or links.esl,
-		esl2 = links.eslgaming2 or links.esl2,
-		esl3 = links.eslgaming3 or links.esl3,
-		esl4 = links.eslgaming4 or links.esl4,
-		esl5 = links.eslgaming5 or links.esl5,
-		esportal = links.esportal,
-		facebook = links.facebook,
-		facebook2 = links.facebook2,
-		['facebook-gaming'] = links['facebook-gaming'] or links.fbgg,
-		faceit = links.faceit,
-		['faceit-c'] = links['faceit-c'],
-		['faceit-c2'] = links['faceit-c2'],
-		['faceit-hub'] = links['faceit-hub'],
-		['faceit-org'] = links['faceit-org'],
-		factor = links.factor,
-		fanclub = links.fanclub,
-		gamersclub = links.gamersclub,
-		gamersclub2 = links.gamersclub2,
-		halodatahive = links.halodatahive,
-		home = links.website or links.web or links.site or links.url,
-		home2 = links.website2 or links.web2 or links.site2 or links.url2,
-		huyatv = links.huyatv or links.huya,
-		huyatv2 = links.huyatv2 or links.huya2,
-		iccup = links.iccup,
-		instagram = links.instagram,
-		instagram2 = links.instagram2,
-		kuaishou = links.kuaishou,
-		letsplaylive = links.letsplaylive or links.cybergamer,
-		loco = links.loco,
-		matcherino = links.matcherino,
-		matcherinolink = links.matcherinolink,
-		mildom = links.mildom,
-		octane = links.octane,
-		patreon = links.patreon,
-		playlist = links.playlist,
-		privsteam = links.privsteam,
-		pubsteam = links.pubsteam,
-		reddit = links.reddit,
-		royaleapi = links.royaleapi,
-		rules = links.rules or links.rulebook,
-		rules2 = links.rules2 or links.rulebook2,
-		['siege-gg'] = links.siegegg,
-		snapchat = links.snapchat,
-		sk = links.sk,
-		sostronk = links.sostronk,
-		['start-gg'] = links.startgg or links.smashgg,
-		steam = links.steam,
-		steamalternative = links.steamalternative,
-		stratz = links.stratz,
-		stream = links.stream,
-		stream2 = links.stream2,
-		tiktok = links.tiktok,
-		tlpd = links.tlpd,
-		tlpdint = links.tlpdint,
-		tlpdkr = links.tlpdkr,
-		tlpdsospa = links.tlpdsospa,
-		tlprofile = links.tlprofile,
-		tlstream = links.tlstream,
-		toornament = links.toornament,
-		toornament2 = links.toornament2,
-		toornament3 = links.toornament3,
-		['trackmania-io'] = links['trackmania-io'],
-		trovo = links.trovo,
-		trovo2 = links.trovo2,
-		twitch = links.twitch,
-		twitch2 = links.twitch2,
-		twitch3 = links.twitch3,
-		twitch4 = links.twitch4,
-		twitch5 = links.twitch5,
-		twitter = links.twitter,
-		twitter2 = links.twitter2,
-		vidio = links.vidio,
-		vk = links.vk,
-		vlr = links.vlr,
-		weibo = links.weibo,
-		weibo2 = links.weibo2,
-		youtube = links.youtube,
-		youtube2 = links.youtube2,
-		youtube3 = links.youtube3,
-		youtube4 = links.youtube4,
-		youtube5 = links.youtube5,
-		zhangyutv = links.zhangyutv,
-	}
+	local function iterateLinks(tbl, aliases)
+		local index = 1
+		local function getValue(keys)
+			for _, key in ipairs(keys) do
+				if tbl[key] then
+					return tbl[key]
+				end
+			end
+		end
+		local function suffixAliases(alias)
+			return alias .. index
+		end
+
+		return function()
+			local keys = Array.map(aliases, suffixAliases)
+			local value = getValue(keys)
+			if index == 1 and not value then
+				value = getValue(aliases)
+			end
+			index = index + 1
+			if value then
+				return (index - 1), value
+			else
+				return nil
+			end
+		end
+	end
+
+	local transformedLinks = {}
+	for linkKey in pairs(PREFIXES) do
+		local aliases = ALIASES[linkKey] or {}
+		table.insert(aliases, 1, linkKey)
+
+		for index, link in iterateLinks(links, aliases) do
+			transformedLinks[linkKey .. (index == 1 and '' or index)] = link
+		end
+	end
+
+	return transformedLinks
 end
 
+---@param platform string
+---@param id string?
+---@param variant string?
+---@return string
 function Links.makeFullLink(platform, id, variant)
 	if id == nil or id == '' then
 		return ''
 	end
 
-	local prefixData = _PREFIXES[platform]
+	local prefixData = PREFIXES[platform]
 
 	if not prefixData then
 		return ''
@@ -323,20 +316,37 @@ function Links.makeFullLink(platform, id, variant)
 
 	local prefix = prefixData[variant] or prefixData[1]
 
-	return prefix .. id .. (_SUFFIXES[platform] or '')
+	local suffixData = SUFFIXES[platform] or {}
+	local suffix = suffixData[variant] or suffixData[1] or ''
+
+	return prefix .. id .. suffix
 end
 
+---@param links {[string]: string}
+---@param variant string?
+---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
 	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links._removeAppendedNumber(key), item, variant)
+		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
 	end
 	return links
 end
 
 --remove appended number
 --needed because the link icons require e.g. 'esl' instead of 'esl2'
-function Links._removeAppendedNumber(key)
-	return string.gsub(key, '%d$', '')
+---@param key string
+---@return string
+function Links.removeAppendedNumber(key)
+	return (string.gsub(key, '%d$', ''))
+end
+
+---Builds the icon for a given link
+---@param key string
+---@param size number?
+---@return string
+function Links.makeIcon(key, size)
+	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
+		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
 
 return Class.export(Links, {frameOnly = true})

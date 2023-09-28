@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
-local CleanRaceFullName = require('Module:CleanRace2')
+local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
+local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local RaceIcon = require('Module:RaceIcon')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -26,28 +28,34 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _ICON_MINERALS = '[[File:Minerals.gif|baseline|link=Minerals]]'
-local _ICON_GAS = mw.loadData('Module:Gas')
-local _ICON_TIME = mw.loadData('Module:Buildtime')
-local _ICON_SUPPLY = mw.loadData('Module:Supply')
-local _ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local _ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
-local _ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
+local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
-local _race
 
+---@param frame Frame
+---@return Html
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
+
+	_args.game = Game.name{game = _args.game}
+
 	unit.nameDisplay = CustomUnit.nameDisplay
 	unit.setLpdbData = CustomUnit.setLpdbData
 	unit.createWidgetInjector = CustomUnit.createWidgetInjector
-	return unit:createInfobox(frame)
+	unit.getWikiCategories = CustomUnit.getWikiCategories
+
+	return unit:createInfobox()
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
+	Array.appendWith(
+		widgets,
 		Title{name = 'Unit stats'},
 		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay()}},
 		Cell{name = 'Attributes', content = {_args.attributes}},
@@ -62,24 +70,39 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Cargo size', content = {_args.cargo_size}},
 		Cell{name = 'Cargo capacity', content = {_args.cargo_capacity}},
 		Cell{name = 'Strong against', content = {String.convertWikiListToHtmlList(_args.strong)}},
-		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}},
-	}
+		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}}
+	)
 
-	if _args.game ~= 'lotv' and _args.buildtime then
+	if _args.game ~= GAME_LOTV and _args.buildtime then
 		table.insert(widgets, Center{content = {
-			'<small>\'\'\'Note:\'\'\' ' ..
+			'<small><b>Note:</b> ' ..
 			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' \'\'See [[Game Speed]].\'\'</small>'
+			' <i>See [[Game Speed]].</i></small>'
 		}})
 	end
 
 	return widgets
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' and not String.isEmpty(_args.min) then
 		return {
-			Cell{name = 'Cost', content = {CustomUnit:_getCostDisplay()}},
+			Cell{name = 'Cost', content = {CostDisplay.run{
+				faction = _args.race,
+				minerals = _args.min,
+				mineralsTotal = _args.totalmin,
+				mineralsForced = true,
+				gas = _args.gas,
+				gasTotal = _args.totalgas,
+				gasForced = true,
+				buildTime = _args.buildtime,
+				buildTimeTotal = _args.totalbuildtime,
+				supply = _args.supply or _args.control or _args.psy,
+				supplyTotal = _args.totalsupply or _args.totalcontrol or _args.totalpsy,
+			}}},
 		}
 	elseif id == 'requirements' then
 		return {
@@ -114,66 +137,32 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string
 function CustomUnit:_defenseDisplay()
-	local display = _ICON_HP .. ' ' .. (_args.hp or 0)
+	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
-		display = display .. ' ' .. _ICON_SHIELDS .. ' ' .. _args.shield
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
 	end
-	display = display .. ' ' .. _ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
 
 	return display
 end
 
+---@param args table
+---@return string
 function CustomUnit:nameDisplay(args)
-	local raceIcon = CustomUnit._getRace(args.race or 'unknown')
-	local name = args.name or self.pagename
+	local raceIcon = Faction.Icon{size = 'large', faction = args.race or Faction.defaultFaction}
+	raceIcon = raceIcon and (raceIcon .. '&nbsp;') or ''
 
-	return raceIcon .. '&nbsp;' .. name
+	return raceIcon .. (args.name or self.pagename)
 end
 
-function CustomUnit._getRace(race)
-	race = string.lower(race)
-	_race = CleanRace[race] or race or ''
-	local category = CleanRaceFullName[_race]
-	local display = RaceIcon.getBigIcon({'alt_' .. _race})
-	if not category and _race ~= 'unknown' then
-		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	elseif category then
-		category = '[[Category:' .. category .. ' Units]]'
-	end
-
-	return display .. (category or '')
-end
-
-function CustomUnit:_getCostDisplay()
-	local minerals = _args.min or 0
-	minerals = _ICON_MINERALS .. '&nbsp;' .. minerals
-
-	local gas = _args.gas or 0
-	gas = (_ICON_GAS[_race] or _ICON_GAS['default']) .. '&nbsp;' .. gas
-
-	local buildtime = _args.buildtime
-	if not String.isEmpty(buildtime) then
-		buildtime = '&nbsp;' .. (_ICON_TIME[_race] or _ICON_TIME['default']) .. '&nbsp;' .. buildtime
-	else
-		buildtime = ''
-	end
-
-	local supply = _args.supply or _args.psy or _args.control
-	if not String.isEmpty(supply) then
-		supply = '&nbsp;' .. (_ICON_SUPPLY[_race] or _ICON_SUPPLY['default']) .. '&nbsp;' .. supply
-	else
-		supply = ''
-	end
-
-	return minerals .. '&nbsp;' .. gas .. buildtime .. supply
-end
-
+---@return string?
 function CustomUnit:_getHotkeys()
 	local display
 	if not String.isEmpty(_args.hotkey) then
@@ -187,21 +176,28 @@ function CustomUnit:_getHotkeys()
 	return display
 end
 
+---@param args table
 function CustomUnit:setLpdbData(args)
-	local lpdbData = {
+	mw.ext.LiquipediaDB.lpdb_datapoint('unit_' .. (args.name or ''), {
 		name = args.name,
 		type = 'Unit',
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			race = _race,
+			wasonlybeta = tostring(Logic.readBool(args.wasOnlyBeta)),
+			deprecated = tostring(Logic.readBool(args.deprecated)),
+			iscampaignunit = tostring(Logic.readBool(args.isCampaignUnit)),
+			race = Faction.read(args.race),
 			size = args.size,
 			type = args.type,
 			builtfrom = args.builtfrom,
 			requires = args.requires,
 			minerals = args.min,
+			mineralstotal = args.totalmin,
 			gas = args.gas,
+			gastotal = args.totalgas,
 			buildtime = args.buildtime,
+			buildtimetotal = args.totalbuildtime,
 			attributes = args.attributes,
 			hp = args.hp,
 			shield = args.shield,
@@ -218,17 +214,23 @@ function CustomUnit:setLpdbData(args)
 			morphs = args.morphs,
 			strong_against = args.strong,
 			weak_against = args.weak,
+			supply = args.supply or args.control or args.psy,
+			supplytotal = args.totalsupply or args.totalcontrol or args.totalpsy,
 		}),
-	}
-	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', lpdbData)
+	})
 end
 
+---@param index number
+---@return Widget[]
 function CustomUnit:_getAttack(index)
 	local attackHeader = 'Attack ' .. index
 	if not String.isEmpty(_args['attack' .. index .. '_name']) then
 		attackHeader = attackHeader .. ': ' .. _args['attack' .. index .. '_name']
 	end
-	local widgets = {
+
+	CustomUnit:_storeAttack(index)
+
+	return {
 		Title{name = attackHeader},
 		Cell{name = 'Targets', content = {_args['attack' .. index .. '_target']}},
 		Cell{name = 'Damage', content = {_args['attack' .. index .. '_damage']}},
@@ -242,19 +244,17 @@ function CustomUnit:_getAttack(index)
 			}
 		}
 	}
-
-	CustomUnit:_storeAttack(index)
-	return widgets
 end
 
+---@param index number
 function CustomUnit:_storeAttack(index)
-	local lpdbData = {
+	mw.ext.LiquipediaDB.lpdb_datapoint((_args.name or '') .. 'attack' .. index, {
 		name = _args['attack' .. index .. '_name'] or ('Attack ' .. index),
 		type = 'Unit attack ' .. index,
 		information = _args.game,
 		image = _args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			race = _race,
+			race = Faction.read(_args.race),
 			damage = _args['attack' .. index .. '_damage'],
 			dps = _args['attack' .. index .. '_dps'],
 			cooldown = _args['attack' .. index .. '_cooldown'],
@@ -263,11 +263,19 @@ function CustomUnit:_storeAttack(index)
 			range = _args['attack' .. index .. '_range'],
 			target = _args['attack' .. index .. '_target'],
 		}),
-	}
-	mw.ext.LiquipediaDB.lpdb_datapoint(
-		(_args.name or '') .. 'attack' .. index,
-		lpdbData
-	)
+	})
+end
+
+---@param args table
+---@return string[]
+function CustomUnit:getWikiCategories(args)
+	local race = Faction.read(args.race)
+
+	if not race then
+		return {}
+	end
+
+	return {Faction.toName(race) .. ' Units'}
 end
 
 return CustomUnit

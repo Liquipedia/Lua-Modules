@@ -23,25 +23,31 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
 
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'location' then
 		local locations = {}
-		_args.country1, _args.city1, _args.location1date = _args.country, _args.city, _args.locationdate
-		for _, country, index in Table.iter.pairsByPrefix(_args, 'country') do
+		_args.city1 = _args.city1 or _args.city
+		for prefix, country, index in Table.iter.pairsByPrefix(_args, 'country', {requireIndex = false}) do
 			local city = _args['city'.. index]
-			local locationDate = _args['location'..index..'date']
+			local locationDate = _args[prefix..'date']
 			local text = Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 			if locationDate then
 				text = text .. '&nbsp;<small>' .. locationDate .. '</small>'

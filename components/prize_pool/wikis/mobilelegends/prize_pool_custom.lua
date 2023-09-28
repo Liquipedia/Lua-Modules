@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -38,7 +38,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.publishertier = Variables.varDefault('tournament_publishertier', '')
 	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
 
 	local team = lpdbData.participant or ''
@@ -52,7 +51,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 end
 
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

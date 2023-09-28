@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -23,27 +24,28 @@ local _args
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomShow.run(frame)
 	local customShow = Show(frame)
 	_show = customShow
 	_args = customShow.args
 	customShow.createWidgetInjector = CustomShow.createWidgetInjector
-	return customShow:createInfobox(frame)
+	return customShow:createInfobox()
 end
 
 function CustomShow:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'No. of episodes',
-		content = {_args['num_episodes']}
-	})
-	table.insert(widgets, Cell{
-		name = 'Original Release',
-		content = {CustomShow:_getReleasePeriod(_args.sdate, _args.edate)}
-	})
+	Array.appendWith(
+		widgets,
+		Cell{name = 'No. of episodes', content = {_args['num_episodes']}},
+		Cell{name = 'Original Release', content = {CustomShow:_getReleasePeriod(_args.sdate, _args.edate)}}
+	)
 
 	if Namespace.isMain() and _args.edate == nil then
 		_show.infobox:categories('Active Shows')
@@ -52,6 +54,9 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param sdate string?
+---@param edate string?
+---@return string?
 function CustomShow:_getReleasePeriod(sdate, edate)
 	if not sdate then return nil end
 	return sdate .. ' - ' .. (edate or '<b>Present</b>')

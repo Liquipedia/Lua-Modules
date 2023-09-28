@@ -8,32 +8,21 @@
 
 --Shared functions between SC2 person infoboxes (Player/Commentator and MapMaker)
 
-local CleanRace = require('Module:CleanRace')
+local Array = require('Module:Array')
+local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local RaceIcon = require('Module:RaceIcon').getBigIcon
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
---race stuff tables
-local _RACE_DATA = {
-	p = {'Protoss'},
-	pt = {'Protoss', 'Terran'},
-	pz = {'Protoss', 'Zerg'},
-	t = {'Terran'},
-	tp = {'Terran', 'Protoss'},
-	tz = {'Terran', 'Zerg'},
-	z = {'Zerg'},
-	zt = {'Zerg', 'Terran'},
-	zp = {'Zerg', 'Protoss'},
-	r = {'Random'},
-	a = {'Protoss', 'Terran', 'Zerg'},
-}
-local _RACE_ALL = 'All'
-local _RACE_ALL_SHORT = 'a'
+local RACE_ALL = 'All'
+local RACE_ALL_SHORT = 'a'
+local RACE_ALL_ICON = '[[File:RaceIcon All.png|30px|link=]]'
 
 --role stuff tables
-local _ROLES = {
+local ROLES = {
 	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
 	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
 	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
@@ -43,23 +32,21 @@ local _ROLES = {
 	['observer'] = 'Observer', ['photographer'] = 'Photographer',
 	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
 }
-local _CLEAN_OTHER_ROLES = {
+local CLEAN_OTHER_ROLES = {
 	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
 	['content producer'] = 'Content producer', ['streamer'] = 'false',
 }
 
-local _MILITARY_DATA = {
+local MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
 	ongoing = {category = 'Persons on Military Duty', storeValue = 'ongoing'},
 	fulfilled = {category = 'Persons that completed their Military Duty', storeValue = 'fulfilled'},
 	exempted = {category = 'Persons exempted from Military Duty', storeValue = 'exempted'},
 }
-_MILITARY_DATA.pending = _MILITARY_DATA.starting
-_MILITARY_DATA.started = _MILITARY_DATA.ongoing
-_MILITARY_DATA.ending = _MILITARY_DATA.ongoing
+MILITARY_DATA.pending = MILITARY_DATA.starting
+MILITARY_DATA.started = MILITARY_DATA.ongoing
+MILITARY_DATA.ending = MILITARY_DATA.ongoing
 
-local _raceData
-local _statusStore
 local _militaryStore
 local _args
 
@@ -84,63 +71,64 @@ function CustomPerson.shouldStoreData()
 end
 
 function CustomPerson.nameDisplay()
-	CustomPerson.getRaceData(_args.race or 'unknown')
-	local raceIcon = RaceIcon({'alt_' .. _raceData.race})
+	local raceData = CustomPerson.readFactions(_args.race or Faction.defaultFaction)
+
+	local raceIcons
+	if raceData.isAll then
+		raceIcons = RACE_ALL_ICON
+	else
+		raceIcons = table.concat(Array.map(raceData.factions, function(faction)
+			return Faction.Icon{faction = faction, size = 'large'}
+		end))
+	end
+
 	local name = _args.id or _PAGENAME
 
-	return raceIcon .. '&nbsp;' .. name
+	return raceIcons .. '&nbsp;' .. name
 end
 
 function CustomPerson.getRaceData(race, asCategory)
-	race = string.lower(race)
-	race = CleanRace[race] or race
-	local raceTable = _RACE_DATA[race]
+	local factions = CustomPerson.readFactions(race).factions
 
-	local faction, faction2
-	if race == _RACE_ALL_SHORT then
-		faction = _RACE_ALL
-	else
-		faction = (raceTable or {})[1]
-		faction2 = (raceTable or {})[2]
-	end
-
-	local display
-	if not raceTable and race ~= 'unknown' then
-		display = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	else
+	return table.concat(Array.map(factions, function(faction)
 		if asCategory then
-			for raceIndex, raceValue in ipairs(raceTable or {}) do
-				raceTable[raceIndex] = ':Category:' .. raceValue .. ' Players|' .. raceValue .. ']]'
-					.. '[[Category:' .. raceValue .. ' Players'
-			end
+			return '[[:Category:' .. faction .. ' Players|' .. faction .. ']]'
 		end
-		if raceTable then
-			display = '[[' .. table.concat(raceTable, ']],&nbsp;[[') .. ']]'
-		end
+		return '[[' .. faction .. ']]'
+	end) or {}, ',&nbsp;')
+end
+
+function CustomPerson.readFactions(input)
+	local factions
+	if input == RACE_ALL or input == RACE_ALL_SHORT then
+		factions = Array.copy(Faction.coreFactions)
+	else
+		factions = Faction.readMultiFaction(input, {alias = false})
 	end
 
-	_raceData = {
-		race = race,
-		faction = faction or '',
-		faction2 = faction2 or '',
-		display = display,
-	}
+	local isAll = Table.deepEquals(Array.sortBy(factions, FnUtil.identity), Faction.coreFactions)
 
-	return display
+	factions = Array.map(factions, Faction.toName)
+
+	return {isAll = isAll, factions = factions}
 end
 
 function CustomPerson.adjustLPDB(_, lpdbData)
 	local extradata = lpdbData.extradata or {}
-	extradata.race = _raceData.race
-	extradata.faction = _raceData.faction
-	extradata.faction2 = _raceData.faction2
+
+	local raceData = CustomPerson.readFactions(_args.race)
+
+	extradata.race = raceData.isAll and RACE_ALL_SHORT or raceData.factions[1]
+	extradata.faction = raceData.isAll and RACE_ALL or raceData.factions[1]
+	extradata.faction2 = (not raceData.isAll) and raceData.factions[2] or nil
 	extradata.lc_id = string.lower(_PAGENAME)
 	extradata.teamname = _args.team
 	extradata.role = _args.role
 	extradata.role2 = _args.role2
 	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive', '') or ''
+	extradata.activeplayer = not CustomPerson.getStatusToStore()
+		and CustomPerson._isPlayer(_args)
+		and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
 		extradata.racehistorical = true
@@ -152,12 +140,17 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 	return lpdbData
 end
 
+function CustomPerson._isPlayer(args)
+	return not Logic.readBool(_args.isplayer) and
+		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
+end
+
 function CustomPerson.military(military)
 	if military and military ~= 'false' then
 		local display = military
 		local militaryCategory = ''
 		military = string.lower(military)
-		for key, item in pairs(_MILITARY_DATA) do
+		for key, item in pairs(MILITARY_DATA) do
 			if String.contains(military, key) then
 				militaryCategory = '[[Category:' .. item.category .. ']]'
 				_militaryStore = item.storeValue
@@ -171,16 +164,10 @@ end
 
 function CustomPerson.getStatusToStore()
 	if _args.death_date then
-		_statusStore = 'Deceased'
+		return 'Deceased'
 	elseif _args.retired then
-		_statusStore = 'Retired'
-	elseif
-		(not Logic.readBool(_args.isplayer)) and
-		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
-	then
-		_statusStore = 'not player'
+		return 'Retired'
 	end
-	return _statusStore
 end
 
 function CustomPerson.getPersonType()
@@ -190,9 +177,9 @@ function CustomPerson.getPersonType()
 
 	local role = _args.role or _args.occupation or _args.defaultPersonType
 	role = string.lower(role or '')
-	local category = _ROLES[role]
-	local store = category or _CLEAN_OTHER_ROLES[role] or _args.defaultPersonType
-	if category == _ROLES['map maker'] then
+	local category = ROLES[role]
+	local store = category or CLEAN_OTHER_ROLES[role] or _args.defaultPersonType
+	if category == ROLES['map maker'] then
 		category = 'Mapmaker'
 	end
 

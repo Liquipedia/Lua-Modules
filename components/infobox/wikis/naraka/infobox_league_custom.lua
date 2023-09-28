@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
@@ -35,7 +36,9 @@ function CustomLeague.run(frame)
 	_args = league.args
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	return league:createInfobox(frame)
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -62,10 +65,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_publishertier', args.narakapremier)
+end
+
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = args.platform
-	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = args.narakapremier
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number)
 

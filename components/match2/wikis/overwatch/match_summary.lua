@@ -37,8 +37,8 @@ local _LINK_DATA = {
 		iconDark = 'File:ESL_2019_icon_darkmode.png',
 		text = 'Match page on ESL'
 	},
-	owl = {icon = 'File:Overwatch League allmode.png', text = 'Overwatch League matchpage'},
-	owc = {icon = 'File:OWC-BMS icon.png', text = 'OW Contenders matchpage'},
+	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
+	owc = {icon = 'File:Overwatch Contenders logo.png', text = 'Overwatch Contenders matchpage'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
 	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
@@ -123,7 +123,7 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if (match.extradata or {}).mvp then
+	if match.extradata.mvp then
 		local mvpData = match.extradata.mvp
 		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()

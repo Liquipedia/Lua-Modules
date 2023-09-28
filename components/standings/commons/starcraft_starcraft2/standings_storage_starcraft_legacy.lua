@@ -25,6 +25,7 @@ local INVALID_OPPONENT_CATEGORY = '[[Category:Pages with invalid opponent '
 
 local Wrapper = {}
 
+---@param frame Frame
 function Wrapper.table(frame)
 	local args = Arguments.getArgs(frame)
 	if not Wrapper._shouldStore(args) then
@@ -35,6 +36,8 @@ function Wrapper.table(frame)
 	return StandingsStorage.fromTemplateHeader(args)
 end
 
+---@param frame Frame
+---@return string?
 function Wrapper.entry(frame)
 	local args = Arguments.getArgs(frame)
 	if not Wrapper._shouldStore(args) then
@@ -72,6 +75,8 @@ function Wrapper.entry(frame)
 	return StandingsStorage.fromTemplateEntry(storageArgs)
 end
 
+---@param args table
+---@return table?
 function Wrapper._processOpponent(args)
 	local opponentInput = args[1] or ''
 	-- case team opponent
@@ -112,6 +117,9 @@ function Wrapper._processOpponent(args)
 end
 
 -- parse the single player and add them to the opponentArgs
+---@param playerInput string
+---@param opponentArgs table
+---@param prefix string
 function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	-- attempts to find [[link|name]] and skips images (images have multiple |)
 	local link, name = playerInput:match('%[%[([^|]-)|([^|]-)%]%]')
@@ -121,7 +129,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	end
 	opponentArgs[prefix] = name
 	opponentArgs[prefix .. 'link'] = link
-	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
 	-- get the race
 	-- first remove the flag so that only 1 image is left
@@ -130,6 +138,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
 end
 
+---@return boolean
 function Wrapper._shouldStore(args)
 	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))
 end

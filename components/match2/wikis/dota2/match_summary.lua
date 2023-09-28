@@ -44,8 +44,8 @@ local _AUTO_LINKS = {
 	{
 		icon = 'File:STRATZ_icon_lightmode.svg',
 		iconDark = 'File:STRATZ_icon_darkmode.svg',
-		url = 'https://stratz.com/en-us/match/',
-		name = 'Stratz'
+		url = 'https://stratz.com/matches/',
+		name = 'STRATZ'
 	},
 }
 
@@ -97,7 +97,6 @@ function CustomMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	local matchSummary = MatchSummary():init('400px')
-	matchSummary.root:css('flex-wrap', 'unset')
 
 	matchSummary:header(CustomMatchSummary._createHeader(match))
 				:body(CustomMatchSummary._createBody(match))
@@ -186,16 +185,14 @@ function CustomMatchSummary._createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
 			end
+			mvp:setPoints(mvpData.points)
 
 			body:addRow(mvp)
 		end
@@ -321,7 +318,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-popup-side-color-' .. color)
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
-			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{
 				hero = opponentHeroesData[index],
 				size = _SIZE_HERO,
@@ -342,6 +338,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
 	end

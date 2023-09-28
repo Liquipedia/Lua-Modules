@@ -13,9 +13,11 @@ local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampi
 
 local CustomUnofficialWorldChampion = Class.new()
 
+---@param frame Frame
+---@return Html
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
-	return unofficialWorldChampion:createInfobox(frame)
+	return unofficialWorldChampion:createInfobox()
 end
 
 return CustomUnofficialWorldChampion

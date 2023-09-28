@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -67,13 +67,13 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, 1, Cell{
 				name = 'ALGS circuit tier',
 				content = {'[[Apex Legends Global Series|' .. algsTier .. ']]'},
-				classes = {'valvepremier-highlighted'}
+				classes = {'tournament-highlighted-bg'}
 			})
 		end
 		table.insert(widgets, Cell{
 			name = 'EA tier',
 			content = {Tier['ea'][string.lower(_args.eatier or '')]},
-			classes = {'valvepremier-highlighted'}
+			classes = {'tournament-highlighted-bg'}
 		})
 		return widgets
 	elseif id == 'customcontent' then
@@ -90,12 +90,12 @@ function CustomInjector:parse(id, widgets)
 end
 
 
-function CustomLeague:liquipediaTierHighlighted()
-	return String.isNotEmpty(_args['ea-sponsored'])
+function CustomLeague:liquipediaTierHighlighted(args)
+	return String.isNotEmpty(args['ea-sponsored'])
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(_args['ea-sponsored']) and _EA_ICON or ''
+function CustomLeague:appendLiquipediatierDisplay(args)
+	return Logic.readBool(args['ea-sponsored']) and _EA_ICON or ''
 end
 
 function CustomInjector:addCustomCells(widgets)
@@ -123,11 +123,11 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	return foundArgs
 end
 
-function CustomLeague:defineCustomPageVariables()
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
-	Variables.varDefine('tournament_tiertype', _args.liquipediatiertype)
+	Variables.varDefine('tournament_ticker_name', args.tickername or '')
+	Variables.varDefine('tournament_tier', args.liquipediatier or '')
+	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 
 	--Legacy date vars
 	local sdate = Variables.varDefault('tournament_startdate', '')
@@ -140,52 +140,49 @@ function CustomLeague:defineCustomPageVariables()
 	Variables.varDefine('edate', edate)
 
 	--Apexs specific vars
-	Variables.varDefine('tournament_gamemode', string.lower(_args.mode or ''))
-	Variables.varDefine('tournament_series2', _args.series2 or '')
-	Variables.varDefine('tournament_publisher', _args['ea-sponsored'] or '')
-	Variables.varDefine('tournament_pro_circuit_tier', _args.pctier or '')
+	Variables.varDefine('tournament_gamemode', string.lower(args.mode or ''))
+	Variables.varDefine('tournament_series2', args.series2 or '')
+	Variables.varDefine('tournament_publisher', args['ea-sponsored'] or '')
+	Variables.varDefine('tournament_pro_circuit_tier', args.pctier or '')
 
 	local isIndividual = ''
-	if String.isNotEmpty(_args.player_number) then
+	if String.isNotEmpty(args.player_number) then
 		isIndividual = 'true'
 	end
 	Variables.varDefine('tournament_individual', isIndividual)
 
-	local eaMajor = _args.eamajor
+	local eaMajor = args.eamajor
 	if String.isEmpty(eaMajor) then
-		local eaTier = string.lower(_args.eatier or '')
-		if eaTier == 'major' then
-			eaMajor = 'true'
+		local eaTier = string.lower(args.eatier or '')
+		if String.isNotEmpty(eaTier) and eaTier ~= 'online' then
+			eaMajor = eaTier
 		else
-			local algsTier = string.lower(_args.algstier or '')
-			if algsTier == 'major' then
-				eaMajor = 'true'
+			local algsTier = string.lower(args.algstier or '')
+			if String.isNotEmpty(algsTier) and algsTier ~= 'online' then
+				eaMajor = algsTier
 			else
 				eaMajor = ''
 			end
 		end
 	end
-	Variables.varDefine('tournament_ea_major', eaMajor)
-	local regionData = Locale.formatLocations(_args)
-	Variables.varDefine('tournament_location_region', regionData.region1 or _args.country)
+	Variables.varDefine('tournament_publishertier', eaMajor)
+	local regionData = Locale.formatLocations(args)
+	Variables.varDefine('tournament_location_region', regionData.region1 or args.country)
 end
 
-function CustomLeague:addToLpdb(lpdbData)
-	lpdbData.participantsnumber = _args.team_number
-	lpdbData.publishertier = _args.pctier
-
-	lpdbData.extradata['is ea major'] = Variables.varDefault('tournament_ea_major', '')
+function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
+	lpdbData.extradata.platform = string.lower(args.platform or 'pc')
 
-	--retrieve sponsors from _args.sponsors if sponsorX, X=1,...,3, is empty
+	--retrieve sponsors from args.sponsors if sponsorX, X=1,...,3, is empty
 	if
-		String.isEmpty(_args.sponsor1) and
-		String.isEmpty(_args.sponsor2) and
-		String.isEmpty(_args.sponsor3) and
-		String.isNotEmpty(_args.sponsor)
+		String.isEmpty(args.sponsor1) and
+		String.isEmpty(args.sponsor2) and
+		String.isEmpty(args.sponsor3) and
+		String.isNotEmpty(args.sponsor)
 	then
 		lpdbData.sponsors = {}
-		local sponsors = mw.text.split(_args.sponsor, '<br>', true)
+		local sponsors = mw.text.split(args.sponsor, '<br>', true)
 		for key, item in pairs(sponsors) do
 			lpdbData.sponsors['sponsor' .. key] = item
 		end
@@ -220,7 +217,7 @@ function CustomLeague._getPlatform()
 	end
 end
 
-function CustomLeague.getWikiCategories(args)
+function CustomLeague:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.algstier) then
 		table.insert(categories, 'Apex Legends Global Series Tournaments')

@@ -6,9 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local ChampionIcon = require('Module:ChampionIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
@@ -44,6 +42,7 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 _ROLES['assistant coach'] = _ROLES.coach
 _ROLES['strategic coach'] = _ROLES.coach
@@ -56,8 +55,6 @@ _ROLES['adc'] = _ROLES.bottom
 _ROLES['bot'] = _ROLES.bottom
 _ROLES['ad carry'] = _ROLES.bottom
 _ROLES['sup'] = _ROLES.support
-
-local _SIZE_CHAMPION = '25x25px'
 
 local CustomPlayer = Class.new()
 
@@ -77,17 +74,20 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = TeamHistoryAuto._results{
+			hiderole = 'true',
+			iconModule = 'Module:PositionIcon/data',
+			addlpdbdata = 'true'
+		}
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -118,21 +118,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Champion
-	local championIcons = Array.map(Player:getAllArgsForBase(_args, 'champion'),
-		function(champion, _)
-			return ChampionIcon.getImage{champion, size = _SIZE_CHAMPION}
-		end
-	)
-	return {Cell{
-		name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
-		content = {
-			table.concat(championIcons, '&nbsp;')
-		}
-	}}
-end
-
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
@@ -147,7 +132,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.signatureChampion3 = _args.champion3
 	lpdbData.extradata.signatureChampion4 = _args.champion4
 	lpdbData.extradata.signatureChampion5 = _args.champion5
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
@@ -186,17 +171,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

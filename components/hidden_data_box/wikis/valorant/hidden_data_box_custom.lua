@@ -8,18 +8,24 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Tier = mw.loadData('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
 local CustomHiddenDataBox = {}
 
+---@param args table
+---@return string
 function CustomHiddenDataBox.run(args)
+	args = args or {}
+	args.liquipediatier = Tier.toNumber(args.liquipediatier)
+
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-	args.liquipediatier = Tier.number[args.liquipediatier or '']
 	return BasicHiddenDataBox.run(args)
 end
 
+---@param args table
+---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	queryResult.extradata = queryResult.extradata or {}
 

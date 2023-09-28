@@ -8,17 +8,10 @@
 
 local Table = {}
 
----@generic T
----@param tbl T[]
----@return T[]
+---@deprecated
+---Use Array.randomize
 function Table.randomize(tbl)
-	math.randomseed(os.time())
-
-	for i = #tbl, 2, -1 do
-		local j = math.random(i)
-		tbl[i], tbl[j] = tbl[j], tbl[i]
-	end
-	return tbl
+	return require('Module:Array').randomize(tbl)
 end
 
 ---Get the size of a table
@@ -32,7 +25,7 @@ function Table.size(tbl)
 	return i
 end
 
----@param tbl any[]
+---@param tbl table
 ---@param value any
 ---@return boolean
 function Table.includes(tbl, value)
@@ -57,6 +50,22 @@ function Table.filter(tbl, predicate, argument)
 		if predicate(entry, argument) then
 			filteredTbl[foundMatches] = entry
 			foundMatches = foundMatches + 1
+		end
+	end
+
+	return filteredTbl
+end
+
+---@generic K, V
+---@param tbl {[K]: V}
+---@param predicate fun(key?: K, value?: V): boolean
+---@return {[K]: V}
+function Table.filterByKey(tbl, predicate)
+	local filteredTbl = {}
+
+	for key, entry in pairs(tbl) do
+		if predicate(key, entry) then
+			filteredTbl[key] = entry
 		end
 	end
 
@@ -139,7 +148,8 @@ function Table.deepCopy(tbl_, options)
 	end
 
 	if options.reuseRef ~= false then
-		deepCopy = require('Module:FnUtil').memoize(deepCopy)
+		local FnUtil = require('Module:FnUtil')
+		deepCopy = FnUtil.memoize(deepCopy)
 	end
 
 	return deepCopy(tbl_)
@@ -235,12 +245,10 @@ end
 --Example:
 --`Table.map({a = 3, b = 4, c = 5}, function(k, v) return 2 * v, k end)`
 --Returns `{6 = 'a', 8 = 'b', 10 = 'c'}`
---
---The return is not parsed correctly yet by extension, https://github.com/sumneko/lua-language-server/issues/1535
----@generic K, V, T
+---@generic K, V, U, T
 ---@param xTable {[K] : V}
----@param f fun(key?: K, value?: V): K, T
----@return {[K] : T}
+---@param f fun(key?: K, value?: V): U, T
+---@return {[U] : T}
 function Table.map(xTable, f)
 	local yTable = {}
 	for xKey, xValue in pairs(xTable) do
@@ -276,6 +284,11 @@ f(2, 3)
 f('player4', 4, 'player')
 
 ]]
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param prefixes string[]
+---@param f function
+---@return {[I] : T}
 function Table.mapArgumentsByPrefix(args, prefixes, f)
 	local function indexFromKey(key)
 		local prefix, index = key:match('^([%a_]+)(%d+)$')
@@ -289,14 +302,19 @@ function Table.mapArgumentsByPrefix(args, prefixes, f)
 	return Table.mapArguments(args, indexFromKey, f)
 end
 
---[[
-Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
-from an arguments table, and applies a transform to each key or index.
-
-Most common use-case will be `Table.mapArgumentsByPrefix` where
-the `indexFromKey` function retrieves keys based on a prefix.
-]]
-function Table.mapArguments(args, indexFromKey, f)
+--- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
+-- from an arguments table, and applies a transform to each key or index.
+--
+-- Most common use-case will be `Table.mapArgumentsByPrefix` where
+-- the `indexFromKey` function retrieves keys based on a prefix.
+--
+---@generic K, V, T, I
+---@param args {[K] : V}
+---@param indexFromKey fun(key?: K): integer?
+---@param f fun(key?: K, index?: integer, ...?: any): T
+---@param noInterleave boolean?
+---@return {[I] : T}
+function Table.mapArguments(args, indexFromKey, f, noInterleave)
 	local entriesByIndex = {}
 
 	-- Non-numeric args
@@ -311,7 +329,11 @@ function Table.mapArguments(args, indexFromKey, f)
 		end
 	end
 
-	-- Numeric index entries fills in gaps of prefixN= entries
+	if noInterleave then
+		return entriesByIndex
+	end
+
+	-- Numeric index entries fills in gaps of prefixN= entries if not disabled
 	local entryIndex = 1
 	for argIndex = 1, math.huge do
 		if not args[argIndex] then
@@ -386,6 +408,10 @@ Table.groupBy({a = 3, b = 4, c = 5}, parity)
 	1 = {a = 3, c = 5},
 }
 ]]
+---@generic K, V, T
+---@param tbl {[K] : V}
+---@param f fun(key?: K, value?: V): T
+---@return {[T] : {[K]: V}}
 function Table.groupBy(tbl, f)
 	local groups = {}
 	for key, value in pairs(tbl) do
@@ -409,13 +435,9 @@ function Table.extract(tbl, key)
 	return value
 end
 
-function Table.getByPath(tbl, path)
-	for _, fieldName in ipairs(path) do
-		tbl = tbl[fieldName]
-	end
-	return tbl
-end
-
+---@param tbl table
+---@param path any[]
+---@return any?
 function Table.getByPathOrNil(tbl, path)
 	for _, fieldName in ipairs(path) do
 		if type(tbl) ~= 'table' then
@@ -426,6 +448,9 @@ function Table.getByPathOrNil(tbl, path)
 	return tbl
 end
 
+---@param tbl table
+---@param path any[]
+---@param value any
 function Table.setByPath(tbl, path, value)
 	for i = 1, #path - 1 do
 		if tbl[path[i]] == nil then
@@ -436,10 +461,10 @@ function Table.setByPath(tbl, path, value)
 	tbl[path[#path]] = value
 end
 
---[[
-Returns the unique key in a table. Returns nil if the table is empty or has
-multiple keys.
-]]
+---Returns the unique key in a table. Returns nil if the table is empty or has multiple keys.
+---@generic K, V
+---@param tbl {[K]: V}
+---@return K?
 function Table.uniqueKey(tbl)
 	local key0 = nil
 	for key, _ in pairs(tbl) do
@@ -449,10 +474,10 @@ function Table.uniqueKey(tbl)
 	return key0
 end
 
---[[
-Returns the entries of a table as an array of key value pairs. The ordering of
-the array is not specified.
-]]
+---Returns the entries of a table as an array of key value pairs. The ordering of the array is not specified.
+---@generic K, V
+---@param tbl {[K]: V}
+---@return {[1]: K, [2]: V}[]
 function Table.entries(tbl)
 	local entries = {}
 	for key, value in pairs(tbl) do
@@ -462,6 +487,9 @@ function Table.entries(tbl)
 end
 
 -- Polyfill of lua 5.2 table.pack
+---@generic V
+---@param ... V
+---@return {n: integer, value...: V}
 function Table.pack(...)
 	return {n = select('#', ...), ...}
 end
@@ -472,6 +500,10 @@ end
 Table.iter = {}
 
 -- iterate over table in a sorted order
+---@generic K, V
+---@param tbl {[K]: V}
+---@param order? fun(tbl: table, a: K, b: K): boolean
+---@return function
 function Table.iter.spairs(tbl, order)
 	-- collect the keys
 	local keys = {}
@@ -498,9 +530,13 @@ end
 --[[
 Iterates over table entries whose keys are prefixed numbers. The entries are
 visited in order, starting from 1. The iteration stops upon a skipped number.
+If requireIndex is disabled, for the first entry, both `prefix` and `prefix1`
+are valid keys, with a preference for the latter.
 
 Example:
+```
 local args = {
+	p = {},
 	p1 = {},
 	p2 = {},
 	p3 = {},
@@ -510,14 +546,35 @@ local args = {
 for key, player, index in Table.iter.pairsByPrefix(args, 'p') do
 	mw.log(key)
 end
-
-will print out 'p1 p2 p3'
+```
+will print out `p1 p2 p3`
 ]]
-function Table.iter.pairsByPrefix(tbl, prefix)
+---@param tbl table
+---@param prefixes string|string[]
+---@param options? {requireIndex: boolean}
+---@return function
+function Table.iter.pairsByPrefix(tbl, prefixes, options)
+	options = options or {}
+
+	if type(prefixes) == 'string' then
+		prefixes = {prefixes}
+	end
+
+	local getByPrefixes = function(index)
+		for _, prefix in ipairs(prefixes) do
+			local key = prefix .. index
+			if tbl[key] then
+				return key, tbl[key]
+			end
+		end
+	end
+
 	local i = 1
 	return function()
-		local key = prefix .. i
-		local value = tbl[key]
+		local key, value = getByPrefixes(i)
+		if options.requireIndex == false and i == 1 and not value then
+			key, value = getByPrefixes('')
+		end
 		i = i + 1
 		if value then
 			return key, value, (i - 1)
@@ -527,18 +584,29 @@ function Table.iter.pairsByPrefix(tbl, prefix)
 	end
 end
 
+---@deprecated Use Array.forEach
+---@generic V
+---@param tbl V[]
+---@param lambda fun(item: V)
 function Table.iter.forEach(tbl, lambda)
 	for _, item in ipairs(tbl) do
 		lambda(item)
 	end
 end
 
+---@deprecated Use Array.forEach
+---@generic V
+---@param tbl V[]
+---@param lambda fun(index: integer, item: V)
 function Table.iter.forEachIndexed(tbl, lambda)
 	for index, item in ipairs(tbl) do
 		lambda(index, item)
 	end
 end
 
+---@generic K, V
+---@param tbl {[K]: V}
+---@param lambda fun(key: K, val: V?)
 function Table.iter.forEachPair(tbl, lambda)
 	for key, val in pairs(tbl) do
 		lambda(key, val)

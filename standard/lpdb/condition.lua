@@ -13,13 +13,15 @@ local Array = require('Module:Array')
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
+---@class AbstractConditionNode:BaseClass
 local _ConditionNode = Class.new()
 
---[[
-	A tree of conditions, specifying the conditions for an LPDB request
-
-	Can be used recursively, as in, a tree of trees
-]]
+---A tree of conditions, specifying the conditions for an LPDB request.
+---Can be used recursively, as in, a tree of trees.
+---@class ConditionTree:AbstractConditionNode
+---@operator call(...): ConditionTree
+---@field _nodes ConditionNode[]
+---@field booleanOperator lpdbBooleanOperator
 local ConditionTree = Class.new(_ConditionNode,
 	function(self, booleanOperator)
 		self.booleanOperator = booleanOperator
@@ -27,8 +29,12 @@ local ConditionTree = Class.new(_ConditionNode,
 	end
 )
 
+---@param node AbstractConditionNode|AbstractConditionNode[]|nil
+---@return self
 function ConditionTree:add(node)
-	if node.is_a ~= nil and node:is_a(_ConditionNode) then
+	if not node then
+		return self
+	elseif node.is_a ~= nil and node:is_a(_ConditionNode) then
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes
@@ -39,6 +45,7 @@ function ConditionTree:add(node)
 	return self
 end
 
+---@return string
 function ConditionTree:toString()
 	assert(self.booleanOperator ~= nil)
 	return table.concat(Array.map(self._nodes,
@@ -53,9 +60,13 @@ function ConditionTree:toString()
 
 end
 
---[[
-	A condition in a ConditionTree
-]]
+---A condition in a ConditionTree
+---@class ConditionNode:AbstractConditionNode
+---@operator call(...): ConditionNode
+---@field name ColumnName
+---@field comparator lpdbComparator
+---@field value string|number
+---@field is_a function
 local ConditionNode = Class.new(_ConditionNode,
 	function(self, name, comparator, value)
 		self.name = name
@@ -64,6 +75,7 @@ local ConditionNode = Class.new(_ConditionNode,
 	end
 )
 
+---@return string
 function ConditionNode:toString()
 	return String.interpolate(
 		'[[${name}${comparator}${value}]]',
@@ -75,6 +87,7 @@ function ConditionNode:toString()
 	)
 end
 
+---@enum lpdbComparator
 local Comparator = {
 	equals = '::',
 	notEquals = '::!',
@@ -86,20 +99,23 @@ Comparator.neq = Comparator.notEquals
 Comparator.gt = Comparator.greaterThan
 Comparator.lt = Comparator.lessThan
 
+---@enum lpdbBooleanOperator
 local BooleanOperator = {
 	all = 'AND',
 	any = 'OR',
 }
 
---[[
-	Represents a column name in LPDB, including an optional super key
-]]
+---Represents a column name in LPDB, including an optional super key
+---@class ColumnName
+---@operator call(...): ColumnName
+---@field name string
+---@field superName string?
 local ColumnName = Class.new(
 
-	-- @param name: name of the column in LPDB
-	-- @param superName (optional): The key that the `name` exists in, e.g. if we
+	--- @param name string name of the column in LPDB
+	--- @param superName string? The key that the `name` exists in, e.g. if we
 	-- want `extradata_player`, the `superName` would be 'extradata', while
-	-- the `name` would be 'player"'
+	-- the `name` would be 'player'
 	function(self, name, superName)
 		self.name = name
 
@@ -109,6 +125,7 @@ local ColumnName = Class.new(
 	end
 )
 
+---@return string
 function ColumnName:toString()
 	if String.isNotEmpty(self.superName) then
 		return String.interpolate(

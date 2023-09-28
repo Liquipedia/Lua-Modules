@@ -13,7 +13,7 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
@@ -21,23 +21,19 @@ local HiddenDataBox = {}
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
-local TIER_MODE_TYPES = 'types'
-local TIER_MODE_TIERS = 'tiers'
+local DEFAULT_TIER_TYPE = 'general'
 
 ---Entry point
+---@param args table?
+---@return string
 function HiddenDataBox.run(args)
 	args = args or {}
 	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
 	local doQuery = not Logic.readBool(args.noQuery)
 
-	local warnings = {}
-	local warning
-	args.liquipediatier, warning
-		= HiddenDataBox.validateTier(args.liquipediatier, TIER_MODE_TIERS)
-	table.insert(warnings, warning)
-	args.liquipediatiertype, warning
-		= HiddenDataBox.validateTier(args.liquipediatiertype, TIER_MODE_TYPES)
-	table.insert(warnings, warning)
+	local warnings
+	args.liquipediatier, args.liquipediatiertype, warnings
+		= HiddenDataBox.validateTier(args.liquipediatier, args.liquipediatiertype)
 
 	local parent = args.parent or args.tournament or tostring(mw.title.getCurrentTitle().basePageTitle)
 	parent = parent:gsub(' ', '_')
@@ -68,15 +64,15 @@ function HiddenDataBox.run(args)
 		queryResult = queryResult[1] or {}
 	end
 
-	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.tournamentName(args.name), queryResult.name)
+	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
 	HiddenDataBox.checkAndAssign(
 		'tournament_shortname',
-		TextSanitizer.tournamentName(args.shortname),
+		TextSanitizer.stripHTML(args.shortname),
 		queryResult.shortname
 	)
 	HiddenDataBox.checkAndAssign(
 		'tournament_tickername',
-		TextSanitizer.tournamentName(args.tickername),
+		TextSanitizer.stripHTML(args.tickername),
 		queryResult.tickername
 	)
 	HiddenDataBox.checkAndAssign('tournament_icon', args.icon, queryResult.icon)
@@ -85,6 +81,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
 	HiddenDataBox.checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
+	HiddenDataBox.checkAndAssign('tournament_publishertier', args.publishertier, queryResult.publishertier)
 
 	HiddenDataBox.checkAndAssign('tournament_type', args.type, queryResult.type)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
@@ -104,19 +101,30 @@ function HiddenDataBox.run(args)
 	return WarningBox.displayAll(warnings)
 end
 
+---Cleans date input
+---@param primaryDate string?
+---@param secondaryDate string?
+---@return string?
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
 	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-			String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+		String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
 end
 
+---Assigns the wiki Variables according to given input, wiki variable and queryResults
+---@param variableName string
+---@param valueFromArgs string|number|nil
+---@param valueFromQuery string|number|nil
 function HiddenDataBox.checkAndAssign(variableName, valueFromArgs, valueFromQuery)
-	if String.isNotEmpty(valueFromArgs) then
+	if Logic.isNotEmpty(valueFromArgs) then
 		Variables.varDefine(variableName, valueFromArgs)
 	elseif String.isEmpty(Variables.varDefault(variableName)) then
 		Variables.varDefine(variableName, valueFromQuery or '')
 	end
 end
 
+---Fetches participant information from the parent page
+---@param parent string
+---@return {[string]: {[string]: string}}
 function HiddenDataBox._fetchParticipants(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']]',
@@ -136,10 +144,16 @@ function HiddenDataBox._fetchParticipants(parent)
 end
 
 -- overridable so that wikis can add custom vars
+---@param args table
+---@param queryResult table
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
 -- overridable so that wikis can add custom vars
+---@param participant string
+---@param participantResolved string
+---@param key string
+---@param value string|number
 function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
@@ -147,32 +161,28 @@ function HiddenDataBox.setWikiVariableForParticipantKey(participant, participant
 	end
 end
 
--- overridable so that wikis can adjust according to their tier system
-function HiddenDataBox.validateTier(tierString, tierMode)
-	if String.isEmpty(tierString) then
-		return
-	end
-	local warning
-	local tierValue = (Tier.text[tierMode] and
-						Tier.text[tierMode][tierString:lower()]) or
-						Tier.text[tierString]
+---Validates the provided tier, tierType pair
+---@param tier string|number|nil
+---@param tierType string?
+---@return string|number|nil, string?, string[]
+function HiddenDataBox.validateTier(tier, tierType)
+	local warnings = {}
 
-	if not tierValue then
-		tierValue = tierString
-		warning = String.interpolate(
-			INVALID_TIER_WARNING,
-			{
-				tierString = tierString,
-				tierMode = tierMode == TIER_MODE_TYPES and 'Tier Type' or 'Tier',
-			}
-		)
+	if not tier and not tierType then
+		return nil, nil, warnings
 	end
 
-	-- For types we want to return the normalized value
-	-- For tiers we want to return the input
-	tierValue = tierMode == TIER_MODE_TYPES and tierValue or tierString
+	local tierValue, tierTypeValue = Tier.toValue(tier, tierType)
 
-	return tierValue, warning
+	if tier and not tierValue then
+		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+	end
+
+	if tierType and tierType:lower() ~= DEFAULT_TIER_TYPE and not tierTypeValue then
+		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+	end
+
+	return tierValue, tierTypeValue, warnings
 end
 
 return Class.export(HiddenDataBox)

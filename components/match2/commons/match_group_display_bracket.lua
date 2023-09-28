@@ -16,14 +16,18 @@ local MathUtil = require('Module:MathUtil')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
-local matchHasDetailsWikiSpecific = require('Module:Brkts/WikiSpecific').matchHasDetails
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local html = mw.html
-local _NON_BREAKING_SPACE = '&nbsp;'
+local NON_BREAKING_SPACE = '&nbsp;'
+local OPPONENT_HEIGHT_PADDING = 4
 
 local BracketDisplay = {propTypes = {}, types = {}}
 
@@ -104,11 +108,12 @@ function BracketDisplay.Bracket(props)
 		headerMargin = propsConfig.headerMargin or defaultConfig.headerMargin,
 		hideRoundTitles = propsConfig.hideRoundTitles or false,
 		lineWidth = propsConfig.lineWidth or defaultConfig.lineWidth,
-		matchHasDetails = propsConfig.matchHasDetails or matchHasDetailsWikiSpecific or DisplayHelper.defaultMatchHasDetails,
+		matchHasDetails = propsConfig.matchHasDetails or WikiSpecific.matchHasDetails or DisplayHelper.defaultMatchHasDetails,
 		matchMargin = propsConfig.matchMargin or math.floor(defaultConfig.opponentHeight / 4),
 		matchWidth = propsConfig.matchWidth or defaultConfig.matchWidth,
 		matchWidthMobile = propsConfig.matchWidthMobile or defaultConfig.matchWidthMobile,
-		opponentHeight = propsConfig.opponentHeight or defaultConfig.opponentHeight,
+		opponentHeight = propsConfig.opponentHeight
+			or BracketDisplay.computeBracketOpponentHeight(props.bracket.matchesById, defaultConfig.opponentHeight),
 		qualifiedHeader = propsConfig.qualifiedHeader or defaultConfig.qualifiedHeader,
 		roundHorizontalMargin = propsConfig.roundHorizontalMargin or defaultConfig.roundHorizontalMargin,
 		scoreWidth = propsConfig.scoreWidth or defaultConfig.scoreWidth,
@@ -143,6 +148,25 @@ function BracketDisplay.Bracket(props)
 
 	return html.create('div'):addClass('brkts-bracket-wrapper')
 		:node(bracketNode)
+end
+
+function BracketDisplay.computeBracketOpponentHeight(matchesById, defaultOpponentHeight)
+	local maxHeight = defaultOpponentHeight
+
+	for _, match in pairs(matchesById) do
+		for _, opponent in ipairs(match.opponents) do
+			maxHeight = math.max(maxHeight, BracketDisplay._computeOpponentHeight(opponent.type, defaultOpponentHeight))
+		end
+	end
+
+	return maxHeight
+end
+
+function BracketDisplay._computeOpponentHeight(opponentType, defaultOpponentHeight)
+	local numberOfRows = Opponent.partySize(opponentType) or 1
+
+	-- remove padding then multipy it by player rows and after that add padding once
+	return numberOfRows * (defaultOpponentHeight - OPPONENT_HEIGHT_PADDING) + OPPONENT_HEIGHT_PADDING
 end
 
 BracketDisplay.types.Layout = TypeUtil.struct({
@@ -309,7 +333,7 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = {
-				header = config.qualifiedHeader or '!q',
+				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
 		end
@@ -380,7 +404,7 @@ function BracketDisplay.MatchHeader(props)
 
 	local headerNode = html.create('div'):addClass('brkts-header brkts-header-div')
 		:addClass(--do not display the header if it is "&nbsp;"
-			options[1] == _NON_BREAKING_SPACE
+			options[1] == NON_BREAKING_SPACE
 			and 'brkts-header-nodisplay' or ''
 		)
 		:css('height', props.height .. 'px')

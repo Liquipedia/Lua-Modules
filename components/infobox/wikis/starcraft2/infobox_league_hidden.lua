@@ -13,6 +13,7 @@ local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Flags = require('Module:Flags')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Links = require('Module:Links')
@@ -22,7 +23,7 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local HiddenInfoboxLeague = {}
@@ -30,22 +31,15 @@ local HiddenInfoboxLeague = {}
 local _args
 local _pagename = mw.title.getCurrentTitle().text
 
-local _TODAY = os.date('%Y-%m-%d', os.time())
-
-local _GAME_WOL = 'wol'
-local _GAME_HOTS = 'hots'
-local _GAME_LOTV = 'lotv'
-local _GAME_MOD = 'mod'
-
-local _GAMES = {
-	[_GAME_WOL] = {'Wings of Liberty', 'WoL'},
-	[_GAME_HOTS] = {'Heart of the Swarm', 'HotS'},
-	[_GAME_LOTV] = {'Legacy of the Void', 'LotV'},
-	[_GAME_MOD] = {'mod', 'mod'}
-}
+local TODAY = os.date('%Y-%m-%d', os.time())
+local GAME_MOD = 'mod'
+local GAME_LOTV = Game.name{game = 'lotv'}
 
 function HiddenInfoboxLeague.run(args)
 	_args = args
+
+	args.liquipediatiertype = args.liquipediatiertype or args.tiertype
+	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.name{game = _args.game}
 
 	HiddenInfoboxLeague._definePageVariables()
 
@@ -99,7 +93,7 @@ function HiddenInfoboxLeague._getCategories()
 		end
 	end
 
-	table.insert(categories, HiddenInfoboxLeague.getTierCategories())
+	HiddenInfoboxLeague.getTierCategories()
 
 	table.insert(categories, HiddenInfoboxLeague._getCountryCategories())
 
@@ -138,30 +132,22 @@ function HiddenInfoboxLeague._getCountryCategories()
 end
 
 function HiddenInfoboxLeague.getTierCategories()
-	local tierCategories = {}
+	local tier = _args.liquipediatier
+	local tierType = _args.liquipediatiertype
 
-	local tier = _args.liquipediatier or ''
-	local tierType = _args.liquipediatiertype or _args.tiertype or ''
+	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	local isValidTierTuple = Tier.isValid(tier, tierType)
 
-	local tierText = Tier.text.tiers[tier]
-	if String.isNotEmpty(tier) and tierText == nil then
-		table.insert(tierCategories, 'Pages with invalid Tier')
+	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tier')
+	elseif tierCategory then
+		mw.ext.TeamLiquidIntegration.add_category(tierCategory)
 	end
-	tierText = tierText or tier
-	table.insert(tierCategories, tierText .. ' Tournaments')
-	if _args.team_number or _args.team1 then
-		table.insert(tierCategories, tierText .. ' Team Tournaments')
+	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid Tiertype')
+	elseif tierTypeCategory then
+		mw.ext.TeamLiquidIntegration.add_category(tierTypeCategory)
 	end
-
-	if String.isNotEmpty(tierType) and Tier.text.types[string.lower(tierType)] == nil then
-		table.insert(tierCategories, 'Pages with invalid Tiertype')
-	end
-
-	if tierCategories == {} then
-		return nil
-	end
-
-	return table.concat(tierCategories, ']] [[Category:')
 end
 
 function HiddenInfoboxLeague._definePageVariables()
@@ -192,7 +178,7 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_location2', _args.location2 or _args.city2)
 	Variables.varDefine('tournament_venue', _args.venue)
 
-	Variables.varDefine('tournament_game', (_GAMES[string.lower(_args.game or '')] or {})[1] or _GAMES[_GAME_WOL][1])
+	Variables.varDefine('tournament_game', _args.game)
 
 	-- If no parent is available, set pagename instead to ease querying
 	local parent = _args.parent or mw.title.getCurrentTitle().prefixedText
@@ -206,16 +192,10 @@ function HiddenInfoboxLeague._definePageVariables()
 	Variables.varDefine('tournament_startdate', sdate)
 	Variables.varDefine('tournament_enddate', edate)
 
-	--Legacy vars
-	Variables.varDefine('tournament_tier', tier)
-	Variables.varDefine('tournament_tiertype', tierType)
-	Variables.varDefine('tournament_ticker_name', _args.tickername or name)
-	Variables.varDefine('tournament_abbreviation', _args.abbreviation or '')
-
 	--SC2 specific vars
 	Variables.varDefine('tournament_mode', _args.mode or '1v1')
 	Variables.varDefine('headtohead', _args.headtohead or 'true')
-	Variables.varDefine('featured', _args.featured or 'false')
+	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(_args.featured)))
 	--series number
 	local seriesNumber = _args.number or ''
 	local seriesNumberLength = string.len(seriesNumber)
@@ -286,7 +266,7 @@ function HiddenInfoboxLeague._getPrizePool()
 		prizePool = HiddenInfoboxLeague._cleanPrizeValue(prizePool)
 
 		if localCurrency then
-			local exchangeDate = Variables.varDefault('tournament_enddate', _TODAY)
+			local exchangeDate = Variables.varDefault('tournament_enddate', TODAY)
 			prizePoolUSD = HiddenInfoboxLeague._currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
 			if not prizePoolUSD then
 				error('Invalid local currency "' .. localCurrency .. '"')
@@ -298,7 +278,7 @@ function HiddenInfoboxLeague._getPrizePool()
 end
 
 function HiddenInfoboxLeague._cleanPrizeValue(value)
-	if String.isEmpty(value) then
+	if Logic.isEmpty(value) then
 		return nil
 	end
 
@@ -322,21 +302,21 @@ function HiddenInfoboxLeague._currencyConversion(localPrize, currency, exchangeD
 end
 
 function HiddenInfoboxLeague._getPatch()
-	local game = string.lower(_args.game or '')
-	local patch = _args.patch or ''
-	local shouldUseAutoPatch = _args.autopatch or ''
+	local game = _args.game
+	local patch = _args.patch
+	local shouldUseAutoPatch = Logic.nilOr(Logic.readBoolOrNil(_args.autopatch), true)
 	local epatch = _args.epatch or ''
-	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
-	local edate = Variables.varDefault('tournament_enddate', _TODAY)
+	local sdate = Variables.varDefault('tournament_startdate', TODAY)
+	local edate = Variables.varDefault('tournament_enddate', TODAY)
 
 	if String.isNotEmpty(game) then
-		if (shouldUseAutoPatch == 'false' or game ~= 'lotv') and epatch == '' then
+		if (not shouldUseAutoPatch or game ~= GAME_LOTV) and epatch == '' then
 			epatch = patch
 		end
-		if patch == '' and game == _GAME_LOTV and shouldUseAutoPatch ~= 'false' then
+		if String.isEmpty(patch) and game == GAME_LOTV and shouldUseAutoPatch then
 			patch = 'Patch ' .. (Autopatch._main({sdate}) or '')
 		end
-		if epatch == '' and game == 'lotv' and shouldUseAutoPatch ~= 'false' then
+		if String.isEmpty(epatch) and game == GAME_LOTV and shouldUseAutoPatch then
 			epatch = 'Patch ' .. (Autopatch._main({edate}) or '')
 		end
 
@@ -388,7 +368,7 @@ function HiddenInfoboxLeague._setLpdbData()
 		icon = Variables.varDefault('tournament_icon'),
 		icondark = Variables.varDefault('tournament_icondark'),
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.series or ''),
-		game = string.lower(_args.game or ''),
+		game = _args.game,
 		patch = Variables.varDefault('patch', ''),
 		endpatch = Variables.varDefaultMulti('epatch', 'patch', ''),
 		type = _args.type,
@@ -432,10 +412,10 @@ function HiddenInfoboxLeague._getMaps()
 	local mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, prefix)
 
 	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
-		map = mw.text.split(map, '|')
+		local mapArray = mw.text.split(map, '|')
 		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
 		}
 	end))
 end
@@ -524,16 +504,13 @@ function HiddenInfoboxLeague._getAllArgsForBase(base, options)
 end
 
 function HiddenInfoboxLeague._getGameVersionCategory()
-	local game = string.lower(_args.game or '')
-	local beta = _args.beta or ''
+	local beta = String.isNotEmpty(_args.beta) and 'Beta ' or ''
 
-	if _GAMES[game] ~= nil then
-		return (beta ~= '' and 'Beta ' or '') .. _GAMES[game][2] .. ' Competitions'
-	elseif game ~= _GAME_MOD then
-		return (beta ~= '' and 'Beta ' or '') .. ' Competitions'
+	if _args.game == GAME_MOD then
+		return String.isNotEmpty(beta) and (beta .. ' Competitions') or nil
 	end
 
-	return nil
+	return beta .. _args.game .. ' Competitions'
 end
 
 return Class.export(HiddenInfoboxLeague)

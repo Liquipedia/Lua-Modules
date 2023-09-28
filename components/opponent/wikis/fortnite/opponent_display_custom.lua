@@ -18,15 +18,12 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local html = mw.html
 
---[[
-Display components for opponents used by the Fortnite wiki
-]]
+---Display components for opponents used by the Fortnite wiki
 local FortniteOpponentDisplay = {propTypes = {}, types={}}
 
---[[
-Displays an opponent as an inline element. Useful for describing opponents in
-prose.
-]]
+---Displays an opponent as an inline element. Useful for describing opponents in prose.
+---@param props InlineOpponentProps
+---@return Html|string|nil
 function FortniteOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
@@ -50,10 +47,11 @@ end
 Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
+---@param props BlockOpponentProps
+---@return Html
 function FortniteOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
-	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
@@ -75,9 +73,9 @@ function FortniteOpponentDisplay.BlockOpponent(props)
 	end
 end
 
---[[
-Displays a player opponent (solo, duo, trio, or quad) as an inline element.
-]]
+---Displays a player opponent (solo, duo, trio, or quad) as an inline element.
+---@param props InlineOpponentProps
+---@return Html
 function FortniteOpponentDisplay.PlayerInlineOpponent(props)
 	local opponent = props.opponent
 
@@ -98,9 +96,9 @@ function FortniteOpponentDisplay.PlayerInlineOpponent(props)
 		:node(table.concat(playerTexts, ' / '))
 end
 
---[[
-Displays a player opponent (solo, duo, trio, or quad) as a block element.
-]]
+---Displays a player opponent (solo, duo, trio, or quad) as a block element.
+---@param props BlockOpponentProps
+---@return Html
 function FortniteOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 

@@ -7,12 +7,13 @@
 --
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
-local SquadRow = require('Module:Squad/Row')
-local SquadAutoRefs = require('Module:SquadAuto/References')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
+local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
 
 local CustomSquad = {}
 
@@ -30,16 +31,16 @@ function CustomSquad.header(self)
 	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
 
 	headerRow:node(makeHeader('ID'))
-			:node(makeHeader())
-			:node(makeHeader('Name'))
-			:node(makeHeader()) -- "Role"
-			:node(makeHeader('Join Date'))
+		:node(makeHeader())
+		:node(makeHeader('Name'))
+		:node(makeHeader()) -- "Role"
+		:node(makeHeader('Join Date'))
 	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
-				:node(makeHeader('New Team'))
+			:node(makeHeader('New Team'))
 	end
 
 	self.content:node(headerRow)
@@ -119,8 +120,9 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow(mw.getCurrentFrame(), player.role, {useTemplatesForSpecialTeams = true})
+	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
+	row:status(squadType)
 	row:id{
 		player.id,
 		flag = player.flag,
@@ -129,6 +131,7 @@ function CustomSquad._playerRow(player, squadType)
 		role = player.role,
 		team = player.team,
 		teamrole = player.teamrole,
+		date = player.leavedate or player.inactivedate or player.leavedate,
 	}
 	row:name{name = player.name}
 	row:role{role = player.role}
@@ -149,12 +152,11 @@ function CustomSquad._playerRow(player, squadType)
 	end
 
 	return row:create(
-		Variables.varDefault(
-			'squad_name',
-			mw.title.getCurrentTitle().prefixedText
-		)
+		mw.title.getCurrentTitle().prefixedText
 		.. '_' .. player.id .. '_'
 		.. ReferenceCleaner.clean(player.joindate)
+		.. (player.role and '_' .. player.role or '')
+		.. '_' .. squadType
 	)
 end
 

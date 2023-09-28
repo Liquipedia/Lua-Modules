@@ -40,6 +40,7 @@ local _ROLES = {
 	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
 	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
+	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', isplayer = false},
 	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
 	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
@@ -77,17 +78,16 @@ function CustomPlayer.run(frame)
 	end
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = tostring(TeamHistoryAuto._results{addlpdbdata='true'})
+		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 	end
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -145,7 +145,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.signatureChampion3 = _args.champion3
 	lpdbData.extradata.signatureChampion4 = _args.champion4
 	lpdbData.extradata.signatureChampion5 = _args.champion5
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
@@ -184,17 +184,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

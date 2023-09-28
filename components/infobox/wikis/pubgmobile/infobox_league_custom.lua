@@ -69,7 +69,7 @@ function CustomLeague.run(frame)
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 function CustomLeague:createWidgetInjector()
@@ -86,11 +86,11 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
+					CustomLeague._getGameMode()
 				}
 			},
 			Cell{name = 'Platform', content = {
-					CustomLeague:_getPlatform()
+					CustomLeague._getPlatform()
 				}
 			},
 		}
@@ -111,16 +111,14 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.game = args.platform
-	lpdbData.participantsnumber = args.player_number or args.team_number
-	lpdbData.publishertier = args.pubgpremier
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
-	Variables.varDefine('tournament_game', _game or _args.game)
-	Variables.varDefine('tournament_publishertier', _args['pubgpremier'])
+function CustomLeague:defineCustomPageVariables(args)
+	Variables.varDefine('tournament_game', _game or args.game)
+	Variables.varDefine('tournament_publishertier', args.pubgpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
@@ -135,7 +133,7 @@ function CustomLeague:liquipediaTierHighlighted()
 	return Logic.readBool(_args.pubgpremier)
 end
 
-function CustomLeague:_getGameMode()
+function CustomLeague._getGameMode()
 	if String.isEmpty(_args.perspective) and String.isEmpty(_args.mode) then
 		return nil
 	end
@@ -157,7 +155,7 @@ function CustomLeague:_getGameMode()
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
 
-function CustomLeague:_getPlatform()
+function CustomLeague._getPlatform()
 	if String.isEmpty(_args.platform) then
 		return nil
 	end

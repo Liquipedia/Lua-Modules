@@ -25,18 +25,23 @@ local CustomInjector = Class.new(Injector)
 local _weapon
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
 	_weapon = weapon
 	_args = _weapon.args
 	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
-	return weapon:createInfobox(frame)
+	return weapon:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomWeapon:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
@@ -66,6 +71,8 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param content string|number|Html|nil
+---@return Html
 function CustomWeapon:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')

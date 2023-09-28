@@ -9,10 +9,9 @@
 -- This module is used for both the Player and Commentator infoboxes
 
 local Abbreviation = require('Module:Abbreviation')
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CleanRace = require('Module:CleanRace')
+local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
@@ -22,6 +21,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
@@ -35,7 +35,6 @@ local ColumnName = Condition.ColumnName
 
 local EPT_SEASON = mw.loadData('Module:Series/EPT/config').currentSeason
 
-local PAGENAME = mw.title.getCurrentTitle().prefixedText
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local ALL_KILL_ICON = '[[File:AllKillIcon.png|link=All-Kill Format]]&nbsp;×&nbsp;'
 local EARNING_MODES = {solo = '1v1', team = 'team'}
@@ -46,7 +45,7 @@ local MAXIMUM_NUMBER_OF_ACHIEVEMENTS = 40
 local NUMBER_OF_RECENT_MATCHES = 10
 
 --race stuff
-local AVAILABLE_RACES = {'p', 't', 'z', 'r', 'total'}
+local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
@@ -76,7 +75,7 @@ function CustomPlayer.run(frame)
 	player.earningsGlobal = {}
 	player.shouldQueryData = PersonSc2.shouldStoreData()
 	if player.shouldQueryData then
-		player.yearsActive = CustomPlayer._getMatchupData(PAGENAME)
+		player.yearsActive = CustomPlayer._getMatchupData(player.pagename)
 	end
 
 	player.shouldStoreData = PersonSc2.shouldStoreData
@@ -88,8 +87,9 @@ function CustomPlayer.run(frame)
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.getWikiCategories = CustomPlayer.getWikiCategories
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
@@ -138,7 +138,7 @@ end
 function CustomInjector:addCustomCells(widgets)
 	local rank1, rank2 = {}, {}
 	if _player.shouldQueryData then
-		rank1, rank2 = CustomPlayer._getRank(PAGENAME)
+		rank1, rank2 = CustomPlayer._getRank(_player.pagename)
 	end
 
 	local currentYearEarnings = _player.earningsGlobal[tostring(CURRENT_YEAR)]
@@ -172,7 +172,7 @@ function CustomPlayer._getActiveCasterYears()
 	if _player.shouldQueryData then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			query = 'year::date',
-			conditions = '[[page::' .. PAGENAME:gsub('_', ' ') .. ']]',
+			conditions = '[[page::' .. _player.pagename .. ']] OR [[page::' .. _player.pagename:gsub(' ', '_') .. ']]',
 			limit = 5000,
 		})
 
@@ -192,15 +192,17 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _player.shouldQueryData then
-		return MatchTicker.run({player = PAGENAME}, _player.recentMatches)
+		return MatchTicker.run({player = self.pagename}, _player.recentMatches)
 	end
 end
 
 function CustomPlayer._getMatchupData(player)
 	local yearsActive
-	player = string.gsub(player, '_', ' ')
+	local playerWithoutUnderscore = player
+	player = player:gsub(' ', '_')
 	local queryParameters = {
-		conditions = '[[opponent::' .. player .. ']] AND [[walkover::]] AND [[winner::>]]',
+		conditions = '([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])' ..
+			'AND [[walkover::]] AND [[winner::>]]',
 		order = 'date desc',
 		query = table.concat({
 				'match2opponents',
@@ -234,7 +236,7 @@ function CustomPlayer._getMatchupData(player)
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player)
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
 		if #_player.recentMatches <= NUMBER_OF_RECENT_MATCHES then
@@ -275,7 +277,7 @@ function CustomPlayer._getYearsActive(years)
 		if years[i] then
 			if (not tempYear) and (i ~= CURRENT_YEAR) then
 				if firstYear then
-					firstYear = nil
+					firstYear = false
 				else
 					yearsActive = yearsActive .. '<br/>'
 				end
@@ -310,33 +312,39 @@ function CustomPlayer._setVarsForVS(table)
 	end
 end
 
-function CustomPlayer._addScoresToVS(vs, opponents, player)
+function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
+	--catch matches vs empty opponents and literals
+	if #opponents ~= 2 or Array.any(opponents, function(opponent) return opponent.type == Opponent.literal end) then
+
+		return vs
+	end
+
 	local plIndex = 1
 	local vsIndex = 2
-	--catch matches vs empty opponents
-	if opponents[1] and opponents[2] then
-		if opponents[2].name == player then
-			plIndex = 2
-			vsIndex = 1
-		end
-		local plOpp = opponents[plIndex]
-		local vsOpp = opponents[vsIndex]
 
-		local prace = CleanRace[plOpp.match2players[1].extradata.faction] or 'r'
-		local orace = CleanRace[vsOpp.match2players[1].extradata.faction] or 'r'
-
-		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+	if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
+		plIndex = 2
+		vsIndex = 1
 	end
+	local plOpp = opponents[plIndex]
+	local vsOpp = opponents[vsIndex]
+
+	local pRace = Faction.read(plOpp.match2players[1].extradata.faction)
+	pRace = pRace and pRace ~= Faction.defaultFaction and pRace or 'r'
+	local oRace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+	oRace = oRace and oRace ~= Faction.defaultFaction and oRace or 'r'
+
+	vs[pRace][oRace].win = vs[pRace][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace][oRace].loss = vs[pRace][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total'][oRace].win = vs['total'][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total'][oRace].loss = vs['total'][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs[pRace]['total'].win = vs[pRace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace]['total'].loss = vs[pRace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	return vs
 end
@@ -429,6 +437,7 @@ function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
 		earnings[mode] = {}
 	end
 	local year = string.sub(data.date, 1, 4)
+	data.individualprizemoney = tonumber(data.individualprizemoney) or 0
 	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
 	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
 	earnings_total = (earnings_total or 0) + data.individualprizemoney
@@ -483,6 +492,8 @@ function CustomPlayer._setAchievements(data, place)
 
 	if CustomPlayer._isAwardAchievement(data, tier) then
 		table.insert(_player.awardAchievements, data)
+	elseif String.isNotEmpty((data.extradata or {}).award) then
+		return
 	elseif CustomPlayer._isAchievement(data, place, tier) then
 		table.insert(_player.achievements, data)
 	elseif (#_player.achievementsFallBack + #_player.achievements) < MINIMUM_NUMBER_OF_ALLOWED_ACHIEVEMENTS then
@@ -543,7 +554,7 @@ end
 function CustomPlayer._getAllkills()
 	if _player.shouldQueryData then
 		local allkillsData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[pagename::' .. PAGENAME .. ']] AND [[type::allkills]]',
+			conditions = '[[pagename::' .. _player.pagename:gsub(' ', '_') .. ']] AND [[type::allkills]]',
 			query = 'information',
 			limit = 1
 		})
@@ -551,6 +562,14 @@ function CustomPlayer._getAllkills()
 			return allkillsData[1].information
 		end
 	end
+end
+
+function CustomPlayer:getWikiCategories(categories)
+	for _, faction in pairs(PersonSc2.readFactions(_args.race).factions) do
+		table.insert(categories, faction .. ' Players')
+	end
+
+	return categories
 end
 
 return CustomPlayer

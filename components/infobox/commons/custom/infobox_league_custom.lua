@@ -14,7 +14,7 @@ local CustomLeague = {}
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	return league:createInfobox(frame)
+	return league:createInfobox()
 end
 
 return CustomLeague

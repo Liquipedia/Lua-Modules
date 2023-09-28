@@ -46,7 +46,7 @@ local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t'))
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -56,7 +56,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match)
+function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(
 		match,
@@ -184,7 +184,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	-- set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if not Logic.isEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -209,9 +209,9 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local lastPlacement = NO_SCORE
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score) or ''
+			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and String.isEmpty(winner) then
+			if counter == 1 and Logic.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
@@ -221,7 +221,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or counter
 				lastPlacement = counter
-				lastScore = score
+				lastScore = score or NO_SCORE
 			end
 		end
 	end
@@ -421,7 +421,11 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
+					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+						resolveRedirect = true,
+						applyUnderScores = true,
+						maxNumPlayers = MAX_NUM_PLAYERS,
+					})
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -467,7 +471,7 @@ end
 
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
-	if String.isNotEmpty(match.winner) then
+	if Logic.isNotEmpty(match.winner) then
 		match.finished = true
 	end
 
@@ -510,29 +514,6 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].status = walkoverType
 	end
 	return opponents
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local players = {}
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
-
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-	match['opponent' .. oppIndex].match2players = players
-	return match
 end
 
 --

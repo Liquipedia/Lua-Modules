@@ -25,13 +25,17 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
 	_args = unofficialWorldChampion.args
 	unofficialWorldChampion.createWidgetInjector = CustomUnofficialWorldChampion.createWidgetInjector
-	return unofficialWorldChampion:createInfobox(frame)
+	return unofficialWorldChampion:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	--Regional distribution
 	if String.isNotEmpty(_args.region1) then
@@ -54,6 +58,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnofficialWorldChampion:createWidgetInjector()
 	return CustomInjector()
 end

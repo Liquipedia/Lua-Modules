@@ -10,6 +10,22 @@ return {
 	startYear = 2015,
 	wikiName = 'criticalops',
 	name = 'Critical Ops',
-	defaultTeamLogo = 'Critical Ops allmode.png',
-	defaultTeamLogoDark = 'Critical Ops allmode.png',
+	games = {
+		cops = {
+			abbreviation = 'Crit Ops',
+			name = 'Critical Ops',
+			link = 'Critical Ops',
+			logo = {
+				darkMode = 'Critical Ops allmode.png',
+				lightMode = 'Critical Ops allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Critical Ops allmode.png',
+				lightMode = 'Critical Ops allmode.png',
+			},
+		},
+	},
+	defaultGame = 'cops',
+	defaultTeamLogo = 'Critical Ops allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Critical Ops allmode.png', ---@deprecated
 }

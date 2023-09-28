@@ -11,6 +11,9 @@ local StringUtils = require('Module:StringUtils')
 
 local Lua = {}
 
+---Checks for the existence of a Lua module
+---@param name string
+---@return boolean
 function Lua.moduleExists(name)
 	if package.loaded[name] then
 		return true
@@ -30,12 +33,22 @@ function Lua.moduleExists(name)
 	end
 end
 
+---Imports a module if it exists by its name.
+---
+---Allows requireDevIfEnabled option (requires the development version of a module if it
+---exists and the dev feature flag is enabled. Otherwise requires the non-development module).
+---@param name string
+---@param options {requireDevIfEnabled: boolean}?
+---@return unknown?
 function Lua.requireIfExists(name, options)
 	if Lua.moduleExists(name) then
 		return Lua.import(name, options)
 	end
 end
 
+---Loads (mw.loadData) a data module if it exists by its name.
+---@param name string
+---@return unknown?
 function Lua.loadDataIfExists(name)
 	if Lua.moduleExists(name) then
 		return mw.loadData(name)
@@ -44,11 +57,10 @@ end
 
 ---Imports a module by its name.
 ---
----options.requireDevIfEnabled:
----Requires the development version of a module (with /dev appended to name) if it
----exists and the dev feature flag is enabled. Otherwise requires the non-development module.
+---Allows requireDevIfEnabled option (requires the development version of a module if it
+---exists and the dev feature flag is enabled. Otherwise requires the non-development module).
 ---@param name string
----@param options {requireDevIfEnabled: boolean}
+---@param options {requireDevIfEnabled: boolean}?
 ---@return unknown
 function Lua.import(name, options)
 	options = options or {}
@@ -89,6 +101,8 @@ require('Module:Magpie/dev').theive({args = {foo = 3}})
 require('Module:FeatureFlag').set('dev', nil)
 
 ]]
+---@param frame Frame
+---@return unknown
 function Lua.invoke(frame)
 	local moduleName = frame.args.module
 	local fnName = frame.args.fn
@@ -133,6 +147,10 @@ function JayModule.TemplateJay(frame) ... end
 JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
 
 ]]
+---@param module table
+---@param baseModuleName string
+---@param fnName string
+---@return fun(frame: Frame|table): unknown
 function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
 	assert(
 		not StringUtils.endsWith(baseModuleName, '/dev'),
@@ -180,6 +198,9 @@ function Jay.TemplateJay(frame) ... end
 Lua.autoInvokeEntryPoints(JayModule, 'Module:JayModule')
 
 ]]
+---@param module table
+---@param baseModuleName string
+---@param fnNames string[]?
 function Lua.autoInvokeEntryPoints(module, baseModuleName, fnNames)
 	fnNames = fnNames or Lua.getDefaultEntryPoints(module)
 
@@ -192,6 +213,8 @@ end
 Returns the functions whose names begin with 'Template'. Functions that start
 with 'Template' are presumably entry points.
 ]]
+---@param module table
+---@return string[]
 function Lua.getDefaultEntryPoints(module)
 	local fnNames = {}
 	for fnName, fn in pairs(module) do

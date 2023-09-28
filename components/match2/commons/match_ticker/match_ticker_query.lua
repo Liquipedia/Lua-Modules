@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -18,7 +19,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _CURRENT_DATE_STAMP = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')))
+local _CURRENT_DATE_STAMP = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdate]]))
 
 local _LIMIT_INCREASE = 20
 local _DEFAULT_LIMIT = 20
@@ -120,14 +121,14 @@ end
 
 function BaseConditions:tournamentConditions(queryArgs)
 	local tournaments = {}
-	local tournament = queryArgs.tournament or queryArgs.tournament1
+	local tournament = queryArgs.tournament or queryArgs.tournament1 or queryArgs[1]
 	local tournamentIndex = 1
 	while String.isNotEmpty(tournament) do
 		tournament = mw.ext.TeamLiquidIntegration.resolve_redirect(tournament)
 		tournament = string.gsub(tournament, '%s', '_')
 		table.insert(tournaments, tournament)
 		tournamentIndex = tournamentIndex + 1
-		tournament = queryArgs['tournament' .. tournamentIndex]
+		tournament = queryArgs['tournament' .. tournamentIndex] or queryArgs[tournamentIndex]
 	end
 	if not Table.isEmpty(tournaments) then
 		local tournamentConditionTree = ConditionTree(BooleanOperator.any)
@@ -135,6 +136,9 @@ function BaseConditions:tournamentConditions(queryArgs)
 			tournamentConditionTree:add({ConditionNode(ColumnName('pagename'), Comparator.eq, item)})
 		end
 		return tournamentConditionTree
+	elseif Logic.readBool(queryArgs.byParent) then
+		return ConditionNode(ColumnName('parent'), Comparator.eq,
+			queryArgs.parent or Variables.varDefault('tournament_parent'))
 	end
 
 	return nil
@@ -142,12 +146,17 @@ end
 
 function BaseConditions:participantConditions(queryArgs)
 	if String.isNotEmpty(queryArgs.team) then
-		return {ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team)}
+		return ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team),
+			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.team:gsub(' ', '_')),
+		}
 	elseif String.isNotEmpty(queryArgs.player) then
-		return ConditionTree(BooleanOperator.any):add({
+		return ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('player'), Comparator.eq, queryArgs.player),
 			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.player),
-		})
+			ConditionNode(ColumnName('player'), Comparator.eq, queryArgs.player:gsub(' ', '_')),
+			ConditionNode(ColumnName('opponent'), Comparator.eq, queryArgs.player:gsub(' ', '_')),
+		}
 	end
 end
 
@@ -166,7 +175,7 @@ function BaseConditions:dateConditions(queryArgs)
 
 		if Logic.readBool(queryArgs.ongoing) then
 			local secondsLive = 60 * 60 * MatchTickerQuery.maximumLiveHoursOfMatches
-			local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t')) - secondsLive)
+			local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdate]]) - secondsLive)
 			dateConditions:add({ConditionNode(ColumnName('date'), Comparator.gt, timeStamp)})
 
 			if not Logic.readBool(queryArgs.upcoming) then

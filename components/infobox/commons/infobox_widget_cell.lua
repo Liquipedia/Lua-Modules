@@ -11,25 +11,41 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class CellWidgetOptions
+---@field columns number?
+---@field makeLink boolean?
+
+---@class CellWidget: Widget
+---@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
+---@field name string|number
+---@field content (string|number)[]
+---@field options CellWidgetOptions
+---@field classes string[]?
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
 		self.content = input.content
-		self.options = input.options
+		self.options = input.options or {}
 		self.classes = input.classes
+
+		self.options.columns = self.options.columns or 2
 	end
 )
 
+---@param description string|number
+---@return CellWidget
 function Cell:_new(description)
 	self.root = mw.html.create('div')
 	self.description = mw.html.create('div')
-	self.description:addClass('infobox-cell-2')
+	self.description:addClass('infobox-cell-'.. self.options.columns)
 					:addClass('infobox-description')
 					:wikitext(description .. ':')
 	self.contentDiv = nil
 	return self
 end
 
+---@param ... string
+---@return CellWidget
 function Cell:_class(...)
 	for i = 1, select('#', ...) do
 		local item = select(i, ...)
@@ -42,8 +58,9 @@ function Cell:_class(...)
 	return self
 end
 
+---@param ... string|number
+---@return CellWidget
 function Cell:_content(...)
-	self.contentText = ...
 	local firstItem = select(1, ...)
 	if firstItem == nil or firstItem == '' then
 		self.contentDiv = nil
@@ -51,7 +68,7 @@ function Cell:_content(...)
 	end
 
 	self.contentDiv = mw.html.create('div')
-	self.contentDiv:addClass('infobox-cell-2')
+	self.contentDiv:css('width', (100 * (self.options.columns - 1) / self.options.columns) .. '%') -- 66.66% for col = 3
 	for i = 1, select('#', ...) do
 		if i > 1 then
 			self.contentDiv:wikitext('<br/>')
@@ -61,7 +78,7 @@ function Cell:_content(...)
 			break
 		end
 
-		if self.options ~= nil and self.options.makeLink == true then
+		if self.options.makeLink == true then
 			self.contentDiv:wikitext('[[' .. item .. ']]')
 		else
 			self.contentDiv:wikitext(item)
@@ -70,6 +87,7 @@ function Cell:_content(...)
 	return self
 end
 
+---@return {[1]: Html?}
 function Cell:make()
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))

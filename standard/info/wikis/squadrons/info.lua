@@ -10,6 +10,22 @@ return {
 	startYear = 2020,
 	wikiName = 'squadrons',
 	name = 'Star Wars: Squadrons',
-	defaultTeamLogo = 'Star Wars Squadrons allmode.png',
-	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png',
+	games = {
+		squadrons = {
+			abbreviation = 'Squadrons',
+			name = 'Star Wars: Squadrons',
+			link = 'Star Wars: Squadrons',
+			logo = {
+				darkMode = 'Star Wars Squadrons allmode.png',
+				lightMode = 'Star Wars Squadrons allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Star Wars Squadrons allmode.png',
+				lightMode = 'Star Wars Squadrons allmode.png',
+			},
+		},
+	},
+	defaultGame = 'squadrons',
+	defaultTeamLogo = 'Star Wars Squadrons allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png', ---@deprecated
 }

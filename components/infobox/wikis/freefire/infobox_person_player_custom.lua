@@ -22,8 +22,6 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _EMPTY_AUTO_HISTORY = '<table style="width:100%;text-align:left"></table>'
-
 local _ROLES = {
 	-- Players
 	support = {category = 'Support players', variable = 'Support', isplayer = true},
@@ -57,27 +55,22 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
+		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
 			player = _pagename
-		}) or ''
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		}
 
-		if String.isNotEmpty(manualHistory) or String.isNotEmpty(automatedHistory) then
+		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
@@ -109,7 +102,7 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.extradata.isplayer = tostring(CustomPlayer._isNotPlayer(_args.role) or CustomPlayer._isNotPlayer(_args.role2))
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
@@ -132,17 +125,6 @@ end
 function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
 end
 
 function CustomPlayer:getPersonType(args)

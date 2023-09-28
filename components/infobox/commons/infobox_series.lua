@@ -6,14 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
+local Tier = require('Module:Tier/Custom')
 local WarningBox = require('Module:WarningBox')
+local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
@@ -22,10 +25,7 @@ local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 
-local _TIER_MODE_TYPES = 'types'
-local _TIER_MODE_TIERS = 'tiers'
-local _INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
-	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
+local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -35,16 +35,20 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
 
 Series.warnings = {}
 
+---@param frame Frame
+---@return string
 function Series.run(frame)
 	local series = Series(frame)
-	return series:createInfobox(frame)
+	return series:createInfobox()
 end
 
-function Series:createInfobox(frame)
+---@return string
+function Series:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
@@ -103,12 +107,8 @@ function Series:createInfobox(frame)
 		},
 		Builder{
 			builder = function()
-				args.venue1 = args.venue1 or args.venue
-				args.venue1link = args.venue1link or args.venuelink
-				args.venue1desc = args.venue1desc or args.venuedesc
-
 				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue') do
+				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
 					-- TODO: Description
 					local description = ''
 					table.insert(venues, self:_createLink(venueName, nil, args[prefix .. 'link'], description))
@@ -165,20 +165,15 @@ function Series:createInfobox(frame)
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	if Namespace.isMain() then
-		infobox:categories(
-			'Tournament series',
-			self:_setCountryCategories(args.country),
-			self:_setCountryCategories(args.country2),
-			self:_setCountryCategories(args.country3),
-			self:_setCountryCategories(args.country4),
-			self:_setCountryCategories(args.country5)
-		)
+	if self:shouldStore(args) then
+		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if Namespace.isMain() then
+	if self:shouldStore(args) then
+		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
+
 		local lpdbData = {
 			name = self.name,
 			image = args.image,
@@ -196,12 +191,8 @@ function Series:createInfobox(frame)
 			next = args.next,
 			next2 = args.next2,
 			prizepool = args.prizepool,
-			liquipediatier = Tier.text.tiers
-				and Tier.text.tiers[string.lower(args.liquipediatier or '')]
-				or args.liquipediatiertype,
-			liquipediatiertype = Tier.text.types
-				and Tier.text.types[string.lower(args.liquipediatiertype or '')]
-				or args.liquipediatiertype,
+			liquipediatier = tier,
+			liquipediatiertype = tierType,
 			publishertier = args.publishertier,
 			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
 			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
@@ -224,7 +215,7 @@ function Series:createInfobox(frame)
 				Links.makeFullLinksForTableItems(links or {})
 			),
 		}
-		lpdbData = self:_getIconFromLeagueIconSmall(frame, lpdbData)
+		lpdbData = self:_getIconFromLeagueIconSmall(lpdbData)
 
 		lpdbData = self:addToLpdb(lpdbData)
 		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
@@ -235,57 +226,44 @@ function Series:createInfobox(frame)
 end
 
 --- Allows for overriding this functionality
+---@param lpdbData table
+---@return table
 function Series:addToLpdb(lpdbData)
 	return lpdbData
 end
 
+--- Allows for overriding this functionality
+---@param args table
+---@return boolean
+function Series:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+end
+
+---@param args table
+---@return string
 function Series:createLiquipediaTierDisplay(args)
-	local tier = args.liquipediatier
-	local tierType = args.liquipediatiertype
-	if String.isEmpty(tier) then
-		return nil
-	end
-
-	local function buildTierString(tierString, tierMode)
-		local tierText
-		if not Tier.text[tierMode] then -- allow legacy tier modules
-			tierText = Tier.text[tierString]
-		else -- default case, i.e. tier module with intended format
-			tierText = Tier.text[tierMode][tierString:lower()]
-		end
-		if not tierText then
-			tierMode = tierMode == _TIER_MODE_TYPES and 'Tiertype' or 'Tier'
-			table.insert(
-				self.warnings,
-				String.interpolate(_INVALID_TIER_WARNING, {tierString = tierString, tierMode = tierMode})
-			)
-			return ''
-		else
-			self.infobox:categories(tierText .. ' Tournaments')
-			return '[[' .. tierText .. ' Tournaments|' .. tierText .. ']]'
-		end
-	end
-
-	local tierDisplay = buildTierString(tier, _TIER_MODE_TIERS)
-
-	if String.isNotEmpty(tierType) then
-		tierDisplay = buildTierString(tierType, _TIER_MODE_TYPES) .. '&nbsp;(' .. tierDisplay .. ')'
-	end
-
-	return tierDisplay .. self.appendLiquipediatierDisplay(args)
+	return (Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true}) or '')
+		.. self:appendLiquipediatierDisplay(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function Series:liquipediaTierHighlighted(args)
 	return false
 end
 
 --- Allows for overriding this functionality
-function Series:appendLiquipediatierDisplay()
+---@param args table
+---@return string
+function Series:appendLiquipediatierDisplay(args)
 	return ''
 end
 
-function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
+---@param lpdbData table
+---@return table
+function Series:_getIconFromLeagueIconSmall(lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
 	local iconSmallTemplate = LeagueIcon.display{
@@ -315,6 +293,9 @@ function Series:_getIconFromLeagueIconSmall(frame, lpdbData)
 	return lpdbData
 end
 
+---@param country string?
+---@param city string?
+---@return string
 function Series:_createLocation(country, city)
 	if country == nil or country == '' then
 		return ''
@@ -323,10 +304,16 @@ function Series:_createLocation(country, city)
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
 end
 
+---@param id string?
+---@param name string?
+---@param link string?
+---@param desc string?
+---@return string?
 function Series:_createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
+	---@cast id -nil
 
 	local output
 
@@ -358,37 +345,66 @@ function Series:_createLink(id, name, link, desc)
 	return output
 end
 
+---@param args table
+---@return string[]
 function Series:_createOrganizers(args)
-	local organizers = {
-		Series:_createLink(
-			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
-	}
+	local organizers = {}
 
-	local index = 2
-
-	while not String.isEmpty(args['organizer' .. index]) do
-		table.insert(
-			organizers,
-			Series:_createLink(
-				args['organizer' .. index],
-				args['organizer' .. index .. '-name'],
-				args['organizer' .. index .. '-link'],
-				args['organizerref' .. index])
-		)
-		index = index + 1
+	for prefix, organizer in Table.iter.pairsByPrefix(args, 'organizer', {requireIndex = false}) do
+		table.insert(organizers, self:_createLink(organizer, args[prefix .. '-name'], args[prefix .. '-link']))
 	end
 
 	return organizers
 end
 
+---@param args table
+---@return string[]
+function Series:_getCategories(args)
+	local categories = {'Tournament series'}
+
+	for _, country in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+		table.insert(categories, self:_setCountryCategories(country))
+	end
+
+	Array.extendWith(categories, self:addTierCategories(args))
+
+	return categories
+end
+
+---@param args table
+---@return string[]
+function Series:addTierCategories(args)
+	local categories = {}
+	local tier = args.liquipediatier
+	local tierType = args.liquipediatiertype
+
+	local tierCategory, tierTypeCategory = Tier.toCategory(tier, tierType)
+	local isValidTierTuple = Tier.isValid(tier, tierType)
+	table.insert(categories, tierCategory)
+	table.insert(categories, tierTypeCategory)
+
+	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(categories, 'Pages with invalid Tier')
+	end
+	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(categories, 'Pages with invalid Tiertype')
+	end
+
+	return categories
+end
+
+---@param country string?
+---@return string?
 function Series:_setCountryCategories(country)
 	if String.isEmpty(country) then
-		return ''
+		return nil
 	end
 
 	local countryAdjective = Flags.getLocalisation(country)
 	if not countryAdjective then
-		return 'Unrecognised Country||' .. country
+		return 'Unrecognised Country'
 	end
 
 	return countryAdjective .. ' Tournaments'

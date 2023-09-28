@@ -20,6 +20,7 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
+local DISQUALIFIED = 'dq'
 
 ---@param data table
 function StandingsStorage.run(data)
@@ -62,6 +63,12 @@ function StandingsStorage.table(data)
 		stagename = data.stagename or Variables.varDefault('bracket_header'),
 	}
 
+	local config = {
+		hasdraws = data.hasdraw,
+		hasovertimes = data.hasovertime,
+		haspoints = data.haspoints,
+	}
+
 	mw.ext.LiquipediaDB.lpdb_standingstable('standingsTable_' .. data.standingsindex,
 		{
 			tournament = Variables.varDefault('tournament_name', ''),
@@ -71,6 +78,7 @@ function StandingsStorage.table(data)
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
 			matches = Json.stringify(data.matches or {}),
+			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
 		}
 	)
@@ -85,9 +93,9 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
-	standingsIndex = tonumber(standingsIndex)
+	local standingsIndexNumber = tonumber(standingsIndex)
 
-	if not standingsIndex or not roundIndex or not slotIndex then
+	if not standingsIndexNumber or not roundIndex or not slotIndex then
 		return
 	end
 
@@ -100,7 +108,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 
 	local lpdbEntry = {
 		parent = Variables.varDefault('tournament_parent', ''),
-		standingsindex = standingsIndex,
+		standingsindex = standingsIndexNumber,
 		placement = entry.placement or entry.rank,
 		definitestatus = entry.definitestatus or entry.bg,
 		currentstatus = entry.currentstatus or entry.pbg,
@@ -114,20 +122,21 @@ function StandingsStorage.entry(entry, standingsIndex)
 			buchholz = tonumber(entry.buchholz),
 		},
 		roundindex = roundIndex,
+		slotindex = slotIndex,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, entry.extradata)),
 	}
 
+	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
+
 	mw.ext.LiquipediaDB.lpdb_standingsentry(
-		'standing_' .. standingsIndex .. '_' .. roundIndex .. '_' .. slotIndex,
+		'standing_' .. standingsIndexNumber .. '_' .. roundIndex .. '_' .. slotIndex,
 		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
 	)
 end
 
 ---@return boolean
 function StandingsStorage.shouldStore()
-	return Namespace.isMain()
-			and not Logic.readBool(Variables.varDefault('disable_SMW_storage'))
-			and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 ---@param data table
@@ -160,6 +169,9 @@ function StandingsStorage.fromTemplateHeader(frame)
 		return
 	end
 
+	data.roundcount = tonumber(data.roundcount) or 1
+	data.finished = Logic.readBool(data.finished)
+
 	StandingsStorage.table(data)
 end
 
@@ -179,6 +191,28 @@ function StandingsStorage.fromTemplateEntry(frame)
 	local opponentArgs
 	if data.opponent then
 		opponentArgs = Json.parseIfString(data.opponent)
+
+	elseif data.player then
+		-- TODO: sanity checks
+		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|?([^|]-)%]%]')
+		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
+
+		data.participant = String.nilIfEmpty(data.participant)
+		data.participantdisplay = String.nilIfEmpty(data.participantdisplay)
+		data.participantflag = String.nilIfEmpty(data.participantflag)
+
+		opponentArgs = {
+			link = data.participant or data.participantdisplay or data.player,
+			name = data.participantdisplay or data.participant or data.player,
+			type = Opponent.solo,
+			flag = data.participantflag or data.flag,
+			team = data.team
+		}
+		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		if String.isNotEmpty(race) then
+			opponentArgs.race = race:sub(1, 1):lower()
+		end
+
 	elseif data.team then
 		-- attempts to find [[teamPage|teamDisplay]] and skips images (images have multiple |)
 		local teamPage = string.match(data.team, '%[%[([^|]-)|[^|]-%]%]')
@@ -207,26 +241,18 @@ function StandingsStorage.fromTemplateEntry(frame)
 			data.participant = 'tbd'
 			data.participantdisplay = 'TBD'
 		end
-	elseif data.player then
-		-- TODO: sanity checks
-		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|([^|]-)%]%]')
-		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
-		opponentArgs = {
-			link = data.participant,
-			name = data.participantdisplay,
-			type = Opponent.solo,
-			flag = data.participantflag
-		}
-		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
-		if String.isNotEmpty(race) then
-			opponentArgs.race = race:sub(1, 1):lower()
-		end
 	end
 
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
 
-	-- Template don't have SlotIndex, use placement as workaround
-	data.slotindex = data.placement
+	if (data.placement or ''):lower() == DISQUALIFIED then
+		data.definitestatus = DISQUALIFIED
+		data.currentstatus = DISQUALIFIED
+	end
+
+	data.placement = tonumber(data.placement)
+	-- If template doesn't have slotIndex, use placement as workaround
+	data.slotindex = tonumber(data.slotindex) or data.placement
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
@@ -23,19 +24,25 @@ local zeroWidthSpace = '&#8203;'
 local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
+---@alias teamStyle 'standard'|'short'|'bracket'|'hybrid'|'icon'
 
---[[
-Display component for an opponent entry appearing in a bracket match.
-]]
+---Display component for an opponent entry appearing in a bracket match.
+---@class BracketOpponentEntry
+---@operator call(...): BracketOpponentEntry
+---@field content Html
+---@field root Html
 OpponentDisplay.BracketOpponentEntry = Class.new(
+	---@param self self
+	---@param opponent standardOpponent
+	---@param options {forceShortName: boolean}
 	function(self, opponent, options)
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == 'solo' then
-			self:createPlayer(opponent.players[1])
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+			self:createPlayers(opponent)
+		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
 		end
 
@@ -44,6 +51,9 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 	end
 )
 
+---Creates team display as BracketOpponentEntry
+---@param template string
+---@param options {forceShortName: boolean}
 function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	options = options or {}
 	local forceShortName = options.forceShortName
@@ -57,14 +67,19 @@ function OpponentDisplay.BracketOpponentEntry:createTeam(template, options)
 	self.content:node(opponentNode)
 end
 
-function OpponentDisplay.BracketOpponentEntry:createPlayer(player)
-	local playerNode = PlayerDisplay.BlockPlayer({
-		player = player,
+---Creates party display as BracketOpponentEntry
+---@param opponent standardOpponent
+function OpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
+	local playerNode = OpponentDisplay.BlockPlayers({
+		opponent = opponent,
 		overflow = 'ellipsis',
+		showLink = false,
 	})
 	self.content:node(playerNode)
 end
 
+---Creates literal display as BracketOpponentEntry
+---@param name string
 function OpponentDisplay.BracketOpponentEntry:createLiteral(name)
 	local literal = OpponentDisplay.BlockLiteral({
 		name = name,
@@ -73,6 +88,8 @@ function OpponentDisplay.BracketOpponentEntry:createLiteral(name)
 	self.content:node(literal)
 end
 
+---Adds scores to BracketOpponentEntry
+---@param opponent standardOpponent
 function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	local score1Node = OpponentDisplay.BracketScore({
 		isWinner = opponent.placement == 1 or opponent.advances,
@@ -98,39 +115,57 @@ end
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?',
-	showLink = 'boolean?', -- does not affect opponent.type == 'team'
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
+	showFlag = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	showLink = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	dq = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects Opponent.team
 }
 
---[[
-Displays an opponent as an inline element. Useful for describing opponents in
-prose.
-]]
+---@class InlineOpponentProps
+---@field flip boolean?
+---@field opponent standardOpponent
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field dq boolean?
+---@field teamStyle teamStyle?
+
+---Displays an opponent as an inline element. Useful for describing opponents in prose.
+---@param props InlineOpponentProps
+---@return Html|string|nil
 function OpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return opponent.name or ''
-
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.InlinePlayer{
-			player = opponent.players[1],
-			flip = props.flip,
-			dq = props.dq,
-		}
-
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		return OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+---@param props InlineOpponentProps
+---@return Html
+function OpponentDisplay.InlinePlayers(props)
+	local opponent = props.opponent
+
+	local playerTexts = Array.map(opponent.players, function(player)
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
+	end)
+
+	if props.flip then
+		playerTexts = Array.reverse(playerTexts)
+	end
+
+	return mw.html.create('span')
+		:node(table.concat(playerTexts, ' / '))
 end
 
 OpponentDisplay.propTypes.BlockOpponent = {
@@ -144,17 +179,30 @@ OpponentDisplay.propTypes.BlockOpponent = {
 	abbreviateTbd = 'boolean?',
 }
 
+---@class BlockOpponentProps
+---@field flip boolean?
+---@field opponent standardOpponent
+---@field overflow OverflowModes?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field playerClass string?
+---@field teamStyle teamStyle?
+
 --[[
 Displays an opponent as a block element. The width of the component is
 determined by its layout context, and not of the opponent.
 ]]
+---@param props BlockOpponentProps
+---@return Html
 function OpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == 'team' then
+	if opponent.type == Opponent.team then
 		return OpponentDisplay.BlockTeamContainer({
 			flip = props.flip,
 			overflow = props.overflow,
@@ -162,25 +210,36 @@ function OpponentDisplay.BlockOpponent(props)
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
-	elseif opponent.type == 'literal' then
+	elseif opponent.type == Opponent.literal then
 		return OpponentDisplay.BlockLiteral({
 			flip = props.flip,
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == 'solo' then
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
-			player = opponent.players[1],
-			showFlag = props.showFlag,
-			showLink = showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			abbreviateTbd = props.abbreviateTbd
-		})
+	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+end
+
+---@param props BlockOpponentProps
+---@return Html
+function OpponentDisplay.BlockPlayers(props)
+	local opponent = props.opponent
+
+	local playerNodes = Array.map(opponent.players, function(player)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
+			:addClass(props.playerClass)
+	end)
+
+	local playersNode = mw.html.create('div')
+		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+	for _, playerNode in ipairs(playerNodes) do
+		playersNode:node(playerNode)
+	end
+
+	return playersNode
 end
 
 OpponentDisplay.propTypes.InlineTeamContainer = {
@@ -189,9 +248,9 @@ OpponentDisplay.propTypes.InlineTeamContainer = {
 	template = 'string',
 }
 
---[[
-Displays a team as an inline element. The team is specified by a template.
-]]
+---Displays a team as an inline element. The team is specified by a template.
+---@param props {flip: boolean?, template: string, style: teamStyle?}
+---@return string?
 function OpponentDisplay.InlineTeamContainer(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeamContainer)
 
@@ -237,15 +296,17 @@ OpponentDisplay.propTypes.InlineTeam = {
 Displays a team as an inline element. The team is specified by a team struct.
 Only the default icon is supported.
 ]]
+---@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
+---@return string
 function OpponentDisplay.InlineTeam(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeam)
-	return OpponentDisplay.InlineTeamContainer(Table.merge(props, {
+	return (OpponentDisplay.InlineTeamContainer(Table.merge(props, {
 		template = 'default',
 	}))
 		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace))
+		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace) --[[@as string]])
 		:gsub('DefaultShort', props.team.shortName)
-		:gsub('DefaultBracket', props.team.bracketName)
+		:gsub('DefaultBracket', props.team.bracketName))
 end
 
 OpponentDisplay.propTypes.BlockTeamContainer = {
@@ -260,6 +321,8 @@ OpponentDisplay.propTypes.BlockTeamContainer = {
 Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
+---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
+---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeamContainer)
 
@@ -284,11 +347,21 @@ OpponentDisplay.propTypes.BlockTeam = {
 	team = MatchGroupUtil.types.Team,
 }
 
+---@class blockTeamProps
+---@field flip boolean
+---@field icon string
+---@field overflow OverflowModes?
+---@field showLink boolean?
+---@field style teamStyle?
+---@field team standardTeamProps
+
 --[[
 Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by a team
 struct and icon wikitext.
 ]]
+---@param props blockTeamProps
+---@return Html
 function OpponentDisplay.BlockTeam(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeam)
 	local style = props.style or 'standard'
@@ -338,9 +411,9 @@ OpponentDisplay.propTypes.BlockLiteral = {
 	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
 }
 
---[[
-Displays the name of a literal opponent as a block element.
-]]
+---Displays the name of a literal opponent as a block element.
+---@param props {flip: boolean?, name: string, overflow: OverflowModes}
+---@return Html
 function OpponentDisplay.BlockLiteral(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockLiteral)
 
@@ -355,9 +428,9 @@ OpponentDisplay.propTypes.BlockScore = {
 	scoreText = 'any',
 }
 
---[[
-Displays a score within the context of a block element.
-]]
+---Displays a score within the context of a block element.
+---@param props {isWinner: boolean?, scoreText: string|number?}
+---@return Html
 function OpponentDisplay.BlockScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockScore)
 
@@ -369,9 +442,9 @@ function OpponentDisplay.BlockScore(props)
 	return mw.html.create('div'):wikitext(scoreText)
 end
 
---[[
-Displays the first score or status of the opponent, as a string.
-]]
+---Displays the first score or status of the opponent, as a string.
+---@param opponent standardOpponent
+---@return string
 function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		if opponent.score == 0 and Opponent.isTbd(opponent) then
@@ -384,9 +457,9 @@ function OpponentDisplay.InlineScore(opponent)
 	end
 end
 
---[[
-Displays the second score or status of the opponent, as a string.
-]]
+---Displays the second score or status of the opponent, as a string.
+---@param opponent standardOpponent
+---@return string
 function OpponentDisplay.InlineScore2(opponent)
 	if opponent.status2 == 'S' then
 		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
@@ -404,9 +477,9 @@ OpponentDisplay.propTypes.BracketScore = {
 	scoreText = 'any',
 }
 
---[[
-Displays a score within the context of a bracket opponent entry.
-]]
+---Displays a score within the context of a bracket opponent entry.
+---@param props {isWinner: boolean?, scoreText: string|number?}
+---@return Html
 function OpponentDisplay.BracketScore(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BracketScore)
 

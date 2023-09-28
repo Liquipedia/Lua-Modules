@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
@@ -53,7 +53,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 end
 
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
-	if String.isEmpty(tier) then
+	if Logic.isEmpty(tier) then
 		return 0
 	end
 

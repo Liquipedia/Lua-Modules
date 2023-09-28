@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local CurrencyData = mw.loadData('Module:Currency/Data')
+local Info = mw.loadData('Module:Info')
 local Logic = require('Module:Logic')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
@@ -20,7 +21,11 @@ local LANG = mw.getContentLanguage()
 local NON_BREAKING_SPACE = '&nbsp;'
 local USD = 'usd'
 local USD_TEMPLATE_ALIAS = '1'
+local DEFAULT_ROUND_PRECISION = 2
+local DASH = '-'
 
+---@param frame Frame
+---@return string
 function Currency.template(frame)
 	local args = Arguments.getArgs(frame)
 	local currencyCode = args.currency or args[1]
@@ -33,7 +38,7 @@ function Currency.template(frame)
 	-- fallback handling like in the old template
 	if not display then
 		display = (currencyCode or '?')
-			.. (String.isNotEmpty(prizeValue) and (NON_BREAKING_SPACE .. prizeValue) or '')
+			.. (Logic.isNotEmpty(prizeValue) and (NON_BREAKING_SPACE .. prizeValue) or '')
 		Variables.varDefine('noncurrency', 'true')
 		Variables.varDefine('localcurrencysymbol', NON_BREAKING_SPACE)
 	end
@@ -41,10 +46,29 @@ function Currency.template(frame)
 	return display
 end
 
+---@class currencyDisplayOptions
+---@field dashIfZero boolean?
+---@field displaySymbol boolean?
+---@field displayCurrencyCode boolean?
+---@field forceRoundPrecision boolean?
+---@field formatPrecision integer?
+---@field formatValue boolean?
+---@field setVariables boolean?
+---@field useHtmlStyling boolean?
+
+---@param currencyCode string?
+---@param prizeValue string|number|nil
+---@param options currencyDisplayOptions?
+---@return string?
 function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
-	options.symbol = Logic.emptyOr(options.symbol, true)
-	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
+	options.displaySymbol = Logic.emptyOr(options.displaySymbol, true)
+	options.displayCurrencyCode = Logic.emptyOr(options.displayCurrencyCode, true)
+	options.useHtmlStyling = Logic.emptyOr(options.useHtmlStyling, true)
+
+	if options.dashIfZero and tonumber(prizeValue) == 0 then
+		return DASH
+	end
 
 	local currencyData = Currency.raw(currencyCode)
 
@@ -55,15 +79,16 @@ function Currency.display(currencyCode, prizeValue, options)
 		return nil
 	end
 
+	local spaceString = options.useHtmlStyling and NON_BREAKING_SPACE or ' '
+
 	local currencyPrefix = ''
 	if currencyData.symbol.text and not currencyData.symbol.isAfter then
-		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '')
+		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and spaceString or '')
 	end
 	local currencySuffix = ''
 	if currencyData.symbol.text and currencyData.symbol.isAfter then
-		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text
+		currencySuffix = (currencyData.symbol.hasSpace and spaceString or '') .. currencyData.symbol.text
 	end
-	local currencyAbbreviation = Abbreviation.make(currencyData.code, currencyData.name)
 
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', currencyData.code or '')
@@ -71,52 +96,67 @@ function Currency.display(currencyCode, prizeValue, options)
 		Variables.varDefine('localcurrencysymbolafter', currencySuffix)
 	end
 
-	if options.abbreviation and currencyData.symbol.text == currencyData.code then
-		options.symbol = false
+	if options.displayCurrencyCode and currencyData.symbol.text == currencyData.code then
+		options.displaySymbol = false
 	end
 
 	local prizeDisplay = ''
-	if options.symbol then
+	if options.displaySymbol then
 		prizeDisplay = prizeDisplay .. currencyPrefix
 	end
 	if prizeValue then
 		if Logic.isNumeric(prizeValue) and options.formatValue then
-			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision)
+			prizeValue = Currency.formatMoney(prizeValue, options.formatPrecision, options.forceRoundPrecision, false)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
-	if options.symbol then
+	if options.displaySymbol then
 		prizeDisplay = prizeDisplay .. currencySuffix
 	end
-	if options.abbreviation then
-		prizeDisplay = prizeDisplay .. (prizeDisplay ~= '' and NON_BREAKING_SPACE or '') .. currencyAbbreviation
+	if options.displayCurrencyCode then
+		local currencyCodeDisplay = not options.useHtmlStyling and currencyData.code
+			or Abbreviation.make(currencyData.code, currencyData.name)
+		prizeDisplay = prizeDisplay .. (String.isNotEmpty(prizeDisplay) and spaceString or '') .. currencyCodeDisplay
 	end
 
 	return prizeDisplay
 end
 
+---@param currencyCode string?
+---@return {code: string, name: string, symbol: {hasSpace: boolean?, isAfter: boolean?, text: string}}?
 function Currency.raw(currencyCode)
 	if String.isEmpty(currencyCode) then
 		return nil
 	end
+	---@cast currencyCode -nil
 
 	return CurrencyData[currencyCode:lower()]
 end
 
-function Currency.formatMoney(value, precision)
-	if not Logic.isNumeric(value) then
-		return 0
+---@param value string|number|nil
+---@param precision integer?
+---@param forceRoundPrecision boolean?
+---@param dashIfZero boolean?
+---@return string|number
+function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
+	dashIfZero = Logic.nilOr(Logic.readBoolOrNil(dashIfZero), true)
+	if not Logic.isNumeric(value) or (tonumber(value) == 0 and not forceRoundPrecision) then
+		return dashIfZero and DASH or 0
 	end
-	precision = tonumber(precision) or 2
+	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
 
 	local roundedValue = Math.round{value, precision}
 	local integer, decimal = math.modf(roundedValue)
-	if decimal == 0 then
+
+	if precision <= 0 or decimal == 0 and not forceRoundPrecision then
 		return LANG:formatNum(integer)
 	end
+
 	return LANG:formatNum(integer) .. string.format('%.' .. precision .. 'f', decimal):sub(2)
 end
 
+---@param props {currency: string, currencyRate: string|number|nil, date: string?, setVariables: boolean?}
+---@return number?
 function Currency.getExchangeRate(props)
 	if not props then
 		error('No props passed to "Currency.getExchangeRate"')
@@ -134,7 +174,7 @@ function Currency.getExchangeRate(props)
 		currencyRate = mw.ext.CurrencyExchange.currencyexchange(1, currency, USD:upper(), props.date)
 	end
 
-	if setVariables and currencyRate and String.isNotEmpty(currencyRate) then
+	if setVariables and currencyRate and Logic.isNotEmpty(currencyRate) then
 		Variables.varDefine('exchangerate_' .. currency, currencyRate)
 	end
 

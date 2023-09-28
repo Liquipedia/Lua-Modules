@@ -157,11 +157,11 @@ function MapVeto:vetoStart(firstVeto)
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = '\'\'\'Start Map Veto\'\'\''
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = _ARROW_LEFT
 	elseif firstVeto == 2 then
 		textCenter = _ARROW_RIGHT
-		textRight = '\'\'\'Start Map Veto\'\'\''
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
 		:tag('th'):wikitext(textLeft or ''):done()

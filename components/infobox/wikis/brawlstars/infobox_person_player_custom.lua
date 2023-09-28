@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction/infobox')
+local PlayerIntroduction = require('Module:PlayerIntroduction')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local Variables = require('Module:Variables')
@@ -55,13 +55,13 @@ function CustomPlayer.run(frame)
 
 	_args = player.args
 
-	local builtInfobox = player:createInfobox(frame)
+	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((_args.autoPI or ''):lower()) then
-		autoPlayerIntro = PlayerIntroduction._main{
+		autoPlayerIntro = PlayerIntroduction.run{
 			team = _args.team,
-			name = _args.name,
+			name = Logic.emptyOr(_args.romanized_name, _args.name),
 			romanizedname = _args.romanized_name,
 			status = _args.status,
 			type = Variables.varDefault('type'),
@@ -116,7 +116,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local mmrDisplay = '[[Leaderboards|' .. _args.mmr .. ']]'
 	if String.isNotEmpty(_args.mmrdate) then
-		mmrDisplay = mmrDisplay .. '&nbsp;<small>\'\'(last update: ' .. _args.mmrdate .. '\'\'</small>'
+		mmrDisplay = mmrDisplay .. '&nbsp;<small><i>(last update: ' .. _args.mmrdate .. '</i></small>'
 	end
 
 	return {Cell{name = 'Solo MMR', content = {mmrDisplay}}}
@@ -173,7 +173,6 @@ function CustomPlayer._createRole(role)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
 	local roleData = CustomPlayer._getRole(args.role)
 
 	if roleData then

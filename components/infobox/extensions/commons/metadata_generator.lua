@@ -6,16 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local String = require('Module:StringUtils')
+local AnOrA = require('Module:A or an')
+local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Games = mw.loadData('Module:Games')
-local Variables = require('Module:Variables')
-local StringUtils = require('Module:StringUtils')
-local Class = require('Module:Class')
-local AnOrA = require('Module:A or an')
-local Tier = mw.loadData('Module:Tier')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Tier = require('Module:Tier/Utils')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
+
+local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
 
 local MetadataGenerator = {}
 
@@ -23,7 +25,7 @@ local TIME_FUTURE = 1
 local TIME_ONGOING = 0
 local TIME_PAST = -1
 
-local TYPES_TO_DISPLAY = {'qualifier', 'showmatch', 'show match'}
+local TYPES_TO_DISPLAY = {'qualifier', 'showmatch'}
 
 function MetadataGenerator.tournament(args)
 	local output
@@ -39,19 +41,12 @@ function MetadataGenerator.tournament(args)
 		args['organizer3-name'] or args.organizer3,
 	}
 
+	---@type integer|string|nil
 	---@type string?
-	local tier = args.liquipediatier and MetadataGenerator.getTierText(args.liquipediatier) or nil
-
-	if not tier then
-		tier = 'Unknown Tier'
-	end
-
-	local tierType = 'tournament'
-	if args.liquipediatiertype then
-		local tierTypeLower = args.liquipediatiertype:lower()
-		if Table.includes(TYPES_TO_DISPLAY, tierTypeLower) then
-			tierType = tierTypeLower
-		end
+	local tier, tierType = Tier.toName(args.liquipediatier, args.liquipediatiertype)
+	tier = tier or 'Unknown Tier'
+	if not tierType or not Table.includes(TYPES_TO_DISPLAY, Tier.toIdentifier(args.liquipediatiertype)) then
+		tierType = 'tournament'
 	end
 
 	local publisher
@@ -71,12 +66,8 @@ function MetadataGenerator.tournament(args)
 	end
 
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
-	local prizepool = prizepoolusd or (
-		args.prizepool and args.localcurrency and (
-			Variables.varDefault('localcurrencysymbol', '') .. args.prizepool ..
-			Variables.varDefault('localcurrencysymbolafter', '') .. ' ' ..
-			Variables.varDefault('localcurrencycode', '')
-		)
+	local prizepool = prizepoolusd or (args.prizepool and args.localcurrency and
+		Currency.display(args.localcurrency, args.prizepool, {formatValue = true, useHtmlStyling = false})
 	)
 	local charity = args.charity == 'true'
 	local dateVerb = (tense == TIME_PAST and 'took place ')
@@ -88,7 +79,7 @@ function MetadataGenerator.tournament(args)
 		(tense == TIME_FUTURE and ' which will take place ') or
 		' taking place '
 
-	output = StringUtils.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
+	output = String.interpolate('${name} is ${a}${type}${locality}${game}${charity}${tierType}${organizer}', {
 		name = name,
 		a = AnOrA._main{
 			tournamentType or locality or game or (charity and 'charity' or nil) or tierType,
@@ -109,12 +100,12 @@ function MetadataGenerator.tournament(args)
 		output = output .. '. '
 	end
 
-	output = output .. StringUtils.interpolate('This ${tier}${tierType} ', {
+	output = output .. String.interpolate('This ${tier}${tierType} ', {
 		tier = tierType ~= tier and (tier .. ' ') or '',
 		tierType = tierType
 	})
 	if not String.isEmpty(publisher) then
-		output = output .. StringUtils.interpolate('is a ${publisher}${tense}', {
+		output = output .. String.interpolate('is a ${publisher}${tense}', {
 			publisher = publisher,
 			tense = ((date and dateVerbPublisher) or ((teams or players or prizepool) and ' featuring '))
 		})
@@ -134,7 +125,7 @@ function MetadataGenerator.tournament(args)
 			(prizepool and ' ' or '')
 	end
 	if prizepool then
-		output = output .. StringUtils.interpolate('${competing}a total ${charity}prize pool of ${prizepool}', {
+		output = output .. String.interpolate('${competing}a total ${charity}prize pool of ${prizepool}', {
 			competing = (teams or players) and 'competing over ' or '',
 			charity = charity and 'charity ' or '',
 			prizepool = prizepool
@@ -148,14 +139,6 @@ function MetadataGenerator.tournament(args)
 	output = output .. '.'
 
 	return output
-end
-
-function MetadataGenerator.getTierText(tierString)
-	if not Tier.text.tiers then -- allow legacy tier modules
-		return Tier.text[tierString]
-	else -- default case, i.e. tier module with intended format
-		return Tier.text.tiers[tierString:lower()]
-	end
 end
 
 function MetadataGenerator.getDate(startDate, endDate)

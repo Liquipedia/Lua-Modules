@@ -9,27 +9,26 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
 local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
---[[
-	The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
-	a matchlist.
-]]
+-- The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
+-- a matchlist.
 local MatchGroup = {}
 
---[[
-	Sets up a MatchList, a list of matches displayed vertically. The matches
-	are saved to LPDB.
-]]
+-- Sets up a MatchList, a list of matches displayed vertically. The matches
+-- are saved to LPDB.
 function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
@@ -52,9 +51,7 @@ function MatchGroup.MatchList(args)
 	return table.concat(Array.map(parts, tostring))
 end
 
---[[
-	Sets up a Bracket, a tree structure of matches. The matches are saved to LPDB.
-]]
+-- Sets up a Bracket, a tree structure of matches. The matches are saved to LPDB.
 function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
@@ -78,18 +75,33 @@ function MatchGroup.Bracket(args)
 	return table.concat(Array.map(parts, tostring))
 end
 
---[[
-Displays a matchlist or bracket specified by ID.
-]]
+-- Displays a matchlist or bracket specified by ID.
 function MatchGroup.MatchGroupById(args)
 	local bracketId = args.id or args[1]
+	assert(bracketId, 'Missing bracket ID')
+
+	if args.shortTemplate then
+		bracketId = ShortenBracket.adjustMatchesAndBracketId{
+			bracketId = bracketId,
+			shortTemplate = args.shortTemplate,
+		}
+	end
+
 	args.id = bracketId
 	args[1] = bracketId
-	assert(bracketId, 'Missing bracket ID')
 
 	local matches = MatchGroupUtil.fetchMatches(bracketId)
 	assert(#matches ~= 0, 'No data found for bracketId=' .. bracketId)
+
 	local matchGroupType = matches[1].bracketData.type
+
+	if Logic.readBool(args.forceMatchList) then
+		matchGroupType = 'matchlist'
+		Array.forEach(matches, function(match)
+			match.bracketData.header = match.bracketData.header
+				and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
+		end)
+	end
 
 	local config
 	if matchGroupType == 'matchlist' then
@@ -109,9 +121,7 @@ function MatchGroup.MatchGroupById(args)
 	})
 end
 
---[[
-Displays a singleMatch specified by a bracket ID and matchID.
-]]
+-- Displays a singleMatch specified by a bracket ID and matchID.
 function MatchGroup.MatchByMatchId(args)
 	local bracketId = args.id
 	local matchId = args.matchid
@@ -167,7 +177,6 @@ if FeatureFlag.get('perf') then
 end
 
 Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
-
 
 MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
 
