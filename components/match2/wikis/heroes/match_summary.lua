@@ -32,7 +32,7 @@ local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
-local TBD = 'TBD'
+local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -360,7 +360,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('min-width', '140px')
+		:css('min-width', '120px')
 		:css('margin-left', '1%')
 		:css('margin-right', '1%')
 		:node(mw.html.create('div')
