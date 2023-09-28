@@ -30,6 +30,7 @@ local _CURRENT_YEAR = tonumber(os.date('%Y'))
 ActiveYears.startYear = Info.startYear
 ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 ActiveYears.additionalConditions = ''
+ActiveYears.noResultsText = 'Player has no results.'
 
 ---
 -- Entry point
@@ -62,16 +63,20 @@ function ActiveYears.display(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
+	-- Build conditions
 	local conditions = ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, args.mode)
 
 	return ActiveYears._calculate(conditions)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
-	local playerConditionTree = ConditionTree(BooleanOperator.any):add({
-		ConditionNode(ColumnName('participant'), Comparator.eq, player),
-		ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
-	})
+	local playerConditionTree = ConditionTree(BooleanOperator.any)
+	if prefix == 'p' then
+		playerConditionTree:add({
+			ConditionNode(ColumnName('participant'), Comparator.eq, player),
+			ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
+		})
+	end
 	for playerIndex = 1, playerPositionLimit do
 		playerConditionTree:add({
 			ConditionNode(ColumnName('players_' .. prefix .. playerIndex), Comparator.eq, player),
@@ -98,12 +103,16 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 end
 
 function ActiveYears._calculate(conditions)
+	-- Get years
 	local years = ActiveYears._getYears(conditions)
-
 	if Table.isEmpty(years) then
-		return 'Player has no results.'
+		return ActiveYears.noResultsText
 	end
 
+	return ActiveYears._displayYears(years)
+end
+
+function ActiveYears._displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
 

@@ -250,11 +250,6 @@ function Footer:create()
 	return self.root
 end
 
----MatchSummary Casters Class
----@class MatchSummaryCasters
----@operator call: MatchSummaryCasters
----@field root Html
----@field casters string[]
 local Casters = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -265,9 +260,6 @@ local Casters = Class.new(
 	end
 )
 
----adds a casters display to thge casters list
----@param caster {name: string, displayName: string, flag: string?}?
----@return MatchSummaryCasters
 function Casters:addCaster(caster)
 	if Logic.isNotEmpty(caster) then
 		---@cast caster -nil
@@ -282,8 +274,6 @@ function Casters:addCaster(caster)
 	return self
 end
 
----creates the casters display
----@return Html
 function Casters:create()
 	return self.root
 		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
