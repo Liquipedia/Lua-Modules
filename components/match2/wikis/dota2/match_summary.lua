@@ -53,6 +53,10 @@ local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Hero Ban Class
+---@class DotaHeroBan: MatchSummaryRowInterface
+---@operator call: DotaHeroBan
+---@field root Html
+---@field table Html
 local HeroBan = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -62,6 +66,7 @@ local HeroBan = Class.new(
 	end
 )
 
+---@return DotaHeroBan
 function HeroBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','35%'):wikitext(''):done()
@@ -70,6 +75,10 @@ function HeroBan:createHeader()
 	return self
 end
 
+---@param banData {numberOfBans: integer, [1]: table, [2]: table}
+---@param gameNumber integer
+---@param numberOfBans integer
+---@return DotaHeroBan
 function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):attr('rowspan', '2'):node(mw.html.create('div')
@@ -88,36 +97,23 @@ function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	return self
 end
 
+---@return Html
 function HeroBan:create()
 	return self.root
 end
 
-
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
+end
 
-	local matchSummary = MatchSummary():init('400px')
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	local publisherids = {}
-	for index, game in ipairs(match.games) do
-		if not Logic.isEmpty(game.vod) then
-			vods[index] = game.vod
-		end
-		if not String.isEmpty(game.extradata.publisherid) then
-			publisherids[index] = game.extradata.publisherid
-		end
-	end
-
-	match.links.vod = match.vod
 	if
 		Logic.readBool(match.extradata.headtohead) and
 		match.opponents[1].type == Opponent.team and
@@ -128,46 +124,26 @@ function CustomMatchSummary.getByMatchId(args)
 		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
 		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
 	end
-	if not Table.isEmpty(vods) or not Table.isEmpty(publisherids) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
 
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
+	local publisherIds = {}
+	Array.forEach(match.games, function(game, gameIndex)
+		publisherIds[gameIndex] = Logic.emptyOr(game.extradata.publisherid)
+	end)
+
+	Array.forEach(AUTO_LINKS, function(siteData)
+		for index, publisherId in pairs(publisherIds) do
+			local link = siteData.url .. publisherId
+			local text = 'Game ' .. index .. ' on ' .. siteData.name
+			footer:addLink(link, siteData.icon, siteData.iconDark, text)
 		end
+	end)
 
-		for _, site in ipairs(AUTO_LINKS) do
-			for index, publisherid in pairs(publisherids) do
-				local link = site.url .. publisherid
-				local text = 'Game '..index..' on '.. site.name
-				footer:addLink(link, site.icon, site.iconDark, text)
-			end
-		end
-
-		footer:addLinks(LINK_DATA, match.links)
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -202,7 +178,7 @@ function CustomMatchSummary._createBody(match)
 	-- Pre-Process Hero Ban Data
 	local showGameBans = {}
 	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
+		local extradata = game.extradata or {}
 		local banData = {{}, {}}
 		local numberOfBans = 0
 		for index = 1, MAX_NUM_BANS do
@@ -241,6 +217,9 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -270,8 +249,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(CustomMatchSummary._createAbbreviation{
-			title = String.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
-			text = String.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
+			title = Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
+			text = Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
 		})
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
@@ -289,6 +268,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
@@ -305,10 +286,17 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
+---@param args table
+---@return string
 function CustomMatchSummary._createAbbreviation(args)
 	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
 end
 
+---@param opponentHeroesData table
+---@param numberOfHeroes integer
+---@param flip boolean?
+---@param isBan boolean?
+---@return Html
 function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfHeroes, flip, isBan)
 	local opponentHeroesDisplay = {}
 	local color = opponentHeroesData.side or ''
