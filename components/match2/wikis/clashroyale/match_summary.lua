@@ -312,10 +312,11 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		})
 	)
 
+	local scoreDisplay = table.concat(subMatch.scores, ' - ')
 	local scoreElement
 	if extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
 		scoreElement = mw.html.create('div')
-			:node(mw.html.create('div'):wikitext(scoreElement))
+			:node(mw.html.create('div'):wikitext(scoreDisplay))
 			:node(mw.html.create('div')
 				:css('font-size', '85%')
 				:wikitext(Abbreviation.make('KOTH', 'King of the Hill'))
@@ -324,7 +325,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:node(scoreElement or table.concat(subMatch.scores, ' - '))
+		:node(scoreElement or scoreDisplay)
 	)
 
 	-- players right side
