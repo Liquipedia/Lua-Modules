@@ -489,6 +489,7 @@ end
 ---@param record table
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
+	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
@@ -496,7 +497,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		bracketData.lowerEdges = bracketData.lowerEdges
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
-	---@cast extradata table
 
 	return {
 		bestof = tonumber(record.bestof) or 0,
@@ -591,8 +591,8 @@ end
 ---@param record table
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(record)
+	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	---@cast extradata table
 	return {
 		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
 		advances = Logic.readBoolOrNil(Table.extract(extradata, 'advances')),
@@ -639,8 +639,8 @@ end
 ---@param record table
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
+	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	---@cast extradata table
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -814,7 +814,7 @@ end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
----@param recordExtradata string|table
+---@param recordExtradata string|table|nil
 ---@return table
 ---@overload fun(recordExtradata: any): {}
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
