@@ -214,7 +214,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	return footer:addElement(match.extradata.showh2h and CustomMatchSummary._getHeadToHead(match) or nil)
+	return footer:addElement(match.extradata.showh2h and CustomMatchSummary._getHeadToHead(match.opponents) or nil)
 end
 
 ---@param opponents standardOpponent[]
