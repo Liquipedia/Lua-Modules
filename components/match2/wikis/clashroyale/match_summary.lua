@@ -13,11 +13,9 @@ local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -43,71 +41,24 @@ LINK_DATA.interview2 = LINK_DATA.interview
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init('360px')
-	matchSummary.root:css('flex-wrap', 'unset')
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match, args.matchId))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if not Logic.isEmpty(game.vod) then
-			vods[index] = game.vod
-		end
-	end
-	match.links.vod = match.vod
-
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Match Vod + other links
-		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linkType, link in pairs(match.links) do
-			if not LINK_DATA[linkType] then
-				mw.log('Unknown link: ' .. linkType)
-			else
-				footer:addElement(buildLink(link, LINK_DATA[linkType].icon, LINK_DATA[linkType].text))
-			end
-		end
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
-
-	return header
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createBody(match, matchId)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.timestamp ~= DateExt.epochZero) then
@@ -119,7 +70,7 @@ function CustomMatchSummary._createBody(match, matchId)
 	end
 
 	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
-		return CustomMatchSummary._createTeamMatchBody(body, match, matchId)
+		return CustomMatchSummary._createTeamMatchBody(body, match, match.matchId)
 	end
 
 	-- Iterate each map
@@ -127,7 +78,7 @@ function CustomMatchSummary._createBody(match, matchId)
 		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
-	local extradata = match.extradata
+	local extradata = match.extradata or {}
 	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
 		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
 	end
@@ -135,6 +86,10 @@ function CustomMatchSummary._createBody(match, matchId)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@param date string
+---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 
@@ -191,6 +146,10 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	return row
 end
 
+---@param t1bans string[]?
+---@param t2bans string[]?
+---@param date string
+---@return MatchSummaryRow
 function CustomMatchSummary._banRow(t1bans, t2bans, date)
 	t1bans = t1bans or {}
 	t2bans = t2bans or {}
@@ -232,6 +191,10 @@ function CustomMatchSummary._banRow(t1bans, t2bans, date)
 	return banRow
 end
 
+---@param body MatchSummaryBody
+---@param match MatchGroupUtilMatch
+---@param matchId string
+---@return MatchSummaryBody
 function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 	local subMatches = match.extradata.submatches
 	for _, game in ipairs(match.games) do
@@ -265,6 +228,10 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 	return body
 end
 
+---@param subMatchIndex integer
+---@param subMatch table
+---@param match MatchGroupUtilMatch
+---@return table
 function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
 	local players = {{}, {}, hash = {{}, {}}}
 
@@ -279,6 +246,10 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 	return players
 end
 
+---@param players any
+---@param game MatchGroupUtilGame
+---@param match MatchGroupUtilMatch
+---@return table
 function CustomMatchSummary._extractPlayersFromGame(players, game, match)
 	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
 		participantKey = mw.text.split(participantKey, '_')
@@ -303,7 +274,12 @@ function CustomMatchSummary._extractPlayersFromGame(players, game, match)
 
 	return players
 end
-
+---comment
+---@param players table
+---@param subMatchIndex integer
+---@param subMatch table
+---@param extradata table
+---@return MatchSummaryRow
 function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
 	local row = MatchSummary.Row()
 
@@ -336,8 +312,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 		})
 	)
 
-	-- scores and in case of koth also info that it is koth
-	local scoreElement = table.concat(subMatch.scores, ' - ')
+	local scoreElement
 	if extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
 		scoreElement = mw.html.create('div')
 			:node(mw.html.create('div'):wikitext(scoreElement))
@@ -349,7 +324,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:node(scoreElement)
+		:node(scoreElement or table.concat(subMatch.scores, ' - '))
 	)
 
 	-- players right side
@@ -371,6 +346,8 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -387,6 +364,8 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
+---@param args table
+---@return Html
 function CustomMatchSummary._opponentCardsDisplay(args)
 	local cardDataSets = args.data
 	local flip = args.flip
