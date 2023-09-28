@@ -254,7 +254,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
 ---CreateMatch cs specific overwrite due to altered styles for match comment
