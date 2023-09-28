@@ -8,20 +8,19 @@
 
 local CustomMatchSummary = {}
 
+local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
+local ChampionIcon = require('Module:HeroIcon')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local ExternalLinks = require('Module:ExternalLinks')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ChampionIcon = require('Module:HeroIcon')
-local Table = require('Module:Table')
-local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
+local Table = require('Module:Table')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
@@ -32,12 +31,24 @@ local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
+local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
+
+local VETO_TYPE_TO_TEXT = {
+	ban = 'BAN',
+	pick = 'PICK',
+	decider = 'DECIDER',
+	defaultban = 'DEFAULT BAN',
+}
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Champion Ban Class
+---@class HeroesOfTheStormHeroBan: MatchSummaryRowInterface
+---@operator call: HeroesOfTheStormHeroBan
+---@field isBan boolean
+---@field root Html
+---@field table Html
 local ChampionBan = Class.new(
 	function(self, options)
 		options = options or {}
@@ -49,6 +60,7 @@ local ChampionBan = Class.new(
 	end
 )
 
+---@return HeroesOfTheStormHeroBan
 function ChampionBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','40%'):wikitext(''):done()
@@ -57,6 +69,11 @@ function ChampionBan:createHeader()
 	return self
 end
 
+---@param banData {numberOfBans: integer, [1]: table, [2]: table}
+---@param gameNumber integer
+---@param numberOfBans integer
+---@param date string
+---@return HeroesOfTheStormHeroBan
 function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	self.table:tag('tr')
 		:tag('td')
@@ -74,11 +91,16 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	return self
 end
 
+---@return Html
 function ChampionBan:create()
 	return self.root
 end
 
 -- Map Veto Class
+---@class HeroesOfTheStormMapVeto: MatchSummaryRowInterface
+---@operator call: HeroesOfTheStormMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -88,6 +110,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return HeroesOfTheStormMapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -96,6 +119,9 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@param format string?
+---@return HeroesOfTheStormMapVeto
 function MapVeto:vetoStart(firstVeto, format)
 	format = format and ('Veto format: ' .. format) or nil
 	local textLeft
@@ -119,6 +145,9 @@ function MapVeto:vetoStart(firstVeto, format)
 	return self
 end
 
+---@param map1 string?
+---@param map2 string?
+---@return string, string
 function MapVeto._displayMaps(map1, map2)
 	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
 		return TBD, TBD
@@ -128,13 +157,10 @@ function MapVeto._displayMaps(map1, map2)
 		Logic.isEmpty(map2) and FP or ('[[' .. map2 .. ']]')
 end
 
-local VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-}
-
+---@param vetoType string?
+---@param map1 string?
+---@param map2 string?
+---@return HeroesOfTheStormMapVeto
 function MapVeto:addRound(vetoType, map1, map2)
 	map1, map2 = MapVeto._displayMaps(map1, map2)
 
@@ -154,6 +180,10 @@ function MapVeto:addRound(vetoType, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return HeroesOfTheStormMapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -163,67 +193,41 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string
+---@return HeroesOfTheStormMapVeto
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init('480px')
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.lrthread = match.lrthread
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			match.links['vodgame' .. index] = vod
-		end
-
-		footer.inner = mw.html.create('div')
-			:addClass('bracket-popup-footer plainlinks vodlink')
-			:node(ExternalLinks.print(match.links))
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
+	if Table.isNotEmpty(match.links) then
+		footer:addElement(ExternalLinks.print(match.links))
+	end
 
-	return header
+	return footer
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -271,7 +275,7 @@ function CustomMatchSummary._createBody(match)
 	-- Pre-Process Champion Ban Data
 	local championBanData = {}
 	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
+		local extradata = game.extradata or {}
 		local banData = {{}, {}}
 		local numberOfBans = 0
 		for index = 1, MAX_NUM_BANS do
@@ -324,6 +328,10 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@param date string
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -344,8 +352,8 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	end
 
 	if
-		String.isEmpty(game.length) and
-		String.isEmpty(game.winner) and
+		Logic.isEmpty(game.length) and
+		Logic.isEmpty(game.winner) and
 		championsDataIsEmpty
 	then
 		return nil
@@ -383,6 +391,8 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
@@ -399,6 +409,12 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
+---@param opponentChampionsData table
+---@param numberOfChampions integer
+---@param date string
+---@param flip boolean?
+---@param isBan boolean?
+---@return Html
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
 	local color = opponentChampionsData.color or ''
