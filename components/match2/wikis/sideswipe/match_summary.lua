@@ -29,11 +29,7 @@ local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 ---@field leftElementAdditional Html
 ---@field rightElementAdditional Html
 ---@field scoreBoardElement Html
-local Header = Class.new(MatchSummary.Header,
-	function(self)
-		self.root:addClass('brkts-popup-header-dev')
-	end
-)
+local Header = Class.new(MatchSummary.Header)
 
 ---@param content Html
 ---@return SideswipeMatchSummaryHeader
