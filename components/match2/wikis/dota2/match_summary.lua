@@ -15,11 +15,9 @@ local HeroIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
 local MAX_NUM_BANS = 7
@@ -219,7 +217,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow?
+---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game, gameIndex)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}

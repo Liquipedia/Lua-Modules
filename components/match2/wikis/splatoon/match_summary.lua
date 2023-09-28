@@ -21,7 +21,7 @@ local WeaponIcon = require('Module:WeaponIcon')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
 local NUM_OPPONENTS = 2
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
