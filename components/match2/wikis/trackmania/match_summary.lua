@@ -6,16 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
-local Json = require('Module:Json')
 local Abbreviation = require('Module:Abbreviation')
+local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
 
