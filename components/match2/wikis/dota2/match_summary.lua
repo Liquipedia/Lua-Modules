@@ -22,14 +22,14 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local _MAX_NUM_BANS = 7
-local _NUM_HEROES_PICK_TEAM = 5
-local _NUM_HEROES_PICK_SOLO = 1
-local _SIZE_HERO = '57x32px'
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local MAX_NUM_BANS = 7
+local NUM_HEROES_PICK_TEAM = 5
+local NUM_HEROES_PICK_SOLO = 1
+local SIZE_HERO = '57x32px'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
-local _LINK_DATA = {
+local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
@@ -38,7 +38,7 @@ local _LINK_DATA = {
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'FACEIT match room'},
 }
 -- Auto generated links from Publisher ID
-local _AUTO_LINKS = {
+local AUTO_LINKS = {
 	{icon = 'File:DOTABUFF-icon.png', url = 'https://www.dotabuff.com/matches/', name = 'DOTABUFF'},
 	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches/', name = 'datDota'},
 	{
@@ -49,8 +49,8 @@ local _AUTO_LINKS = {
 	},
 }
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -140,7 +140,7 @@ function CustomMatchSummary.getByMatchId(args)
 			})
 		end
 
-		for _, site in ipairs(_AUTO_LINKS) do
+		for _, site in ipairs(AUTO_LINKS) do
 			for index, publisherid in pairs(publisherids) do
 				local link = site.url .. publisherid
 				local text = 'Game '..index..' on '.. site.name
@@ -148,7 +148,7 @@ function CustomMatchSummary.getByMatchId(args)
 			end
 		end
 
-		footer:addLinks(_LINK_DATA, match.links)
+		footer:addLinks(LINK_DATA, match.links)
 
 		matchSummary:footer(footer)
 	end
@@ -170,7 +170,7 @@ end
 function CustomMatchSummary._createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -205,7 +205,7 @@ function CustomMatchSummary._createBody(match)
 		local extradata = game.extradata
 		local banData = {{}, {}}
 		local numberOfBans = 0
-		for index = 1, _MAX_NUM_BANS do
+		for index = 1, MAX_NUM_BANS do
 			if String.isNotEmpty(extradata['team1ban' .. index]) then
 				numberOfBans = index
 				banData[1][index] = extradata['team1ban' .. index]
@@ -245,9 +245,9 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local numberOfHeroes = _NUM_HEROES_PICK_TEAM
+	local numberOfHeroes = NUM_HEROES_PICK_TEAM
 	if game.mode == Opponent.solo then
-		numberOfHeroes = _NUM_HEROES_PICK_SOLO
+		numberOfHeroes = NUM_HEROES_PICK_SOLO
 	end
 	local heroesData = {{}, {}}
 	for heroIndex = 1, numberOfHeroes do
@@ -297,9 +297,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		:css('margin-right', '1%')
 
 	if Logic.readBool(isWinner) then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
@@ -320,9 +320,9 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-popup-side-hero-hover')
 			:node(HeroIcon._getImage{
 				hero = opponentHeroesData[index],
-				size = _SIZE_HERO,
+				size = SIZE_HERO,
 			})
-		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
+		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
 			else

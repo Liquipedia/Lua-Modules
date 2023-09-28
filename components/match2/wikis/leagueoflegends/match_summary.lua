@@ -25,11 +25,11 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local _MAX_NUM_BANS = 7
-local _NUM_HEROES_PICK_TEAM = 5
-local _NUM_HEROES_PICK_SOLO = 1
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local MAX_NUM_BANS = 7
+local NUM_HEROES_PICK_TEAM = 5
+local NUM_HEROES_PICK_SOLO = 1
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 -- Hero Ban Class
 local HeroBan = Class.new(
@@ -179,7 +179,7 @@ function CustomMatchSummary._createBody(match)
 		local extradata = game.extradata
 		local banData = {{}, {}}
 		local numberOfBans = 0
-		for index = 1, _MAX_NUM_BANS do
+		for index = 1, MAX_NUM_BANS do
 			if String.isNotEmpty(extradata['team1ban' .. index]) then
 				numberOfBans = index
 				banData[1][index] = extradata['team1ban' .. index]
@@ -219,9 +219,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local numberOfHeroes = _NUM_HEROES_PICK_TEAM
+	local numberOfHeroes = NUM_HEROES_PICK_TEAM
 	if game.mode == Opponent.solo then
-		numberOfHeroes = _NUM_HEROES_PICK_SOLO
+		numberOfHeroes = NUM_HEROES_PICK_SOLO
 	end
 
 	local heroesData = {{}, {}}
@@ -273,9 +273,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		:css('margin-right', '1%')
 
 	if Logic.readBool(isWinner) then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
@@ -293,7 +293,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
-		if numberOfHeroes == _NUM_HEROES_PICK_SOLO then
+		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
 			else
