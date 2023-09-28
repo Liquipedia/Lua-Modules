@@ -127,6 +127,8 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
+---@param match MatchGroupUtilMatch
+---@return TrackmaniaMatchSummaryHeader
 function CustomMatchSummary.createHeader(match)
 	local header = Header()
 
