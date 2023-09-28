@@ -26,6 +26,9 @@ local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Header Class
 ---@class SideswipeMatchSummaryHeader: MatchSummaryHeader
+---@field leftElementAdditional Html
+---@field rightElementAdditional Html
+---@field scoreBoardElement Html
 local Header = Class.new(MatchSummary.Header,
 	function(self)
 		self.root:addClass('brkts-popup-header-dev')
