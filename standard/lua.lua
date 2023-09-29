@@ -70,7 +70,11 @@ function Lua.import(name, options)
 		end
 
 		local devName = name .. '/dev'
-		if require('Module:FeatureFlag').get('dev') and Lua.moduleExists(devName) then
+		local devEnabled = require('Module:FeatureFlag').get('dev')
+		if devEnabled and require('Module:Namespace').isMain() then
+			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
+		end
+		if devEnabled and Lua.moduleExists(devName) then
 			return require(devName)
 		else
 			return require(name)
