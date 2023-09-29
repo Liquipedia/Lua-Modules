@@ -255,7 +255,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
 				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
-			) and (not Import.config.ignoreNonScoreEliminations or entry.opponent.status == SCORE_STATUS)
+			) and (not Import.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
 
