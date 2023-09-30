@@ -187,14 +187,14 @@ end
 
 function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
 	local baseMoney = tonumber(Variables.varDefault(hasLocalCurrency and
-			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or 
+			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or
 			('tournament_prizepool' .. BASE_CURRENCY:lower())
 		)) or 0
 
 	Array.forEach(self.opponents, function(opponent)
 		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1]
 			or opponent.prizeRewards[PRIZE_TYPE_LOCAL_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_LOCAL_CURRENCY .. 1]
-			or (opponent.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or self.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or 0) == 0 
+			or (opponent.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or self.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or 0) == 0
 		then
 			return
 		end
