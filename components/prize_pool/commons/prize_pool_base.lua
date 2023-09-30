@@ -45,6 +45,7 @@ local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 BasePrizePool.config = {
@@ -314,8 +315,30 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
-	[PRIZE_TYPE_FREETEXT] = {
+	[PRIZE_TYPE_PERCENTAGE] = {
 		sortOrder = 50,
+
+		header = 'percentage',
+		headerParse = function (prizePool, input, context, index)
+			assert(index == 1, 'Percentage only supports index 1')
+			return {title = 'Percentage'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{content = {{data.title}}}
+		end,
+
+		row = 'percentage',
+		rowParse = function (placement, input, context, index)
+			return BasePrizePool._parseInteger(input)
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return TableCell{content = {{data .. '%'}}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 60,
 
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
@@ -379,8 +402,15 @@ function BasePrizePool:create(args)
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 			end
+			local hasLocalCurrency1 = Array.any(self.prizes, function(prize)
+				return canConvertCurrency(prize) and prize.index == 1
+			end)
+			local hasPercentage1 = Array.any(self.prizes, function(prize)
+				return prize.type == PRIZE_TYPE_PERCENTAGE and prize.index == 1
+			end)
 
 			for _, placement in ipairs(self.placements) do
+				if hasPercentage1 then placement:_calculateFromPercentage(BasePrizePool.prizeTypes, hasLocalCurrency1) end
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
 			end
 		end
