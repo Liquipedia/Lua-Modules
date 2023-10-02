@@ -286,27 +286,26 @@ function ParticipantTable:create()
 		:css('max-width', '100%')
 		:node(ParticipantTable.textCell(self.config.title or 'Participants'):addClass('opponent-list-title'))
 
-	Array.forEach(self.sections, function(section) ParticipantTable:displaySection(section) end)
+	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
 	return self.display
 end
 
+---@param section ParticipantTableSection
 function ParticipantTable:displaySection(section)
-
-	local entries = section.config.onlyNotable and Array.filter(section.entries, function(entry)
-		return self.isNotable(entry)
-	end) or section.entries
+	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
 	local sectionNode = mw.html.create('div')
 		:addClass('opponent-list-section')
 		:node(self.sectionTitle(section, #entries))
 
-	if section.config.sortOpponents then
-		Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
+	if Table.isEmpty(section.entries) then
+		self.display:node(sectionNode:node(self.tbd()))
+		return
 	end
 
-	if Table.isEmpty(section.entries) then
-		return sectionNode:node(self.tbd())
+	if section.config.sortOpponents then
+		Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
 	end
 
 	Array.forEach(entries, function(entry)
@@ -318,7 +317,7 @@ function ParticipantTable:displaySection(section)
 	Array.forEach(Array.range(currentColumn, self.config.colSpan),
 		function() sectionNode:node(self.empty()) end)
 
-	return sectionNode
+	self.display:node(sectionNode)
 end
 
 ---@param text string|number
@@ -361,6 +360,12 @@ function ParticipantTable:displayEntry(entry)
 		showPlayerTeam = self.config.showTeams,
 		opponent = entry.opponent,
 	})
+end
+
+---@param entries ParticipantTableEntry[]
+---@return ParticipantTableEntry[]
+function ParticipantTable.filterOnlyNotables(entries)
+	return Array.filter(entries, function(entry) return ParticipantTable.isNotable(entry) end)
 end
 
 ---@param entry ParticipantTableEntry

@@ -8,9 +8,11 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
@@ -24,6 +26,9 @@ local Variables = require('Module:Variables')
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
 ---@field opponent StarcraftStandardOpponent
+
+---@class StarcraftParticipantTableSection: ParticipantTableSection
+---@field entries StarcraftParticipantTableEntry[]
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@field isPureSolo boolean
@@ -40,7 +45,7 @@ local ROLL_OUT_DATE = '2023-10-31'
 local StarcraftParticipantTable = {}
 
 ---@param frame Frame
----@return Html
+---@return Html?
 function StarcraftParticipantTable.run(frame)
 	local participantTable = ParticipantTable(frame)
 
@@ -51,6 +56,9 @@ function StarcraftParticipantTable.run(frame)
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
 	participantTable.buildExtradata = StarcraftParticipantTable.buildExtradata
 	participantTable.getPlacements = StarcraftParticipantTable.getPlacements
+	participantTable.displaySoloRaceTableSection = StarcraftParticipantTable.displaySoloRaceTableSection
+
+
 
 	participantTable:init():store()
 
@@ -81,6 +89,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 		z = tonumber(args.zerg),
 		r = tonumber(args.random),
 	}
+	config.columnWidth = tonumber(args.columnWidth)
 
 	return config
 end
@@ -155,10 +164,119 @@ function StarcraftParticipantTable.isPureSolo(sections)
 	end) end)
 end
 
----@return Html
+---@return Html?
 function StarcraftParticipantTable:createSoloRaceTable()
-	someBS
-	return Html ---todo
+	if not self.config.display then return end
+
+	local factioNumbers = StarcraftParticipantTable:_getFactionNumbers()
+
+	local config = self.config
+
+	local factionColumns
+	if not config.isRandomEvent and
+		(config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.r > 0) then
+
+		factionColumns = Faction.knownFactions
+	else
+		factionColumns = Faction.coreFactions
+	end
+
+	if config.displayUnknownColumn or config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction] > 0 then
+		Array.appendWith(factionColumns, Faction.defaultFaction)
+	end
+
+	self.display = mw.html.create('div')
+		:addClass('participant-table')
+		:css('grid-template-columns', 'repeat(' .. #factionColumns .. ', 1fr)')
+		:css('width', config.columnWidth and (#factionColumns * config.columnWidth .. 'px') or nil)
+		:node(StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers))
+
+	Array.forEach(self.sections, function(section) self:displaySoloRaceTableSection(section, factionColumns) end)
+
+	return self.display
+end
+
+---@return table
+function StarcraftParticipantTable:_getFactionNumbers()
+	local calculatedNumbers = Table.map(Faction.factions, function(key, faction) return faction, 0 end)
+	Array.forEach(self.sections, function(section)
+		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
+
+		Array.forEach(section.entries, function(entry)
+			local faction = entry.opponent.players[1].race
+			calculatedNumbers[faction] = calculatedNumbers[faction] + 1
+		end)
+	end)
+
+	for faction, value in pairs(calculatedNumbers) do
+		calculatedNumbers[faction] = self.config.manualFactionCounts[faction] or value
+	end
+
+	return calculatedNumbers
+end
+
+---@param factionColumns table
+---@param factioNumbers table
+---@return Html
+function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
+	local config = self.config
+	local header = mw.html.create('div'):addClass('participant-table-header')
+
+	Array.forEach(factionColumns, function(faction)
+		local parts = Array.extend(
+			config.isRandomEvent and Faction.Icon{faction = 'r'} or nil,
+			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
+			' ' .. Faction.toName(faction),
+			config.isRandomEvent and ' Main' or nil,
+			config.showCountByRace and " ''(" .. factioNumbers[faction] .. ")''" or nil
+		)
+
+		header:tag('div')
+			:addClass('participant-table-race-header opponent-list-cell')
+			:addClass(Faction.bgClass(faction))
+			:tag('div')
+				:addClass('opponent-list-cell-content')
+				:wikitext(table.concat(parts))
+	end)
+
+	return header
+end
+
+---@param section StarcraftParticipantTableSection
+---@param factionColumns table
+function StarcraftParticipantTable:displaySoloRaceTableSection(section, factionColumns)
+	local sectionNode = mw.html.create('div')
+		:addClass('participant-table-section')
+		:node(self.sectionTitle(section, #section.entries))
+
+	if Table.isEmpty(section.entries) then
+		self.display:node(sectionNode:node(self.tbd()))
+		return
+	end
+
+	if section.config.sortOpponents then
+		Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
+	end
+
+	-- Group entries by faction
+	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].race end)
+
+	-- Find the race with the most players
+	local maxRaceLength = Array.max(
+		Array.map(factionColumns, function(faction) return #(byFaction[faction] or {}) end)
+	) or 0
+
+	Array.forEach(Array.range(1, maxRaceLength), function(rowIndex)
+		Array.forEach(factionColumns, function(faction)
+			local entry = byFaction[faction] and byFaction[faction][rowIndex]
+			sectionNode:node(
+				entry and self:displayEntry(entry) or
+				mw.html.create('div'):addClass('opponent-list-cell')
+			)
+		end)
+	end)
+
+	self.display:node(sectionNode)
 end
 
 return StarcraftParticipantTable
