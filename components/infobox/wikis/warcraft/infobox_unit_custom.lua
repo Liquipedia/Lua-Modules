@@ -223,7 +223,7 @@ function CustomUnit:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('unit_' .. (args.name or ''), {
 		type = 'unit',
 		name = args.name or self.pagename,
-		image = args.image and ('Wc3BTN' .. args.icon .. '.png') or nil,
+		image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil,
 		information = CustomUnit.getUnitRaceType(args),
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
 	})
