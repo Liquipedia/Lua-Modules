@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 ---@field showCountByRace boolean
 ---@field isRandomEvent boolean
 ---@field isQualified boolean?
+---@field manualFactionCounts {p: number?, t: number?, z: number?, r: number?}
 
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
@@ -74,6 +75,12 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents or parentConfig.sortOpponents), true)
 	config.sortPlayers = true
+	config.manualFactionCounts = {
+		p = tonumber(args.protoss),
+		t = tonumber(args.terran),
+		z = tonumber(args.zerg),
+		r = tonumber(args.random),
+	}
 
 	return config
 end
