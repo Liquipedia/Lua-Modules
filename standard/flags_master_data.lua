@@ -1407,7 +1407,7 @@ local data = {
 		name = 'Latin America South',
 	},
 	['levant'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Levant flag hd.png',
 		localised = 'Levantine',
 		name = 'Levant',
 	},
@@ -1427,7 +1427,7 @@ local data = {
 		name = 'Nordic Countries',
 	},
 	['northafrica'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:North africa flag hd.png',
 		localised = 'North African',
 		name = 'North Africa',
 	},
