@@ -44,4 +44,11 @@ function suite:testParseIfTable()
 	self:assertDeepEquals(nil, (Json.parseIfTable('banana')))
 end
 
+function suite:testStringifySubTables()
+	self:assertDeepEquals({}, Json.stringifySubTables{})
+	self:assertDeepEquals({abc = 'def'}, Json.stringifySubTables{abc = 'def'})
+	self:assertDeepEquals({abc = '["b","c"]'}, Json.stringifySubTables{abc = {'b', 'c'}})
+	self:assertDeepEquals({a = '{"d":1,"b":"c"}', e = 'f'}, Json.stringifySubTables{a = {b = 'c', d = 1}, e = 'f'})
+end
+
 return suite
