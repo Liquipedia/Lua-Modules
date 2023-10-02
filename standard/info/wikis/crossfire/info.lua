@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2016,
+	startYear = 2007,
 	wikiName = 'crossfire',
 	name = 'Crossfire',
 	games = {
