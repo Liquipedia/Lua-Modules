@@ -123,7 +123,7 @@ function StarcraftParticipantTable:buildExtradata(lpdbData, entry)
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	return {
 		seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil,
-		isQualified = tostring(entry.isQualified),
+		isqualified = tostring(entry.isQualified),
 	}
 
 end
