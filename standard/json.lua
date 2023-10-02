@@ -26,7 +26,7 @@ function Json.stringify(obj, pretty)
 	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
 end
 
----Json-stringifies a given table.
+---Json-stringifies subtables of a given table.
 ---@param obj table
 ---@param pretty boolean?
 ---@return table
