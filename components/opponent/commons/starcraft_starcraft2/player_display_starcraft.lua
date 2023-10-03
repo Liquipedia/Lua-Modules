@@ -39,6 +39,7 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 	abbreviateTbd = 'boolean?',
+	note = 'string?',
 }
 
 --[[
@@ -77,12 +78,16 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
+	local noteNode = props.note and mw.html.create('span'):addClass('note'):wikitext(props.note) or nil
+
 	return html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
+		:node(props.flip and noteNode or nil)
 		:node(nameNode)
+		:node(not props.flip and noteNode or nil)
 		:node(teamNode)
 end
 

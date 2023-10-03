@@ -33,6 +33,7 @@ PlayerDisplay.propTypes.BlockPlayer = {
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
 	abbreviateTbd = 'boolean?',
+	note = 'string?',
 }
 
 --[[
@@ -64,11 +65,15 @@ function PlayerDisplay.BlockPlayer(props)
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
+	local noteNode = props.note and mw.html.create('span'):addClass('note'):wikitext(props.note) or nil
+
 	return mw.html.create('div'):addClass('block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
+		:node(props.flip and noteNode or nil)
 		:node(nameNode)
+		:node(not props.flip and noteNode or nil)
 		:node(teamNode)
 end
 
