@@ -36,7 +36,7 @@ local Variables = require('Module:Variables')
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('OpponentLibraries').Opponent
+local Opponent = require('Module:OpponentLibraries').Opponent
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
 

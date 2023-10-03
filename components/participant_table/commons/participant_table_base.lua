@@ -22,7 +22,7 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local OpponentLibraries = require('OpponentLibraries')
+local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
