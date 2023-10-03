@@ -41,26 +41,20 @@ function Class.new(base, init)
 		local object = {}
 		setmetatable(object, instance)
 
-		-- Call constructors
-		if init and base and base.init then
-			-- If the base class has a constructor,
-			-- make sure to call that first
-			base.init(object, ...)
-			init(object, ...)
-		elseif init then
-			-- Else we just call our own
-			init(object, ...)
-		else
-			-- And in cases where we don't have one but the
-			-- base class does, call that one
-			if base and base.init then
-				base.init(object, ...)
-			end
-		end
+		instance.init(object, ...)
+
 		return object
 	end
 
-	instance.init = init
+	instance.init = function(object, ...)
+		if base then
+			base.init(object, ...)
+		end
+		if init then
+			init(object, ...)
+		end
+	end
+
 	instance.export = function(options)
 		return Class.export(instance, options)
 	end
