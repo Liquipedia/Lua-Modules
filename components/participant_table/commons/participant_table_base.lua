@@ -338,13 +338,12 @@ end
 function ParticipantTable:tbd()
 	return mw.html.create('div')
 		:addClass('participantTable-tbd')
-		:css('width', self.config.columnWidth)
 		:wikitext('To be determined')
 end
 
 ---@return Html
 function ParticipantTable:empty()
-	return mw.html.create('div'):css('width', self.config.columnWidth):addClass('participantTable-entry participantTable-empty')
+	return mw.html.create('div'):addClass('participantTable-entry participantTable-empty')
 end
 
 ---@param section ParticipantTableSection
