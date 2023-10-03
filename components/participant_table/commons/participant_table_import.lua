@@ -50,12 +50,16 @@ end
 ---@return ParticipantTableEntry[]
 function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, entriesByName)
 	Array.forEach(matchRecords, function(matchRecord)
-		for opponentIndex, opponentRecord in ipairs(matchRecord.match2opponents) do
-			if ParticipantTableImport._shouldInclude(opponentIndex, config.importOnlyQualified, matchRecord) then
-				local entry = ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
-				entriesByName[entry.name] = entriesByName[entry.name] or entry
+		Array.forEach(matchRecord.match2opponents, function(opponentRecord, opponentIndex)
+			if not ParticipantTableImport._shouldInclude(opponentIndex, config.importOnlyQualified, matchRecord) then
+				return
 			end
-		end
+
+			local entry = ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
+			if not entry then return end
+
+			entriesByName[entry.name] = entriesByName[entry.name] or entry
+		end)
 	end)
 
 	return Array.extractValues(entriesByName)
@@ -73,7 +77,7 @@ end
 
 ---@param opponentRecord table
 ---@return ParticipantTableEntry?
-function ParticipantTableImport._entryFromOpponent(opponentRecord)
+function ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
 	local opponent = Opponent.fromMatch2Record(opponentRecord)
 	if  Opponent.isTbd(opponent) then
 		return

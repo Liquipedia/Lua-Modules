@@ -33,6 +33,8 @@ local Variables = require('Module:Variables')
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@field isPureSolo boolean
 ---@field displaySoloRaceTableSection function
+---@field _displayHeader function
+---@field _getFactionNumbers function
 
 local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
 
@@ -50,17 +52,17 @@ function StarcraftParticipantTable.run(frame)
 	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
 
 	participantTable.args.noStorage = participantTable.args.noStorage or
-		Variables.varDefault('tournament_startdate') > ROLL_OUT_DATE
+		Variables.varDefault('tournament_startdate') and Variables.varDefault('tournament_startdate') < ROLL_OUT_DATE
 
 	participantTable.readConfig = StarcraftParticipantTable.readConfig
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
 	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
 	participantTable.getPlacements = StarcraftParticipantTable.getPlacements
 	participantTable.displaySoloRaceTableSection = StarcraftParticipantTable.displaySoloRaceTableSection
+	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
+	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
 
-
-
-	participantTable:init():store()
+	participantTable:read():store()
 
 	if StarcraftParticipantTable.isPureSolo(participantTable.sections) then
 		participantTable.create = StarcraftParticipantTable.createSoloRaceTable
@@ -124,8 +126,6 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 		end)
 	end
 
-	opponent = Opponent.resolve(opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
-
 	return {
 		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
 		note = opponentArgs.note or sectionArgs[key .. 'note'],
@@ -172,7 +172,7 @@ end
 function StarcraftParticipantTable:createSoloRaceTable()
 	if not self.config.display then return end
 
-	local factioNumbers = StarcraftParticipantTable:_getFactionNumbers()
+	local factioNumbers = self:_getFactionNumbers()
 
 	local config = self.config
 
@@ -189,11 +189,13 @@ function StarcraftParticipantTable:createSoloRaceTable()
 		Array.appendWith(factionColumns, Faction.defaultFaction)
 	end
 
+	local colSpan = Table.size(factionColumns)
+
 	self.display = mw.html.create('div')
 		:addClass('participant-table')
-		:css('grid-template-columns', 'repeat(' .. #factionColumns .. ', 1fr)')
-		:css('width', config.columnWidth and (#factionColumns * config.columnWidth .. 'px') or nil)
-		:node(StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers))
+		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
+		:css('width', config.columnWidth and (colSpan * config.columnWidth .. 'px') or nil)
+		:node(self:_displayHeader(factionColumns, factioNumbers))
 
 	Array.forEach(self.sections, function(section) self:displaySoloRaceTableSection(section, factionColumns) end)
 

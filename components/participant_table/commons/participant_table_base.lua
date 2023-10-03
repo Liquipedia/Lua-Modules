@@ -12,7 +12,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
+local Json = require('Module:Json/dev')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -46,11 +46,11 @@ end)
 ---@param frame Frame
 ---@return Html?
 function ParticipantTable.run(frame)
-	return ParticipantTable(frame):init():store():create()
+	return ParticipantTable(frame):read():store():create()
 end
 
 ---@return ParticipantTable
-function ParticipantTable:init()
+function ParticipantTable:read()
 	self.config = self.readConfig(self.args)
 	self:readSections()
 
@@ -91,7 +91,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
 		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
-		showTeams = not Logic.nilOr(Logic.readBoolOrNil(args.disable_teams), not parentConfig.showTeams),
+		showTeams = not Logic.readBool(args.disable_teams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
 		display = not Logic.readBool(args.hidden)
@@ -116,7 +116,7 @@ function ParticipantTable:fetchSectionsArgs()
 	pageVars:set('stashArgs', '1')
 
 	-- make sure that all sections stashArgs
-	for _, potentialSection in ipairs(args) do
+	for _, potentialSection in pairs(args) do
 		ParticipantTable._stashArgs(potentialSection)
 	end
 
@@ -146,7 +146,8 @@ end
 
 ---@param args table
 function ParticipantTable:readSection(args)
-	local section = {config = self.readConfig(args, self.config)}
+	local config = self.readConfig(args, self.config)
+	local section = {config = config}
 
 	local keys = Array.filter(Array.extractKeys(args), function(key)
 		return String.contains(key, '^%d+$') or
@@ -160,7 +161,7 @@ function ParticipantTable:readSection(args)
 	local sortKeys = function(tbl, key1, key2) return tostring(key1) < tostring(key2) end
 
 	for _, key in Table.iter.spairs(keys, sortKeys) do
-		local entry = self:readEntry(args, key, section.config)
+		local entry = self:readEntry(args, key, config)
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
@@ -168,9 +169,12 @@ function ParticipantTable:readSection(args)
 		entriesByName[entry.name] = entry
 	end
 
-	local entries = Import.importFromMatchGroupSpec(section.config, entriesByName)
+	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
+		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+		return entry
+	end)
 
-	Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
+	Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
 
 	table.insert(self.sections, section)
 end
@@ -210,8 +214,6 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 			return name1 < name2
 		end)
 	end
-
-	opponent = Opponent.resolve(opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
 
 	return {
 		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
