@@ -117,7 +117,7 @@ function ParticipantTable:fetchSectionsArgs()
 
 	-- make sure that all sections stashArgs
 	for _, potentialSection in ipairs(args) do
-		potentialSection = potentialSection
+		ParticipantTable._stashArgs(potentialSection)
 	end
 
 	-- retrieve sectionsArgs
@@ -131,6 +131,14 @@ function ParticipantTable:fetchSectionsArgs()
 
 	return sectionsArgs
 end
+
+---access the args so it stashes
+---@param potentialSection string
+---@return string
+function ParticipantTable._stashArgs(potentialSection)
+	return potentialSection
+end
+
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
