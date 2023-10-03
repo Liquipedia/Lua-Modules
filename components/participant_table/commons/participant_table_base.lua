@@ -97,7 +97,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		display = not Logic.readBool(args.hidden)
 	}
 
-	config.columnWidth = tonumber(args.entrywidth) or config.showTeams and 215 or 155
+	config.columnWidth = tonumber(args.entrywidth) or config.showTeams and 200 or 156
 
 	return config
 end
@@ -289,59 +289,62 @@ end
 
 ---@return Html?
 function ParticipantTable:create()
-	if not self.config.display then return end
+	local config = self.config
+
+	if not config.display then return end
 
 	self.display = mw.html.create('div')
-		:addClass('opponent-list')
-		:css('grid-template-columns', 'repeat(' .. self.config.colSpan .. ', 1fr)')
-		:css('max-width', '100%')
-		:node(ParticipantTable.textCell(self.config.title or 'Participants'):addClass('opponent-list-title'))
+		:addClass('participantTable')
+		:css('max-width', '100%!important')
+		:css('width', (config.colSpan * config.columnWidth + 1) .. 'px')
+		:node(mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants'))
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
 	return self.display
 end
 
+---@return Html
+function ParticipantTable.newSectionNode()
+	return mw.html.create('div'):addClass('participantTable-row')
+end
+
 ---@param section ParticipantTableSection
 function ParticipantTable:displaySection(section)
 	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
-	local sectionNode = mw.html.create('div')
-		:addClass('opponent-list-section')
-		:node(self.sectionTitle(section, #entries))
+	self.display:node(self.newSectionNode():node(self.sectionTitle(section, #section.entries)))
 
 	if Table.isEmpty(section.entries) then
-		self.display:node(sectionNode:node(self.tbd()))
+		self.display:node(self.newSectionNode():node(self:tbd()))
 		return
 	end
 
-	Array.forEach(entries, function(entry)
-		sectionNode:node(self:displayEntry(entry))
+	local sectionNode = ParticipantTable.newSectionNode()
+
+	Array.forEach(entries, function(entry, entryIndex)
+		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth .. 'px'))
 	end)
 
-	local currentColumn = (#entries % self.config.colSpan) + 1
+	local nextColumn = (#entries % self.config.colSpan) + 1
 
-	Array.forEach(Array.range(currentColumn, self.config.colSpan),
-		function() sectionNode:node(self.empty()) end)
+	Array.forEach(Array.range(nextColumn, self.config.colSpan),
+		function() sectionNode:node(self:empty()) end)
 
 	self.display:node(sectionNode)
 end
 
----@param text string|number
 ---@return Html
-function ParticipantTable.textCell(text)
-	return mw.html.create('div'):addClass('opponent-list-cell')
-		:node(mw.html.create('div'):addClass('opponent-list-cell-content'):wikitext(text))
+function ParticipantTable:tbd()
+	return mw.html.create('div')
+		:addClass('participantTable-tbd')
+		:css('width', self.config.columnWidth)
+		:wikitext('To be determined')
 end
 
 ---@return Html
-function ParticipantTable.tbd()
-	return ParticipantTable.textCell('To be determined'):addClass('opponent-list-tbd')
-end
-
----@return Html
-function ParticipantTable.empty()
-	return ParticipantTable.textCell(''):addClass('opponent-list-cell-content')
+function ParticipantTable:empty()
+	return mw.html.create('div'):css('width', self.config.columnWidth):addClass('participantTable-entry participantTable-empty')
 end
 
 ---@param section ParticipantTableSection
@@ -350,11 +353,11 @@ end
 function ParticipantTable.sectionTitle(section, amountOfEntries)
 	if Logic.isEmpty(section.config.title) then return end
 
-	local sectionTitle = ParticipantTable.textCell(section.config.title):addClass('opponent-list-section-title')
+	local title = mw.html.create('div'):addClass('participantTable-title'):wikitext(section.config.title)
 
-	if not section.config.showCountBySection then return sectionTitle end
+	if not section.config.showCountBySection then return title end
 
-	return sectionTitle:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
 end
 
 ---@param entry ParticipantTableEntry
@@ -364,7 +367,7 @@ function ParticipantTable:displayEntry(entry, additionalProps)
 	additionalProps = additionalProps or {}
 
 	return mw.html.create('div')
-		:addClass('opponent-list-cell opponent-list-entry brkts-opponent-hover')
+		:addClass('participantTable-entry brkts-opponent-hover')
 		:attr('aria-label', entry.name)
 		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
 			dq = entry.dq,

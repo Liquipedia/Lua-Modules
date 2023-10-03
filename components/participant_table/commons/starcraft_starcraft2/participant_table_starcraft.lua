@@ -169,11 +169,11 @@ end
 
 ---@return Html?
 function StarcraftParticipantTable:createSoloRaceTable()
-	if not self.config.display then return end
+	local config = self.config
+
+	if not config.display then return end
 
 	local factioNumbers = self:_getFactionNumbers()
-
-	local config = self.config
 
 	local factionColumns
 	if not config.isRandomEvent and
@@ -191,14 +191,16 @@ function StarcraftParticipantTable:createSoloRaceTable()
 	local colSpan = Table.size(factionColumns)
 
 	self.display = mw.html.create('div')
-		:addClass('participant-table')
+		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
 		:css('width', colSpan * config.columnWidth .. 'px')
 		:node(self:_displayHeader(factionColumns, factioNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloRaceTableSection(section, factionColumns) end)
 
-	return self.display
+	return mw.html.create('div')
+		:addClass('table-responsive')
+		:node(self.display)
 end
 
 ---@return table
@@ -225,7 +227,7 @@ end
 ---@return Html
 function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
 	local config = self.config
-	local header = mw.html.create('div'):addClass('participant-table-header')
+	local header = mw.html.create('div'):addClass('participantTable-row')
 
 	Array.forEach(factionColumns, function(faction)
 		local parts = Array.extend(
@@ -237,10 +239,9 @@ function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
 		)
 
 		header:tag('div')
-			:addClass('participant-table-race-header opponent-list-cell')
+			:addClass('participantTable-faction-header participantTable-entry')
 			:addClass(Faction.bgClass(faction))
 			:tag('div')
-				:addClass('opponent-list-cell-content')
 				:wikitext(table.concat(parts))
 	end)
 
@@ -250,12 +251,10 @@ end
 ---@param section StarcraftParticipantTableSection
 ---@param factionColumns table
 function StarcraftParticipantTable:_displaySoloRaceTableSection(section, factionColumns)
-	local sectionNode = mw.html.create('div')
-		:addClass('participant-table-section')
-		:node(self.sectionTitle(section, #section.entries))
+	self.display:node(self.newSectionNode():node(self.sectionTitle(section, #section.entries)))
 
 	if Table.isEmpty(section.entries) then
-		self.display:node(sectionNode:node(self.tbd()))
+		self.display:node(self.newSectionNode():node(self:tbd()))
 		return
 	end
 
@@ -268,16 +267,16 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 	) or 0
 
 	Array.forEach(Array.range(1, maxRaceLength), function(rowIndex)
+		local sectionNode = self.newSectionNode()
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
 				entry and self:displayEntry(entry, {showRace = false}) or
-				mw.html.create('div'):addClass('opponent-list-cell')
+				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)
+		self.display:node(sectionNode)
 	end)
-
-	self.display:node(sectionNode)
 end
 
 return StarcraftParticipantTable
