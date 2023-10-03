@@ -32,7 +32,9 @@ local Variables = require('Module:Variables')
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@field isPureSolo boolean
-local ParticipantTable = Lua.import('Module:ParticipantTable', {requireDevIfEnabled = true})
+---@field displaySoloRaceTableSection function
+
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
 
 local Opponent = require('OpponentLibraries').Opponent
 
@@ -45,7 +47,7 @@ local StarcraftParticipantTable = {}
 ---@param frame Frame
 ---@return Html?
 function StarcraftParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame)
+	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
 
 	participantTable.args.noStorage = participantTable.args.noStorage or
 		Variables.varDefault('tournament_startdate') > ROLL_OUT_DATE
@@ -71,7 +73,7 @@ end
 ---@param parentConfig StarcraftParticipantTableConfig?
 ---@return StarcraftParticipantTableConfig
 function StarcraftParticipantTable.readConfig(args, parentConfig)
-	local config = ParticipantTable.readConfig(args, parentConfig)
+	local config = ParticipantTable.readConfig(args, parentConfig) --[[@as StarcraftParticipantTableConfig]]
 	parentConfig = parentConfig or {}
 
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
