@@ -358,17 +358,20 @@ function ParticipantTable.sectionTitle(section, amountOfEntries)
 end
 
 ---@param entry ParticipantTableEntry
+---@param additionalProps table?
 ---@return Html
-function ParticipantTable:displayEntry(entry)
+function ParticipantTable:displayEntry(entry, additionalProps)
+	additionalProps = additionalProps or {}
+
 	return mw.html.create('div')
 		:addClass('opponent-list-cell opponent-list-entry brkts-opponent-hover')
 		:attr('aria-label', entry.name)
-		:node(OpponentDisplay.BlockOpponent{
+		:node(OpponentDisplay.BlockOpponent(Table.merge(additionalProps, {
 			dq = entry.dq,
 			note = entry.note,
 			showPlayerTeam = self.config.showTeams,
 			opponent = entry.opponent,
-		})
+		})))
 end
 
 ---@param entries ParticipantTableEntry[]
