@@ -34,9 +34,7 @@ local Variables = require('Module:Variables')
 ---@field isPureSolo boolean
 local ParticipantTable = Lua.import('Module:ParticipantTable/Starcraft', {requireDevIfEnabled = true})
 
-local OpponentLibraries = require('OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Opponent = require('OpponentLibraries').Opponent
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
