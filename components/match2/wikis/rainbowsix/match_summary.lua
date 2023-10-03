@@ -157,17 +157,17 @@ end
 ---@return R6Score
 function Score:setFirstRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
-	local leftElement, RightElement
+	local leftElement, rightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		leftElement, RightElement = score, icon
+		leftElement, rightElement = score, icon
 	else
-		leftElement, RightElement = icon, score
+		leftElement, rightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(leftElement)
-				:wikitext(RightElement)
+				:wikitext(rightElement)
 
 	self.top:node(roundScore)
 	return self
@@ -179,17 +179,17 @@ end
 ---@return R6Score
 function Score:setSecondRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
-	local leftElement, RightElement
+	local leftElement, rightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		leftElement, RightElement = score, icon
+		leftElement, rightElement = score, icon
 	else
-		leftElement, RightElement = icon, score
+		leftElement, rightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins')
 				:wikitext(leftElement)
-				:wikitext(RightElement)
+				:wikitext(rightElement)
 
 	self.bottom:node(roundScore)
 	return self
@@ -201,17 +201,17 @@ end
 ---@return R6Score
 function Score:setFirstOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot' .. side]
-	local leftElement, RightElement
+	local leftElement, rightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		leftElement, RightElement = score, icon
+		leftElement, rightElement = score, icon
 	else
-		leftElement, RightElement = icon, score
+		leftElement, rightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(leftElement)
-				:wikitext(RightElement)
+				:wikitext(rightElement)
 
 	self.top:node(roundScore)
 	return self
@@ -223,17 +223,17 @@ end
 ---@return R6Score
 function Score:setSecondOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot'..side]
-	local leftElement, RightElement
+	local leftElement, rightElement
 	if position == POSITION_RIGHT then -- For right side, swap order of score and icon
-		leftElement, RightElement = score, icon
+		leftElement, rightElement = score, icon
 	else
-		leftElement, RightElement = icon, score
+		leftElement, rightElement = icon, score
 	end
 
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('brkts-popup-body-match-sidewins-overtime')
 				:wikitext(leftElement)
-				:wikitext(RightElement)
+				:wikitext(rightElement)
 
 	self.bottom:node(roundScore)
 	return self
