@@ -97,7 +97,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		display = not Logic.readBool(args.hidden)
 	}
 
-	config.columnWidth = tonumber(args.entrywidth) or config.showTeams and 200 or 156
+	config.columnWidth = tonumber(args.entrywidth) or config.showTeams and 212 or 156
 
 	return config
 end
