@@ -96,11 +96,6 @@ local PREFIXES = {
 		player = 'https://www.factor.gg/player/',
 	},
 	fanclub = {''},
-	gamersclub = {
-		'https://csgo.gamersclub.gg/campeonatos/csgo/',
-		team = 'https://csgo.gamersclub.gg/team/',
-		player = 'https://csgo.gamersclub.gg/jogador/',
-	},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
