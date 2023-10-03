@@ -253,10 +253,9 @@ function ParticipantTable:store()
 			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
 
-		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {
-			extradata = self:buildExtradata(lpdbData),
-			date = entry.date,
-		})
+		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = entry.date, extradata = {}})
+
+		ParticipantTable:adjustLpdbData(lpdbData, entry)
 
 		mw.ext.LiquipediaDB.lpdb_placement(self:objectName(lpdbData), Json.stringifySubTables(lpdbData))
 	end) end)
@@ -283,8 +282,8 @@ function ParticipantTable:objectName(lpdbData)
 end
 
 ---@param lpdbData table
----@return table?
-function ParticipantTable:buildExtradata(lpdbData)
+---@param entry ParticipantTableEntry
+function ParticipantTable:adjustLpdbData(lpdbData, entry)
 end
 
 ---@return Html?

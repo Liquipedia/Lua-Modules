@@ -54,7 +54,7 @@ function StarcraftParticipantTable.run(frame)
 
 	participantTable.readConfig = StarcraftParticipantTable.readConfig
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
-	participantTable.buildExtradata = StarcraftParticipantTable.buildExtradata
+	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
 	participantTable.getPlacements = StarcraftParticipantTable.getPlacements
 	participantTable.displaySoloRaceTableSection = StarcraftParticipantTable.displaySoloRaceTableSection
 
@@ -135,15 +135,14 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 end
 
 ---@param lpdbData table
----@param entry table
----@return table
-function StarcraftParticipantTable:buildExtradata(lpdbData, entry)
+---@param entry StarcraftParticipantTableEntry
+function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry)
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
-	return {
-		seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil,
-		isqualified = tostring(entry.isQualified),
-	}
 
+	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
+	lpdbData.extradata.isqualified = tostring(entry.isQualified)
+
+	lpdbData.qualified = entry.isQualified and 1 or nil
 end
 
 ---@return table<string, true>
