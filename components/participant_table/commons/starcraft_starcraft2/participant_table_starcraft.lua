@@ -79,7 +79,6 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	config.showCountByRace = Logic.readBool(args.showCountByRace or args.count)
 	config.isRandomEvent = Logic.readBool(args.is_random_event)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
-	config.sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents or parentConfig.sortOpponents), true)
 	config.sortPlayers = true
 	config.manualFactionCounts = {
 		p = tonumber(args.protoss),
@@ -123,6 +122,8 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 		end)
 	end
 
+	opponent = Opponent.resolve(opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+
 	return {
 		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
 		note = opponentArgs.note or sectionArgs[key .. 'note'],
@@ -134,13 +135,15 @@ end
 
 ---@param lpdbData table
 ---@param entry StarcraftParticipantTableEntry
-function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry)
+---@param config StarcraftParticipantTableConfig
+function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
+	local isQualified = entry.isQualified or config.isQualified
 
 	lpdbData.extradata.seriesnumber = seriesNumber and string.format('%05d', seriesNumber) or nil
-	lpdbData.extradata.isqualified = tostring(entry.isQualified)
+	lpdbData.extradata.isqualified = tostring(isQualified)
 
-	lpdbData.qualified = entry.isQualified and 1 or nil
+	lpdbData.qualified = isQualified and 1 or nil
 end
 
 ---@return table<string, true>

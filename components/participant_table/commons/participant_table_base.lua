@@ -26,8 +26,9 @@ local OpponentLibraries = require('OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
+local Import = Lua.import('Module:ParticipantTable/Import', {requireDevIfEnabled = true})
 local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 
@@ -66,12 +67,12 @@ end
 ---@field colSpan number
 ---@field resolveDate string
 ---@field sortPlayers boolean sort players within an opponent
----@field sortOpponents boolean
 ---@field showTeams boolean
 ---@field title string
 ---@field columnWidth number? width of the column in px
 ---@field importOnlyQualified boolean?
 ---@field display boolean
+---@field count number?
 
 ---@param args table
 ---@param parentConfig ParticipantTableConfig?
@@ -85,11 +86,11 @@ function ParticipantTable.readConfig(args, parentConfig)
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
+		count = tonumber(args.count),
 		colSpan = tonumber(args.colspan) or parentConfig.colSpan or 4,
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
 		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
-		sortOpponents = Logic.readBool(args.sortOpponents or parentConfig.sortOpponents),
 		showTeams = not Logic.nilOr(Logic.readBoolOrNil(args.disable_teams), not parentConfig.showTeams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
@@ -145,7 +146,6 @@ function ParticipantTable:readSection(args)
 			String.contains(key, '^player%d+$')
 	end)
 
-	local entries = {}
 	local entriesByName = {}
 
 	--need custom sort so it doesn't compare number with string
@@ -153,28 +153,16 @@ function ParticipantTable:readSection(args)
 
 	for _, key in Table.iter.spairs(keys, sortKeys) do
 		local entry = self:readEntry(args, key, section.config)
-		if not entriesByName[entry.name] then
-			table.insert(entries, entry)
-			entriesByName[entry.name] = entries[#entries]
-		else
+		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
+
+		entriesByName[entry.name] = entry
 	end
 
-	if section.config.matchGroupSpec then
-		someBS
-		--import shit
-		--needs to merge input and imported --> entriesByName needed!
-	end
+	local entries = Import.importFromMatchGroupSpec(section.config, entriesByName)
 
-	section.entries = Array.map(entries, function(entry)
-		entry.opponent = Opponent.resolve(entry.opponent, entry.date, {syncPlayer = section.config.syncPlayers})
-		return entry
-	end)
-
-	if section.config.sortOpponents then
-		Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
-	end
+	Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
 
 	table.insert(self.sections, section)
 end
@@ -215,6 +203,8 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 		end)
 	end
 
+	opponent = Opponent.resolve(opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+
 	return {
 		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
 		note = opponentArgs.note or sectionArgs[key .. 'note'],
@@ -253,9 +243,9 @@ function ParticipantTable:store()
 			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
 
-		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = entry.date, extradata = {}})
+		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
 
-		ParticipantTable:adjustLpdbData(lpdbData, entry)
+		ParticipantTable:adjustLpdbData(lpdbData, entry, section.config)
 
 		mw.ext.LiquipediaDB.lpdb_placement(self:objectName(lpdbData), Json.stringifySubTables(lpdbData))
 	end) end)
@@ -283,7 +273,8 @@ end
 
 ---@param lpdbData table
 ---@param entry ParticipantTableEntry
-function ParticipantTable:adjustLpdbData(lpdbData, entry)
+---@param config ParticipantTableConfig
+function ParticipantTable:adjustLpdbData(lpdbData, entry, config)
 end
 
 ---@return Html?
@@ -353,7 +344,7 @@ function ParticipantTable.sectionTitle(section, amountOfEntries)
 
 	if not section.config.showCountBySection then return sectionTitle end
 
-	return sectionTitle:tag('i'):wikitext(' (' .. amountOfEntries .. ')'):done()
+	return sectionTitle:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
 end
 
 ---@param entry ParticipantTableEntry
