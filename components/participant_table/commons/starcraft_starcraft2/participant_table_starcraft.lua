@@ -32,7 +32,7 @@ local Variables = require('Module:Variables')
 
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@field isPureSolo boolean
-local ParticipantTable = Lua.import('Module:ParticipantTable/Starcraft', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable', {requireDevIfEnabled = true})
 
 local Opponent = require('OpponentLibraries').Opponent
 

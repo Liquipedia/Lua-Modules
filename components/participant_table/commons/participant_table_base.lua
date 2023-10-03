@@ -29,7 +29,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 
-local pageVars = PageVariableNamespace('StarcraftParticipantTable')
+local pageVars = PageVariableNamespace('ParticipantTable')
 
 ---@class ParticipantTable
 ---@operator call(Frame): ParticipantTable
