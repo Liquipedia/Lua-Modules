@@ -172,12 +172,18 @@ function ParticipantTable:readSection(args)
 		return entry
 	end)
 
+	if section.config.sortOpponents then
+		Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
+	end
+
 	table.insert(self.sections, section)
 end
 
 ---@class ParticipantTableEntry
 ---@field opponent standardOpponent
 ---@field name string
+---@field note string?
+---@field dq boolean
 
 ---@param sectionArgs table
 ---@param key string|number
@@ -209,7 +215,12 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 		end)
 	end
 
-	return {opponent = opponent, name = Opponent.toName(opponent)}
+	return {
+		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
+		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		opponent = opponent,
+		name = Opponent.toName(opponent),
+	}
 end
 
 ---@return ParticipantTable
@@ -304,10 +315,6 @@ function ParticipantTable:displaySection(section)
 		return
 	end
 
-	if section.config.sortOpponents then
-		Array.sortInPlaceBy(entries, function(entry) return entry.name:lower() end)
-	end
-
 	Array.forEach(entries, function(entry)
 		sectionNode:node(self:displayEntry(entry))
 	end)
@@ -354,12 +361,14 @@ end
 ---@return Html
 function ParticipantTable:displayEntry(entry)
 	return mw.html.create('div')
-	:addClass('opponent-list-cell opponent-list-entry brkts-opponent-hover')
-	:attr('aria-label', entry.name)
-	:node(OpponentDisplay.BlockOpponent{
-		showPlayerTeam = self.config.showTeams,
-		opponent = entry.opponent,
-	})
+		:addClass('opponent-list-cell opponent-list-entry brkts-opponent-hover')
+		:attr('aria-label', entry.name)
+		:node(OpponentDisplay.BlockOpponent{
+			dq = entry.dq,
+			note = entry.note,
+			showPlayerTeam = self.config.showTeams,
+			opponent = entry.opponent,
+		})
 end
 
 ---@param entries ParticipantTableEntry[]

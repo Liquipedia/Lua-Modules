@@ -126,6 +126,8 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 	end
 
 	return {
+		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
+		note = opponentArgs.note or sectionArgs[key .. 'note'],
 		opponent = opponent,
 		name = Opponent.toName(opponent),
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']) or config.isQualified),
@@ -252,10 +254,6 @@ function StarcraftParticipantTable:displaySoloRaceTableSection(section, factionC
 	if Table.isEmpty(section.entries) then
 		self.display:node(sectionNode:node(self.tbd()))
 		return
-	end
-
-	if section.config.sortOpponents then
-		Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
 	end
 
 	-- Group entries by faction
