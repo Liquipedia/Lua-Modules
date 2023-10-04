@@ -260,7 +260,7 @@ function MapVeto:addRound(vetotype, map1, map2)
 end
 
 ---@param row Html
----@param styleClass string
+---@param styleClass string?
 ---@param vetoText string
 ---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
