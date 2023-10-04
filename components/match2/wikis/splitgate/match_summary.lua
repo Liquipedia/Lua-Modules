@@ -9,110 +9,45 @@
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
-local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _ICONS = {
-	check = _GREEN_CHECK,
+local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local ICONS = {
+	check = GREEN_CHECK,
 }
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local options = {mergeBracketResetMatch = false}
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, options)
-	local bracketResetMatch = match and match.bracketData and match.bracketData.bracketResetMatchId
-		and MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, match.bracketData.bracketResetMatchId, options)
-
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-		:body(CustomMatchSummary._createBody(match))
-
-	if bracketResetMatch then
-		matchSummary:resetHeader(CustomMatchSummary._createHeader(bracketResetMatch))
-			:resetBody(CustomMatchSummary._createBody(bracketResetMatch))
-	end
-
-	-- comment
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	-- footer
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.lrthread = match.lrthread
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		-- Match Vod + other links
-		local buildLink = function (linkType, link)
-			local linkData = _LINK_DATA[linkType]
-			if not linkData then
-				mw.log('linkType "' .. linkType .. '" is not supported by Module:MatchSummary')
-			else
-				return '[[' .. linkData.icon .. '|link=' .. link .. '|15px|' .. linkData.text .. ']]'
-			end
-		end
-
-		for linkType, link in pairs(match.links) do
-			footer:addElement(buildLink(linkType,link))
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createBody(match)
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -130,11 +65,16 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
 	return htmlCreate('div'):wikitext(score)
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
@@ -187,14 +127,17 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
+---@param showIcon boolean
+---@param iconType string
+---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = htmlCreate('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		container:node(_ICONS[iconType])
+		container:node(ICONS[iconType])
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
