@@ -78,7 +78,6 @@ end
 
 function CustomMap:getWikiCategories(args)
 	return {
-		'Maps',
 		Game.name{game = args.game} .. ' Maps',
 		CustomMap:getType(args.type) .. ' Maps',
 		CustomMap:getType(args.type) .. ' Maps (' .. Game.abbreviation{game = args.game} .. ')'
