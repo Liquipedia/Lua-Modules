@@ -149,7 +149,7 @@ BasePrizePool.prizeTypes = {
 			if data > 0 then
 				return TableCell{content = {
 					Currency.display(BASE_CURRENCY, data,
-						{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
 			end
 		end,
@@ -188,7 +188,7 @@ BasePrizePool.prizeTypes = {
 			if data > 0 then
 				return TableCell{content = {
 					Currency.display(headerData.currency, data,
-					{formatValue = true, formatPrecision = headerData.roundPrecision, abbreviation = false})
+					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
 			end
 		end,

@@ -318,7 +318,6 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-popup-side-color-' .. color)
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
-			:css('float', flip and 'right' or 'left')
 			:node(HeroIcon._getImage{
 				hero = opponentHeroesData[index],
 				size = _SIZE_HERO,
@@ -339,6 +338,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
 	end

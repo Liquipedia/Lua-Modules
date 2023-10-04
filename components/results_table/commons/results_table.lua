@@ -117,7 +117,7 @@ function ResultsTable:buildRow(placement)
 	local useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team
 	row:tag('td'):wikitext(Currency.display('USD',
 			useIndivPrize and placement.individualprizemoney or placement.prizemoney,
-			{dashIfZero = true, abbreviation = false, formatValue = true}
+			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 		))
 
 	return row

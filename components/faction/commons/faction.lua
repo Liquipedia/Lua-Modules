@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Data = mw.loadData('Module:Faction/Data')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -159,4 +160,4 @@ function Faction.bgClass(faction)
 	return factionProps and factionProps.bgClass or nil
 end
 
-return Faction
+return Class.export(Faction)

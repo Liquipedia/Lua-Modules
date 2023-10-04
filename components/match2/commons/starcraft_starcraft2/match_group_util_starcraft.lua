@@ -350,7 +350,7 @@ function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent
 	local gameRaces = {}
 	local hasOffrace = false
 	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
-		local referencePlayer = referenceOpponent.players[playerIx]
+		local referencePlayer = referenceOpponent.players[playerIx] or {}
 		table.insert(gameRaces, gamePlayer.race)
 		if gamePlayer.race ~= referencePlayer.race then
 			hasOffrace = true

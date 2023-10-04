@@ -274,7 +274,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	if prizeValue > 0 then
 		priceCell
 			:wikitext(Currency.display('USD', prizeValue, {
-				dashIfZero = true, abbreviation = false, formatValue = true
+				dashIfZero = true, displayCurrencyCode = false, formatValue = true
 			}))
 	else
 		priceCell

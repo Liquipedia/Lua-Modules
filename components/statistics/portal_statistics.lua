@@ -36,7 +36,7 @@ local ColumnName = Condition.ColumnName
 
 local Count = Lua.import('Module:Count', {requireDevIfEnabled = true})
 
-local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
+local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
 local EPOCH_DATE = '1970-01-01'

@@ -368,6 +368,12 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 		if bracketResetMatch then
 			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 		end
+	elseif options.returnBoth then
+		local bracketResetMatch = match
+			and match.bracketData.bracketResetMatchId
+			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+
+		return match, bracketResetMatch
 	end
 
 	return match
