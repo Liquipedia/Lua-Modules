@@ -34,6 +34,7 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
+	customMap.addToLpdb = CustomMap.addToLpdb
 	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
 	_args.releasedate = _args.date
