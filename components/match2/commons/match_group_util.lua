@@ -31,16 +31,42 @@ Display related functions go in Module:MatchGroup/Display/Helper.
 ]]
 local MatchGroupUtil = {types = {}}
 
+---@class MatchGroupUtilLowerEdge
+---@field lowerMatchIndex number
+---@field opponentIndex number
 MatchGroupUtil.types.LowerEdge = TypeUtil.struct({
 	lowerMatchIndex = 'number',
 	opponentIndex = 'number',
 })
+---@alias AdvanceBg 'up'|'stayup'|'stay'|'staydown'|'down'
 MatchGroupUtil.types.AdvanceBg = TypeUtil.literalUnion('up', 'stayup', 'stay', 'staydown', 'down')
+---@class MatchGroupUtilAdvanceSpot
+---@field bg AdvanceBg
+---@field matchId string?
+---@field type string?
 MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 	bg = MatchGroupUtil.types.AdvanceBg,
 	matchId = 'string?',
 	type = TypeUtil.literalUnion('advance', 'custom', 'qualify'),
 })
+
+---@class MatchGroupUtilBracketBracketData
+---@field coordinates MatchGroupUtilMatchCoordinates
+---@field advanceSpots MatchGroupUtilAdvanceSpot[]
+---@field bracketResetMatchId string?
+---@field header string?
+---@field lowerEdges MatchGroupUtilLowerEdge[]?
+---@field lowerMatchIds string[]
+---@field qualLose boolean?
+---@field qualLoseLiteral string?
+---@field qualSkip number?
+---@field qualWin boolean?
+---@field qualWinLiteral string?
+---@field skipRound number?
+---@field thirdPlaceMatchId string?
+---@field title string?
+---@field type 'bracket'
+---@field upperMatchId string?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -59,6 +85,17 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	type = TypeUtil.literal('bracket'),
 	upperMatchId = 'string?',
 })
+---@class MatchGroupUtilMatchCoordinates
+---@field depth number
+---@field depthCount number
+---@field matchIndexInRound number
+---@field rootIndex number
+---@field roundCount number
+---@field roundIndex number
+---@field sectionCount number
+---@field sectionIndex number
+---@field semanticDepth number
+---@field semanticRoundIndex number
 MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	depth = 'number',
 	depthCount = 'number',
@@ -71,12 +108,18 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 	semanticDepth = 'number',
 	semanticRoundIndex = 'number',
 })
+---@class MatchGroupUtilMatchlistBracketData
+---@field header string?
+---@field title string?
+---@field dateHeader boolean?
+---@field type 'matchlist'
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
 	dateHeader = 'boolean?',
 	type = TypeUtil.literal('matchlist'),
 })
+---@alias MatchGroupUtilBracketData MatchGroupUtilMatchlistBracketData|MatchGroupUtilBracketBracketData
 MatchGroupUtil.types.BracketData = TypeUtil.union(
 	MatchGroupUtil.types.MatchlistBracketData,
 	MatchGroupUtil.types.BracketBracketData
@@ -87,11 +130,13 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field flag string?
 ---@field pageName string?
 ---@field team string?
+---@field extradata table?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
 	pageName = 'string?',
 	team = 'string?',
+	extradata = 'table?',
 })
 
 ---@class standardOpponent
@@ -137,8 +182,27 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	type = 'string',
 })
 
+---@alias ResultType 'default'|'draw'|'np'
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
+---@alias WalkoverType 'L'|'FF'|'DQ'
 MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
+
+---@class MatchGroupUtilGame
+---@field comment string?
+---@field game string?
+---@field header string?
+---@field length number?
+---@field map string?
+---@field mode string?
+---@field participants table
+---@field resultType ResultType?
+---@field scores number[]
+---@field subgroup number?
+---@field type string?
+---@field vod string?
+---@field walkover WalkoverType?
+---@field winner integer?
+---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
 	game = 'string?',
@@ -154,8 +218,30 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	vod = 'string?',
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
+	extradata = 'table?',
 })
 
+---@class MatchGroupUtilMatch
+---@field bracketData MatchGroupUtilBracketData
+---@field comment string?
+---@field date string
+---@field dateIsExact boolean
+---@field finished boolean
+---@field game string?
+---@field games MatchGroupUtilGame[]
+---@field links table
+---@field matchId string?
+---@field mode string?
+---@field opponents standardOpponent[]
+---@field resultType ResultType?
+---@field stream table
+---@field type string?
+---@field vod string?
+---@field walkover WalkoverType?
+---@field winner string?
+---@field extradata table?
+---@field timestamp number
+---@field bestof number?
 MatchGroupUtil.types.Match = TypeUtil.struct({
 	bracketData = MatchGroupUtil.types.BracketData,
 	comment = 'string?',
@@ -174,6 +260,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	vod = 'string?',
 	walkover = 'string?',
 	winner = 'number?',
+	extradata = 'table?',
 })
 
 ---@class standardTeamProps
@@ -188,12 +275,25 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 	shortName = 'string',
 })
 
+---@class MatchGroupUtilMatchlist
+---@field matches MatchGroupUtilMatch[]
+---@field matchesById table<string, MatchGroupUtilMatch>
+---@field type 'matchlist'
 MatchGroupUtil.types.Matchlist = TypeUtil.struct({
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
 	type = TypeUtil.literal('matchlist'),
 })
 
+---@class MatchGroupUtilBracket
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@field coordinatesByMatchId table<string, MatchGroupUtilMatchCoordinates>
+---@field matches MatchGroupUtilMatch[]
+---@field matchesById table<string, MatchGroupUtilMatch>
+---@field rootMatchIds string[]
+---@field rounds string[][]
+---@field sections string[][]
+---@field type 'bracket'
 MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	coordinatesByMatchId = TypeUtil.table('string', MatchGroupUtil.types.MatchCoordinates),
@@ -205,30 +305,30 @@ MatchGroupUtil.types.Bracket = TypeUtil.struct({
 	type = TypeUtil.literal('bracket'),
 })
 
+---@alias MatchGroupUtilMatchGroup MatchGroupUtilBracket|MatchGroupUtilMatchlist
 MatchGroupUtil.types.MatchGroup = TypeUtil.union(
 	MatchGroupUtil.types.Matchlist,
 	MatchGroupUtil.types.Bracket
 )
 
---[[
-Fetches all matches in a matchlist or bracket. Tries to read from page
-variables before fetching from LPDB. Returns a list of records
-ordered lexicographically by matchId.
-]]
+---Fetches all matches in a matchlist or bracket. Tries to read from page variables before fetching from LPDB.
+---Returns a list of records ordered lexicographically by matchId.
+---@param bracketId string
+---@return table[]
 function MatchGroupUtil.fetchMatchRecords(bracketId)
 	local varData = Variables.varDefault('match2bracket_' .. bracketId)
 	if varData then
-		return Json.parse(varData)
-	else
-		return mw.ext.LiquipediaDB.lpdb(
-			'match2',
-			{
-				conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
-				order = 'match2id ASC',
-				limit = 5000,
-			}
-		)
+		return (Json.parse(varData))
 	end
+
+	return mw.ext.LiquipediaDB.lpdb(
+		'match2',
+		{
+			conditions = '([[namespace::0]] or [[namespace::>0]]) AND [[match2bracketid::' .. bracketId .. ']]',
+			order = 'match2id ASC',
+			limit = 5000,
+		}
+	)
 end
 
 MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
@@ -236,10 +336,9 @@ MatchGroupUtil.fetchMatchGroup = FnUtil.memoize(function(bracketId)
 	return MatchGroupUtil.makeMatchGroup(matchRecords)
 end)
 
---[[
-Creates a match group structure from its match records. Returns a value of type
-MatchGroupUtil.types.MatchGroup.
-]]
+---Creates a match group structure from its match records. Returns a value of type MatchGroupUtil.types.MatchGroup.
+---@param matchRecords table[]
+---@return MatchGroupUtilMatchGroup
 function MatchGroupUtil.makeMatchGroup(matchRecords)
 	local type = matchRecords[1] and matchRecords[1].match2bracketdata.type or 'matchlist'
 	if type == 'matchlist' then
@@ -251,6 +350,8 @@ function MatchGroupUtil.makeMatchGroup(matchRecords)
 	end
 end
 
+---@param matchRecords table[]
+---@return MatchGroupUtilMatchlist
 function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
 
@@ -261,8 +362,10 @@ function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 	}
 end
 
+---@param matchRecords table[]
+---@return MatchGroupUtilBracket
 function MatchGroupUtil.makeBracketFromRecords(matchRecords)
-	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
+	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord) --[[@as MatchGroupUtilMatch[] ]]
 
 	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
 	local bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end)
@@ -295,10 +398,9 @@ function MatchGroupUtil.makeBracketFromRecords(matchRecords)
 	return bracket
 end
 
---[[
-Returns an array of all the IDs of root matches. The matches are sorted in
-display order.
-]]
+---Returns an array of all the IDs of root matches. The matches are sorted in display order.
+---@param bracketDatasById table<string, MatchGroupUtilBracketData>
+---@return string[]
 function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
 	-- Matches without upper matches
 	local rootMatchIds = {}
@@ -317,10 +419,8 @@ function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
 	return rootMatchIds
 end
 
---[[
-Populate bracketData.upperMatchId if it is missing. This can happen if the
-bracket template is missing data.
-]]
+---Populate bracketData.upperMatchId if it is missing. This can happen if the bracket template is missing data.
+---@param bracketDatasById table<string, MatchGroupUtilBracketData>
 function MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
 	local upperMatchIds = MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
 
@@ -329,10 +429,9 @@ function MatchGroupUtil.backfillUpperMatchIds(bracketDatasById)
 	end
 end
 
---[[
-Populate bracketData.coordinates if it is missing. This can happen if the
-bracket template has not been recently purged.
-]]
+---Populate bracketData.coordinates if it is missing.
+---This can happen if the bracket template has not been recently purged.
+---@param matchGroup MatchGroupUtilMatchGroup
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
@@ -342,19 +441,20 @@ function MatchGroupUtil.backfillCoordinates(matchGroup)
 	end
 end
 
---[[
-Fetches all matches in a matchlist or bracket. Returns a list of structurally
-typed matches lexicographically ordered by matchId.
-]]
+---Fetches all matches in a matchlist or bracket.
+---Returns a list of structurally typed matches lexicographically ordered by matchId.
+---@param bracketId string
+---@return MatchGroupUtilMatch[]
 function MatchGroupUtil.fetchMatches(bracketId)
 	return MatchGroupUtil.fetchMatchGroup(bracketId).matches
 end
 
---[[
-Returns a match struct for use in a bracket display or match summary popup. The
-bracket display and match summary popup expects that the finals match also
-include results from the bracket reset match.
-]]
+---Returns a match struct for use in a bracket display or match summary popup. The bracket display and match summary
+---popup expects that the finals match also include results from the bracket reset match.
+---@param bracketId string
+---@param matchId string
+---@param options {mergeBracketResetMatch: boolean?, returnBoth: boolean?}?
+---@return MatchGroupUtilMatch, MatchGroupUtilMatch?
 function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 	options = options or {}
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
@@ -379,23 +479,21 @@ function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
 	return match
 end
 
---[[
-Converts a match record to a structurally typed table with the appropriate data
-types for field values. The match record is either a match created in the store
-bracket codepath (WikiSpecific.processMatch), or a record fetched from LPDB
-(MatchGroupUtil.fetchMatchRecords). The returned match struct is used in
-various display components (Bracket, MatchSummary, etc)
-
-This is the implementation used on wikis by default. Wikis may specify a
-different conversion by setting WikiSpecific.matchFromRecord. Refer
-to the starcraft2 wiki as an example.
-]]
+---Converts a match record to a structurally typed table with the appropriate data types for field values.
+---The match record is either a match created in the store bracket codepath (WikiSpecific.processMatch),
+---or a record fetched from LPDB (MatchGroupUtil.fetchMatchRecords).
+---The returned match struct is used in various display components (Bracket, MatchSummary, etc)
+---
+---This is the implementation used on wikis by default. Wikis may specify a different conversion by setting
+---WikiSpecific.matchFromRecord. Refer to the starcraft2 wiki as an example.
+---@param record table
+---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
-		bracketData.lowerEdges = bracketData.loweredges
+		bracketData.lowerEdges = bracketData.lowerEdges
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
 
@@ -427,6 +525,8 @@ function MatchGroupUtil.matchFromRecord(record)
 	}
 end
 
+---@param data table?
+---@return MatchGroupUtilBracketData
 function MatchGroupUtil.bracketDataFromRecord(data)
 	if not data then
 		return {}
@@ -461,6 +561,8 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 	end
 end
 
+---@param bracketData MatchGroupUtilBracketData
+---@return table
 function MatchGroupUtil.bracketDataToRecord(bracketData)
 	local coordinates = bracketData.coordinates
 	return {
@@ -475,7 +577,7 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 		qualloseLiteral = bracketData.qualLoseLiteral,
 		qualskip = bracketData.qualSkip ~= 0 and bracketData.qualSkip or nil,
 		qualwin = bracketData.qualWin and 'true' or nil,
-		qualwinLiteral = bracketData.qualwinLiteral,
+		qualwinLiteral = bracketData.qualWinLiteral,
 		skipround = bracketData.skipRound ~= 0 and bracketData.skipRound or nil,
 		thirdplace = bracketData.thirdPlaceMatchId,
 		tolower = bracketData.lowerMatchIds[#bracketData.lowerMatchIds],
@@ -485,6 +587,8 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
+---@param record table
+---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -502,6 +606,8 @@ function MatchGroupUtil.opponentFromRecord(record)
 	}
 end
 
+---@param args table
+---@return table
 function MatchGroupUtil.createOpponent(args)
 	return {
 		extradata = args.extradata or {},
@@ -516,6 +622,8 @@ function MatchGroupUtil.createOpponent(args)
 	}
 end
 
+---@param record table
+---@return standardPlayer
 function MatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -526,6 +634,8 @@ function MatchGroupUtil.playerFromRecord(record)
 	}
 end
 
+---@param record table
+---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -548,6 +658,8 @@ function MatchGroupUtil.gameFromRecord(record)
 	}
 end
 
+---@param data table
+---@return string[]
 function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
 	local lowerMatchIds = {}
 	if nilIfEmpty(data.toupper) then
@@ -559,10 +671,10 @@ function MatchGroupUtil.computeLowerMatchIdsFromLegacy(data)
 	return lowerMatchIds
 end
 
---[[
-Auto compute lower edges, which encode the connector lines between lower
-matches and this match.
-]]
+---Auto compute lower edges, which encode the connector lines between lower matches and this match.
+---@param lowerMatchCount integer
+---@param opponentCount integer
+---@return {lowerMatchIndex: integer, opponentIndex: integer}[]
 function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
 	local lowerEdges = {}
 	if lowerMatchCount <= opponentCount then
@@ -586,10 +698,10 @@ function MatchGroupUtil.autoAssignLowerEdges(lowerMatchCount, opponentCount)
 	return lowerEdges
 end
 
---[[
-Computes just the advance spots that can be determined from a match bracket
-data. More are found in populateAdvanceSpots.
-]]
+---Computes just the advance spots that can be determined from a match bracket data.
+---More are found in populateAdvanceSpots.
+---@param data table
+---@return table<1|2, {bg: string, type: string, matchId: string}>
 function MatchGroupUtil.computeAdvanceSpots(data)
 	local advanceSpots = {}
 
@@ -614,6 +726,7 @@ function MatchGroupUtil.computeAdvanceSpots(data)
 	return advanceSpots
 end
 
+---@param bracket MatchGroupUtilBracket
 function MatchGroupUtil.populateAdvanceSpots(bracket)
 	if #bracket.matches == 0 then
 		return
@@ -644,7 +757,10 @@ function MatchGroupUtil.populateAdvanceSpots(bracket)
 	end
 end
 
--- Merges a grand finals match with results of its bracket reset match.
+---Merges a grand finals match with results of its bracket reset match.
+---@param match table
+---@param bracketResetMatch table
+---@return table
 function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	local mergedMatch = Table.merge(match, {
 		opponents = {},
@@ -667,9 +783,9 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	return mergedMatch
 end
 
---[[
-Fetches information about a team via mw.ext.TeamTemplate.
-]]
+---Fetches information about a team via mw.ext.TeamTemplate.
+---@param template string
+---@return table?
 function MatchGroupUtil.fetchTeam(template)
 	--exception for TBD opponents
 	if string.lower(template) == 'tbd' then
@@ -693,18 +809,19 @@ function MatchGroupUtil.fetchTeam(template)
 	}
 end
 
---[[
-Parse extradata as a JSON string if read from page variables. Otherwise create
-a copy if fetched from lpdb. The returned extradata table can then be mutated
-without altering the source.
-]]
+---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
+---The returned extradata table can then be mutated without altering the source.
+---@param recordExtradata any
+---@return table
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)
 		or type(recordExtradata) == 'table' and Table.copy(recordExtradata)
 		or {}
 end
 
--- Convert 0-based indexes to 1-based
+---Convert 0-based indexes to 1-based
+---@param record table
+---@return table
 function MatchGroupUtil.indexTableFromRecord(record)
 	return Table.map(record, function(key, value)
 		if key:match('Index') and type(value) == 'number' then
@@ -715,7 +832,9 @@ function MatchGroupUtil.indexTableFromRecord(record)
 	end)
 end
 
--- Convert 1-based indexes to 0-based
+---Convert 1-based indexes to 0-based
+---@param coordinates table
+---@return table
 function MatchGroupUtil.indexTableToRecord(coordinates)
 	return Table.map(coordinates, function(key, value)
 		if key:match('Index') and type(value) == 'number' then
@@ -726,6 +845,9 @@ function MatchGroupUtil.indexTableToRecord(coordinates)
 	end)
 end
 
+---@param sectionIndex integer
+---@param sectionCount integer
+---@return string
 function MatchGroupUtil.sectionIndexToString(sectionIndex, sectionCount)
 	if sectionIndex == 1 then
 		return 'upper'
@@ -736,17 +858,16 @@ function MatchGroupUtil.sectionIndexToString(sectionIndex, sectionCount)
 	end
 end
 
---[[
-Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and
-the base match ID R02-M002.
-]]
+---Splits a matchId like h5HXaqbSVP_R02-M002 into the bracket ID h5HXaqbSVP and the base match ID R02-M002.
+---@param matchId string
+---@return string?, string?
 function MatchGroupUtil.splitMatchId(matchId)
 	return matchId:match('^(.-)_([%w-]+)$')
 end
 
---[[
-Converts R01-M003 to R1M3
-]]
+---Converts R01-M003 to R1M3
+---@param matchId string
+---@return string
 function MatchGroupUtil.matchIdToKey(matchId)
 	if matchId == 'RxMBR' or matchId == 'RxMTP' then
 		return matchId
@@ -755,9 +876,9 @@ function MatchGroupUtil.matchIdToKey(matchId)
 	return 'R' .. tonumber(round) .. 'M' .. tonumber(matchInRound)
 end
 
---[[
-Converts R1M3 to R01-M003
-]]
+---Converts R1M3 to R01-M003
+---@param matchKey string
+---@return string
 function MatchGroupUtil.matchIdFromKey(matchKey)
 	if matchKey == 'RxMBR' or matchKey == 'RxMTP' then
 		return matchKey
