@@ -32,21 +32,21 @@ local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 local Header = Class.new(MatchSummary.Header)
 
 ---@param content Html
----@return SideswipeMatchSummaryHeader
+---@return self
 function Header:leftOpponentTeam(content)
 	self.leftElementAdditional = content
 	return self
 end
 
 ---@param content Html
----@return SideswipeMatchSummaryHeader
+---@return self
 function Header:rightOpponentTeam(content)
 	self.rightElementAdditional = content
 	return self
 end
 
 ---@param content Html
----@return SideswipeMatchSummaryHeader
+---@return self
 function Header:scoreBoard(content)
 	self.scoreBoardElement = content
 	return self

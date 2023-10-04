@@ -31,7 +31,7 @@ local HEADTOHEAD = '[[File:Match Info Stats.png|14x14px|link=%s|Head to Head his
 local Header = Class.new(MatchSummary.Header)
 
 ---@param content Html
----@return TrackmaniaMatchSummaryHeader
+---@return self
 function Header:scoreBoard(content)
 	self.scoreBoardElement = content
 	return self
