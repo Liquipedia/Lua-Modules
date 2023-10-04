@@ -44,7 +44,7 @@ local ChampionBan = Class.new(
 	end
 )
 
----@return MobileLegendsChampionBan
+---@return self
 function ChampionBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','40%'):wikitext(''):done()
@@ -57,7 +57,7 @@ end
 ---@param gameNumber integer
 ---@param numberOfBans integer
 ---@param date string
----@return MobileLegendsChampionBan
+---@return self
 function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	self.table:tag('tr')
 		:tag('td')

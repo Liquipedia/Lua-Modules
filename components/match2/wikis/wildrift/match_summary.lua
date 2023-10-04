@@ -43,7 +43,7 @@ local ChampionBan = Class.new(
 	end
 )
 
----@return WildriftChampionBan
+---@return self
 function ChampionBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','40%'):wikitext(''):done()
@@ -55,7 +55,7 @@ end
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
 ---@param numberOfBans integer
----@return WildriftChampionBan
+---@return self
 function ChampionBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td')
