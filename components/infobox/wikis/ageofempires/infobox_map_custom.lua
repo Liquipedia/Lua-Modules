@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
@@ -34,6 +35,7 @@ local _args
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
+	customMap.addToLpdb = CustomMap.addToLpdb
 	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
 	_args.releasedate = _args.date
@@ -68,7 +70,7 @@ end
 
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
-		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator),
+		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
 		maptype = CustomMap:getType(args.type),
 		icon = args.icon,
