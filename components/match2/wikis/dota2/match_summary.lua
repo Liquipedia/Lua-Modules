@@ -64,7 +64,7 @@ local HeroBan = Class.new(
 	end
 )
 
----@return DotaHeroBan
+---@return self
 function HeroBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','35%'):wikitext(''):done()
@@ -76,7 +76,7 @@ end
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
 ---@param numberOfBans integer
----@return DotaHeroBan
+---@return self
 function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):attr('rowspan', '2'):node(mw.html.create('div')

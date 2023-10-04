@@ -45,7 +45,7 @@ local HeroBan = Class.new(
 	end
 )
 
----@return LeagueoOfLegendsHeroBan
+---@return self
 function HeroBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width', '40%'):wikitext(''):done()
@@ -57,7 +57,7 @@ end
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
 ---@param numberOfBans integer
----@return LeagueoOfLegendsHeroBan
+---@return self
 function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):css('float', 'left')
