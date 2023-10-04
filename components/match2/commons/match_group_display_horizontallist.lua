@@ -24,10 +24,27 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
+---@class HorizontallistConfig
+---@field forceShortName boolean
+---@field MatchSummaryContainer function
+---@field OpponentEntry function
+
+---@class HorizontallistConfigOptions
+---@field forceShortName boolean?
+
+---@class HorizontallistProps
+---@field bracketId string
+---@field config HorizontallistConfigOptions?
+
+---@class HorizontallistBracket
+---@field bracket MatchGroupUtilMatchGroup
+---@field config HorizontallistConfigOptions?
+
+---@param args table
+---@return HorizontallistConfigOptions
 function HorizontallistDisplay.configFromArgs(args)
 	return {
 		forceShortName = Logic.readBoolOrNil(args.forceShortName),
-		opponentHeight = tonumber(args.opponentHeight),
 	}
 end
 
@@ -45,10 +62,10 @@ HorizontallistDisplay.propTypes.BracketContainer = {
 	config = TypeUtil.optional(HorizontallistDisplay.types.BracketConfigOptions),
 }
 
---[[
-Display component for a tournament bracket. The bracket is specified by ID.
-The component fetches the match data from LPDB or page variables.
-]]
+---Display component for a tournament bracket. The bracket is specified by ID.
+---The component fetches the match data from LPDB or page variables.
+---@param props HorizontallistProps
+---@return Html
 function HorizontallistDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.BracketContainer)
 	return HorizontallistDisplay.Bracket({
@@ -62,18 +79,18 @@ HorizontallistDisplay.propTypes.Bracket = {
 	config = TypeUtil.optional(HorizontallistDisplay.types.BracketConfigOptions),
 }
 
---[[
-Display component for a tournament bracket. Match data is specified in the
-input.
-]]
+---Display component for a tournament bracket.
+---Match data is specified in the input.
+---@param props HorizontallistBracket
+---@return Html
 function HorizontallistDisplay.Bracket(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.Bracket)
 
 	local defaultConfig = DisplayHelper.getGlobalConfig()
 	local propsConfig = props.config or {}
 	local config = {
-		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
-		OpponentEntry = propsConfig.OpponentEntry or OpponentDisplay.BracketOpponentEntry,
+		MatchSummaryContainer = DisplayHelper.DefaultMatchSummaryContainer,
+		OpponentEntry = OpponentDisplay.BracketOpponentEntry,
 		forceShortName = propsConfig.forceShortName or defaultConfig.forceShortName,
 	}
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
@@ -109,6 +126,8 @@ function HorizontallistDisplay.Bracket(props)
 	return mw.html.create('div'):addClass('brkts-br-wrapper'):node(bracketNode):node(matchNode)
 end
 
+---@param bracket MatchGroupUtilMatchGroup
+---@return MatchGroupUtilMatchGroup
 function HorizontallistDisplay._sortMatches(bracket)
 	local matchOrder = function(match1, match2)
 		if not match1[2].coordinates then
@@ -123,6 +142,9 @@ function HorizontallistDisplay._sortMatches(bracket)
 	return Array.sortBy(Table.entries(bracket.bracketDatasById), FnUtil.identity, matchOrder)
 end
 
+---@param bracket MatchGroupUtilMatchGroup
+---@param config HorizontallistConfig
+---@return string[]
 function HorizontallistDisplay.computeHeaders(bracket, config)
 	-- Group by inheritedHeader
 	local headers = Array.groupAdjacentBy(
@@ -150,11 +172,10 @@ HorizontallistDisplay.propTypes.NodeHeader = {
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
 }
 
---[[
-Display component for the headers of a node in the bracket tree. Draws a row of
-headers for the match, everything to the left of it, and for the qualification
-spots.
-]]
+--- Display component for the headers of a node in the bracket tree.
+--- Draws a row of headers for the match, everything to the left of it, and for the qualification spots.
+---@param props table #TODO
+---@return Html?
 function HorizontallistDisplay.NodeHeader(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.NodeHeader)
 	if not props.header then
@@ -183,9 +204,9 @@ HorizontallistDisplay.propTypes.Match = {
 	matchHasDetails = 'function',
 }
 
---[[
-Display component for a match
-]]
+---Display component for a match
+---@param props table #TODO
+---@return Html
 function HorizontallistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.Match)
 	local matchNode = mw.html.create('div')
