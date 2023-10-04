@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -22,6 +24,8 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 	.. '${tierMode}[[Category:Pages with invalid ${tierMode}]]'
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
+
+local Opponent = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true}).Opponent
 
 ---Entry point
 ---@param args table?
@@ -48,17 +52,7 @@ function HiddenDataBox.run(args)
 		if not queryResult[1] and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		elseif args.participantGrabber then
-			local participants = HiddenDataBox._fetchParticipants(parent)
-
-			Table.iter.forEachPair(participants, function (participant, players)
-				-- TODO: An improvement would be called TeamCard module for this
-				-- Would need a rework for the function that does it however
-				local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-
-				Table.iter.forEachPair(players, function(key, value)
-					HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
-				end)
-			end)
+			Array.forEach(HiddenDataBox._fetchPlacements(parent), HiddenDataBox._setWikiVariablesFromPlacement)
 		end
 
 		queryResult = queryResult[1] or {}
@@ -124,23 +118,17 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return {[string]: {[string]: string}}
-function HiddenDataBox._fetchParticipants(parent)
+---@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}[]
+function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. parent .. ']]',
+		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
 		limit = 1000,
-		query = 'players, participant',
+		query = 'opponentplayers, opponentname, opponenttype',
 	})
 
-	return
-		Table.map(
-			Table.filter(placements, function(placement)
-				return String.isNotEmpty(placement.participant) and placement.participant:lower() ~= 'tbd'
-			end),
-			function(_, placement)
-				return placement.participant, placement.players
-			end
-		)
+	return Array.filter(placements, function(placement)
+		return String.isNotEmpty(placement.opponentname) and placement.opponentname:lower() ~= 'tbd'
+	end)
 end
 
 -- overridable so that wikis can add custom vars
@@ -149,12 +137,29 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
+---@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
+function HiddenDataBox._setWikiVariablesFromPlacement(placement)
+	if Opponent.typeIsParty(placement.opponenttype) then
+		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
+		Opponent.resolve(Opponent.fromLpdbStruct(placement), {syncPlayer = true})
+		return
+	end
+
+	-- TODO: An improvement would be called TeamCard module for this
+	-- Would need a rework for the function that does it however
+	local participant = placement.opponentname
+	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
+	Table.iter.forEachPair(placement.opponentplayers, function(key, value)
+		HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+	end)
+end
+
 -- overridable so that wikis can add custom vars
 ---@param participant string
 ---@param participantResolved string
 ---@param key string
 ---@param value string|number
-function HiddenDataBox.setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+function HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
 		Variables.varDefine(participantResolved .. '_' .. key, value)
