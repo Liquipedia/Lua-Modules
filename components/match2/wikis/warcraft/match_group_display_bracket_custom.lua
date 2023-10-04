@@ -50,32 +50,21 @@ function CustomBracketDisplay.OpponentEntry(props)
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
 	if opponent.type == Opponent.team then
-		local bracketNode = OpponentDisplay.BlockTeamContainer({
-			overflow = 'ellipsis',
+		local bracketNode =
+		leftNode:node(OpponentDisplay.BlockTeamContainer({
 			showLink = false,
-			style = 'bracket',
+			style = 'hybrid',
 			team = opponent.team,
 			template = opponent.template,
-		})
-		local shortNode = OpponentDisplay.BlockTeamContainer({
-			overflow = 'hidden',
-			showLink = false,
-			style = 'short',
-			team = opponent.team,
-			template = opponent.template,
-		})
-		leftNode
-			:node(bracketNode:addClass('hidden-xs'))
-			:node(shortNode:addClass('visible-xs'))
+		}))
 	else
-		local blockOpponentNode = OpponentDisplay.BlockOpponent({
+		leftNode:node(OpponentDisplay.BlockOpponent({
 			opponent = opponent,
 			overflow = 'ellipsis',
 			playerClass = 'starcraft-bracket-block-player',
 			showLink = false,
 			showRace = not showRaceBackground,
-		})
-		leftNode:node(blockOpponentNode)
+		}))
 	end
 
 	local scoreNode
