@@ -34,7 +34,7 @@ StarcraftMatchGroupUtil.types.Opponent = TypeUtil.extendStruct(MatchGroupUtil.ty
 	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	team = TypeUtil.optional(MatchGroupUtil.types.Team),
 })
----@class StarcraftMatchGroupUtilGameOpponent
+---@class StarcraftMatchGroupUtilGameOpponent:GameOpponent
 ---@field isArchon boolean
 ---@field isSpecialArchon boolean
 ---@field placement number?
