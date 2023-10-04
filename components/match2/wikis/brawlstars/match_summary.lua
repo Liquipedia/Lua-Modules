@@ -59,7 +59,7 @@ local Brawler = Class.new(
 	end
 )
 
----@return BrawlstarsMatchSummaryBrawler
+---@return self
 function Brawler:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','35%'):wikitext(''):done()
@@ -75,7 +75,7 @@ end
 ---@param numberBrawlers integer
 ---@param date string
 ---@param firstPick integer?
----@return BrawlstarsMatchSummaryBrawler
+---@return self
 function Brawler:row(brawlerData, gameNumber, numberBrawlers, date, firstPick)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
