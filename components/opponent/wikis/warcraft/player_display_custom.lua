@@ -40,7 +40,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
-	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
+	local nameNode = mw.html.create(props.dq and 's' or 'span')
 		:wikitext(
 			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and player.pageName
@@ -48,6 +48,14 @@ function CustomPlayerDisplay.BlockPlayer(props)
 			or Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
+
+	if props.note then
+		nameNode = mw.html.create('span'):addClass('name')
+			:node(nameNode)
+			:tag('sup'):addClass('note'):wikitext(props.note):done()
+	else
+		nameNode:addClass('name')
+	end
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
@@ -67,16 +75,12 @@ function CustomPlayerDisplay.BlockPlayer(props)
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
-	local noteNode = props.note and mw.html.create('span'):addClass('note'):wikitext(props.note) or nil
-
 	return mw.html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(raceNode)
-		:node(props.flip and noteNode or nil)
 		:node(nameNode)
-		:node(not props.flip and noteNode or nil)
 		:node(teamNode)
 end
 
