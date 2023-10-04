@@ -48,7 +48,6 @@ function CustomBracketDisplay.OpponentEntry(props)
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
 	if opponent.type == Opponent.team then
-		local bracketNode =
 		leftNode:node(OpponentDisplay.BlockTeamContainer({
 			showLink = false,
 			style = 'hybrid',
