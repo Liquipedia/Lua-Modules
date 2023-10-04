@@ -52,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 			name = 'First Appearance',
 			content = {Page.makeInternalLink({onlyIfExists = true}, _args.appearance) or _args.appearance}
 		},
-		Cell{name = 'Competition Span', content = {_args.span}},
+		Cell{name = 'Competition Span', content = {_args.span}}
 	)
 	return widgets
 end
