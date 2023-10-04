@@ -65,7 +65,7 @@ local OperatorBans = Class.new(
 	end
 )
 
----@return R6OperatorBan
+---@return self
 function OperatorBans:setLeft()
 	self.root
 		:addClass('brkts-popup-body-operator-bans')
@@ -74,7 +74,7 @@ function OperatorBans:setLeft()
 	return self
 end
 
----@return R6OperatorBan
+---@return self
 function OperatorBans:setRight()
 	self.root
 		:addClass('brkts-popup-body-operator-bans')
@@ -84,7 +84,7 @@ function OperatorBans:setRight()
 end
 
 ---@param operator string?
----@return R6OperatorBan
+---@return self
 function OperatorBans:add(operator)
 	if Logic.isEmpty(operator) then
 		return self
@@ -120,7 +120,7 @@ local Score = Class.new(
 	end
 )
 
----@return R6Score
+---@return self
 function Score:setLeft()
 	self.table
 		:css('float', 'left')
@@ -128,7 +128,7 @@ function Score:setLeft()
 	return self
 end
 
----@return R6Score
+---@return self
 function Score:setRight()
 	self.table
 		:css('float', 'right')
@@ -137,7 +137,7 @@ function Score:setRight()
 end
 
 ---@param score string|number|nil
----@return R6Score
+---@return self
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -154,7 +154,7 @@ end
 ---@param side string
 ---@param score number
 ---@param position integer
----@return R6Score
+---@return self
 function Score:setFirstRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
 	local leftElement, rightElement
@@ -176,7 +176,7 @@ end
 ---@param side string
 ---@param score number
 ---@param position integer
----@return R6Score
+---@return self
 function Score:setSecondRoundScore(side, score, position)
 	local icon = ROUND_ICONS[side]
 	local leftElement, rightElement
@@ -198,7 +198,7 @@ end
 ---@param side string
 ---@param score number
 ---@param position integer
----@return R6Score
+---@return self
 function Score:setFirstOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot' .. side]
 	local leftElement, rightElement
@@ -220,7 +220,7 @@ end
 ---@param side string
 ---@param score number
 ---@param position integer
----@return R6Score
+---@return self
 function Score:setSecondOvertimeRoundScore(side, score, position)
 	local icon = ROUND_ICONS['ot'..side]
 	local leftElement, rightElement
@@ -239,7 +239,7 @@ function Score:setSecondOvertimeRoundScore(side, score, position)
 	return self
 end
 
----@return R6Score
+---@return self
 function Score:addEmptyOvertime()
 	local roundScore = mw.html.create('td'):css('width','20px')
 	self.top:node(roundScore)
@@ -267,7 +267,7 @@ local MapVeto = Class.new(
 	end
 )
 
----@return R6MapVeto
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -277,7 +277,7 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
----@return R6MapVeto
+---@return self
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -297,7 +297,7 @@ function MapVeto:vetoStart(firstVeto)
 end
 
 ---@param map string?
----@return R6MapVeto
+---@return self
 function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
@@ -317,7 +317,7 @@ end
 ---@param vetotype string?
 ---@param map1 string?
 ---@param map2 string?
----@return R6MapVeto
+---@return self
 function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
@@ -357,7 +357,7 @@ end
 ---@param row Html
 ---@param styleClass string
 ---@param vetoText string
----@return R6MapVeto
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -369,7 +369,7 @@ end
 
 ---@param row Html
 ---@param map string
----@return R6MapVeto
+---@return self
 function MapVeto:addColumnVetoMap(row,map)
 	row:tag('td'):wikitext(map):done()
 	return self
