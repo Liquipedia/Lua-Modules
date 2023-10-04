@@ -106,7 +106,7 @@ function HorizontallistDisplay.Bracket(props)
 
 	local bracketNode = mw.html.create('div')
 			:addClass('navigation-tabs')
-			:attr('data-js-battle-royale', 'navigation-tabs')
+			:attr('data-js-battle-royale', 'navigation')
 			:attr('role', 'tabpanel')
 			:node(list)
 
