@@ -20,7 +20,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
 ]]
-local StarcraftMatchGroupUtil = {}
+local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 StarcraftMatchGroupUtil.types = {}
 
@@ -34,6 +34,12 @@ StarcraftMatchGroupUtil.types.Opponent = TypeUtil.extendStruct(MatchGroupUtil.ty
 	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	team = TypeUtil.optional(MatchGroupUtil.types.Team),
 })
+---@class StarcraftMatchGroupUtilGameOpponent:GameOpponent
+---@field isArchon boolean
+---@field isSpecialArchon boolean
+---@field placement number?
+---@field players StarcraftStandardPlayer[]
+---@field score number?
 StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	isArchon = 'boolean',
 	isSpecialArchon = 'boolean',
@@ -41,13 +47,30 @@ StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
 	score = 'number?',
 })
+
+---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
+---@field opponents StarcraftMatchGroupUtilGameOpponent[]
+---@field offraces table<integer, string[]>?
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
 })
+---@class StarcraftMatchGroupUtilVeto
+---@field by number?
+---@field map string
 StarcraftMatchGroupUtil.types.MatchVeto = TypeUtil.struct({
 	by = 'number',
 	map = 'string',
 })
+---@class StarcraftMatchGroupUtilSubmatch
+---@field games StarcraftMatchGroupUtilGame[]
+---@field mode string
+---@field opponents StarcraftMatchGroupUtilGameOpponent[]
+---@field resultType ResultType
+---@field scores table<number, number>
+---@field subgroup number
+---@field walkover WalkoverType
+---@field winner number?
+---@field header string?
 StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	mode = 'string',
@@ -58,6 +81,16 @@ StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
 })
+---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games StarcraftMatchGroupUtilGame[]
+---@field headToHead boolean
+---@field isFfa boolean
+---@field noScore boolean?
+---@field opponentMode 'uniform'|'team'
+---@field opponents StarcraftStandardOpponent[]
+---@field vetoes StarcraftMatchGroupUtilVeto[]
+---@field submatches StarcraftMatchGroupUtilSubmatch[]?
+---@field casters string?
 StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types.Match, {
 	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
 	headToHead = 'boolean',
@@ -68,9 +101,10 @@ StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types
 	vetoes = TypeUtil.array(StarcraftMatchGroupUtil.types.MatchVeto),
 })
 
-
+---@param record table
+---@return StarcraftMatchGroupUtilMatch
 function StarcraftMatchGroupUtil.matchFromRecord(record)
-	local match = MatchGroupUtil.matchFromRecord(record)
+	local match = MatchGroupUtil.matchFromRecord(record)--[[@as StarcraftMatchGroupUtilMatch]]
 
 	-- Add additional fields to opponents
 	StarcraftMatchGroupUtil.populateOpponents(match)
@@ -100,9 +134,9 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Add vetoes
 	match.vetoes = {}
-	for vetoIx = 1, math.huge do
-		local map = Table.extract(extradata, 'veto' .. vetoIx)
-		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIx .. 'by'))
+	for vetoIndex = 1, math.huge do
+		local map = Table.extract(extradata, 'veto' .. vetoIndex)
+		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIndex .. 'by'))
 		if not map then break end
 
 		table.insert(match.vetoes, {map = map, by = by})
@@ -117,7 +151,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	return match
 end
 
--- Move additional fields from extradata to struct
+---Move additional fields from extradata to struct
+---@param match StarcraftMatchGroupUtilMatch
 function StarcraftMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
@@ -130,15 +165,6 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		for _, player in ipairs(opponent.players) do
 			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
-
-		if opponent.template == 'default' then
-			opponent.team = {
-				bracketName = Table.extract(opponent.extradata, 'bracket'),
-				displayName = Table.extract(opponent.extradata, 'display'),
-				pageName = opponent.name,
-				shortName = Table.extract(opponent.extradata, 'short'),
-			}
-		end
 	end
 
 	if #opponents == 2 and opponents[1].score2 and opponents[2].score2 then
@@ -148,21 +174,23 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 	end
 end
 
--- Computes game.opponents by looking up matchOpponents.players on each
--- participant.
+---Computes game.opponents by looking up matchOpponents.players on each participant.
+---@param game StarcraftMatchGroupUtilGame
+---@param matchOpponents StarcraftStandardOpponent[]
+---@return StarcraftMatchGroupUtilGameOpponent[]
 function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local function playerFromParticipant(opponentIx, matchPlayerIx, participant)
-		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
+	local function playerFromParticipant(opponentIndex, matchPlayerIndex, participant)
+		local matchPlayer = matchOpponents[opponentIndex].players[matchPlayerIndex]
 		if matchPlayer then
 			return Table.merge(matchPlayer, {
-				matchPlayerIx = matchPlayerIx,
+				matchPlayerIndex = matchPlayerIndex,
 				race = participant.faction,
 				position = tonumber(participant.position),
 			})
 		else
 			return {
 				displayName = 'TBD',
-				matchPlayerIx = matchPlayerIx,
+				matchPlayerIndex = matchPlayerIndex,
 				race = Faction.defaultFaction,
 			}
 		end
@@ -171,31 +199,31 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	-- Convert participants list to players array
 	local opponentPlayers = {}
 	for key, participant in pairs(game.participants) do
-		local opponentIx, matchPlayerIx = key:match('(%d+)_(%d+)')
-		opponentIx = tonumber(opponentIx)
-		-- opponentIx can not be nil due to the format of the participants keys
-		---@cast opponentIx -nil
-		matchPlayerIx = tonumber(matchPlayerIx)
+		local opponentIndex, matchPlayerIndex = key:match('(%d+)_(%d+)')
+		opponentIndex = tonumber(opponentIndex)
+		-- opponentIndex can not be nil due to the format of the participants keys
+		---@cast opponentIndex -nil
+		matchPlayerIndex = tonumber(matchPlayerIndex)
 
-		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)
+		local player = playerFromParticipant(opponentIndex, matchPlayerIndex, participant)
 
-		if not opponentPlayers[opponentIx] then
-			opponentPlayers[opponentIx] = {}
+		if not opponentPlayers[opponentIndex] then
+			opponentPlayers[opponentIndex] = {}
 		end
-		table.insert(opponentPlayers[opponentIx], player)
+		table.insert(opponentPlayers[opponentIndex], player)
 	end
 
 	local modeParts = mw.text.split(game.mode or '', 'v')
 
 	-- Create game opponents
 	local opponents = {}
-	for opponentIx = 1, #modeParts do
+	for opponentIndex = 1, #modeParts do
 		local opponent = {
-			isArchon = modeParts[opponentIx] == 'Archon',
-			isSpecialArchon = modeParts[opponentIx]:match('^%dS$'),
-			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIx)),
-			players = opponentPlayers[opponentIx] or {},
-			score = game.scores[opponentIx],
+			isArchon = modeParts[opponentIndex] == 'Archon',
+			isSpecialArchon = modeParts[opponentIndex]:match('^%dS$'),
+			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIndex)),
+			players = opponentPlayers[opponentIndex] or {},
+			score = game.scores[opponentIndex],
 		}
 		if opponent.placement and (opponent.placement < 1 or 99 <= opponent.placement) then
 			opponent.placement = nil
@@ -213,7 +241,7 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		else
 			-- Sort players by the order they appear in the match opponent players list
 			table.sort(opponent.players, function(a, b)
-				return a.matchPlayerIx < b.matchPlayerIx
+				return a.matchPlayerIndex < b.matchPlayerIndex
 			end)
 		end
 	end
@@ -221,7 +249,9 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return opponents
 end
 
--- Group games on the subgroup field to form submatches
+---Group games on the subgroup field to form submatches
+---@param matchGames StarcraftMatchGroupUtilGame[]
+---@return StarcraftMatchGroupUtilGame[][]
 function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 	-- Group games on adjacent subgroups
 	local previousSubgroup = nil
@@ -239,28 +269,31 @@ function StarcraftMatchGroupUtil.groupBySubmatch(matchGames)
 	return submatchGames
 end
 
---Constructs a submatch object whose properties are aggregated from that of its games.
+---Constructs a submatch object whose properties are aggregated from that of its games.
+---@param games StarcraftMatchGroupUtilGame[]
+---@param match StarcraftMatchGroupUtilMatch
+---@return StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
 	-- If the same race was played in all games, display that instead of the
 	-- player's race listed in the match.
-	for opponentIx, opponent in pairs(opponents) do
+	for opponentIndex, opponent in pairs(opponents) do
 		-- Aggregate races among games for each player
 		local playerRaces = {}
 		for _, game in pairs(games) do
-			for playerIx, player in pairs(game.opponents[opponentIx].players) do
-				if not playerRaces[playerIx] then
-					playerRaces[playerIx] = {}
+			for playerIndex, player in pairs(game.opponents[opponentIndex].players) do
+				if not playerRaces[playerIndex] then
+					playerRaces[playerIndex] = {}
 				end
-				playerRaces[playerIx][player.race] = true
+				playerRaces[playerIndex][player.race] = true
 			end
 		end
 
-		for playerIx, player in pairs(opponent.players) do
-			player.race = Table.uniqueKey(playerRaces[playerIx])
+		for playerIndex, player in pairs(opponent.players) do
+			player.race = Table.uniqueKey(playerRaces[playerIndex])
 			if not player.race then
-				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
+				local matchPlayer = match.opponents[opponentIndex].players[player.matchPlayerIndex]
 				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
 			end
 		end
@@ -268,13 +301,13 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 
 	-- Sum up scores
 	local scores = {}
-	for opponentIx, _ in pairs(opponents) do
-		scores[opponentIx] = 0
+	for opponentIndex, _ in pairs(opponents) do
+		scores[opponentIndex] = 0
 	end
 	for _, game in pairs(games) do
 		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
-			for opponentIx, score in pairs(scores) do
-				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
+			for opponentIndex, score in pairs(scores) do
+				scores[opponentIndex] = score + (game.scores[opponentIndex] or 0)
 			end
 		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
@@ -327,30 +360,32 @@ function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	}
 end
 
--- Determine if a match has details that should be displayed via popup
+---Determine if a match has details that should be displayed via popup
+---@param match StarcraftMatchGroupUtilMatch
+---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
 	return match.dateIsExact
-		or match.vod
+		or String.isNotEmpty(match.vod)
 		or not Table.isEmpty(match.links)
-		or match.comment
-		or match.casters
+		or String.isNotEmpty(match.comment)
+		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes
 		or Array.any(match.games, function(game)
 			return game.map and game.map ~= 'TBD'
-				or game.winner
+				or Logic.isNumeric(game.winner)
 		end)
 end
 
---[[
-Determines if any players in an opponent are not playing their main race by
-comparing them to a reference opponent. Returns the races played if at least
-one player chose an offrace or nil if otherwise.
-]]
+---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
+---Returns the races played if at least one player chose an offrace or nil if otherwise.
+---@param gameOpponent StarcraftMatchGroupUtilGameOpponent
+---@param referenceOpponent StarcraftStandardOpponent|StarcraftMatchGroupUtilGameOpponent
+---@return string[]?
 function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	local gameRaces = {}
 	local hasOffrace = false
-	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
-		local referencePlayer = referenceOpponent.players[playerIx] or {}
+	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do
+		local referencePlayer = referenceOpponent.players[playerIndex] or {}
 		table.insert(gameRaces, gamePlayer.race)
 		if gamePlayer.race ~= referencePlayer.race then
 			hasOffrace = true
@@ -359,6 +394,8 @@ function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent
 	return hasOffrace and gameRaces or nil
 end
 
+---@param record table
+---@return StarcraftStandardPlayer
 function StarcraftMatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
@@ -369,17 +406,6 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		pageName = record.name,
 		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
-end
-
--- merge submatches for reset matches
-function StarcraftMatchGroupUtil.mergeResetSubmatches(match, bracketId)
-	if match and String.isNotEmpty(match.bracketData.bracketResetMatchId) then
-		local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
-		local bracketResetMatch = bracket.matchesById[match.bracketData.bracketResetMatchId]
-		Array.extendWith(match.submatches, bracketResetMatch.submatches)
-	end
-
-	return match.submatches
 end
 
 return StarcraftMatchGroupUtil

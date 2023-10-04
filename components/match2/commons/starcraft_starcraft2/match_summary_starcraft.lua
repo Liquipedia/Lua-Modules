@@ -7,187 +7,158 @@
 --
 
 local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
+local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
-local TypeUtil = require('Module:TypeUtil')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
-local StarcraftOpponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
-local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 
-local html = mw.html
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
---[[
-Display component for the match summary used by the starcraft and stacraft2
-wikis. Shows details of a StarCraft match, including opponents, maps,
-submatches, and external media links.
-]]
-local StarcraftMatchSummary = {propTypes = {}}
-
-StarcraftMatchSummary.propTypes.MatchSummaryContainer = {
-	bracketId = 'string',
-	matchId = 'string',
-	config = 'table?',
+local ICONS = {
+	greenCheck = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
+	yellowQuestionMark = '[[File:YellowQuestionMark.png|14x14px|link=]]',
+	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
+	noCheck = '[[File:NoCheck.png|link=]]',
 }
+local LINKS_DATA = {
+	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
+	interview = {icon = 'File:Interview32.png', text = 'Interview'},
+	review = {icon = 'File:Reviews32.png', text = 'Review'},
+	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
+	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
+}
+LINKS_DATA.preview2 = LINKS_DATA.preview
+LINKS_DATA.interview2 = LINKS_DATA.interview
+LINKS_DATA.recap = LINKS_DATA.review
 
-function StarcraftMatchSummary.MatchSummaryContainer(props)
-	local options = {mergeBracketResetMatch = false}
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId, options)
-	local bracketResetMatch = match and match.bracketData.bracketResetMatchId
-		and MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, match.bracketData.bracketResetMatchId, options)
+local UNIFORM_MATCH = 'uniform'
+local TBD = 'TBD'
 
-	local MatchSummary = match.isFfa
-		and Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary
-		or StarcraftMatchSummary.MatchSummary
+---Custom Class for displaying game details in submatches
+---@class StarcraftMatchSummarySubmatchRow: MatchSummaryRowInterface
+---@operator call: StarcraftMatchSummarySubmatchRow
+---@field root Html
+local StarcraftMatchSummarySubmatchRow = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-sc-submatch')
+	end
+)
 
-	return MatchSummary{match = match, bracketResetMatch = bracketResetMatch, config = props.config}
+---@param element Html|string|nil
+---@return self
+function StarcraftMatchSummarySubmatchRow:addElement(element)
+	self.root:node(element)
+	return self
 end
 
-StarcraftMatchSummary.propTypes.MatchSummary = {
-	bracketResetMatch = TypeUtil.optional(StarcraftMatchGroupUtil.types.Match),
-	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table',
-}
+---@return Html
+function StarcraftMatchSummarySubmatchRow:create()
+	return self.root
+end
 
-function StarcraftMatchSummary.MatchSummary(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.MatchSummary)
-	local match = props.match
-	local bracketResetMatch = props.bracketResetMatch
+local StarcraftMatchSummary = {}
 
-	local propsConfig = props.config or {}
-	local config = {
-		showScore = propsConfig.showScore or false,
-	}
+---@param args {bracketId: string, matchId: string, config: table?}
+---@return Html
+function StarcraftMatchSummary.MatchSummaryContainer(args)
+	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
+	local match, bracketResetMatch =
+		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
+	---@cast match StarcraftMatchGroupUtilMatch
+	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
-	-- Compute offraces
-	StarcraftMatchSummary.computeOffraces(match)
-	if bracketResetMatch then
-		StarcraftMatchSummary.computeOffraces(bracketResetMatch)
+	if match.isFfa then
+		return Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary{
+			match = match,
+			bracketResetMatch = bracketResetMatch,
+			config = args.config
+		}
 	end
 
-	return html.create('div')
-		:addClass('brkts-popup')
+	local matchSummary = MatchSummary():init()
 		:addClass('brkts-popup-sc')
-		:addClass(match.opponentMode == 'uniform' and 'brkts-popup-sc-uniform-match' or 'brkts-popup-sc-team-match')
-		:node(StarcraftMatchSummary.Header{match = match, config = config})
-		:node(StarcraftMatchSummary.Body{match = match})
-		:node(bracketResetMatch and StarcraftMatchSummary.Body{match = bracketResetMatch, config = {isReset = true}} or nil)
-		:node(StarcraftMatchSummary.Footer{match = match, showHeadToHead = match.headToHead})
+		:addClass(match.opponentMode ~= UNIFORM_MATCH  and 'brkts-popup-sc-team-match' or nil)
+
+	--additional header for when martin adds the the css and buttons for switching between match and reset match
+	--if bracketResetMatch then
+		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
+		--matchSummary:header(createHeader(match, {noScore = true}))
+		--here martin can add the buttons for switching between match and reset match
+	--end
+
+	matchSummary:addMatch(MatchSummary.createMatch(match, StarcraftMatchSummary))
+	matchSummary:addMatch(MatchSummary.createMatch(bracketResetMatch, StarcraftMatchSummary))
+
+	return matchSummary:create()
 end
 
-StarcraftMatchSummary.propTypes.Header = {
-	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table'
-}
+---@param match StarcraftMatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function StarcraftMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-function StarcraftMatchSummary.Header(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Header)
-	local match = props.match
-
-	local showScore = props.config.showScore
-
-	local renderOpponent = function(opponentIx)
-		local opponent = match.opponents[opponentIx]
-		local flip = opponentIx == 1
-		local opponentDisplay = {}
-		table.insert(opponentDisplay, StarcraftOpponentDisplay.BlockOpponent{
-			flip = flip,
-			opponent = opponent,
-			overflow = 'wrap',
-			showFlag = false,
-			showLink = opponent.type == 'team' or showScore,
-		})
-		local side = (flip and 'left' or 'right')
-
-		local display = html.create('div')
-
-		if showScore then
-			display:addClass('brkts-popup-header-opponent-' .. side)
-				:addClass('brkts-popup-sc-header-opponent-with-score')
-
-			local scoreDisplay = StarcraftOpponentDisplay.BlockScore{
-				isWinner = opponent.placement == 1 or opponent.advances,
-				scoreText = StarcraftOpponentDisplay.InlineScore(opponent),
-			}
-			scoreDisplay:addClass('brkts-popup-header-opponent-score-' .. side)
-			table.insert(opponentDisplay, scoreDisplay)
-		else
-			display:addClass('brkts-popup-header-opponent')
-		end
-		if not flip then
-			opponentDisplay = Array.reverse(opponentDisplay)
-		end
-		Array.forEach(opponentDisplay, function(opponentNode) display:node(opponentNode) end)
-
-		return display
+	if not match.headToHead or #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
+		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
+	then
+		return footer:addLinks(LINKS_DATA, match.links)
 	end
-	local header = html.create('div'):addClass('brkts-popup-header-dev')
-		:node(renderOpponent(1))
-		:node(renderOpponent(2))
 
-	return header
+	match.links.h2h = tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
+		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
+		.. match.opponents[1].players[1].pageName
+		.. '&Head_to_head_query%5Bopponent%5D='
+		.. match.opponents[2].players[1].pageName
+		.. '&wpRunQuery=Run+query'
+	match.links.h2h = string.gsub(match.links.h2h, ' ', '_')
+
+	return footer:addLinks(LINKS_DATA, match.links)
 end
 
-StarcraftMatchSummary.propTypes.Body = {
-	match = StarcraftMatchGroupUtil.types.Match,
-	config = 'table?',
-}
+---@param match StarcraftMatchGroupUtilMatch
+---@return MatchSummaryBody
+function StarcraftMatchSummary.createBody(match)
+	StarcraftMatchSummary.computeOffraces(match)
 
-function StarcraftMatchSummary.Body(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Body)
-	local config = props.config or {}
-	local match = props.match
+	local body = MatchSummary.Body()
 
-	local body = html.create('div')
-		:addClass('brkts-popup-body')
-		:addClass('brkts-popup-sc-body')
-
-	if config.isReset then
-		body:node(StarcraftMatchSummary.ResetHeader())
+	--this if can be removed once the "switching between match and reset match" stuff has been implemented
+	if String.endsWith(match.matchId, '_RxMBR') then
+		body:addRow(MatchSummary.Row()
+			:addClass('brkts-popup-sc-veto-center')
+			:css('line-height', '80%')
+			:css('font-weight', 'bold')
+			:addElement('Reset match')
+		)
 	end
 
 	-- Stream, date, and countdown
 	if match.dateIsExact then
-		local countdownNode = DisplayHelper.MatchCountdownBlock(match)
-			:addClass('brkts-popup-body-element')
-			:addClass('brkts-popup-countdown')
-		body:node(countdownNode)
+		body:addRow(MatchSummary.Row():addElement(
+			DisplayHelper.MatchCountdownBlock(match)
+		):addClass('brkts-popup-countdown'))
 	end
 
 	-- add a comment if there is a pre match map advantage
 	for _, opponent in ipairs(match.opponents or {}) do
-		-- if the opponent has a (numeric) pre match advantage build the comment
-		if Logic.isNumeric((opponent.extradata or {}).advantage) then
-			body:node(
-				html.create('div')
-					:addClass('brkts-popup-body-element')
-					:addClass('brkts-popup-sc-game-center') -- use this over comment class so it is shown in the height as maps
-					:node(StarcraftOpponentDisplay.InlineOpponent{
-						opponent = StarcraftOpponent.isTbd(opponent) and StarcraftOpponent.tbd() or opponent,
-						showFlag = false,
-						showLink = true,
-						showRace = false,
-						teamStyle = 'short',
-					})
-					:wikitext(' starts with a ' .. opponent.extradata.advantage .. ' map advantage.')
-			)
-		end
+		StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 	end
 
-	if match.opponentMode == 'uniform' then
-		for _, game in ipairs(match.games) do
-			if game.map or game.winner then
-				body:node(StarcraftMatchSummary.Game(game):addClass('brkts-popup-body-element'))
-			end
-		end
-	else -- match.opponentMode == 'team'
-
+	if match.opponentMode == UNIFORM_MATCH then
+		Array.forEach(match.games, function(game)
+			body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game')
+				:addElements(StarcraftMatchSummary.Game(game))) end)
+	else -- team games
 		-- Show the submatch score if any submatch consists of more than one game
 		-- or if the Map name starts with 'Submatch' (and the submatch has a game)
 		local showScore = Array.any(match.submatches, function(submatch)
@@ -195,306 +166,28 @@ function StarcraftMatchSummary.Body(props)
 				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
 		end)
 
-		for _, submatch in ipairs(match.submatches) do
-			body:node(
-				StarcraftMatchSummary.TeamSubmatch({submatch = submatch, showScore = showScore})
-					:addClass('brkts-popup-body-element')
-			)
-		end
+		Array.forEach(match.submatches, function(submatch)
+			body:addRow(StarcraftMatchSummary.TeamSubmatch{submatch = submatch, showScore = showScore}) end)
 	end
 
-	-- Vetoes
-	for ix, veto in ipairs(match.vetoes) do
-		local vetoNode = StarcraftMatchSummary.Veto(veto)
-		if ix == 1 then
-			body:node(StarcraftMatchSummary.VetoHeader{header = 'Vetoes'})
-		end
-		body:node(vetoNode:addClass('brkts-popup-body-element'))
+	if Table.isNotEmpty(match.vetoes) then
+		-- add Veto Header
+		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-header brkts-popup-sc-veto-center'):addElement('Vetoes'))
 	end
+	Array.forEach(match.vetoes, function(veto)
+		body:addRow(StarcraftMatchSummary.Veto(veto))
+	end)
 
-	-- Match casters
 	if match.casters then
-		body:node(
-			html.create('div'):addClass('brkts-popup-body-element brkts-popup-sc-game-comment')
-				:node('Caster(s): ' .. match.casters)
-		)
-	end
-
-	-- Match comment
-	if match.comment then
-		body:node(
-			html.create('div'):addClass('brkts-popup-sc-game-comment')
-				:node(match.comment)
-		)
+		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-comment'):addElement('Caster(s): ' .. match.casters))
 	end
 
 	return body
 end
 
-function StarcraftMatchSummary.Game(game, config)
-	DisplayUtil.assertPropTypes(game, StarcraftMatchGroupUtil.types.Game.struct)
-
-	local centerNode = html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game, config))
-
-	local winnerIcon = function(opponentIx)
-		return game.resultType == 'draw' and StarcraftMatchSummary.ColoredIcon('YellowLine')
-			or game.winner == opponentIx and StarcraftMatchSummary.ColoredIcon('GreenCheck')
-			or StarcraftMatchSummary.ColoredIcon('NoCheck')
-	end
-
-	local showOffraceIcons = game.offraces ~= nil and (game.offraces[1] ~= nil or game.offraces[2] ~= nil)
-	local offraceIcons = function(opponentIx)
-		local offraces = game.offraces ~= nil and game.offraces[opponentIx] or nil
-		local opponent = game.opponents ~= nil and game.opponents[opponentIx] or nil
-
-		if offraces and opponent then
-			if opponent.isArchon then
-				return StarcraftMatchSummary.OffraceIcons({offraces[1]})
-			else
-				return StarcraftMatchSummary.OffraceIcons(offraces)
-			end
-		elseif showOffraceIcons then
-			return StarcraftMatchSummary.OffraceIcons({})
-		else
-			return nil
-		end
-	end
-
-	local bodyNode = html.create('div')
-		:addClass('brkts-popup-sc-game-body')
-		:node(winnerIcon(1))
-		:node(offraceIcons(1))
-		:node(centerNode)
-		:node(offraceIcons(2))
-		:node(winnerIcon(2))
-
-	local commentNode
-	if game.comment then
-		commentNode = html.create('div')
-			:addClass('brkts-popup-sc-game-comment')
-			:wikitext(game.comment)
-	end
-
-	local serverNode
-	if (game.extradata or {}).server then
-		serverNode = html.create('div')
-			:addClass('brkts-popup-sc-game-comment')
-			:wikitext('Played server: ' .. game.extradata.server)
-	end
-
-	local gameNode = html.create('div')
-		:addClass('brkts-popup-sc-game')
-		:node(game.header and StarcraftMatchSummary.GameHeader({header = game.header}) or nil)
-		:node(bodyNode)
-		:node(serverNode)
-		:node(commentNode)
-
-	return gameNode
-end
-
-StarcraftMatchSummary.propTypes.TeamSubmatch = {
-	showScore = 'boolean',
-	submatch = StarcraftMatchGroupUtil.types.Submatch,
-}
-
-function StarcraftMatchSummary.TeamSubmatch(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.TeamSubmatch)
-	local submatch = props.submatch
-
-	local centerNode = html.create('div')
-		:addClass('brkts-popup-sc-submatch-center')
-	for _, game in ipairs(submatch.games) do
-		if game.map or game.winner then
-			centerNode:node(StarcraftMatchSummary.Game(
-					game,
-					{noLink = String.startsWith(game.map or '', 'Submatch')}
-				)
-			)
-		end
-	end
-
-	local renderOpponent = function(opponentIx)
-		local opponent = submatch.opponents[opponentIx]
-		local node = opponent
-			and StarcraftOpponentDisplay.BlockOpponent({
-				opponent = opponent,
-				flip = opponentIx == 1,
-			})
-			or html.create('div'):wikitext('&nbsp;')
-		return node:addClass('brkts-popup-sc-submatch-opponent')
-	end
-
-	-- Render scores
-	local renderScore = function(opponentIx)
-		local isWinner = opponentIx == submatch.winner
-		local text
-		if submatch.resultType == 'default' then
-			text = isWinner and 'W' or submatch.walkover
-		else
-			local score = submatch.scores[opponentIx]
-			text = score and tostring(score) or ''
-		end
-		return html.create('div')
-			:addClass('brkts-popup-sc-submatch-score')
-			:wikitext(text)
-	end
-
-	local renderSide = function(opponentIx)
-		local sideNode = html.create('div')
-			:addClass('brkts-popup-sc-submatch-side')
-			:addClass(opponentIx == 1 and 'brkts-popup-left' or 'brkts-popup-right')
-			:addClass(opponentIx == submatch.winner and 'bg-win' or nil)
-			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
-			:node(opponentIx == 1 and renderOpponent(1) or nil)
-			:node(props.showScore and renderScore(opponentIx) or nil)
-			:node(opponentIx == 2 and renderOpponent(2) or nil)
-
-		return sideNode
-	end
-
-	local bodyNode = html.create('div')
-		:addClass('brkts-popup-sc-submatch-body')
-		:addClass(props.showScore and 'brkts-popup-sc-submatch-has-score' or nil)
-		:node(renderSide(1))
-		:node(centerNode)
-		:node(renderSide(2))
-
-	local headerNode
-	if submatch.header then
-		headerNode = html.create('div')
-			:addClass('brkts-popup-sc-submatch-header')
-			:wikitext(submatch.header)
-	end
-
-	local submatchNode = html.create('div')
-		:addClass('brkts-popup-sc-submatch')
-		:node(headerNode)
-		:node(bodyNode)
-
-	return submatchNode
-end
-
-StarcraftMatchSummary.propTypes.GameHeader = {
-	header = 'string',
-}
-
-function StarcraftMatchSummary.GameHeader(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.GameHeader)
-	return html.create('div')
-		:addClass('brkts-popup-sc-game-header')
-		:wikitext(props.header)
-end
-
-function StarcraftMatchSummary.ResetHeader()
-	return html.create('div')
-		:addClass('brkts-popup-body-element brkts-popup-sc-veto-center')
-		:css('font-weight', 'bold')
-		:wikitext('Reset match')
-end
-
-StarcraftMatchSummary.propTypes.VetoHeader = {
-	header = 'string',
-}
-
-function StarcraftMatchSummary.VetoHeader(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.VetoHeader)
-	return html.create('div')
-		:addClass('brkts-popup-body-element brkts-popup-sc-game-header brkts-popup-sc-veto-center')
-		:wikitext(props.header)
-end
-
-function StarcraftMatchSummary.Veto(veto)
-	DisplayUtil.assertPropTypes(veto, StarcraftMatchGroupUtil.types.MatchVeto.struct)
-
-	local centerNode = html.create('div'):addClass('brkts-popup-sc-veto-center')
-		:node('[[' .. veto.map .. ']]')
-
-	local statusIcon = function(opponentIx)
-		return opponentIx == veto.by
-			and StarcraftMatchSummary.ColoredIcon('RedCross')
-			or StarcraftMatchSummary.ColoredIcon('NoCheck')
-	end
-
-	return html.create('div')
-		:addClass('brkts-popup-sc-veto-body')
-		:node(statusIcon(1))
-		:node(centerNode)
-		:node(statusIcon(2))
-end
-
-StarcraftMatchSummary.propTypes.Footer = {
-	match = StarcraftMatchGroupUtil.types.Match,
-	showHeadToHead = 'boolean',
-}
-
-function StarcraftMatchSummary.Footer(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchSummary.propTypes.Footer)
-	local match = props.match
-
-	local links = StarcraftMatchExternalLinks.extractFromMatch(match)
-
-	local headToHeadNode
-	if props.showHeadToHead
-		and match.mode == '1_1'
-		and match.opponents[1].players[1]
-		and match.opponents[1].players[1].pageName
-		and match.opponents[2].players[1]
-		and match.opponents[2].players[1].pageName
-	then
-		local link = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
-			.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
-			.. match.opponents[1].players[1].pageName
-			.. '&Head_to_head_query%5Bopponent%5D='
-			.. match.opponents[2].players[1].pageName
-			.. '&wpRunQuery=Run+query'
-		link = string.gsub(link, ' ', '_')
-		headToHeadNode = '[[File:Match Info Stats.png|link=' .. link .. '|16px|Head-to-head statistics]]'
-	end
-
-	local hasFooter = (0 < #links) or headToHeadNode
-	if hasFooter then
-		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
-			:node(headToHeadNode)
-			:addClass('brkts-popup-sc-footer-links vodlink')
-		return html.create('div')
-			:addClass('brkts-popup-footer')
-			:addClass('brkts-popup-sc-footer')
-			:node(linksNode)
-	else
-		return nil
-	end
-end
-
-function StarcraftMatchSummary.ColoredIcon(icon)
-	if icon == 'GreenCheck' then
-		return '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-	elseif icon == 'YellowLine' then
-		return '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
-	elseif icon == 'YellowQuestionMark' then
-		return '[[File:YellowQuestionMark.png|14x14px|link=]]'
-	elseif icon == 'RedCross' then
-		return '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>'
-	elseif icon == 'NoCheck' then
-		return '[[File:NoCheck.png|link=]]'
-	else
-		return nil
-	end
-end
-
--- Renders off-races as Nx2 grid of tiny icons
-function StarcraftMatchSummary.OffraceIcons(races)
-	local racesNode = html.create('div')
-		:addClass('brkts-popup-sc-game-offrace-icons')
-	for _, race in ipairs(races) do
-		racesNode:node(Faction.Icon{size = 'tiny', faction = race})
-	end
-
-	return racesNode
-end
-
+---@param match StarcraftMatchGroupUtilMatch
 function StarcraftMatchSummary.computeOffraces(match)
-	if match.opponentMode == 'uniform' then
+	if match.opponentMode == UNIFORM_MATCH then
 		StarcraftMatchSummary.computeMatchOffraces(match)
 	else
 		for _, submatch in pairs(match.submatches) do
@@ -503,20 +196,200 @@ function StarcraftMatchSummary.computeOffraces(match)
 	end
 end
 
---[[
-Populate game.offraces if the played races differ from the races listed in the
-match
-]]
+---@param match StarcraftMatchGroupUtilMatch|StarcraftMatchGroupUtilSubmatch
 function StarcraftMatchSummary.computeMatchOffraces(match)
 	for _, game in ipairs(match.games) do
 		game.offraces = {}
-		for opponentIx, gameOpponent in pairs(game.opponents) do
-			game.offraces[opponentIx] = StarcraftMatchGroupUtil.computeOffraces(
+		for opponentIndex, gameOpponent in pairs(game.opponents) do
+			game.offraces[opponentIndex] = MatchGroupUtilStarcraft.computeOffraces(
 				gameOpponent,
-				match.opponents[opponentIx]
+				match.opponents[opponentIndex]
 			)
 		end
 	end
+end
+
+---@param body MatchSummaryBody
+---@param opponent StarcraftStandardOpponent
+function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
+	local extradata = opponent.extradata or {}
+	if not Logic.isNumeric(extradata.advantage) and not Logic.isNumeric(extradata.penalty) then
+		return
+	end
+	local infoType = Logic.isNumeric(extradata.advantage) and 'advantage' or 'penalty'
+	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
+
+	body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-center')
+		:addElement(mw.html.create():node(OpponentDisplay.InlineOpponent{
+			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
+			showFlag = false,
+			showLink = true,
+			showRace = false,
+			teamStyle = 'short',
+		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
+end
+
+---@param game StarcraftMatchGroupUtilGame
+---@param options {noLink: boolean}?
+---@return (Html|string)[]
+function StarcraftMatchSummary.Game(game, options)
+	local getWinnerIcon = function(opponentIndex)
+		return StarcraftMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
+			or game.winner == opponentIndex and 'greenCheck')
+	end
+
+	local showOffraceIcons = game.offraces ~= nil and (game.offraces[1] ~= nil or game.offraces[2] ~= nil)
+	local offraceIcons = function(opponentIndex)
+		local offraces = game.offraces ~= nil and game.offraces[opponentIndex] or nil
+		local opponent = game.opponents ~= nil and game.opponents[opponentIndex] or nil
+
+		if offraces and opponent and opponent.isArchon then
+			return StarcraftMatchSummary.OffraceIcons({offraces[1]})
+		elseif offraces and opponent then
+			return StarcraftMatchSummary.OffraceIcons(offraces)
+		elseif showOffraceIcons then
+			return StarcraftMatchSummary.OffraceIcons({})
+		else
+			return nil
+		end
+	end
+
+	local gameNodes = {StarcraftMatchSummary.GameHeader(game.header)}
+
+	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-game-center')
+		:wikitext(DisplayHelper.MapAndStatus(game, options))
+
+	table.insert(gameNodes, mw.html.create('div')
+		:addClass('brkts-popup-sc-game-body')
+		:node(getWinnerIcon(1))
+		:node(offraceIcons(1))
+		:node(centerNode)
+		:node(offraceIcons(2))
+		:node(getWinnerIcon(2))
+	)
+
+	if (game.extradata or {}).server then
+		table.insert(gameNodes, mw.html.create('div'):addClass('brkts-popup-sc-game-comment')
+			:wikitext('Played server: ' .. (game.extradata or {}).server))
+	end
+
+	if game.comment then
+		table.insert(gameNodes, mw.html.create('div'):addClass('brkts-popup-sc-game-comment'):wikitext(game.comment))
+	end
+
+	return gameNodes
+end
+
+---Renders off-races as Nx2 grid of tiny icons
+---@param races string[]
+---@return Html
+function StarcraftMatchSummary.OffraceIcons(races)
+	local racesNode = mw.html.create('div')
+		:addClass('brkts-popup-sc-game-offrace-icons')
+	for _, race in ipairs(races) do
+		racesNode:node(Faction.Icon{size = '12px', faction = race})
+	end
+
+	return racesNode
+end
+
+---@param header string|number|nil
+---@return Html?
+function StarcraftMatchSummary.GameHeader(header)
+	if not header then return end
+	return mw.html.create('div')
+		:addClass('brkts-popup-sc-game-header')
+		:wikitext(header)
+end
+
+---@param props {submatch: StarcraftMatchGroupUtilSubmatch, showScore: boolean}
+---@return StarcraftMatchSummarySubmatchRow
+function StarcraftMatchSummary.TeamSubmatch(props)
+	local submatch = props.submatch
+
+	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-submatch-center')
+	Array.forEach(submatch.games, function(game)
+		if not game.map and not game.winner then return end
+		for _, node in ipairs(StarcraftMatchSummary.Game(game, {noLink = String.startsWith(game.map or '', 'Submatch')})) do
+			centerNode:node(node)
+		end
+	end)
+
+	local renderOpponent = function(opponentIndex)
+		local opponent = submatch.opponents[opponentIndex]
+		local node = opponent
+			and OpponentDisplay.BlockOpponent({
+				opponent = opponent,
+				flip = opponentIndex == 1,
+			})
+			or mw.html.create('div'):wikitext('&nbsp;')
+		return node:addClass('brkts-popup-sc-submatch-opponent')
+	end
+
+	local renderScore = function(opponentIndex)
+		local isWinner = opponentIndex == submatch.winner
+		local text
+		if submatch.resultType == 'default' then
+			text = isWinner and 'W' or submatch.walkover
+		else
+			local score = submatch.scores[opponentIndex]
+			text = score and tostring(score) or ''
+		end
+		return mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-score')
+			:wikitext(text)
+	end
+
+	local renderSide = function(opponentIndex)
+		local sideNode = mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-side')
+			:addClass(opponentIndex == 1 and 'brkts-popup-left' or 'brkts-popup-right')
+			:addClass(opponentIndex == submatch.winner and 'bg-win' or nil)
+			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
+			:node(opponentIndex == 1 and renderOpponent(1) or nil)
+			:node(props.showScore and renderScore(opponentIndex) or nil)
+			:node(opponentIndex == 2 and renderOpponent(2) or nil)
+
+		return sideNode
+	end
+
+	local bodyNode = mw.html.create('div')
+		:addClass('brkts-popup-sc-submatch-body')
+		:addClass(props.showScore and 'brkts-popup-sc-submatch-has-score' or nil)
+		:node(renderSide(1))
+		:node(centerNode)
+		:node(renderSide(2))
+
+	local headerNode
+	if submatch.header then
+		headerNode = mw.html.create('div')
+			:addClass('brkts-popup-sc-submatch-header')
+			:wikitext(submatch.header)
+	end
+
+	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
+end
+
+---@param veto {map: string, by: number}
+---@return MatchSummaryRow
+function StarcraftMatchSummary.Veto(veto)
+	local statusIcon = function(opponentIndex)
+		return StarcraftMatchSummary.toIcon(opponentIndex == veto.by and 'redCross')
+	end
+
+	veto.map = veto.map or TBD
+
+	return MatchSummary.Row():addClass('brkts-popup-sc-veto-body')
+		:addElement(statusIcon(1))
+		:addElement(mw.html.create('div'):addClass('brkts-popup-sc-veto-center')
+			:wikitext(veto.map:upper() == TBD and TBD or ('[[' .. veto.map .. ']]')))
+		:addElement(statusIcon(2))
+end
+
+---@param key string|boolean|nil
+---@return string
+function StarcraftMatchSummary.toIcon(key)
+	return ICONS[key] or ICONS.noCheck
 end
 
 return StarcraftMatchSummary

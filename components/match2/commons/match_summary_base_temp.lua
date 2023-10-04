@@ -576,7 +576,7 @@ function MatchSummary.addVodsToFooter(match, footer)
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
----@param matchData table
+---@param matchData table?
 ---@param CustomMatchSummary table
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary)
