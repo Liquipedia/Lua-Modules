@@ -55,7 +55,7 @@ local StarcraftMatchSummarySubmatchRow = Class.new(
 )
 
 ---@param element Html|string|nil
----@return StarcraftMatchSummarySubmatchRow
+---@return self
 function StarcraftMatchSummarySubmatchRow:addElement(element)
 	self.root:node(element)
 	return self
