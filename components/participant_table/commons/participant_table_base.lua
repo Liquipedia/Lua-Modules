@@ -313,7 +313,9 @@ end
 function ParticipantTable:displaySection(section)
 	local entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
-	self.display:node(self.newSectionNode():node(self.sectionTitle(section, #section.entries)))
+	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
+
+	self.display:node(self.newSectionNode():node(self.sectionTitle(section, sectionEntryCount)))
 
 	if Table.isEmpty(section.entries) then
 		self.display:node(self.newSectionNode():node(self:tbd()))

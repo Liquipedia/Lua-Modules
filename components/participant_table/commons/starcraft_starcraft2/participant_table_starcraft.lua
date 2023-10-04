@@ -51,6 +51,8 @@ local StarcraftParticipantTable = {}
 function StarcraftParticipantTable.run(frame)
 	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
 
+	--disable storage for events before rollout date
+	--need to clean them up regarding transcludes first
 	participantTable.args.noStorage = participantTable.args.noStorage or
 		Variables.varDefault('tournament_startdate') and Variables.varDefault('tournament_startdate') < ROLL_OUT_DATE
 
@@ -161,6 +163,8 @@ function StarcraftParticipantTable:getPlacements()
 	return placements
 end
 
+---@param sections StarcraftParticipantTableSection[]
+---@return boolean
 function StarcraftParticipantTable.isPureSolo(sections)
 	return Array.all(sections, function(section) return Array.all(section.entries, function(entry)
 		return entry.opponent.type == Opponent.solo
@@ -205,21 +209,28 @@ end
 
 ---@return table
 function StarcraftParticipantTable:_getFactionNumbers()
-	local calculatedNumbers = Table.map(Faction.factions, function(key, faction) return faction, 0 end)
+	local calculatedNumbers = {}
+
 	Array.forEach(self.sections, function(section)
 		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
 		Array.forEach(section.entries, function(entry)
 			local faction = entry.opponent.players[1].race
-			calculatedNumbers[faction] = calculatedNumbers[faction] + 1
+			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
+			if entry.dq then
+				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
+			end
 		end)
 	end)
 
-	for faction, value in pairs(calculatedNumbers) do
-		calculatedNumbers[faction] = self.config.manualFactionCounts[faction] or value
+	local factionNumbers = {}
+	for _, faction in pairs(Faction.factions) do
+		factionNumbers[faction] = calculatedNumbers[faction] or 0
+		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
+			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))
 	end
 
-	return calculatedNumbers
+	return factionNumbers
 end
 
 ---@param factionColumns table
@@ -235,7 +246,7 @@ function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
 			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
 			' ' .. Faction.toName(faction),
 			config.isRandomEvent and ' Main' or nil,
-			config.showCountByRace and " ''(" .. factioNumbers[faction] .. ")''" or nil
+			config.showCountByRace and " ''(" .. factioNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
 		header:tag('div')
@@ -251,7 +262,9 @@ end
 ---@param section StarcraftParticipantTableSection
 ---@param factionColumns table
 function StarcraftParticipantTable:_displaySoloRaceTableSection(section, factionColumns)
-	self.display:node(self.newSectionNode():node(self.sectionTitle(section, #section.entries)))
+	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
+
+	self.display:node(self.newSectionNode():node(self.sectionTitle(section, sectionEntryCount)))
 
 	if Table.isEmpty(section.entries) then
 		self.display:node(self.newSectionNode():node(self:tbd()))
