@@ -86,7 +86,12 @@ function HorizontallistDisplay.Bracket(props)
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
-	local bracketNode = mw.html.create('div'):addClass('navigation-tabs'):attr('role', 'tabpanel'):node(list)
+
+	local bracketNode = mw.html.create('div')
+			:addClass('navigation-tabs')
+			:attr('data-js-battle-royale', 'navigation-tabs')
+			:attr('role', 'tabpanel')
+			:node(list)
 
 	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
 	for matchIndex, match in ipairs(HorizontallistDisplay._sortMatches(props.bracket)) do
@@ -165,6 +170,7 @@ function HorizontallistDisplay.NodeHeader(props)
 			:attr('aria-selected', tostring(isSelected))
 			:attr('aria-controls', 'panel' .. props.index)
 			:attr('tabindex', '0')
+			:attr('data-js-battle-royale', 'navigation-tab')
 			:wikitext(props.header)
 end
 
