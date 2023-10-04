@@ -10,9 +10,6 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
@@ -39,7 +36,7 @@ function CustomMap.run(frame)
 	customMap.getWikiCategories = CustomMap.getWikiCategories
 	_args = customMap.args
 	_args.releasedate = _args.date
-	
+
 	return customMap:createInfobox()
 end
 
