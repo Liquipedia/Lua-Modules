@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchSummary/Base/temp
+-- page=Module:MatchSummary/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
