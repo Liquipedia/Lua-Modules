@@ -17,8 +17,6 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local html = mw.html
-
 local CustomBracketDisplay = {}
 
 ---@param props {bracketId: string, config: table}
