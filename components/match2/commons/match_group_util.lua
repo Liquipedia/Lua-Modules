@@ -489,7 +489,6 @@ end
 ---@param record table
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
-	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
@@ -591,7 +590,6 @@ end
 ---@param record table
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(record)
-	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
@@ -639,7 +637,6 @@ end
 ---@param record table
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
-	---@type table
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
