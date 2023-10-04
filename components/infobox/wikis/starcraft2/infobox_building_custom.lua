@@ -58,7 +58,6 @@ function CustomInjector:addCustomCells(widgets)
 		widgets,
 		Cell{name = 'Size', content = {_args.size}},
 		Cell{name = 'Sight', content = {_args.sight}},
-		Cell{name = 'Sight', content = {_args.sight}},
 		Cell{name = 'Energy', content = {_args.energy}},
 		Cell{name = 'Detection/Attack Range', content = {_args.detection_range}}
 	)
