@@ -44,14 +44,15 @@ local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
--- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
 local OpponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
--- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	match = MatchFunctions.parseSetting(match)
 	-- Adjust map data, especially set participants data
@@ -68,35 +69,18 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
-function MatchFunctions.adjustMapData(match)
-	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local scores
-		Table.mergeInto(map, MatchFunctions.readDate(map))
-		map = MapFunctions.getParticipants(map, opponents)
-		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
-		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
-		map = MapFunctions.getTournamentVars(map)
-		map = MapFunctions.getExtraData(map, scores)
 
-		match[key] = map
-	end
 
-	return match
-end
-
--- called from Module:Match/Subobjects
 CustomMatchGroupInput.processMap = FnUtil.identity
-
--- called from Module:Match/Subobjects
 CustomMatchGroupInput.processPlayer = FnUtil.identity
 
---
---
+---@param record table
+---@param timestamp number
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
+	---@type number|string
 	local teamTemplateDate = timestamp
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
@@ -109,6 +93,10 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
+---@param data table
+---@param indexedScores table[]
+---@return table
+---@return table[]
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	if Table.includes(NP_STATUSES, data.finished) then
 		-- Map or Match wasn't played, set not played
@@ -130,6 +118,11 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	return data, indexedScores
 end
 
+---@param opponents table[]
+---@param winner string|number
+---@param finished boolean
+---@return table[]
+---@return string|number
 function CustomMatchGroupInput.setPlacement(opponents, winner, finished)
 	local lastScore = NO_SCORE
 	local lastPlacement = NO_SCORE
@@ -137,7 +130,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, finished)
 	for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 		local score = tonumber(opp.score)
 		counter = counter + 1
-		if counter == 1 and String.isEmpty(winner) and finished then
+		if counter == 1 and Logic.isEmpty(winner) and finished then
 			winner = scoreIndex
 		end
 		if lastScore == score then
@@ -152,6 +145,10 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, finished)
 	return opponents, winner
 end
 
+---@param table table
+---@param key1 any
+---@param key2 any
+---@return boolean
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
 	local value1 = tonumber(table[key1].score) or NO_SCORE
 	local value2 = tonumber(table[key2].score) or NO_SCORE
@@ -161,6 +158,27 @@ end
 --
 -- match related functions
 --
+---@param match table
+---@return table
+function MatchFunctions.adjustMapData(match)
+	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local scores
+		Table.mergeInto(map, MatchFunctions.readDate(map))
+		map = MapFunctions.getParticipants(map, opponents)
+		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
+		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
+		map = MapFunctions.getTournamentVars(map)
+		map = MapFunctions.getExtraData(map, scores)
+
+		match[key] = map
+	end
+
+	return match
+end
+
+---@param match table
+---@return table
 function MatchFunctions.parseSetting(match)
 	-- Score Settings
 	match.scoreSettings = {
@@ -183,7 +201,9 @@ function MatchFunctions.parseSetting(match)
 	return match
 end
 
--- Calculate the points based on the map results
+--- Calculate the points based on the map results
+---@param match table
+---@return table
 function MatchFunctions.getScoreFromMaps(match)
 	local newScores = {}
 
@@ -204,6 +224,8 @@ function MatchFunctions.getScoreFromMaps(match)
 	return match
 end
 
+---@param matchArgs table
+---@return table
 function MatchFunctions.readDate(matchArgs)
 	if matchArgs.date then
 		return MatchGroupInput.readDate(matchArgs.date)
@@ -216,12 +238,16 @@ function MatchFunctions.readDate(matchArgs)
 	end
 end
 
+---@param match table
+---@return table
 function MatchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function MatchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -233,6 +259,8 @@ function MatchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return table
 function MatchFunctions.getExtraData(match)
 	match.extradata = {
 		scoring = match.scoreSettings,
@@ -242,6 +270,8 @@ function MatchFunctions.getExtraData(match)
 	return match
 end
 
+---@param match table
+---@return table
 function MatchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -306,6 +336,7 @@ function MatchFunctions.getOpponents(match)
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
 	end
+
 	return match
 end
 
@@ -314,6 +345,9 @@ end
 --
 
 -- Parse extradata information
+---@param map table
+---@param scores table[]
+---@return table
 function MapFunctions.getExtraData(map, scores)
 	map.extradata = {
 		comment = map.comment,
@@ -324,6 +358,9 @@ function MapFunctions.getExtraData(map, scores)
 end
 
 -- Parse participant information
+---@param map table
+---@param opponents table[]
+---@return table
 function MapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	for opponentIndex, opponent in ipairs(opponents) do
@@ -344,6 +381,11 @@ function MapFunctions.getParticipants(map, opponents)
 	return map
 end
 
+---@param player table
+---@param opponentIndex integer
+---@param players table[]?
+---@param participants table
+---@return any
 function MapFunctions.attachToParticipant(player, opponentIndex, players, participants)
 	player.player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
 	for playerIndex, item in pairs(players or {}) do
@@ -356,6 +398,10 @@ function MapFunctions.attachToParticipant(player, opponentIndex, players, partic
 	return participants
 end
 
+---@param map table
+---@param opponents table[]
+---@param idx integer
+---@return table
 function MapFunctions.getOpponentStats(map, opponents, idx)
 	for oppIdx, opponent in pairs(opponents) do
 		map['t'.. oppIdx ..'data'] = Json.parseIfString(opponent['m' .. idx])
@@ -364,7 +410,11 @@ function MapFunctions.getOpponentStats(map, opponents, idx)
 	return map
 end
 
--- Calculate Score and Winner of the map
+---Calculate Score and Winner of the map
+---@param map table
+---@param scoreSettings table
+---@return table
+---@return table
 function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	map.scores = {}
 	local indexedScores = {}
@@ -397,6 +447,8 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	return map, indexedScores
 end
 
+---@param map table
+---@return table
 function MapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	return MatchGroupInput.getCommonTournamentVars(map)
@@ -405,6 +457,9 @@ end
 --
 -- opponent related functions
 --
+---@param template string
+---@return string?
+---@return string?
 function OpponentFunctions.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
 	if raw then
