@@ -40,7 +40,7 @@ local Agents = Class.new(
 	end
 )
 
----@return ValorantAgents
+---@return self
 function Agents:setLeft()
 	self.root	:css('float', 'left')
 				:css('margin-left', '10px')
@@ -48,7 +48,7 @@ function Agents:setLeft()
 	return self
 end
 
----@return ValorantAgents
+---@return self
 function Agents:setRight()
 	self.root	:css('float', 'right')
 				:css('margin-right', '10px')
@@ -57,7 +57,7 @@ function Agents:setRight()
 end
 
 ---@param agent string
----@return ValorantAgents
+---@return self
 function Agents:add(agent)
 	if Logic.isEmpty(agent) then
 		return self
@@ -88,7 +88,7 @@ local Score = Class.new(
 	end
 )
 
----@return ValorantScore
+---@return self
 function Score:setLeft()
 	self.root	:css('float', 'left')
 				:css('margin-left', '4px')
@@ -96,7 +96,7 @@ function Score:setLeft()
 	return self
 end
 
----@return ValorantScore
+---@return self
 function Score:setRight()
 	self.root	:css('float', 'right')
 				:css('margin-right', '4px')
@@ -105,7 +105,7 @@ function Score:setRight()
 end
 
 ---@param score string|number|nil
----@return ValorantScore
+---@return self
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore:attr('rowspan', '2')
@@ -119,7 +119,7 @@ end
 
 ---@param side string
 ---@param score number
----@return ValorantScore
+---@return self
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
@@ -132,7 +132,7 @@ end
 
 ---@param side string
 ---@param score number
----@return ValorantScore
+---@return self
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
@@ -172,7 +172,7 @@ local MapVeto = Class.new(
 	end
 )
 
----@return ValorantMapVeto
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -182,7 +182,7 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
----@return ValorantMapVeto
+---@return self
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -202,7 +202,7 @@ function MapVeto:vetoStart(firstVeto)
 end
 
 ---@param map string?
----@return ValorantMapVeto
+---@return self
 function MapVeto:addDecider(map)
 	if Logic.isEmpty(map) then
 		map = 'TBD'
@@ -222,7 +222,7 @@ end
 ---@param vetotype string?
 ---@param map1 string?
 ---@param map2 string?
----@return ValorantMapVeto
+---@return self
 function MapVeto:addRound(vetotype, map1, map2)
 	if Logic.isEmpty(map1) then
 		map1 = 'TBD'
@@ -262,7 +262,7 @@ end
 ---@param row Html
 ---@param styleClass string
 ---@param vetoText string
----@return ValorantMapVeto
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -274,7 +274,7 @@ end
 
 ---@param row Html
 ---@param map string
----@return ValorantMapVeto
+---@return self
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
