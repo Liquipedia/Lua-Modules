@@ -258,7 +258,7 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---CreateMatch cs specific overwrite due to altered styles for match comment
----@param matchData table
+---@param matchData table?
 ---@return MatchSummaryMatch?
 function CustomMatchSummary.createMatch(matchData)
 	if not matchData then
