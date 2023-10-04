@@ -358,7 +358,7 @@ function CustomPlayer._getGames()
 			if String.isEmpty(entry.game) then
 				return {}
 			end
-			return {name=entry.game, active = isActive(entry.game)}
+			return {name = entry.game, active = isActive(entry.game)}
 		end),
 		Table.isNotEmpty
 	)
