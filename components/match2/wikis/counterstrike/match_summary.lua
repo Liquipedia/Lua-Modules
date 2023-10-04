@@ -46,20 +46,20 @@ local Score = Class.new(
 	end
 )
 
----@return CounterstrikeScore
+---@return self
 function Score:setLeft()
 	self.table:css('float', 'left')
 	return self
 end
 
----@return CounterstrikeScore
+---@return self
 function Score:setRight()
 	self.table:css('float', 'right')
 	return self
 end
 
 ---@param score string|number|nil
----@return CounterstrikeScore
+---@return self
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -75,7 +75,7 @@ end
 
 ---@param side string
 ---@param score number
----@return CounterstrikeScore
+---@return self
 function Score:setFirstHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -89,7 +89,7 @@ end
 
 ---@param side string
 ---@param score number
----@return CounterstrikeScore
+---@return self
 function Score:setSecondHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -121,7 +121,7 @@ local MapVeto = Class.new(
 	end
 )
 
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -131,7 +131,7 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -151,7 +151,7 @@ function MapVeto:vetoStart(firstVeto)
 end
 
 ---@param map string?
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:addDecider(map)
 	map = Logic.emptyOr(map, TBD)
 
@@ -168,7 +168,7 @@ end
 ---@param vetotype string?
 ---@param map1 string?
 ---@param map2 string?
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = Logic.emptyOr(map1, TBD)
 	map2 = Logic.emptyOr(map2, TBD)
@@ -201,7 +201,7 @@ end
 ---@param row Html
 ---@param styleClass string
 ---@param vetoText string
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -213,7 +213,7 @@ end
 
 ---@param row Html
 ---@param map string?
----@return CounterstrikeMapVeto
+---@return self
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
@@ -238,7 +238,7 @@ local MatchStatus = Class.new(
 )
 
 ---@param content string|number|Html|nil
----@return CounterstrikeMatchStatus
+---@return self
 function MatchStatus:content(content)
 	self.root:node(content):node(MatchSummary.Break():create())
 	return self
