@@ -41,38 +41,19 @@ function CustomMap.run(frame)
 end
 
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Map Type',
-		content = {CustomMap:getType(_args.type)}
-	})
-	table.insert(widgets, Cell{
-		name = 'Starting [[Town Center|TC]](s)',
-		content = {_args.tc}
-	})
-	table.insert(widgets, Cell{
-		name = 'Walls',
-		content = {_args.walls}
-	})
-	table.insert(widgets, Cell{
-		name = 'Nomad',
-		content = {_args.nomad}
-	})
-	table.insert(widgets, Cell{
-		name = 'Player Capacity',
-		content = {_args.players}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {Page.makeInternalLink(Game.link{game = _args.game})}
-	})
-	table.insert(widgets, Cell{
-		name = 'First Appearance',
-		content = {Page.makeInternalLink({onlyIfExists = true}, _args.appearance) or _args.appearance}
-	})
-	table.insert(widgets, Cell{
-		name = 'Competition Span',
-		content = {_args.span}
-	})
+	Array.appendWith(widgets,
+		Cell{name = 'Map Type', content = {CustomMap:getType(_args.type)}},
+		Cell{name = 'Starting [[Town Center|TC]](s)', content = {_args.tc}},
+		Cell{name = 'Walls', content = {_args.walls}},
+		Cell{name = 'Nomad', content = {_args.nomad}},
+		Cell{name = 'Player Capacity', content = {_args.players}},
+		Cell{name = 'Game', content = {Page.makeInternalLink(Game.link{game = _args.game})}},
+		Cell{
+			name = 'First Appearance',
+			content = {Page.makeInternalLink({onlyIfExists = true}, _args.appearance) or _args.appearance}
+		},
+		Cell{name = 'Competition Span', content = {_args.span}},
+	)
 	return widgets
 end
 
