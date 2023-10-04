@@ -13,6 +13,7 @@ local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
@@ -126,7 +127,9 @@ function CustomPlayer.run(frame)
 			first_name = _args.first_name,
 			last_name = _args.last_name,
 			status = _args.status,
-			game = mw.text.listToText(_args.gameList),
+			game = mw.text.listToText(Array.map(_args.gameList, function(game)
+					return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
+				end)),
 			type = roleType,
 			role = _args.roleList[1],
 			role2 = _args.roleList[2],
@@ -168,7 +171,12 @@ function CustomInjector:addCustomCells(widgets)
 	-- Games & Inactive Games
 	table.insert(widgets, Cell{
 		name = 'Games',
-		content = _args.gameList
+		content = Array.map(
+				_args.gameList,
+				function(game)
+					return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
+				end
+		)
 	})
 	--Elo ratings
 	table.insert(widgets, Title{name = 'Ratings'})
@@ -234,7 +242,17 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role2 = _args.roleList[2]
 	lpdbData.extradata.roles = mw.text.listToText(_args.roleList)
 	lpdbData.extradata.isplayer = CustomPlayer._getRoleType(_args.roleList).player
-	lpdbData.extradata.game = mw.text.listToText(_args.gameList)
+	lpdbData.extradata.game = mw.text.listToText(Array.map(_args.gameList, Operator.property('name')))
+	Array.forEach(_args.gameList,
+		function(game, index)
+			lpdbData.extradata['game' .. index] = game.name
+		end
+	)
+
+	-- RelicLink IDs
+	lpdbData.extradata.aoe2net_id = _args.aoe2net_id
+	lpdbData.extradata.aoe3net_id = _args.aoe3net_id
+	lpdbData.extradata.aoe4net_id = _args.aoe4net_id
 
 	return lpdbData
 end
@@ -243,7 +261,7 @@ function CustomPlayer:getWikiCategories(categories)
 	local roles = CustomPlayer._getRoleType(_args.roleList)
 
 	Array.forEach(_args.gameList, function(game)
-		local gameName = Game.name{game = game}
+		local gameName = game.name
 		if not gameName then
 			return
 		end
@@ -334,14 +352,16 @@ function CustomPlayer._getGames()
 		return placement and placement.date and placement.date >= placementThreshold
 	end
 
-	games = Array.map(
+	games = Array.filter(Array.map(
 		games,
 		function(entry)
 			if String.isEmpty(entry.game) then
-				return nil
+				return {}
 			end
-			return entry.game .. (isActive(entry.game) and '' or ' <i><small>(Inactive)</small></i>')
-		end)
+			return {name=entry.game, active = isActive(entry.game)}
+		end),
+		Table.isNotEmpty
+	)
 
 	return games
 end
