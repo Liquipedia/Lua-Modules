@@ -45,7 +45,7 @@ function CustomBracketDisplay.OpponentEntry(props)
 	local isWinner = (opponent.placement2 or opponent.placement or 0) == 1
 		or opponent.advances
 
-	local leftNode = html.create('div'):addClass('brkts-opponent-entry-left')
+	local leftNode = mw.html.create('div'):addClass('brkts-opponent-entry-left')
 		:addClass(showRaceBackground and Faction.bgClass(opponent.players[1].race) or nil)
 		:addClass(isWinner and 'brkts-opponent-win' or nil)
 
@@ -101,7 +101,7 @@ function CustomBracketDisplay.OpponentEntry(props)
 		})
 	end
 
-	return html.create('div'):addClass('brkts-opponent-entry')
+	return mw.html.create('div'):addClass('brkts-opponent-entry')
 		:node(leftNode)
 		:node(scoreNode)
 		:node(score2Node)
