@@ -389,7 +389,11 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, parent.icon, Variables.varDefault('tournament_icon'))
 	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, Variables.varDefault('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, parent.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+	obj.liquipediatier = Logic.emptyOr(
+		obj.liquipediatier,
+		parent.liquipediatier,
+		Variables.varDefault('tournament_liquipediatier')
+	)
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
