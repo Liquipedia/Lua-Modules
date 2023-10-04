@@ -49,7 +49,7 @@ function ParticipantTable.run(frame)
 	return ParticipantTable(frame):read():store():create()
 end
 
----@return ParticipantTable
+---@return self
 function ParticipantTable:read()
 	self.config = self.readConfig(self.args)
 	self:readSections()
@@ -223,7 +223,7 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 	}
 end
 
----@return ParticipantTable
+---@return self
 function ParticipantTable:store()
 	if self.config.noStorage then return self end
 
