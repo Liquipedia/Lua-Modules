@@ -787,7 +787,7 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 end
 
 ---Fetches information about a team via mw.ext.TeamTemplate.
----@param template any
+---@param template string
 ---@return table?
 function MatchGroupUtil.fetchTeam(template)
 	--exception for TBD opponents
