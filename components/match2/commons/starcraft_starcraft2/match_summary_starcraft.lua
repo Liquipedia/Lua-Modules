@@ -73,7 +73,7 @@ local StarcraftMatchSummary = {}
 function StarcraftMatchSummary.MatchSummaryContainer(args)
 	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
 	local match, bracketResetMatch =
-		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
+		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
 	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
