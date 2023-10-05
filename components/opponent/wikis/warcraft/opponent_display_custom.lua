@@ -95,9 +95,16 @@ function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer(Table.merge(props, {team = player.team, player = player, showRace = showRace}))
-			:addClass(props.playerClass)
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {
+			team = player.team,
+			player = player,
+			showRace = showRace,
+			note = playerIndex == 1 and note or nil,
+		})):addClass(props.playerClass)
 	end)
 
 	local playersNode = mw.html.create('div')

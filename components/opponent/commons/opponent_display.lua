@@ -189,6 +189,8 @@ OpponentDisplay.propTypes.BlockOpponent = {
 ---@field abbreviateTbd boolean?
 ---@field playerClass string?
 ---@field teamStyle teamStyle?
+---@field dq boolean?
+---@field note string|number|nil
 
 --[[
 Displays an opponent as a block element. The width of the component is
@@ -228,9 +230,15 @@ end
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer(Table.merge(props, {player = player, team = player.team}))
-			:addClass(props.playerClass)
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {
+			player = player,
+			team = player.team,
+			note = playerIndex == 1 and note or nil,
+		})):addClass(props.playerClass)
 	end)
 
 	local playersNode = mw.html.create('div')
