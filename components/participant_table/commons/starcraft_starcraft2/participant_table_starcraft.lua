@@ -97,7 +97,7 @@ end
 
 ---@param sectionArgs table
 ---@param key string|number
----@param config any
+---@param config StarcraftParticipantTableConfig
 ---@return StarcraftParticipantTableEntry
 function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 	--if not a json assume it is a solo opponent
