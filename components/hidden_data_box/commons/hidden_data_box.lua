@@ -52,7 +52,11 @@ function HiddenDataBox.run(args)
 		if not queryResult[1] and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		elseif args.participantGrabber then
-			Array.forEach(HiddenDataBox._fetchPlacements(parent), HiddenDataBox._setWikiVariablesFromPlacement)
+			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
+				Variables.varDefault('tournament_startdate') or HiddenDataBox.cleanDate(args.edate) or
+				queryResult.enddate or Variables.varDefault('tournament_enddate')
+
+			Array.forEach(HiddenDataBox._fetchPlacements(parent), HiddenDataBox._setWikiVariablesFromPlacement, date)
 		end
 
 		queryResult = queryResult[1] or {}
@@ -138,10 +142,10 @@ function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
 ---@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
-function HiddenDataBox._setWikiVariablesFromPlacement(placement)
+function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
-		Opponent.resolve(Opponent.fromLpdbStruct(placement), {syncPlayer = true})
+		Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
 		return
 	end
 
