@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
----@field displayUnknownColumn boolean
+---@field displayUnknownColumn boolean?
 ---@field displayRandomColumn boolean?
 ---@field showCountByRace boolean
 ---@field isRandomEvent boolean
@@ -80,7 +80,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	local config = ParticipantTable.readConfig(args, parentConfig) --[[@as StarcraftParticipantTableConfig]]
 	parentConfig = parentConfig or {}
 
-	config.displayUnknownColumn = Logic.readBool(args.unknowncolumn)
+	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
 	config.showCountByRace = Logic.readBool(args.showCountByRace or args.count)
 	config.isRandomEvent = Logic.readBool(args.is_random_event)
@@ -187,7 +187,9 @@ function StarcraftParticipantTable:createSoloRaceTable()
 		factionColumns = Array.copy(Faction.coreFactions)
 	end
 
-	if config.displayUnknownColumn then
+	if config.displayUnknownColumn or
+		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction .. 'Display'] > 0 then
+
 		table.insert(factionColumns, Faction.defaultFaction)
 	end
 
@@ -214,8 +216,9 @@ function StarcraftParticipantTable:_getFactionNumbers()
 		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
 		Array.forEach(section.entries, function(entry)
-			local faction = entry.opponent.players[1].race
-			if not faction then return end
+			local faction = entry.opponent.players[1].race or Faction.defaultFaction
+			--if we have defaultFaction push it into the entry too
+			entry.opponent.players[1].race = faction
 			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
 			if entry.dq then
 				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
