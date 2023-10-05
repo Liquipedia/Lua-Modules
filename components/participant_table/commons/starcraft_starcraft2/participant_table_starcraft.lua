@@ -198,7 +198,7 @@ function StarcraftParticipantTable:createSoloRaceTable()
 	self.display = mw.html.create('div')
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
-		:css('width', colSpan * config.columnWidth .. 'px')
+		:css('width', (colSpan * config.columnWidth) .. 'px')
 		:node(self:_displayHeader(factionColumns, factioNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloRaceTableSection(section, factionColumns) end)
