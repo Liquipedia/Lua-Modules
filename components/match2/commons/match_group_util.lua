@@ -459,30 +459,16 @@ end
 ---popup expects that the finals match also include results from the bracket reset match.
 ---@param bracketId string
 ---@param matchId string
----@param options {mergeBracketResetMatch: boolean?, returnBoth: boolean?}?
 ---@return MatchGroupUtilMatch, MatchGroupUtilMatch?
-function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId, options)
-	options = options or {}
+function MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchId)
 	local bracket = MatchGroupUtil.fetchMatchGroup(bracketId)
 	local match = bracket.matchesById[matchId]
 
-	if Logic.nilOr(options.mergeBracketResetMatch, true) then
-		local bracketResetMatch = match
-			and match.bracketData.bracketResetMatchId
-			and bracket.matchesById[match.bracketData.bracketResetMatchId]
+	local bracketResetMatch = match
+		and match.bracketData.bracketResetMatchId
+		and bracket.matchesById[match.bracketData.bracketResetMatchId]
 
-		if bracketResetMatch then
-			return MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
-		end
-	elseif options.returnBoth then
-		local bracketResetMatch = match
-			and match.bracketData.bracketResetMatchId
-			and bracket.matchesById[match.bracketData.bracketResetMatchId]
-
-		return match, bracketResetMatch
-	end
-
-	return match
+	return match, bracketResetMatch
 end
 
 ---Converts a match record to a structurally typed table with the appropriate data types for field values.
