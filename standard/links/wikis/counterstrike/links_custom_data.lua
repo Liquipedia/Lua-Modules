@@ -8,6 +8,11 @@
 
 return {
 	prefixes = {
+		gamersclub = {
+			'https://gamersclub.com.br/tournaments/cs/',
+			team = 'https://gamersclub.com.br/team/',
+			player = 'https://gamersclub.com.br/player/',
+		},
 		faceit = {
 			'https://www.faceit.com/en/csgo/tournament/',
 			team = 'https://www.faceit.com/en/teams/',

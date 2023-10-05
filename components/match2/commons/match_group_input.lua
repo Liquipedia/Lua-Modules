@@ -384,20 +384,26 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- Retrieves Common Tournament Variables used inside match2 and match2game
-function MatchGroupInput.getCommonTournamentVars(obj)
-	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+function MatchGroupInput.getCommonTournamentVars(obj, parent)
+	parent = parent or {}
+	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
+	obj.icon = Logic.emptyOr(obj.icon, parent.icon, Variables.varDefault('tournament_icon'))
+	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, Variables.varDefault('tournament_icondark'))
+	obj.liquipediatier = Logic.emptyOr(
+		obj.liquipediatier,
+		parent.liquipediatier,
+		Variables.varDefault('tournament_liquipediatier')
+	)
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
+		parent.liquipediatiertype,
 		Variables.varDefault('tournament_liquipediatiertype')
 	)
-	obj.series = Logic.emptyOr(obj.series, Variables.varDefault('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, Variables.varDefault('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, Variables.varDefault('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, Variables.varDefault('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
+	obj.series = Logic.emptyOr(obj.series, parent.series, Variables.varDefault('tournament_series'))
+	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, Variables.varDefault('tournament_shortname'))
+	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
+	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
+	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
 
 	return obj
 end

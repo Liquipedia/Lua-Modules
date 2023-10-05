@@ -178,19 +178,16 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return StarcraftPlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return StarcraftPlayerDisplay.BlockPlayer(Table.merge(props, {
 			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
 			team = player.team,
-			abbreviateTbd = props.abbreviateTbd,
-		})
-			:addClass(props.playerClass)
+			note = playerIndex == 1 and note or nil,
+			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
+		})):addClass(props.playerClass)
 	end)
 
 	if #opponent.players == 1 then

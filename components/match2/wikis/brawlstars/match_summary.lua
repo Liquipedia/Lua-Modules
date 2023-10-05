@@ -18,7 +18,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
 
-local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -59,7 +59,7 @@ local Brawler = Class.new(
 	end
 )
 
----@return BrawlstarsMatchSummaryBrawler
+---@return self
 function Brawler:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','35%'):wikitext(''):done()
@@ -75,7 +75,7 @@ end
 ---@param numberBrawlers integer
 ---@param date string
 ---@param firstPick integer?
----@return BrawlstarsMatchSummaryBrawler
+---@return self
 function Brawler:row(brawlerData, gameNumber, numberBrawlers, date, firstPick)
 	if numberBrawlers > 0 then
 		self.table:tag('tr')
@@ -162,7 +162,7 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
@@ -172,7 +172,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	return footer:addLinks(LINK_DATA, match.links)
 end
 
----@param match table
+---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -242,7 +242,7 @@ function CustomMatchSummary.createBody(match)
 	-- Pre-Process Brawler bans
 	local showGameBans = {}
 	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
+		local extradata = game.extradata or {}
 		local bans = Json.parseIfString(extradata.bans or '{}')
 		if not Table.isEmpty(bans) then
 			bans.numberOfBans = math.max(#bans.team1, #bans.team2)
@@ -268,7 +268,7 @@ function CustomMatchSummary.createBody(match)
 	return body
 end
 
----@param game table
+---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -276,7 +276,7 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	return htmlCreate('div'):wikitext(score)
 end
 
----@param game table
+---@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
@@ -330,7 +330,7 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
----@param game table
+---@param game MatchGroupUtilGame
 ---@return string
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'

@@ -36,6 +36,11 @@ local EXPERIENCE = mw.loadData('Module:Experience')
 local DEFAULT_BUILDING_TYPE_RACE = 'Neutral'
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Hit Points]]'
 local ICON_FOOD = '[[File:Food_WC3_Icon.gif|15px|link=Food]]'
+local ADDITIONAL_BUILDING_RACES = {
+	creeps = 'Creeps',
+	neutral = 'Creeps',
+	c = 'Creeps',
+}
 
 local _args
 
@@ -64,12 +69,13 @@ function CustomInjector:addCustomCells(widgets)
 	local mana = Shared.manaValues(_args)
 	local acquisitionRange = tonumber(_args.acq_range) or 0
 	local level = tonumber(_args.level) or 0
+	local race = Faction.toName(Faction.read(_args.race)) or ADDITIONAL_BUILDING_RACES[string.lower(_args.race or '')]
 
 	Array.appendWith(widgets,
 		Cell{name = '[[Food supplied|Food]]', content = {
 			_args.foodproduced and (ICON_FOOD .. ' ' .. _args.foodproduced) or nil,
 		}},
-		Cell{name = '[[Race|Race]]', content = {'[['.. Faction.toName(Faction.read(_args.race)) ..']]'}},
+		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or _args.race}},
 		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
 			_args.class and String.convertWikiListToHtmlList(_args.class) or nil}},
 		Cell{name = 'Sleeps', content = {_args.sleeps}},
@@ -77,7 +83,7 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Morphs into', content = {_args.morphs}},
 		Cell{name = 'Duration', content = {_args.duration}},
 		Cell{name = 'Formation Rank', content = {_args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {_args.daysight .. ' / ' .. _args.nightsight}},
+		Cell{name = '[[Sight_Range|Sight]]', content = {race and (_args.daysight .. ' / ' .. _args.nightsight) or nil}},
 		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
 		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
 			level > 0 and ('[[Experience|'.._args.level..']]') or nil}},
@@ -190,7 +196,7 @@ function CustomBuilding:_defenseDisplay()
 	end
 
 	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if tonumber(_args.hitpoint_bonus) > 0 then
+	if (tonumber(_args.hitpoint_bonus) or 0) > 0 then
 		return display .. ' (' .. _args.hp + _args.hitpoint_bonus .. ')'
 	end
 	return display
@@ -248,7 +254,7 @@ function CustomBuilding:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. (args.name or ''), {
 		type = 'building',
 		name = args.name or self.pagename,
-		image = args.image and ('Wc3BTN' .. args.icon .. '.png') or nil,
+		image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil,
 		information = CustomBuilding.getBuildingType(args),
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
 	})
