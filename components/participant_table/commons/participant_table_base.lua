@@ -64,15 +64,15 @@ end
 ---@field syncPlayers boolean
 ---@field showCountBySection boolean
 ---@field onlyNotable boolean
+---@field count number?
 ---@field colSpan number
 ---@field resolveDate string
 ---@field sortPlayers boolean sort players within an opponent
 ---@field showTeams boolean
----@field title string
----@field columnWidth number? width of the column in px
+---@field title string?
 ---@field importOnlyQualified boolean?
 ---@field display boolean
----@field count number?
+---@field columnWidth number? width of the column in px
 
 ---@param args table
 ---@param parentConfig ParticipantTableConfig?
