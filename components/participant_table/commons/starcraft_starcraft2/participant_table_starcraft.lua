@@ -16,12 +16,12 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
----@field displayUnknownColumn boolean?
+---@field displayUnknownColumn boolean
 ---@field displayRandomColumn boolean?
 ---@field showCountByRace boolean
 ---@field isRandomEvent boolean
 ---@field isQualified boolean?
----@field manualFactionCounts {p: number?, t: number?, z: number?, r: number?}
+---@field manualFactionCounts table<string, number?>
 
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
@@ -80,18 +80,17 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	local config = ParticipantTable.readConfig(args, parentConfig) --[[@as StarcraftParticipantTableConfig]]
 	parentConfig = parentConfig or {}
 
-	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
-	config.displayRandomColumn = Logic.readBoolOrNil(args.unknowncolumn)
+	config.displayUnknownColumn = Logic.readBool(args.unknowncolumn)
+	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
 	config.showCountByRace = Logic.readBool(args.showCountByRace or args.count)
 	config.isRandomEvent = Logic.readBool(args.is_random_event)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
-	config.manualFactionCounts = {
-		p = tonumber(args.protoss),
-		t = tonumber(args.terran),
-		z = tonumber(args.zerg),
-		r = tonumber(args.random),
-	}
+
+	config.manualFactionCounts = {}
+	Array.forEach(Faction.knownFactions, function(faction)
+		config.manualFactionCounts[faction] = tonumber(args[Faction.toName(faction):lower()])
+	end)
 
 	return config
 end
@@ -181,18 +180,18 @@ function StarcraftParticipantTable:createSoloRaceTable()
 
 	local factionColumns
 	if not config.isRandomEvent and
-		(config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.r > 0) then
+		(config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.rDisplay > 0) then
 
-		factionColumns = Faction.knownFactions
+		factionColumns = Array.copy(Faction.knownFactions)
 	else
-		factionColumns = Faction.coreFactions
+		factionColumns = Array.copy(Faction.coreFactions)
 	end
 
-	if config.displayUnknownColumn or config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction] > 0 then
-		Array.appendWith(factionColumns, Faction.defaultFaction)
+	if config.displayUnknownColumn then
+		table.insert(factionColumns, Faction.defaultFaction)
 	end
 
-	local colSpan = Table.size(factionColumns)
+	local colSpan = #factionColumns
 
 	self.display = mw.html.create('div')
 		:addClass('participantTable participantTable-faction')
@@ -216,6 +215,7 @@ function StarcraftParticipantTable:_getFactionNumbers()
 
 		Array.forEach(section.entries, function(entry)
 			local faction = entry.opponent.players[1].race
+			if not faction then return end
 			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
 			if entry.dq then
 				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
