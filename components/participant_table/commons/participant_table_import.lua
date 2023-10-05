@@ -51,7 +51,7 @@ end
 function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, entriesByName)
 	Array.forEach(matchRecords, function(matchRecord)
 		Array.forEach(matchRecord.match2opponents, function(opponentRecord, opponentIndex)
-			if not ParticipantTableImport._shouldInclude(opponentIndex, config.importOnlyQualified, matchRecord) then
+			if not ParticipantTableImport._shouldInclude(opponentIndex, matchRecord, config.importOnlyQualified) then
 				return
 			end
 
@@ -66,10 +66,10 @@ function ParticipantTableImport._entriesFromMatchRecords(matchRecords, config, e
 end
 
 ---@param opponentIndex integer
----@param importOnlyQualified boolean?
 ---@param matchRecord table
+---@param importOnlyQualified boolean?
 ---@return boolean
-function ParticipantTableImport._shouldInclude(opponentIndex, importOnlyQualified, matchRecord)
+function ParticipantTableImport._shouldInclude(opponentIndex, matchRecord, importOnlyQualified)
 	local bracketData = matchRecord.match2bracketdata
 	return not importOnlyQualified or Logic.readBool(bracketData.quallose) or
 		Logic.readBool(bracketData.qualwin) and tonumber(matchRecord.winner) == opponentIndex
