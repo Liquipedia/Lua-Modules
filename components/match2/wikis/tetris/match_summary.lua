@@ -12,7 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
