@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 
-local MatchSummary = Lua.import('Module:MatchSummary/Base/temp', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
