@@ -29,4 +29,20 @@ end
 WikiSpecific.processMap = FnUtil.identity
 WikiSpecific.processPlayer = FnUtil.identity
 
+---Determine if a match has details that should be displayed via popup
+---@param match table
+---@return boolean
+function WikiSpecific.matchHasDetails(match)
+	return match.dateIsExact
+		or match.vod
+		or not Table.isEmpty(match.links)
+		or match.comment
+		or match.casters
+		or 0 < #match.vetoes
+		or Array.any(match.games, function(game)
+			return game.map and game.map ~= 'TBD'
+				or game.winner
+		end)
+end
+
 return WikiSpecific

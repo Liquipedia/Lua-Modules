@@ -51,7 +51,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.patch = PatchAuto.retrieve{date = match.date}
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._adjustData(match)
-	CustomMatchGroupInput._checkFinished(match)
+	CustomMatchGroupInput._updateFinished(match)
 	match.stream = Streams.processStreams(match)
 	CustomMatchGroupInput._getLinks(match)
 	CustomMatchGroupInput._getExtraData(match)
@@ -84,7 +84,7 @@ function CustomMatchGroupInput._readDate(matchArgs)
 end
 
 ---@param match table
-function CustomMatchGroupInput._checkFinished(match)
+function CustomMatchGroupInput._updateFinished(match)
 	match.finished = Logic.nilOr(Logic.readBoolOrNil(match.finished), Logic.isNotEmpty(match.winner))
 	if match.finished then
 		return
@@ -727,6 +727,7 @@ end
 ---@param heroesInput string?
 ---@param faction string?
 ---@param playerName string
+---@param ignoreFactionHeroCheck boolean
 ---@return string[]?
 function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ignoreFactionHeroCheck)
 	if String.isEmpty(heroesInput) then
