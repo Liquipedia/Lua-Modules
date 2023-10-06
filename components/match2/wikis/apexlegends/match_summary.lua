@@ -58,6 +58,7 @@ local MATCH_STANDING_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--rank',
 		iconClass = 'fas fa-hashtag',
 		header = {
@@ -73,6 +74,7 @@ local MATCH_STANDING_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--team',
 		iconClass = 'fas fa-users',
 		header = {
@@ -85,6 +87,7 @@ local MATCH_STANDING_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--total-points',
 		iconClass = 'fas fa-star',
 		header = {
@@ -144,6 +147,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--rank',
 		iconClass = 'fas fa-hashtag',
 		header = {
@@ -159,6 +163,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--team',
 		iconClass = 'fas fa-users',
 		header = {
@@ -171,6 +176,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--total-points',
 		iconClass = 'fas fa-star',
 		header = {
@@ -183,6 +189,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--placements',
 		iconClass = 'fas fa-trophy-alt',
 		header = {
@@ -195,6 +202,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		sortable = true,
 		class = 'cell--kills',
 		iconClass = 'fas fa-skull',
 		header = {
@@ -365,7 +373,7 @@ end
 function CustomMatchSummary._createOverallPage(match)
 	local infoArea = mw.html.create('div')
 			:addClass('panel-content')
-			:attr('id', 'panel1')
+			:attr('id', 'panel' .. match.matchId)
 			:tag('h5')
 					:addClass('panel-content__button')
 					:attr('tabindex', 0)
@@ -405,7 +413,7 @@ end
 function CustomMatchSummary._createGameTab(game, idx)
 	local infoArea = mw.html.create('div')
 			:addClass('panel-content')
-			:attr('id', 'panel1')
+			:attr('id', 'panel' .. idx)
 			:tag('h5')
 					:addClass('panel-content__button')
 					:attr('tabindex', 0)
@@ -466,10 +474,10 @@ function CustomMatchSummary._createMatchStandings(match)
 					:done()
 
 	Array.forEach(MATCH_STANDING_COLUMNS, function(column)
-		header:tag('div')
+		local cell = header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass(column.class)
-				:tag('div'):addClass('panel-table__cell-grouped')
+				local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
 						:tag('i')
 								:addClass('panel-table__cell-icon')
 								:addClass(column.iconClass)
@@ -477,10 +485,12 @@ function CustomMatchSummary._createMatchStandings(match)
 						:tag('span')
 								:wikitext(column.header.value)
 								:done()
-						:tag('div')
+						if (column.sortable) then
+							groupedCell:tag('div')
 								:addClass('panel-table__sort')
 								:tag('i')
 									:addClass('fas fa-sort')
+						end
 	end)
 
 	Array.forEach(match.games, function (game, idx)
@@ -554,10 +564,10 @@ function CustomMatchSummary._createGameStandings(game)
 			:addClass('row--header')
 
 	Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-		header:tag('div')
+		local cell = header:tag('div')
 			:addClass('panel-table__cell')
 			:addClass(column.class)
-			:tag('div'):addClass('panel-table__cell-grouped')
+			local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
 				:tag('i')
 								:addClass('panel-table__cell-icon')
 								:addClass(column.iconClass)
@@ -565,6 +575,12 @@ function CustomMatchSummary._createGameStandings(game)
 						:tag('span')
 								:wikitext(column.header.value)
 								:done()
+						if (column.sortable) then
+							groupedCell:tag('div')
+								:addClass('panel-table__sort')
+								:tag('i')
+									:addClass('fas fa-sort')
+						end
 	end)
 
 	Array.forEach(game.extradata.opponents, function (opponent)
