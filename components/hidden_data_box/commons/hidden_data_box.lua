@@ -32,7 +32,6 @@ local Opponent = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = t
 ---@return string
 function HiddenDataBox.run(args)
 	args = args or {}
-	args.participantGrabber = Logic.nilOr(Logic.readBoolOrNil(args.participantGrabber), true)
 	local doQuery = not Logic.readBool(args.noQuery)
 
 	local warnings
@@ -51,7 +50,7 @@ function HiddenDataBox.run(args)
 
 		if not queryResult[1] and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
-		elseif args.participantGrabber then
+		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
 				Variables.varDefault('tournament_startdate') or HiddenDataBox.cleanDate(args.edate) or
 				queryResult.enddate or Variables.varDefault('tournament_enddate')
