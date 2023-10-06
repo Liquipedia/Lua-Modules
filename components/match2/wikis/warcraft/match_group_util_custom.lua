@@ -32,16 +32,50 @@ CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.P
 	race = CustomMatchGroupUtil.types.Race,
 })
 
+---@class WarcraftMatchGroupUtilGameOpponent:GameOpponent
+---@field placement number?
+---@field players WarcraftStandardPlayer[]
+---@field score number?
 CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	placement = 'number?',
 	players = TypeUtil.array(CustomMatchGroupUtil.types.Player),
 	score = 'number?',
 })
 
+---@class WarcraftMatchGroupUtilGame: MatchGroupUtilGame
+---@field opponents  WarcraftMatchGroupUtilGameOpponent[]
+---@field offraces table<integer, string[]>?
+
+---@class WarcraftMatchGroupUtilVeto
+---@field by number?
+---@field map string
+
+---@class WarcraftMatchGroupUtilSubmatch
+---@field games WarcraftMatchGroupUtilGame[]
+---@field mode string
+---@field opponents WarcraftMatchGroupUtilGameOpponent[]
+---@field resultType ResultType
+---@field scores table<number, number>
+---@field subgroup number
+---@field walkover WalkoverType
+---@field winner number?
+---@field header string?
+
+---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games WarcraftMatchGroupUtilGame[]
+---@field headToHead boolean
+---@field isFfa boolean
+---@field noScore boolean?
+---@field opponentMode 'uniform'|'team'
+---@field opponents WarcraftStandardOpponent[]
+---@field vetoes WarcraftMatchGroupUtilVeto[]
+---@field submatches WarcraftMatchGroupUtilSubmatch[]?
+---@field casters string?
+
 ---@param record table
----@return table
+---@return WarcraftMatchGroupUtilMatch
 function CustomMatchGroupUtil.matchFromRecord(record)
-	local match = MatchGroupUtil.matchFromRecord(record)
+	local match = MatchGroupUtil.matchFromRecord(record) --[[@as WarcraftMatchGroupUtilMatch]]
 
 	-- Add additional fields to opponents
 	CustomMatchGroupUtil.populateOpponents(match)
@@ -89,7 +123,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 end
 
 ---Move additional fields from extradata to struct
----@param match table
+---@param match WarcraftMatchGroupUtilMatch
 function CustomMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
@@ -111,9 +145,9 @@ function CustomMatchGroupUtil.populateOpponents(match)
 end
 
 ---Computes game.opponents by looking up matchOpponents.players on each participant.
----@param game table
----@param matchOpponents table
----@return table
+---@param game WarcraftMatchGroupUtilGame
+---@param matchOpponents WarcraftStandardOpponent[]
+---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	local function playerFromParticipant(opponentIx, matchPlayerIx, participant)
 		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
@@ -178,8 +212,8 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 end
 
 ---Group games on the subgroup field to form submatches
----@param matchGames table[]
----@return table[]
+---@param matchGames WarcraftMatchGroupUtilGame[]
+---@return WarcraftMatchGroupUtilGame[][]
 function CustomMatchGroupUtil.groupBySubmatch(matchGames)
 	-- Group games on adjacent subgroups
 	local previousSubgroup = nil
@@ -198,9 +232,9 @@ function CustomMatchGroupUtil.groupBySubmatch(matchGames)
 end
 
 ---Constructs a submatch object whose properties are aggregated from that of its games.
----@param games table[]
----@param match table
----@return table
+---@param games WarcraftMatchGroupUtilGame[]
+---@param match WarcraftMatchGroupUtilMatch
+---@return WarcraftMatchGroupUtilSubmatch
 function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
@@ -288,27 +322,11 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 	}
 end
 
----Determine if a match has details that should be displayed via popup
----@param match table
----@return boolean
-function CustomMatchGroupUtil.matchHasDetails(match)
-	return match.dateIsExact
-		or match.vod
-		or not Table.isEmpty(match.links)
-		or match.comment
-		or match.casters
-		or 0 < #match.vetoes
-		or Array.any(match.games, function(game)
-			return game.map and game.map ~= 'TBD'
-				or game.winner
-		end)
-end
-
 ---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
 ---Returns the races played if at least one player chose an offrace or nil if otherwise.
----@param gameOpponent table
----@param referenceOpponent table
----@return table
+---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
+---@param referenceOpponent WarcraftStandardOpponent|WarcraftMatchGroupUtilGameOpponent
+---@return string[]?
 function CustomMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	local gameRaces = {}
 	local hasOffrace = false
@@ -321,7 +339,7 @@ function CustomMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 end
 
 ---@param record table
----@return table
+---@return WarcraftStandardPlayer
 function CustomMatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	return {
