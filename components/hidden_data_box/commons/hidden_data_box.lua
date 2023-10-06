@@ -56,7 +56,9 @@ function HiddenDataBox.run(args)
 				Variables.varDefault('tournament_startdate') or HiddenDataBox.cleanDate(args.edate) or
 				queryResult.enddate or Variables.varDefault('tournament_enddate')
 
-			Array.forEach(HiddenDataBox._fetchPlacements(parent), HiddenDataBox._setWikiVariablesFromPlacement, date)
+			Array.forEach(HiddenDataBox._fetchPlacements(parent), function(placement)
+				HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
+			end)
 		end
 
 		queryResult = queryResult[1] or {}
@@ -142,6 +144,7 @@ function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
 ---@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
+---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
