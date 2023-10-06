@@ -22,8 +22,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 
 local Condition = require('Module:Condition')
@@ -62,10 +61,9 @@ local _args
 local _player
 
 function CustomPlayer.run(frame)
-	local player = Person(frame)
+	local player = CustomPerson(frame)
 	_args = player.args
 	_player = player
-	PersonSc2.setArgs(_args)
 
 	player.recentMatches = {}
 	player.infoboxAchievements = {}
@@ -73,16 +71,10 @@ function CustomPlayer.run(frame)
 	player.achievements = {}
 	player.achievementsFallBack = {}
 	player.earningsGlobal = {}
-	player.shouldQueryData = PersonSc2.shouldStoreData()
+	player.shouldQueryData = player:shouldStoreData(_args)
 	if player.shouldQueryData then
 		player.yearsActive = CustomPlayer._getMatchupData(player.pagename)
 	end
-
-	player.shouldStoreData = PersonSc2.shouldStoreData
-	player.getStatusToStore = PersonSc2.getStatusToStore
-	player.adjustLPDB = PersonSc2.adjustLPDB
-	player.getPersonType = PersonSc2.getPersonType
-	player.nameDisplay = PersonSc2.nameDisplay
 
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -97,7 +89,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {_player:getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -156,7 +148,7 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
 		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
-		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Military Service', content = {_args.military}},
 		Cell{
 			name = Abbreviation.make('Years active', 'Years active as a player'),
 			content = {_player.yearsActive}
@@ -565,9 +557,11 @@ function CustomPlayer._getAllkills()
 end
 
 function CustomPlayer:getWikiCategories(categories)
-	for _, faction in pairs(PersonSc2.readFactions(_args.race).factions) do
+	for _, faction in pairs(self:readFactions(_args.race).factions) do
 		table.insert(categories, faction .. ' Players')
 	end
+
+	table.insert(categories, self:military(_args.military).category)
 
 	return categories
 end
