@@ -29,13 +29,13 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		local raceHistory = Logic.readBool(record.extradata.racehistorical)
+		local raceHistory = Logic.readBool(record.extradata.factionhistorical)
 			and CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 			or nil
 
 		return {
 			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
-			race = Faction.read(record.extradata.race),
+			race = Faction.read(record.extradata.faction),
 			raceHistory = raceHistory,
 		}
 	end
