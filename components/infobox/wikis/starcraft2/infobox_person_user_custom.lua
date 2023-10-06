@@ -34,8 +34,9 @@ function CustomUser.run(frame)
 	user.shouldStoreData = CustomUser.shouldStoreData
 	user.getStatusToStore = CustomUser.getStatusToStore
 	user.getPersonType = CustomUser.getPersonType
-
 	user.createWidgetInjector = CustomUser.createWidgetInjector
+	user._getArgsfromBaseDefault = CustomUser._getArgsfromBaseDefault
+	user._getFavouriteTeams = CustomUser._getFavouriteTeams
 
 	return user:createInfobox()
 end
@@ -63,13 +64,13 @@ end
 function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Languages', content = {_args.languages}},
-		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+		Cell{name = 'Favorite players', content = _user:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+		Cell{name = 'Favorite casters', content = _user._getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
 	}
 	if not String.isEmpty(_args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
+		table.insert(widgets, Center{content = {_user._getFavouriteTeams()}})
 	end
 
 	return widgets
