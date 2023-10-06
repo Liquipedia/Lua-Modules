@@ -65,19 +65,19 @@ function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Languages', content = {_args.languages}},
 		Cell{name = 'Favorite players', content = _user:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = _user._getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+		Cell{name = 'Favorite casters', content = _user:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
 	}
 	if not String.isEmpty(_args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {_user._getFavouriteTeams()}})
+		table.insert(widgets, Center{content = {_user:_getFavouriteTeams()}})
 	end
 
 	return widgets
 end
 
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = _user:getAllArgsForBase(_args, 'fav-team-')
+	local foundArgs = self:getAllArgsForBase(_args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do
@@ -89,7 +89,7 @@ function CustomUser:_getFavouriteTeams()
 end
 
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = _user:getAllArgsForBase(_args, base)
+	local foundArgs = self:getAllArgsForBase(_args, base)
 	table.insert(foundArgs, _args[default])
 	return foundArgs
 end
