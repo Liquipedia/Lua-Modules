@@ -113,9 +113,8 @@ function StarcraftMatchSummary.addToFooter(match, footer)
 	then
 		return footer:addLinks(LINKS_DATA, match.links)
 	end
-
-	match.links.h2h = tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
-		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
+	match.links.h2h = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
+		.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
 		.. match.opponents[1].players[1].pageName
 		.. '&Head_to_head_query%5Bopponent%5D='
 		.. match.opponents[2].players[1].pageName
