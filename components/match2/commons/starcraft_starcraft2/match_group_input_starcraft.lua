@@ -635,7 +635,6 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 			if player.displayname then
 				Variables.varDefine(player.displayname .. '_page', player.name)
 			end
-				
 			table.insert(players, player)
 		else
 			break
