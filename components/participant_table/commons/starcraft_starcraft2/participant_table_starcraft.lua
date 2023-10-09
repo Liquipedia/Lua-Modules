@@ -42,19 +42,12 @@ local Opponent = require('Module:OpponentLibraries').Opponent
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
-local ROLL_OUT_DATE = '2023-10-31'
-
 local StarcraftParticipantTable = {}
 
 ---@param frame Frame
 ---@return Html?
 function StarcraftParticipantTable.run(frame)
 	local participantTable = ParticipantTable(frame) --[[@as StarcraftParticipantTable]]
-
-	--disable storage for events before rollout date
-	--need to clean them up regarding transcludes first
-	participantTable.args.noStorage = participantTable.args.noStorage or
-		Variables.varDefault('tournament_startdate') and Variables.varDefault('tournament_startdate') < ROLL_OUT_DATE
 
 	participantTable.readConfig = StarcraftParticipantTable.readConfig
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
