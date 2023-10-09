@@ -362,6 +362,7 @@ OpponentDisplay.propTypes.BlockTeam = {
 ---@field showLink boolean?
 ---@field style teamStyle?
 ---@field team standardTeamProps
+---@field dq boolean?
 
 --[[
 Displays a team as a block element. The width of the component is determined by
@@ -375,7 +376,7 @@ function OpponentDisplay.BlockTeam(props)
 	local style = props.style or 'standard'
 
 	local function createNameNode(name)
-		return mw.html.create('span'):addClass('name')
+		return mw.html.create(props.dq and 's' or 'span'):addClass('name')
 			:wikitext(props.showLink ~= false and props.team.pageName
 				and '[[' .. props.team.pageName .. '|' .. name .. ']]'
 				or name
