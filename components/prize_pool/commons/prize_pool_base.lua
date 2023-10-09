@@ -329,7 +329,12 @@ BasePrizePool.prizeTypes = {
 
 		row = 'percentage',
 		rowParse = function (placement, input, context, index)
-			return BasePrizePool._parseInteger(input)
+			local value = BasePrizePool._parseInteger(input)
+			if value then
+				placement.hasPercentage = true
+			end
+
+			return value
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
@@ -745,7 +750,7 @@ end
 -- or if there is a money reward in another currency whilst currency conversion is active
 function BasePrizePool:_hasBaseCurrency()
 	return (Array.any(self.placements, function (placement)
-		return placement.hasBaseCurrency
+		return placement.hasBaseCurrency or placement.hasPercentage
 	end)) or (self.options.autoExchange and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))
