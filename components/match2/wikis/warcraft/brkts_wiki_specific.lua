@@ -18,15 +18,6 @@ WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	return CustomMatchGroupUtil.matchFromRecord
 end)
 
----@param matchGroupType string
----@return Html
----@diagnostic disable-next-line: duplicate-set-field
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Custom', {requireDevIfEnabled = true}).BracketContainer
-end
-
 WikiSpecific.processMap = FnUtil.identity
 WikiSpecific.processPlayer = FnUtil.identity
 
