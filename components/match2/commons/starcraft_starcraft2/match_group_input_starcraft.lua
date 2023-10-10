@@ -622,16 +622,20 @@ end
 function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	local players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
+		local prefix = teamName .. '_p' .. playerIndex
+		local name = Variables.varDefault(prefix)
 		if Logic.isNotEmpty(name) then
 			---@cast name -nil
-			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-			players[playerIndex] = {
+			local player = {
 				name = name:gsub(' ', '_'),
-				displayname = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'display'),
-				flag = Flags.CountryName(flag),
-				extradata = {faction = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')}
+				displayname = Variables.varDefault(prefix .. 'dn'),
+				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
+				extradata = {faction = Variables.varDefault(prefix .. 'race')}
 			}
+			if player.displayname then
+				Variables.varDefine(player.displayname .. '_page', player.name)
+			end
+			table.insert(players, player)
 		else
 			break
 		end
