@@ -14,7 +14,6 @@ local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
