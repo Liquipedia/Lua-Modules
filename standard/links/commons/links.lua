@@ -104,6 +104,7 @@ local PREFIXES = {
 		player = 'https://halodatahive.com/Player/Detail/',
 	},
 	home = {''},
+	haojiao = {'https://web.haojiao.cc/wiki/team/t2Ud5pOQlscKLbRC/'},
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
