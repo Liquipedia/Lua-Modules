@@ -6,7 +6,7 @@
 local liquipedia = {}
 
 local importFunctions = {}
-importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists', 'Lua%.loadDataIfExists'}
+importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists'}
 importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.'}
 
 function importFunctions._row(name)

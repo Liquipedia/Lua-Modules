@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local REGION_DATA = mw.loadData('Module:Region/Data')
-local COUNTRY_TO_REGION_DATA = Lua.loadDataIfExists('Module:Region/CountryData') or {}
+local COUNTRY_TO_REGION_DATA = Lua.requireIfExists('Module:Region/CountryData', {requireDevIfEnabled = true, loadData = true}) or {}
 
 local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
 
