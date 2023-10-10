@@ -104,7 +104,11 @@ local PREFIXES = {
 		player = 'https://halodatahive.com/Player/Detail/',
 	},
 	home = {''},
-	haojiao = {'https://web.haojiao.cc/wiki/team/t2Ud5pOQlscKLbRC/'},
+	haojiao = {
+		'https://web.haojiao.cc/wiki/tour/t2Ud5pOQlscKLbRC/',
+		team = 'https://web.haojiao.cc/wiki/team/t2Ud5pOQlscKLbRC/',
+		player = 'https://web.haojiao.cc/wiki/player/t2Ud5pOQlscKLbRC/',
+	},
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
