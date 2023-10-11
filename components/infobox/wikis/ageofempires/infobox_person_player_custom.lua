@@ -163,6 +163,8 @@ function CustomInjector:parse(id, widgets)
 				end)
 			}
 		}
+	elseif id == 'region' then
+		return {}
 	end
 	return widgets
 end
