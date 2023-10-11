@@ -238,8 +238,8 @@ function CustomUnit.getUnitRaceType(args)--this gets more complex for units
 	if cleanedRace == Faction.toName('n') then
 		cleanedRace = 'Night Elf'
 	end
-	if (race == 'creeps' or race == 'demon') and (tonumber(args.passive) or 0) > 0 then
-		cleanedRace = 'Creep'
+	if (race == 'creeps' or race == 'demon') then
+		cleanedRace = (tonumber(args.passive) or 0) > 0 and 'Neutral' or 'Creep'
 	elseif race == 'other' or race == 'commoner' then
 		cleanedRace = 'Neutral'
 	end
