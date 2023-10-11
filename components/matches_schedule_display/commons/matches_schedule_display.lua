@@ -218,7 +218,7 @@ end
 ---@return string
 function MatchesTable:determineMatchHeader(match)
 	local matchHeader = Logic.emptyOr(
-		match.match2bracketdata.header or match.extradata.matchsection,
+		match.match2bracketdata.inheritedheader or match.extradata.matchsection,
 		self.currentId == match.match2bracketid and self.currentMatchHeader or nil,
 		--if we do not have a matchHeader yet try:
 		-- 1) the title (in case it is a matchlist)
