@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 
-local config = Lua.loadDataIfExists('Module:Match/Config') or {}
+local config = Lua.requireIfExists('Module:Match/Config', {requireDevIfEnabled = true, loadData = true}) or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})

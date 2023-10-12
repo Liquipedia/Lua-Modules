@@ -17,7 +17,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
+local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {requireDevIfEnabled = true, loadData = true})
 
 -- These last_headings are considered sub headings
 -- and matchsection should be used instead if available

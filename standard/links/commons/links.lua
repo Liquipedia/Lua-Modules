@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
+local CustomData = Lua.requireIfExists('Module:Links/CustomData', {requireDevIfEnabled = true, loadData = true}) or {}
 
 local Links = {}
 
