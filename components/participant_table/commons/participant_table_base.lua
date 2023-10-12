@@ -231,7 +231,6 @@ function ParticipantTable:store()
 		tournament = Variables.varDefault('tournament_name'),
 		parent = Variables.varDefault('tournament_parent'),
 		series = Variables.varDefault('tournament_series'),
-		shortname = Variables.varDefault('tournament_tickername'),
 		startdate = Variables.varDefault('tournament_startdate'),
 		mode = Variables.varDefault('tournament_mode'),
 		type = Variables.varDefault('tournament_type'),
