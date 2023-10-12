@@ -26,6 +26,22 @@ function Json.stringify(obj, pretty)
 	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
 end
 
+---Json-stringifies subtables of a given table.
+---@param obj table
+---@param pretty boolean?
+---@return table
+function Json.stringifySubTables(obj, pretty)
+	local objectWithStringifiedSubtables = {}
+	for key, item in pairs(obj) do
+		if type(item) == 'table' then
+			objectWithStringifiedSubtables[key] = Json.stringify(item, pretty)
+		else
+			objectWithStringifiedSubtables[key] = item
+		end
+	end
+
+	return objectWithStringifiedSubtables
+end
 
 ---Parses a given JSON encoded table to its table representation.
 ---If the parse fails it returns an empty table.
