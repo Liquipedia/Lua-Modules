@@ -105,21 +105,35 @@ function CustomMatchSummary.createBody(match)
 			DisplayHelper.MatchCountdownBlock(match)
 		))
 	end
-
-	if BigMatch.isEnabledFor(match) then
-		local matchPageElement = mw.html.create('center')
-		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
-						:css('display', 'block')
-						:css('margin', 'auto')
-		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement):addClass('brkts-popup-mvp'))
-	end
-
+	
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
 		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
 		body:addRow(rowDisplay)
 	end
-
+	
+	-- Add Match Page link
+	if BigMatch.isEnabledFor(match) then
+		local matchPageElement = mw.html.create('center')
+		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|')
+						:css('display', 'block')
+						:css('margin', 'auto')
+						:tag('span')
+							:addClass('fa-stack')
+							:css('font-size','10px')
+							:css('vertical-align','text-bottom')
+							:tag('i')
+								:addClass('fad fa-file fa-stack-2x')
+								:done()
+							:tag('i')
+								:addClass('fas fa-info fa-stack-1x')
+								:done()
+							:done()
+						:wikitext('MATCH PAGE')
+						:wikitext(']]')
+		body:addRow(MatchSummary.Row():css('font-size', '14px'):css('font-weight','600'):css('line-height','2em'):addElement(matchPageElement))
+	end
+	
 	-- Add Match MVP(s)
 	if match.extradata.mvp then
 		local mvpData = match.extradata.mvp
