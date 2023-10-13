@@ -314,7 +314,7 @@ function CustomMatchGroupInput._opponentInput(match)
 		end
 
 		--set initial opponent sumscore
-		opponent.sumscore = tonumber(opponent.extradata.advantage) or tonumber('-' .. (opponent.extradata.penalty or '')) or 0
+		opponent.sumscore = tonumber(opponent.extradata.advantage) or -1 * (tonumber(opponent.extradata.penalty) or 0)
 
 		table.insert(opponentTypes, opponent.type)
 
