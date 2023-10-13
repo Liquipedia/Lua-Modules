@@ -69,10 +69,6 @@ function MatchLegacy.convertParameters(match2)
 
 		if match.resulttype == 'default' then
 			match.resulttype = string.upper(match.walkover or '')
-			if match.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
-				--needs to be converted because in match1 storage it was marked this way
-				match.resulttype = 'unk'
-			end
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
