@@ -106,7 +106,7 @@ function MatchLegacy._convertParameters(match2)
 	local extradata = match.extradata --[[@as table]]
 
 	extradata.legacymatchid = (tonumber(Variables.varDefault('matchID')) or 0) + 1
-	Variables.varDefine('matchID', match.staticid)
+	Variables.varDefine('matchID', extradata.legacymatchid)
 
 	extradata.mapdetails = #(match2.match2games) > 0 and 1 or 0
 	extradata.tournamentstage = Variables.varDefault('tournamentStage') or (
