@@ -23,7 +23,8 @@ end
 ---@param pretty boolean?
 ---@return string
 function Json.stringify(obj, pretty)
-	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
+	return pretty == true and mw.text.jsonEncode(obj, mw.text.JSON_PRETTY) or
+		mw.ext.LiquipediaDB.lpdb_create_json(obj)
 end
 
 ---Json-stringifies subtables of a given table.
