@@ -310,7 +310,7 @@ function CustomMatchGroupInput._opponentInput(match)
 		elseif opponent.type == Opponent.literal then
 			opponent = CustomMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 		else
-			error('Unsupported Opponent Type')
+			error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 		end
 
 		--set initial opponent sumscore
