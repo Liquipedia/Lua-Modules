@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Opponent = require('Module:Opponent')
-local OpponentDisplay = require('Module:OpponentDisplay')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local Variables = require('Module:Variables')
 
 local RoleOf = {}
@@ -24,26 +26,34 @@ function RoleOf.get(args)
 
 	local team = args.team or mw.title.getCurrentTitle().text
 	local teamPage = mw.ext.TeamLiquidIntegration.resolve_redirect(team):gsub(' ', '_')
-	local teamData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
-		conditions = '[[pagename::' .. teamPage .. ']] AND [[status::active]] AND ' ..
-			'([[position::' .. args.role .. ']] OR [[role::' .. args.role .. ']])',
+	local staffData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
+		conditions = '[[pagename::' .. teamPage .. ']] AND [[status::active]]',
 		query = 'id, link, nationality',
-		limit = 1
-	})[1]
+		limit = 100,
+	})
 
-	if not teamData then
+	if #staffData == 0 then
 		return
 	end
 
-	Variables.varDefine(args.role .. 'id', teamData.link)
-	local opponent = Opponent.readOpponentArgs{
-		type = Opponent.solo,
-		name = teamData.id,
-		link = teamData.link,
-		flag = teamData.nationality,
-	}
-	---@cast opponent -nil
-	return tostring(OpponentDisplay.InlineOpponent{opponent = opponent})
+	local output = {}
+	Array.forEach(staffData, function (staff)
+		if not (staff.role or ''):lower():find(string.lower(args.role))
+				and not (staff.position or ''):lower():find(string.lower(args.role)) then
+			return
+		end
+
+		Variables.varDefine(args.role .. 'id', staff.link)
+		local opponent = Opponent.readOpponentArgs{
+			type = Opponent.solo,
+			name = staff.id,
+			link = staff.link,
+			flag = staff.nationality,
+		}
+		table.insert(output, OpponentDisplay.InlineOpponent{opponent = opponent})
+	end)
+
+	return table.concat(output, ' ')
 end
 
 return Class.export(RoleOf)
