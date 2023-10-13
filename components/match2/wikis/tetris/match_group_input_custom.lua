@@ -85,7 +85,6 @@ function CustomMatchGroupInput._getVodStuff(match)
 end
 
 function CustomMatchGroupInput._getExtraData(match)
-	local casters = {}
 	match.extradata = {
 		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
