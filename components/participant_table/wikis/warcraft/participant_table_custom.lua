@@ -65,7 +65,6 @@ end
 ---@return WarcraftParticipantTableConfig
 function CustomParticipantTable.readConfig(args, parentConfig)
 	local config = ParticipantTable.readConfig(args, parentConfig) --[[@as WarcraftParticipantTableConfig]]
-	parentConfig = parentConfig or {}
 
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
