@@ -182,7 +182,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	if Logic.readBool(data.finished) then
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
-			data.resulttype = 'draw'
+			data.resulttype = DRAW_RESULT_TYPE
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
