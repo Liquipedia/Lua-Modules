@@ -816,7 +816,6 @@ end
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@param addGroupBy string?
 ---@return table
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
