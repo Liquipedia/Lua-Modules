@@ -26,7 +26,6 @@ function MatchLegacy.storeMatch(match2, options)
 end
 
 function MatchLegacy.convertParameters(match2)
-	local doStore = true
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
