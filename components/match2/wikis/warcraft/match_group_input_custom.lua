@@ -609,10 +609,10 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 	end
 
 	local opponentRaces, playerNameArray = CustomMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
-	if tonumber(map.winner or 0) == 1 then
+	if tonumber(map.winner) == 1 then
 		map.extradata.winnerfaction = opponentRaces[1]
 		map.extradata.loserfaction = opponentRaces[2]
-	elseif tonumber(map.winner or 0) == 2 then
+	elseif tonumber(map.winner) == 2 then
 		map.extradata.winnerfaction = opponentRaces[2]
 		map.extradata.loserfaction = opponentRaces[1]
 	end
