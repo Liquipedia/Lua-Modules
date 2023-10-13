@@ -26,7 +26,6 @@ local TBD = 'TBD'
 
 ---@param match table
 ---@param options {storeMatch2:boolean, storeMatch1:boolean, storePageVar:boolean, bracketId: string}
----@return nil
 function MatchLegacy.storeMatch(match, options)
 	if not options.storeMatch1 or #match.match2opponents ~= 2 or not Namespace.isMain() then
 		return
@@ -35,14 +34,17 @@ function MatchLegacy.storeMatch(match, options)
 	match = MatchLegacy._parseJsons(match)
 
 	if Array.all(match.match2opponents, function(opponent) return opponent.type == Opponent.solo end) then
-		return MatchLegacy._storeSoloMatch(match)
+		MatchLegacy._storeSoloMatch(match)
+		return
 	end
 
 	if Array.all(match.match2opponents, function(opponent) return opponent.type == Opponent.team
 		or opponent.type == Opponent.solo end) then
 
-		return MatchLegacy._storeTeamMatch(match)
+		MatchLegacy._storeTeamMatch(match)
 	end
+
+	return
 end
 
 ---@param object table
