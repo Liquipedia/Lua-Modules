@@ -306,9 +306,9 @@ function matchFunctions.getScoreFromMapWinners(match)
 			local winner = tonumber(map.winner)
 			foundScores = true
 			-- Only two opponents in C-OPS
-				if winner and winner > 0 and winner <= 2 then
-					newScores[winner] = (newScores[winner] or 0) + 1
-				end
+			if winner and winner > 0 and winner <= 2 then
+				newScores[winner] = (newScores[winner] or 0) + 1
+			end
 		end
 	end
 	if not opponent1.score and foundScores then
