@@ -77,7 +77,7 @@ function MatchLegacy.convertParameters(match2)
 		return nil, false
 	end
 
-	return match, doStore
+	return match, true
 end
 
 return MatchLegacy
