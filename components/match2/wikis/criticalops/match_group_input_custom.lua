@@ -338,7 +338,6 @@ end
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournamentSTATUS'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
