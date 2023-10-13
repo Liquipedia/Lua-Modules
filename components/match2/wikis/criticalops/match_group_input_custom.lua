@@ -279,7 +279,7 @@ function matchFunctions.removeUnsetMaps(match)
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 		if map.map == DUMMY_MAP_NAME then
 			match[mapKey] = nil
-			end
+		end
 	end
 	return match
 end
