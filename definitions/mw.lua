@@ -657,7 +657,7 @@ mw.ext.LiquipediaDB = {}
 
 ---@param obj table
 ---@return string
----Encode a table to a JSON string. Errors are raised if the passed value cannot be encoded in JSON.
+---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
 function mw.ext.LiquipediaDB.lpdb_create_json(obj) end
 
 ---@param obj any[]
