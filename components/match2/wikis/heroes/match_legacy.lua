@@ -12,6 +12,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Opponent = require('Module:Opponent')
 
 local _GAME_EXTRADATA_CONVERTER = {
 	ban = 'b',
@@ -52,23 +53,7 @@ function MatchLegacy._convertParameters(match2)
 	local extradata = Json.parseIfString(match2.extradata)
 	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
-	match.extradata.mvpteam = extradata.mvpteam
 	match.extradata.comment = extradata.comment
-
-	local opponents = match2.match2opponents or {}
-	match.extradata.team1icon = (opponents[1] or {}).icon
-	match.extradata.team2icon = (opponents[2] or {}).icon
-	match.extradata.opponent1literal = tostring((opponents[1] or {}).type == 'literal')
-	match.extradata.opponent2literal = tostring((opponents[2] or {}).type == 'literal')
-	match.extradata.opponent1game = 'false'
-	match.extradata.opponent2game = 'false'
-
-	local games = match2.match2games or {}
-	for key, game in ipairs(games) do
-		if String.isNotEmpty(game.vod) then
-			match.extradata['vodgame' .. key] = game.vod
-		end
-	end
 
 	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
 
@@ -77,7 +62,7 @@ function MatchLegacy._convertParameters(match2)
 		local prefix = 'opponent'..index
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
-		if opponent.type == 'team' then
+		if opponent.type == Opponent.team then
 			match[prefix] = opponent.name
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
@@ -88,12 +73,12 @@ function MatchLegacy._convertParameters(match2)
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
 			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
-		elseif opponent.type == 'solo' then
+		elseif opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix..'flag'] = player.flag
-		elseif opponent.type == 'literal' then
+		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
 		end
 	end
@@ -105,7 +90,7 @@ function MatchLegacy._convertParameters(match2)
 end
 
 function MatchLegacy.storeGames(match, match2)
-	local games = ''
+	local games = {}
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 
@@ -140,9 +125,9 @@ function MatchLegacy.storeGames(match, match2)
 			'legacygame_' .. match2.match2id .. '_' .. gameIndex,
 			game
 		)
-		games = games .. res
+		table.insert(games, res)
 	end
-	return games
+	return table.concat(games)
 end
 
 return MatchLegacy
