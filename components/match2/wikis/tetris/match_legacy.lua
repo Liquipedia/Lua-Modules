@@ -47,21 +47,21 @@ function MatchLegacy.convertParameters(match2)
 		if opponent1.type == 'solo' then
 			local player = opponent1match2players[1] or {}
 			match.opponent1 = player.name and player.name:gsub('_', ' ') or nil
-			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
+			match.opponent1score = (tonumber(opponent1.score) or 0) > 0 and opponent1.score or 0
 			match.opponent1flag = player.flag
 			match.extradata.opponent1name = player.displayname
 			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
 			player = opponent2match2players[1] or {}
 			match.opponent2 = player.name and player.name:gsub('_', ' ') or nil
-			match.opponent2score = (tonumber(opponent2.score) or 0) >= 0 and opponent2.score or 0
+			match.opponent2score = (tonumber(opponent2.score) or 0) > 0 and opponent2.score or 0
 			match.opponent2flag = player.flag
 			match.extradata.opponent2name = player.displayname
 			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
 		elseif opponent1.type == 'team' then
 			match.opponent1 = String.isNotEmpty(opponent1.name) and opponent1.name:gsub('_', ' ') or 'TBD'
-			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
+			match.opponent1score = (tonumber(opponent1.score) or 0) > 0 and opponent1.score or 0
 			match.opponent2 = String.isNotEmpty(opponent2.name) and opponent2.name:gsub('_', ' ') or 'TBD'
-			match.opponent2score = (tonumber(opponent2.score) or 0) >= 0 and opponent2.score or 0
+			match.opponent2score = (tonumber(opponent2.score) or 0) > 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
 			return nil, false
