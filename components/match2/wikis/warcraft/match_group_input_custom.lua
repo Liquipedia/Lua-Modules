@@ -545,7 +545,7 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 
 	if hasManualScores then
 		for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
-			if not tonumber(map.winner or '') then
+			if not tonumber(map.winner) then
 				map.winner = scoreIndex
 			else
 				break
