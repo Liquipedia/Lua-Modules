@@ -100,12 +100,13 @@ function MatchLegacy._convertParameters(match2)
 	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader, ''))[1]
 	match.tickername = Variables.varDefault('tournament_tickername', Variables.varDefault('tournament_ticker_name'))
 
+	match.staticid = match2.match2id
+
 	match.extradata = match.extradata or {}
 	local extradata = match.extradata --[[@as table]]
 
-	match.staticid = (tonumber(Variables.varDefault('matchID')) or 0) + 1
+	extradata.legacymatchid = (tonumber(Variables.varDefault('matchID')) or 0) + 1
 	Variables.varDefine('matchID', match.staticid)
-	extradata.legacymatchid = match.staticid
 
 	extradata.mapdetails = #(match2.match2games) > 0 and 1 or 0
 	extradata.tournamentstage = Variables.varDefault('tournamentStage') or (
