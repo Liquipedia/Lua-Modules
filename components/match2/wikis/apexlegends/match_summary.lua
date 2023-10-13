@@ -228,7 +228,7 @@ function CustomMatchSummary.getByMatchId(args)
 
 	match = CustomMatchSummary._opponents(match)
 
-	local matchSummary = mw.html.create('div'):addClass('navigation-content-container')
+	local matchSummary = mw.html.create()
 
 	local addNode = FnUtil.curry(matchSummary.node, matchSummary)
 	addNode(CustomMatchSummary._createHeader(match))
@@ -332,7 +332,7 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createPointsDistributionTable(match)
-	local wrapper = mw.html.create()
+	local wrapper = mw.html.create('div'):addClass('panel-content__collapsible')
 	wrapper:tag('h5')
 			:addClass('panel-content__button')
 			:addClass('is--collapsed')
@@ -371,16 +371,11 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createOverallPage(match)
-	local infoArea = mw.html.create('div')
-			:addClass('panel-content')
-			:attr('id', 'panel' .. match.matchId)
-			:tag('h5')
-					:addClass('panel-content__button')
-					:attr('tabindex', 0)
-					:wikitext('Schedule')
-					:done()
+	local page = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel' .. match.matchId)
+	local schedule = page:tag('div'):addClass('panel-content__collapsible')
+	schedule:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Schedule')
 
-	local scheduleList = infoArea:tag('div')
+	local scheduleList = schedule:tag('div')
 			:addClass('panel-content__container')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
@@ -400,27 +395,20 @@ function CustomMatchSummary._createOverallPage(match)
 				:node(CustomMatchSummary._gameCountdown(game))
 	end)
 
-	infoArea:node(CustomMatchSummary._createPointsDistributionTable(match))
+	page:node(CustomMatchSummary._createPointsDistributionTable(match))
 
-	return mw.html.create()
-			:node(infoArea)
-			:node(CustomMatchSummary._createMatchStandings(match))
+	return page:node(CustomMatchSummary._createMatchStandings(match))
 end
 
 ---@param game table
 ---@param idx integer
 ---@return Html
 function CustomMatchSummary._createGameTab(game, idx)
-	local infoArea = mw.html.create('div')
-			:addClass('panel-content')
-			:attr('id', 'panel' .. idx)
-			:tag('h5')
-					:addClass('panel-content__button')
-					:attr('tabindex', 0)
-					:wikitext('Game Details')
-					:done()
+	local page = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel' .. idx)
+	local details = page:tag('div'):addClass('panel-content__collapsible')
+	details:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Game Details')
 
-	local gameDetails = infoArea:tag('div')
+	local gameDetails = details:tag('div')
 			:addClass('panel-content__container')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
@@ -450,11 +438,9 @@ function CustomMatchSummary._createGameTab(game, idx)
 			:tag('span')
 					:wikitext(Page.makeInternalLink(game.map))
 
-	infoArea:node(CustomMatchSummary._createPointsDistributionTable(game))
+	page:node(CustomMatchSummary._createPointsDistributionTable(game))
 
-	return mw.html.create()
-			:node(infoArea)
-			:node(CustomMatchSummary._createGameStandings(game))
+	return page:node(CustomMatchSummary._createGameStandings(game))
 end
 
 ---@param match table
