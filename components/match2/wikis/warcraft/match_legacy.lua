@@ -39,7 +39,10 @@ function MatchLegacy.storeMatch(match, options)
 	end
 
 	if Array.all(match.match2opponents, function(opponent) return opponent.type == Opponent.team
-		or opponent.type == Opponent.solo end) then return MatchLegacy._storeTeamMatch(match) end
+		or opponent.type == Opponent.solo end) then
+
+		return MatchLegacy._storeTeamMatch(match)
+	end
 end
 
 ---@param object table
