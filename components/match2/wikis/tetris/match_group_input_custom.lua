@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
---local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -30,10 +29,7 @@ local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_ST
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t'))
---local MAX_NUM_PLAYERS_PER_MAP = 2
---local TBD = 'tbd'
---local TBA = 'tba'
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local BYE = 'bye'
 local MAX_NUM_MAPS = 30
 
@@ -90,31 +86,17 @@ end
 
 function CustomMatchGroupInput._getExtraData(match)
 	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-
 	match.extradata = {
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'subgroup' .. subGroupIndex
 
-		match.extradata[prefix .. 'header'] = CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
+		match.extradata[prefix .. 'header'] = String.nilIfEmpty(match['set' .. subGroupIndex .. 'header'])
 	end
 
 	return match
-end
-
-function CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-	local header = match['set' .. subGroupIndex .. 'header']
-
-	return String.isNotEmpty(header) and header or nil
 end
 
 function CustomMatchGroupInput._adjustData(match)
@@ -349,10 +331,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	}
 
 	-- inherit stuff from match data
-	map.type = Logic.emptyOr(map.type, match.type)
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = Logic.emptyOr(map.game, match.game)
+	MatchGroupInput.getCommonTournamentVars(map, match)
 	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
@@ -362,10 +341,10 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	-- set sumscore to 0 if it isn't a number
-	if String.isEmpty(match.opponent1.sumscore) then
+	if Logic.isEmpty(match.opponent1.sumscore) then
 		match.opponent1.sumscore = 0
 	end
-	if String.isEmpty(match.opponent2.sumscore) then
+	if Logic.isEmpty(match.opponent2.sumscore) then
 		match.opponent2.sumscore = 0
 	end
 
@@ -480,7 +459,7 @@ function walkoverProcessing.walkover(obj, scores)
 		walkoverProcessing.numericWalkover(obj, walkover)
 	elseif walkover then
 		walkoverProcessing.nonNumericWalkover(obj, walkover)
-	elseif #scores ~=2 then -- since we always have 2 opponents outside of ffa
+	elseif #scores ~= 2 then -- since we always have 2 opponents outside of ffa
 		error('Unexpected number of opponents when calculating winner')
 	elseif Array.all(scores, function(score)
 			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
