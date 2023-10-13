@@ -243,8 +243,14 @@ function Match.copyRecords(matchRecord)
 	})
 end
 
-local function stringifyIfTable(tbl)
-	return type(tbl) == 'table' and Json.stringify(tbl) or nil
+---@param tbl string|table|nil
+---@param options {isArray: boolean?}?
+---@return string|nil
+local function stringifyIfTable(tbl, options)
+	if type(tbl) ~= 'table' then return end
+
+	options = options or {}
+	return options.isArray and mw.ext.LiquipediaDB.lpdb_create_array(tbl) or Json.stringify(tbl)
 end
 
 function Match.encodeJson(matchRecord)
@@ -262,7 +268,7 @@ function Match.encodeJson(matchRecord)
 	for _, gameRecord in ipairs(matchRecord.match2games) do
 		gameRecord.extradata = stringifyIfTable(gameRecord.extradata)
 		gameRecord.participants = stringifyIfTable(gameRecord.participants)
-		gameRecord.scores = stringifyIfTable(gameRecord.scores)
+		gameRecord.scores = stringifyIfTable(gameRecord.scores, {isArray = true})
 	end
 end
 
