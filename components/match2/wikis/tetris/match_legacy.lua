@@ -74,8 +74,7 @@ function MatchLegacy.convertParameters(match2)
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = json.stringify(match.extradata)
 	else
-		doStore = false
-		match = nil
+		return nil, false
 	end
 
 	return match, doStore
