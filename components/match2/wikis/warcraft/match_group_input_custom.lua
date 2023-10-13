@@ -480,10 +480,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	}
 
 	-- inherit stuff from match data
-	map.type = match.type
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = match.game
+	map = MatchGroupInput.getCommonTournamentVars(map, match)
 	map.date = map.date or match.date
 	map.patch = match.patch
 
