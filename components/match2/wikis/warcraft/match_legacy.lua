@@ -28,7 +28,9 @@ local TBD = 'TBD'
 ---@param options {storeMatch2:boolean, storeMatch1:boolean, storePageVar:boolean, bracketId: string}
 ---@return nil
 function MatchLegacy.storeMatch(match, options)
-	if not options.storeMatch1 or #match.match2opponents ~= 2 or not Namespace.isMain() then return end
+	if not options.storeMatch1 or #match.match2opponents ~= 2 or not Namespace.isMain() then
+		return
+	end
 
 	match = MatchLegacy._parseJsons(match)
 
