@@ -446,7 +446,7 @@ function CustomMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 	local template = string.lower(Logic.emptyOr(opponent.template, opponent[1], '')--[[@as string]]):gsub('_', ' ')
 
 	if String.isEmpty(template) or template == 'noteam' then
-		opponent = Opponent.blank(Opponent.team)
+		opponent = Table.merge(opponent, Opponent.blank(Opponent.team))
 		opponent.name = Opponent.toName(opponent)
 		return opponent
 	end
