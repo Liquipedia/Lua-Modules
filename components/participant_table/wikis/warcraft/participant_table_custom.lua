@@ -42,7 +42,7 @@ local CustomParticipantTable = {}
 ---@param frame Frame
 ---@return Html?
 function CustomParticipantTable.run(frame)
-	local participantTable = ParticipantTable(frame) --[[@as CustomParticipantTable]]
+	local participantTable = ParticipantTable(frame) --[[@as WarcraftParticipantTable]]
 
 	participantTable.readConfig = CustomParticipantTable.readConfig
 	participantTable.readEntry = CustomParticipantTable.readEntry
