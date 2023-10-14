@@ -306,7 +306,7 @@ function CustomMatchGroupInput._opponentInput(match)
 			opponent = CustomMatchGroupInput.processPartyOpponentInput(opponent, partySize)
 		elseif opponent.type == Opponent.team then
 			opponent = CustomMatchGroupInput.ProcessTeamOpponentInput(opponent, match.date)
-			CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent.name)
+			opponent = CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent)
 		elseif opponent.type == Opponent.literal then
 			opponent = CustomMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 		else
@@ -334,10 +334,10 @@ end
 ---reads the players of a team from input and wiki variables
 ---@param match table
 ---@param opponentIndex integer
----@param teamName string
+---@param opponent table
 ---@return table
-function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, teamName)
-	local opponent = match['opponent' .. opponentIndex]
+function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent)
+	local teamName = opponent.name
 	local playersData = Json.parseIfString(opponent.players) or {}
 
 	local players = {}
@@ -367,7 +367,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, teamName
 
 	opponent.match2players = players
 
-	return match
+	return opponent
 end
 
 ---@param opponent table
@@ -446,12 +446,12 @@ function CustomMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 	local template = string.lower(Logic.emptyOr(opponent.template, opponent[1], '')--[[@as string]]):gsub('_', ' ')
 
 	if String.isEmpty(template) or template == 'noteam' then
-		return Opponent.blank(Opponent.team)
-	end
-
-	if not mw.ext.TeamTemplate.teamexists(template) then
+		opponent = Table.merge(opponent, Opponent.blank(Opponent.team))
+		opponent.name = Opponent.toName(opponent)
 		return opponent
 	end
+
+	assert(mw.ext.TeamTemplate.teamexists(template), 'Missing team template "' .. template .. '"')
 
 	local templateData = mw.ext.TeamTemplate.raw(template, date)
 
