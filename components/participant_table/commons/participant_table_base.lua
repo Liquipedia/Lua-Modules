@@ -327,10 +327,10 @@ function ParticipantTable:displaySection(section)
 		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth .. 'px'))
 	end)
 
-	local nextColumn = (#entries % self.config.colSpan) + 1
-
-	Array.forEach(Array.range(nextColumn, self.config.colSpan),
-		function() sectionNode:node(self:empty()) end)
+	local currentColumn = (#entries) % self.config.colSpan
+	if currentColumn ~= 0 then
+		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
+	end
 
 	self.display:node(sectionNode)
 end
