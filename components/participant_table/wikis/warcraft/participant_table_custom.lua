@@ -86,10 +86,7 @@ end
 ---@return WarcraftParticipantTableEntry
 function CustomParticipantTable:readEntry(sectionArgs, key, config)
 	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or Logic.isNumeric(key) and {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-	} or {
+	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
 		link = sectionArgs[key .. 'link'],
