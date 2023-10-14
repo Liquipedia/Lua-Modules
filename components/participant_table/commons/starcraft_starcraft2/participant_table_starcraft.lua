@@ -93,10 +93,7 @@ end
 ---@param config StarcraftParticipantTableConfig
 ---@return StarcraftParticipantTableEntry
 function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
-	local prefix = key
-	if Logic.isNumeric(key) then
-		prefix = 'p' .. key
-	end
+	local prefix = Logic.isNumeric(key) and ('p' .. key) or key
 
 	--if not a json assume it is a solo opponent
 	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
