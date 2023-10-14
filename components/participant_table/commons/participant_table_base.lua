@@ -68,6 +68,7 @@ end
 ---@field colSpan number
 ---@field resolveDate string
 ---@field sortPlayers boolean sort players within an opponent
+---@field sortOpponents boolean
 ---@field showTeams boolean
 ---@field title string?
 ---@field importOnlyQualified boolean?
@@ -91,6 +92,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
 		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
+		sortOpponents = Logic.nilOr(Logic.readBoolOrNil(args.sortOpponents), parentConfig.sortOpponents, true),
 		showTeams = not Logic.readBool(args.disable_teams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
@@ -174,7 +176,9 @@ function ParticipantTable:readSection(args)
 		return entry
 	end)
 
-	Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
+	if config.sortOpponents then
+		Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
+	end
 
 	table.insert(self.sections, section)
 end
