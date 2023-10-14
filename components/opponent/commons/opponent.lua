@@ -304,10 +304,9 @@ function Opponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
-				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
-				end
+				local savePageVar = not Opponent.playerIsTbd(player)
+				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
+				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
 			else
 				PlayerExt.populatePageName(player)
 			end
