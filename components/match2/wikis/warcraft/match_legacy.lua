@@ -73,7 +73,7 @@ function MatchLegacy._storeSoloMatch(match2)
 
 	match.games = games
 
-	match.extradata = Json.stringify(extradata)
+	match.extradata = Json.stringify(match.extradata)
 	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
 end
 
@@ -88,7 +88,7 @@ function MatchLegacy._storeTeamMatch(match2)
 		MatchLegacy._storeSubMatch(submatch, sumbmatchIndex, match)
 	end
 
-	match.extradata = Json.stringify(extradata)
+	match.extradata = Json.stringify(match.extradata)
 	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
 end
 
