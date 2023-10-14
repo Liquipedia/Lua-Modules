@@ -160,10 +160,9 @@ function StarcraftOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
-				StarcraftPlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])})
-				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
-				end
+				local savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])
+				StarcraftPlayerExt.syncPlayer(player, {savePageVar = savePageVar})
+				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
 				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)
