@@ -306,7 +306,8 @@ function Opponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
-				player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
+				player.team =
+					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
 			else
 				PlayerExt.populatePageName(player)
 			end
