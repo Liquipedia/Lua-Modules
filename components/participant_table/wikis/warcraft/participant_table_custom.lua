@@ -20,6 +20,7 @@ local Variables = require('Module:Variables')
 ---@field displayMultipleFactionColumn boolean?
 ---@field showCountByRace boolean
 ---@field manualFactionCounts table<string, number?>
+---@field soloColumnWidth number
 
 ---@class WarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field opponent WarcraftStandardOpponent
@@ -71,6 +72,8 @@ function CustomParticipantTable.readConfig(args, parentConfig)
 	config.displayMultipleFactionColumn = Logic.readBoolOrNil(args.multiplecolumn)
 	config.showCountByRace = Logic.readBool(args.showCountByRace or args.count)
 	config.sortPlayers = true
+	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
+	config.soloColumnWidth = tonumber(args.entrywidth) or config.showTeams and 212 or 156
 
 	config.manualFactionCounts = {}
 	Array.forEach(Faction.knownFactions, function(faction)
@@ -164,7 +167,7 @@ function CustomParticipantTable:createSoloRaceTable()
 	self.display = mw.html.create('div')
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
-		:css('width', (colSpan * config.columnWidth) .. 'px')
+		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
 		:node(self:_displayHeader(factionColumns, factioNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloRaceTableSection(section, factionColumns) end)
@@ -231,7 +234,7 @@ end
 function CustomParticipantTable:_displaySoloRaceTableSection(section, factionColumns)
 	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
 
-	self.display:node(self.newSectionNode():node(self.sectionTitle(section, sectionEntryCount)))
+	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
 
 	if Table.isEmpty(section.entries) then
 		self.display:node(self.newSectionNode():node(self:tbd()))
