@@ -73,7 +73,8 @@ end
 ---@field title string?
 ---@field importOnlyQualified boolean?
 ---@field display boolean
----@field columnWidth number? width of the column in px
+---@field width string
+---@field columnWidth string
 
 ---@param args table
 ---@param parentConfig ParticipantTableConfig?
@@ -88,7 +89,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		syncPlayers = Logic.nilOr(Logic.readBoolOrNil(args.syncPlayers), parentConfig.syncPlayers, true),
 		showCountBySection = Logic.readBool(args.showCountBySection or parentConfig.showCountBySection),
 		count = tonumber(args.count),
-		colSpan = tonumber(args.colspan) or parentConfig.colSpan or 4,
+		colSpan = parentConfig.colSpan or tonumber(args.colspan) or 4,
 		onlyNotable = Logic.readBool(args.onlyNotable or parentConfig.onlyNotable),
 		resolveDate = args.date or parentConfig.resolveDate or DateExt.getContextualDate(),
 		sortPlayers = Logic.readBool(args.sortPlayers or parentConfig.sortPlayers),
@@ -99,7 +100,12 @@ function ParticipantTable.readConfig(args, parentConfig)
 		display = not Logic.readBool(args.hidden)
 	}
 
-	config.columnWidth = tonumber(args.entrywidth) or config.showTeams and 212 or 156
+	config.width = parentConfig.width
+	if not config.width then
+		local columnWidth = parentConfig.columnWidth or tonumber(args.entrywidth) or config.showTeams and 212 or 156
+		config.width = parentConfig.width or ((columnWidth * config.colSpan) .. 'px')
+	end
+	config.columnWidth = config.columnWidth or ((100 / config.colSpan) .. '%')
 
 	return config
 end
@@ -299,7 +305,7 @@ function ParticipantTable:create()
 	self.display = mw.html.create('div')
 		:addClass('participantTable')
 		:css('max-width', '100%!important')
-		:css('width', (config.colSpan * config.columnWidth + 1) .. 'px')
+		:css('width', config.width)
 		:node(mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants'))
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
@@ -318,7 +324,7 @@ function ParticipantTable:displaySection(section)
 
 	local sectionEntryCount = #Array.filter(entries, function(entry) return not entry.dq end)
 
-	self.display:node(self.newSectionNode():node(self.sectionTitle(section, sectionEntryCount)))
+	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
 
 	if Table.isEmpty(section.entries) then
 		self.display:node(self.newSectionNode():node(self:tbd()))
@@ -328,7 +334,7 @@ function ParticipantTable:displaySection(section)
 	local sectionNode = ParticipantTable.newSectionNode()
 
 	Array.forEach(entries, function(entry, entryIndex)
-		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth .. 'px'))
+		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
 	end)
 
 	local currentColumn = (#entries) % self.config.colSpan
@@ -354,8 +360,10 @@ end
 ---@param section ParticipantTableSection
 ---@param amountOfEntries number
 ---@return Html?
-function ParticipantTable.sectionTitle(section, amountOfEntries)
-	if Logic.isEmpty(section.config.title) then return end
+function ParticipantTable:sectionTitle(section, amountOfEntries)
+	if Logic.isEmpty(section.config.title) or section.config.title == self.config.title then
+		return
+	end
 
 	local title = mw.html.create('div'):addClass('participantTable-title'):wikitext(section.config.title)
 
