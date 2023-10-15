@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
@@ -44,7 +45,7 @@ end)
 function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
-		date = date or PlayerExt.getContextualDateOrNow()
+		date = date or DateExt.getContextualDateOrNow()
 		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
 		return entry and Faction.read(entry.race)
 	else
