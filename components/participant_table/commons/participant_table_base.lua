@@ -103,7 +103,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 	config.width = parentConfig.width
 	if not config.width then
 		local columnWidth = parentConfig.columnWidth or tonumber(args.entrywidth) or config.showTeams and 212 or 156
-		config.width = parentConfig.width or ((columnWidth * config.colSpan) .. 'px')
+		config.width = (columnWidth * config.colSpan) .. 'px'
 	end
 	config.columnWidth = config.columnWidth or ((100 / config.colSpan) .. '%')
 
