@@ -66,13 +66,15 @@ function MatchLegacy._storeSoloMatch(match2)
 	match.mode = '1v1'
 	match.objectName = 'legacymatch_' .. match2.match2id
 
-	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
-
-	match.extradata = Json.parseIfString(match.extradata)
-
+	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		MatchLegacy._storeGame(game, gameIndex, match)
+		games = games .. (MatchLegacy._storeGame(game, gameIndex, match) or '')
 	end
+
+	match.games = games
+
+	match.extradata = Json.stringify(match.extradata)
+	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
 end
 
 ---@param match2 table
@@ -82,13 +84,12 @@ function MatchLegacy._storeTeamMatch(match2)
 		return opponent.type == Opponent.team end) and Opponent.team or 'mixed'
 	match.objectName = 'legacymatch_' .. match2.match2id
 
-	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
-
-	match.extradata = Json.parseIfString(match.extradata)
-
 	for sumbmatchIndex, submatch in Table.iter.spairs(MatchLegacy._groupIntoSubmatches(match2, match.objectName)) do
 		MatchLegacy._storeSubMatch(submatch, sumbmatchIndex, match)
 	end
+
+	match.extradata = Json.stringify(match.extradata)
+	mw.ext.LiquipediaDB.lpdb_match(match.objectName, match)
 end
 
 ---@param match2 table
@@ -133,8 +134,6 @@ function MatchLegacy._convertParameters(match2)
 		end
 		match.walkover = match.winner
 	end
-
-	match.extradata = Json.stringify(extradata)
 
 	return match
 end
@@ -200,9 +199,12 @@ function MatchLegacy._storeSubMatch(submatch, submatchIndex, match)
 
 	MatchLegacy._opponentToLegacy(submatchStorageObject, submatch.opponents)
 
+	local games = ''
 	for gameIndex, game in ipairs(submatch.games) do
-		MatchLegacy._storeGame(game, gameIndex, submatchStorageObject)
+		games = games .. (MatchLegacy._storeGame(game, gameIndex, submatchStorageObject) or '')
 	end
+
+	submatchStorageObject.games = games
 
 	submatchStorageObject.extradata = Json.stringify(extradata)
 
@@ -230,6 +232,7 @@ end
 ---@param game2 table
 ---@param gameIndex integer
 ---@param match table
+---@return string?
 function MatchLegacy._storeGame(game2, gameIndex, match)
 	if game2.resulttype == 'np' then return end
 
@@ -267,7 +270,7 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 		game.walkover = game2.winner
 	end
 
-	mw.ext.LiquipediaDB.lpdb_game(objectName, game)
+	return mw.ext.LiquipediaDB.lpdb_game(objectName, game)
 end
 
 ---@param participants table<string, table>
