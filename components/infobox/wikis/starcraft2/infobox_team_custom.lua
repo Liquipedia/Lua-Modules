@@ -12,7 +12,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Participant')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Math = require('Module:Math')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -132,7 +132,7 @@ end
 
 function CustomTeam:createBottomContent()
 	if _doStore then
-		return MatchTicker.run({team = _team.pagename})
+		return MatchTicker.participant{team = self.pagename}
 	end
 end
 

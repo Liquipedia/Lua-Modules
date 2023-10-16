@@ -15,7 +15,7 @@ local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
-local MatchTicker = require('Module:MatchTicker/Participant')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Math = require('Module:Math')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -184,7 +184,7 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _player.shouldQueryData then
-		return MatchTicker.run({player = self.pagename}, _player.recentMatches)
+		return MatchTicker.participant({player = self.pagename}, _player.recentMatches)
 	end
 end
 
