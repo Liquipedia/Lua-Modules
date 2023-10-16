@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -60,16 +61,19 @@ end
 ---@return number|string
 function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	scoreIndex = scoreIndex or ''
-	local status = opponent['status' .. scoreIndex] or opponent.extradata['status' .. scoreIndex] or ''
-	local score = opponent['score' .. scoreIndex] or opponent.extradata['score' .. scoreIndex] or 0
-	if status == SCORE_STATUS then
-		if (score == ZERO_SCORE and Opponent.isTbd(opponent)) or score == NO_SCORE then
-			return ''
-		else
-			return score ~= -1 and tostring(score) or ''
-		end
+	local status = opponent['status' .. scoreIndex] or opponent.extradata['status' .. scoreIndex]
+	local score = tonumber(opponent['score' .. scoreIndex] or opponent.extradata['score' .. scoreIndex])
+
+	if Logic.isNotEmpty(status) and status ~= SCORE_STATUS then
+		return status
 	end
-	return score or status or ''
+
+	score = score or 0
+	if (score == ZERO_SCORE and Opponent.isTbd(opponent)) or score == NO_SCORE then
+		return ''
+	end
+
+	return score
 end
 
 return Class.export(OpponentDisplayCustom)
