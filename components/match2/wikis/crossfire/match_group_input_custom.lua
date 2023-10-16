@@ -25,10 +25,12 @@ local DEFAULT_BESTOF = 3
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local GAME = mw.loadData('Module:GameVersion')
+
 local NOW = os.time(os.date('!*t'))
 local LANG = mw.getContentLanguage()
 local MATCHTIME = tonumber(LANG:formatDate('U', match.date))
 local THRESHOLD = match.dateexact and 30800 or 86400
+local MATCH = mw.getMatchFunctions()
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -75,7 +77,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	teamTemplateDate = teamTemplateDate ~= EPOCH_TIME_EXTENDED and teamTemplateDate or DateExt.getContextualDateOrNow()
-
+	
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
