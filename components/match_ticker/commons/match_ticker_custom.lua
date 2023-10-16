@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -73,7 +74,7 @@ function CustomMatchTicker.participant(args, matches)
 	matches = matches or {}
 
 	--adjusting args
-	args.infoboxClass = true
+	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
