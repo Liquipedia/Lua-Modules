@@ -83,7 +83,7 @@ end
 ---@return Html
 function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
+		:addClass('brkts-popup-score')
 
 	if bestof > 0 and isNotFinished then
 		return scoreBoardNode
@@ -93,7 +93,6 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 				:css('text-align', 'center')
 				:node(score)
 			)
-			:node('<br>')
 			:node(mw.html.create('span')
 				:wikitext('(')
 				:node(Abbreviation.make(
