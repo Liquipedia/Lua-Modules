@@ -93,17 +93,16 @@ end
 ---@param config StarcraftParticipantTableConfig
 ---@return StarcraftParticipantTableEntry
 function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
+	local prefix = Logic.isNumeric(key) and ('p' .. key) or key
+
 	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or Logic.isNumeric(key) and {
+	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-	} or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'],
-		flag = sectionArgs[key .. 'flag'],
-		team = sectionArgs[key .. 'team'],
-		race = sectionArgs[key .. 'race'],
+		link = sectionArgs[key .. 'link'] or sectionArgs[prefix .. 'link'],
+		flag = sectionArgs[key .. 'flag'] or sectionArgs[prefix .. 'flag'],
+		team = sectionArgs[key .. 'team'] or sectionArgs[prefix .. 'team'],
+		race = sectionArgs[key .. 'race'] or sectionArgs[prefix .. 'race'],
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
