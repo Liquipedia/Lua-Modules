@@ -163,12 +163,9 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		container:node(ICONS[iconType])
-	else
-		container:node(NO_CHECK)
+		return container:node(ICONS[iconType])
 	end
-
-	return container
+	return container:node(NO_CHECK)
 end
 
 return CustomMatchSummary
