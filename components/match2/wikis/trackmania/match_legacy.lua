@@ -11,7 +11,6 @@ local MatchLegacy = {}
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
