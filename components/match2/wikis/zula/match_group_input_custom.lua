@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
+local DateExt = require('Module:Date/Ext')
 local Streams = require('Module:Links/Stream')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
@@ -42,12 +43,10 @@ local NOW = os.time(os.date('!*t'))
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local TODAY = os.date('%Y-%m-%d')
 
 -- containers for process helper functions
 local matchFunctions = {}
