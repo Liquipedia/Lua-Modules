@@ -35,7 +35,7 @@ function CustomMatchTicker.tournament(frame)
 	)
 end
 
----Entry point for display on main page
+---Entry point for display on the main page
 ---@param frame Frame
 ---@return Html|string
 function CustomMatchTicker.mainPage(frame)
@@ -43,7 +43,7 @@ function CustomMatchTicker.mainPage(frame)
 	return MatchTicker(args):query():create()
 end
 
----Entry point for display on main page
+---Entry point for display on player pages
 ---@param frame Frame
 ---@return Html
 function CustomMatchTicker.player(frame)
@@ -54,7 +54,7 @@ function CustomMatchTicker.player(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on main page
+---Entry point for display on team pages
 ---@param frame Frame
 ---@return Html
 function CustomMatchTicker.team(frame)
@@ -65,12 +65,15 @@ function CustomMatchTicker.team(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on main page
+---Entry point for display on any participant-type page
 ---@param args table
 ---@param matches {ongoing: table?, upcoming: table?, recent: table?}?
 ---@return Html
 function CustomMatchTicker.participant(args, matches)
 	matches = matches or {}
+
+	--adjusting args
+	args.infoboxClass = true
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
