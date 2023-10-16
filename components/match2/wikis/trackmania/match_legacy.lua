@@ -61,52 +61,6 @@ function MatchLegacy._convertParameters(match2)
 
 	match.staticid = match2.match2id
 
-	local opponent1 = match2.match2opponents[1] or {}
-	local opponent1match2players = opponent1.match2players or {}
-	if opponent1.type == Opponent.team then
-		-- has to use template's pagename
-		-- match.opponent1 = opponent1.name
-		match.opponent1 = Team.queryRaw(opponent1.template).page
-		match.opponent1score = (tonumber(opponent1.score) or 0) > 0
-			and opponent1.score or 0
-		local opponent1players = {}
-		for i = 1, 10 do
-			local player = opponent1match2players[i] or {}
-			opponent1players['p' .. i] = player.name or ''
-			opponent1players['p' .. i .. 'flag'] = player.flag or ''
-		end
-		match.opponent1players = Json.stringify(opponent1players)
-	elseif opponent1.type == Opponent.solo then
-		local player = opponent1match2players[1] or {}
-		match.opponent1 = player.name
-		match.opponent1score = (tonumber(opponent1.score) or 0) > 0
-			and opponent1.score or 0
-		match.opponent1flag = player.flag
-	end
-
-	local opponent2 = match2.match2opponents[2] or {}
-	local opponent2match2players = opponent2.match2players or {}
-	if opponent2.type == Opponent.team then
-		-- has to use template's pagename
-		-- match.opponent2 = opponent2.name
-		match.opponent2 = Team.queryRaw(opponent2.template).page
-		match.opponent2score = (tonumber(opponent2.score) or 0) > 0
-			and opponent2.score or 0
-		local opponent2players = {}
-		for i = 1, 10 do
-			local player = opponent2match2players[i] or {}
-			opponent2players['p' .. i] = player.name or ''
-			opponent2players['p' .. i .. 'flag'] = player.flag or ''
-		end
-		match.opponent2players = Json.stringify(opponent2players)
-	elseif opponent2.type == Opponent.solo then
-		local player = opponent2match2players[1] or {}
-		match.opponent2 = player.name
-		match.opponent2score = (tonumber(opponent2.score) or 0) > 0
-			and opponent2.score or 0
-		match.opponent2flag = player.flag
-	end
-
 	if match2.walkover then
 		match.resulttype = match2.walkover
 		if match2.walkover == 'ff' or match2.walkover == 'dq' then
@@ -115,6 +69,32 @@ function MatchLegacy._convertParameters(match2)
 			match.walkover = nil
 		end
 	end
+
+	-- Handle Opponents
+	local handleOpponent = function(index)
+		local prefix = 'opponent' .. index
+		local opponent = match2.match2opponents[index] or {}
+		local opponentMatch2Players = opponent.match2players or {}
+		if opponent.type == Opponent.team then
+			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
+			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			local opponentPlayers = {}
+			for playerIndex, player in ipairs(opponentMatch2Players) do
+				opponentPlayers['p' .. playerIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or '')
+				opponentPlayers['p' .. playerIndex .. 'flag'] = player.flag or ''
+				opponentPlayers['p' .. playerIndex .. 'dn'] = player.displayname or ''
+			end
+			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
+		elseif opponent.type == Opponent.solo then
+			local player = opponentMatch2Players[1] or {}
+			match[prefix] = player.name
+			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			match[prefix .. 'flag'] = player.flag
+		end
+	end
+
+	handleOpponent(1)
+	handleOpponent(2)
 
 	return match
 end
