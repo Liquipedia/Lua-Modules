@@ -355,14 +355,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(match, map),
 	}
-
-	-- inherit stuff from match data
-	map.type = Logic.emptyOr(map.type, match.type)
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = Logic.emptyOr(map.game, match.game)
-	map.date = Logic.emptyOr(map.date, match.date)
-
+	
 	-- determine score, resulttype, walkover and winner
 	CustomMatchGroupInput._mapWinnerProcessing(map)
 
