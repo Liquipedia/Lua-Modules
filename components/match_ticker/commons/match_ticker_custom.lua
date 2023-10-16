@@ -33,7 +33,7 @@ function CustomMatchTicker.tournament(frame)
 	args.infoboxWrapperClass = args.infoboxWrapperClass or true
 
 	return MatchTicker(args):query():create(
-		MatchTicker.DisplayComponents.Header('Upcoming matches')
+		MatchTicker.DisplayComponents.Header('Upcoming Matches')
 	)
 end
 
