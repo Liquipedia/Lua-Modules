@@ -74,13 +74,13 @@ function CustomMatchTicker.participant(args, matches)
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
-			limit = 5, ongoing = true
+			limit = args.ongoingLimit or 5, ongoing = true
 		})):query(matches.ongoing):create(MatchTicker.DisplayComponents.Header('Ongoing Matches')))
 		:node(MatchTicker(Table.merge(args, {
-			limit = 3, upcoming = true
+			limit = args.upcomingLimit or 3, upcoming = true
 		})):query(matches.upcoming):create(MatchTicker.DisplayComponents.Header('Upcoming Matches')))
 		:node(MatchTicker(Table.merge(args, {
-			limit = 5, recent = true
+			limit = args.recentLimit or 5, recent = true
 		})):query(matches.recent):create(MatchTicker.DisplayComponents.Header('Recent Matches')))
 end
 

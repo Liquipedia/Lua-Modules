@@ -51,7 +51,7 @@ local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
-local DEFAULT_LIVE_HOURS = 3
+local DEFAULT_LIVE_HOURS = 8
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---@class MatchTickerConfig
