@@ -24,8 +24,12 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local _GAME = mw.loadData('Module:GameVersion')
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local GAME = mw.loadData('Module:GameVersion')
+local NOW = os.time(os.date('!*t'))
+local LANG = mw.getContentLanguage()
+local MATCHTIME = tonumber(LANG:formatDate('U', match.date))
+local THRESHOLD = match.dateexact and 30800 or 86400
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -67,22 +71,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
-		)
-	end
-
+	teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
@@ -284,7 +277,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
@@ -296,7 +289,7 @@ function matchFunctions.getTournamentVars(match)
 
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match.game = _GAME[match.game or '']
+	match.game = GAME[match.game or '']
 
 	return match
 end
@@ -305,40 +298,14 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
-	match.links = {}
-	local links = match.links
-	if match.preview then links.preview = match.preview end
-	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.faceit then links.faceit = 'https://www.faceit.com/en/halo_infinite/room/' .. match.faceit end
-	if match.stats then links.stats = match.stats end
-
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = matchFunctions.getMVP(match),
-		isconverted = 0
+		mvp = MatchGroupInput.readMvp(match)
 	}
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index,player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -365,11 +332,6 @@ function matchFunctions.getOpponents(match)
 				opponent.score = -1
 			end
 			opponents[opponentIndex] = opponent
-
-			-- get players from vars for teams
-			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
-			end
 		end
 	end
 
@@ -386,11 +348,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t'))
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if MATCHTIME + THRESHOLD < NOW then
 			match.finished = true
 		end
 	end
@@ -403,24 +361,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end
@@ -470,7 +410,7 @@ function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
 
 	map = MatchGroupInput.getCommonTournamentVars(map)
-	map.game = _GAME[map.game or '']
+	map.game = GAME[map.game or '']
 
 	return map
 end
