@@ -34,11 +34,10 @@ function Json.stringify(obj, options)
 	end
 	options = options or {}
 
-	if options.pretty == true then
-		return mw.text.jsonEncode(obj, mw.text.JSON_PRETTY)
-	elseif options.asArray then
-		return mw.ext.LiquipediaDB.lpdb_create_array(obj)
+	if options.pretty or options.asArray then
+		return mw.text.jsonEncode(obj, options.pretty and mw.text.JSON_PRETTY or nil)
 	end
+
 	return mw.ext.LiquipediaDB.lpdb_create_json(obj)
 end
 
