@@ -28,9 +28,6 @@ local GAME = mw.loadData('Module:GameVersion')
 
 local NOW = os.time(os.date('!*t'))
 local LANG = mw.getContentLanguage()
-local MATCHTIME = tonumber(LANG:formatDate('U', match.date))
-local THRESHOLD = match.dateexact and 30800 or 86400
-local MATCH = mw.getMatchFunctions()
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -76,8 +73,8 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	teamTemplateDate = teamTemplateDate ~= EPOCH_TIME_EXTENDED and teamTemplateDate or DateExt.getContextualDateOrNow()
-	
+	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
+
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
@@ -350,6 +347,8 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+		local MATCHTIME = tonumber(LANG:formatDate('U', match.date))
+		local THRESHOLD = match.dateexact and 30800 or 86400
 		if MATCHTIME + THRESHOLD < NOW then
 			match.finished = true
 		end
