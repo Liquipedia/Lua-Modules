@@ -47,7 +47,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 local Header = Class.new(
 	function(self, text)
 		self.root = mw.html.create('div')
-			:addClass('infobox-header wiki-backgroundcolor-light')
+			:addClass('infobox-header')
 			:wikitext(text)
 	end
 )
