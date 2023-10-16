@@ -383,12 +383,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if isWinner then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
+		return container:node(GREEN_CHECK)
 	end
-
-	return container
+	return container:node(NO_CHECK)
 end
 
 return CustomMatchSummary
