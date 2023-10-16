@@ -46,7 +46,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 }
 local NONE = 'none'
-local WRAPPER_DEFAULT_CLASS = 'fo-nttax-infobox wiki-bordercolor-light'
+local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
@@ -136,15 +136,18 @@ function MatchTicker:init(args)
 
 	local wrapperClasses = type(args.wrapperClasses) == 'table' and args.wrapperClasses
 		or args.wrapperClasses == NONE and {}
-		or {args.wrapperClasses or WRAPPER_DEFAULT_CLASS}
+		or {args.wrapperClasses or args.wrapperClass}
 
-	local game = args.game and Game.abbreviation{game = args.game}:lower()
-
-	if Logic.readBool(args.infoboxWrapperClass) or game then
-		table.insert(wrapperClasses, INFOBOX_WRAPPER_CLASS)
+	if Logic.readBool(args.infoboxClass) then
+		table.insert(wrapperClasses, INFOBOX_DEFAULT_CLASS)
 	end
-	if game then
-		table.insert(wrapperClasses, 'infobox-' .. game)
+
+	if Logic.readBool(args.infoboxWrapperClass) then
+		table.insert(wrapperClasses, INFOBOX_WRAPPER_CLASS)
+		local game = args.game and Game.abbreviation{game = args.game}:lower()
+		if game then
+			table.insert(wrapperClasses, 'infobox-' .. game)
+		end
 	end
 	config.wrapperClasses = wrapperClasses
 
