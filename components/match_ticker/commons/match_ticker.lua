@@ -138,7 +138,7 @@ function MatchTicker:init(args)
 		or args.wrapperClasses == NONE and {}
 		or {args.wrapperClasses or args.wrapperClass}
 
-	if Logic.readBool(args.infoboxClass) then
+	if Logic.readBool(args.infoboxClass) or Logic.readBool(args.infoboxWrapperClass) then
 		table.insert(wrapperClasses, INFOBOX_DEFAULT_CLASS)
 	end
 
