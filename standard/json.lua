@@ -19,12 +19,23 @@ function Json.fromArgs(frame)
 end
 
 ---Json-stringifies a given table.
----@param obj table
----@param pretty boolean?
----@return string
-function Json.stringify(obj, pretty)
-	return pretty == true and mw.text.jsonEncode(obj, mw.text.JSON_PRETTY) or
-		mw.ext.LiquipediaDB.lpdb_create_json(obj)
+---@param obj table|string
+---@param options {pretty: boolean?, asArray: boolean?}
+---@return string?
+---@overload fun(any: any): any
+function Json.stringify(obj, options)
+	if type(obj) ~= 'table' then
+		return obj
+	end
+
+	options = options or {}
+
+	if options.pretty == true then
+		return mw.text.jsonEncode(obj, mw.text.JSON_PRETTY)
+	elseif options.asArray then
+		return mw.ext.LiquipediaDB.lpdb_create_array(obj)
+	end
+	return mw.ext.LiquipediaDB.lpdb_create_json(obj)
 end
 
 ---Json-stringifies subtables of a given table.
@@ -35,7 +46,7 @@ function Json.stringifySubTables(obj, pretty)
 	local objectWithStringifiedSubtables = {}
 	for key, item in pairs(obj) do
 		if type(item) == 'table' then
-			objectWithStringifiedSubtables[key] = Json.stringify(item, pretty)
+			objectWithStringifiedSubtables[key] = Json.stringify(item, {pretty = pretty})
 		else
 			objectWithStringifiedSubtables[key] = item
 		end

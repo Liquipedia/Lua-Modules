@@ -77,7 +77,7 @@ function StandingsStorage.table(data)
 			title = mw.text.trim(cleanedTitle),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
-			matches = mw.ext.LiquipediaDB.lpdb_create_array(data.matches or {}),
+			matches = Json.stringify(data.matches or {}, {asArray = true}),
 			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
 		}
