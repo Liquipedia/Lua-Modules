@@ -28,6 +28,10 @@ function Json.stringify(obj, options)
 		return obj
 	end
 
+	--temp workaround until adjusted in 2 non git modules:
+	if type(options) == 'boolean' then
+		options = {pertty = options}
+	end
 	options = options or {}
 
 	if options.pretty == true then
