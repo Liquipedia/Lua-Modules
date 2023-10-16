@@ -71,6 +71,7 @@ MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
 	header = 'string?',
+	inheritedHeader = 'string?',
 	lowerEdges = TypeUtil.array(MatchGroupUtil.types.LowerEdge),
 	lowerMatchIds = TypeUtil.array('string'),
 	qualLose = 'boolean?',
@@ -146,7 +147,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
----@field players standardPlayer[]
+---@field players standardPlayer[]?
 ---@field score number?
 ---@field score2 number?
 ---@field status string?
@@ -280,6 +281,7 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
 MatchGroupUtil.types.Matchlist = TypeUtil.struct({
+	bracketDatasById = TypeUtil.table('string', MatchGroupUtil.types.BracketData),
 	matches = TypeUtil.array(MatchGroupUtil.types.Match),
 	matchesById = TypeUtil.table('string', MatchGroupUtil.types.Match),
 	type = TypeUtil.literal('matchlist'),
@@ -355,9 +357,13 @@ end
 function MatchGroupUtil.makeMatchlistFromRecords(matchRecords)
 	local matches = Array.map(matchRecords, WikiSpecific.matchFromRecord)
 
+	local matchesById = Table.map(matches, function(_, match) return match.matchId, match end)
+	local bracketDatasById = Table.mapValues(matchesById, function(match) return match.bracketData end)
+
 	return {
+		bracketDatasById = bracketDatasById,
 		matches = matches,
-		matchesById = Table.map(matches, function(_, match) return match.matchId, match end),
+		matchesById = matchesById,
 		type = 'matchlist',
 	}
 end
@@ -524,6 +530,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			bracketResetMatchId = nilIfEmpty(data.bracketreset),
 			coordinates = data.coordinates and MatchGroupUtil.indexTableFromRecord(data.coordinates),
 			header = nilIfEmpty(data.header),
+			inheritedHeader = nilIfEmpty(data.inheritedheader),
 			lowerEdges = data.loweredges and Array.map(data.loweredges, MatchGroupUtil.indexTableFromRecord),
 			lowerMatchIds = data.lowerMatchIds or MatchGroupUtil.computeLowerMatchIdsFromLegacy(data),
 			qualifiedHeader = nilIfEmpty(data.qualifiedheader),
@@ -539,8 +546,10 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 		}
 	else
 		return {
-			header = nilIfEmpty(data.header),
 			dateHeader = nilIfEmpty(data.dateheader),
+			header = nilIfEmpty(data.header),
+			inheritedHeader = nilIfEmpty(data.inheritedheader),
+			matchIndex = nilIfEmpty(data.matchIndex),
 			title = nilIfEmpty(data.title),
 			type = 'matchlist',
 		}
