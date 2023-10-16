@@ -12,11 +12,13 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions', {requireDevIfEnabled = true})
@@ -36,7 +38,6 @@ local WINNER_TO_BG_CLASS = {
 	'recent-matches-right',
 }
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
-local ABBR_UTC = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC)">UTC</abbr>'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---Display class for the header of a match ticker
@@ -251,10 +252,19 @@ end
 function Details:countdown()
 	local match = self.match
 
+	local dateString
+	if Logic.readBool(match.dateexact) then
+		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
+				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or (Timezone.getTimezoneString('UTC')))
+	else
+		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. (Timezone.getTimezoneString('UTC'))
+	end
+
 	local countdownArgs = Table.merge(match.stream or {}, {
 		rawcountdown = not Logic.readBool(match.finished),
 		rawdatetime = Logic.readBool(match.finished),
-		date = match.date .. ABBR_UTC,
+		date = dateString,
 		finished = match.finished
 	})
 

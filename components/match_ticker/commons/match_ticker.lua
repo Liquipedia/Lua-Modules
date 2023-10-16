@@ -32,6 +32,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'icon',
 	'icondark',
 	'date',
+	'dateexact',
 	'liquipediatier',
 	'liquipediatiertype',
 	'publishertier',
