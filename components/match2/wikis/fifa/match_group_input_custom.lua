@@ -78,17 +78,8 @@ function CustomMatchGroupInput._getVodStuff(match)
 end
 
 function CustomMatchGroupInput._getExtraData(match)
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-
 	match.extradata = {
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 		hassubmatches = tostring(Logic.readBool(match.hasSubmatches)),
 	}
 end
@@ -128,7 +119,7 @@ function CustomMatchGroupInput._winnerProcessing(obj, scores, isMatch)
 		obj.finished = true
 	end
 
-	obj.finished = CustomMatchGroupInput._checkFinished(obj)
+	obj.finished = CustomMatchGroupInput._isFinished(obj)
 
 	obj.winner = tonumber(obj.winner)
 
@@ -185,7 +176,7 @@ function CustomMatchGroupInput._computeOpponentMatchScore(match, opponentIndex)
 	return sumScore
 end
 
-function CustomMatchGroupInput._checkFinished(obj)
+function CustomMatchGroupInput._isFinished(obj)
 	if Logic.readBoolOrNil(obj.finished) == false then
 		return false
 	elseif Logic.readBool(obj.finished) or obj.winner then
@@ -238,10 +229,7 @@ function CustomMatchGroupInput._opponentInput(match)
 		opponent = Json.parseIfString(opponent) or Opponent.blank()
 
 		-- Convert byes to literals
-		if
-			string.upper(opponent.template or '') == BYE
-			or string.upper(opponent.name or '') == BYE
-		then
+		if Opponent.isBye(opponent) then
 			opponent = {type = Opponent.literal, name = BYE}
 		end
 
@@ -251,7 +239,7 @@ function CustomMatchGroupInput._opponentInput(match)
 
 			opponent = CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 		else
-			error('Unsupported Opponent Type')
+			error('Unsupported Opponent Type: ' .. (opponent.type or ''))
 		end
 
 		match['opponent' .. opponentIndex] = opponent
@@ -277,19 +265,9 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-
-	if type(record.players) == 'table' then
-		for _, player in pairs(record.players) do
-			player.name = player.name:gsub(' ', '_')
-		end
-	end
-
-	if record.name and record.type ~= Opponent.literal then
-		record.name = record.name:gsub(' ', '_')
-	end
 
 	if record.type == Opponent.team then
 		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
