@@ -355,7 +355,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(match, map),
 	}
-	
 	-- determine score, resulttype, walkover and winner
 	CustomMatchGroupInput._mapWinnerProcessing(map)
 
