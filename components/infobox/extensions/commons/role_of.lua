@@ -28,7 +28,7 @@ function RoleOf.get(args)
 	local teamPage = mw.ext.TeamLiquidIntegration.resolve_redirect(team):gsub(' ', '_')
 	local staffData = mw.ext.LiquipediaDB.lpdb('squadplayer', {
 		conditions = '[[pagename::' .. teamPage .. ']] AND [[status::active]]',
-		query = 'id, link, nationality',
+		query = 'id, link, nationality, position, role',
 		limit = 100,
 	})
 
@@ -50,7 +50,7 @@ function RoleOf.get(args)
 			link = staff.link,
 			flag = staff.nationality,
 		}
-		table.insert(output, OpponentDisplay.InlineOpponent{opponent = opponent})
+		table.insert(output, tostring(OpponentDisplay.InlineOpponent{opponent = opponent}))
 	end)
 
 	return table.concat(output, ' ')
