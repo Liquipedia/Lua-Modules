@@ -216,7 +216,7 @@ end
 ---@field match table
 local Details = Class.new(
 	function(self, args)
-		assert(args.match 'No Match passed to MatchTickerDetails class')
+		assert(args.match, 'No Match passed to MatchTickerDetails class')
 		self.root = mw.html.create('tr')
 		self.hideTournament = args.hideTournament
 		self.isBrMatch = args.isBrMatch
