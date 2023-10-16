@@ -158,27 +158,23 @@ function ParticipantTable:readSection(args)
 	end)
 
 	local entriesByName = {}
-
-	--need custom sort so it doesn't compare number with string
-	local sortKeys = function(tbl, key1, key2) return tostring(key1) < tostring(key2) end
-
-	for _, key in Table.iter.spairs(keys, sortKeys) do
+	Array.forEach(keys, function(key)
 		local entry = self:readEntry(args, key, config)
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
 
 		entriesByName[entry.name] = entry
-	end
+	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
 		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
 		return entry
 	end)
 
-	if config.sortOpponents then
-		Array.sortInPlaceBy(section.entries, function(entry) return entry.name:lower() end)
-	end
+	Array.sortInPlaceBy(section.entries, function(entry)
+		return config.sortOpponents and entry.name:lower() or entry.inputIndex or -1
+	end)
 
 	table.insert(self.sections, section)
 end
@@ -224,6 +220,7 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 		note = opponentArgs.note or sectionArgs[key .. 'note'],
 		opponent = opponent,
 		name = Opponent.toName(opponent),
+		inputIndex = tonumber(string.match(key, '%d+')),
 	}
 end
 
