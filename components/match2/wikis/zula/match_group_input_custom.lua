@@ -98,13 +98,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == EPOCH_TIME_EXTENDED then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			TODAY
-		)
-	end
+	teamTemplateDate = teamTemplateDate ~= EPOCH_TIME_EXTENDED and teamTemplateDate or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -417,11 +411,6 @@ function matchFunctions.getOpponents(match)
 				opponent.score = NOT_PLAYED_SCORE
 			end
 			opponents[opponentIndex] = opponent
-
-			-- get players from vars for teams
-			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
-			end
 		end
 	end
 
@@ -452,26 +441,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		player = Json.parseIfString(player)
-		local playerPrefix = teamName .. '_p' .. playerIndex
-		player.name = player.name or Variables.varDefault(playerPrefix)
-		player.flag = player.flag or Variables.varDefault(playerPrefix .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(playerPrefix .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end
