@@ -9,14 +9,13 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
@@ -26,6 +25,12 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TBD = 'TBD'
 
 -- Score Class
+---@class CriticalopsScore
+---@operator call(string|number|nil): CriticalopsScore
+---@field root Html
+---@field table Html
+---@field top Html
+---@field bottom Html
 local Score = Class.new(
 	function(self, direction)
 		self.root = mw.html.create('div')
@@ -38,16 +43,20 @@ local Score = Class.new(
 	end
 )
 
+---@return CriticalopsScore
 function Score:setLeft()
 	self.table:css('float', 'left')
 	return self
 end
 
+---@return CriticalopsScore
 function Score:setRight()
 	self.table:css('float', 'right')
 	return self
 end
 
+---@param score string|number|nil
+---@return CriticalopsScore
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -61,6 +70,9 @@ function Score:setMapScore(score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return CriticalopsScore
 function Score:setFirstHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -72,6 +84,9 @@ function Score:setFirstHalfScore(score, side)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return CriticalopsScore
 function Score:setSecondHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -83,12 +98,17 @@ function Score:setSecondHalfScore(score, side)
 	return self
 end
 
+---@return Html
 function Score:create()
 	self.table:node(self.top):node(self.bottom)
 	return self.root
 end
 
 -- Map Veto Class
+---@class CriticalopsMapVeto: MatchSummaryRowInterface
+---@operator call: CriticalopsMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -98,6 +118,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return CriticalopsMapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -106,6 +127,8 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return CriticalopsMapVeto
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -124,6 +147,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return CriticalopsMapVeto
 function MapVeto:addDecider(map)
 	map = Logic.emptyOr(map, TBD)
 
@@ -137,6 +162,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return CriticalopsMapVeto
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = Logic.emptyOr(map1, TBD)
 	map2 = Logic.emptyOr(map2, TBD)
@@ -166,6 +195,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return CriticalopsMapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -175,15 +208,22 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string
+---@return CriticalopsMapVeto
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
 
+---@class CriticalopsMatchStatus: MatchSummaryRowInterface
+---@operator call: CriticalopsMatchStatus
+---@field root Html
 local MatchStatus = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -194,56 +234,29 @@ local MatchStatus = Class.new(
 	end
 )
 
+---@param content Html|string|number|nil
+---@return CriticalopsMatchStatus
 function MatchStatus:content(content)
 	self.root:node(content):node(MatchSummary.Break():create())
 	return self
 end
 
+---@return Html
 function MatchStatus:create()
 	return self.root
 end
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 end
 
-function CustomMatchSummary.addToFooter(match, footer)
-	local vods = {}
-	local secondVods = {}
-	if Logic.isNotEmpty(match.links.vod2) then
-		for _, vod2 in ipairs(match.links.vod2) do
-			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = link
-		end
-		match.links.vod2 = nil
-	end
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		return CustomMatchSummary._createFooter(match, vods, secondVods)
-	end
-
-	return footer
-end
-
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -275,11 +288,9 @@ function CustomMatchSummary._createBody(match)
 					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
 				end
 				if vetoRound.type == 'decider' then
-					mapVeto:addDecider(CustomMatchSummary._createMapLink(vetoRound.decider, match.game))
+					mapVeto:addDecider(vetoRound.decider)
 				else
-					mapVeto:addRound(vetoRound.type,
-										CustomMatchSummary._createMapLink(vetoRound.team1, match.game),
-										CustomMatchSummary._createMapLink(vetoRound.team2, match.game))
+					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
 				end
 			end
 
@@ -297,116 +308,8 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createFooter(match, vods, secondVods)
-	local footer = MatchSummary.Footer()
-
-	local separator = '<b>·</b>'
-
-	local function addFooterLink(icon, iconDark, url, label, index)
-		if icon == 'stats' then
-			icon = index ~= 0 and 'Match Info Stats' .. index .. '.png' or 'Match Info Stats.png'
-		end
-		if index > 0 then
-			label = label .. ' for Game ' .. index
-		end
-
-		icon = 'File:' .. icon
-		if iconDark then
-			iconDark = 'File:' .. iconDark
-		end
-
-		footer:addLink(url, icon, iconDark, label)
-	end
-
-	local function addVodLink(gamenum, vod, part)
-		if vod then
-			gamenum = (gamenum and match.bestof > 1) and gamenum or nil
-			local htext
-			if part then
-				if gamenum then
-					htext = 'Watch Game ' .. gamenum .. ' (part ' .. part .. ')'
-				else
-					htext = 'Watch VOD (part ' .. part .. ')'
-				end
-			end
-			footer:addElement(VodLink.display{
-				gamenum = gamenum,
-				vod = vod,
-				htext = htext
-			})
-		end
-	end
-
-	-- Match vod
-	if secondVods[0] then
-		addVodLink(nil, match.vod, 1)
-		addVodLink(nil, secondVods[0], 2)
-	else
-		addVodLink(nil, match.vod, nil)
-	end
-
-	-- Game Vods
-	for index, vod in pairs(vods) do
-		if secondVods[index] then
-			addVodLink(index, vod, 1)
-			addVodLink(index, secondVods[index], 2)
-		else
-			addVodLink(index, vod, nil)
-		end
-	end
-
-	if Table.isNotEmpty(match.links) then
-		if Logic.isNotEmpty(vods) or match.vod then
-			footer:addElement(separator)
-		end
-	else
-		return footer
-	end
-
-	--- Platforms is used to keep the order of the links in footer
-	local platforms = mw.loadData('Module:MatchExternalLinks')
-	local links = match.links
-
-	local insertDotNext = false
-	local iconsInserted = 0
-
-	for _, platform in ipairs(platforms) do
-		if Logic.isNotEmpty(platform) then
-			local link = links[platform.name]
-			if link then
-				if insertDotNext then
-					insertDotNext = false
-					iconsInserted = 0
-					footer:addElement(separator)
-				end
-
-				local icon = platform.icon
-				local iconDark = platform.iconDark
-				local label = platform.label
-				local addGameLabel = platform.isMapStats and match.bestof and match.bestof > 1
-
-				for _, val in ipairs(link) do
-					addFooterLink(icon, iconDark, val[1], label, addGameLabel and val[2] or 0)
-					iconsInserted = iconsInserted + 1
-				end
-
-				if platform.stats then
-					for _, site in ipairs(platform.stats) do
-						if links[site] then
-							footer:addElement(separator)
-							break
-						end
-					end
-				end
-			end
-		else
-			insertDotNext = iconsInserted > 0 and true or false
-		end
-	end
-
-	return footer
-end
-
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -439,7 +342,7 @@ function CustomMatchSummary._createMap(game)
 	-- Map Info
 	local mapInfo = mw.html.create('div')
 	mapInfo	:addClass('brkts-popup-spaced')
-			:wikitext(CustomMatchSummary._createMapLink(game.map))
+			:wikitext('[[' .. game.map .. ']]')
 			:css('text-align', 'center')
 			:css('padding','5px 2px')
 			:css('flex-grow','1')
@@ -473,6 +376,8 @@ function CustomMatchSummary._createMap(game)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
@@ -484,17 +389,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	end
 
 	return container
-end
-
-function CustomMatchSummary._createMapLink(map, game)
-	if Logic.isNotEmpty(map) then
-		if Logic.isNotEmpty(game) then
-			return '[[' .. map .. '/' .. game .. '|' .. map .. ']]'
-		else
-			return '[[' .. map .. '|' .. map .. ']]'
-		end
-	end
-	return ''
 end
 
 return CustomMatchSummary
