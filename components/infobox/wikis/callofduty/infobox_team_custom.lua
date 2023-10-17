@@ -14,7 +14,6 @@ local String = require('Module:StringUtils')
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local CustomTeam = Class.new()
-local _doStore = true
 
 function CustomTeam.run(frame)
 	local team = Team(frame)
@@ -25,9 +24,7 @@ function CustomTeam.run(frame)
 end
 
 function CustomTeam:createBottomContent()
-	if _doStore then
-		return MatchTicker.participant{team = self.pagename}
-	end
+	return MatchTicker.participant{team = self.pagename}
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
