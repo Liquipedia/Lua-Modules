@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -29,13 +30,14 @@ function CustomMatchTicker.tournament(frame)
 	args.tournament = args.tournament or args.tournament1 or args[1] or CURRENT_PAGE
 	args.queryByParent = args.queryByParent or true
 	args.showAllTbdMatches = args.showAllTbdMatches or true
+	args.infoboxWrapperClass = args.infoboxWrapperClass or true
 
 	return MatchTicker(args):query():create(
-		MatchTicker.DisplayComponents.Header('Upcoming matches')
+		MatchTicker.DisplayComponents.Header('Upcoming Matches')
 	)
 end
 
----Entry point for display on main page
+---Entry point for display on the main page
 ---@param frame Frame
 ---@return Html|string
 function CustomMatchTicker.mainPage(frame)
@@ -43,7 +45,7 @@ function CustomMatchTicker.mainPage(frame)
 	return MatchTicker(args):query():create()
 end
 
----Entry point for display on main page
+---Entry point for display on player pages
 ---@param frame Frame
 ---@return Html
 function CustomMatchTicker.player(frame)
@@ -54,7 +56,7 @@ function CustomMatchTicker.player(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on main page
+---Entry point for display on team pages
 ---@param frame Frame
 ---@return Html
 function CustomMatchTicker.team(frame)
@@ -65,12 +67,15 @@ function CustomMatchTicker.team(frame)
 	return CustomMatchTicker.participant(args)
 end
 
----Entry point for display on main page
+---Entry point for display on any participant-type page
 ---@param args table
 ---@param matches {ongoing: table?, upcoming: table?, recent: table?}?
 ---@return Html
 function CustomMatchTicker.participant(args, matches)
 	matches = matches or {}
+
+	--adjusting args
+	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {
