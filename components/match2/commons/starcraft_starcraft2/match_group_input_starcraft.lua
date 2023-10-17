@@ -170,7 +170,8 @@ function StarcraftMatchGroupInput._getExtraData(match)
 				extradata,
 				match['veto' .. vetoIndex],
 				match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex],
-				vetoIndex
+				vetoIndex,
+				match['veto' .. vetoIndex .. 'displayName']
 			)
 		end
 
@@ -185,9 +186,10 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	return match
 end
 
-function StarcraftMatchGroupInput._getVeto(extradata, map, vetoBy, vetoIndex)
+function StarcraftMatchGroupInput._getVeto(extradata, map, vetoBy, vetoIndex, displayName)
 	extradata['veto' .. vetoIndex] = (map ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
 	extradata['veto' .. vetoIndex .. 'by'] = vetoBy
+	extradata['veto' .. vetoIndex .. 'displayname'] = displayName
 
 	return extradata
 end
@@ -723,8 +725,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- set initial extradata for maps
 	map.extradata = {
-		comment = map.comment or '',
-		header = map.header or '',
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		header = map.header,
 		noQuery = match.noQuery,
 		server = map.server,
 	}
