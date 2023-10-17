@@ -22,6 +22,7 @@ local Variables = require('Module:Variables')
 ---@field isRandomEvent boolean
 ---@field isQualified boolean?
 ---@field manualFactionCounts table<string, number?>
+---@field soloColumnWidth number
 
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
@@ -79,6 +80,8 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	config.isRandomEvent = Logic.readBool(args.is_random_event)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
+	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
+	config.soloColumnWidth = tonumber(args.entrywidth) or config.showTeams and 212 or 156
 
 	config.manualFactionCounts = {}
 	Array.forEach(Faction.knownFactions, function(faction)
@@ -190,7 +193,7 @@ function StarcraftParticipantTable:createSoloRaceTable()
 	self.display = mw.html.create('div')
 		:addClass('participantTable participantTable-faction')
 		:css('grid-template-columns', 'repeat(' .. colSpan .. ', 1fr)')
-		:css('width', (colSpan * config.columnWidth) .. 'px')
+		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
 		:node(self:_displayHeader(factionColumns, factioNumbers))
 
 	Array.forEach(self.sections, function(section) self:_displaySoloRaceTableSection(section, factionColumns) end)
@@ -259,7 +262,7 @@ end
 function StarcraftParticipantTable:_displaySoloRaceTableSection(section, factionColumns)
 	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
 
-	self.display:node(self.newSectionNode():node(self.sectionTitle(section, sectionEntryCount)))
+	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
 
 	if Table.isEmpty(section.entries) then
 		self.display:node(self.newSectionNode():node(self:tbd()))
