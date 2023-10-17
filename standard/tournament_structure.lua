@@ -47,7 +47,7 @@ end
 function TournamentStructure.readMatchGroupsSpec(args)
 	local matchGroupIds = {args.id}
 	table.insert(matchGroupIds, args.matchGroupId)
-	for _, id in Table.iter.pairsByPrefix(args, 'matchGroupId') do
+	for _, id in Table.iter.pairsByPrefix(args, {'matchGroupId', 'id'}) do
 		table.insert(matchGroupIds, id)
 	end
 
