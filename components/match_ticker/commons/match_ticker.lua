@@ -136,7 +136,7 @@ function MatchTicker:init(args)
 
 	local wrapperClasses = type(args.wrapperClasses) == 'table' and args.wrapperClasses
 		or args.wrapperClasses == NONE and {}
-		or {args.wrapperClasses or args.wrapperClass}
+		or {args.wrapperClasses}
 
 	if Logic.readBool(args.infoboxClass) or Logic.readBool(args.infoboxWrapperClass) then
 		table.insert(wrapperClasses, INFOBOX_DEFAULT_CLASS)
