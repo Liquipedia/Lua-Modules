@@ -49,17 +49,21 @@ StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 })
 
 ---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
+---@field mapDisplayName string?
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
 ---@field offraces table<integer, string[]>?
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
+	mapDisplayName = 'string?',
 })
 ---@class StarcraftMatchGroupUtilVeto
 ---@field by number?
 ---@field map string
+---@field displayName string?
 StarcraftMatchGroupUtil.types.MatchVeto = TypeUtil.struct({
-	by = 'number',
+	by = 'number?',
 	map = 'string',
+	displayName = 'string?',
 })
 ---@class StarcraftMatchGroupUtilSubmatch
 ---@field games StarcraftMatchGroupUtilGame[]
@@ -112,6 +116,8 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Compute game.opponents by looking up game.participants in match.opponents
 	for _, game in ipairs(match.games) do
 		game.opponents = StarcraftMatchGroupUtil.computeGameOpponents(game, match.opponents)
+		game.extradata = game.extradata or {}
+		game.mapDisplayName = game.extradata.displayname
 	end
 
 	-- Determine whether the match is a team match with different players each game
@@ -137,9 +143,11 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	for vetoIndex = 1, math.huge do
 		local map = Table.extract(extradata, 'veto' .. vetoIndex)
 		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIndex .. 'by'))
+		local displayName = Table.extract(extradata, 'veto' .. vetoIndex .. 'displayname')
+
 		if not map then break end
 
-		table.insert(match.vetoes, {map = map, by = by})
+		table.insert(match.vetoes, {map = map, by = by, displayName = displayName})
 	end
 
 	-- Misc

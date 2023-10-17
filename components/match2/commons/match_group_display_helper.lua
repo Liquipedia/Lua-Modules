@@ -114,7 +114,9 @@ unusual status.
 function DisplayHelper.MapAndStatus(game, config)
 	config = config or {}
 	local mapText
-	if game.map and not config.noLink then
+	if game.map and game.mapDisplayName then
+		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
+	elseif game.map and not config.noLink then
 		mapText = '[[' .. game.map .. ']]'
 	elseif game.map then
 		mapText = game.map

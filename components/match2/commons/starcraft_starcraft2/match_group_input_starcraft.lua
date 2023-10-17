@@ -31,7 +31,6 @@ local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = '
 local _DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 30
-local _MAX_NUM_VETOS = 6
 local _MAX_NUM_VODGAMES = 9
 local _DEFAULT_BEST_OF = 99
 local _OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
@@ -156,28 +155,24 @@ end
 function StarcraftMatchGroupInput._getExtraData(match)
 	local extradata
 	if Logic.readBool(match.ffa) then
-		extradata = getStarcraftFfaInputModule().getExtraData(match)
-	else
-		extradata = {
-			noQuery = match.noQuery,
-			casters = match.casters,
-			headtohead = match.headtohead,
-			ffa = 'false',
-		}
+		match.extradata = getStarcraftFfaInputModule().getExtraData(match)
+		return match
+	end
 
-		for vetoIndex = 1, _MAX_NUM_VETOS do
-			extradata = StarcraftMatchGroupInput._getVeto(
-				extradata,
-				match['veto' .. vetoIndex],
-				match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex],
-				vetoIndex
-			)
-		end
+	extradata = {
+		noQuery = match.noQuery,
+		casters = match.casters,
+		headtohead = match.headtohead,
+		ffa = 'false',
+	}
 
-		for subGroupIndex = 1, _MAX_NUM_MAPS do
-			extradata['subGroup' .. subGroupIndex .. 'header']
-				= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-		end
+	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
+		StarcraftMatchGroupInput._getVeto(extradata, vetoMap, match, prefix, vetoIndex)
+	end
+
+	for subGroupIndex = 1, _MAX_NUM_MAPS do
+		extradata['subGroup' .. subGroupIndex .. 'header']
+			= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	end
 
 	match.extradata = extradata
@@ -185,11 +180,10 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	return match
 end
 
-function StarcraftMatchGroupInput._getVeto(extradata, map, vetoBy, vetoIndex)
-	extradata['veto' .. vetoIndex] = (map ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
-	extradata['veto' .. vetoIndex .. 'by'] = vetoBy
-
-	return extradata
+function StarcraftMatchGroupInput._getVeto(extradata, map, match, prefix, vetoIndex)
+	extradata[prefix] = map and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
+	extradata[prefix .. 'by'] = match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex]
+	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
 function StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
@@ -723,8 +717,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- set initial extradata for maps
 	map.extradata = {
-		comment = map.comment or '',
-		header = map.header or '',
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		header = map.header,
 		noQuery = match.noQuery,
 		server = map.server,
 	}

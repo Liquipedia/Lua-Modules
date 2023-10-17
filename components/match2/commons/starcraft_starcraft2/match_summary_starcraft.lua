@@ -369,19 +369,24 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
 end
 
----@param veto {map: string, by: number}
+---@param veto StarcraftMatchGroupUtilVeto
 ---@return MatchSummaryRow
 function StarcraftMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
 		return StarcraftMatchSummary.toIcon(opponentIndex == veto.by and 'redCross')
 	end
 
-	veto.map = veto.map or TBD
+	local map = veto.map or TBD
+	if veto.displayName then
+		map = '[[' .. map .. '|' .. veto.displayName .. ']]'
+	elseif map:upper() ~= TBD then
+		map = '[[' .. map .. ']]'
+	end
 
 	return MatchSummary.Row():addClass('brkts-popup-sc-veto-body')
 		:addElement(statusIcon(1))
 		:addElement(mw.html.create('div'):addClass('brkts-popup-sc-veto-center')
-			:wikitext(veto.map:upper() == TBD and TBD or ('[[' .. veto.map .. ']]')))
+			:wikitext(map))
 		:addElement(statusIcon(2))
 end
 
