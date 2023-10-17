@@ -147,7 +147,7 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 		if not map then break end
 
-		table.insert(match.vetoes, {map = map, by = by})
+		table.insert(match.vetoes, {map = map, by = by, displayName = displayName})
 	end
 
 	-- Misc
