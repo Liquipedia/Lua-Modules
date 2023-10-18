@@ -25,8 +25,8 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TBD = 'TBD'
 
 -- Score Class
----@class CriticalopsScore
----@operator call(string|number|nil): CriticalopsScore
+---@class ZulaScore
+---@operator call(string|number|nil): ZulaScore
 ---@field root Html
 ---@field table Html
 ---@field top Html
@@ -43,20 +43,20 @@ local Score = Class.new(
 	end
 )
 
----@return CriticalopsScore
+---@return ZulaScore
 function Score:setLeft()
 	self.table:css('float', 'left')
 	return self
 end
 
----@return CriticalopsScore
+---@return ZulaScore
 function Score:setRight()
 	self.table:css('float', 'right')
 	return self
 end
 
 ---@param score string|number|nil
----@return CriticalopsScore
+---@return ZulaScore
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -72,7 +72,7 @@ end
 
 ---@param side string
 ---@param score number
----@return CriticalopsScore
+---@return ZulaScore
 function Score:setFirstHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -86,7 +86,7 @@ end
 
 ---@param side string
 ---@param score number
----@return CriticalopsScore
+---@return ZulaScore
 function Score:setSecondHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -105,8 +105,8 @@ function Score:create()
 end
 
 -- Map Veto Class
----@class CriticalopsMapVeto: MatchSummaryRowInterface
----@operator call: CriticalopsMapVeto
+---@class ZulaMapVeto: MatchSummaryRowInterface
+---@operator call: ZulaMapVeto
 ---@field root Html
 ---@field table Html
 local MapVeto = Class.new(
@@ -118,7 +118,7 @@ local MapVeto = Class.new(
 	end
 )
 
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -128,7 +128,7 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -148,7 +148,7 @@ function MapVeto:vetoStart(firstVeto)
 end
 
 ---@param map string?
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:addDecider(map)
 	map = Logic.emptyOr(map, TBD)
 
@@ -165,7 +165,7 @@ end
 ---@param vetotype string?
 ---@param map1 string?
 ---@param map2 string?
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = Logic.emptyOr(map1, TBD)
 	map2 = Logic.emptyOr(map2, TBD)
@@ -198,7 +198,7 @@ end
 ---@param row Html
 ---@param styleClass string
 ---@param vetoText string
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -210,7 +210,7 @@ end
 
 ---@param row Html
 ---@param map string
----@return CriticalopsMapVeto
+---@return ZulaMapVeto
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
@@ -221,8 +221,8 @@ function MapVeto:create()
 	return self.root
 end
 
----@class CriticalopsMatchStatus: MatchSummaryRowInterface
----@operator call: CriticalopsMatchStatus
+---@class ZulaMatchStatus: MatchSummaryRowInterface
+---@operator call: ZulaMatchStatus
 ---@field root Html
 local MatchStatus = Class.new(
 	function(self)
@@ -235,7 +235,7 @@ local MatchStatus = Class.new(
 )
 
 ---@param content Html|string|number|nil
----@return CriticalopsMatchStatus
+---@return ZulaMatchStatus
 function MatchStatus:content(content)
 	self.root:node(content):node(MatchSummary.Break():create())
 	return self
