@@ -13,8 +13,6 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local UNKNOWNREASON_DEFAULT_LOSS = 'L'
-
 function MatchLegacy.storeMatch(match2, options)
 	local match, doStore = MatchLegacy.convertParameters(match2)
 
