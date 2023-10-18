@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
+-- wiki=fifa
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
