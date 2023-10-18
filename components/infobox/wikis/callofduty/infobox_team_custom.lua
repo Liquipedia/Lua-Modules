@@ -28,7 +28,7 @@ function CustomTeam:createBottomContent()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.extradata.competesin = string.upper(args.league or '')
+	lpdbData.extradata.competesin = String.isNotEmpty(args.league) and args.league:upper() or nil
 
 	return lpdbData
 end
