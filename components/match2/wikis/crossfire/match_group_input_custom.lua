@@ -171,7 +171,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local temporaryPlace = -99
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score or '') or ''
+			local score = tonumber(opp.score) or ''
 			counter = counter + 1
 			if counter == 1 and (winner or '') == '' then
 				if finished then
@@ -179,9 +179,9 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 				end
 			end
 			if temporaryScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or temporaryPlace
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or temporaryPlace
 			else
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or counter
 				temporaryPlace = counter
 				temporaryScore = score
 			end
@@ -192,8 +192,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or -99) or -99
-	local value2 = tonumber(table[key2].score or -99) or -99
+	local value1 = tonumber(table[key1].score) or -99
+	local value2 = tonumber(table[key2].score) or -99
 	return value1 > value2
 end
 
@@ -341,7 +341,7 @@ function matchFunctions.getOpponents(match)
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.ceil(match.bestof/2)
 		for _, item in pairs(opponents) do
-			if tonumber(item.score or 0) >= firstTo then
+			if (tonumber(item.score) or 0) >= firstTo then
 				match.finished = true
 				break
 			end
