@@ -15,6 +15,7 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local DateExt = require('Module:Date/Ext')
 local Streams = require('Module:Links/Stream')
+local Match = require('Module:Match')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
@@ -28,6 +29,8 @@ local GAME = mw.loadData('Module:GameVersion')
 
 local NOW = os.time(os.date('!*t'))
 local LANG = mw.getContentLanguage()
+local MATCHTIME = tonumber(LANG:formatDate('U', Match.date))
+local THRESHOLD = Match.dateexact and 30800 or 86400
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -347,8 +350,6 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local MATCHTIME = tonumber(LANG:formatDate('U', match.date))
-		local THRESHOLD = match.dateexact and 30800 or 86400
 		if MATCHTIME + THRESHOLD < NOW then
 			match.finished = true
 		end
