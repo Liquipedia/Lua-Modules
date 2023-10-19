@@ -9,8 +9,17 @@
 local Array = require('Module:Array')
 local Error = require('Module:Error')
 local Json = require('Module:Json')
+local Page = require('Module:Page')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local FILTERED_STACK_ITEMS = {
+	'Module:ResultOrError:124: in function <Module:ResultOrError:123>',
+	'Module:ResultOrError:115: in function <Module:ResultOrError:114>',
+	'[C]: in function \'xpcall\'',
+	'Module:ResultOrError:113: in function \'try\'',
+}
 
 local pageVars = PageVariableNamespace('ErrorStash')
 
