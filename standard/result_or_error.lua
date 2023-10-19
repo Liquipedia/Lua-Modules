@@ -95,7 +95,7 @@ function Error:map(_, onError)
 end
 
 function Error:get()
-	error(table.concat(Array.extend(self.error, self.stacks), '\n'))
+	error(require('Module:ErrorExt').printErrorJson(self), 0)
 end
 
 --[[
