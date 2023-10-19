@@ -16,17 +16,17 @@ return {
 			name = 'osu!',
 			link = 'osu!',
 			logo = {
-				darkMode = 'Osu single color allmode.png',
-				lightMode = 'Osu single color allmode.png',
+				darkMode = 'osu! allmode.png',
+				lightMode = 'osu! allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Osu single color allmode.png',
-				lightMode = 'Osu single color allmode.png',
+				darkMode = 'osu! default allmode.png',
+				lightMode = 'osu! default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'osu',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Osu single color allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Osu single color allmode.png', ---@deprecated
+	defaultTeamLogo = 'osu! default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'osu! default allmode.png', ---@deprecated
 }
