@@ -87,6 +87,48 @@ function ErrorExt.makeFullStackTrace(error)
 	return table.concat(parts, '\n')
 end
 
+---Builds a JSON string for using with `liquipedia.customLuaErrors` JS module via error().
+---@param error error
+---@return string
+function ErrorExt.printErrorJson(error)
+	local stackTrace = {}
+	for _, stack in ipairs(error.stacks) do
+		local stackFrames = mw.text.split(stack, '\n')
+		stackFrames = Array.filter(
+			Array.map(
+				Array.sub(stackFrames, 2, #stackFrames),
+				function(frame) return String.trim(frame) end
+			),
+			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame) end
+		)
+		for index, frame in ipairs(stackFrames) do
+			if not (index == 1 and frame == '[C]: ?') then
+				local stackEntry = {content = frame}
+				local frameSplit = mw.text.split(frame, ':', true)
+				if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
+					stackEntry.prefix = frameSplit[1]
+					stackEntry.content = table.concat(frameSplit, ':', 2)
+				elseif frameSplit[1] == 'mw.lua' then
+					stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
+					stackEntry.content =  table.concat(frameSplit, ':', 3)
+				elseif frameSplit[1] == 'Module' then
+					local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
+						or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'
+					stackEntry.link = {wiki = wiki, title = table.concat(frameSplit, ':', 1, 2), ln = frameSplit[3]}
+					stackEntry.prefix = table.concat(frameSplit, ':', 1, 3)
+					stackEntry.content = table.concat(frameSplit, ':', 4)
+				end
+				table.insert(stackTrace, stackEntry)
+			end
+		end
+	end
+
+	return Json.stringify({
+			errorShort = string.format('Lua error in %s:%s at line %s:%s.', unpack(mw.text.split(error.error, ':', true)))
+			, stackTrace = stackTrace,
+		})
+end
+
 local Stash = {}
 ErrorExt.Stash = Stash
 
