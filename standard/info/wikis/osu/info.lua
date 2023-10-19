@@ -12,7 +12,7 @@ return {
 	name = 'osu!',
 	games = {
 		osu = {
-			abbreviation = 'osu',
+			abbreviation = 'osu!',
 			name = 'osu!',
 			link = 'osu!',
 			logo = {
