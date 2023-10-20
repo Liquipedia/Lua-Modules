@@ -32,9 +32,9 @@ local ICONS = {
 local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	mplink = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
-	['mplink2'] = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
-	['mplink3'] = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
 }
+	LINK_DATA.mplink2 = LINK_DATA.mplink
+	LINK_DATA.mplink3 = LINK_DATA.mplink
 
 local VETO_TYPE_TO_TEXT = {
 	ban = 'BAN',
@@ -47,8 +47,8 @@ local VETO_TYPE_TO_TEXT = {
 local CustomMatchSummary = {}
 
 -- Map Veto Class
----@class osuMapVeto: MatchSummaryRowInterface
----@operator call: osuMapVeto
+---@class self: MatchSummaryRowInterface
+---@operator call: self
 ---@field root Html
 ---@field table Html
 local MapVeto = Class.new(
@@ -60,7 +60,7 @@ local MapVeto = Class.new(
 	end
 )
 
----@return osuMapVeto
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -71,7 +71,7 @@ end
 
 ---@param firstVeto number?
 ---@param format string?
----@return osuMapVeto
+---@return self
 function MapVeto:vetoStart(firstVeto, format)
 	format = format and ('Veto format: ' .. format) or nil
 	local textLeft
@@ -110,7 +110,7 @@ end
 ---@param vetoType string?
 ---@param map1 string?
 ---@param map2 string?
----@return osuMapVeto
+---@return self
 function MapVeto:addRound(vetoType, map1, map2)
 	map1, map2 = MapVeto._displayMaps(map1, map2)
 
@@ -133,7 +133,7 @@ end
 ---@param row Html
 ---@param styleClass string
 ---@param vetoText string
----@return osuMapVeto
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -145,7 +145,7 @@ end
 
 ---@param row Html
 ---@param map string
----@return osuMapVeto
+---@return self
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
@@ -291,8 +291,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@return string
 function CustomMatchSummary._getMapDisplay(game)
-	local mapDisplay = '[[' .. game.map .. ']]'
-	return mapDisplay
+	return '[[' .. game.map .. ']]'
 end
 
 ---@param showIcon boolean?
@@ -300,7 +299,7 @@ end
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
+	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
 		return container:node(ICONS[iconType])
