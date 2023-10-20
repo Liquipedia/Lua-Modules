@@ -299,9 +299,9 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.preview then links.preview = match.preview end
-	if match.mplink then links.mplink = 'https://osu.ppy.sh/community/matches/' .. match.mplink end
-	if match.mplink2 then links.mplink2 = 'https://osu.ppy.sh/community/matches/' .. match.mplink2 end
-	if match.mplink3 then links.mplink3 = 'https://osu.ppy.sh/community/matches/' .. match.mplink3 end
+	for key, linkPart in Table.iter.pairsByPrefix(match, 'mplink', {requireIndex = false}) do
+		links[key] = 'https://osu.ppy.sh/community/matches/' .. linkPart
+	end
 
 	return match
 end
@@ -433,9 +433,9 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
-function mapFunctions.getTournamentVars(map)
+function mapFunctions.getTournamentVars(map, match)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
+	return MatchGroupInput.getCommonTournamentVars(map, match)
 end
 
 --
