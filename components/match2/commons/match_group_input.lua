@@ -81,7 +81,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
-			bracketData.matchPage = match.matchPage
+			bracketData.matchpage = match.matchPage
 
 			local nextMatchId = bracketId .. '_' .. MatchGroupInput._matchlistMatchIdFromIndex(matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
