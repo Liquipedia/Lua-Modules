@@ -22,7 +22,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local MAX_NUM_OPPONENTS = 8
+local MAX_NUM_OPPONENTS = 4
 local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
@@ -289,10 +289,7 @@ end
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-
-	match = MatchGroupInput.getCommonTournamentVars(match)
-
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)
@@ -438,10 +435,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-
-	map = MatchGroupInput.getCommonTournamentVars(map)
-
-	return map
+	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --
