@@ -24,6 +24,84 @@ return {
 				lightMode = 'osu! default allmode.png',
 			},
 		},
+		lazer = {
+			abbreviation = 'osu!lazer',
+			name = 'osu!lazer',
+			link = 'osu!lazer',
+			logo = {
+				darkMode = 'osu! allmode.png',
+				lightMode = 'osu! allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! default allmode.png',
+				lightMode = 'osu! default allmode.png',
+			},
+		},
+		catch = {
+			abbreviation = 'Catch',
+			name = 'Catch',
+			link = 'osu!catch',
+			logo = {
+				darkMode = 'osu! Catch default lightmode.png',
+				lightMode = 'osu! Catch default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! Catch default lightmode.png',
+				lightMode = 'osu! Catch default darkmode.png',
+			},
+		},
+		taiko = {
+			abbreviation = 'Taiko',
+			name = 'Taiko',
+			link = 'osu!taiko',
+			logo = {
+				darkMode = 'osu! Taiko default lightmode.png',
+				lightMode = 'osu! Taiko default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! Taiko default lightmode.png',
+				lightMode = 'osu! Taiko default darkmode.png',
+			},
+		},
+		mania = {
+			abbreviation = 'Mania',
+			name = 'Mania',
+			link = 'osu!mania',
+			logo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+		},
+		['mania 4k'] = {
+			abbreviation = 'Mania 4K',
+			name = 'Mania (4 Keys)',
+			link = 'osu!mania',
+			logo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+		},
+		['mania 7k'] = {
+			abbreviation = 'Mania 7K',
+			name = 'Mania (7 Keys)',
+			link = 'osu!mania',
+			logo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'osu! Mania default lightmode.png',
+				lightMode = 'osu! Mania default darkmode.png',
+			},
+		},
 	},
 	defaultGame = 'osu',
 	defaultRoundPrecision = 0,
