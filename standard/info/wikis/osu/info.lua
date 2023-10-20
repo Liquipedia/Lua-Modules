@@ -42,12 +42,12 @@ return {
 			name = 'Catch',
 			link = 'osu!catch',
 			logo = {
-				darkMode = 'osu! Catch default lightmode.png',
-				lightMode = 'osu! Catch default darkmode.png',
+				darkMode = 'osu! Catch default darkmode.png',
+				lightMode = 'osu! Catch default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! Catch default lightmode.png',
-				lightMode = 'osu! Catch default darkmode.png',
+				darkMode = 'osu! Catch default darkmode.png',
+				lightMode = 'osu! Catch default lightmode.png',
 			},
 		},
 		taiko = {
@@ -55,12 +55,12 @@ return {
 			name = 'Taiko',
 			link = 'osu!taiko',
 			logo = {
-				darkMode = 'osu! Taiko default lightmode.png',
-				lightMode = 'osu! Taiko default darkmode.png',
+				darkMode = 'osu! Taiko default darkmode.png',
+				lightMode = 'osu! Taiko default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! Taiko default lightmode.png',
-				lightMode = 'osu! Taiko default darkmode.png',
+				darkMode = 'osu! Taiko default darkmode.png',
+				lightMode = 'osu! Taiko default lightmode.png',
 			},
 		},
 		mania = {
@@ -68,12 +68,12 @@ return {
 			name = 'Mania',
 			link = 'osu!mania',
 			logo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 		},
 		['mania 4k'] = {
@@ -81,12 +81,12 @@ return {
 			name = 'Mania (4 Keys)',
 			link = 'osu!mania',
 			logo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 		},
 		['mania 7k'] = {
@@ -94,12 +94,12 @@ return {
 			name = 'Mania (7 Keys)',
 			link = 'osu!mania',
 			logo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! Mania default lightmode.png',
-				lightMode = 'osu! Mania default darkmode.png',
+				darkMode = 'osu! Mania default darkmode.png',
+				lightMode = 'osu! Mania default lightmode.png',
 			},
 		},
 	},
