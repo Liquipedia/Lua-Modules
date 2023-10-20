@@ -81,6 +81,8 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
+			bracketData.matchPage = match.matchPage
+
 			local nextMatchId = bracketId .. '_' .. MatchGroupInput._matchlistMatchIdFromIndex(matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
 
@@ -142,6 +144,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
 		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
+
+		bracketData.matchpage = match.matchPage
 
 		match.parent = context.tournamentParent
 		match.matchsection = context.matchSection
