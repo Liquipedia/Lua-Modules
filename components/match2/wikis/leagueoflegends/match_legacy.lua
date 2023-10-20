@@ -69,8 +69,8 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-		if bracketData.inheritedheader then
+	if type(bracketData) == 'table' then
+		if bracketData.type == 'bracket' and bracketData.inheritedheader then
 			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
 		match.extradata.matchpage = bracketData.matchpage
