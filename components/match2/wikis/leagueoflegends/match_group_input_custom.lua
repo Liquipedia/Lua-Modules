@@ -512,6 +512,8 @@ function matchFunctions.mergeWithStandalone(match)
 		return match
 	end
 
+	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
+
 	-- Update Opponents from the Stanlone Match
 	match.opponent1 = standaloneMatch.match2opponents[1]
 	match.opponent2 = standaloneMatch.match2opponents[2]
