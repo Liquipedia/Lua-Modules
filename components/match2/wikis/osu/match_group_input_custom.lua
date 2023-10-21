@@ -318,20 +318,29 @@ end
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
-	local mapVeto = Json.parseIfString(match.mapveto)
+	match.mapveto = Json.parseIfString(match.mapveto)
 
-	local data = {
-		vetostart = mapVeto.vetostart,
-		format = mapVeto.format,
-	}
-	for index, vetoType in ipairs(mw.text.split(mapVeto.types or '', ',')) do
+	local vetoTypes = mw.text.split(match.mapveto.types or '', ',')
+	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetoStart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetoTypes) do
 		vetoType = mw.text.trim(vetoType):lower()
 		if not Table.includes(ALLOWED_VETOES, vetoType) then
 			return nil -- Any invalid input will not store (ie hide) all vetoes.
 		end
-		table.insert(data, {type = vetoType, team1 = mapVeto['t1map'..index], team2 = mapVeto['t2map'..index]})
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
 	end
-
+	if data[1] then
+		data[1].vetostart = vetoStart
+	end
 	return data
 end
 
