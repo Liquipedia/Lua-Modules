@@ -21,6 +21,9 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local SCORE_STATUS = 'S'
+local DEFAULT_WIN = 'W'
+
 ---@class CrossTableLeague
 ---@operator call(table?): CrossTableLeague
 ---@field args table
@@ -36,7 +39,6 @@ function CrossTableLeague:init(args)
 	self.args = args or {}
 	self.config = self:readConfig()
 	self.opponents = self:readOpponents()
-	self.matches = self:query()
 
 	return self
 end
@@ -49,10 +51,8 @@ end
 ---@field cellwidth number
 ---@field matchGroupSpecs table
 ---@field buttonStyle string?
----@field matchLink string?
----@field shouldLink boolean
 ---@field queryOrder string
----@field showDate boolean
+---@field dateLess boolean
 ---@field date string
 
 ---@return CrossTableLeagueConfig
@@ -60,17 +60,15 @@ function CrossTableLeague:readConfig()
 	local args = self.args
 
 	return {
-		startDate = DateExt.readTimestamp(args.sdate),
-		endDate = DateExt.readTimestamp(args.edate),
+		startDate = DateExt.readTimestampOrNil(args.sdate),
+		endDate = DateExt.readTimestampOrNil(args.edate),
 		isSingle = Logic.readBool(args.single),
 		walkoverWin = tonumber(args.walkover_win) or 0,
-		cellwidth = (tonumber(args.cellwidth) or 45),
+		cellwidth = (tonumber(args.cellwidth) or 60),
 		matchGroupSpecs = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec(),
 		buttonStyle = args.button,
-		matchLink = args.matchlink,
-		shouldLink = Logic.readBool(args.links),
 		queryOrder = Logic.readBool(args.backwards) and 'date desc' or 'date asc',
-		showDate = not Logic.readBool(args.dateless),
+		dateLess = Logic.readBool(args.dateless),
 		date = DateExt.getContextualDateOrNow(),
 	}
 end
@@ -79,13 +77,13 @@ end
 function CrossTableLeague:readOpponents()
 	local args = self.args
 
-	local leftSide = CrossTableLeague:_readSideOpponents(args.opponent1 and 'opponent'
+	local leftSide = self:_readSideOpponents(args.opponent1 and 'opponent'
 		or args.team1 and 'team'
 		or args.player1 and 'player' or nil)
 
 	if not leftSide then return {} end
 
-	local bottomSide = CrossTableLeague:_readSideOpponents(args.bopponent1 and 'opponent'
+	local bottomSide = self:_readSideOpponents(args.bopponent1 and 'opponent'
 		or args.bteam1 and 'team'
 		or args.bplayer1 and 'player' or nil, 'b')
 
@@ -105,7 +103,7 @@ function CrossTableLeague:_readSideOpponents(keyPrefix, side)
 	side = side or ''
 
 	local entries = {}
-	for prefix, opponentInput, index in Table.iter.pairsByPrefix(args, side .. keyPrefix) do
+	for prefix, opponentInput in Table.iter.pairsByPrefix(args, side .. keyPrefix) do
 		local opponent
 		if keyPrefix == 'opponent' then
 			opponent = Json.parseIfTable(opponentInput)
@@ -119,9 +117,10 @@ function CrossTableLeague:_readSideOpponents(keyPrefix, side)
 			}}}
 		end
 		opponent = Opponent.resolve(Opponent.readOpponentArgs(opponent), self.config.date, {syncPlayer = true})
+		opponent.name = opponent.name or Opponent.toName(opponent)
 		table.insert(entries, {
 			opponent = opponent,
-			aliases = self:_processAliases(opponent.type, args[prefix .. 'alias'])
+			aliases = self:_processAliases(opponent.type, args[prefix .. 'alias'], opponentInput)
 		})
 	end
 
@@ -130,8 +129,9 @@ end
 
 ---@param opponentType string
 ---@param aliasInput string?
+---@param opponentInput string
 ---@return string[]
-function CrossTableLeague:_processAliases(opponentType, aliasInput)
+function CrossTableLeague:_processAliases(opponentType, aliasInput, opponentInput)
 	if not aliasInput then return {} end
 	local aliases = mw.text.split(aliasInput, ',')
 
@@ -145,6 +145,8 @@ function CrossTableLeague:_processAliases(opponentType, aliasInput)
 	Array.forEach(aliases, function(alias)
 		Array.extendWith(allAliases, {alias}, Team.queryHistoricalNames(alias:gsub('_', ' '):lower()))
 	end)
+	--for team input the `opponentInput` is supposed to be a team template, query historical names for it as aliases too
+	Array.extendWith(allAliases, Team.queryHistoricalNames(opponentInput:gsub('_', ' '):lower()))
 
 	return allAliases
 end
@@ -178,12 +180,9 @@ function CrossTableLeague:query()
 		table.insert(conditions, '([[date::<' .. config.endDate .. ']] OR [[date::' .. config.endDate .. ']])')
 	end
 
-	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
-		limit = 1000,
-		offset = 0,
-		order = config.queryOrder,
-		conditions = table.concat(conditions, ' AND '),
-	})
+	if not config.dateLess then
+		table.insert(conditions, '([[date::!1970-01-01 00:00:00]] OR [[finished::1]])')
+	end
 
 	self.matches = self:_filterAndSortMatches(mw.ext.LiquipediaDB.lpdb('match2', {
 		limit = 1000,
@@ -221,8 +220,8 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 	local p = {}
 	p.processMatch = function(match, hasBeenProcessed)
 		local opponents = match.match2opponents
-		local leftIndex = CrossTableLeague:_findEntryIndex(self.opponents[1], opponents[1].name)
-		local rightIndex = CrossTableLeague:_findEntryIndex(self.opponents[2], opponents[2].name)
+		local leftIndex = self:_findEntryIndex(self.opponents[1], opponents[1].name)
+		local rightIndex = self:_findEntryIndex(self.opponents[2], opponents[2].name)
 
 		if hasBeenProcessed and not leftIndex or not rightIndex then
 			return
@@ -289,7 +288,6 @@ function CrossTableLeague:_readOpponentsFromMatches(matches)
 	end
 
 	for _, match in pairs(matches) do
-		local opponents = match.match2opponents
 		processOpponent(match.match2opponents[1])
 		processOpponent(match.match2opponents[2])
 	end
@@ -310,44 +308,73 @@ function CrossTableLeague:create()
 
 	self.display = mw.html.create('div')
 		:addClass('table-responsive toggle-area toggle-area-1')
-		:attr('data-toggle-area','1')
+		:attr('data-toggle-area', '1')
 
 	self:_button()
 
-
-	local tableWidth = (#self.opponents[1] + 1) * self.config.cellwidth + 26
+	local tableWidth = #self.opponents[2] * self.config.cellwidth + 26
+	if self.config.buttonStyle ~= 'above' or not self.config.isSingle then
+		tableWidth = tableWidth + self.config.cellwidth
+	end
 
 	local tableDisplay = self.display:tag('div')
 		:css('min-width',tableWidth .. 'px')
 
 	if self.config.buttonStyle ~= 'above' then
-		tableDisplay:css('float','left')
+		tableDisplay:css('float', 'left')
 	end
 
 	self.table = tableDisplay:tag('table')
 		:addClass('wikitable wikitable-bordered crosstable')
-		:css('margin','0px 13px 13px 0px')
+		:css('margin', '0px 13px 13px 0px')
 
-	for rowIndex, opponent in ipairs(self.opponents[2]) do
+	Array.forEach(self.opponents[1], function(entry, rowIndex)
 		local row = self.table:tag('tr'):addClass('crosstable-tr')
 			:tag('th'):node(OpponentDisplay.BlockOpponent{
-				opponent = opponent,
+				opponent = entry.opponent,
 				teamStyle = 'icon',
 			}):done()
-		for columnIndex in ipairs(self.opponents[1]) do
-			row:node(self:_displayCell(self.matches[columnIndex][rowIndex]))
+		for columnIndex in ipairs(self.opponents[2]) do
+			row:node(self:displayCell(rowIndex, columnIndex))
+		end
+		if self.opponents.isMirrored and not self.config.isSingle then
+			self:addTotalCells(row, rowIndex)
+		end
+		if rowIndex == 1 and self.config.isSingle then
+			row:attr('data-toggle-area-content', '2')
+		end
+	end)
+
+	local bottomRow = self.table:tag('tr'):addClass('crosstable-tr'):tag('th'):done()
+
+	local toggleGroup
+	local bottomCell = function(entry, columnIndex)
+		local cell = bottomRow:tag('th')
+			:node(OpponentDisplay.BlockOpponent{
+				opponent = entry.opponent,
+				teamStyle = 'icon',
+			})
+		if toggleGroup or columnIndex == #self.opponents[2] and self.config.isSingle then
+			cell:attr('data-toggle-area-content', toggleGroup or '2')
 		end
 	end
 
+	if self.opponents.isMirrored and not self.config.isSingle then
+		toggleGroup = '1'
+	end
+	Array.forEach(self.opponents[2], bottomCell)
 
+	if self.opponents.isMirrored and not self.config.isSingle then
+		toggleGroup = '2'
+		Array.forEach(self.opponents[2], bottomCell)
+	end
 
-	--TODO: build the display based on self.matches, self.opponents and self.config.
-	someBs
+	return self.display
 end
 
 ---@return Html?
 function CrossTableLeague:_button()
-	if self.config.buttonStyle == 'hidden' then
+	if self.config.buttonStyle == 'hidden' or not self.opponents.isMirrored then
 		return
 	end
 
@@ -361,9 +388,9 @@ function CrossTableLeague:_button()
 			:attr('data-toggle-area-content', tostring(toggleGroup))
 			:tag('span')
 				:addClass('toggle-area-button btn btn-primary')
-				:attr('data-toggle-area-btn',tostring(3 - toggleGroup))
-				:css('width','150px')
-				:css('margin-bottom','12px')
+				:attr('data-toggle-area-btn', tostring(3 - toggleGroup))
+				:css('width', '150px')
+				:css('margin-bottom', '12px')
 				:wikitext(text)
 				:done()
 			:done()
@@ -373,7 +400,134 @@ function CrossTableLeague:_button()
 	buildButton(closeText, 2)
 end
 
+---@param rowIndex integer
+---@param columnIndex integer
+---@param toggleArea string?
+---@return Html
+function CrossTableLeague:displayCell(rowIndex, columnIndex, toggleArea)
+	local cell = mw.html.create('td')
+	local match = self.matches[rowIndex][columnIndex]
+	toggleArea = toggleArea
+		or self.config.isSingle and rowIndex <= columnIndex and '2'
+		or self.opponents.isMirrored and not self.config.isSingle and '1'
+		or nil
 
+	if not match and rowIndex == columnIndex and self.opponents.isMirrored then
+		return cell
+			:addClass('crosstable-bgc-cross')
+			:attr('data-toggle-area-content', toggleArea)
+			:css('min-width', self.config.cellwidth .. 'px')
+	elseif not match then
+		return cell
+			:addClass('crosstable-bgc-r-r')
+			:attr('data-toggle-area-content', toggleArea)
+			:css('min-width', self.config.cellwidth .. 'px')
+	end
 
+	local body = mw.html.create('b')
+	local opponents = match.match2opponents or {{}, {}}
+	local scores = {
+		CrossTableLeague._getScore(opponents[1]),
+		CrossTableLeague._getScore(opponents[2]),
+	}
+	if Logic.readBool(match.finished) or self.config.dateLess then
+		body:wikitext(scores[1] .. '-' .. scores[2])
+	else
+		body:wikitext('&nbsp;')
+	end
+
+	return cell
+		:addClass('crosstable-bgc-r' .. scores[1] .. '-r' .. scores[2] .. (match.winner == 0 and '-draw' or ''))
+		:css('min-width', self.config.cellwidth .. 'px')
+		:attr('data-toggle-area-content', toggleArea)
+		:node(body)
+		:node(CrossTableLeague.footer(match))
+end
+
+---@param opponent standardOpponent
+---@return string|number|nil
+function CrossTableLeague._getScore(opponent)
+	return opponent.status ~= SCORE_STATUS and opponent.status or
+		opponent.score ~= -1 and opponent.score or 0
+end
+
+---@param match table
+---@return Html?
+function CrossTableLeague.footer(match)
+	local timestamp = DateExt.readTimestampOrNil(match.date) or 0
+	if not Logic.readBool(match.dateexact) and timestamp == 0 then
+		return
+	end
+
+	return mw.html.create()
+		:wikitext('<br>')
+		:tag('span')
+			:css('font-size', '80%')
+			:wikitext(DateExt.formatTimestamp('M j', timestamp))
+			:done()
+end
+
+function CrossTableLeague:addTotalCells(row, rowIndex)
+	for columnIndex in ipairs(self.opponents[2]) do
+		row:node(self:displayTotalCell(rowIndex, columnIndex))
+	end
+end
+
+---@param rowIndex integer
+---@param columnIndex integer
+---@return Html
+function CrossTableLeague:displayTotalCell(rowIndex, columnIndex)
+	local match = self.matches[rowIndex][columnIndex]
+	if not match then
+		return mw.html.create('td')
+			:addClass('crosstable-bgc-cross')
+			:attr('data-toggle-area-content', '2')
+			:css('min-width', self.config.cellwidth .. 'px')
+	end
+
+	local opponents = (match or {}).match2opponents or {{}, {}}
+	local scores1 = {
+		CrossTableLeague._getScore(opponents[1]),
+		CrossTableLeague._getScore(opponents[2]),
+	}
+
+	local mirrorColumnIndex = self:_findEntryIndex(self.opponents[2], opponents[2].name)
+	local mirrorRowIndex = self:_findEntryIndex(self.opponents[1], opponents[1].name)
+
+	local mirroredMatch = (self.matches[mirrorRowIndex] or {})[mirrorColumnIndex]
+
+	if not mirroredMatch then
+		return self:displayCell(rowIndex, columnIndex, '2')
+	end
+
+	local mirroredMatchOpponents = mirroredMatch.match2opponents or {{}, {}}
+	local scores2 = {
+		CrossTableLeague._getScore(mirroredMatchOpponents[1]),
+		CrossTableLeague._getScore(mirroredMatchOpponents[2]),
+	}
+
+	local toSumScore = function(scoreValue)
+		return tonumber(scoreValue) or scoreValue == DEFAULT_WIN and self.config.walkoverWin or 0
+	end
+
+	local totalScores = {
+		toSumScore(scores1[1]) + toSumScore(scores2[1]),
+		toSumScore(scores1[2]) + toSumScore(scores2[2]),
+	}
+
+	local footer = mw.html.create()
+		:wikitext('<br>')
+		:tag('span')
+			:css('font-size', '80%')
+			:wikitext(table.concat(scores1, '-') .. ', ' .. table.concat(scores2, '-'))
+			:done()
+
+	return mw.html.create('td')
+		:addClass('crosstable-bgc-r' .. totalScores[1] .. '-r' .. totalScores[2])
+		:css('min-width', self.config.cellwidth .. 'px')
+		:attr('data-toggle-area-content', '2')
+		:node(table.concat(totalScores, '-'))
+		:node(footer)
+end
 
 return CrossTableLeague
