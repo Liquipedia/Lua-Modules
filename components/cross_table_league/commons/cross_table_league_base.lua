@@ -27,6 +27,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field config CrossTableLeagueConfig
 ---@field opponents {[1]: CrossTableLeagueEntry[]?, [2]: CrossTableLeagueEntry[]?, isMirrored: boolean}
 ---@field matches table[][]?
+---@field display Html
 local CrossTableLeague = Class.new()
 
 ---@param args table?
@@ -41,10 +42,11 @@ function CrossTableLeague:init(args)
 end
 
 ---@class CrossTableLeagueConfig
----@field startDate string?
----@field endDate string?
+---@field startDate number?
+---@field endDate number?
 ---@field isSingle boolean
 ---@field walkoverWin number
+---@field cellwidth number
 ---@field matchGroupSpecs table
 ---@field buttonStyle string?
 ---@field matchLink string?
@@ -58,11 +60,11 @@ function CrossTableLeague:readConfig()
 	local args = self.args
 
 	return {
-		startDate = args.sdate,
-		endDate = args.edate,
+		startDate = DateExt.readTimestamp(args.sdate),
+		endDate = DateExt.readTimestamp(args.edate),
 		isSingle = Logic.readBool(args.single),
 		walkoverWin = tonumber(args.walkover_win) or 0,
-		cellwidth = (tonumber(args.cellwidth) or 45) .. 'px',
+		cellwidth = (tonumber(args.cellwidth) or 45),
 		matchGroupSpecs = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec(),
 		buttonStyle = args.button,
 		matchLink = args.matchlink,
@@ -306,8 +308,69 @@ function CrossTableLeague:create()
 			return Array.map(self.opponents[2], function() return {} end) end)
 	end
 
+	self.display = mw.html.create('div')
+		:addClass('table-responsive toggle-area toggle-area-1')
+		:attr('data-toggle-area','1')
+
+	self:_button()
+
+
+	local tableWidth = (#self.opponents[1] + 1) * self.config.cellwidth + 26
+
+	local tableDisplay = self.display:tag('div')
+		:css('min-width',tableWidth .. 'px')
+
+	if self.config.buttonStyle ~= 'above' then
+		tableDisplay:css('float','left')
+	end
+
+	self.table = tableDisplay:tag('table')
+		:addClass('wikitable wikitable-bordered crosstable')
+		:css('margin','0px 13px 13px 0px')
+
+	for rowIndex, opponent in ipairs(self.opponents[2]) do
+		local row = self.table:tag('tr'):addClass('crosstable-tr')
+			:tag('th'):node(OpponentDisplay.BlockOpponent{
+				opponent = opponent,
+				teamStyle = 'icon',
+			}):done()
+		for columnIndex in ipairs(self.opponents[1]) do
+			row:node(self:_displayCell(self.matches[columnIndex][rowIndex]))
+		end
+	end
+
+
+
 	--TODO: build the display based on self.matches, self.opponents and self.config.
 	someBs
+end
+
+---@return Html?
+function CrossTableLeague:_button()
+	if self.config.buttonStyle == 'hidden' then
+		return
+	end
+
+	local openText, closeText = 'Show Aggregate', 'Show Individual'
+	if self.config.isSingle then
+		openText, closeText = 'Show Duplicates', 'Hide Duplicates'
+	end
+
+	local buildButton = function(text, toggleGroup)
+		self.display:tag('span')
+			:attr('data-toggle-area-content', tostring(toggleGroup))
+			:tag('span')
+				:addClass('toggle-area-button btn btn-primary')
+				:attr('data-toggle-area-btn',tostring(3 - toggleGroup))
+				:css('width','150px')
+				:css('margin-bottom','12px')
+				:wikitext(text)
+				:done()
+			:done()
+	end
+
+	buildButton(openText, 1)
+	buildButton(closeText, 2)
 end
 
 
