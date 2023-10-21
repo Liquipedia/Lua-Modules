@@ -39,9 +39,9 @@ local LINK_DATA = {
 local VETO_TYPE_TO_TEXT = {
 	ban = 'BAN',
 	pick = 'PICK',
-	protect = 'PROTECT',
 	decider = 'DECIDER',
 	defaultban = 'DEFAULT BAN',
+	protect = 'PROTECT',
 
 }
 local CustomMatchSummary = {}
@@ -105,6 +105,24 @@ function MapVeto._displayMaps(map1, map2)
 
 	return Logic.isEmpty(map1) and NONE or ('[[' .. map1 .. ']]'),
 		Logic.isEmpty(map2) and NONE or ('[[' .. map2 .. ']]')
+end
+
+---@param map string?
+---@return self
+function MapVeto:addDecider(map)
+	if Logic.isEmpty(map) then
+		map = 'TBD'
+	else
+		map = '[[' .. map .. '|' .. map .. ']]'
+	end
+	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
+
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
+	self:addColumnVetoMap(row, map)
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
+
+	self.table:node(row)
+	return self
 end
 
 ---@param vetoType string?
@@ -206,17 +224,21 @@ function CustomMatchSummary.createBody(match)
 
 	end
 
-		-- Add the Map Vetoes
+	-- Add the Map Vetoes
 	if match.extradata.mapveto then
 		local vetoData = match.extradata.mapveto
 		if vetoData then
 			local mapVeto = MapVeto()
-			if vetoData.vetostart then
-				mapVeto:vetoStart(tonumber(vetoData.vetostart), vetoData.format)
-			end
 
 			for _,vetoRound in ipairs(vetoData) do
-				mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
+				if vetoRound.vetostart then
+					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
+				end
+				if vetoRound.type == 'decider' then
+					mapVeto:addDecider(vetoRound.decider)
+				else
+					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
+				end
 			end
 
 			body:addRow(mapVeto)
@@ -225,7 +247,6 @@ function CustomMatchSummary.createBody(match)
 
 	return body
 end
-
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return Html
