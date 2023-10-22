@@ -22,7 +22,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local MAX_NUM_OPPONENTS = 4
+local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
@@ -168,13 +168,13 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local temporaryScore = -99
+		local temporaryScore
 		local temporaryPlace = -99
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score) or ''
 			counter = counter + 1
-			if counter == 1 and (winner or '') == '' then
+			if counter == 1 and Logic.isNotEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
