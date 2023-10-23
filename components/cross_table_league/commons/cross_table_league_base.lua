@@ -35,7 +35,7 @@ local CrossTableLeague = Class.new()
 
 ---@param args table?
 ---@return self
-function CrossTableLeague:init(args)
+function CrossTableLeague:read(args)
 	self.args = args or {}
 	self.config = self:readConfig()
 	self.opponents = self:readOpponents()

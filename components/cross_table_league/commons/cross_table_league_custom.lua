@@ -16,7 +16,7 @@ local CustomCrossTableLeague = {}
 ---@param args table?
 ---@return Html?
 function CustomCrossTableLeague.run(args)
-	return CrossTableLeague():init(args):query():create()
+	return CrossTableLeague():read(args):query():create()
 end
 
 return Class.export(CustomCrossTableLeague)
