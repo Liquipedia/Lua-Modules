@@ -23,6 +23,7 @@ local PREFIXES = {
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
+	['apple-podcasts'] = {'https://podcasts.apple.com/'},
 	afreeca = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
@@ -152,6 +153,7 @@ local PREFIXES = {
 	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
+	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
 		'https://stratz.com/leagues/',
