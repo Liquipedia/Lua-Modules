@@ -8,7 +8,6 @@
 
 local MatchGroupLegacyDefault = {}
 
-local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
