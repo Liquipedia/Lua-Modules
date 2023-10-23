@@ -23,6 +23,7 @@ local Variables = require('Module:Variables')
 ---@field isQualified boolean?
 ---@field manualFactionCounts table<string, number?>
 ---@field soloColumnWidth number
+---@field soloAsRaceTable boolean
 
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
@@ -60,7 +61,7 @@ function StarcraftParticipantTable.run(frame)
 
 	participantTable:read():store()
 
-	if StarcraftParticipantTable.isPureSolo(participantTable.sections) then
+	if StarcraftParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsRaceTable then
 		participantTable.create = StarcraftParticipantTable.createSoloRaceTable
 	end
 
@@ -87,6 +88,8 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	Array.forEach(Faction.knownFactions, function(faction)
 		config.manualFactionCounts[faction] = tonumber(args[Faction.toName(faction):lower()])
 	end)
+
+	config.soloAsRaceTable = not Logic.readBool(args.soloNotAsRaceTable)
 
 	return config
 end
