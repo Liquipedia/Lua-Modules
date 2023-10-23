@@ -223,7 +223,7 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		local leftIndex = self:_findEntryIndex(self.opponents[1], opponents[1].name)
 		local rightIndex = self:_findEntryIndex(self.opponents[2], opponents[2].name)
 
-		if hasBeenProcessed and not leftIndex or not rightIndex then
+		if hasBeenProcessed and (not leftIndex or not rightIndex) then
 			return
 		elseif not leftIndex or not rightIndex then
 			return p.processMatch(CrossTableLeague._flipMatch(match), true)
