@@ -33,6 +33,7 @@ local Variables = require('Module:Variables')
 ---@field entries StarcraftParticipantTableEntry[]
 
 ---@class StarcraftParticipantTable: ParticipantTable
+---@field config StarcraftParticipantTableConfig
 ---@field isPureSolo boolean
 ---@field _displaySoloRaceTableSection function
 ---@field _displayHeader function
