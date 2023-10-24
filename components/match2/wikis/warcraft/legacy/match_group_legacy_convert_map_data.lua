@@ -122,35 +122,35 @@ function ConvertMapData.teamMulti(args)
 			table.insert(mapPlayers, opponentPlayers[opponentIndex][name2])
 		end
 
+		for mapPrefix, map, submatchMapIndex in Table.iter.pairsByPrefix(args, prefix .. 'map') do
+			mapIndex = mapIndex + 1
+			local parsedPrefix = 'map' .. mapIndex
+			parsedArgs[parsedPrefix] = map
+			parsedArgs[parsedPrefix .. 'win'] = args[prefix .. 'win' .. submatchMapIndex]
 
-
-
-
-
-
+			Array.forEach(mapPlayers, function(players, opponentIndex)
+				Array.forEach(players, function(player, playerIndex)
+					local playerPrefix = parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex
+					parsedArgs[playerPrefix] = player.name
+				end)
+				--only had race and heroes support for 1v1 submatches ...
+				local playerPrefix = parsedPrefix .. 't' .. opponentIndex .. 'p1'
+				parsedArgs[playerPrefix .. 'race'] = args[mapPrefix .. 'p' .. opponentIndex .. 'race']
+				parsedArgs[playerPrefix .. 'heroes'] = args[mapPrefix .. 'p' .. opponentIndex .. 'heroes']
+			end)
+		end
 
 		submatchIndex = submatchIndex + 1
 		prefix = 'm' .. submatchIndex
 	end
 
+	Array.forEach(opponentPlayers, function(players, opponentIndex)
+		Array.forEach(Array.extractValues(players), function(player, playerIndex)
+			parsedArgs['opponent' .. opponentIndex .. '_p' .. playerIndex] = Json.stringify(player)
+		end)
+	end)
 
-
-	--[[
-	{{#if:{{{m1p1|}}}{{{m1p2|}}}{{{m1map1|}}}|{{BracketTeamMatchMulti/row
-|p1={{{m1p1|}}}|p1flag={{{m1p1flag|}}}|p1race={{{m1p1race|}}}|p1link={{{m1p1link|}}}
-|p1-2={{{m1p1-2|}}}|p1-2flag={{{m1p1-2flag|}}}|p1-2race={{{m1p1-2race|}}}|p1-2link={{{m1p1-2link|}}}
-|p2={{{m1p2|}}}|p2flag={{{m1p2flag|}}}|p2race={{{m1p2race|}}}|p2link={{{m1p2link|}}}
-|p2-2={{{m1p2-2|}}}|p2-2flag={{{m1p2-2flag|}}}|p2-2race={{{m1p2-2race|}}}|p2-2link={{{m1p2-2link|}}}
-|p1score={{{m1p1score|0}}}|p2score={{{m1p2score|0}}}|winner={{{m1win|}}}
-|map1={{{m1map1|}}}|map2={{{m1map2|}}}|map3={{{m1map3|}}}|map4={{{m1map4|}}}|map5={{{m1map5|}}}|map6={{{m1map6|}}}|map7={{{m1map7|}}}
-|win1={{{m1win1}}}|win2={{{m1win2}}}|win3={{{m1win3}}}|win4={{{m1win4}}}|win5={{{m1win5}}}|win6={{{m1win6}}}|win7={{{m1win7}}}
-|map1p1heroes={{{m1map1p1heroes|}}}|map2p1heroes={{{m1map2p1heroes|}}}|map3p1heroes={{{m1map3p1heroes|}}}|map4p1heroes={{{m1map4p1heroes|}}}|map5p1heroes={{{m1map5p1heroes|}}}|map6p1heroes={{{m1map6p1heroes|}}}|map7p1heroes={{{m1map7p1heroes|}}}
-|map1p2heroes={{{m1map1p2heroes|}}}|map2p2heroes={{{m1map2p2heroes|}}}|map3p2heroes={{{m1map3p2heroes|}}}|map4p2heroes={{{m1map4p2heroes|}}}|map5p2heroes={{{m1map5p2heroes|}}}|map6p2heroes={{{m1map6p2heroes|}}}|map7p2heroes={{{m1map7p2heroes|}}}
-|map1p1race={{{m1map1p1race|}}}|map2p1race={{{m1map2p1race|}}}|map3p1race={{{m1map3p1race|}}}|map4p1race={{{m1map4p1race|}}}|map5p1race={{{m1map5p1race|}}}|map6p1race={{{m1map6p1race|}}}|map7p1race={{{m1map7p1race|}}}
-|map1p2race={{{m1map1p2race|}}}|map2p2race={{{m1map2p2race|}}}|map3p2race={{{m1map3p2race|}}}|map4p2race={{{m1map4p2race|}}}|map5p2race={{{m1map5p2race|}}}|map6p2race={{{m1map6p2race|}}}|map7p2race={{{m1map7p2race|}}}
-|matchNo=1
-}}}}
-	]]
+	return Json.stringify(parsedArgs)
 end
 
 return Class.export(ConvertMapData)
