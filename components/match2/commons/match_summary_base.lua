@@ -532,7 +532,7 @@ end
 
 ---Default header function
 ---@param match table
----@param options {teamStyle: boolean?, width: string?, noScore:boolean?}?
+---@param options {teamStyle: string?, width: string?, noScore:boolean?}?
 ---@return MatchSummaryHeader
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
@@ -577,7 +577,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
----@param options {teamStyle: boolean?, width: string?, noScore: boolean?}?
+---@param options {teamStyle: string?, width: string?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -604,7 +604,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle: boolean?, width: string?, noScore:boolean?}?
+---@param options {teamStyle: string?, width: string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
