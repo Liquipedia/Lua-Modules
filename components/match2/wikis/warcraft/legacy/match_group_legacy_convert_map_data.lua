@@ -126,6 +126,7 @@ function ConvertMapData.teamMulti(args)
 			mapIndex = mapIndex + 1
 			local parsedPrefix = 'map' .. mapIndex
 			parsedArgs[parsedPrefix] = map
+			parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
 			parsedArgs[parsedPrefix .. 'win'] = args[prefix .. 'win' .. submatchMapIndex]
 
 			Array.forEach(mapPlayers, function(players, opponentIndex)
