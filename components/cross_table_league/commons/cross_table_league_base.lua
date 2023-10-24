@@ -33,15 +33,9 @@ local DEFAULT_WIN = 'W'
 ---@field display Html
 local CrossTableLeague = Class.new()
 
----@param args table?
----@return self
-function CrossTableLeague:read(args)
-	self.args = args or {}
-	self.config = self:readConfig()
-	self.opponents = self:readOpponents()
-
-	return self
-end
+---@class CrossTableLeagueEntry
+---@field opponent standardOpponent
+---@field aliases string[]
 
 ---@class CrossTableLeagueConfig
 ---@field startDate number?
@@ -54,6 +48,16 @@ end
 ---@field queryOrder string
 ---@field dateLess boolean
 ---@field date string
+
+---@param args table?
+---@return self
+function CrossTableLeague:read(args)
+	self.args = args or {}
+	self.config = self:readConfig()
+	self.opponents = self:readOpponents()
+
+	return self
+end
 
 ---@return CrossTableLeagueConfig
 function CrossTableLeague:readConfig()
@@ -89,10 +93,6 @@ function CrossTableLeague:readOpponents()
 
 	return {leftSide, bottomSide or leftSide, isMirrored = not bottomSide}
 end
-
----@class CrossTableLeagueEntry
----@field opponent standardOpponent
----@field aliases string[]
 
 ---@param keyPrefix string?
 ---@param side string?
