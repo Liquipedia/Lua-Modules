@@ -106,7 +106,7 @@ function ConvertMapData.teamMulti(args)
 				flag = args[playerInputPrefix .. 'flag'],
 				race = args[playerInputPrefix .. 'race'],
 			}
-			table.insert(mapPlayers, opponentPlayers[opponentIndex][name])
+			table.insert(mapPlayers[opponentIndex], opponentPlayers[opponentIndex][name])
 
 			--optional second player
 			local player2InputPrefix = prefix .. 'p' .. opponentIndex .. '-2'
@@ -119,7 +119,7 @@ function ConvertMapData.teamMulti(args)
 					race = args[player2InputPrefix .. 'race'],
 				}
 			end
-			table.insert(mapPlayers, opponentPlayers[opponentIndex][name2])
+			table.insert(mapPlayers[opponentIndex], opponentPlayers[opponentIndex][name2])
 		end
 
 		for mapPrefix, map, submatchMapIndex in Table.iter.pairsByPrefix(args, prefix .. 'map') do
