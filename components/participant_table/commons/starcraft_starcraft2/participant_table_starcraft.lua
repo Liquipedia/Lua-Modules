@@ -109,6 +109,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 		flag = sectionArgs[key .. 'flag'] or sectionArgs[prefix .. 'flag'],
 		team = sectionArgs[key .. 'team'] or sectionArgs[prefix .. 'team'],
 		race = sectionArgs[key .. 'race'] or sectionArgs[prefix .. 'race'],
+		dq = sectionArgs[key .. 'dq'] or sectionArgs[prefix .. 'dq'],
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -125,7 +126,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
+		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note or sectionArgs[key .. 'note'],
 		opponent = opponent,
 		name = Opponent.toName(opponent),
