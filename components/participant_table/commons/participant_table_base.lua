@@ -165,6 +165,9 @@ function ParticipantTable:readSection(args)
 		end
 
 		entriesByName[entry.name] = entry
+
+		--needed so index is increased
+		return entry
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
