@@ -343,7 +343,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	local players = {}
 
 	for playerIndex = 1, MAX_NUM_PLAYERS do
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+		local player = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)) or {}
 
 		player.name = Logic.emptyOr(player.name, playersData['p' .. playerIndex],
 			Variables.varDefault(teamName .. '_p' .. playerIndex))
@@ -672,7 +672,9 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 	local playerData = {}
 
 	local numberOfPlayers = 0
+--mw.logObject(map, 'map')
 	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+--mw.logObject(playerInput, prefix)
 		numberOfPlayers = numberOfPlayers + 1
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
