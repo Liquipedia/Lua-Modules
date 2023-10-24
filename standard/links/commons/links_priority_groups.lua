@@ -31,6 +31,7 @@ return {
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
+		'rgl',
 		'royaleapi',
 		'siege-gg',
 		'sk',

@@ -132,6 +132,11 @@ local PREFIXES = {
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
+	rgl = {
+		'https://rgl.gg/Public/LeagueTable?s=',
+		team = 'https://rgl.gg/Public/Team?t=',
+		player = 'https://rgl.gg/Public/PlayerProfile?p=',
+	},
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
