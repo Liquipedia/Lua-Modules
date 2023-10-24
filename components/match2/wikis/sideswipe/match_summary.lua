@@ -146,8 +146,9 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param options {teamStyle: boolean?, width: string?}?
 ---@return SideswipeMatchSummaryHeader
-function CustomMatchSummary.createHeader(match)
+function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
