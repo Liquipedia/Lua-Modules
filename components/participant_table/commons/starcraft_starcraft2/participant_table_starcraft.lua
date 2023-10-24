@@ -96,19 +96,25 @@ end
 
 ---@param sectionArgs table
 ---@param key string|number
+---@param index number
 ---@param config StarcraftParticipantTableConfig
 ---@return StarcraftParticipantTableEntry
-function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
-	local prefix = Logic.isNumeric(key) and ('p' .. key) or key
+function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
+	local prefix = 'p' .. index
+	local valueFromArgs = function(postfix)
+		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
+	end
 
 	--if not a json assume it is a solo opponent
 	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'] or sectionArgs[prefix .. 'link'],
-		flag = sectionArgs[key .. 'flag'] or sectionArgs[prefix .. 'flag'],
-		team = sectionArgs[key .. 'team'] or sectionArgs[prefix .. 'team'],
-		race = sectionArgs[key .. 'race'] or sectionArgs[prefix .. 'race'],
+		link = valueFromArgs('link'),
+		flag = valueFromArgs('flag'),
+		team = valueFromArgs('team'),
+		dq = valueFromArgs('dq'),
+		note = valueFromArgs('note'),
+		race = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -125,11 +131,11 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
-		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		dq = Logic.readBool(opponentArgs.dq),
+		note = opponentArgs.note,
 		opponent = opponent,
 		name = Opponent.toName(opponent),
-		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']) or config.isQualified),
+		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 	}
 end
 
