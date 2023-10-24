@@ -95,7 +95,7 @@ function CustomMatchSummary.getByMatchId(args)
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then
 		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true}))
+		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
 		--here martin can add the buttons for switching between match and reset match
 	--end
 

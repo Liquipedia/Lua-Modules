@@ -165,7 +165,7 @@ end
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch

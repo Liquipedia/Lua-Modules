@@ -532,24 +532,24 @@ end
 
 ---Default header function
 ---@param match table
----@param options {noScore: boolean?}?
+---@param options {teamStyle: teamStyle?, width: string?, noScore:boolean?}?
 ---@return MatchSummaryHeader
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
-
+	local teamStyle = options.teamStyle
 	local header = MatchSummary.Header()
 
 	if options.noScore then
 		return header
-			:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-			:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+			:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
+			:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
 	end
 
 	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left', teamStyle))
 		:leftScore(header:createScore(match.opponents[1]))
 		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
 end
 
 ---Creates a match footer with vods if vods are set
@@ -578,8 +578,9 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
+---@param options {teamStyle: teamStyle?, width: string?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
-function MatchSummary.createMatch(matchData, CustomMatchSummary)
+function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
 		return
 	end
@@ -587,7 +588,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary)
 	local match = Match()
 
 	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-	match:header(createHeader(matchData))
+	match:header(createHeader(matchData, options))
 
 	match:body(CustomMatchSummary.createBody(matchData))
 
@@ -604,7 +605,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options table?
+---@param options {teamStyle: teamStyle?, width: string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
@@ -619,12 +620,12 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then
 		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true}))
+		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
 		--here martin can add the buttons for switching between match and reset match
 	--end
 
 	local createMatch = CustomMatchSummary.createMatch or function(matchData)
-		return MatchSummary.createMatch(matchData, CustomMatchSummary)
+		return MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	end
 	matchSummary:addMatch(createMatch(match))
 	matchSummary:addMatch(createMatch(bracketResetMatch))
