@@ -672,9 +672,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 	local playerData = {}
 
 	local numberOfPlayers = 0
---mw.logObject(map, 'map')
 	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
---mw.logObject(playerInput, prefix)
 		numberOfPlayers = numberOfPlayers + 1
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
