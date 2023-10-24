@@ -431,7 +431,7 @@ function CrossTableLeague:displayCell(rowIndex, columnIndex, toggleArea)
 		CrossTableLeague._getScore(opponents[2]),
 	}
 	if Logic.readBool(match.finished) or self.config.dateLess then
-		body:wikitext(scores[1] .. '-' .. scores[2])
+		body:wikitext(scores[1] .. ':' .. scores[2])
 	else
 		body:wikitext('&nbsp;')
 	end
@@ -519,14 +519,14 @@ function CrossTableLeague:displayTotalCell(rowIndex, columnIndex)
 		:wikitext('<br>')
 		:tag('span')
 			:css('font-size', '80%')
-			:wikitext(table.concat(scores1, '-') .. ', ' .. table.concat(scores2, '-'))
+			:wikitext(table.concat(scores1, ':') .. ', ' .. table.concat(scores2, ':'))
 			:done()
 
 	return mw.html.create('td')
 		:addClass('crosstable-bgc-r' .. totalScores[1] .. '-r' .. totalScores[2])
 		:css('min-width', self.config.cellwidth .. 'px')
 		:attr('data-toggle-area-content', '2')
-		:node(table.concat(totalScores, '-'))
+		:node(table.concat(totalScores, ':'))
 		:node(footer)
 end
 
