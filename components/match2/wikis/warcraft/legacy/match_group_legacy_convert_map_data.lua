@@ -36,7 +36,7 @@ function ConvertMapData.team(args)
 	args = args or {}
 
 	local parsedArgs = Table.filterByKey(args, function(key)
-		return string.match(key, 'map') == nil
+		return string.match(key, 'm%d') == nil
 	end)
 
 	local opponentPlayers = {{}, {}}
@@ -54,7 +54,7 @@ function ConvertMapData.team(args)
 			local name = args[playerInputPrefix .. 'link'] or args[playerInputPrefix] or TBD
 			local player = {
 				name = name,
-				displayname = args[playerInputPrefix] or TBD,
+				displayname = args[playerInputPrefix] or name,
 				flag = args[playerInputPrefix .. 'flag'],
 				race = args[playerInputPrefix .. 'race'],
 			}
@@ -64,6 +64,9 @@ function ConvertMapData.team(args)
 			parsedArgs[playerPrefix .. 'race'] = player.race
 			parsedArgs[playerPrefix .. 'heroes'] = args[playerInputPrefix .. 'heroes']
 		end
+
+		mapIndex = mapIndex + 1
+		prefix = 'm' .. mapIndex
 	end
 
 	Array.forEach(opponentPlayers, function(players, opponentIndex)
@@ -82,9 +85,55 @@ function ConvertMapData.teamMulti(args)
 	args = args or {}
 
 	local parsedArgs = Table.filterByKey(args, function(key)
-		return string.match(key, 'map') == nil
+		return string.match(key, 'm%d') == nil
 	end)
-mw.logObject(args)
+
+	local opponentPlayers = {{}, {}}
+	local mapIndex = 0
+	local submatchIndex = 1
+	local prefix = 'm' .. submatchIndex
+
+	while args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'map1'] do
+		--parse players
+		local mapPlayers = {{}, {}}
+		for opponentIndex = 1, NUMBER_OF_OPPONENTS do
+			local playerInputPrefix = prefix .. 'p' .. opponentIndex
+
+			local name = args[playerInputPrefix .. 'link'] or args[playerInputPrefix] or TBD
+			opponentPlayers[opponentIndex][name] = {
+				name = name,
+				displayname = args[playerInputPrefix] or name,
+				flag = args[playerInputPrefix .. 'flag'],
+				race = args[playerInputPrefix .. 'race'],
+			}
+			table.insert(mapPlayers, opponentPlayers[opponentIndex][name])
+
+			--optional second player
+			local player2InputPrefix = prefix .. 'p' .. opponentIndex .. '-2'
+			local name2 = args[player2InputPrefix .. 'link'] or args[player2InputPrefix]
+			if name2 then
+				opponentPlayers[opponentIndex][name2] = {
+					name = name2,
+					displayname = args[player2InputPrefix] or name,
+					flag = args[player2InputPrefix .. 'flag'],
+					race = args[player2InputPrefix .. 'race'],
+				}
+			end
+			table.insert(mapPlayers, opponentPlayers[opponentIndex][name2])
+		end
+
+
+
+
+
+
+
+
+		submatchIndex = submatchIndex + 1
+		prefix = 'm' .. submatchIndex
+	end
+
+
 
 	--[[
 	{{#if:{{{m1p1|}}}{{{m1p2|}}}{{{m1map1|}}}|{{BracketTeamMatchMulti/row
