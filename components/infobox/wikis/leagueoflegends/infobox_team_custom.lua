@@ -10,14 +10,24 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+
+local REGION_REMAPPINGS = {
+	['south america'] = 'latin america',
+	['asia-pacific'] = 'pacific',
+	['asia'] = 'pacific',
+	['taiwan'] = 'pacific',
+	['southeast asia'] = 'pacific',
+}
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -35,11 +45,12 @@ function CustomTeam.run(frame)
 	team.args.manager = RoleOf.get{role = 'Manager'}
 	team.args.captain = RoleOf.get{role = 'Captain'}
 
-
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.getWikiCategories = CustomTeam.getWikiCategories
+	team._createRegion = CustomTeam._createRegion
+
 	return team:createInfobox()
 end
 
@@ -91,6 +102,26 @@ function CustomTeam:getWikiCategories(args)
 	end
 
 	return categories
+end
+
+function CustomTeam:_createRegion(region)
+	if String.isEmpty(region) then
+		return
+	end
+
+	local regionData = Region.run({region = region})
+	if Table.isEmpty(regionData) then
+		return
+	end
+
+	local remappedRegion = REGION_REMAPPINGS[regionData.region:lower()]
+	if remappedRegion then
+		return CustomTeam:_createRegion(remappedRegion)
+	end
+
+	Variables.varDefine('region', regionData.region)
+
+	return regionData.display
 end
 
 return CustomTeam
