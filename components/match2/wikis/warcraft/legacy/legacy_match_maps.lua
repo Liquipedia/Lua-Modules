@@ -157,6 +157,7 @@ function LegacyMatchMaps.teamInit(frame)
 	matchlistVars:set('matchListTitle', args.title or args[1] or 'Match List')
 	matchlistVars:set('width', args.width or '350px')
 	matchlistVars:set('hide', args.hide or 'true')
+	matchlistVars:set('islegacy', 'true')
 end
 
 -- invoked by Template:MatchMapsTeams
@@ -238,6 +239,7 @@ function LegacyMatchMaps._resetVars()
 	matchlistVars:delete('matchListTitle')
 	matchlistVars:delete('hide')
 	matchlistVars:delete('width')
+	matchlistVars:delete('islegacy')
 end
 
 return LegacyMatchMaps
