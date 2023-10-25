@@ -27,7 +27,6 @@ local REGION_REMAPPINGS = {
 	['philippines'] = 'southeast asia',
 	['singapore'] = 'southeast asia',
 	['malaysia'] = 'southeast asia',
-	['philippines'] = 'southeast asia',
 
 	['bangladesh'] = 'south asia',
 	['pakistan'] = 'south asia',
