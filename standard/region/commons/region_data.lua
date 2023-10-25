@@ -70,6 +70,9 @@ return {
 		jp = 'japan',
 		br = 'brazil',
 		vn = 'vietnam',
+		pk = 'pakistan',
+		id = 'indonesia',
+		th = 'thailand',
 	},
 
 	cis = {
@@ -237,5 +240,17 @@ return {
 	vietnam = {
 		region = 'Vietnam',
 		flag = 'vietnam',
+	},
+	pakistan = {
+		region = 'Pakistan',
+		flag = 'pakistan',
+	},
+	thailand = {
+		region = 'Thailand',
+		flag = 'thailand',
+	},
+	indonesia = {
+		region = 'Indonesia',
+		flag = 'indonesia',
 	},
 }
