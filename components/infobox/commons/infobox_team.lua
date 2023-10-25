@@ -24,6 +24,7 @@ local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -220,7 +221,7 @@ function Team:_createRegion(region)
 		return
 	end
 
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	return Region.display({region = region})
 end
 
 function Team:_createLocation(location)
