@@ -113,7 +113,7 @@ function LegacyMatchMaps._readMaps(args)
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'map' .. mapIndex
 		local map = Table.filterByKey(args, function(key) return String.startsWith(key, prefix) end)
-		local map = Table.map(map, function(key, value)
+		map = Table.map(map, function(key, value)
 			args[key] = nil
 			if key == prefix then
 				return 'map', value
