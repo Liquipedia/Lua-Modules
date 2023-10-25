@@ -46,6 +46,15 @@ return {
 		['latin america north'] = 'latam north',
 		['latin america south'] = 'latam south',
 
+		['apacn'] = 'apac north',
+		['asia pacific north'] = 'apac north',
+		['asia-pacific north'] = 'apac north',
+
+		['apacs'] = 'apac south',
+		['asia pacific south'] = 'apac south',
+		['asia-pacific south'] = 'apac south',
+
+		['ssa'] = 'sub-saharan africa',
 		['sub saharan africa'] = 'sub-saharan africa',
 
 		['global'] = 'world',
@@ -130,7 +139,15 @@ return {
 		flag = 'asia',
 	},
 	apac = {
-		region = 'Asia Pacific',
+		region = 'Asia-Pacific',
+		flag = 'asia-pacific',
+	},
+	['apac north'] = {
+		region = 'Asia-Pacific North',
+		flag = 'asia-pacific',
+	},
+	['apac south'] = {
+		region = 'Asia-Pacific South',
 		flag = 'asia-pacific',
 	},
 	msp = {
