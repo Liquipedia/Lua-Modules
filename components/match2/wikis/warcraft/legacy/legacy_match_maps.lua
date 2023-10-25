@@ -157,7 +157,7 @@ function LegacyMatchMaps.teamInit(frame)
 	matchlistVars:set('matchListTitle', args.title or args[1] or 'Match List')
 	matchlistVars:set('width', args.width or '350px')
 	matchlistVars:set('hide', args.hide or 'true')
-	matchlistVars:set('islegacy', 'true')
+	globalVars:set('islegacy', 'true')
 end
 
 -- invoked by Template:MatchMapsTeams
@@ -234,12 +234,12 @@ function LegacyMatchMaps._resetVars()
 	globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
 	globalVars:set('match_number', 0)
 	globalVars:delete('matchsection')
+	globalVars:delete('islegacy')
 	matchlistVars:delete('store')
 	matchlistVars:delete('bracketid')
 	matchlistVars:delete('matchListTitle')
 	matchlistVars:delete('hide')
 	matchlistVars:delete('width')
-	matchlistVars:delete('islegacy')
 end
 
 return LegacyMatchMaps
