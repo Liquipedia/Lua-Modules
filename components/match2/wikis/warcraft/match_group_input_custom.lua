@@ -293,6 +293,12 @@ function CustomMatchGroupInput._opponentInput(match)
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
 
+		-- Fix legacy winner
+		if Logic.readBool(opponent.win) and Logic.isEmpty(match.winner) then
+			match.winner = tostring(opponentIndex)
+		end
+		opponent.win = nil
+
 		-- Opponent processing (first part)
 		-- Sort out extradata
 		opponent.extradata = {
@@ -672,7 +678,9 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 	local playerData = {}
 
 	local numberOfPlayers = 0
+--mw.logObject(map, 'map')
 	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+--mw.logObject(playerInput, prefix)
 		numberOfPlayers = numberOfPlayers + 1
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
