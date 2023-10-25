@@ -103,7 +103,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 			p1flag = prefix .. 'flag',
 			p1race = prefix .. 'race',
 			p1link = prefix .. 'link',
-			score = prefix .. 'score',
+			score = prefix .. 'score' .. (reset and '2' or ''),
 			win = prefix .. 'win',
 			['$notEmpty$'] = bracketType == 'team' and (prefix .. 'team') or prefix,
 		}
