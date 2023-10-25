@@ -11,7 +11,6 @@ return {
 		europe = 'eu',
 
 		america = 'na',
-		americas = 'na',
 		['north america'] = 'na',
 		['northern america'] = 'na',
 
@@ -90,6 +89,10 @@ return {
 	sa = {
 		region = 'South America',
 		file = 'unasur.png',
+	},
+	americas = {
+		region = 'Americas',
+		flag = 'americas',
 	},
 	['central america'] = {
 		region = 'Central America',
