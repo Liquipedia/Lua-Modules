@@ -221,7 +221,13 @@ function Team:_createRegion(region)
 		return
 	end
 
-	return Region.display({region = region})
+	local regionData = Region.run({region = region})
+	if Table.isNotEmpty(regionData) then
+		Variables.varDefine('region', regionData.region)
+		return regionData.display
+	end
+
+	return
 end
 
 function Team:_createLocation(location)
