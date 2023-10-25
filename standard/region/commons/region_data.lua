@@ -64,6 +64,7 @@ return {
 		sk = 'korea',
 		['south korea'] = 'korea',
 
+		['in'] = 'india',
 		tr = 'turkey',
 		tw = 'taiwan',
 		jp = 'japan',
@@ -208,6 +209,10 @@ return {
 	china = {
 		region = 'China',
 		flag = 'china',
+	},
+	india = {
+		region = 'India',
+		flag = 'india',
 	},
 	korea = {
 		region = 'Korea',
