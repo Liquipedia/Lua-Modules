@@ -64,6 +64,7 @@ return {
 		sk = 'korea',
 		['south korea'] = 'korea',
 
+		tr = 'turkey',
 		tw = 'taiwan',
 		jp = 'japan',
 		br = 'brazil',
@@ -150,6 +151,10 @@ return {
 		region = 'Asia-Pacific South',
 		flag = 'asia-pacific',
 	},
+	['pacific'] = {
+		region = 'Pacific',
+		flag = 'asia',
+	},
 	msp = {
 		region = 'MSP',
 		flag = 'msp',
@@ -207,6 +212,10 @@ return {
 	korea = {
 		region = 'Korea',
 		flag = 'south korea',
+	},
+	turkey = {
+		region = 'Turkey',
+		flag = 'turkey',
 	},
 	taiwan = {
 		region = 'Taiwan',
