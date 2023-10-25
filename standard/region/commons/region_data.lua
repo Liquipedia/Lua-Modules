@@ -49,6 +49,16 @@ return {
 		['sub saharan africa'] = 'sub-saharan africa',
 
 		['global'] = 'world',
+
+		-- "country" regions
+		kr = 'korea',
+		sk = 'korea',
+		['south korea'] = 'korea',
+
+		tw = 'taiwan',
+		jp = 'japan',
+		br = 'brazil',
+		vn = 'vietnam',
 	},
 
 	cis = {
@@ -170,5 +180,31 @@ return {
 	world = {
 		region = 'World',
 		flag = 'world',
+	},
+
+	-- "country" regions
+	china = {
+		region = 'China',
+		flag = 'china',
+	},
+	korea = {
+		region = 'Korea',
+		flag = 'south korea',
+	},
+	taiwan = {
+		region = 'Taiwan',
+		flag = 'taiwan',
+	},
+	japan = {
+		region = 'Japan',
+		flag = 'japan',
+	},
+	brazil = {
+		region = 'Brazil',
+		flag = 'brazil',
+	},
+	vietnam = {
+		region = 'Vietnam',
+		flag = 'vietnam',
 	},
 }
