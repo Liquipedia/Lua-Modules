@@ -79,7 +79,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 
 	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
