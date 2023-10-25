@@ -343,7 +343,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	local players = {}
 
 	for playerIndex = 1, MAX_NUM_PLAYERS do
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+		local player = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)) or {}
 
 		player.name = Logic.emptyOr(player.name, playersData['p' .. playerIndex],
 			Variables.varDefault(teamName .. '_p' .. playerIndex))
