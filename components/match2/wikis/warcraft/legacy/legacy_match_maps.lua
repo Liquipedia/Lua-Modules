@@ -92,7 +92,7 @@ function LegacyMatchMaps._readSoloOpponents(args)
 			return
 		end
 
-		local opponent = {
+		args['opponent' .. opponentIndex] = {
 			type = Opponent.solo,
 			p1 = name,
 			p1flag = args[prefix .. 'flag'],
@@ -105,8 +105,6 @@ function LegacyMatchMaps._readSoloOpponents(args)
 		args[prefix .. 'link'] = nil
 		args[prefix .. 'race'] = nil
 		args[prefix .. 'score'] = nil
-
-		args['opponent' .. opponentIndex] = opponent
 	end)
 end
 
@@ -119,6 +117,9 @@ function LegacyMatchMaps._readMaps(args)
 			args[key] = nil
 			if key == prefix then
 				return 'map', value
+			end
+			if key == prefix .. 'win' then
+				return 'winner', value
 			end
 			local heroesOpponentIndex = string.match(key, '^' .. prefix .. 'p(%d)heroes$')
 			if heroesOpponentIndex then
@@ -144,20 +145,99 @@ end
 -- invoked by Template:MatchListStart
 ---@param frame Frame
 function LegacyMatchMaps.teamInit(frame)
+	local args = Arguments.getArgs(frame)
 
+	local store = Logic.nilOr(
+		Logic.readBoolOrNil(args.store),
+		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
+	)
+
+	matchlistVars:set('store', tostring(store))
+	matchlistVars:set('bracketid', args.id)
+	matchlistVars:set('matchListTitle', args.title or args[1] or 'Match List')
+	matchlistVars:set('width', args.width or '350px')
+	matchlistVars:set('hide', args.hide or 'true')
 end
 
 -- invoked by Template:MatchMapsTeams
 ---@param frame Frame
 function LegacyMatchMaps.teamMatch(frame)
+	local args = Arguments.getArgs(frame)
 
+	args = Table.merge(Json.parseIfString(args.details) or {}, args)
+	args.details = nil
+
+	LegacyMatchMaps._readTeamOpponents(args)
+	--map data gets preprocessed already due to using the same template as in brackets
+	LegacyMatchMaps._readMaps(args)
+
+	Template.stashReturnValue(args, 'LegacyMatchlist')
+end
+
+---@param args table
+function LegacyMatchMaps._readTeamOpponents(args)
+	Array.forEach(Array.range(1, NUMBER_OF_OPPONENTS), function(opponentIndex)
+		local template = args['team' .. opponentIndex]
+		args['team' .. opponentIndex] = nil
+		if template:upper() == BYE then
+			args['opponent' .. opponentIndex] = {type = Opponent.literal, name = BYE}
+			return
+		end
+
+		args['opponent' .. opponentIndex] = {
+			type = Opponent.team,
+			template = template,
+			score = args['games' .. opponentIndex],
+		}
+
+		args['games' .. opponentIndex] = nil
+	end)
 end
 
 -- invoked by Template:MatchListEnd
----@param frame Frame
 ---@return string
-function LegacyMatchMaps.teamClose(frame)
+function LegacyMatchMaps.teamClose()
+	local bracketId = matchlistVars:get('bracketid')
+	assert(bracketId, 'Missing id')
 
+	local store = Logic.readBool(matchlistVars:get('store'))
+	local hide = Logic.readBool(matchlistVars:get('hide'))
+
+	local args = {
+		id = bracketId,
+		isLegacy = true,
+		title = matchlistVars:get('matchListTitle'),
+		width = matchlistVars:get('width'),
+		store = store,
+		noDuplicateCheck = not store,
+		collapsed = hide,
+		attached = hide,
+	}
+
+	local matches = Template.retrieveReturnValues('LegacyMatchlist')
+
+	Array.forEach(matches, function(match, matchIndex)
+		args['M' .. matchIndex] = Match._toEncodedJson(match)
+	end)
+
+	-- generate Display
+	-- this also stores the MatchData
+	local matchHtml = MatchGroup.MatchList(args)
+
+	LegacyMatchMaps._resetVars()
+
+	return matchHtml
+end
+
+function LegacyMatchMaps._resetVars()
+	globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
+	globalVars:set('match_number', 0)
+	globalVars:delete('matchsection')
+	matchlistVars:delete('store')
+	matchlistVars:delete('bracketid')
+	matchlistVars:delete('matchListTitle')
+	matchlistVars:delete('hide')
+	matchlistVars:delete('width')
 end
 
 return LegacyMatchMaps
