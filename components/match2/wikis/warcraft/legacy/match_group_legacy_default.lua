@@ -121,7 +121,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 			round.D = round.D + 1
 		else
 			prefix = 'R' .. round.R .. 'W' .. round.W
-			round.D = round.D + 1
+			round.W = round.W + 1
 		end
 
 		opponents[opponentIndex] = readOpponent(prefix)
