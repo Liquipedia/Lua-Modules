@@ -106,7 +106,7 @@ function ConvertMapData.teamMulti(args)
 				flag = args[playerInputPrefix .. 'flag'],
 				race = args[playerInputPrefix .. 'race'],
 			}
-			table.insert(mapPlayers[opponentIndex], opponentPlayers[opponentIndex][name])
+			table.insert(mapPlayers[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name] or {}))
 
 			--optional second player
 			local player2InputPrefix = prefix .. 'p' .. opponentIndex .. '-2'
@@ -119,7 +119,7 @@ function ConvertMapData.teamMulti(args)
 					race = args[player2InputPrefix .. 'race'],
 				}
 			end
-			table.insert(mapPlayers[opponentIndex], opponentPlayers[opponentIndex][name2])
+			table.insert(mapPlayers[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name2] or {}))
 		end
 
 		for mapPrefix, map, submatchMapIndex in Table.iter.pairsByPrefix(args, prefix .. 'map') do
@@ -136,7 +136,7 @@ function ConvertMapData.teamMulti(args)
 				end)
 				--only had race and heroes support for 1v1 submatches ...
 				local playerPrefix = parsedPrefix .. 't' .. opponentIndex .. 'p1'
-				parsedArgs[playerPrefix .. 'race'] = args[mapPrefix .. 'p' .. opponentIndex .. 'race']
+				parsedArgs[playerPrefix .. 'race'] = args[mapPrefix .. 'p' .. opponentIndex .. 'race'] or players[1].race
 				parsedArgs[playerPrefix .. 'heroes'] = args[mapPrefix .. 'p' .. opponentIndex .. 'heroes']
 			end)
 		end
