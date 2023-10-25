@@ -57,6 +57,7 @@ return {
 		['sub saharan africa'] = 'sub-saharan africa',
 
 		['global'] = 'world',
+		['rest of the world'] = 'rotw',
 
 		-- "country" regions
 		kr = 'korea',
@@ -208,6 +209,10 @@ return {
 	},
 	world = {
 		region = 'World',
+		flag = 'world',
+	},
+	rotw = {
+		region = 'Rest of the World',
 		flag = 'world',
 	},
 
