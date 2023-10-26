@@ -57,18 +57,18 @@ function Squad:title()
 
 	if String.isNotEmpty(titleText) then
 		local titleContainer = mw.html.create('tr')
-	
+
 		local titleRow = mw.html.create('th')
 		titleRow:addClass('large-only')
 			:attr('colspan', '1')
 			:wikitext(titleText)
-	
+
 		local titleRow2 = mw.html.create('th')
 		titleRow2:addClass('large-only')
 			:attr('colspan', '10')
 			:addClass('roster-title-row2-border')
 			:wikitext(titleText)
-	
+
 		titleContainer:node(titleRow):node(titleRow2)
 		self.content:node(titleContainer)
 	end
