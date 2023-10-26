@@ -43,7 +43,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-
 	table.insert(widgets, Cell{
 		name = 'Engine',
 		content = {_args.engine}
