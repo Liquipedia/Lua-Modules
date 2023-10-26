@@ -20,6 +20,7 @@ return {
 		'esea-d',
 		'esl',
 		'esportal',
+		'etf2l',
 		'faceit',
 		'faceit-c',
 		'faceit-hub',
