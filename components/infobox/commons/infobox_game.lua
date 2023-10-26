@@ -106,8 +106,7 @@ function Game:addToLpdb(lpdbData, args)
 end
 
 function Game:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Game
