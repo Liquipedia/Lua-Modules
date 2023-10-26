@@ -21,6 +21,7 @@ return {
 		'esl',
 		'esportal',
 		'faceit',
+		'faceit-l',
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
