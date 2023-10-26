@@ -53,7 +53,7 @@ function Squad:title()
 		defaultTitle = 'Inactive Players'
 	end
 
-	local titleText = String.isEmpty(self.args.title) and defaultTitle or self.args.title
+	local titleText = Logic.emptyOr(self.args.title, defaultTitle)
 
 	if String.isNotEmpty(titleText) then
 		local titleContainer = mw.html.create('tr')
