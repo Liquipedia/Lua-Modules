@@ -81,6 +81,11 @@ local PREFIXES = {
 		player = 'https://play.eslgaming.com/player/',
 	},
 	esportal = {'https://esportal.com/tournament/'},
+	etf2l = {
+		'',
+		team = 'https://etf2l.org/teams/',
+		player = 'https://etf2l.org/forum/user/',
+	},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
 	faceit = {
