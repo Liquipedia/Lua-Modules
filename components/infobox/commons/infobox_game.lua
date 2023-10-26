@@ -97,10 +97,6 @@ function Game:_setLpdbData(args, links)
 	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, lpdbData)
 end
 
---- Allows for overriding this functionality
-function Game:defineCustomPageVariables(args)
-end
-
 function Game:addToLpdb(lpdbData, args)
 	return lpdbData
 end
