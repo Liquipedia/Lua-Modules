@@ -37,7 +37,7 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_player = player
 	_args = player.args
-	
+
 	if String.isEmpty(player.args.team) then
 		player.args.team = PlayerTeamAuto._main{team = 'team'}
 	end
