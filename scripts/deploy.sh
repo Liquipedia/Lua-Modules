@@ -127,7 +127,8 @@ for luaFile in $luaFiles; do
     sleep 4
   fi
 
-  if [[ ! $allModulesDeployed ]]; then
+  if [ "$allModulesDeployed" != true ]; then
+    echo "DEBUG: Some modules were not deployed!"
     exit 1
   fi
 done
