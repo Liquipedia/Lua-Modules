@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 local Squad = Class.new()
