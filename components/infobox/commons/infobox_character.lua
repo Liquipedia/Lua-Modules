@@ -94,7 +94,7 @@ function Character:createInfobox()
 
 	if Namespace.isMain() then
 		infobox:categories(args.informationType or 'Character')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		infobox:categories(table.unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 

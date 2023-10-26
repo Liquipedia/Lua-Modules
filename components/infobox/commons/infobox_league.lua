@@ -257,7 +257,7 @@ function League:createInfobox()
 	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	if self:shouldStore(args) then
-		self.infobox:categories(unpack(self:_getCategories(args)))
+		self.infobox:categories(table.unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, links)
 		self:_setSeoTags(args)
 	end

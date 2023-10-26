@@ -107,7 +107,7 @@ function Weapon:createInfobox()
 	}
 
 	infobox:categories('Weapons')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	infobox:categories(table.unpack(self:getWikiCategories(args)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 

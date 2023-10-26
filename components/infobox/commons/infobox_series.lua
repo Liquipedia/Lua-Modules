@@ -166,7 +166,7 @@ function Series:createInfobox()
 	}
 
 	if self:shouldStore(args) then
-		infobox:categories(unpack(self:_getCategories(args)))
+		infobox:categories(table.unpack(self:_getCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

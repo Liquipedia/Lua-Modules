@@ -55,7 +55,7 @@ function Tool:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Tools', unpack(self:getWikiCategories(args)))
+		infobox:categories('Tools', table.unpack(self:getWikiCategories(args)))
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

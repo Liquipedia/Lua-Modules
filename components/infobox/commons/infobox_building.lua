@@ -97,7 +97,7 @@ function Building:createInfobox()
 	}
 
 	infobox:categories('Buildings')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	infobox:categories(table.unpack(self:getWikiCategories(args)))
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 

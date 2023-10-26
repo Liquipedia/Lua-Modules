@@ -201,7 +201,7 @@ function Team:createInfobox()
 	-- Categories
 	if self:shouldStore(args) then
 		infobox:categories('Teams')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		infobox:categories(table.unpack(self:getWikiCategories(args)))
 	end
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)

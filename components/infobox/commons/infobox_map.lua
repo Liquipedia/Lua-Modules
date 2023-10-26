@@ -56,7 +56,7 @@ function Map:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Maps', unpack(self:getWikiCategories(args)))
+		infobox:categories('Maps', table.unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args)
 	end
 

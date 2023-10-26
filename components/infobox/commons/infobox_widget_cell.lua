@@ -90,8 +90,8 @@ end
 ---@return {[1]: Html?}
 function Cell:make()
 	self:_new(self.name)
-	self:_class(unpack(self.classes or {}))
-	self:_content(unpack(self.content))
+	self:_class(table.unpack(self.classes or {}))
+	self:_content(table.unpack(self.content))
 
 	if self.contentDiv == nil then
 		return {}
