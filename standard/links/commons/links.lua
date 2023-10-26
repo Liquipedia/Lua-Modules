@@ -251,6 +251,7 @@ local ICON_KEYS_TO_RENAME = {
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
+	['faceit-l'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
 	matcherinolink = 'matcherino',
