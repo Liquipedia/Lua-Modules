@@ -81,7 +81,7 @@ function Game:_setLpdbData(args, links)
 		imagedark = args.imagedark,
 		date = args.releasedate,
 		type = 'game',
-		extradata = {		
+		extradata = {
 			developer = args.developer,
 			publisher = args.publisher,
 			platform = args.platform,
