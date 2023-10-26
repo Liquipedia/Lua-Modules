@@ -10,6 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Logic = require('Module:Logic')
+local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
@@ -22,17 +24,13 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
----@class GameInfobox: BasicInfobox
 local Game = Class.new(BasicInfobox)
 
----@param frame Frame
----@return Html
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
----@return Html
 function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -65,11 +63,51 @@ function Game:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain() then
-		infobox:categories('Games')
+	-- Store LPDB data and Wiki-variables
+	if self:shouldStore(args) then
+		self:_setLpdbData(args, links)
+		self:defineCustomPageVariables(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+end
+
+function Game:_setLpdbData(args, links)
+	local name = args.romanized_name or self.name
+
+	local lpdbData = {
+		name = name,
+		image = args.image,
+		imagedark = args.imagedark,
+		date = args.releasedate,
+		type = 'game',
+		extradata = {		
+			developer = args.developer,
+			publisher = args.publisher,
+			platform = args.platform,
+			links = mw.ext.LiquipediaDB.lpdb_create_json(
+				Links.makeFullLinksForTableItems(links or {}, 'game')
+			),
+		}
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, lpdbData)
+end
+
+--- Allows for overriding this functionality
+function Game:defineCustomPageVariables(args)
+end
+
+function Game:addToLpdb(lpdbData, args)
+	return lpdbData
+end
+
+function Game:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Game
