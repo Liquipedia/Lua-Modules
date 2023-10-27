@@ -24,6 +24,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _game
 
+---@param frame Frame
+---@return Html
 function CustomGame.run(frame)
 	local game = Game(frame)
 	
