@@ -10,6 +10,8 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
 
+---@class Namespace
+---@field prefix string
 local Namespace = Class.new(function(self, prefix)
 	self.prefix = prefix
 end)
@@ -47,6 +49,8 @@ function CachedTable:delete(key)
 	self:set(key, nil)
 end
 
+---@class PageVariableNamespace
+---@operator call(string?):Namespace
 local PageVariableNamespace = {}
 
 function PageVariableNamespace.readOptions(options)

@@ -85,17 +85,24 @@ end
 
 ---@param sectionArgs table
 ---@param key string|number
+---@param index number
 ---@param config WarcraftParticipantTableConfig
 ---@return WarcraftParticipantTableEntry
-function CustomParticipantTable:readEntry(sectionArgs, key, config)
+function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
+	local prefix = 'p' .. index
+	local valueFromArgs = function(postfix)
+		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
+	end
 	--if not a json assume it is a solo opponent
 	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'],
-		flag = sectionArgs[key .. 'flag'],
-		team = sectionArgs[key .. 'team'],
-		race = sectionArgs[key .. 'race'],
+		link = valueFromArgs('link'),
+		flag = valueFromArgs('flag'),
+		team = valueFromArgs('team'),
+		dq = valueFromArgs('dq'),
+		note = valueFromArgs('note'),
+		race = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -112,8 +119,8 @@ function CustomParticipantTable:readEntry(sectionArgs, key, config)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
-		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		dq = Logic.readBool(opponentArgs.dq),
+		note = opponentArgs.note,
 		opponent = opponent,
 		name = Opponent.toName(opponent),
 	}
