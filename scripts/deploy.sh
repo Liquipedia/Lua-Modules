@@ -119,6 +119,7 @@ for luaFile in $luaFiles; do
     if [[ "${result}" == "Success" ]]; then
       echo "...${result}"
     else
+      echo "...failed to deploy"
       allModulesDeployed=false
     fi
 
