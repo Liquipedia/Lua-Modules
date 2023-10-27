@@ -70,7 +70,6 @@ function Game:createInfobox()
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		self:defineCustomPageVariables(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
