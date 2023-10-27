@@ -63,9 +63,9 @@ end
 ---@param args table
 ---@return table
 function CustomGame:addToLpdb(lpdbData, args)
-	lpdbData.extradata.engine = _args.engine
-	lpdbData.extradata.genre = _args.genre
-	lpdbData.extradata.mode = _args.mode
+	lpdbData.extradata.engine = args.engine
+	lpdbData.extradata.genre = args.genre
+	lpdbData.extradata.mode = args.mode
 	
 	return lpdbData
 end
