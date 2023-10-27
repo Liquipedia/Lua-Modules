@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 
-local config = Lua.loadDataIfExists('Module:Match/Config') or {}
+local config = Lua.requireIfExists('Module:Match/Config', {requireDevIfEnabled = true, loadData = true}) or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
@@ -31,7 +31,6 @@ local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = '
 local _DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 30
-local _MAX_NUM_VETOS = 6
 local _MAX_NUM_VODGAMES = 9
 local _DEFAULT_BEST_OF = 99
 local _OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
@@ -110,7 +109,7 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
 		if matchUnixTime + threshold < currentUnixTime then
@@ -156,28 +155,24 @@ end
 function StarcraftMatchGroupInput._getExtraData(match)
 	local extradata
 	if Logic.readBool(match.ffa) then
-		extradata = getStarcraftFfaInputModule().getExtraData(match)
-	else
-		extradata = {
-			noQuery = match.noQuery,
-			casters = match.casters,
-			headtohead = match.headtohead,
-			ffa = 'false',
-		}
+		match.extradata = getStarcraftFfaInputModule().getExtraData(match)
+		return match
+	end
 
-		for vetoIndex = 1, _MAX_NUM_VETOS do
-			extradata = StarcraftMatchGroupInput._getVeto(
-				extradata,
-				match['veto' .. vetoIndex],
-				match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex],
-				vetoIndex
-			)
-		end
+	extradata = {
+		noQuery = match.noQuery,
+		casters = match.casters,
+		headtohead = match.headtohead,
+		ffa = 'false',
+	}
 
-		for subGroupIndex = 1, _MAX_NUM_MAPS do
-			extradata['subGroup' .. subGroupIndex .. 'header']
-				= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-		end
+	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
+		StarcraftMatchGroupInput._getVeto(extradata, vetoMap, match, prefix, vetoIndex)
+	end
+
+	for subGroupIndex = 1, _MAX_NUM_MAPS do
+		extradata['subGroup' .. subGroupIndex .. 'header']
+			= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	end
 
 	match.extradata = extradata
@@ -185,11 +180,10 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	return match
 end
 
-function StarcraftMatchGroupInput._getVeto(extradata, map, vetoBy, vetoIndex)
-	extradata['veto' .. vetoIndex] = (map ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
-	extradata['veto' .. vetoIndex .. 'by'] = vetoBy
-
-	return extradata
+function StarcraftMatchGroupInput._getVeto(extradata, map, match, prefix, vetoIndex)
+	extradata[prefix] = map and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
+	extradata[prefix .. 'by'] = match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex]
+	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
 function StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
@@ -219,10 +213,6 @@ function StarcraftMatchGroupInput._adjustData(match)
 		if Logic.isNotEmpty(vodgame) and Logic.isNotEmpty(match['map' .. index]) then
 			match['map' .. index].vod = match['map' .. index].vod or vodgame
 		end
-	end
-
-	if string.find(match.mode, 'team') then
-		match = StarcraftMatchGroupInput._subMatchStructure(match)
 	end
 
 	match = StarcraftMatchGroupInput._matchWinnerProcessing(match)
@@ -360,69 +350,6 @@ function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 				end
 			end
 		end
-	end
-
-	return match
-end
-
-function StarcraftMatchGroupInput._subMatchStructure(match)
-	local subMatches = {}
-	local numberOfMaps = 0
-
-	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
-		local subGroupIndex = map.subgroup
-
-		--create a new sub-match if necessary
-		subMatches[subGroupIndex] = subMatches[subGroupIndex] or {
-			date = map.date,
-			game = map.game,
-			liquipediatier = map.liquipediatier,
-			liquipediatiertype = map.liquipediatiertype,
-			participants = Table.deepCopy(map.participants or {}),
-			mode = map.mode,
-			resulttype = 'submatch',
-			subgroup = subGroupIndex,
-			extradata = {
-				header = Logic.emptyOr(
-					match['subGroup' .. subGroupIndex .. 'header'],
-					match['subgroup' .. subGroupIndex .. 'header'],
-					match['submatch' .. subGroupIndex .. 'header']
-				),
-				noQuery = match.noQuery,
-				matchsection = Variables.varDefault('matchsection'),
-				featured = match.publishertier,
-				isSubMatch = 'true',
-				opponent1 = map.extradata.opponent1,
-				opponent2 = map.extradata.opponent2,
-			},
-			type = match.type,
-			scores = {0, 0},
-			winner = 0
-		}
-
-		--adjust sub-match scores
-		if map.map and String.startsWith(map.map, 'Submatch') then
-			for opponentIndex, score in ipairs(subMatches[subGroupIndex].scores) do
-				subMatches[subGroupIndex].scores[opponentIndex] = score + (map.scores[opponentIndex] or 0)
-			end
-		else
-			local winner = tonumber(map.winner) or ''
-			if subMatches[subGroupIndex].scores[winner] then
-				subMatches[subGroupIndex].scores[winner] = subMatches[subGroupIndex].scores[winner] + 1
-			end
-		end
-		numberOfMaps = mapIndex
-	end
-
-	for subMatchIndex, subMatch in ipairs(subMatches) do
-		--get winner
-		if subMatch.scores[1] > subMatch.scores[2] then
-			subMatch.winner = 1
-		elseif subMatch.scores[2] > subMatch.scores[1] then
-			subMatch.winner = 2
-		end
-
-		match['map' .. (numberOfMaps + subMatchIndex)] = subMatch
 	end
 
 	return match
@@ -689,15 +616,20 @@ end
 function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	local players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
+		local prefix = teamName .. '_p' .. playerIndex
+		local name = Variables.varDefault(prefix)
 		if Logic.isNotEmpty(name) then
-			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-			players[playerIndex] = {
+			---@cast name -nil
+			local player = {
 				name = name:gsub(' ', '_'),
-				displayname = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'display'),
-				flag = Flags.CountryName(flag),
-				extradata = {faction = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')}
+				displayname = Variables.varDefault(prefix .. 'dn'),
+				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
+				extradata = {faction = Variables.varDefault(prefix .. 'race')}
 			}
+			if player.displayname then
+				Variables.varDefine(player.displayname .. '_page', player.name)
+			end
+			table.insert(players, player)
 		else
 			break
 		end
@@ -725,7 +657,7 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 		opponent.extradata.short = Logic.emptyOr(opponent.short, opponent.name, opponent[1] or '')
 		opponent.extradata.bracket = Logic.emptyOr(opponent.bracket, opponent.name, opponent[1] or '')
 	else
-		opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], ''))
+		opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], '')--[[@as string]])
 		if String.isEmpty(opponent.template) then
 			opponent.template = 'tbd'
 		end
@@ -785,9 +717,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- set initial extradata for maps
 	map.extradata = {
-		comment = map.comment or '',
-		header = map.header or '',
-		isSubMatch = 'false',
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		header = map.header,
 		noQuery = match.noQuery,
 		server = map.server,
 	}

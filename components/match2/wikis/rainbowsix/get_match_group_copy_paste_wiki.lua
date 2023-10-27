@@ -53,7 +53,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 	for i = 1, bestof do
 		out = out .. '\n\t|map' .. i .. '={{Map|map='
-		if not mapDetails then
+		if showScore then
 			out = out .. '|score1=|score2='
 		end
 		out = out .. '|finished='

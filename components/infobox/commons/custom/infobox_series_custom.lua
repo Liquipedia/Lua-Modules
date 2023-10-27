@@ -12,6 +12,8 @@ local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
 local CustomSeries = {}
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	return series:createInfobox()

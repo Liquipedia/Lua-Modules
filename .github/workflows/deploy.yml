@@ -48,12 +48,22 @@ jobs:
             components/**/*.lua
             standard/**/*.lua
 
-      - name: Deploy
+      - name: Deploy Old Dev
         if: steps.changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
           WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL }}
+          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
+        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+
+      - name: Deploy New Dev
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
+          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL2 }}
           DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
         run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"

@@ -19,7 +19,7 @@ local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki', {requireDe
 local getArgs = require('Module:Arguments').getArgs
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local BracketAlias = Lua.loadDataIfExists('Module:BracketAlias')
+local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {requireDevIfEnabled = true, loadData = true})
 
 local copyPaste = {}
 

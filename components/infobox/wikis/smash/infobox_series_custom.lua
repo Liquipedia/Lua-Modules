@@ -21,6 +21,8 @@ local CustomSeries = {}
 
 local _series
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	_series = Series(frame)
 
@@ -31,10 +33,14 @@ function CustomSeries.run(frame)
 	return _series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		return {
@@ -47,6 +53,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@return table
 function CustomSeries:addToLpdb(lpdbData)
 	lpdbData.game = _series.args.game or 'none'
 	lpdbData.launcheddate = _series.args.sdate

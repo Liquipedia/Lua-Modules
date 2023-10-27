@@ -227,7 +227,9 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
-	local date = DateExt.toYmdInUtc(Logic.emptyOr(options.date, DateExt.getContextualDateOrNow()))
+	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
+	---@cast dateInput -nil
+	local date = DateExt.toYmdInUtc(dateInput)
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}

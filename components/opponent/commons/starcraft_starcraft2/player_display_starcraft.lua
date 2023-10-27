@@ -39,6 +39,7 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 	abbreviateTbd = 'boolean?',
+	note = 'string?',
 }
 
 --[[
@@ -50,7 +51,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
+	local nameNode = html.create(props.dq and 's' or 'span')
 		:wikitext(
 			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and player.pageName
@@ -58,6 +59,14 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
+
+	if props.note then
+		nameNode = mw.html.create('span'):addClass('name')
+			:node(nameNode)
+			:tag('sup'):addClass('note'):wikitext(props.note):done()
+	else
+		nameNode:addClass('name')
+	end
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
@@ -135,7 +144,7 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		displayName = args[1],
 		flag = args.flag,
 		pageName = args.link,
-		race = StarcraftPlayerExt.readRace(args.race),
+		race = Faction.read(args.race),
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,

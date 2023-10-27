@@ -195,7 +195,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 	elseif data.player then
 		-- TODO: sanity checks
 		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|?([^|]-)%]%]')
-		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
 		data.participant = String.nilIfEmpty(data.participant)
 		data.participantdisplay = String.nilIfEmpty(data.participantdisplay)

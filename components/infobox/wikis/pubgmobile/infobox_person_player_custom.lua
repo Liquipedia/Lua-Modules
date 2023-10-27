@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
-local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -146,24 +145,23 @@ function CustomPlayer._createRole(key, role)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+	if Player:shouldStoreData(_args) then
 		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of player', {player = _pagename})
 	end
 end
 
 function CustomPlayer._isPlayerOrStaff()
-local roleData
-if String.isNotEmpty(_args.role) then
-	roleData = _ROLES[_args.role:lower()]
-end
--- If the role is missing, assume it is a player
-if roleData and roleData.isplayer == false then
-	return 'staff'
-else
-	return 'player'
-end
+	local roleData
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
+	end
+	-- If the role is missing, assume it is a player
+	if roleData and roleData.isplayer == false then
+		return 'staff'
+	else
+		return 'player'
+	end
 end
 
 return CustomPlayer

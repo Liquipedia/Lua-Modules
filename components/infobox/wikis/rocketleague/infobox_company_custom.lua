@@ -21,6 +21,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell({
 		name = 'Epic Creator Code',
@@ -29,6 +31,8 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param frame Frame
+---@return Html
 function CustomCompany.run(frame)
 	local company = Company(frame)
 	company.createWidgetInjector = CustomCompany.createWidgetInjector
@@ -36,6 +40,7 @@ function CustomCompany.run(frame)
 	return company:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomCompany:createWidgetInjector()
 	return CustomInjector()
 end

@@ -129,7 +129,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	end
 	opponentArgs[prefix] = name
 	opponentArgs[prefix .. 'link'] = link
-	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
 	-- get the race
 	-- first remove the flag so that only 1 image is left

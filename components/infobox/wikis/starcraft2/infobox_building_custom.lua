@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
@@ -21,8 +22,10 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
+---@class CustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
 
+---@class CustomWidgetInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
@@ -31,9 +34,9 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
 local _args
-local _race
-local _building_attributes = {}
 
+---@param frame Frame
+---@return Html
 function CustomBuilding.run(frame)
 	local building = Building(frame)
 	_args = building.args
@@ -42,15 +45,22 @@ function CustomBuilding.run(frame)
 
 	building.nameDisplay = CustomBuilding.nameDisplay
 	building.setLpdbData = CustomBuilding.setLpdbData
+	building.getWikiCategories = CustomBuilding.getWikiCategories
 	building.createWidgetInjector = CustomBuilding.createWidgetInjector
+
 	return building:createInfobox()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{name = 'Size', content = {_args.size}})
-	table.insert(widgets, Cell{name = 'Sight', content = {_args.sight}})
-	table.insert(widgets, Cell{name = 'Energy', content = {_args.energy}})
-	table.insert(widgets, Cell{name = 'Detection/Attack Range', content = {_args.detection_range}})
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Size', content = {_args.size}},
+		Cell{name = 'Sight', content = {_args.sight}},
+		Cell{name = 'Energy', content = {_args.energy}},
+		Cell{name = 'Detection/Attack Range', content = {_args.detection_range}}
+	)
 
 	if _args.game ~= GAME_LOTV then
 		table.insert(widgets, Center{content = {
@@ -63,11 +73,14 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _race,
+				faction = _args.race,
 				minerals = _args.min,
 				mineralsTotal = _args.totalmin,
 				mineralsForced = true,
@@ -116,10 +129,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return CustomWidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string
 function CustomBuilding:_defenseDisplay()
 	local display = ICON_HP .. ' ' .. (_args.hp or 0)
 	if _args.shield then
@@ -127,41 +142,45 @@ function CustomBuilding:_defenseDisplay()
 	end
 	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
 
-	if _args.light then
-		table.insert(_building_attributes, 'Light')
+	return display .. ' ' .. table.concat(CustomBuilding._getAttributes(_args, true), ', ')
+end
+
+---@param args table
+---@param makeLink boolean?
+---@return string[]
+function CustomBuilding._getAttributes(args, makeLink)
+	local race = Faction.read(args.race) or Faction.defaultFaction
+	local attributes = {}
+
+	if args.light then
+		table.insert(attributes, 'Light')
 	else
-		table.insert(_building_attributes, 'Armored')
+		table.insert(attributes, 'Armored')
 	end
-	table.insert(_building_attributes, 'Structure')
-	if _race == 't' then
-		table.insert(_building_attributes, 'Mechanical')
-	elseif _race == 'z' then
-		table.insert(_building_attributes, 'Biological')
+	table.insert(attributes, 'Structure')
+	if race == 't' then
+		table.insert(attributes, 'Mechanical')
+	elseif race == 'z' then
+		table.insert(attributes, 'Biological')
 	end
-	return display .. ' ' .. '[[' .. table.concat(_building_attributes, ']], [[') .. ']]'
+
+	if makeLink then
+		return Array.map(attributes, function(attribute) return '[[' .. attribute .. ']]' end)
+	end
+
+	return attributes
 end
 
+---@param args table
+---@return string
 function CustomBuilding:nameDisplay(args)
-	local raceIcon = CustomBuilding._getRace(args.race or 'unknown')
-	local name = args.name or self.pagename
+	local raceIcon = Faction.Icon{size = 'large', faction = args.race or Faction.defaultFaction}
+	raceIcon = raceIcon and (raceIcon .. '&nbsp;') or ''
 
-	return raceIcon .. '&nbsp;' .. name
+	return raceIcon .. (args.name or self.pagename)
 end
 
-function CustomBuilding._getRace(race)
-	_race = Faction.read(race)
-	local category = Faction.toName(_race)
-	local display = Faction.Icon{size = 'large', faction = _race} or ''
-	if not category and _race ~= 'unknown' then
-		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	elseif category then
-		category = '[[Category:' .. category .. ' Buildings]]'
-	end
-
-	return display .. (category or '')
-end
-
+---@return string?
 function CustomBuilding:_getHotkeys()
 	local display
 	if not String.isEmpty(_args.hotkey) then
@@ -175,10 +194,11 @@ function CustomBuilding:_getHotkeys()
 	return display
 end
 
+---@param args table
 function CustomBuilding:setLpdbData(args)
-	local lpdbData = {
+	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. (args.name or ''), {
 		name = args.name,
-		type = 'Building information ' .. _race,
+		type = 'Building information ' .. (Faction.read(args.race) or ''),
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
@@ -192,7 +212,7 @@ function CustomBuilding:setLpdbData(args)
 			hp = args.hp,
 			shield = args.shield,
 			armor = args.armor or 1,
-			attributes = table.concat(_building_attributes, ', '),
+			attributes = table.concat(CustomBuilding._getAttributes(args), ', '),
 			hotkey = (args.hotkey or '') .. (args.hotkey2 ~= nil and (', ' .. args.hotkey2) or ''),
 			energy = args.energy,
 			size = args.size,
@@ -213,8 +233,19 @@ function CustomBuilding:setLpdbData(args)
 			range = args.range,
 			cooldown = args.cooldown,
 		}),
-	}
-	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', lpdbData)
+	})
+end
+
+---@param args table
+---@return string[]
+function CustomBuilding:getWikiCategories(args)
+	local race = Faction.read(args.race)
+
+	if not race then
+		return {}
+	end
+
+	return {Faction.toName(race) .. ' Buildings'}
 end
 
 return CustomBuilding

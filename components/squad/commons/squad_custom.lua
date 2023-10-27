@@ -83,6 +83,7 @@ function CustomSquad._playerRow(player, squadType)
 		captain = player.captain,
 		role = player.role,
 		team = player.team,
+		date = player.leavedate or player.inactivedate or player.leavedate,
 	}
 	row:name{name = player.name}
 	row:role{role = player.role}

@@ -37,6 +37,8 @@ local CustomSeries = {}
 local _args
 local _series
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
@@ -53,10 +55,13 @@ function CustomSeries.run(frame)
 	return series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Game version',
@@ -94,6 +99,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return string?
 function CustomSeries._getSeriesPrizepools()
 	local seriesTotalPrizeInput = Json.parseIfString(_args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or _args.series or mw.title.getCurrentTitle().text
@@ -107,6 +113,9 @@ function CustomSeries._getSeriesPrizepools()
 	}
 end
 
+---@param game string?
+---@param patch string?
+---@return string
 function CustomSeries._getGameVersion(game, patch)
 	local shouldUseAutoPatch = Logic.readBool(_args.autopatch or true)
 	local modName = _args.modname
@@ -150,8 +159,10 @@ function CustomSeries._getGameVersion(game, patch)
 	return gameVersion .. patchDisplay
 end
 
+---@param dateEntry string?
+---@return string|osdate
 function CustomSeries._retrievePatchDate(dateEntry)
-	return String.isNotEmpty(dateEntry)
+	return String.isNotEmpty(dateEntry) ---@cast dateEntry -nil
 		and dateEntry:lower() ~= 'tbd'
 		and dateEntry:lower() ~= 'tba'
 		and dateEntry or TODAY
@@ -184,12 +195,17 @@ function CustomSeries._addCustomVariables()
 	end
 end
 
+---@param lpdbData table
+---@return table
 function CustomSeries:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
 	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
 	return lpdbData
 end
 
+---@param date string?
+---@param edate string?
+---@param sdate string?
 function CustomSeries._setDateMatchVar(date, edate, sdate)
 	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
 	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
@@ -198,6 +214,8 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
 
+---@param ... string
+---@return string?
 function CustomSeries._validDateOr(...)
 	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
 

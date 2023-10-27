@@ -49,7 +49,7 @@ function suite:testFilter()
 	))
 end
 
-function suite:testFlattern()
+function suite:testFlatten()
 	local a = {1, 2, 3, {5, 3}, {6, 4}}
 	self:assertDeepEquals({1, 2, 3, 5, 3, 6, 4}, Array.flatten(a))
 end

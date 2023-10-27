@@ -11,6 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -39,9 +40,10 @@ local Achievements = {}
 ---@field playerLimit integer?
 
 ---Entry point for achievements icons in infobox player
----@param args AchievementIconsArgs
+---@param args AchievementIconsArgs?
 ---@return string?
 function Achievements.player(args)
+	if not Namespace.isMain() then return end
 	args = args or {}
 	local options = Achievements._readOptions(args)
 
@@ -62,7 +64,7 @@ end
 ---@param player string
 ---@param onlySolo boolean
 ---@param playerLimit integer
----@return unknown
+---@return string
 function Achievements._playerConditions(player, onlySolo, playerLimit)
 	player = player:gsub(' ', '_')
 	local playerNoUnderScore = player:gsub('_', ' ')
@@ -80,10 +82,11 @@ function Achievements._playerConditions(player, onlySolo, playerLimit)
 end
 
 ---Entry point for infobox team to fetch both team achievements and solo achievements while on team as sep. icon strings
----@param args AchievementIconsArgs
+---@param args AchievementIconsArgs?
 ---@return string? #Team Achievements icon string
 ---@return string? #Solo Achievements while on team icon string
 function Achievements.teamAndTeamSolo(args)
+	if not Namespace.isMain() then return end
 	local historicalPages = Achievements._getTeamNames()
 	local options = Achievements._readOptions(args)
 
@@ -92,9 +95,10 @@ function Achievements.teamAndTeamSolo(args)
 end
 
 ---Entry point for infobox team to fetch solo achievements while on team as icon strings
----@param args AchievementIconsArgs
+---@param args AchievementIconsArgs?
 ---@return string?
 function Achievements.teamSolo(args)
+	if not Namespace.isMain() then return end
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(
@@ -102,9 +106,10 @@ function Achievements.teamSolo(args)
 end
 
 ---Entry point for infobox team to fetch team achievements as icon strings
----@param args AchievementIconsArgs
+---@param args AchievementIconsArgs?
 ---@return string?
 function Achievements.team(args)
+	if not Namespace.isMain() then return end
 	local options = Achievements._readOptions(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(

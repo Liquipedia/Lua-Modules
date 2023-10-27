@@ -62,6 +62,7 @@ function Import._getConfig(args, placements)
 	end
 
 	return {
+		ignoreNonScoreEliminations = Logic.readBool(args.ignoreNonScoreEliminations),
 		importLimit = Import._importLimit(args.importLimit, placements),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
@@ -254,7 +255,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
 				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
-			)
+			) and (not Import.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
 
@@ -289,7 +290,7 @@ end
 -- Computes the placements of a LPDB bracket
 -- @options.importWinners: Whether to include placements for non-eliminated opponents.
 function Import._computeBracketPlacementGroups(bracket, options)
-	local firstDeRoundIndex = Import._findDeRoundIndex(bracket)
+	local firstDropdownRoundIndexes = Import._findBracketFirstDropdownRounds(bracket)
 	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
 
 	local function getGroupKeys(matchId)
@@ -314,24 +315,33 @@ function Import._computeBracketPlacementGroups(bracket, options)
 			return {}
 
 		else
-			local groupKeys = {}
+			local function shouldImportKnockedOutOpponents()
+				if bracket.bracketDatasById[matchId].qualLose and not options.importWinners then
+					return false
+				elseif coordinates.sectionIndex == #bracket.sections then
+					-- Always include lowest bracket section
+					return true
+				elseif not firstDropdownRoundIndexes[coordinates.sectionIndex] then
+					-- No dropdown opponents for this level
+					return false
+				elseif coordinates.roundIndex < firstDropdownRoundIndexes[coordinates.sectionIndex] then
+					-- Also include opponents directly knocked out from an upper bracket
+					return true
+				end
+				return false
+			end
 
-			-- Winners of root matches
+			local groupKeys = {}
 			if coordinates.depth == 0 and options.importWinners then
+				-- Winners of root matches
 				table.insert(groupKeys, {0, coordinates.sectionIndex, 1})
 				-- in case of qualLose also Loser of root match if not lower bracket (lower bracket gets handled below)
 				if bracket.bracketDatasById[matchId].qualLose and coordinates.sectionIndex ~= #bracket.sections then
 					table.insert(groupKeys, {0, coordinates.sectionIndex, 2})
 				end
 			end
-
-			-- Opponents knocked out from sole section (se) or lower bracket (de)
-			if (not bracket.bracketDatasById[matchId].qualLose or options.importWinners) and (
-				coordinates.sectionIndex == #bracket.sections
-
-				-- Include opponents directly knocked out from the upper bracket
-				or firstDeRoundIndex and coordinates.roundIndex < firstDeRoundIndex) then
-
+			if shouldImportKnockedOutOpponents() then
+				-- Opponents knocked out from sole section (se) or lower sections (de/te/etc.)
 				table.insert(groupKeys, {2, coordinates.depth, 2})
 			end
 
@@ -377,23 +387,21 @@ function Import._getPreTiebreakMatchIds(bracket)
 	return sfMatchIds
 end
 
--- Finds the first round in where upper bracket opponents drop to the lower
--- bracket. Returns nil if it cannot be determined unambiguously, or if the
--- bracket is not double elimination.
-function Import._findDeRoundIndex(bracket)
-	if #bracket.sections ~= 2 then
-		return
-	end
+-- Gets the first round of each level (section) of a bracket where losers drop to the level below.
+-- Returns empty array if the bracket is single elimination. If no losers drop to a lower level, then
+-- the array will contain `-1` for that level.
+---@return number[]
+function Import._findBracketFirstDropdownRounds(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
+	local roundIndexes = Array.range(1, #bracket.rounds)
 
-	for roundIndex = 1, #bracket.rounds do
-		local lbCount = countsByRound[roundIndex][2]
-		if lbCount == 0 then
-			return roundIndex
-		elseif lbCount > 0 then
-			return
-		end
-	end
+	return Array.map(Array.range(2, #bracket.sections), function(sectionIndex)
+		local firstRoundWithPositiveCount = Array.find(roundIndexes, function(roundIndex)
+			return countsByRound[roundIndex][sectionIndex] >= 0 end)
+
+		return firstRoundWithPositiveCount and countsByRound[firstRoundWithPositiveCount][sectionIndex] == 0
+			and firstRoundWithPositiveCount or -1
+	end)
 end
 
 function Import._mergePlacements(lpdbEntries, placements)

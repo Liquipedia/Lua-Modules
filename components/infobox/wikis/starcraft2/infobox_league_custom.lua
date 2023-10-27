@@ -10,7 +10,6 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -24,6 +23,7 @@ local Variables = require('Module:Variables')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -100,18 +100,17 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'customcontent' then
-		--player breakdown
-		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
+		local raceBreakdown = RaceBreakdown.run(_args) or {}
 		local playerBreakDownEvent = CustomLeague._playerBreakDownEvent() or {}
-		--make playerNumber available for commons category check
-		_args.player_number = playerRaceBreakDown.playerNumber or playerBreakDownEvent.playerNumber
-		local playerNumber = _args.player_number or 0
-		Variables.varDefine('tournament_playerNumber', playerNumber)
-		if playerNumber > 0 then
-			table.insert(widgets, Title{name = 'Player breakdown'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {playerNumber}})
-			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
-			table.insert(widgets, Breakdown{content = playerBreakDownEvent.display, classes = {'infobox-center'}})
+		_args.player_number = raceBreakdown.total or playerBreakDownEvent.playerNumber
+
+		if _args.player_number and _args.player_number > 0 then
+			Array.appendWith(widgets,
+				Title{name = 'Player Breakdown'},
+				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }},
+				Breakdown{content = playerBreakDownEvent.display, classes = {'infobox-center'}}
+			)
 		end
 
 		--teams section
@@ -366,39 +365,6 @@ function CustomLeague._playerBreakDownEvent()
 	return playerBreakDown or {}
 end
 
-function CustomLeague._playerRaceBreakDown()
-	local playerBreakDown = {}
-	local playerNumber = tonumber(_args.player_number) or 0
-	local zergNumber = tonumber(_args.zerg_number) or 0
-	local terranNumbner = tonumber(_args.terran_number) or 0
-	local protossNumber = tonumber(_args.protoss_number) or 0
-	local randomNumber = tonumber(_args.random_number) or 0
-	if playerNumber == 0 then
-		playerNumber = zergNumber + terranNumbner + protossNumber + randomNumber
-	end
-
-	if playerNumber > 0 then
-		playerBreakDown.playerNumber = playerNumber
-		if zergNumber + terranNumbner + protossNumber + randomNumber > 0 then
-			playerBreakDown.display = {}
-			if protossNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'p'} .. ' ' .. protossNumber)
-			end
-			if terranNumbner > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 't'} .. ' ' .. terranNumbner)
-			end
-			if zergNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'z'} .. ' ' .. zergNumber)
-			end
-			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r'} .. ' ' .. randomNumber)
-			end
-		end
-	end
-
-	return playerBreakDown or {}
-end
-
 function CustomLeague:_makeBasedListFromArgs(prefix)
 	local foundArgs = {}
 	for key, linkValue in Table.iter.pairsByPrefix(_args, prefix) do
@@ -483,11 +449,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	local participantsNumber = tonumber(Variables.varDefault('tournament_playerNumber')) or 0
-	if participantsNumber == 0 then
-		participantsNumber = args.team_number or 0
-	end
-	lpdbData.participantsnumber = participantsNumber
 	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
 	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
 

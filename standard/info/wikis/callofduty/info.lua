@@ -30,7 +30,7 @@ return {
 			link = 'Call of Duty: Black Ops',
 			logo = {
 				darkMode = 'Call of Duty Black Ops darkmode.png',
-				lightMode = 'Call of Duty Black Ops Logo.png',
+				lightMode = 'Call of Duty Black Ops lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -82,7 +82,7 @@ return {
 			link = 'Black Ops Cold War',
 			logo = {
 				darkMode = 'Call of Duty Black Ops Cold War darkmode.png',
-				lightMode = 'COD ColdWar Teamcard.png',
+				lightMode = 'Call of Duty Black Ops Cold War lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -160,7 +160,7 @@ return {
 			link = 'Call of Duty: Ghosts',
 			logo = {
 				darkMode = 'Call of Duty Ghosts darkmode.png',
-				lightMode = 'COD Ghosts TeamCardImage.png',
+				lightMode = 'Call of Duty Ghosts lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -232,6 +232,19 @@ return {
 				lightMode = 'Call of Duty Default Lightmode.png',
 			},
 		},
+		mwiii = {
+			abbreviation = 'MWIII',
+			name = 'Call of Duty: Modern Warfare III',
+			link = 'Call of Duty: Modern Warfare III',
+			logo = {
+				darkMode = 'COD MWIII default allmode.png',
+				lightMode = 'COD MWIII default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default Lightmode.png',
+			},
+		},
 		vg = {
 			abbreviation = 'VG',
 			name = 'Call of Duty: Vanguard',
@@ -276,8 +289,8 @@ return {
 			name = 'Call of Duty: Warzone',
 			link = 'Call of Duty: Warzone',
 			logo = {
-				darkMode = 'COD Warzone logo.png',
-				lightMode = 'COD Warzone logo.png',
+				darkMode = 'COD Warzone 1.0 default darkmode.png',
+				lightMode = 'COD Warzone 1.0 default lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -289,8 +302,8 @@ return {
 			name = 'Call of Duty: Warzone 2.0',
 			link = 'Call of Duty: Warzone 2.0',
 			logo = {
-				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				darkMode = 'COD Warzone 2.0 default allmode.png',
+				lightMode = 'COD Warzone 2.0 default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -302,8 +315,21 @@ return {
 			name = 'Call of Duty: Warzone Mobile',
 			link = 'Call of Duty: Warzone Mobile',
 			logo = {
+				darkMode = 'COD Warzone Mobile default darkmode.png',
+				lightMode = 'COD Warzone Mobile default lightmode.png',
+			},
+			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
 				lightMode = 'Call of Duty Default Lightmode.png',
+			},
+		},
+		online = {
+			abbreviation = 'CODOL',
+			name = 'Call of Duty Online',
+			link = 'Call of Duty Online',
+			logo = {
+				darkMode = 'COD Online default allmode.png',
+				lightMode = 'COD Online default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',

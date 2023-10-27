@@ -12,6 +12,8 @@ local Company = Lua.import('Module:Infobox/Company', {requireDevIfEnabled = true
 
 local CustomCompany = {}
 
+---@param frame Frame
+---@return Html
 function CustomCompany.run(frame)
 	local company = Company(frame)
 	return company:createInfobox()

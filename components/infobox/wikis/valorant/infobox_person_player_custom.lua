@@ -10,10 +10,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
-local String = require('Module:StringUtils')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
+local Region = require('Module:Region')
+local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -93,6 +93,8 @@ function CustomInjector:parse(id, widgets)
 			name = 'Retired',
 			content = {_args.retired}
 		})
+	elseif id == 'region' then
+		return {}
 	end
 	return widgets
 end
@@ -123,7 +125,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
 	lpdbData.extradata.agent3 = Variables.varDefault('agent3')
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Region.name({region = _args.region, country = _args.country})
 
 	return lpdbData
 end

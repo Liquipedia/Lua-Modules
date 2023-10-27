@@ -37,7 +37,7 @@ function MatchLegacy._storeGames(match, match2, options)
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
+		if game.mode == '1v1' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
@@ -115,7 +115,7 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.liquipediatier = match2.liquipediatier
 			submatch.type = match2.type
 			submatch.game = match2.game
-			submatch.extradata = json.stringify(submatch.extradata)
+			submatch.extradata = json.stringify(submatch.extradata --[[@as table]])
 
 			mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id .. gameIndex,
@@ -185,8 +185,7 @@ function MatchLegacy._convertParameters(match2)
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = json.stringify(match.extradata)
 	else
-		doStore = false
-		match = nil
+		return nil, false
 	end
 
 	return match, doStore

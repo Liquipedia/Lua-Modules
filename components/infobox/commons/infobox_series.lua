@@ -35,15 +35,19 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
 
 Series.warnings = {}
 
+---@param frame Frame
+---@return string
 function Series.run(frame)
 	local series = Series(frame)
 	return series:createInfobox()
 end
 
+---@return string
 function Series:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -222,31 +226,43 @@ function Series:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---@param lpdbData table
+---@return table
 function Series:addToLpdb(lpdbData)
 	return lpdbData
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function Series:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
+---@param args table
+---@return string
 function Series:createLiquipediaTierDisplay(args)
 	return (Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true}) or '')
 		.. self:appendLiquipediatierDisplay(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function Series:liquipediaTierHighlighted(args)
 	return false
 end
 
 --- Allows for overriding this functionality
-function Series:appendLiquipediatierDisplay()
+---@param args table
+---@return string
+function Series:appendLiquipediatierDisplay(args)
 	return ''
 end
 
+---@param lpdbData table
+---@return table
 function Series:_getIconFromLeagueIconSmall(lpdbData)
 	local icon = lpdbData.icon
 	local iconDark = lpdbData.icondark
@@ -277,6 +293,9 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 	return lpdbData
 end
 
+---@param country string?
+---@param city string?
+---@return string
 function Series:_createLocation(country, city)
 	if country == nil or country == '' then
 		return ''
@@ -285,10 +304,16 @@ function Series:_createLocation(country, city)
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
 end
 
+---@param id string?
+---@param name string?
+---@param link string?
+---@param desc string?
+---@return string?
 function Series:_createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
+	---@cast id -nil
 
 	local output
 
@@ -320,6 +345,8 @@ function Series:_createLink(id, name, link, desc)
 	return output
 end
 
+---@param args table
+---@return string[]
 function Series:_createOrganizers(args)
 	local organizers = {}
 
@@ -330,6 +357,8 @@ function Series:_createOrganizers(args)
 	return organizers
 end
 
+---@param args table
+---@return string[]
 function Series:_getCategories(args)
 	local categories = {'Tournament series'}
 
@@ -342,6 +371,8 @@ function Series:_getCategories(args)
 	return categories
 end
 
+---@param args table
+---@return string[]
 function Series:addTierCategories(args)
 	local categories = {}
 	local tier = args.liquipediatier
@@ -364,6 +395,8 @@ function Series:addTierCategories(args)
 	return categories
 end
 
+---@param country string?
+---@return string?
 function Series:_setCountryCategories(country)
 	if String.isEmpty(country) then
 		return nil

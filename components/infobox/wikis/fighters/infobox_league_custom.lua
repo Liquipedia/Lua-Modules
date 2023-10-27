@@ -30,6 +30,7 @@ local _league
 
 local ABBR_USD = '<abbr title="United States Dollar">USD</abbr>'
 local DEFAULT_TYPE = 'offline'
+local MANUAL_SERIES_ICON = true
 local TODAY = os.date('%Y-%m-%d', os.time())
 
 local CustomLeague = Class.new()
@@ -41,13 +42,14 @@ function CustomLeague.run(frame)
 	_args = _league.args
 
 	-- Abbreviations
-	_args.circuitabbr = _args.abbreviation or CustomLeague.getAbbrFromSeries(_args.circuit)
+	_args.circuitabbr = _args.circuitabbr or CustomLeague.getAbbrFromSeries(_args.circuit)
 
 	-- Auto Icon
 	local seriesIconLight, seriesIconDark = CustomLeague.getIconFromSeries(_args.series)
 	_args.circuitIconLight, _args.circuitIconDark = CustomLeague.getIconFromSeries(_args.circuit)
 	_args.icon = _args.icon or seriesIconLight or _args.circuitIconLight
 	_args.icondark = _args.icondark or seriesIconDark or _args.circuitIconDark
+	_args.display_series_icon_from_manual_input = MANUAL_SERIES_ICON
 
 	-- Normalize name
 	_args.game = Game.toIdentifier{game = _args.game}
@@ -283,7 +285,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	circuitIndex = circuitIndex or ''
 	local circuitArgs = {
 		circuit = _args['circuit' .. circuitIndex],
-		abbreviation = _args['abbreviation' .. circuitIndex],
+		abbreviation = _args['circuit' .. circuitIndex .. 'abbr'],
 		icon = _args['circuit' .. circuitIndex .. 'IconLight'],
 		iconDark = _args['circuit' .. circuitIndex .. 'IconDark'],
 		tier = _args['circuit' .. circuitIndex .. 'tier'],

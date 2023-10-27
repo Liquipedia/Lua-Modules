@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -16,6 +17,8 @@ local TypeUtil = require('Module:TypeUtil')
 
 local PlayerExt = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
 	or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+
+local BYE = 'bye'
 
 --[[
 Structural type representation of an opponent.
@@ -54,7 +57,7 @@ Opponent.quad = OpponentTypes.quad
 Opponent.literal = OpponentTypes.literal
 
 Opponent.partyTypes = {Opponent.solo, Opponent.duo, Opponent.trio, Opponent.quad}
-Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal})
+Opponent.types = Array.extend(Opponent.partyTypes, {Opponent.team, Opponent.literal}) --[[@as table]]
 
 ---@enum PartySize
 Opponent.partySizes = {
@@ -165,6 +168,24 @@ function Opponent.isTbd(opponent)
 	else
 		return Array.any(opponent.players, Opponent.playerIsTbd)
 	end
+end
+
+---Checks if an opponent is empty
+---@param opponent standardOpponent?
+---@return boolean
+function Opponent.isEmpty(opponent)
+	-- if no type is set consider opponent as empty
+	return not opponent or not opponent.type
+		-- if neither name nor template nor players are set consider the opponent as empty
+		or (String.isEmpty(opponent.name) and String.isEmpty(opponent.template) and Logic.isDeepEmpty(opponent.players))
+end
+
+---Checks whether an opponent is a BYE Opponent
+---@param opponent standardOpponent
+---@return boolean
+function Opponent.isBye(opponent)
+	return string.lower(opponent.name or '') == BYE
+		or string.lower(opponent.template or '') == BYE
 end
 
 ---Checks if a player is a TBD player
@@ -283,10 +304,10 @@ function Opponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
-				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), nil, {date = date})
-				end
+				local savePageVar = not Opponent.playerIsTbd(player)
+				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
+				player.team =
+					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
 			else
 				PlayerExt.populatePageName(player)
 			end
@@ -424,7 +445,9 @@ function Opponent.toLpdbStruct(opponent)
 			players[prefix] = player.pageName
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
-			players[prefix .. 'team'] = player.team and Opponent.toName({type = Opponent.team, template = player.team}) or nil
+			players[prefix .. 'team'] = player.team and
+				Opponent.toName({type = Opponent.team, template = player.team, players = {}}) or
+				nil
 			players[prefix .. 'template'] = player.team
 		end
 		storageStruct.opponentplayers = players

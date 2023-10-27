@@ -23,7 +23,7 @@ local FortniteOpponentDisplay = {propTypes = {}, types={}}
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html|string
+---@return Html|string|nil
 function FortniteOpponentDisplay.InlineOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
@@ -52,7 +52,6 @@ determined by its layout context, and not of the opponent.
 function FortniteOpponentDisplay.BlockOpponent(props)
 	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
-	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
@@ -103,18 +102,15 @@ end
 function FortniteOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {
 			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showPlayerTeam = props.showPlayerTeam,
 			team = player.team,
-			abbreviateTbd = props.abbreviateTbd,
-		})
-			:addClass(props.playerClass)
+			note = playerIndex == 1 and note or nil,
+		})):addClass(props.playerClass)
 	end)
 
 	if #opponent.players == 1 then

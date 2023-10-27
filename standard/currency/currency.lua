@@ -47,13 +47,14 @@ function Currency.template(frame)
 end
 
 ---@class currencyDisplayOptions
----@field abbreviation boolean?
 ---@field dashIfZero boolean?
+---@field displaySymbol boolean?
+---@field displayCurrencyCode boolean?
 ---@field forceRoundPrecision boolean?
 ---@field formatPrecision integer?
 ---@field formatValue boolean?
 ---@field setVariables boolean?
----@field symbol boolean?
+---@field useHtmlStyling boolean?
 
 ---@param currencyCode string?
 ---@param prizeValue string|number|nil
@@ -61,8 +62,9 @@ end
 ---@return string?
 function Currency.display(currencyCode, prizeValue, options)
 	options = options or {}
-	options.symbol = Logic.emptyOr(options.symbol, true)
-	options.abbreviation = Logic.emptyOr(options.abbreviation, true)
+	options.displaySymbol = Logic.emptyOr(options.displaySymbol, true)
+	options.displayCurrencyCode = Logic.emptyOr(options.displayCurrencyCode, true)
+	options.useHtmlStyling = Logic.emptyOr(options.useHtmlStyling, true)
 
 	if options.dashIfZero and tonumber(prizeValue) == 0 then
 		return DASH
@@ -77,15 +79,16 @@ function Currency.display(currencyCode, prizeValue, options)
 		return nil
 	end
 
+	local spaceString = options.useHtmlStyling and NON_BREAKING_SPACE or ' '
+
 	local currencyPrefix = ''
 	if currencyData.symbol.text and not currencyData.symbol.isAfter then
-		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '')
+		currencyPrefix = currencyData.symbol.text .. (currencyData.symbol.hasSpace and spaceString or '')
 	end
 	local currencySuffix = ''
 	if currencyData.symbol.text and currencyData.symbol.isAfter then
-		currencySuffix = (currencyData.symbol.hasSpace and NON_BREAKING_SPACE or '') .. currencyData.symbol.text
+		currencySuffix = (currencyData.symbol.hasSpace and spaceString or '') .. currencyData.symbol.text
 	end
-	local currencyAbbreviation = Abbreviation.make(currencyData.code, currencyData.name)
 
 	if options.setVariables then
 		Variables.varDefine('localcurrencycode', currencyData.code or '')
@@ -93,12 +96,12 @@ function Currency.display(currencyCode, prizeValue, options)
 		Variables.varDefine('localcurrencysymbolafter', currencySuffix)
 	end
 
-	if options.abbreviation and currencyData.symbol.text == currencyData.code then
-		options.symbol = false
+	if options.displayCurrencyCode and currencyData.symbol.text == currencyData.code then
+		options.displaySymbol = false
 	end
 
 	local prizeDisplay = ''
-	if options.symbol then
+	if options.displaySymbol then
 		prizeDisplay = prizeDisplay .. currencyPrefix
 	end
 	if prizeValue then
@@ -107,11 +110,13 @@ function Currency.display(currencyCode, prizeValue, options)
 		end
 		prizeDisplay = prizeDisplay .. prizeValue
 	end
-	if options.symbol then
+	if options.displaySymbol then
 		prizeDisplay = prizeDisplay .. currencySuffix
 	end
-	if options.abbreviation then
-		prizeDisplay = prizeDisplay .. (prizeDisplay ~= '' and NON_BREAKING_SPACE or '') .. currencyAbbreviation
+	if options.displayCurrencyCode then
+		local currencyCodeDisplay = not options.useHtmlStyling and currencyData.code
+			or Abbreviation.make(currencyData.code, currencyData.name)
+		prizeDisplay = prizeDisplay .. (String.isNotEmpty(prizeDisplay) and spaceString or '') .. currencyCodeDisplay
 	end
 
 	return prizeDisplay

@@ -265,7 +265,7 @@ function StarcraftFfaInput._matchPlacements(match, numberOfOpponents, noscore, I
 		for scoreIndex, score in Table.iter.spairs(IndScore, StarcraftFfaInput._placementSortFunction) do
 			local opponent = match['opponent' .. scoreIndex]
 			counter = counter + 1
-			if counter == 1 and String.isEmpty(match.winner) then
+			if counter == 1 and Logic.isEmpty(match.winner) then
 				if match.finished or score >= match.bestof then
 					match.winner = scoreIndex
 					match.finished = 'true'
@@ -431,7 +431,6 @@ function StarcraftFfaInput._mapInput(match, mapKey, subgroup, noscore, numberOfO
 	map.extradata = {
 		comment = map.comment or '',
 		header = map.header or '',
-		isSubMatch = 'false',
 		noQuery = match.noQuery,
 	}
 
@@ -512,7 +511,7 @@ function StarcraftFfaInput._mapScoreProcessing(map, numberOfOpponents, noscore)
 			local temp = {}
 			for scoreIndex, score in Table.iter.spairs(indexedScores, StarcraftFfaInput._placementSortFunction) do
 				counter = counter + 1
-				if counter == 1 and String.isEmpty(map.winner) then
+				if counter == 1 and Logic.isEmpty(map.winner) then
 					map.winner = scoreIndex
 					map.extradata['placement' .. scoreIndex] = tonumber(map['placement' .. scoreIndex] or '') or
 						tonumber(map['opponent' .. scoreIndex .. 'placement'] or '') or counter

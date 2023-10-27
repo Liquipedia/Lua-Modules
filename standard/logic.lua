@@ -70,6 +70,24 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---Checks if a given object (table|string|nil) is deep empty
+---i.e. is empty itself or only contains objects that are deep empty
+---@param val table|string|nil
+---@return boolean
+---@overload fun(val: any):false
+function Logic.isDeepEmpty(val)
+	return Logic.isEmpty(val) or type(val) == 'table' and
+		require('Module:Table').all(val, function(key, item) return Logic.isDeepEmpty(item) end)
+end
+
+---Inverse of `Logic.isDeepEmpty`
+---@param val table|string|nil
+---@return boolean
+---@overload fun(val: any):true
+function Logic.isNotDeepEmpty(val)
+	return not Logic.isDeepEmpty(val)
+end
+
 ---Check if the input is a representation of a boolean
 ---@param val string|number|boolean|nil
 ---@return boolean

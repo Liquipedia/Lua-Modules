@@ -99,6 +99,10 @@ function LegacyPrizePool.run(dependency)
 		end
 	end
 
+	if CUSTOM_HANDLER.afterSlots then
+		newArgs = CUSTOM_HANDLER.afterSlots(newArgs)
+	end
+
 	-- iterate over slots and merge opponents into the slots directly
 	local numberOfSlots = newSlotIndex
 	for slotIndex = 1, numberOfSlots do

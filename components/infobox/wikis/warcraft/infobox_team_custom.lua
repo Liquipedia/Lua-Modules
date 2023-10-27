@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
@@ -15,6 +14,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
@@ -54,7 +54,7 @@ function CustomTeam.run(frame)
 	_team = team
 
 	-- Automatic achievements
-	team.args.achievements = Achievements.team{team = team.pagename}
+	team.args.achievements = Achievements.team{noTemplate = true}
 
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
 	team.addToLpdb = CustomTeam.addToLpdb

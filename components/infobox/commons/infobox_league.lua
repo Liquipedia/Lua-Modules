@@ -45,11 +45,14 @@ local League = Class.new(BasicInfobox)
 
 League.warnings = {}
 
+---@param frame Frame
+---@return string
 function League.run(frame)
 	local league = League(frame)
 	return league:createInfobox()
 end
 
+---@return Html
 function League:createInfobox()
 	local args = self.args
 	args.abbreviation = self:_fetchAbbreviation()
@@ -259,9 +262,14 @@ function League:createInfobox()
 		self:_setSeoTags(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(League.warnings)
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(WarningBox.displayAll(League.warnings))
+		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
+---@param args table
+---@return string[]
 function League:_getCategories(args)
 	local categories = {'Tournaments'}
 	if String.isEmpty(args.country) then
@@ -273,6 +281,8 @@ function League:_getCategories(args)
 	return Array.extend(categories, self:getWikiCategories(args))
 end
 
+---@param args table
+---@return string[]
 function League:addParticipantTypeCategory(args)
 	local categories = {}
 	if not String.isEmpty(args.team_number) then
@@ -285,6 +295,8 @@ function League:addParticipantTypeCategory(args)
 	return categories
 end
 
+---@param args table
+---@return string[]
 function League:addTierCategories(args)
 	local categories = {}
 	local tier = args.liquipediatier
@@ -308,35 +320,49 @@ function League:addTierCategories(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function League:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 --- Allows for overriding this functionality
+---@param args table
 function League:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
+---@param lpdbData table
+---@param args table
+---@return table
 function League:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string
 function League:seoText(args)
 	return MetadataGenerator.tournament(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function League:liquipediaTierHighlighted(args)
 	return false
 end
 
 --- Allows for overriding this functionality
-function League:appendLiquipediatierDisplay()
+---@param args table
+---@return string
+function League:appendLiquipediatierDisplay(args)
 	return ''
 end
 
+---@param args table
+---@return string?
 function League:createLiquipediaTierDisplay(args)
 	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true})
 
@@ -347,6 +373,8 @@ function League:createLiquipediaTierDisplay(args)
 	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
+---@param args table
+---@return string?
 function League:_createPrizepool(args)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return nil
@@ -367,6 +395,7 @@ function League:_createPrizepool(args)
 	}
 end
 
+---@param args table
 function League:_definePageVariables(args)
 	Variables.varDefine('tournament_name', TextSanitizer.stripHTML(args.name))
 	Variables.varDefine('tournament_shortname', TextSanitizer.stripHTML(args.shortname or args.abbreviation))
@@ -407,9 +436,13 @@ function League:_definePageVariables(args)
 	-- if wikis want it unset they can unset it via the defineCustomPageVariables() call
 	Variables.varDefine('tournament_currency', args.localcurrency or '')
 
+	Variables.varDefine('tournament_summary', self:seoText(args))
+
 	self:defineCustomPageVariables(args)
 end
 
+---@param args table
+---@param links table
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
@@ -459,6 +492,7 @@ function League:_setLpdbData(args, links)
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
 			Links.makeFullLinksForTableItems(links or {})
 		),
+		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
 		},
@@ -469,6 +503,7 @@ function League:_setLpdbData(args, links)
 	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
 end
 
+---@param args table
 function League:_setSeoTags(args)
 	local desc = self:seoText(args)
 	if desc then
@@ -476,6 +511,9 @@ function League:_setSeoTags(args)
 	end
 end
 
+---@param args table
+---@param base string
+---@return table
 function League:_getNamedTableofAllArgsForBase(args, base)
 	local basedArgs = self:getAllArgsForBase(args, base)
 	local namedArgs = {}
@@ -492,6 +530,8 @@ end
 --	country: the country
 --	location: the city or place
 -- }
+---@param args table
+---@return string
 function League:_createLocation(args)
 	if String.isEmpty(args.country) then
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/TBD')
@@ -523,10 +563,17 @@ function League:_createLocation(args)
 	return table.concat(display)
 end
 
+---@param options table?
+---@param series string?
+---@param abbreviation string?
+---@param icon string?
+---@param iconDark string?
+---@return string?
 function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	if String.isEmpty(series) then
 		return nil
 	end
+	---@cast series -nil
 	options = options or {}
 
 	local seriesPageExists = Page.exists(series)
@@ -564,6 +611,9 @@ function League:_createSeries(options, series, abbreviation, icon, iconDark)
 	return output
 end
 
+---@param iconSmallTemplate string?
+---@param manualIcon string?
+---@param manualIconDark string?
 function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
 		icon = manualIcon,
@@ -581,10 +631,16 @@ function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
 	end
 end
 
+---@param id string?
+---@param name string?
+---@param link string?
+---@param desc string?
+---@return string?
 function League:createLink(id, name, link, desc)
 	if String.isEmpty(id) then
 		return nil
 	end
+	---@cast id -nil
 
 	local output
 
@@ -616,6 +672,8 @@ function League:createLink(id, name, link, desc)
 	return output
 end
 
+---@param args table
+---@return string[]
 function League:_createOrganizers(args)
 	local organizers = {}
 
@@ -626,6 +684,8 @@ function League:_createOrganizers(args)
 	return organizers
 end
 
+---@param date string?
+---@return string?
 function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
@@ -633,10 +693,15 @@ function League:_cleanDate(date)
 	return ReferenceCleaner.clean(date)
 end
 
+---@param date string?
+---@return boolean
 function League:_isUnknownDate(date)
 	return date == nil or string.lower(date) == 'tba' or string.lower(date) == 'tbd'
 end
 
+---@param previous string?
+---@param next string?
+---@return boolean
 function League:_isChronologySet(previous, next)
 	-- We only need to check the first of these params, since it makes no sense
 	-- to set next2 and not next, etc.
@@ -644,6 +709,8 @@ function League:_isChronologySet(previous, next)
 end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
+---@param item string?
+---@return string
 function League:_getPageNameFromChronology(item)
 	if item == nil then
 		return ''
@@ -653,6 +720,7 @@ function League:_getPageNameFromChronology(item)
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
+---@return string?
 function League:_fetchAbbreviation()
 	if not String.isEmpty(self.args.abbreviation) then
 		return self.args.abbreviation

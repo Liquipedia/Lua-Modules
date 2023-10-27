@@ -23,6 +23,8 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 
 local globalVars = PageVariableNamespace({cached = true})
 
+local DEFAULT_MAX_NUM_PLAYERS = 10
+
 local MatchGroupInput = {}
 
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
@@ -78,6 +80,8 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.groupRoundIndex = context.groupRoundIndex
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
+
+			bracketData.matchpage = match.matchPage
 
 			local nextMatchId = bracketId .. '_' .. MatchGroupInput._matchlistMatchIdFromIndex(matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
@@ -140,6 +144,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
 		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
+
+		bracketData.matchpage = match.matchPage
 
 		match.parent = context.tournamentParent
 		match.matchsection = context.matchSection
@@ -382,20 +388,26 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- Retrieves Common Tournament Variables used inside match2 and match2game
-function MatchGroupInput.getCommonTournamentVars(obj)
-	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+function MatchGroupInput.getCommonTournamentVars(obj, parent)
+	parent = parent or {}
+	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
+	obj.icon = Logic.emptyOr(obj.icon, parent.icon, Variables.varDefault('tournament_icon'))
+	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, Variables.varDefault('tournament_icondark'))
+	obj.liquipediatier = Logic.emptyOr(
+		obj.liquipediatier,
+		parent.liquipediatier,
+		Variables.varDefault('tournament_liquipediatier')
+	)
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
+		parent.liquipediatiertype,
 		Variables.varDefault('tournament_liquipediatiertype')
 	)
-	obj.series = Logic.emptyOr(obj.series, Variables.varDefault('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, Variables.varDefault('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, Variables.varDefault('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, Variables.varDefault('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
+	obj.series = Logic.emptyOr(obj.series, parent.series, Variables.varDefault('tournament_series'))
+	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, Variables.varDefault('tournament_shortname'))
+	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
+	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
+	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
 
 	return obj
 end
@@ -428,6 +440,117 @@ function MatchGroupInput.readMvp(match)
 	end)
 
 	return {players = parsedPlayers, points = mvppoints}
+end
+
+---@class MatchGroupInputReadPlayersOfTeamOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field applyUnderScores boolean?
+
+---reads the players of a team from input and wiki variables
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@param options MatchGroupInputReadPlayersOfTeamOptions?
+---@return table
+function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
+	options = options or {}
+
+	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
+	local opponent = match['opponent' .. opponentIndex]
+	local playersData = Json.parseIfString(opponent.players) or {}
+
+	local players = {}
+
+	for playerIndex = 1, maxNumPlayers do
+		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
+
+		player.name = player.name or playersData['p' .. playerIndex]
+			or Variables.varDefault(teamName .. '_p' .. playerIndex)
+
+		player.name = player.name and options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
+			or player.name
+
+		player.name = player.name and options.applyUnderScores and player.name:gsub(' ', '_') or player.name
+
+		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
+
+		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
+			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
+
+		if Table.isNotEmpty(player) then
+			table.insert(players, player)
+		end
+	end
+
+	opponent.match2players = players
+
+	return match
+end
+
+---reads the caster input of a match
+---@param match table
+---@param options {noSort: boolean?}?
+---@return string?
+function MatchGroupInput.readCasters(match, options)
+	options = options or {}
+	local casters = {}
+	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
+		table.insert(casters, MatchGroupInput._getCasterInformation(
+			casterName,
+			match[casterKey .. 'flag'],
+			match[casterKey .. 'name']
+		))
+	end
+
+	if not options.noSort then
+		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
+	end
+
+	return Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+end
+
+---fills in missing information for a given caster
+---@param name string
+---@param flag string?
+---@param displayName string?
+---@return {name:string, displayName: string, flag: string?}
+function MatchGroupInput._getCasterInformation(name, flag, displayName)
+	flag = Logic.emptyOr(flag, Variables.varDefault(name .. '_flag'))
+	displayName = Logic.emptyOr(displayName, Variables.varDefault(name .. 'dn'))
+
+	if String.isEmpty(flag) or String.isEmpty(displayName) then
+		local parent = Variables.varDefault(
+			'tournament_parent',
+			mw.title.getCurrentTitle().text
+		)
+		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
+		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
+			query = 'flag, id',
+			limit = 1,
+		})
+		if type(data) == 'table' and data[1] then
+			flag = String.isNotEmpty(flag) and flag or data[1].flag
+			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		end
+	end
+
+	if String.isNotEmpty(flag) then
+		Variables.varDefine(name .. '_flag', flag)
+	end
+
+	if String.isEmpty(displayName) then
+		displayName = name
+	end
+	Variables.varDefine(name .. '_dn', displayName)
+
+	return {
+		name = name,
+		displayName = displayName,
+		flag = flag,
+	}
 end
 
 return MatchGroupInput

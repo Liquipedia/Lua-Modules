@@ -33,14 +33,9 @@ StarcraftOpponentDisplay.propTypes.InlineOpponent = {
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
 }
 
----@class StarcraftInlineOpponentProps
----@field flip boolean?
+---@class StarcraftInlineOpponentProps: InlineOpponentProps
 ---@field opponent StarcraftStandardOpponent
----@field showFlag boolean?
----@field showLink boolean?
 ---@field showRace boolean?
----@field dq boolean?
----@field teamStyle teamStyle
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props StarcraftInlineOpponentProps
@@ -77,16 +72,8 @@ StarcraftOpponentDisplay.propTypes.BlockOpponent = {
 	abbreviateTbd = 'boolean?',
 }
 
----@class StarcraftBlockOpponentProps
----@field flip boolean?
+---@class StarcraftBlockOpponentProps: BlockOpponentProps
 ---@field opponent StarcraftStandardOpponent
----@field overflow ('ellipsis'|'wrap'|'hidden')?
----@field showFlag boolean?
----@field showLink boolean?
----@field showPlayerTeam boolean?
----@field abbreviateTbd boolean?
----@field playerClass string?
----@field teamStyle teamStyle?
 ---@field showRace boolean?
 
 --[[
@@ -130,7 +117,7 @@ end
 ---@return string?
 function StarcraftOpponentDisplay.InlineTeamContainer(props)
 	return props.template == 'default'
-		and OpponentDisplay.InlineTeam(props)
+		and OpponentDisplay.InlineTeam({flip = props.flip, template = props.template, teamStyle = props.style})
 		or OpponentDisplay.InlineTeamContainer(props)
 end
 
@@ -191,19 +178,16 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return StarcraftPlayerDisplay.BlockPlayer({
-			flip = props.flip,
-			overflow = props.overflow,
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return StarcraftPlayerDisplay.BlockPlayer(Table.merge(props, {
 			player = player,
-			showFlag = props.showFlag,
-			showLink = props.showLink,
-			showPlayerTeam = props.showPlayerTeam,
-			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
 			team = player.team,
-			abbreviateTbd = props.abbreviateTbd,
-		})
-			:addClass(props.playerClass)
+			note = playerIndex == 1 and note or nil,
+			showRace = showRace and not opponent.isArchon and not opponent.isSpecialArchon,
+		})):addClass(props.playerClass)
 	end)
 
 	if #opponent.players == 1 then

@@ -16,11 +16,9 @@ local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 local WeaponIcon = require('Module:WeaponIcon')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local NUM_OPPONENTS = 2
@@ -37,6 +35,10 @@ local LINK_DATA = {
 local NON_BREAKING_SPACE = '&nbsp;'
 
 -- Map Veto Class
+---@class SplatoonMapVeto: MatchSummaryRowInterface
+---@operator call: SplatoonMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -46,6 +48,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -54,6 +57,8 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return self
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -72,6 +77,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return string
 function MapVeto._displayMap(map)
 	if Logic.isEmpty(map) then
 		map = TBD
@@ -82,6 +89,8 @@ function MapVeto._displayMap(map)
 	return map
 end
 
+---@param map string?
+---@return self
 function MapVeto:addDecider(map)
 	map = MapVeto._displayMap(map)
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
@@ -94,6 +103,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return self
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = MapVeto._displayMap(map1)
 	map2 = MapVeto._displayMap(map2)
@@ -123,6 +136,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -132,79 +149,37 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string
+---@return self
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
 
-
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init('490px')
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if not Logic.isEmpty(game.vod) then
-			vods[index] = game.vod
-		end
-	end
-	match.links.vod = match.vod
-
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Match Vod + other links
-		local buildLink = function (link, icon, text)
-			return '[['..icon..'|link='..link..'|15px|'..text..']]'
-		end
-
-		for linkType, link in pairs(match.links) do
-			if not LINK_DATA[linkType] then
-				mw.log('Unknown link: ' .. linkType)
-			else
-				footer:addElement(buildLink(link, LINK_DATA[linkType].icon, LINK_DATA[linkType].text))
-			end
-		end
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
-
-	return header
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or match.timestamp ~= DateExt.epochZero then
@@ -260,7 +235,9 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
-function CustomMatchSummary._createGame(game, gameIndex)
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
+function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 
 	if Logic.isNotEmpty(game.header) then
@@ -329,6 +306,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	return row
 end
 
+---@param game MatchGroupUtilGame
+---@return string
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 
@@ -339,6 +318,10 @@ function CustomMatchSummary._getMapDisplay(game)
 	return mapDisplay
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@param flip boolean?
+---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex, flip)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -349,6 +332,8 @@ function CustomMatchSummary._gameScore(game, opponentIndex, flip)
 		)
 end
 
+---@param showIcon boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(showIcon)
 	local container = mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -364,13 +349,14 @@ function CustomMatchSummary._createCheckMark(showIcon)
 	return container
 end
 
+---@param props {data: string[], flip: boolean, game: string}
+---@return Html
 function CustomMatchSummary._opponentWeaponsDisplay(props)
 	local flip = props.flip
 
 	local displayElements = Array.map(props.data, function(weapon)
 		return mw.html.create('div')
 			:addClass('brkts-champion-icon')
-			:css('float', flip and 'right' or 'left')
 			:node(WeaponIcon._getImage{
 				weapon = weapon,
 				game = props.game,
@@ -384,6 +370,7 @@ function CustomMatchSummary._opponentWeaponsDisplay(props)
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 
 	for _, item in ipairs(displayElements) do
 		display:node(item)

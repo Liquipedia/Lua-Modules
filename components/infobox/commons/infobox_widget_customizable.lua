@@ -11,6 +11,10 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class CustomizableWidget: Widget
+---@operator call({id: string, children: Widget[]}): CustomizableWidget
+---@field id string
+---@field children Widget[]
 local Customizable = Class.new(
 	Widget,
 	function(self, input)
@@ -19,6 +23,7 @@ local Customizable = Class.new(
 	end
 )
 
+---@return Widget[]
 function Customizable:make()
 	if self.context.injector == nil then
 		return self.children

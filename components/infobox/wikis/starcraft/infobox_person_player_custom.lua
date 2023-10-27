@@ -21,6 +21,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -44,6 +45,8 @@ local FIRST_DAY_OF_YEAR = '-01-01'
 local LAST_DAY_OF_YEAR = '-12-31'
 local KOREAN = 'South Korea'
 
+local BOT_INFORMATION_TYPE = 'Bot'
+
 -- race stuff
 local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
@@ -64,6 +67,12 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	_player = player
 
+	_args.achievements = Achievements.player{noTemplate = true, baseConditions = {
+		'[[liquipediatiertype::]]',
+		'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+		'[[placement::1]]',
+	}}
+
 	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.nameDisplay = CustomPlayer.nameDisplay
@@ -71,8 +80,15 @@ function CustomPlayer.run(frame)
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getWikiCategories = CustomPlayer.getWikiCategories
 	player.getPersonType = CustomPlayer.getPersonType
+	player.shouldStoreData = CustomPlayer.shouldStoreData
 
 	return player:createInfobox()
+end
+
+function CustomPlayer:shouldStoreData(args)
+	return Namespace.isMain() and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+		and args.informationType ~= BOT_INFORMATION_TYPE
 end
 
 function CustomInjector:parse(id, widgets)
@@ -98,6 +114,21 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomInjector:addCustomCells(widgets)
+	if _args.informationType == BOT_INFORMATION_TYPE then
+		return {
+			Cell{name = 'Programmer', content = {_args.programmer}},
+			Cell{name = 'Affiliation', content = {_args.affiliation}},
+			Cell{name = 'Bot Version', content = {_args.botversion}},
+			Cell{name = 'BWAPI Version', content = {_args.bwapiversion}},
+			Cell{name = 'Language', content = {_args.language}},
+			Cell{name = 'Wrapper', content = {_args.wrapper}},
+			Cell{name = 'Terrain Analysis', content = {_args.terrain_analysis}},
+			Cell{name = 'AI Techniques', content = {_args.aitechniques}},
+			Cell{name = 'Framework', content = {_args.framework}},
+			Cell{name = 'Strategies', content = {_args.strategies}},
+		}
+	end
+
 	-- switch to enable yearsActive once 1v1 matches have been converted to match2 storage
 	local yearsActive = Logic.readBool(_args.enableYearsActive)
 		and Namespace.isMain() and CustomPlayer._getMatchupData() or nil
@@ -467,6 +498,19 @@ function CustomPlayer:getWikiCategories(categories)
 
 	for _, faction in pairs(Faction.readMultiFaction(_args.race, {alias = false})) do
 		table.insert(categories, faction .. ' Players')
+	end
+
+	local botCategoryKeys = {
+		'language',
+		'wrapper',
+		'terrain_analysis',
+		'aitechniques',
+		'framework',
+	}
+	for _, key in pairs(botCategoryKeys) do
+		if _args.informationType == BOT_INFORMATION_TYPE and _args[key] then
+			table.insert(categories, _args[key] .. ' bot')
+		end
 	end
 
 	return categories

@@ -27,15 +27,19 @@ local Builder = Widgets.Builder
 
 local Language = mw.language.new('en')
 
+---@class CompanyInfobox: BasicInfobox
 local Company = Class.new(BasicInfobox)
 
 local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
+---@param frame Frame
+---@return Html
 function Company.run(frame)
 	local company = Company(frame)
 	return company:createInfobox()
 end
 
+---@return Html
 function Company:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -125,6 +129,8 @@ function Company:createInfobox()
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
+---@param location string?
+---@return string
 function Company:_createLocation(location)
 	if location == nil then
 		return ''
@@ -134,6 +140,7 @@ function Company:_createLocation(location)
 				'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
+---@return string?
 function Company:_getOrganizerPrizepools()
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =

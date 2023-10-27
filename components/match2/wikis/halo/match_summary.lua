@@ -6,29 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local Opponent = require('Module:OpponentLibraries').Opponent
 
-local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local _LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
+local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+
+local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	esl = {
@@ -46,61 +42,20 @@ local _LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 }
 
--- Custom Caster Class
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster['flag']) .. ' ' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-	return self
-end
-
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(table.concat(self.casters, #self.casters > 2 and ', ' or ' & '))
-end
-
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+end
 
-	local matchSummary = MatchSummary():init()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-		:body(CustomMatchSummary._createBody(match))
-
-	-- comment
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	-- footer
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.lrthread = match.lrthread
-	match.links.vod = match.vod
 	if
 		match.opponents[1].type == Opponent.team and
 		match.opponents[2].type == Opponent.team
@@ -126,41 +81,15 @@ function CustomMatchSummary.getByMatchId(args)
 		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end
 
-	if Table.isNotEmpty(vods) or Table.isNotEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-				source = vod.url
-			})
-		end
-
-		footer:addLinks(_LINK_DATA, match.links)
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -178,7 +107,7 @@ function CustomMatchSummary._createBody(match)
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = Casters()
+		local casterRow = MatchSummary.Casters()
 		for _, caster in pairs(casters) do
 			casterRow:addCaster(caster)
 		end
@@ -204,11 +133,16 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
 	return mw.html.create('div'):wikitext(score)
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
@@ -261,6 +195,8 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
+---@param game MatchGroupUtilGame
+---@return string
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 	if String.isNotEmpty(game.mode) then
@@ -269,14 +205,16 @@ function CustomMatchSummary._getMapDisplay(game)
 	return mapDisplay
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._addCheckmark(isWinner)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if isWinner then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container

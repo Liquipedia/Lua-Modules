@@ -63,6 +63,7 @@ function suite:testDisplay()
 	self:assertEquals('€1,200&nbsp;<abbr title="Euro">EUR</abbr>', Currency.display('EUR', 1200, {formatValue = true}))
 	self:assertEquals('€1200&nbsp;<abbr title="Euro">EUR</abbr>', Currency.display('EUR', 1200))
 	self:assertEquals('€&nbsp;<abbr title="Euro">EUR</abbr>', Currency.display('EUR'))
+	self:assertEquals('€ EUR', Currency.display('EUR', nil, {useHtmlStyling = false}))
 end
 
 return suite

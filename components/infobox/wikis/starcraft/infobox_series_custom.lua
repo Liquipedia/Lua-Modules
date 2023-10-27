@@ -31,6 +31,8 @@ local CustomSeries = {}
 
 local _args
 
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
 	local series = Series(frame)
 	_args = series.args
@@ -39,14 +41,18 @@ function CustomSeries.run(frame)
 	_args.liquipediatier = _args.liquipediatier or _args.tier
 
 	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	series.addToLpdb = CustomSeries.addToLpdb
 
 	return series:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomSeries:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Patch', content = {CustomSeries._getPatch()}})
 	table.insert(widgets, Cell{name = 'Server', content = {_args.server}})
@@ -70,6 +76,7 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return string?
 function CustomSeries._getSeriesPrizepools()
 	local seriesTotalPrizeInput = Json.parseIfString(_args.prizepooltot or '{}')
 	local series = seriesTotalPrizeInput.series or _args.series or mw.title.getCurrentTitle().text
@@ -83,6 +90,7 @@ function CustomSeries._getSeriesPrizepools()
 	}
 end
 
+---@return string?
 function CustomSeries._getPatch()
 	local patch = _args.patch
 	local endPatch = _args.epatch
@@ -127,12 +135,17 @@ function CustomSeries._addCustomVariables()
 	end
 end
 
-function Series:addToLpdb(lpdbData)
+---@param lpdbData table
+---@return table
+function CustomSeries:addToLpdb(lpdbData)
 	Variables.varDefine('tournament_icon', lpdbData.icon)
 	Variables.varDefine('tournament_icon_dark', lpdbData.icondark)
 	return lpdbData
 end
 
+---@param date string?
+---@param edate string?
+---@param sdate string?
 function CustomSeries._setDateMatchVar(date, edate, sdate)
 	local endDate = CustomSeries._validDateOr(date, edate, sdate) or ''
 	local startDate = CustomSeries._validDateOr(date, sdate, edate) or ''
@@ -142,6 +155,8 @@ function CustomSeries._setDateMatchVar(date, edate, sdate)
 	Variables.varDefine('tournament_startdate', startDate)
 end
 
+---@param ... string
+---@return string?
 function CustomSeries._validDateOr(...)
 	local regexString = '%d%d%d%d%-%d%d%-%d%d' --(i.e. YYYY-MM-DD)
 

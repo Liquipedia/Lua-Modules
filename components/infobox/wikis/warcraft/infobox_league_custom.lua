@@ -23,6 +23,7 @@ local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -55,6 +56,8 @@ local MODES = {
 	['2v2'] = {tier = ' 2v2', store = '2v2', category = '2v2'},
 	default = {store = '1v1', category = 'Individual'},
 }
+
+local BREAKDOWN_RACES = Array.map(Array.map(Array.append(Faction.knownFactions, 'm'), Faction.toName), string.lower)
 
 local TIER_1 = 1
 local TIER_2 = 2
@@ -123,26 +126,24 @@ function CustomInjector:parse(id, widgets)
 			return dateCells
 		end
 	elseif id == 'customcontent' then
-		--player breakdown
-		local playerRaceBreakDown = CustomLeague._playerRaceBreakDown() or {}
-		---@type number|string
-		local playerNumber = playerRaceBreakDown.playerNumber or _args.player_number
-		if playerNumber or _args.team_number then
+		local raceBreakdown = RaceBreakdown.run(_args, BREAKDOWN_RACES) or {}
+		_args.player_number = _args.player_number or raceBreakdown.total
+
+		if _args.player_number or _args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
 
-		if playerNumber then
-			table.insert(widgets, Cell{name = 'Number of players',
-				content = {CustomLeague._displayParticipantNumber(playerNumber)}})
-			table.insert(widgets, Breakdown{content = playerRaceBreakDown.display, classes = {'infobox-center'}})
+		if _args.player_number then
+			Array.appendWith(widgets,
+				Cell{name = 'Number of Players', content = {_args.player_number or raceBreakdown.total}},
+				Breakdown{content = raceBreakdown.display or {}, classes = { 'infobox-center' }}
+			)
 
-			-- clean var of '+' suffix
-			playerNumber = string.gsub(playerNumber, '%+', '')
-			--make playerNumber available for commons category check
-			_args.player_number = playerNumber
+			_args.player_number = string.gsub(_args.player_number, '%+', '')
 		end
+
 		if _args.team_number then
-			table.insert(widgets, Cell{name = 'Number of teams',
+			table.insert(widgets, Cell{name = 'Number of Teams',
 				content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
 
 			-- clean var of '+' suffix
@@ -245,54 +246,6 @@ function CustomLeague:_getServer()
 	end
 
 	return '[[Server|' .. _args.server .. ']]'
-end
-
-function CustomLeague._playerRaceBreakDown()
-	local playerBreakDown = {}
-	local playerNumber = tonumber(_args.player_number) or 0
-	local humanNumber = tonumber(_args.human_number) or 0
-	local orcNumber = tonumber(_args.orc_number) or 0
-	local undeadNumber = tonumber(_args.undead_number) or 0
-	local nightelfNumber = tonumber(_args.nightelf_number) or 0
-	local randomNumber = tonumber(_args.random_number) or 0
-	local multipleNumber = tonumber(_args.multiple_number) or 0
-
-	if playerNumber == 0 then
-		playerNumber = humanNumber + orcNumber + undeadNumber + undeadNumber + nightelfNumber + randomNumber + multipleNumber
-	end
-
-	if playerNumber > 0 then
-		playerBreakDown.playerNumber = playerNumber
-		if humanNumber + orcNumber + undeadNumber + nightelfNumber + randomNumber + multipleNumber > 0 then
-			playerBreakDown.display = {}
-			if humanNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'h', showLink = false, showTitle = false}
-					.. ' ' .. humanNumber)
-			end
-			if orcNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'o', showLink = false, showTitle = false}
-					.. ' ' .. orcNumber)
-			end
-			if undeadNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'u', showLink = false, showTitle = false}
-					.. ' ' .. undeadNumber)
-			end
-			if nightelfNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'n', showLink = false, showTitle = false}
-					.. ' ' .. nightelfNumber)
-			end
-			if randomNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'r', showLink = false, showTitle = false}
-					.. ' ' .. randomNumber)
-			end
-			if multipleNumber > 0 then
-				table.insert(playerBreakDown.display, Faction.Icon{faction = 'm', showLink = false, showTitle = false}
-					.. ' ' .. multipleNumber)
-			end
-		end
-	end
-
-	return playerBreakDown or {}
 end
 
 function CustomLeague:defineCustomPageVariables(args)

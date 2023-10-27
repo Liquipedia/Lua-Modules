@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
+local CustomData = Lua.requireIfExists('Module:Links/CustomData', {requireDevIfEnabled = true, loadData = true}) or {}
 
 local Links = {}
 
@@ -23,6 +23,7 @@ local PREFIXES = {
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
+	['apple-podcasts'] = {'https://podcasts.apple.com/'},
 	afreeca = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
@@ -80,6 +81,11 @@ local PREFIXES = {
 		player = 'https://play.eslgaming.com/player/',
 	},
 	esportal = {'https://esportal.com/tournament/'},
+	etf2l = {
+		'',
+		team = 'https://etf2l.org/teams/',
+		player = 'https://etf2l.org/forum/user/',
+	},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
 	faceit = {
@@ -96,11 +102,6 @@ local PREFIXES = {
 		player = 'https://www.factor.gg/player/',
 	},
 	fanclub = {''},
-	gamersclub = {
-		'https://csgo.gamersclub.gg/campeonatos/csgo/',
-		team = 'https://csgo.gamersclub.gg/team/',
-		player = 'https://csgo.gamersclub.gg/jogador/',
-	},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
@@ -109,6 +110,11 @@ local PREFIXES = {
 		player = 'https://halodatahive.com/Player/Detail/',
 	},
 	home = {''},
+	haojiao = {
+		'https://web.haojiao.cc/wiki/tour/t2Ud5pOQlscKLbRC/',
+		team = 'https://web.haojiao.cc/wiki/team/t2Ud5pOQlscKLbRC/',
+		player = 'https://web.haojiao.cc/wiki/player/t2Ud5pOQlscKLbRC/',
+	},
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
@@ -131,6 +137,11 @@ local PREFIXES = {
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
+	rgl = {
+		'https://rgl.gg/Public/LeagueTable?s=',
+		team = 'https://rgl.gg/Public/Team?t=',
+		player = 'https://rgl.gg/Public/PlayerProfile?p=',
+	},
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
@@ -152,6 +163,7 @@ local PREFIXES = {
 	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
+	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
 		'https://stratz.com/leagues/',

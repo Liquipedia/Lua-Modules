@@ -12,8 +12,12 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class WidgetFactory
 local WidgetFactory = Class.new()
 
+---@param widget Widget
+---@param injector WidgetInjector
+---@return Widget[]
 function WidgetFactory.work(widget, injector)
 	local convertedWidgets = {}
 

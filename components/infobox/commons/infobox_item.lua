@@ -19,13 +19,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class ItemInfobox: BasicInfobox
 local Item = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Item.run(frame)
 	local item = Item(frame)
 	return item:createInfobox()
 end
 
+---@return Html
 function Item:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -108,14 +112,19 @@ function Item:createInfobox()
 	return builtInfobox
 end
 
+---@param args table
+---@return string[]
 function Item:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Item:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Item:setLpdbData(args)
 end
 

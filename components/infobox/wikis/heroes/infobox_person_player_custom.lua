@@ -43,6 +43,13 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+function CustomInjector:parse(id, widgets)
+	if id == 'history' and string.match(_args.retired or '', '%d%d%d%d') then
+		table.insert(widgets, Cell{name = 'Retired', content = {_args.retired}})
+	end
+	return widgets
+end
+
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end

@@ -319,11 +319,6 @@ opponents leave the tournament directly from the upper bracket.
 The third place match is not counted.
 ]]
 function MatchGroupCoordinates.computeRawCounts(bracket)
-	if #bracket.sections > 2 then
-		-- Triple elimination brackets are not supported
-		return {}
-	end
-
 	local reverseRounds = Array.reverse(bracket.rounds)
 
 	local countsBySection = Array.map(Array.range(1, #bracket.sections), function(sectionIx) return 0 end)

@@ -1302,6 +1302,11 @@ local data = {
 	},
 
 	-- ISO 3166-1 alpha-2 Traditional Reservations
+	['serbiaandmontenegro'] = {
+		flag = 'File:cs_hd.png',
+		localised = 'Serbian and Montenegrin',
+		name = 'Serbia and Montenegro',
+	},
 	['yugoslavia'] = {
 		flag = 'File:yu_hd.png',
 		localised = 'Yugoslavian',
@@ -1402,7 +1407,7 @@ local data = {
 		name = 'Latin America South',
 	},
 	['levant'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:Levant flag hd.png',
 		localised = 'Levantine',
 		name = 'Levant',
 	},
@@ -1422,7 +1427,7 @@ local data = {
 		name = 'Nordic Countries',
 	},
 	['northafrica'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:North africa flag hd.png',
 		localised = 'North African',
 		name = 'North Africa',
 	},
@@ -1438,7 +1443,7 @@ local data = {
 	},
 	['oceania'] = {
 		flag = 'File:anz hd.png',
-		localised = 'Oceanic',
+		localised = 'Oceanian',
 		name = 'Oceania',
 	},
 	['southamerica'] = {
@@ -1708,7 +1713,7 @@ local twoLetter = {
 	['pw'] = 'palau',
 	['py'] = 'paraguay',
 	['qa'] = 'qatar',
-	['re'] = 'réunion',
+	['re'] = 'reunion',
 	['ro'] = 'romania',
 	['rs'] = 'serbia',
 	['ru'] = 'russia',
@@ -1777,11 +1782,11 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
-	['uk'] = 'unitedkingdom',
 	['un'] = 'unitednations',
 
 	--   ISO 3166-1 alpha-2 Traditional Reservations
 	['yu'] = 'yugoslavia',
+	['cs'] = 'serbiaandmontenegro',
 }
 
 -- This table includes:
@@ -2144,6 +2149,7 @@ local aliases = {
 	['ukni'] = 'northernireland',
 
 	--language flag abbreviations
+	['usgb'] = 'englishspeaking',
 	['usuk'] = 'englishspeaking',
 	['deat'] = 'germanspeaking',
 	['esmx'] = 'spanishspeaking',
@@ -2156,6 +2162,7 @@ local aliases = {
 	['gerspeaking'] = 'germanspeaking',
 	['araspeaking'] = 'arabicspeaking',
 
+	['uk'] = 'unitedkingdom',
 	['ff'] = 'filler',
 	['fillerflag'] = 'filler',
 	['unknown'] = 'filler',

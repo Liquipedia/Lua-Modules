@@ -13,6 +13,10 @@ local Table = require('Module:Table')
 local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
+---@class LinksWidget: Widget
+---@operator call({content: table<string, string>, variant: string?}): LinksWidget
+---@field links table<string, string>
+---@field variant string?
 local Links = Class.new(
 	Widget,
 	function(self, input)
@@ -21,96 +25,9 @@ local Links = Class.new(
 	end
 )
 
-local PRIORITY_GROUPS = {
-	core = {
-		'home',
-		'site',
-		'website'
-	},
-	league = {
-		'5ewin',
-		'abiosgaming',
-		'aligulac',
-		'apexlegendsstatus',
-		'battlefy',
-		'b5csgo',
-		'challengermode',
-		'challonge',
-		'cybergamer',
-		'datdota',
-		'dotabuff',
-		'esea',
-		'esea-d',
-		'esl',
-		'esportal',
-		'faceit',
-		'faceit-c',
-		'faceit-hub',
-		'faceit-org',
-		'factor',
-		'gamersclub',
-		'halodatahive',
-		'letsplaylive',
-		'matcherino',
-		'matcherinolink',
-		'nwc3l',
-		'royaleapi',
-		'siege-gg',
-		'sk',
-		'smashboards',
-		'sostronk',
-		'start-gg',
-		'stratz',
-		'tonamel',
-		'toornament',
-		'trackmania-io',
-		'vlr',
-		'bracket',
-		'rules',
-		'rulebook',
-	},
-	social = {
-		'discord',
-		'facebook',
-		'instagram',
-		'privsteam',
-		'pubsteam',
-		'reddit',
-		'snapchat',
-		'steam',
-		'steamalternative',
-		'telegram',
-		'tiktok',
-		'twitter',
-		'vk',
-		'weibo'
-	},
-	streams = {
-		'twitch',
-		'youtube',
-		'stream',
-		'afreeca',
-		'dlive',
-		'facebook-gaming',
-		'vidio',
-		'booyah',
-		'douyin',
-		'douyu',
-		'huyatv',
-		'zhangyutv',
-		'bilibili-stream',
-		'kuaishou',
-		'kick',
-		'cc',
-		'niconico',
-		'nimotv',
-		'openrec',
-		'steamtv',
-		'yandexefir',
-		'zhanqitv',
-	}
-}
+local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {requireDevIfEnabled = true, loadData = true})
 
+---@return {[1]: Html}
 function Links:make()
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
@@ -143,6 +60,9 @@ function Links:make()
 	}
 end
 
+---@param key string
+---@param value string?
+---@return string
 function Links:_makeLink(key, value)
 	key = UtilLinks.removeAppendedNumber(key)
 	return '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..

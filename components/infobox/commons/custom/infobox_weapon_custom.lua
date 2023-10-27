@@ -12,6 +12,8 @@ local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 
 local CustomWeapon = {}
 
+---@param frame Frame
+---@return Html
 function CustomWeapon.run(frame)
 	local weapon = Weapon(frame)
 	return weapon:createInfobox()

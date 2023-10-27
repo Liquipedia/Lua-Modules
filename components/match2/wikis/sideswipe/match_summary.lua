@@ -13,84 +13,63 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local _TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local _TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
+local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Header Class
-local Header = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-header-dev')
-	end
-)
+---@class SideswipeMatchSummaryHeader: MatchSummaryHeader
+---@field leftElementAdditional Html
+---@field rightElementAdditional Html
+---@field scoreBoardElement Html
+local Header = Class.new(MatchSummary.Header)
 
+---@param content Html
+---@return self
 function Header:leftOpponentTeam(content)
 	self.leftElementAdditional = content
 	return self
 end
 
+---@param content Html
+---@return self
 function Header:rightOpponentTeam(content)
 	self.rightElementAdditional = content
 	return self
 end
 
+---@param content Html
+---@return self
 function Header:scoreBoard(content)
-	self.scoreBoard = content
+	self.scoreBoardElement = content
 	return self
 end
 
-function Header:leftOpponent(content)
-	self.leftElement = content
-	return self
-end
-
-function Header:rightOpponent(content)
-	self.rightElement = content
-	return self
-end
-
+---@param opponent1 standardOpponent
+---@param opponent2 standardOpponent
+---@return Html
 function Header:createScoreDisplay(opponent1, opponent2)
-	local function getScore(opponent)
-		local scoreText
-		local isWinner = opponent.placement == 1 or opponent.advances
-		if opponent.placement2 then
-			-- Bracket Reset, show W/L
-			if opponent.placement2 == 1 then
-				isWinner = true
-				scoreText = 'W'
-			else
-				isWinner = false
-				scoreText = 'L'
-			end
-		else
-			scoreText = OpponentDisplay.InlineScore(opponent)
-		end
-		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = scoreText,
-		}
-	end
-
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(
-			getScore(opponent1)
+			self:createScore(opponent1)
 				:css('margin-right', 0)
 		)
 		:node(' : ')
-		:node(getScore(opponent2))
+		:node(self:createScore(opponent2))
 end
 
+---@param score number?
+---@param bestof number?
+---@param isNotFinished boolean?
+---@return Html
 function Header:createScoreBoard(score, bestof, isNotFinished)
 	local scoreBoardNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
@@ -117,17 +96,23 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	return scoreBoardNode:node(score)
 end
 
+---@param opponent standardOpponent
+---@param date string
+---@return Html?
 function Header:soloOpponentTeam(opponent, date)
 	if opponent.type == 'solo' then
 		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
 		local display = teamExists
 			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or _TBD_ICON
+			or TBD_ICON
 		return mw.html.create('div'):wikitext(display)
 			:addClass('brkts-popup-header-opponent-solo-team')
 		end
 end
 
+---@param opponent standardOpponent
+---@param opponentIndex integer
+---@return Html
 function Header:createOpponent(opponent, opponentIndex)
 	return OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
@@ -140,69 +125,33 @@ function Header:createOpponent(opponent, opponentIndex)
 			or 'brkts-popup-header-opponent-solo-with-team')
 end
 
+---@return Html
 function Header:create()
 	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 		:node(self.leftElementAdditional)
 		:node(self.leftElement)
-	self.root:node(self.scoreBoard)
+	self.root:node(self.scoreBoardElement)
 	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
 		:node(self.rightElement)
 		:node(self.rightElementAdditional)
 	return self.root
 end
 
-
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	-- footer
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	if Table.isNotEmpty(vods) or String.isNotEmpty(match.vod) then
-		local footer = MatchSummary.Footer()
-
-		-- Match Vod
-		if String.isNotEmpty(match.vod) then
-			footer:addElement(VodLink.display{
-				vod = match.vod,
-			})
-		end
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			footer:addElement(VodLink.display{
-				gamenum = index,
-				vod = vod,
-			})
-		end
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
-function CustomMatchSummary._createHeader(match)
+---@param match MatchGroupUtilMatch
+---@param options {teamStyle: boolean?, width: string?}?
+---@return SideswipeMatchSummaryHeader
+function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
-	header
+	return header
 		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
 		:leftOpponent(header:createOpponent(match.opponents[1], 1))
 		:scoreBoard(header:createScoreBoard(
@@ -215,11 +164,11 @@ function CustomMatchSummary._createHeader(match)
 		))
 		:rightOpponent(header:createOpponent(match.opponents[2], 2))
 		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
-
-	return header
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
@@ -235,6 +184,8 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
@@ -262,14 +213,14 @@ function CustomMatchSummary._createGame(game)
 	end
 
 	row:addElement(CustomMatchSummary._iconDisplay(
-		_GREEN_CHECK,
+		GREEN_CHECK,
 		game.winner == 1,
 		game.scores[1],
 		1
 	))
 	row:addElement(centerNode)
 	row:addElement(CustomMatchSummary._iconDisplay(
-		_GREEN_CHECK,
+		GREEN_CHECK,
 		game.winner == 2,
 		game.scores[2],
 		2
@@ -279,7 +230,7 @@ function CustomMatchSummary._createGame(game)
 		local timeouts = Json.parseIfString(extradata.timeout)
 		row:addElement(MatchSummary.Break():create())
 		row:addElement(CustomMatchSummary._iconDisplay(
-			_TIMEOUT,
+			TIMEOUT,
 			Table.includes(timeouts, 1)
 		))
 		row:addElement(mw.html.create('div')
@@ -287,7 +238,7 @@ function CustomMatchSummary._createGame(game)
 			:node(mw.html.create('div'):node('Timeout'))
 		)
 		row:addElement(CustomMatchSummary._iconDisplay(
-			_TIMEOUT,
+			TIMEOUT,
 			Table.includes(timeouts, 2)
 		))
 	end
@@ -316,6 +267,9 @@ function CustomMatchSummary._createGame(game)
 	return row
 end
 
+---@param goalesValue string|number
+---@param side 1|2
+---@return Html
 function CustomMatchSummary._goalDisaplay(goalesValue, side)
 	local goalsDisplay = mw.html.create('div')
 		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
@@ -330,12 +284,17 @@ function CustomMatchSummary._goalDisaplay(goalesValue, side)
 			:node(goalsDisplay)
 end
 
+---@param icon string
+---@param shouldDisplay boolean?
+---@param additionalElement number|string|Html|nil
+---@param side integer?
+---@return Html
 function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side)
 	local flip = side == 2
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
-		:node(shouldDisplay and icon or _NO_CHECK)
+		:node(shouldDisplay and icon or NO_CHECK)
 		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
 end
 

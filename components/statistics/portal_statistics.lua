@@ -36,7 +36,7 @@ local ColumnName = Condition.ColumnName
 
 local Count = Lua.import('Module:Count', {requireDevIfEnabled = true})
 
-local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
+local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
 local EPOCH_DATE = '1970-01-01'
@@ -109,6 +109,7 @@ end
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
+	args.startYear = tonumber(args.year)
 
 	local params = {
 		catLabel = Logic.readBool(args.isForTeam) and 'Teams' or 'Players',
@@ -117,25 +118,9 @@ function StatisticsPortal.topEarningsChart(args)
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
-	local topEarningsList
+	local topEarningsList = StatisticsPortal._getOpponentEarningsData(args, config)
 
-	if config.opponentType == Opponent.team then
-		topEarningsList = StatisticsPortal._getTeams(
-			args.limit,
-			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
-	elseif config.opponentType == Opponent.solo then
-		topEarningsList = StatisticsPortal._getPlayers(
-			args.limit,
-			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
-	end
-
-	local yearSeriesData = Array.map(Array.range(config.startYear, CURRENT_YEAR), function(year)
+	local yearSeriesData = Array.map(Array.range(config.startYear, tonumber(args.year) or CURRENT_YEAR), function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
 			return teamData.extradata['earningsin' .. year] or 0
 		end)
@@ -815,14 +800,12 @@ Section: Query Functions
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@param addGroupBy string?
 ---@return table
-function StatisticsPortal._getPlayers(limit, addConditions, addOrder, addGroupBy)
+function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'pagename, id, nationality, earnings, extradata, birthdate, team',
 		conditions = addConditions or '',
 		order = addOrder,
-		groupby = addGroupBy,
 		limit = limit or MAX_QUERY_LIMIT,
 	})
 
@@ -833,18 +816,59 @@ end
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@param addGroupBy string?
 ---@return table
-function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
+function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		query = 'pagename, name, template, earnings, extradata',
 		conditions = addConditions or '',
 		order = addOrder,
-		groupby = addGroupBy,
 		limit = limit or MAX_QUERY_LIMIT,
 	})
 
 	return data
+end
+
+
+---@param args table?
+---@param config table?
+---@return table
+function StatisticsPortal._getOpponentEarningsData(args, config)
+	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
+	local queryFields
+	if opponentType == Opponent.team then
+		queryFields = 'pagename, name, template, earnings, extradata'
+	else
+		queryFields = 'pagename, id, nationality, earnings, extradata, birthdate, team'
+	end
+
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
+
+	local data = {}
+
+	local processData = function(item)
+		table.insert(data, item)
+	end
+
+	local queryParameters = {
+		conditions = conditions:toString(),
+		limit = MAX_QUERY_LIMIT,
+		query = queryFields,
+	}
+
+	Lpdb.executeMassQuery(opponentType, queryParameters, processData)
+
+	local earningsFunction = function (a)
+		if String.isNotEmpty(args.year) and a.extradata then
+			return tonumber(a.extradata['earningsin'..args.year]) or 0
+		else
+			return tonumber(a.earnings) or 0
+		end
+	end
+
+	table.sort(data, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
+
+	return Array.sub(data, 1, args.limit)
 end
 
 
@@ -1270,7 +1294,9 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			rotate = config.axisRotate,
 		},
 	}
-	config.customLegend = config.customLegend or seriesNames
+	if Table.isEmpty(config.customLegend) then
+		config.customLegend = seriesNames
+	end
 
 	return StatisticsPortal._drawChart(config, chartData)
 end
