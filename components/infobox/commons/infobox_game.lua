@@ -24,13 +24,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@Class GameInfobox: BasicInfobox
 local Game = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
+---@return Html
 function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -72,6 +76,8 @@ function Game:createInfobox()
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
+---@param args table
+---@param links table
 function Game:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
 
@@ -97,10 +103,17 @@ function Game:_setLpdbData(args, links)
 	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, lpdbData)
 end
 
+--- Allows for overriding this functionality
+---@param lpdbData table
+---@param args table
+---@return table
 function Game:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+--- Allows for overriding this functionality
+---@param args table
+---@return boolean
 function Game:shouldStore(args)
 	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
