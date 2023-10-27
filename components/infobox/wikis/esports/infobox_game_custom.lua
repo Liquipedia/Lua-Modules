@@ -26,7 +26,6 @@ local _game
 
 function CustomGame.run(frame)
 	local game = Game(frame)
-	_game = game
 	
 	game.createWidgetInjector = CustomGame.createWidgetInjector
 	game.addToLpdb = CustomGame.addToLpdb
