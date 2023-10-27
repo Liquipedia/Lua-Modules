@@ -9,7 +9,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local Game = Lua.import('Module:Infobox/Game', {requireDevIfEnabled = true})
 
@@ -22,16 +21,15 @@ local CustomGame = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
 
 ---@param frame Frame
 ---@return Html
 function CustomGame.run(frame)
 	local game = Game(frame)
-	
+
 	game.createWidgetInjector = CustomGame.createWidgetInjector
 	game.addToLpdb = CustomGame.addToLpdb
-	
+
 	_args = game.args
 	return game:createInfobox()
 end
@@ -56,7 +54,7 @@ function CustomInjector:addCustomCells(widgets)
 		name = 'Mode(s)',
 		content = {_args.mode}
 	})
-	
+
 	return widgets
 end
 
@@ -67,7 +65,7 @@ function CustomGame:addToLpdb(lpdbData, args)
 	lpdbData.extradata.engine = args.engine
 	lpdbData.extradata.genre = args.genre
 	lpdbData.extradata.mode = args.mode
-	
+
 	return lpdbData
 end
 
