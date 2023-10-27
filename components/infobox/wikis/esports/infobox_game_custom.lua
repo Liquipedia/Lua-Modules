@@ -59,6 +59,9 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomGame:addToLpdb(lpdbData, args)
 	lpdbData.extradata.engine = _args.engine
 	lpdbData.extradata.genre = _args.genre
