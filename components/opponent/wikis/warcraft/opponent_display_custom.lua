@@ -50,7 +50,7 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 				template = opponent.template,
 			}))
 		else
-			self.content:node(OpponentDisplay.BlockOpponent({
+			self.content:node(CustomOpponentDisplay.BlockOpponent({
 				opponent = opponent,
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',

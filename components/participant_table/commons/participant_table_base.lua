@@ -17,7 +17,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -157,20 +156,17 @@ function ParticipantTable:readSection(args)
 	local config = self.readConfig(args, self.config)
 	local section = {config = config}
 
-	local keys = Array.filter(Array.extractKeys(args), function(key)
-		return String.contains(key, '^%d+$') or
-			String.contains(key, '^p%d+$') or
-			String.contains(key, '^player%d+$')
-	end)
-
 	local entriesByName = {}
-	Array.forEach(keys, function(key)
-		local entry = self:readEntry(args, key, config)
+	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
+		local entry = self:readEntry(args, key, index, config)
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
 
 		entriesByName[entry.name] = entry
+
+		--needed so index is increased
+		return entry
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
@@ -190,22 +186,28 @@ end
 ---@field name string
 ---@field note string?
 ---@field dq boolean
+---@field inputIndex integer?
 
 ---@param sectionArgs table
 ---@param key string|number
+---@param index number
 ---@param config any
 ---@return ParticipantTableEntry
-function ParticipantTable:readEntry(sectionArgs, key, config)
+function ParticipantTable:readEntry(sectionArgs, key, index, config)
+	local prefix = 'p' .. index
+	local valueFromArgs = function(postfix)
+		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
+	end
+
 	--if not a json assume it is a solo opponent
-	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or Logic.isNumeric(key) and {
+	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-	} or {
-		type = Opponent.solo,
-		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'],
-		flag = sectionArgs[key .. 'flag'],
-		team = sectionArgs[key .. 'team'],
+		link = valueFromArgs('link'),
+		flag = valueFromArgs('flag'),
+		team = valueFromArgs('team'),
+		dq = valueFromArgs('dq'),
+		note = valueFromArgs('note'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -222,11 +224,11 @@ function ParticipantTable:readEntry(sectionArgs, key, config)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
-		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		dq = Logic.readBool(opponentArgs.dq),
+		note = opponentArgs.note,
 		opponent = opponent,
 		name = Opponent.toName(opponent),
-		inputIndex = tonumber(string.match(key, '%d+')),
+		inputIndex = index,
 	}
 end
 
