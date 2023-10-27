@@ -32,12 +32,12 @@ local CustomTeam = Class.new()
 function CustomTeam.run(frame)
 	local team = Team(frame)
 
-	team._createRegion = CustomTeam._createRegion
+	team.createRegion = CustomTeam.createRegion
 
 	return team:createInfobox()
 end
 
-function CustomTeam:_createRegion(region)
+function CustomTeam:createRegion(region)
 	if String.isEmpty(region) then
 		return
 	end
@@ -49,7 +49,7 @@ function CustomTeam:_createRegion(region)
 
 	local remappedRegion = REGION_REMAPPINGS[regionData.region:lower()]
 	if remappedRegion then
-		return CustomTeam:_createRegion(remappedRegion)
+		return CustomTeam:createRegion(remappedRegion)
 	end
 
 	Variables.varDefine('region', regionData.region)

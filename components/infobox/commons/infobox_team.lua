@@ -96,7 +96,7 @@ function Team:createInfobox()
 				Cell{
 					name = 'Region',
 					content = {
-						self:_createRegion(args.region)
+						self:createRegion(args.region)
 					}
 				},
 			}
@@ -215,7 +215,7 @@ function Team:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
 end
 
-function Team:_createRegion(region)
+function Team:createRegion(region)
 	if String.isEmpty(region) then
 		return
 	end

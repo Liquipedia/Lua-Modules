@@ -51,7 +51,7 @@ function CustomTeam.run(frame)
 
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
-	team._createRegion = CustomTeam._createRegion
+	team.createRegion = CustomTeam.createRegion
 
 	return team:createInfobox()
 end
@@ -74,7 +74,7 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomTeam:_createRegion(region)
+function CustomTeam:createRegion(region)
 	if String.isEmpty(region) then
 		return
 	end
@@ -86,7 +86,7 @@ function CustomTeam:_createRegion(region)
 
 	local remappedRegion = REGION_REMAPPINGS[regionData.region:lower()]
 	if remappedRegion then
-		return CustomTeam:_createRegion(remappedRegion)
+		return CustomTeam:createRegion(remappedRegion)
 	end
 
 	Variables.varDefine('region', regionData.region)
