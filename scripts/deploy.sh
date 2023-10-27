@@ -118,12 +118,12 @@ for luaFile in $luaFiles; do
     echo "DEBUG: ...${rawResult}"
     if [[ "${result}" == "Success" ]]; then
       echo "...${result}"
+      echo '...done'
     else
       echo "...failed to deploy"
       allModulesDeployed=false
     fi
 
-    echo '...done'
     # Don't get rate limited
     sleep 4
   fi
