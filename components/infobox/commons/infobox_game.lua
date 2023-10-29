@@ -78,10 +78,9 @@ end
 ---@param args table
 ---@param links table
 function Game:_setLpdbData(args, links)
-	local name = args.romanized_name or self.name
 
 	local lpdbData = {
-		name = name,
+		name = args.romanized_name or self.name,
 		image = args.image,
 		imagedark = args.imagedark,
 		date = args.releasedate,
