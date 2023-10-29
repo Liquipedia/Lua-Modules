@@ -49,10 +49,55 @@ function Game:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Game Information'},
-		Cell{name = 'Developer', content = self:getAllArgsForBase(args, 'developer'), options = {makeLink = true}},
-		Cell{name = 'Publisher', content = self:getAllArgsForBase(args, 'publisher'), options = {makeLink = true}},
+		Customizable{
+			id = 'developer',
+			children = {
+				Builder{
+					builder = function()
+						local developers = self:getAllArgsForBase(args, 'developer', {makeLink = true})
+						return {
+							Cell{
+								name = #developers > 1 and 'Developers' or 'Developer',
+								content = developers,
+							}
+						}
+					end
+				}
+			}
+		},
+		Customizable{
+			id = 'publisher',
+			children = {
+				Builder{
+					builder = function()
+						local publishers = self:getAllArgsForBase(args, 'publisher', {makeLink = true})
+						return {
+							Cell{
+								name = #publishers > 1 and 'Publishers' or 'Publisher',
+								content = publishers,
+							}
+						}
+					end
+				}
+			}
+		},
 		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
-		Cell{name = 'Platforms', content = self:getAllArgsForBase(args, 'platform')},
+		Customizable{
+			id = 'platform',
+			children = {
+				Builder{
+					builder = function()
+						local platforms = self:getAllArgsForBase(args, 'platform', {makeLink = true})
+						return {
+							Cell{
+								name = #platforms > 1 and 'Platforms' or 'Platform',
+								content = platforms,
+							}
+						}
+					end
+				}
+			}
+		},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -86,9 +131,9 @@ function Game:_setLpdbData(args, links)
 		date = args.releasedate,
 		type = 'game',
 		extradata = {
-			developer = args.developer,
-			publisher = args.publisher,
-			platform = args.platform,
+			developer = table.concat(self:getAllArgsForBase(args, 'developer'), ';'),
+			publisher = table.concat(self:getAllArgsForBase(args, 'publisher'), ';'),
+			platform = table.concat(self:getAllArgsForBase(args, 'platform'), ';'),
 			links = mw.ext.LiquipediaDB.lpdb_create_json(
 				Links.makeFullLinksForTableItems(links or {}, 'game')
 			),
