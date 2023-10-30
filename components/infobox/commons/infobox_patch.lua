@@ -46,7 +46,7 @@ function Patch:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = 'Patch Information'},
+		Title{name = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release', content = {args.release}},
@@ -82,7 +82,7 @@ function Patch:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Patches')
+		infobox:categories(self:getInformationType(args))
 		self:setLpdbData(args)
 	end
 
@@ -94,12 +94,20 @@ end
 function Patch:setLpdbData(args)
 	local date = args.release
 	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
+	local informationType = self:getInformationType(args):lower()
+	mw.ext.LiquipediaDB.lpdb_datapoint(informationType .. '_' .. self.name, {
 		name = args.name,
-		type = 'patch',
+		type = informationType,
 		information = monthAndDay,
 		date = date,
 	})
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string
+function Patch:getInformationType(args)
+	return args.informationType or 'Patch'
 end
 
 --- Allows for overriding this functionality
