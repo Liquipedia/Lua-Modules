@@ -98,10 +98,7 @@ function CustomUnit:setLpdbData(args)
 		}),
 	}
 
-	local objectName = mw.title.getCurrentTitle().text
-	objectName = 'car_' .. objectName
-
-	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('car_' .. self.pagename, lpdbData)
 end
 
 return CustomUnit
