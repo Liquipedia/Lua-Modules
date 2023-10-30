@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Logic = require('Module:Logic')
+
 local Table = {}
 
 ---@deprecated
@@ -27,11 +29,13 @@ end
 
 ---@param tbl table
 ---@param value any
+---@param isPattern boolean?
 ---@return boolean
-function Table.includes(tbl, value)
+function Table.includes(tbl, value, isPattern)
 	for _, entry in pairs(tbl) do
-		if entry == value then
-			return true
+		if isPattern and Logic.isNumeric(string.find(entry, value))
+			or not isPattern and entry == value then
+				return true
 		end
 	end
 	return false
