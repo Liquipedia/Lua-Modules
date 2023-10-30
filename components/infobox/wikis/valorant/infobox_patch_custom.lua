@@ -28,10 +28,10 @@ end
 function CustomPatch:getChronologyData(args)
 	local data = {}
 	if args.previous then
-		data.previous = args.previous .. ' Patch|' .. args.previous
+		data.previous = 'Patch ' .. args.previous .. '|' .. args.previous
 	end
 	if args.next then
-		data.next = args.next .. ' Patch|' .. args.next
+		data.next = 'Patch ' .. args.next .. '|' .. args.next
 	end
 	return data
 end
