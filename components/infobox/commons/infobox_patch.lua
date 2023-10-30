@@ -100,7 +100,7 @@ function Patch:setLpdbData(args)
 		type = informationType,
 		information = monthAndDay,
 		date = date,
-		extradata = {
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			highlights = mw.ext.LiquipediaDB.lpdb_create_array(self:getAllArgsForBase(args, 'highlight'))
 		},
 	})
