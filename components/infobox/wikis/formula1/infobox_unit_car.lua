@@ -95,9 +95,7 @@ function CustomUnit:setLpdbData(args)
 		type = 'car',
 		image = args.image,
 		date = args.released,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			game = game,
-		}),
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{},
 	}
 
 	mw.ext.LiquipediaDB.lpdb_datapoint('car_' .. self.pagename, lpdbData)
