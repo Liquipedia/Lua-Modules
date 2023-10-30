@@ -15,10 +15,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local FILTERED_STACK_ITEMS = {
-	'Module:ResultOrError:124: in function <Module:ResultOrError:123>',
-	'Module:ResultOrError:115: in function <Module:ResultOrError:114>',
-	'[C]: in function \'xpcall\'',
-	'Module:ResultOrError:113: in function \'try\'',
+	'^Module:ResultOrError:%d+: in function <Module:ResultOrError:%d+>$',
+	'^%[C%]: in function \'xpcall\'$',
+	'^Module:ResultOrError:%d+: in function \'try\'$',
 }
 
 local pageVars = PageVariableNamespace('ErrorStash')
@@ -133,7 +132,7 @@ function ErrorExt.printErrorJson(error)
 				Array.sub(stackFrames, 2, #stackFrames),
 				function(frame) return String.trim(frame) end
 			),
-			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame) end
+			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame, true) end
 		)
 		Array.forEach(stackFrames, processStackFrame)
 	end)
