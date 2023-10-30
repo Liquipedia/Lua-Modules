@@ -35,7 +35,6 @@ end
 
 ---@return Html
 function Patch:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -47,11 +46,12 @@ function Patch:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = (self:getInformationType(args)) .. ' Information'},
-		Cell{name = 'Version', content = {args.version}},
+		Customizable{id = 'version', children = {
+			Cell{name = 'Version', content = {args.version}}
+		}},
 		Customizable{id = 'release', children = {
-				Cell{name = 'Release', content = {args.release}},
-			}
-		},
+			Cell{name = 'Release', content = {args.release}}
+		}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -82,11 +82,12 @@ function Patch:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(self:getInformationType(args))
+		self.infobox:categories(self:getInformationType(args))
+		self.infobox:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
@@ -115,6 +116,12 @@ end
 ---@return {previous: string?, next: string?}
 function Patch:getChronologyData(args)
 	return { previous = args.previous, next = args.next }
+end
+
+---@param args table
+---@return string[]
+function Patch:getWikiCategories(args)
+	return {}
 end
 
 return Patch
