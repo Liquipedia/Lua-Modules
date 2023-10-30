@@ -48,6 +48,8 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Fuel', content = {_args.fuel}},
 		Cell{name = 'Lubricant(s)', content = {_args.lubricant}},
 		Cell{name = 'Tyre Supplier', content = {_args.tyres}},
+		Cell{name = 'First Entry', content = {_args.firstentry}},
+		Cell{name = 'Last Entry', content = {_args.lastentry}},
 	}
 end
 
