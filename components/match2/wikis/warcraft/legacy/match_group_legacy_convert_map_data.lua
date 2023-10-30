@@ -122,22 +122,45 @@ function ConvertMapData.teamMulti(args)
 			table.insert(mapPlayers[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name2] or {}))
 		end
 
+		local hasMissingWinner = false
+		local submatchScores = {0, 0}
 		for mapPrefix, map, submatchMapIndex in Table.iter.pairsByPrefix(args, prefix .. 'map') do
 			mapIndex = mapIndex + 1
 			local parsedPrefix = 'map' .. mapIndex
 			parsedArgs[parsedPrefix] = map
 			parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
-			parsedArgs[parsedPrefix .. 'win'] = args[prefix .. 'win' .. submatchMapIndex]
+
+			local winner = tonumber(args[prefix .. 'win' .. submatchMapIndex])
+			parsedArgs[parsedPrefix .. 'win'] = winner
+			if winner and submatchScores[winner] then
+				submatchScores[winner] = submatchScores[winner] + 1
+			elseif winner ~= 0 then
+				hasMissingWinner = true
+			end
 
 			Array.forEach(mapPlayers, function(players, opponentIndex)
 				Array.forEach(players, function(player, playerIndex)
-					local playerPrefix = parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex
-					parsedArgs[playerPrefix] = player.name
+					parsedArgs[parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex] = player.name
 				end)
 				--only had race and heroes support for 1v1 submatches ...
 				local playerPrefix = parsedPrefix .. 't' .. opponentIndex .. 'p1'
 				parsedArgs[playerPrefix .. 'race'] = args[mapPrefix .. 'p' .. opponentIndex .. 'race'] or players[1].race
 				parsedArgs[playerPrefix .. 'heroes'] = args[mapPrefix .. 'p' .. opponentIndex .. 'heroes']
+			end)
+		end
+
+		if hasMissingWinner then
+			mapIndex = mapIndex + 1
+			local parsedPrefix = 'map' .. mapIndex
+			parsedArgs[parsedPrefix] = 'Submatch Score Fix'
+			parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
+			parsedArgs[parsedPrefix .. 'p1score'] = (tonumber(args[prefix .. 'p1score']) or 0) - submatchScores[1]
+			parsedArgs[parsedPrefix .. 'p2score'] = (tonumber(args[prefix .. 'p2score']) or 0) - submatchScores[2]
+
+			Array.forEach(mapPlayers, function(players, opponentIndex)
+				Array.forEach(players, function(player, playerIndex)
+					parsedArgs[parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex] = player.name
+				end)
 			end)
 		end
 
