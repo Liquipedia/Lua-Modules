@@ -79,12 +79,11 @@ end
 ---@param args table
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
-	local categories = {}
 	if Namespace.isMain() then
-		categories = {'Cars'}
+		return {'Cars'}
 	end
 
-	return categories
+	return {}
 end
 
 ---@param args table
