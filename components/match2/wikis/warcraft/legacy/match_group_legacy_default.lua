@@ -39,6 +39,8 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 		race2 = 'map$1$p2race',
 		heroes1 = 'map$1$p1heroes',
 		heroes2 = 'map$1$p2heroes',
+		t1p1heroesNoCheck = 'map$1$p1heroesNoCheck',
+		t2p1heroesNoCheck = 'map$1$p2heroesNoCheck',
 		vod = 'vodgame$1$',
 		subgroup = 'map$1$subgroup',
 	}
