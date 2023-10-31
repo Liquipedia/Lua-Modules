@@ -115,6 +115,13 @@ function LegacyMatchMaps._readMaps(args)
 		local map = Table.filterByKey(args, function(key) return String.startsWith(key, prefix) end)
 		map = Table.map(map, function(key, value)
 			args[key] = nil
+
+			local noCheckIndex = string.match(key, '^' .. prefix .. 'p(%d)heroesNoCheck$')
+			if noCheckIndex then
+				--2v2 submatches never had heroes data so no check needed for those
+				return 't' .. noCheckIndex .. 'p1heroesNoCheck', value
+			end
+
 			if key == prefix then
 				return 'map', value
 			end
