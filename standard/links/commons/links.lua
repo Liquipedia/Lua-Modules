@@ -172,6 +172,10 @@ local PREFIXES = {
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
+	tftv = {
+		'https://www.teamfortress.tv/',
+		player = 'https://www.teamfortress.tv/user/',
+	},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
