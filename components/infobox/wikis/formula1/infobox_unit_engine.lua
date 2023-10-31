@@ -44,13 +44,11 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Manufacturer', content = {_args.manufacturer}},
 		Cell{name = 'Production', content = {_args.production}},
 		Cell{name = 'Weight', content = {_args.weight}},
-		
 		Title{name = 'Engine Output'},
 		Cell{name = 'Power', content = {_args.power}},
 		Cell{name = 'Torque', content = {_args.torque}},
 		Cell{name = 'Idle RPM', content = {_args.idlerpm}},
 		Cell{name = 'Peak RPM', content = {_args.peakrpm}},
-	
 		Title{name = 'Engine Layout'},
 		Cell{name = 'Configuration', content = {_args.configuration}},
 		Cell{name = 'Displacement', content = {_args.displacement}},
