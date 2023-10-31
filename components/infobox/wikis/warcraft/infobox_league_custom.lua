@@ -106,7 +106,10 @@ function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
-			Cell{name = 'Game version', content = {CustomLeague._displayGameVersion()}},
+			Cell{name = 'Game version', content = {
+				CustomLeague._displayGameVersion(),
+				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
+			}},
 			Cell{name = 'Server', content = {CustomLeague:_getServer()}}
 			}
 	elseif id == 'liquipediatier' then
@@ -245,7 +248,11 @@ function CustomLeague:_getServer()
 		return nil
 	end
 
-	return '[[Server|' .. _args.server .. ']]'
+	if String.isEmpty(_args.server2) then
+		return '[[Server|' .. _args.server .. ']]'
+	end
+
+	return '[[Server|' .. _args.server .. ']]', '[[Server|' .. _args.server2 .. ']]'
 end
 
 function CustomLeague:defineCustomPageVariables(args)
@@ -368,6 +375,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		or Variables.varDefault('firstmatch', Variables.varDefault('tournament_startdate'))
 	lpdbData.mode = CustomLeague._getMode()
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
+
+	lpdbData.extradata.server2 = args.server2
+	lpdbData.extradata.patch2 = args.patch2
 
 	return lpdbData
 end
