@@ -96,6 +96,8 @@ function CustomLeague.run(frame)
 	league.addParticipantTypeCategory = CustomLeague.addParticipantTypeCategory
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	--add to league so self is available in them
+	league._getServer = CustomLeague._getServer
 
 	return league:createInfobox(frame)
 end
@@ -116,7 +118,7 @@ function CustomInjector:parse(id, widgets)
 				CustomLeague._displayGameVersion(),
 				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = CustomLeague:_getServer()}
+			Cell{name = 'Server', content = _league:_getServer(_args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
@@ -257,14 +259,10 @@ function CustomLeague:shouldStore(args)
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
 end
 
----@return string?
----@return string?
-function CustomLeague:_getServer()
-	if String.isEmpty(_args.server) then
-		return nil
-	end
-
-	return Array.map(_league:getAllArgsForBase(_args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
+---@param args table
+---@return table
+function CustomLeague:_getServer(args)
+	return Array.map(self:getAllArgsForBase(args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
 end
 
 ---@param args table
