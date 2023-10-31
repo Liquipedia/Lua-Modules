@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 
-local config = Lua.loadDataIfExists('Module:Match/Config') or {}
+local config = Lua.requireIfExists('Module:Match/Config', {requireDevIfEnabled = true, loadData = true}) or {}
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
@@ -31,7 +31,6 @@ local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = '
 local _DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local _MAX_NUM_OPPONENTS = 2
 local _MAX_NUM_PLAYERS = 30
-local _MAX_NUM_VETOS = 6
 local _MAX_NUM_VODGAMES = 9
 local _DEFAULT_BEST_OF = 99
 local _OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
@@ -156,28 +155,24 @@ end
 function StarcraftMatchGroupInput._getExtraData(match)
 	local extradata
 	if Logic.readBool(match.ffa) then
-		extradata = getStarcraftFfaInputModule().getExtraData(match)
-	else
-		extradata = {
-			noQuery = match.noQuery,
-			casters = match.casters,
-			headtohead = match.headtohead,
-			ffa = 'false',
-		}
+		match.extradata = getStarcraftFfaInputModule().getExtraData(match)
+		return match
+	end
 
-		for vetoIndex = 1, _MAX_NUM_VETOS do
-			extradata = StarcraftMatchGroupInput._getVeto(
-				extradata,
-				match['veto' .. vetoIndex],
-				match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex],
-				vetoIndex
-			)
-		end
+	extradata = {
+		noQuery = match.noQuery,
+		casters = match.casters,
+		headtohead = match.headtohead,
+		ffa = 'false',
+	}
 
-		for subGroupIndex = 1, _MAX_NUM_MAPS do
-			extradata['subGroup' .. subGroupIndex .. 'header']
-				= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-		end
+	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
+		StarcraftMatchGroupInput._getVeto(extradata, vetoMap, match, prefix, vetoIndex)
+	end
+
+	for subGroupIndex = 1, _MAX_NUM_MAPS do
+		extradata['subGroup' .. subGroupIndex .. 'header']
+			= StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	end
 
 	match.extradata = extradata
@@ -185,11 +180,10 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	return match
 end
 
-function StarcraftMatchGroupInput._getVeto(extradata, map, vetoBy, vetoIndex)
-	extradata['veto' .. vetoIndex] = (map ~= nil) and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
-	extradata['veto' .. vetoIndex .. 'by'] = vetoBy
-
-	return extradata
+function StarcraftMatchGroupInput._getVeto(extradata, map, match, prefix, vetoIndex)
+	extradata[prefix] = map and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
+	extradata[prefix .. 'by'] = match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex]
+	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
 function StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
@@ -622,16 +616,20 @@ end
 function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	local players = {}
 	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		local name = Variables.varDefault(teamName .. '_p' .. playerIndex)
+		local prefix = teamName .. '_p' .. playerIndex
+		local name = Variables.varDefault(prefix)
 		if Logic.isNotEmpty(name) then
 			---@cast name -nil
-			local flag = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-			players[playerIndex] = {
+			local player = {
 				name = name:gsub(' ', '_'),
-				displayname = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'display'),
-				flag = Flags.CountryName(flag),
-				extradata = {faction = Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')}
+				displayname = Variables.varDefault(prefix .. 'dn'),
+				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
+				extradata = {faction = Variables.varDefault(prefix .. 'race')}
 			}
+			if player.displayname then
+				Variables.varDefine(player.displayname .. '_page', player.name)
+			end
+			table.insert(players, player)
 		else
 			break
 		end
@@ -719,8 +717,9 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- set initial extradata for maps
 	map.extradata = {
-		comment = map.comment or '',
-		header = map.header or '',
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		header = map.header,
 		noQuery = match.noQuery,
 		server = map.server,
 	}

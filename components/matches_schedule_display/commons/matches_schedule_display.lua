@@ -69,6 +69,7 @@ function MatchesTable:init(args)
 		showRound = not Logic.readBool(args.hideround),
 		sortRound = Logic.readBool(args.sortround),
 		showCountdown = Logic.readBool(args.countdown),
+		showMatchPage = Logic.readBool(args.matchpage),
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
 		pages = Array.map(Array.extractValues(
@@ -163,6 +164,7 @@ function MatchesTable:header()
 		:tag('th'):addClass('divCell'):wikitext('Opponent'):done()
 		:tag('th'):addClass('divCell'):css('width','50'):wikitext('Score'):done()
 		:tag('th'):addClass('divCell'):wikitext('vs. Opponent'):done()
+		:node(self.config.showMatchPage and mw.html.create('th'):addClass('divCell') or nil)
 end
 
 ---@param match table
@@ -209,13 +211,14 @@ function MatchesTable:row(match)
 		:node(MatchesTable._buildOpponent(match.match2opponents[1], DO_FLIP, LEFT_SIDE_OPPONENT))
 		:node(MatchesTable.score(match))
 		:node(MatchesTable._buildOpponent(match.match2opponents[2], NO_FLIP, RIGHT_SIDE_OPPONENT))
+		:node(self.config.showMatchPage and MatchesTable.matchPageLinkDisplay(match) or nil)
 end
 
 ---@param match table
 ---@return string
 function MatchesTable:determineMatchHeader(match)
 	local matchHeader = Logic.emptyOr(
-		match.match2bracketdata.header or match.extradata.matchsection,
+		match.match2bracketdata.inheritedheader or match.extradata.matchsection,
 		self.currentId == match.match2bracketid and self.currentMatchHeader or nil,
 		--if we do not have a matchHeader yet try:
 		-- 1) the title (in case it is a matchlist)
@@ -313,6 +316,24 @@ function MatchesTable.scoreDisplay(match)
 		match.match2opponents[2],
 		match.winner == WINNER_RIGHT
 	)
+end
+
+---@param match table
+---@return Html
+function MatchesTable.matchPageLinkDisplay(match)
+	return mw.html.create('td'):addClass('MatchPage')
+		:wikitext('[[Match:ID_' .. match.match2id .. '|')
+		:tag('span')
+			:addClass('fa-stack')
+			:tag('i')
+				:addClass('fad fa-file fa-stack-2x')
+				:done()
+			:tag('i')
+				:addClass('fas fa-info fa-stack-1x')
+				:done()
+			:done()
+		:wikitext('Match Page')
+		:wikitext(']]')
 end
 
 ---@param opponent any

@@ -45,6 +45,7 @@ local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
 local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 local PRIZE_TYPE_FREETEXT = 'FREETEXT'
 
 BasePrizePool.config = {
@@ -314,8 +315,35 @@ BasePrizePool.prizeTypes = {
 			end
 		end,
 	},
-	[PRIZE_TYPE_FREETEXT] = {
+	[PRIZE_TYPE_PERCENTAGE] = {
 		sortOrder = 50,
+
+		header = 'percentage',
+		headerParse = function (prizePool, input, context, index)
+			assert(index == 1, 'Percentage only supports index 1')
+			return {title = 'Percentage'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{content = {{data.title}}}
+		end,
+
+		row = 'percentage',
+		rowParse = function (placement, input, context, index)
+			local value = BasePrizePool._parseInteger(input)
+			if value then
+				placement.hasPercentage = true
+			end
+
+			return value
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return TableCell{content = {{data .. '%'}}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_FREETEXT] = {
+		sortOrder = 60,
 
 		header = 'freetext',
 		headerParse = function (prizePool, input, context, index)
@@ -351,6 +379,8 @@ function BasePrizePool:init(args)
 
 	self.usedAutoConvertedCurrency = false
 
+	self.adjacentContent = Logic.emptyOr(args.adjacentContent)
+
 	return self
 end
 
@@ -379,8 +409,15 @@ function BasePrizePool:create(args)
 			local canConvertCurrency = function(prize)
 				return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 			end
+			local hasLocalCurrency1 = Array.any(self.prizes, function(prize)
+				return canConvertCurrency(prize) and prize.index == 1
+			end)
+			local hasPercentage1 = Array.any(self.prizes, function(prize)
+				return prize.type == PRIZE_TYPE_PERCENTAGE and prize.index == 1
+			end)
 
 			for _, placement in ipairs(self.placements) do
+				if hasPercentage1 then placement:_calculateFromPercentage(BasePrizePool.prizeTypes, hasLocalCurrency1) end
 				placement:_setBaseFromRewards(Array.filter(self.prizes, canConvertCurrency), BasePrizePool.prizeTypes)
 			end
 		end
@@ -480,12 +517,38 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 function BasePrizePool:build(isAward)
-	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
+	local prizePoolTable = self:_buildTable(isAward)
 
-	if self:_shouldDisplayPrizeSummary() then
-		wrapper:wikitext(self:_getPrizeSummaryText())
+	if self.options.storeLpdb then
+		self:storeData()
 	end
 
+	if not (self.options.exchangeInfo or self.adjacentContent or self:_shouldDisplayPrizeSummary()) then
+		return prizePoolTable
+	end
+
+	local wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
+
+	if self:_shouldDisplayPrizeSummary() then
+		wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
+	end
+
+	local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables'):node(prizePoolTable)
+
+	if self.adjacentContent then
+		tablesWrapper:wikitext(self.adjacentContent)
+	end
+
+	wrapper:node(tablesWrapper)
+
+	if self.options.exchangeInfo then
+		wrapper:wikitext(self:_currencyExchangeInfo())
+	end
+
+	return wrapper
+end
+
+function BasePrizePool:_buildTable(isAward)
 	local tbl = WidgetTable{
 		classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
 		css = {width = 'max-content'},
@@ -502,19 +565,12 @@ function BasePrizePool:build(isAward)
 	end
 
 	tbl:setContext{self._widgetInjector}
+	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
-		wrapper:node(node)
+		tableNode:node(node)
 	end
 
-	if self.options.exchangeInfo then
-		wrapper:wikitext(self:_currencyExchangeInfo())
-	end
-
-	if self.options.storeLpdb then
-		self:storeData()
-	end
-
-	return wrapper
+	return tableNode
 end
 
 function BasePrizePool:_buildHeader(isAward)
@@ -668,7 +724,7 @@ function BasePrizePool:_currencyExchangeInfo()
 
 		local wrapper = mw.html.create('small')
 
-		wrapper:wikitext('<br><i>(')
+		wrapper:wikitext('<i>(')
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
@@ -694,7 +750,7 @@ end
 -- or if there is a money reward in another currency whilst currency conversion is active
 function BasePrizePool:_hasBaseCurrency()
 	return (Array.any(self.placements, function (placement)
-		return placement.hasBaseCurrency
+		return placement.hasBaseCurrency or placement.hasPercentage
 	end)) or (self.options.autoExchange and Array.any(self.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_LOCAL_CURRENCY
 	end))

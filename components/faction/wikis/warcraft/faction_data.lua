@@ -21,19 +21,19 @@ local factionProps = {
 		pageName = 'Orc',
 		faction = 'o',
 	},
-	n = {
-		bgClass = 'warcraft-nightelf',
-		index = 3,
-		name = 'Nightelf',
-		pageName = 'Nightelf',
-		faction = 'n',
-	},
 	u = {
 		bgClass = 'warcraft-undead',
-		index = 4,
+		index = 3,
 		name = 'Undead',
 		pageName = 'Undead',
 		faction = 'u',
+	},
+	n = {
+		bgClass = 'warcraft-nightelf',
+		index = 4,
+		name = 'Night Elf',
+		pageName = 'Night Elf',
+		faction = 'n',
 	},
 	r = {
 		bgClass = 'Random',
@@ -59,8 +59,8 @@ local factionProps = {
 return {
 	factionProps = factionProps,
 	defaultFaction = 'a',
-	factions = {'h', 'o', 'n', 'u', 'r', 'a'},
-	knownFactions = {'h', 'o', 'n', 'u', 'r'},
-	coreFactions = {'h', 'o', 'n', 'u'},
-	aliases = {['night elf'] = 'n'},
+	factions = {'h', 'o', 'u', 'n', 'r', 'm', 'a'},
+	knownFactions = {'h', 'o', 'u', 'n', 'r'},
+	coreFactions = {'h', 'o', 'u', 'n'},
+	aliases = {['nightelf'] = 'n'},
 }

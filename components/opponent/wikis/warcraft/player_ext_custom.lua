@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
@@ -29,13 +30,13 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		local raceHistory = Logic.readBool(record.extradata.racehistorical)
+		local raceHistory = Logic.readBool(record.extradata.factionhistorical)
 			and CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 			or nil
 
 		return {
 			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
-			race = Faction.read(record.extradata.race),
+			race = Faction.read(record.extradata.faction),
 			raceHistory = raceHistory,
 		}
 	end
@@ -44,7 +45,7 @@ end)
 function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
-		date = date or PlayerExt.getContextualDateOrNow()
+		date = date or DateExt.getContextualDateOrNow()
 		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
 		return entry and Faction.read(entry.race)
 	else

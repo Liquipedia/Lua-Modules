@@ -7,8 +7,17 @@
 --
 
 return {
-	vod = {icon = 'VOD Icon.png', text = 'Watch VOD'},
-	reddit = {icon = 'Reddit-icon.png', text = 'Reddit Thread'},
-	gol = {icon = 'Gol.gg_allmode.png', text = 'GolGG Match Report'},
-	factor = {icon = 'Factor.gg lightmode.png', iconDark = 'Factor.gg darkmode.png', text = 'FactorGG Match Report'},
+	reddit = {
+		icon = 'File:Reddit-icon.png',
+		text = 'Reddit Thread',
+	},
+	gol = {
+		icon = 'File:Gol.gg allmode.png',
+		text = 'GolGG Match Report',
+	},
+	factor = {
+		icon = 'File:Factor.gg lightmode.png',
+		iconDark = 'File:Factor.gg darkmode.png',
+		text = 'FactorGG Match Report',
+	},
 }

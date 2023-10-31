@@ -33,7 +33,7 @@ return {
 				{{#vods}}
 					<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
 				{{/vods}}
-				<div class="match-bm-lol-match-additional-list">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
+				<div class="match-bm-lol-match-additional-list">{{#links}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 				{{#patch}}
 					<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
 				{{/patch}}

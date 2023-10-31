@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local IconData = Lua.loadDataIfExists('Module:Faction/IconData')
+local IconData = Lua.requireIfExists('Module:Faction/IconData', {requireDevIfEnabled = true, loadData = true})
 	or {byFaction = {}}
 
 local Faction = {propTypes = {}, types = {}}

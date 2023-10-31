@@ -57,6 +57,7 @@ function MatchLegacy._convertParameters(match2)
 	local extradata = Json.parseIfString(match2.extradata)
 	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
+
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		local players = {}
@@ -68,11 +69,13 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-		if bracketData.inheritedheader then
+	if type(bracketData) == 'table' then
+		if bracketData.type == 'bracket' and bracketData.inheritedheader then
 			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
+		match.extradata.matchpage = bracketData.matchpage
 	end
+
 
 	local opponents = match2.match2opponents or {}
 	match.extradata.team1icon = (opponents[1] or {}).icon

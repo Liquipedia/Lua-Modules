@@ -11,33 +11,32 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
-local CustomUser = Class.new(User)
+local CustomUser = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _user
 
 function CustomUser.run(frame)
-	local user = User(frame)
+	local user = CustomPerson(frame)
 	user.args.informationType = user.args.informationType or 'User'
+	_user = user
 	_args = user.args
-	PersonSc2.setArgs(_args)
 
 	user.shouldStoreData = CustomUser.shouldStoreData
 	user.getStatusToStore = CustomUser.getStatusToStore
 	user.getPersonType = CustomUser.getPersonType
-
-	user.nameDisplay = PersonSc2.nameDisplay
-
 	user.createWidgetInjector = CustomUser.createWidgetInjector
+	user._getArgsfromBaseDefault = CustomUser._getArgsfromBaseDefault
+	user._getFavouriteTeams = CustomUser._getFavouriteTeams
 
 	return user:createInfobox()
 end
@@ -45,7 +44,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
-			Cell{name = 'Race', content = {PersonSc2.getRaceData(_args.race or 'unknown')}}
+			Cell{name = 'Race', content = {_user:getRaceData(_args.race or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
@@ -65,13 +64,13 @@ end
 function CustomInjector:addCustomCells()
 	local widgets = {
 		Cell{name = 'Languages', content = {_args.languages}},
-		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+		Cell{name = 'Favorite players', content = _user:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+		Cell{name = 'Favorite casters', content = _user:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
 	}
 	if not String.isEmpty(_args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
+		table.insert(widgets, Center{content = {_user:_getFavouriteTeams()}})
 	end
 
 	return widgets

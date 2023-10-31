@@ -43,8 +43,8 @@ return {
 		['malaysia, singapore, philippines'] = 'msp',
 		['malaysia, singapore, and the philippines'] = 'msp',
 
-		['latin american north'] = 'latam north',
-		['latin american south'] = 'latam south',
+		['latin america north'] = 'latam north',
+		['latin america south'] = 'latam south',
 
 		['sub saharan africa'] = 'sub-saharan africa',
 

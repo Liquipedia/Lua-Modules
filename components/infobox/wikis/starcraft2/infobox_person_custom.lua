@@ -1,21 +1,25 @@
 ---
 -- @Liquipedia
 -- wiki=starcraft2
--- page=Module:Infobox/Person/Custom/Shared
+-- page=Module:Infobox/Person/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---Shared functions between SC2 person infoboxes (Player/Commentator and MapMaker)
+--Extends the Infobox/Person class with shared functions between SC2 person infoboxes
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local RACE_ALL = 'All'
 local RACE_ALL_SHORT = 'a'
@@ -47,20 +51,14 @@ MILITARY_DATA.pending = MILITARY_DATA.starting
 MILITARY_DATA.started = MILITARY_DATA.ongoing
 MILITARY_DATA.ending = MILITARY_DATA.ongoing
 
-local _militaryStore
-local _args
+---@class SC2CustomPerson: Person
+local CustomPerson = Class.new(Person)
 
-local _PAGENAME = mw.title.getCurrentTitle().prefixedText
-
-local CustomPerson = {}
-
-function CustomPerson.setArgs(args)
-	_args = args
-end
-
-function CustomPerson.shouldStoreData()
+---@param args table
+---@return boolean
+function CustomPerson:shouldStoreData(args)
 	if
-		Logic.readBool(_args.disable_lpdb) or Logic.readBool(_args.disable_storage)
+		Logic.readBool(args.disable_lpdb) or Logic.readBool(args.disable_storage)
 		or Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 		or not Namespace.isMain()
 	then
@@ -70,8 +68,10 @@ function CustomPerson.shouldStoreData()
 	return true
 end
 
-function CustomPerson.nameDisplay()
-	local raceData = CustomPerson.readFactions(_args.race or Faction.defaultFaction)
+---@param args table
+---@return string
+function CustomPerson:nameDisplay(args)
+	local raceData = self:readFactions(args.race or Faction.defaultFaction)
 
 	local raceIcons
 	if raceData.isAll then
@@ -82,13 +82,16 @@ function CustomPerson.nameDisplay()
 		end))
 	end
 
-	local name = _args.id or _PAGENAME
+	local name = args.id or self.pagename
 
 	return raceIcons .. '&nbsp;' .. name
 end
 
-function CustomPerson.getRaceData(race, asCategory)
-	local factions = CustomPerson.readFactions(race).factions
+---@param race string?
+---@param asCategory boolean?
+---@return string
+function CustomPerson:getRaceData(race, asCategory)
+	local factions = self:readFactions(race).factions
 
 	return table.concat(Array.map(factions, function(faction)
 		if asCategory then
@@ -98,7 +101,9 @@ function CustomPerson.getRaceData(race, asCategory)
 	end) or {}, ',&nbsp;')
 end
 
-function CustomPerson.readFactions(input)
+---@param input string?
+---@return {isAll: boolean, factions: string[]}
+function CustomPerson:readFactions(input)
 	local factions
 	if input == RACE_ALL or input == RACE_ALL_SHORT then
 		factions = Array.copy(Faction.coreFactions)
@@ -113,21 +118,25 @@ function CustomPerson.readFactions(input)
 	return {isAll = isAll, factions = factions}
 end
 
-function CustomPerson.adjustLPDB(_, lpdbData)
+---@param lpdbData table<string, string|number|table|nil>
+---@param args table
+---@param personType string
+---@return table<string, string|number|table|nil>
+function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata or {}
 
-	local raceData = CustomPerson.readFactions(_args.race)
+	local raceData = self:readFactions(args.race)
 
 	extradata.race = raceData.isAll and RACE_ALL_SHORT or raceData.factions[1]
 	extradata.faction = raceData.isAll and RACE_ALL or raceData.factions[1]
 	extradata.faction2 = (not raceData.isAll) and raceData.factions[2] or nil
-	extradata.lc_id = string.lower(_PAGENAME)
-	extradata.teamname = _args.team
-	extradata.role = _args.role
-	extradata.role2 = _args.role2
-	extradata.militaryservice = _militaryStore
-	extradata.activeplayer = not CustomPerson.getStatusToStore()
-		and CustomPerson._isPlayer(_args)
+	extradata.lc_id = string.lower(self.pagename)
+	extradata.teamname = args.team
+	extradata.role = args.role
+	extradata.role2 = args.role2
+	extradata.militaryservice = self:military(args.military).storeValue
+	extradata.activeplayer = not CustomPerson:getStatusToStore(args)
+		and CustomPerson._isPlayer(args)
 		and Variables.varDefault('isActive', '') or ''
 
 	if Variables.varDefault('racecount') then
@@ -140,50 +149,52 @@ function CustomPerson.adjustLPDB(_, lpdbData)
 	return lpdbData
 end
 
+---@param args table
+---@return boolean
 function CustomPerson._isPlayer(args)
-	return not Logic.readBool(_args.isplayer) and
-		string.lower(_args.role or _args.defaultPersonType) ~= 'player'
+	return not Logic.readBool(args.isplayer) and
+		string.lower(args.role or args.defaultPersonType) ~= 'player'
 end
 
-function CustomPerson.military(military)
-	if military and military ~= 'false' then
-		local display = military
-		local militaryCategory = ''
-		military = string.lower(military)
-		for key, item in pairs(MILITARY_DATA) do
-			if String.contains(military, key) then
-				militaryCategory = '[[Category:' .. item.category .. ']]'
-				_militaryStore = item.storeValue
-				break
-			end
-		end
+---@param military string?
+---@return {category: string?, storeValue: string?}
+function CustomPerson:military(military)
+	if not Logic.readBool(military) then return {} end
 
-		return display .. militaryCategory
+	military = military:lower()
+	for key, data in pairs(MILITARY_DATA) do
+		if String.contains(military, key) then return data end
 	end
+
+	return {}
 end
 
-function CustomPerson.getStatusToStore()
-	if _args.death_date then
+---@param args table
+---@return string?
+function CustomPerson:getStatusToStore(args)
+	if args.death_date then
 		return 'Deceased'
-	elseif _args.retired then
+	elseif args.retired then
 		return 'Retired'
 	end
 end
 
-function CustomPerson.getPersonType()
-	if _args.isplayer == 'true' then
+---@param args table
+---@return {store: string, category: string}
+function CustomPerson:getPersonType(args)
+	if args.isplayer == 'true' then
 		return {store = 'Player', category = 'Player'}
 	end
 
-	local role = _args.role or _args.occupation or _args.defaultPersonType
+	local role = args.role or args.occupation or args.defaultPersonType
 	role = string.lower(role or '')
 	local category = ROLES[role]
-	local store = category or CLEAN_OTHER_ROLES[role] or _args.defaultPersonType
+	local store = category or CLEAN_OTHER_ROLES[role] or args.defaultPersonType
 	if category == ROLES['map maker'] then
 		category = 'Mapmaker'
 	end
 
-	return {store = store, category = category or _args.defaultPersonType}
+	return {store = store, category = category or args.defaultPersonType}
 end
 
 return CustomPerson

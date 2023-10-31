@@ -155,6 +155,11 @@ function Legacy._convert(mapping)
 				elseif not nested.opponent1 then
 					nested = nil
 				end
+				if nested then
+					for _, opponent, opponentIndex in Table.iter.pairsByPrefix(nested, 'opponent') do
+						nested.winner = nested.winner or opponent.win and opponentIndex or nil
+					end
+				end
 
 				newArgs[source] = nested
 			end

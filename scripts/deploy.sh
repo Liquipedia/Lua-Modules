@@ -1,7 +1,7 @@
 #!/bin/bash
 
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
-devWikis=('callofduty' 'rocketleague' 'commons')
+devWikis=('rocketleague' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -20,8 +20,8 @@ else
   gitDeployReason='Automated Weekly Re-Sync'
 fi
 
-for luaFile in $luaFiles
-do
+allModulesDeployed=true
+for luaFile in $luaFiles; do
   if [[ -n "$1" ]]; then
     luaFile="./$luaFile"
   fi
@@ -30,8 +30,7 @@ do
 
   [[ $fileContents =~ $pat ]]
 
-  if [[ "${BASH_REMATCH[1]}" == "" ]]
-  then
+  if [[ "${BASH_REMATCH[1]}" == "" ]]; then
     echo '...skipping - no magic comment found'
   else
     wiki="${BASH_REMATCH[1]}"
@@ -49,8 +48,7 @@ do
     wikiApiUrl="${WIKI_BASE_URL}/${wiki}/api.php"
     ckf="cookie_${wiki}.ck"
 
-    if [[ ${loggedin[${wiki}]} != 1 ]]
-    then
+    if [[ ${loggedin[${wiki}]} != 1 ]]; then
       # Login
       echo "...logging in on \"${wiki}\""
       loginToken=$(
@@ -120,13 +118,19 @@ do
     echo "DEBUG: ...${rawResult}"
     if [[ "${result}" == "Success" ]]; then
       echo "...${result}"
+      echo '...done'
     else
-      exit 1
+      echo "...failed to deploy"
+      allModulesDeployed=false
     fi
 
-    echo '...done'
     # Don't get rate limited
     sleep 4
+  fi
+
+  if [ "$allModulesDeployed" != true ]; then
+    echo "DEBUG: Some modules were not deployed!"
+    exit 1
   fi
 done
 

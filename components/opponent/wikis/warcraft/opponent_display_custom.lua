@@ -7,7 +7,9 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
+local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -24,6 +26,45 @@ CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentD
 	opponent = MatchGroupUtil.types.GameOpponent,
 	showRace = 'boolean?',
 })
+
+---Display component for an opponent entry appearing in a bracket match.
+---@class WarcraftBracketOpponentEntry
+---@operator call(...): WarcraftBracketOpponentEntry
+---@field content Html
+---@field root Html
+CustomOpponentDisplay.BracketOpponentEntry = Class.new(
+	---@param self self
+	---@param opponent WarcraftStandardOpponent
+	---@param options {forceShortName: boolean}
+	function(self, opponent, options)
+		local showRaceBackground = opponent.type == Opponent.solo or opponent.extradata.hasRaceOrFlag
+
+		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
+			:addClass(showRaceBackground and Faction.bgClass(opponent.players[1].race) or nil)
+
+		if opponent.type == Opponent.team then
+			self.content:node(OpponentDisplay.BlockTeamContainer({
+				showLink = false,
+				style = 'hybrid',
+				team = opponent.team,
+				template = opponent.template,
+			}))
+		else
+			self.content:node(CustomOpponentDisplay.BlockOpponent({
+				opponent = opponent,
+				overflow = 'ellipsis',
+				playerClass = 'starcraft-bracket-block-player',
+				showLink = false,
+				showRace = not showRaceBackground,
+			}))
+		end
+
+		self.root = mw.html.create('div'):addClass('brkts-opponent-entry')
+			:node(self.content)
+	end
+)
+
+CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOpponentEntry.addScores
 
 ---@class WarcraftInlineOpponentProps: InlineOpponentProps
 ---@field opponent WarcraftStandardOpponent
@@ -95,9 +136,16 @@ function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
 	local showRace = props.showRace ~= false
 
-	local playerNodes = Array.map(opponent.players, function(player)
-		return PlayerDisplay.BlockPlayer(Table.merge(props, {team = player.team, player = player, showRace = showRace}))
-			:addClass(props.playerClass)
+	--only apply note to first player, hence extract it here
+	local note = Table.extract(props, 'note')
+
+	local playerNodes = Array.map(opponent.players, function(player, playerIndex)
+		return PlayerDisplay.BlockPlayer(Table.merge(props, {
+			team = player.team,
+			player = player,
+			showRace = showRace,
+			note = playerIndex == 1 and note or nil,
+		})):addClass(props.playerClass)
 	end)
 
 	local playersNode = mw.html.create('div')

@@ -38,7 +38,7 @@ end
 ---Allows requireDevIfEnabled option (requires the development version of a module if it
 ---exists and the dev feature flag is enabled. Otherwise requires the non-development module).
 ---@param name string
----@param options {requireDevIfEnabled: boolean}?
+---@param options {requireDevIfEnabled: boolean, loadData: boolean?}?
 ---@return unknown?
 function Lua.requireIfExists(name, options)
 	if Lua.moduleExists(name) then
@@ -47,12 +47,12 @@ function Lua.requireIfExists(name, options)
 end
 
 ---Loads (mw.loadData) a data module if it exists by its name.
+---@deprecated use `Lua.requireIfExists` with `loadData` option instead
 ---@param name string
 ---@return unknown?
 function Lua.loadDataIfExists(name)
-	if Lua.moduleExists(name) then
-		return mw.loadData(name)
-	end
+	mw.ext.TeamLiquidIntegration.add_category('Pages using deprecated Lua.loadDataIfExists function')
+	return Lua.requireIfExists(name, {loadData = true})
 end
 
 ---Imports a module by its name.
@@ -60,10 +60,11 @@ end
 ---Allows requireDevIfEnabled option (requires the development version of a module if it
 ---exists and the dev feature flag is enabled. Otherwise requires the non-development module).
 ---@param name string
----@param options {requireDevIfEnabled: boolean}?
+---@param options {requireDevIfEnabled: boolean?, loadData: boolean?}?
 ---@return unknown
 function Lua.import(name, options)
 	options = options or {}
+	local importFunction = options.loadData and mw.loadData or require
 	if options.requireDevIfEnabled then
 		if StringUtils.endsWith(name, '/dev') then
 			error('Lua.import: Module name should not end in \'/dev\'')
@@ -75,12 +76,12 @@ function Lua.import(name, options)
 			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
 		end
 		if devEnabled and Lua.moduleExists(devName) then
-			return require(devName)
+			return importFunction(devName)
 		else
-			return require(name)
+			return importFunction(name)
 		end
 	else
-		return require(name)
+		return importFunction(name)
 	end
 end
 
