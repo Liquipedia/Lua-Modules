@@ -282,11 +282,13 @@ function CustomMatchSummary._createMapRow(game)
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
 		:node(CustomMatchSummary._gameScore(game, 1))
+		:css('max-width', '20%')
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:css('max-width', '20%')
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
