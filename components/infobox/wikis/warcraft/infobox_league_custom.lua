@@ -116,7 +116,7 @@ function CustomInjector:parse(id, widgets)
 				CustomLeague._displayGameVersion(),
 				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = {CustomLeague:_getServer()}}
+			Cell{name = 'Server', content = CustomLeague:_getServer()}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
@@ -264,11 +264,7 @@ function CustomLeague:_getServer()
 		return nil
 	end
 
-	if String.isEmpty(_args.server2) then
-		return '[[Server|' .. _args.server .. ']]'
-	end
-
-	return '[[Server|' .. _args.server .. ']]', '[[Server|' .. _args.server2 .. ']]'
+	return Array.map(_league:getAllArgsForBase(_args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
 end
 
 ---@param args table
