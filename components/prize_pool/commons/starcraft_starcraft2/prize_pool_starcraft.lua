@@ -46,7 +46,7 @@ function CustomPrizePool.run(frame)
 	-- set some default values
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
-	args.storelpdb = Logic.emptyOr(args.storelpdb, Namespace.isMain())
+	args.storelpdb = Logic.emptyOr(args.storelpdb, Variables.varDefault('disable_LPDB_storage'), Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
 
 	-- overwrite some wiki vars for this PrizePool call
