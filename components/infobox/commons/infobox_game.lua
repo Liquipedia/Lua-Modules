@@ -112,9 +112,8 @@ function Game:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	-- Store LPDB data and Wiki-variables
-	if self:shouldStore(args) then
-		self:_setLpdbData(args, links)
+	if Namespace.isMain then
+		infobox:categories('Games')
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
@@ -152,13 +151,6 @@ end
 ---@return table
 function Game:addToLpdb(lpdbData, args)
 	return lpdbData
-end
-
---- Allows for overriding this functionality
----@param args table
----@return boolean
-function Game:shouldStore(args)
-	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 return Game
