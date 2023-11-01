@@ -114,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
-			Cell{name = 'Game version', content = {
+			Cell{name = 'Game Version', content = {
 				CustomLeague._displayGameVersion(),
 				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
 			}},
