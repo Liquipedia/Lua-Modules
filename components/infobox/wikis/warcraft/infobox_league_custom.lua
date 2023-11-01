@@ -97,7 +97,7 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
 	--add to league so self is available in them
-	league._getServer = CustomLeague._getServer
+	league._getServers = CustomLeague._getServers
 
 	return league:createInfobox(frame)
 end
@@ -118,7 +118,7 @@ function CustomInjector:parse(id, widgets)
 				CustomLeague._displayGameVersion(),
 				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = _league:_getServer(_args)}
+			Cell{name = 'Server', content = _league:_getServers(_args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
@@ -261,7 +261,7 @@ end
 
 ---@param args table
 ---@return table
-function CustomLeague:_getServer(args)
+function CustomLeague:_getServers(args)
 	return Array.map(self:getAllArgsForBase(args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
 end
 
