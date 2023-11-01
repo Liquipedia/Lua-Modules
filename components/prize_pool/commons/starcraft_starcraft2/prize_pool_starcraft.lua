@@ -66,7 +66,7 @@ function CustomPrizePool.run(frame)
 	_series_number = CustomPrizePool._seriesNumber()
 
 	local prizePool = PrizePool(args)
-	
+
 	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
 
 	prizePool:create()
