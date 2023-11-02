@@ -57,7 +57,7 @@ function ParticipantTable:read()
 end
 
 ---@class ParticipantTableConfig
----@field lpdbPrefix string
+---@field lpdbPrefix string?
 ---@field noStorage boolean
 ---@field matchGroupSpec table?
 ---@field syncPlayers boolean
@@ -81,7 +81,7 @@ end
 function ParticipantTable.readConfig(args, parentConfig)
 	parentConfig = parentConfig or {}
 	local config = {
-		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix') or '',
+		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
 		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
 			Variables.varDefault('disable_LPDB_storage') or not Namespace.isMain()),
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
@@ -286,7 +286,8 @@ end
 ---@param lpdbData table
 ---@return string
 function ParticipantTable:objectName(lpdbData)
-	return 'ranking_' .. self.config.lpdbPrefix .. '_' .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
+	local lpdbPrefix = self.config.lpdbPrefix and ('_' .. self.config.lpdbPrefix) or ''
+	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
 end
 
 ---@param lpdbData table
