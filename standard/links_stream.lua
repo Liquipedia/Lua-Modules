@@ -143,6 +143,13 @@ end
 ---@field languageCode string
 ---@field index integer
 ---@field is_a function
+---@field new function
+---@field _fromLegacy function
+---@field toLegacy function
+---@field toString function
+---@field _isStreamKey function
+---@field _isValid function
+---@field __tostring function
 StreamLinks.StreamKey = Class.new(
 	function (self, ...)
 		self:new(...)
@@ -150,7 +157,7 @@ StreamLinks.StreamKey = Class.new(
 )
 local StreamKey = StreamLinks.StreamKey
 
----@param tbl string
+---@param tbl string|StreamKey
 ---@param languageCode string
 ---@param index integer
 ---@overload fun(self, tbl: StreamKey): StreamKey
