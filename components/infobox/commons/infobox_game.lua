@@ -7,11 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
@@ -134,9 +132,11 @@ function Game:_setLpdbData(args, links)
 	local extradata = {}
 	local addToExtradata = function(prefix)
 		args[prefix .. 1] = args[prefix .. 1] or Table.extract(args, prefix)
-		extradata = Table.merge(extradata, Table.filterByKey(args, function(key) return string.match(key, '^' .. prefix .. '%d+$') end))
+		extradata = Table.merge(extradata, Table.filterByKey(
+			args, function(key) return string.match(key, '^' .. prefix .. '%d+$') end)
+		)
 	end
-	
+
 	addToExtradata('publisher')
 	addToExtradata('platform')
 	addToExtradata('developer')
