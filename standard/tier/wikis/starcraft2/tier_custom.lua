@@ -16,6 +16,7 @@ local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@class Starcraft2TierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
 --- Parses queryData to be processable for other Tier functions

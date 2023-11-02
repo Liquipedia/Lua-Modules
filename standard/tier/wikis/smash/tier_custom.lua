@@ -11,12 +11,13 @@ local Table = require('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
+---@class SmashTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
 --- Converts input to standardized identifier format
 ---@param input string|integer|nil
 ---@return string|integer
-function Tier.toIdentifier(input)
+function TierCustom.toIdentifier(input)
 	-- for smash `''` is a valid tier ...
 	return tonumber(input)
 		or string.lower(input or ''):gsub(' ', '')
