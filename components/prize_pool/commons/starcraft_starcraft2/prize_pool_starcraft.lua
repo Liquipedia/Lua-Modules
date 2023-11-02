@@ -79,7 +79,7 @@ function CustomPrizePool.run(frame)
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
 
-	if Logic.readBool(args.storelpdb) then
+	if prizePool.options.storeLpdb then
 		-- stash the lpdb_placement data so teamCards can use them
 		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
 	end
