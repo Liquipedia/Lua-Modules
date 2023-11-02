@@ -114,6 +114,7 @@ function Game:createInfobox()
 
 	if Namespace.isMain then
 		infobox:categories('Games')
+		self:_setLpdbData(args, links)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
@@ -122,27 +123,31 @@ end
 ---@param args table
 ---@param links table
 function Game:_setLpdbData(args, links)
-
 	local lpdbData = {
 		name = args.romanized_name or self.name,
 		image = args.image,
 		imagedark = args.imagedark,
 		date = args.releasedate,
 		type = 'game',
-		extradata = {
-			developer = table.concat(self:getAllArgsForBase(args, 'developer'), ';'),
-			publisher = table.concat(self:getAllArgsForBase(args, 'publisher'), ';'),
-			platform = table.concat(self:getAllArgsForBase(args, 'platform'), ';'),
-			links = mw.ext.LiquipediaDB.lpdb_create_json(
-				Links.makeFullLinksForTableItems(links or {}, 'game')
-			),
-		}
 	}
+
+	local extradata = {}
+	local addToExtradata = function(prefix)
+		args[prefix .. 1] = args[prefix .. 1] or Table.extract(args, prefix)
+		extradata = Table.merge(extradata, Table.filterByKey(args, function(key) return string.match(key, '^' .. prefix .. '%d+$') end))
+	end
+	
+	addToExtradata('publisher')
+	addToExtradata('platform')
+	addToExtradata('developer')
+
+	lpdbData.extradata = extradata
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Table.merge(lpdbData, {
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata),
+	}))
 end
 
 --- Allows for overriding this functionality
