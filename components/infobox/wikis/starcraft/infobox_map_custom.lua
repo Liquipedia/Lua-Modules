@@ -75,7 +75,7 @@ end
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = CustomMap:getNameDisplay(args)
 	lpdbData.extradata = {
-		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator),
+		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
 		height = args.height,
 		width = args.width,
