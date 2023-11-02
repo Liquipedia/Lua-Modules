@@ -79,7 +79,7 @@ function PageVariableNamespace.readOptions(options)
 
 	parsedOptions.cached = Logic.nilOr(options.cached, false)
 	parsedOptions.separator = options.separator or '.'
-	parsedOptions.namespace = options.namespace or '.'
+	parsedOptions.namespace = parsedOptions.namespace or options.namespace
 
 	return parsedOptions
 end
