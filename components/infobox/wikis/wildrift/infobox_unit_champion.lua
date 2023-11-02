@@ -95,7 +95,7 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Armor', content = {_args.armor}},
 		Cell{name = 'Magic Resistance', content = {_args.magicresistance}},
 		Cell{name = 'Movement Speed', content = {_args.movespeed}},
-		widgets, Title{name = 'Esports Statistics'}
+		Title{name = 'Esports Statistics'}
 	)
 
 	local stats = ChampionWL.create({champion = _args.championname or _pagename})
