@@ -52,7 +52,7 @@ function Game:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						local developers = self:getAllArgsForBase(args, 'developer', {makeLink = true})
+						local developers = self:getAllArgsForBase(args, 'developer')
 						return {
 							Cell{
 								name = #developers > 1 and 'Developers' or 'Developer',
@@ -68,7 +68,7 @@ function Game:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						local publishers = self:getAllArgsForBase(args, 'publisher', {makeLink = true})
+						local publishers = self:getAllArgsForBase(args, 'publisher')
 						return {
 							Cell{
 								name = #publishers > 1 and 'Publishers' or 'Publisher',
@@ -85,7 +85,7 @@ function Game:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						local platforms = self:getAllArgsForBase(args, 'platform', {makeLink = true})
+						local platforms = self:getAllArgsForBase(args, 'platform')
 						return {
 							Cell{
 								name = #platforms > 1 and 'Platforms' or 'Platform',
