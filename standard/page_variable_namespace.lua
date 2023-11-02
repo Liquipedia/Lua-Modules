@@ -69,6 +69,7 @@ local PageVariableNamespace = {}
 ---@param options {cached: boolean?, separator: string?, namespace: string?}?
 ---@return {cached: boolean, separator: string, namespace: string?}
 ---@overload fun(options: string): {cached: boolean, separator: string, namespace: string?}
+---@overload fun(): {cached: false, separator: string}
 function PageVariableNamespace.readOptions(options)
 	local parsedOptions = {}
 
