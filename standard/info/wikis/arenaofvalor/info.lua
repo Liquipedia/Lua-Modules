@@ -51,6 +51,19 @@ return {
 				lightMode = 'Honor of Kings 2018-12-24 Logo.png',
 			},
 		},
+		hokic = {
+			abbreviation = 'HoK KIC',
+			name = 'Honor of Kings (KIC Version)',
+			link = 'Honor of Kings (KIC Version)',
+			logo = {
+				darkMode = 'Honor of Kings Icon.png',
+				lightMode = 'Honor of Kings Icon.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Honor of Kings 2018-12-24 Logo.png',
+				lightMode = 'Honor of Kings 2018-12-24 Logo.png',
+			},
+		},
 	},
 	defaultGame = 'aov',
 
