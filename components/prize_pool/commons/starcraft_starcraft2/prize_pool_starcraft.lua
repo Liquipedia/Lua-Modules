@@ -46,7 +46,6 @@ function CustomPrizePool.run(frame)
 	-- set some default values
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
-	args.storelpdb = Logic.emptyOr(args.storelpdb, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
 
 	-- overwrite some wiki vars for this PrizePool call
@@ -66,7 +65,11 @@ function CustomPrizePool.run(frame)
 	-- stash seriesNumber
 	_series_number = CustomPrizePool._seriesNumber()
 
-	local prizePool = PrizePool(args):create()
+	local prizePool = PrizePool(args)
+
+	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
+
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
