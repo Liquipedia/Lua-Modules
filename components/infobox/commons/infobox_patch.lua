@@ -99,6 +99,7 @@ function Patch:setLpdbData(args)
 		name = args.name,
 		type = informationType,
 		information = monthAndDay,
+		image = args.image,
 		date = date,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			highlights = self:getAllArgsForBase(args, 'highlight')
