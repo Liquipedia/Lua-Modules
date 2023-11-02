@@ -16,23 +16,33 @@ local Namespace = Class.new(function(self, prefix)
 	self.prefix = prefix
 end)
 
+---@param key string|number
+---@return string?
 function Namespace:get(key)
 	return StringUtils.nilIfEmpty(mw.ext.VariablesLua.var(self.prefix .. key))
 end
 
+---@param key string|number
+---@param value string|nil
 function Namespace:set(key, value)
 	mw.ext.VariablesLua.vardefine(self.prefix .. key, StringUtils.nilIfEmpty(value))
 end
 
+---@param key string|number
 function Namespace:delete(key)
 	self:set(key, nil)
 end
 
+---@class PageVariableNamespaceCachedTable
+---@field results table
+---@field table table
 local CachedTable = Class.new(function(self, table)
 	self.results = {}
 	self.table = table
 end)
 
+---@param key string|number
+---@return unknown
 function CachedTable:get(key)
 	if not self.results[key] then
 		self.results[key] = self.table:get(key)
@@ -40,11 +50,14 @@ function CachedTable:get(key)
 	return self.results[key]
 end
 
+---@param key string|number
+---@param value string|number|nil
 function CachedTable:set(key, value)
 	self.results[key] = nil
 	self.table:set(key, value)
 end
 
+---@param key string|number
 function CachedTable:delete(key)
 	self:set(key, nil)
 end
@@ -53,16 +66,19 @@ end
 ---@operator call(string?):Namespace
 local PageVariableNamespace = {}
 
+---@param options {cached: boolean?, separator: string?, namespace: string?}?
+---@return {cached: boolean, separator: string, namespace: string?}
 function PageVariableNamespace.readOptions(options)
-	if not options then
-		options = {}
-	elseif type(options) == 'string' then
-		options = {namespace = options}
+	local parsedOptions = {}
+
+	options = options or {}
+	if type(options) == 'string' then
+		parsedOptions = {namespace = options}
 	end
 
-	options.cached = Logic.nilOr(options.cached, false)
-	options.separator = options.separator or '.'
-	return options
+	parsedOptions.cached = Logic.nilOr(options.cached, false)
+	parsedOptions.separator = options.separator or '.'
+	return parsedOptions
 end
 
 PageVariableNamespace.Namespace = Namespace
