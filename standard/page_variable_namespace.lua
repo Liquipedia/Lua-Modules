@@ -68,6 +68,7 @@ local PageVariableNamespace = {}
 
 ---@param options {cached: boolean?, separator: string?, namespace: string?}?
 ---@return {cached: boolean, separator: string, namespace: string?}
+---@overload fun(options: string): {cached: boolean, separator: string, namespace: string?}
 function PageVariableNamespace.readOptions(options)
 	local parsedOptions = {}
 
@@ -78,6 +79,8 @@ function PageVariableNamespace.readOptions(options)
 
 	parsedOptions.cached = Logic.nilOr(options.cached, false)
 	parsedOptions.separator = options.separator or '.'
+	parsedOptions.namespace = options.namespace or '.'
+
 	return parsedOptions
 end
 
