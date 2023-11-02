@@ -71,7 +71,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, date, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
