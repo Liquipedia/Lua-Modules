@@ -309,6 +309,7 @@ function CustomMatchSummary._createHeader(match)
 	local function createHeader(title, icon)
 		return mw.html.create('li')
 				:addClass('panel-tabs__list-item')
+				:attr('data-js-battle-royale', 'panel-tab')
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
 				:tag('i'):addClass('panel-tabs__list-icon'):addClass(icon):done()
@@ -371,7 +372,7 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createOverallPage(match)
-	local page = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel' .. match.matchId)
+	local page = mw.html.create('div'):addClass('panel-content'):attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel' .. match.matchId)
 	local schedule = page:tag('div'):addClass('panel-content__collapsible')
 	schedule:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Schedule')
 
@@ -404,7 +405,7 @@ end
 ---@param idx integer
 ---@return Html
 function CustomMatchSummary._createGameTab(game, idx)
-	local page = mw.html.create('div'):addClass('panel-content'):attr('id', 'panel' .. idx)
+	local page = mw.html.create('div'):addClass('panel-content'):attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel' .. idx)
 	local details = page:tag('div'):addClass('panel-content__collapsible')
 	details:tag('h5'):addClass('panel-content__button'):attr('tabindex', 0):wikitext('Game Details')
 
