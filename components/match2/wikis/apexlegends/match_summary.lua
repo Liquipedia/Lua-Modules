@@ -333,10 +333,11 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createPointsDistributionTable(match)
-	local wrapper = mw.html.create('div'):addClass('panel-content__collapsible')
+	local wrapper = mw.html.create('div'):addClass('panel-content__collapsible'):attr('data-js-battle-royale', 'collapsible')
 	wrapper:tag('h5')
 			:addClass('panel-content__button')
 			:addClass('is--collapsed')
+			:attr('data-js-battle-royale', 'collapsible-button')
 			:attr('tabindex', 0)
 			:wikitext('Points Distribution')
 
@@ -351,6 +352,7 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 	local pointsList = wrapper:tag('div')
 			:addClass('panel-content__container')
 			:addClass('is--hidden')
+			:attr('data-js-battle-royale', 'collapsible-container')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
 			:attr('hidden')
