@@ -87,7 +87,11 @@ function ExternalMediaLink._store(args)
 		translation = args.translation,
 		translator = args.translator,
 		event = args.event,
-		event_link = args['event-link'],
+		event_link = mw.ext.TeamLiquidIntegration.resolve_redirect(
+			String.isNotEmpty(args['event-link']) and args['event-link']
+			or String.isNotEmpty(args.event) and args.event
+			or ''
+		),
 		subject_organization = args.subject_organization1, --legacy
 	}
 
@@ -245,7 +249,7 @@ function ExternalMediaLink.wrapper(args)
 		type = args.type and args.type:lower() or nil,
 		of = args.of,
 		event = args.event,
-		['event-link'] = args['event-link'] and mw.ext.TeamLiquidIntegration.resolve_redirect(args['event-link']) or nil,
+		['event-link'] = args['event-link'],
 		language = args.language,
 		translation = args.translation,
 		translator = args.translator,
