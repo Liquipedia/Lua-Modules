@@ -887,12 +887,12 @@ return {
 			name = 'Mortal Kombat 1',
 			link = 'Mortal Kombat 1',
 			logo = {
-				darkMode = 'Mortal Kombat 1 default darkmode.png',
-				lightMode = 'Mortal Kombat 1 default lightmode.png',
+				darkMode = 'Mortal Kombat 1 icon allmode.png',
+				lightMode = 'Mortal Kombat 1 icon allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Mortal Kombat 1 default darkmode.png',
-				lightMode = 'Mortal Kombat 1 default lightmode.png',
+				darkMode = 'Mortal Kombat 1 allmode.png',
+				lightMode = 'Mortal Kombat 1 allmode.png',
 			},
 		},
 		mvc2 = {
