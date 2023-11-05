@@ -6,15 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
 
 ---Display components for opponents used by the COD wiki
 ---@class CallOfDutyOpponentDisplay: OpponentDisplay
@@ -27,7 +24,7 @@ function CustomOpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	if Opponent.typeIsParty(opponent.type) then
-		return OpponentDisplay.InlinePlayers(props)(props)
+		return OpponentDisplay.InlinePlayers(props)
 	end
 
 	 return OpponentDisplay.InlineOpponent(props)
