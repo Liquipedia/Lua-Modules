@@ -92,7 +92,7 @@ function CustomMatchGroupInput._adjustData(match)
 	end
 
 	local scores = Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
-		local score = CustomMatchGroupInput._computeOpponentMatchScore(match, opponentIndex, true)
+		local score = CustomMatchGroupInput._computeOpponentMatchScore(match, opponentIndex)
 		match['opponent' .. opponentIndex].score = score
 		if Logic.isNumeric(score) then
 			match['opponent' .. opponentIndex].status = SCORE_STATUS
