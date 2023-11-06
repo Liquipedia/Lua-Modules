@@ -20,6 +20,7 @@ local Match = require('Module:Match')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
+local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 2
@@ -30,7 +31,7 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local NOW = os.time(os.date('!*t'))
 local LANG = mw.getContentLanguage()
-local MATCHTIME = tonumber(LANG:formatDate('U', Match.date))
+local MATCHTIME 
 local THRESHOLD = Match.dateexact and 30800 or 86400
 
 -- containers for process helper functions
@@ -110,14 +111,8 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
-		data.finished == 'skip' or
-		data.finished == 'np' or
-		data.finished == 'cancelled' or
-		data.finished == 'canceled' or
-		data.winner == 'skip' or
-		data.winner == 'np' or
-		data.winner == 'cancelled' or
-		data.winner == 'canceled'
+		Table.includes(NP_STATUSES, data.finished) or
+		Table.includes(NP_STATUSES, data.winner)
 	then
 		data.resulttype = 'np'
 		data.finished = true
