@@ -38,6 +38,11 @@ function WikiSpecific.getMatchContainer(displayMode)
 	end
 end
 
+WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+	return StarcraftMatchGroupUtil.matchHasDetails
+end)
+
 --Default Logo for Teams without Team Template
 WikiSpecific.defaultIcon = 'StarCraft 2 Default logo.png'
 
