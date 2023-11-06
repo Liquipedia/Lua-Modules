@@ -135,6 +135,20 @@ function suite:testIncludes()
 	self:assertTrue(Table.includes(b, 'testValue3'))
 	self:assertFalse(Table.includes(a, 'testValue4'))
 	self:assertFalse(Table.includes(b, 'testValue4'))
+
+	self:assertTrue(Table.includes(a, 'testValue', false))
+	self:assertTrue(Table.includes(b, 'testValue', false))
+	self:assertTrue(Table.includes({'^estValue3$'}, '^estValue3$', false))
+	self:assertFalse(Table.includes(b, 'estValue', false))
+
+	self:assertTrue(Table.includes(a, 'testValue', true))
+	self:assertTrue(Table.includes(b, 'testValue', true))
+	self:assertTrue(Table.includes(b, 'testValue3', true))
+	self:assertTrue(Table.includes(b, 'estValue3', true))
+	self:assertTrue(Table.includes(b, 'testValue%d', true))
+	self:assertTrue(Table.includes(b, '^testValue%d$', true))
+	self:assertFalse(Table.includes(b, '^estValue3$', true))
+	self:assertFalse(Table.includes({'^estValue3$'}, '^estValue3$', true))
 end
 
 function suite:testFilterByKey()
