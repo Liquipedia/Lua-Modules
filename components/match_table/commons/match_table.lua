@@ -73,6 +73,7 @@ local DRAW = 'draw'
 ---@field title Title
 ---@field config MatchTableConfig
 ---@field matches MatchTableMatch[]
+---@field stats {matches: {w: number, d: number, l: number}, games: {w: number, d: number, l: number}}
 ---@field display Html
 local MatchTable = Class.new(function(self, args)
 	self.args = args or {}
@@ -324,6 +325,7 @@ end
 function MatchTable:resultFromNonStandardRecord(record)
 end
 
+---@return {matches: {w: number, d: number, l: number}, games: {w: number, d: number, l: number}}
 function MatchTable:statsFromMatches()
 	local totalMatches = {w = 0, d = 0, l = 0}
 	local totalGames = {w = 0, d = 0, l = 0}
@@ -353,8 +355,11 @@ function MatchTable:statsFromMatches()
 	}
 end
 
-todo:
---display
---custom
+---@return Html
+function MatchTable:build()
+
+end
+
+--todo: display, incl. overall stats (runtime issues???)
 
 return MatchTable
