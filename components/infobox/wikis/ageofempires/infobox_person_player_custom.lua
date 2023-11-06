@@ -12,6 +12,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:Matches Player')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
@@ -111,6 +112,7 @@ function CustomPlayer.run(frame)
 	_player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	_player.getPersonType = CustomPlayer.getPersonType
 	_player.getWikiCategories = CustomPlayer.getWikiCategories
+	_player.createBottomContent = CustomPlayer.createBottomContent
 
 	local builtInfobox = _player:createInfobox()
 
@@ -204,6 +206,10 @@ function CustomInjector:addCustomCells(widgets)
 		end
 	end
 	return widgets
+end
+
+function CustomPlayer.createBottomContent()
+	return MatchTicker.get{args = {_player.pagename}}
 end
 
 function CustomPlayer.getRating(id, game)
