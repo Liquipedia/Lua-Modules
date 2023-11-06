@@ -218,7 +218,7 @@ function matchFunctions.getOpponents(args)
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time( --[[@as osdate]])
+		local currentUnixTime = os.time( --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400

@@ -48,7 +48,7 @@ local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local _MIN_EARNINGS_FOR_FEATURED = 100000
 
-local _CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local _CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}

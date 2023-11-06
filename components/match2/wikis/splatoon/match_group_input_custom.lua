@@ -46,7 +46,7 @@ local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
