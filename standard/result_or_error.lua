@@ -95,7 +95,7 @@ function Error:map(_, onError)
 end
 
 function Error:get()
-	error(require('Module:ErrorExt').printErrorJson(self), 0)
+	error(require('Module:Error/Ext').printErrorJson(self), 0)
 end
 
 --[[
