@@ -31,7 +31,7 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local NOW = os.time(os.date('!*t'))
 local MATCHTIME = nil
-local THRESHOLD = Match.dateexact and 30800 or 86400
+local THRESHOLD = 86400
 
 -- containers for process helper functions
 local matchFunctions = {}
