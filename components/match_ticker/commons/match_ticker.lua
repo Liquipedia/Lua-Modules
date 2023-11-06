@@ -292,7 +292,7 @@ function MatchTicker:adjustMatch(match)
 	local opponentNames = Array.append({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
-		Table.includes(opponentNames, match.match2opponents[2].name:gsub(' ', '_'))
+		Table.includes(opponentNames, (match.match2opponents[2].name:gsub(' ', '_')))
 		--check inside match2players too for the player value
 		or self.config.player and Table.any(match.match2opponents[2].match2players, function(_, playerData)
 			return (playerData.name or ''):gsub(' ', '_') == self.config.player end)
