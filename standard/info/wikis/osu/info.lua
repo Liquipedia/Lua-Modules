@@ -16,12 +16,12 @@ return {
 			name = 'osu!',
 			link = 'osu!',
 			logo = {
-				darkMode = 'osu! allmode.png',
-				lightMode = 'osu! allmode.png',
+				darkMode = 'Osu! stable allmode.png',
+				lightMode = 'Osu! stable allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'osu! default allmode.png',
-				lightMode = 'osu! default allmode.png',
+				darkMode = 'Osu! stable allmode.png',
+				lightMode = 'Osu! stable allmode.png',
 			},
 		},
 		lazer = {
