@@ -11,28 +11,30 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
-local ICONS = {
-	check = GREEN_CHECK,
+
+---@enum icons
+local Icon = {
+	CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
 local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	mplink = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
 }
-	LINK_DATA.mplink2 = LINK_DATA.mplink
-	LINK_DATA.mplink3 = LINK_DATA.mplink
+LINK_DATA.mplink2 = LINK_DATA.mplink
+LINK_DATA.mplink3 = LINK_DATA.mplink
 
 local VETO_TYPE_TO_TEXT = {
 	ban = 'BAN',
@@ -86,9 +88,9 @@ function MapVeto:vetoStart(firstVeto, format)
 	else return self end
 
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
-		:tag('th'):wikitext(textLeft or ''):done()
+		:tag('th'):wikitext(textLeft):done()
 		:tag('th'):wikitext(textCenter):done()
-		:tag('th'):wikitext(textRight or ''):done()
+		:tag('th'):wikitext(textRight):done()
 
 	return self
 end
@@ -101,18 +103,14 @@ function MapVeto._displayMaps(map1, map2)
 		return TBD, TBD
 	end
 
-	return Logic.isEmpty(map1) and NONE or ('[[' .. map1 .. ']]'),
-		Logic.isEmpty(map2) and NONE or ('[[' .. map2 .. ']]')
+	return Page.makeInternalLink(map1) or NONE,
+		Page.makeInternalLink(map2) or NONE
 end
 
 ---@param map string?
 ---@return self
 function MapVeto:addDecider(map)
-	if Logic.isEmpty(map) then
-		map = 'TBD'
-	else
-		map = '[[' .. map .. '|' .. map .. ']]'
-	end
+	map = Page.makeInternalLink(map) or TBD
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
 	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
@@ -249,8 +247,7 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
-	return mw.html.create('div'):wikitext(score)
+	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
 end
 
 ---@param game MatchGroupUtilGame
@@ -280,14 +277,14 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icon.CHECK))
 		:node(CustomMatchSummary._gameScore(game, 1))
 		:css('width', '20%')
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icon.CHECK))
 		:css('width', '20%')
 
 	row:addElement(leftNode)
@@ -312,7 +309,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@return string
 function CustomMatchSummary._getMapDisplay(game)
-	return '[[' .. game.map .. ']]'
+	return Page.makeInternalLink(game.map)
 end
 
 ---@param showIcon boolean?
@@ -322,9 +319,9 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		return container:node(ICONS[iconType])
+		return container:node(iconType)
 	end
-	return container:node(NO_CHECK)
+	return container:node(Icon.EMPTY)
 end
 
 return CustomMatchSummary
