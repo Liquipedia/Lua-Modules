@@ -19,10 +19,10 @@ function Json.fromArgs(frame)
 end
 
 ---Json-stringifies a given table.
----@param obj table|string
----@param options {pretty: boolean?, asArray: boolean?}
----@return string?
----@overload fun(any: any): any
+---@param obj table
+---@param options? {pretty: boolean?, asArray: boolean?}
+---@return string
+---@overload fun(obj: any, options: table?): any
 function Json.stringify(obj, options)
 	if type(obj) ~= 'table' then
 		return obj
