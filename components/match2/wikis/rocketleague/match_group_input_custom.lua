@@ -186,8 +186,8 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = MatchGroupInput.readCasters(match),
-		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
-		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
+		hasopponent1 = opponent1.name ~= nil and opponent1.name:match('[^ /]') ~= nil and opponent1.type ~= Opponent.literal,
+		hasopponent2 = opponent2.name ~= nil and opponent2.name:match('[^ /]') ~= nil and opponent2.type ~= Opponent.literal,
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 	return match
