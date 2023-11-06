@@ -16,7 +16,6 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local DateExt = require('Module:Date/Ext')
 local Streams = require('Module:Links/Stream')
-local Match = require('Module:Match')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
