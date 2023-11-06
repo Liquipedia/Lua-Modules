@@ -244,7 +244,7 @@ function Match.copyRecords(matchRecord)
 end
 
 function Match.encodeJson(matchRecord)
-	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata)
+	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata, {asArray = true})
 	matchRecord.stream = Json.stringify(matchRecord.stream)
 	matchRecord.links = Json.stringify(matchRecord.links)
 	matchRecord.extradata = Json.stringify(matchRecord.extradata)
