@@ -331,7 +331,7 @@ function Ratings._initStepDate(ratingTable, transfers, id)
 		local current = from
 		local prev = Ratings._stepDate(from, -1)
 		while os.time(current) < os.time(to) do
-			local date = os.date('!%F', os.time(current)) --[[@as osdate]]
+			local date = os.date('!%F', os.time(current))
 
 			if os.date('%m', os.time(prev)) ~= os.date('%m', os.time(current)) then
 				if hasFirstMonth then
@@ -361,7 +361,7 @@ function Ratings.calc(frame)
 
 	-- date params
 	local dateFrom = Date.parseIsoDate(args.dateFrom or Ratings._getLatestSnapshotDate(id))
-	local dateTo = Date.parseIsoDate(args.dateTo or os.date('!%F')--[[@as string]])
+	local dateTo = Date.parseIsoDate(args.dateTo or os.date('!%F') --[[@as string]])
 
 	-- Fetch data
 	local ratingTable = Table.map(Ratings._getRatingTable(dateFrom, id), function(key, value)
@@ -394,7 +394,7 @@ function Ratings.calc(frame)
 	end
 
 	if dateTo.day ~= 1 then
-		Ratings._newMonth(ratingTable, os.date('!%F', os.time(dateTo)) --[[@as osdate]], id, dateTo)
+		Ratings._newMonth(ratingTable, os.date('!%F', os.time(dateTo)), id, dateTo)
 	end
 
 	-- Display something

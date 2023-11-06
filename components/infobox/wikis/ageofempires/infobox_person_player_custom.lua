@@ -379,7 +379,7 @@ function CustomPlayer._calculateDateThreshold(thresholdConfig)
 	for key, value in pairs(thresholdConfig) do
 		dateThreshold[key] = dateThreshold[key] - value
 	end
-	return os.date('!%F', os.time(dateThreshold --[[@as osdate]]))
+	return os.date('!%F', os.time(dateThreshold --[[@as osdateparam]]))
 end
 
 function CustomPlayer._queryGames()

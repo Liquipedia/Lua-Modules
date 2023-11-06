@@ -88,7 +88,7 @@ function CustomTeam._getGames()
 
 	local dateThreshold = os.date('!*t')
 	dateThreshold.year = dateThreshold.year - INACTIVITY_THRESHOLD_YEARS
-	dateThreshold = os.date('!%F', os.time(dateThreshold --[[@as osdate]]))
+	dateThreshold = os.date('!%F', os.time(dateThreshold --[[@as osdateparam]]))
 
 	local isActive = function(game)
 		local placement = CustomTeam._getLatestPlacement(game)
