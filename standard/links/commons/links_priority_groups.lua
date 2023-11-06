@@ -32,6 +32,7 @@ return {
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
+		'osu',
 		'rgl',
 		'royaleapi',
 		'siege-gg',

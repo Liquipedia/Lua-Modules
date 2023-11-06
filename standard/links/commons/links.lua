@@ -134,6 +134,10 @@ local PREFIXES = {
 		player = 'https://nwc3l.com/profile/',
 	},
 	openrec = {'https://www.openrec.tv/live/'},
+	osu = {
+		'https://osu.ppy.sh/',
+		player = 'https://osu.ppy.sh/users/',
+	},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
