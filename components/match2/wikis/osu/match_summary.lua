@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
