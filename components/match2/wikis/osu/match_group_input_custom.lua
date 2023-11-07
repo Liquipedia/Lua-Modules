@@ -300,6 +300,7 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
 		mapveto = matchFunctions.getMapVeto(match),
+		casters = MatchGroupInput.readCasters(match),
 	}
 	return match
 end
