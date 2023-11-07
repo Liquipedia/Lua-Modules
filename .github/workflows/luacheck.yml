@@ -21,7 +21,6 @@ jobs:
       - name: Setup dependencies
         run: |
           luarocks install luacheck
-          luarocks install busted
 
       - name: Run lint
         run: |
