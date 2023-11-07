@@ -2,8 +2,11 @@ return {
 	_all = {
 		verbose = true,
 		helper = 'spec/test_helper.lua',
-		ROOT = {"spec"},
 	},
 	default = {
+		ROOT = {"spec"},
+	},
+	ci = {
+		ROOT = {"spec"},
 	},
 }
