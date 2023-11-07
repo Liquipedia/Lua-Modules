@@ -33,6 +33,8 @@ local Center = Widgets.Center
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local SECONDS_PER_DAY = 86400
+
 local _league
 local categories = {}
 
@@ -118,12 +120,10 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:createBottomContent()
-	if os.date("%Y-%m-%d") <= Variables.varDefault('tournament_enddate', '1970-01-01') then
-		return MatchTicker.get{args={
-			tournament = _league.pagename,
-			limit = tonumber(_league.args.matchtickerlimit) or 7,
-			queryByParent = true
-		}}
+	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
+
+	if yesterday <= Variables.varDefault('tournament_enddate', '1970-01-01') then
+		return MatchTicker.get{args={parent = _league.pagename, limit = tonumber(_league.args.matchtickerlimit) or 7}}
 	end
 end
 
