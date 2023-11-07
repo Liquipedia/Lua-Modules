@@ -13,6 +13,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
+local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
@@ -218,6 +219,17 @@ function CustomMatchSummary.createBody(match)
 			body:addRow(mvp)
 		end
 
+	end
+
+	-- Add casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = MatchSummary.Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
 	end
 
 	-- Add the Map Vetoes
