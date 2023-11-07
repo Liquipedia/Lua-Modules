@@ -1,4 +1,4 @@
-name: Code Style
+name: Unit Tests
 
 on: [pull_request, workflow_dispatch]
 
@@ -20,18 +20,9 @@ jobs:
 
       - name: Setup dependencies
         run: |
-          luarocks install luacheck
           luarocks install busted
 
-      - name: Run lint
-        run: |
-          luacheck ./ |
-          luacheck ./ --formatter=JUnit > report.xml
-      
-      - name: Report lint
-        uses: mikepenz/action-junit-report@v3
-        if: always()
+      - name: Run test
+        uses: lunarmodules/busted@v2.2.0
         with:
-          report_paths: 'report.xml'
-          check_name: 'junit-report'
-          annotate_notice: false
+          args: --run=ci
