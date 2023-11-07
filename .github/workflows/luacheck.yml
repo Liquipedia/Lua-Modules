@@ -38,5 +38,3 @@ jobs:
 
       - name: Run test
         uses: lunarmodules/busted@v2.2.0
-        with:
-          args: spec --helper spec/test_helper.lua
