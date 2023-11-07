@@ -11,14 +11,13 @@ local function mockRequire()
 		'standard/?.lua;' ..
 		package.path
 
-	require('sumneko_plugin')
-
 	local require_original = require
+	local plugin = require_original('sumneko_plugin')
 
 	function require(module)
 		local newName = module
 		if (string.find(module, 'Module:')) then
-			newName = LuaifyModuleName(module)
+			newName = plugin.luaifyModuleName(module)
 		end
 
 		return require_original(newName)

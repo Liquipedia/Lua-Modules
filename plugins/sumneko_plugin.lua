@@ -12,7 +12,7 @@ importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string
 ---Transforms a MediaWiki module name, e.g. `Module:Array`, into a lua repository name, e.g. `array`
 ---@param name string
 ---@return string
-function LuaifyModuleName(name)
+function importFunctions.luaifyModuleName(name)
 	local normModuleName = name
 		:gsub('Module:', '')-- Remove starting Module:
 		:gsub('^%u', string.lower)-- Lower case first letter
@@ -29,7 +29,7 @@ function LuaifyModuleName(name)
 end
 
 function importFunctions._row(name)
-	local normModuleName = LuaifyModuleName(name)
+	local normModuleName = importFunctions.luaifyModuleName(name)
 
 	return ' ---@module \'' .. normModuleName .. '\''
 end
@@ -71,3 +71,5 @@ function OnSetText(uri, text)
 
 	return diffs
 end
+
+return importFunctions
