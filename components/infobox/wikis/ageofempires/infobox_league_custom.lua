@@ -123,7 +123,11 @@ function CustomLeague:createBottomContent()
 	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
 
 	if yesterday <= Variables.varDefault('tournament_enddate', '1970-01-01') then
-		return MatchTicker.get{args={parent = _league.pagename, limit = tonumber(_league.args.matchtickerlimit) or 7}}
+		return MatchTicker.get{args={
+			parent = _league.pagename,
+			limit = tonumber(_league.args.matchtickerlimit) or 7,
+			noInfoboxWrapper = true
+		}}
 	end
 end
 
