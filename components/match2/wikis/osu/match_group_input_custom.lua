@@ -27,10 +27,7 @@ local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
-local NOW = os.time(os.date('!*t'))
-local MATCHTIME = nil
-local THRESHOLD = 86400
+local NOW = os.time(os.date('!*t') --[[@as osdate]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -376,8 +373,9 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		if MATCHTIME + THRESHOLD < NOW then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+		local threshold = match.dateexact and 30800 or 86400
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
