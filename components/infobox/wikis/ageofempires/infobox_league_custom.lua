@@ -119,7 +119,11 @@ end
 
 function CustomLeague:createBottomContent()
 	if os.date("%Y-%m-%d") <= Variables.varDefault('tournament_enddate', '1970-01-01') then
-		return MatchTicker.get{args={[1] = _league.pagename, limit = tonumber(_league.args.matchtickerlimit) or 7}}
+		return MatchTicker.get{args={
+			tournament = _league.pagename,
+			limit = tonumber(_league.args.matchtickerlimit) or 7,
+			queryByParent = true
+		}}
 	end
 end
 
