@@ -1,4 +1,4 @@
-name: Code Style
+name: Code Style and Test
 
 on: [pull_request, workflow_dispatch]
 
@@ -7,24 +7,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@master
+      - name: Checkout
+        uses: actions/checkout@master
 
-      - uses: leafo/gh-actions-lua@v9
+      - name: Setup lua
+        uses: leafo/gh-actions-lua@v9
         with:
           luaVersion: "5.1"
 
-      - uses: leafo/gh-actions-luarocks@v4
+      - name: Setup ‘luarocks’ 
+        uses: leafo/gh-actions-luarocks@v4
 
-      - name: setup
+      - name: Setup dependencies
         run: |
           luarocks install luacheck
+          luarocks install busted
 
-      - name: test
+      - name: Run lint
         run: |
           luacheck ./ |
           luacheck ./ --formatter=JUnit > report.xml
-
-      - name: junit
+      
+      - name: Report lint
         uses: mikepenz/action-junit-report@v3
         if: always()
         with:
@@ -32,3 +36,7 @@ jobs:
           check_name: 'junit-report'
           annotate_notice: false
 
+      - name: Run test
+        uses: lunarmodules/busted@v2.2.0
+        with:
+          args: spec --helper spec/test_helper.lua
