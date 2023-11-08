@@ -1,4 +1,4 @@
-name: Code Style
+name: Code Stlye and Unit Tests
 
 on: [pull_request, workflow_dispatch]
 
@@ -33,3 +33,34 @@ jobs:
         with:
           report_paths: 'report.xml'
           check_name: 'Lint Report'
+
+  lua-unit-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@master
+
+      - name: Setup lua
+        uses: leafo/gh-actions-lua@v9
+        with:
+          luaVersion: '5.1'
+
+      - name: Setup luarocks
+        uses: leafo/gh-actions-luarocks@v4
+
+      - name: Setup dependencies
+        run: |
+          luarocks install busted
+
+      - name: Run test
+        uses: lunarmodules/busted@v2.2.0
+        with:
+          args: --run=ci --output=junit > busted.xml
+
+      - name: Report test
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'busted.xml'
+          check_name: 'Test Report'
