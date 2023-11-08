@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('abbreviation', function()
-	local Abbreviation  = require('Module:Abbreviation')
+	local Abbreviation = require('Module:Abbreviation')
 
 	describe('make abbreviation', function()
 		it('Empty input returns nil', function()

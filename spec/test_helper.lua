@@ -1,6 +1,6 @@
 -- luacheck: ignore
 
--- Copy from Standard/lua.lua
+-- Copy from standard/lua.lua
 local function fileExists(name)
 	if package.loaded[name] then
 		return true
@@ -10,14 +10,56 @@ local function fileExists(name)
 		for _, searcher in ipairs(package.searchers or package.loaders) do
 			local loader = searcher(name)
 			if type(loader) == 'function' then
-				-- luacheck: ignore
-				-- luacheck complains about package.preload being read-only
 				package.preload[name] = loader
 				return true
 			end
 		end
 		return false
 	end
+end
+
+
+mw = {
+	loadData = function(module)
+		-- Should be expanded with a Meta Table that disallows __index
+		return require(module)
+	end,
+	log = function() end,
+	logObject = function() end,
+	getContentLanguage = function()
+		return {
+			formatNum = function(self, amount)
+				local k
+				local formatted = amount
+				while true do
+					formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
+					if (k == 0) then
+						break
+					end
+				end
+				return formatted
+			end
+		}
+	end,
+}
+mw.ext = {}
+local variablesStorage = {}
+mw.ext.VariablesLua = {
+	vardefine = function(name, value)
+		variablesStorage[name] = tostring(value)
+		return ''
+	end,
+	vardefineecho = function(name, value)
+		variablesStorage[name] = tostring(value)
+		return variablesStorage[name]
+	end,
+	var = function(name) return variablesStorage[name] end,
+}
+mw.ext.CurrencyExchange = {
+	currencyexchange = function(amount, fromCurrency, toCurrency, date) return 0.97097276906869 end
+}
+local function resetMediawiki()
+	variablesStorage = {}
 end
 
 local function mockRequire()
@@ -38,6 +80,10 @@ local function mockRequire()
 			return require_original(newName)
 		end
 
+		if newName == 'info' then
+			return require_original('info.commons.info')
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
@@ -46,9 +92,11 @@ local function mockRequire()
 			end
 		})
 
+		print('Could not find ' .. newName)
 		return mocked_import
 	end
 end
 
 
 require('busted').subscribe({'suite', 'start'}, mockRequire)
+require('busted').subscribe({'test', 'start'}, resetMediawiki)
