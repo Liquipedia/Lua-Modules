@@ -1,4 +1,4 @@
---- Tripple Comment to Enable our LLS Plugin
+--- Triple Comment to Enable our LLS Plugin
 describe('array', function()
 	local Array = require('Module:Array')
 	local Table = require('Module:Table')

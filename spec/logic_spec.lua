@@ -1,4 +1,4 @@
---- Tripple Comment to Enable our LLS Plugin
+--- Triple Comment to Enable our LLS Plugin
 describe('logic', function()
 	local Logic = require('Module:Logic')
 	local Table = require('Module:Table')
