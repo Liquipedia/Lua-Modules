@@ -858,6 +858,13 @@ function mw.ext.VariablesLua.var(name)
 	return mw.ext.VariablesLua.variablesStorage[name] or ''
 end
 
+---Checks if a wiki-variable is stored
+---@param name wikiVaribleKey Key of the wiki-variable
+---@return boolean
+function mw.ext.VariablesLua.varexist(name)
+	return mw.ext.VariablesLua.variablesStorage[name] ~= nil
+end
+
 mw.ext.CurrencyExchange = {}
 
 ---@param amount number
