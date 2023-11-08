@@ -838,7 +838,7 @@ mw.ext.VariablesLua.variablesStorage = {}
 ---@param value wikiVariableValue
 ---@return string #always an empty string
 function mw.ext.VariablesLua.vardefine(name, value)
-	mw.ext.VariablesLua.variablesStorage[name] = tostring(value)
+	mw.ext.VariablesLua.variablesStorage[name] = value
 	return ''
 end
 
@@ -848,14 +848,14 @@ end
 ---@return string
 function mw.ext.VariablesLua.vardefineecho(name, value)
 	mw.ext.VariablesLua.vardefine(name, value)
-	return mw.ext.VariablesLua.var[name]
+	return mw.ext.VariablesLua.var(name)
 end
 
 ---Gets the stored value of a wiki-variable
 ---@param name wikiVaribleKey Key of the wiki-variable
 ---@return string
 function mw.ext.VariablesLua.var(name)
-	return mw.ext.VariablesLua.variablesStorage[name] or ''
+	return mw.ext.VariablesLua.variablesStorage[name] and tostring(mw.ext.VariablesLua.variablesStorage[name]) or ''
 end
 
 ---Checks if a wiki-variable is stored
