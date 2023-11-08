@@ -86,7 +86,7 @@ function Manufacturer:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.created or args.disbanded then
+						if args.founded or args.dissolved then
 							return {
 								Title{name = 'History'},
 								Cell{name = 'Founded', content = {args.founded}},
