@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
@@ -82,17 +81,20 @@ function Manufacturer:createInfobox()
 				Cell{name = 'Status', content = {args.status}},
 			}
 		},
-		Title{name = 'History'},
 		Customizable{
-			id = 'Founded',
+			id = 'history',
 			children = {
-				Cell{name = 'Founded', content = {args.founded}},
-			}
-		},
-		Customizable{
-			id = 'Dissolved',
-			children = {
-				Cell{name = 'Dissolved', content = {args.dissolved}},
+				Builder{
+					builder = function()
+						if args.created or args.disbanded then
+							return {
+								Title{name = 'History'},
+								Cell{name = 'Founded', content = {args.founded}},
+								Cell{name = 'Dissolved', content = {args.dissolved}}
+							}
+						end
+					end
+				}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -126,10 +128,22 @@ end
 
 ---@param args table
 function Manufacturer:setLpdbData(args)
-	lpdbData.extradata = { 
-		status = Variables.varDefault('status') 
-	}
-	
+	local name = args.romanized_name or self.name
+
+	local lpdbData = {
+		name = name,
+		region = args.region,
+		logo = args.image,
+		logodark = args.imagedark,
+		locations = Locale.formatLocations(args),
+		extradata = { 
+			status = args.status
+		}
+		
+	lpdbData = self:addToLpdb(lpdbData, args)
+end
+
+function Manufacturer:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
