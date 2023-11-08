@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -115,13 +116,13 @@ function Manufacturer:setLpdbData(args)
 		name = name,
 		region = args.region,
 		image = args.image,
-		extradata = { 
+		extradata = {
 			imagedark = args.imagedark,
 			status = args.status,
 			locations = Locale.formatLocations(args),
 		}
 	}
-		
+
 	lpdbData = self:addToLpdb(lpdbData, args)
 end
 
