@@ -129,16 +129,16 @@ end
 
 ---@param args table
 function Manufacturer:setLpdbData(args)
-	local name = args.romanized_name or self.name
+	local name = self.name
 
 	local lpdbData = {
 		name = name,
 		region = args.region,
-		logo = args.image,
-		logodark = args.imagedark,
-		locations = Locale.formatLocations(args),
+		image = args.image,
 		extradata = { 
-			status = args.status
+			imagedark = args.imagedark,
+			status = args.status,
+			locations = Locale.formatLocations(args),
 		}
 	}
 		
