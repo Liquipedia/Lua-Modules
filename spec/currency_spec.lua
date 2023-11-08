@@ -32,10 +32,12 @@ describe('currency', function()
 	end)
 
 	describe('raw', function()
-		it('do it', function()
+		it('validate incorrect input returns nil', function()
 			assert.is_nil(Currency.raw())
 			assert.is_nil(Currency.raw(''))
 			assert.is_nil(Currency.raw('dummy'))
+		end)
+		it('correct data works', function()
 			assert.are_same({
 					code = 'EUR',
 					name = 'Euro',
@@ -51,10 +53,12 @@ describe('currency', function()
 	end)
 
 	describe('display', function()
-		it('do it', function()
+		it('validate incorrect input returns nil', function()
 			assert.is_nil(Currency.display())
 			assert.is_nil(Currency.display(''))
 			assert.is_nil(Currency.display('dummy'))
+		end)
+		it('validate options', function()
 			assert.are_equal(DASH, Currency.display('dummy', 0, {dashIfZero = true}))
 			assert.are_equal(DASH, Currency.display('EUR', 0, {dashIfZero = true}))
 			assert.are_equal('€1,200&nbsp;<abbr title="Euro">EUR</abbr>',
