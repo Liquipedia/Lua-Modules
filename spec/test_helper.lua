@@ -22,18 +22,11 @@ end
 
 local function mockRequire()
 	package.path = '?.lua;' ..
-			-- Load plugin for module name parsing
-			'../plugins/?.lua;' ..
-			'plugins/?.lua;' ..
-			-- Load test files
-			'test/standard/?.lua;' ..
-			-- Load main files
-			'../standard/?.lua;' ..
-			'standard/?.lua;' ..
+			'standard/?.lua;' .. -- Load std folder
 			package.path
 
 	local require_original = require
-	local Plugin = require_original('sumneko_plugin')
+	local Plugin = require_original('plugins.sumneko_plugin')
 
 	function require(module)
 		local newName = module
