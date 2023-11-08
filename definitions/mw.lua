@@ -501,7 +501,14 @@ function mw.text.nowiki(s) end
 ---@param pattern string?
 ---@param plain boolean?
 ---@return string[]
-function mw.text.split(s, pattern, plain) end
+function mw.text.split(s, pattern, plain)
+	pattern = pattern or "%s"
+	local t = {}
+	for str in string.gmatch(s, "([^"..pattern.."]+)") do
+			table.insert(t, str)
+	end
+	return t
+end
 
 ---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
 ---@param s string
