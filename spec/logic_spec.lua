@@ -1,15 +1,7 @@
+--- Tripple Comment to Enable our LLS Plugin
 describe('logic', function()
-	local Logic, Table
-
-	setup(function()
-		Logic = require('Module:Logic')
-		Table = require('Module:Table')
-	end)
-
-	teardown(function()
-		Logic = nil
-		Table = nil
-	end)
+	local Logic = require('Module:Logic')
+	local Table = require('Module:Table')
 
 	describe('EmptyOr', function()
 		it('check', function()

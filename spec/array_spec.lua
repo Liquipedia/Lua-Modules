@@ -1,15 +1,7 @@
+--- Tripple Comment to Enable our LLS Plugin
 describe('array', function()
-	local Array, Table
-
-	setup(function()
-		Array = require('Module:Array')
-		Table = require('Module:Table')
-	end)
-
-	teardown(function()
-		Array = nil
-		Table = nil
-	end)
+	local Array = require('Module:Array')
+	local Table = require('Module:Table')
 
 	describe('isArray', function()
 		it('Empty table is array', function()

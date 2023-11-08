@@ -65,6 +65,10 @@ function OnSetText(uri, text)
 		return nil
 	end
 
+	if text:sub(1, 8) == '---@meta' then
+		return nil
+	end
+
 	local diffs = {}
 
 	liquipedia.annotate(text, diffs)
