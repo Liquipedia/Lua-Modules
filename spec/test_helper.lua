@@ -92,7 +92,6 @@ local function mockRequire()
 			end
 		})
 
-		print('Could not find ' .. newName)
 		return mocked_import
 	end
 end
