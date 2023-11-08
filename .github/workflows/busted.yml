@@ -13,7 +13,7 @@ jobs:
       - name: Setup lua
         uses: leafo/gh-actions-lua@v9
         with:
-          luaVersion: "5.1"
+          luaVersion: '5.1'
 
       - name: Setup luarocks
         uses: leafo/gh-actions-luarocks@v4
@@ -25,4 +25,11 @@ jobs:
       - name: Run test
         uses: lunarmodules/busted@v2.2.0
         with:
-          args: --run=ci
+          args: --run=ci --output=junit > busted.xml
+
+      - name: Report test
+        uses: mikepenz/action-junit-report@v3
+        if: always()
+        with:
+          report_paths: 'busted.xml'
+          check_name: 'Test Report'
