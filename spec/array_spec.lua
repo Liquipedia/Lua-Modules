@@ -8,6 +8,7 @@ describe('array', function()
 
 	teardown(function()
 		Array = nil
+		Table = nil
 	end)
 
 	describe('isArray', function()
