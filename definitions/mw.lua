@@ -879,7 +879,7 @@ end
 
 mw.ext.TeamLiquidIntegration = {}
 
----comment
+---Adds a category to a page
 ---@param name string
 ---@param sortName string?
 function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
