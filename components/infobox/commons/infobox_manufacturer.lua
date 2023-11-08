@@ -126,7 +126,9 @@ function Manufacturer:setLpdbData(args)
 	lpdbData = self:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_team('manufacturer_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('manufacturer_' .. self.name, Table.merge(lpdbData, {
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
+	}))
 end
 
 function Manufacturer:addToLpdb(lpdbData, args)
