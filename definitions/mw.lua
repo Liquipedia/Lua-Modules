@@ -1,5 +1,6 @@
--- luacheck: ignore
 ---@meta mw
+-- luacheck: ignore
+---This file contains definitions and simulations of the MediaWiki enviroment
 mw = {}
 
 ---Adds a warning which is displayed above the preview when previewing an edit. `text` is parsed as wikitext.
@@ -34,7 +35,10 @@ function mw.isSubsting() end
 ---See www.mediawiki.org/wiki/Extension:Scribunto/Lua_reference_manual#mw.loadData
 ---@param module string
 ---@return table
-function mw.loadData(module) end
+function mw.loadData(module)
+	--TODO: add __index that errors
+	return require(module)
+end
 
 ---This is the same as mw.loadData(), except it loads data from JSON pages rather than Lua tables. The JSON content must be an array or object. See also mw.text.jsonDecode().
 ---@param page string
@@ -215,7 +219,9 @@ function mw.language.fetchLanguageNames(inLanguage, include) end
 
 ---Returns a new language object for the wiki's default content language.
 ---@return Language
-function mw.language.getContentLanguage() end
+function mw.language.getContentLanguage()
+	return setmetatable(mw.language, {})
+end
 mw.getContentLanguage = mw.language.getContentLanguage
 
 ---Returns a list of MediaWiki's fallback language codes for the specified code.
@@ -246,7 +252,9 @@ function mw.language.isValidCode(code) end
 ---Creates a new language object. Language objects do not have any publicly accessible properties, but they do have several methods, which are documented below.
 ---@param code string
 ---@return Language
-function mw.language.new(code) end
+function mw.language.new(code)
+	return mw.language.getContentLanguage()
+end
 mw.getLanguage = mw.language.new
 
 ---Returns the language code for this language object.
@@ -289,8 +297,18 @@ function mw.language:caseFold(str) end
 ---Formats a number with grouping and decimal separators appropriate for the given language. Given 123456.78, this may produce "123,456.78", "123.456,78", or even something like "١٢٣٬٤٥٦٫٧٨" depending on the language and wiki configuration.
 ---@param num number
 ---@param options? {noCommafy: boolean}
----@return number
-function mw.language:formatNum(num, options) end
+---@return string
+function mw.language:formatNum(num, options)
+	local k
+	local formatted = tostring(num)
+	while true do
+		formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
+		if (k == 0) then
+			break
+		end
+	end
+	return formatted
+end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
@@ -664,5 +682,50 @@ function mw.ext.LiquipediaDB.lpdb_create_json(obj) end
 ---@return string
 ---Encode an Array to a JSON array. Errors are raised if the passed value cannot be encoded in JSON.
 function mw.ext.LiquipediaDB.lpdb_create_array(obj) end
+
+mw.ext.VariablesLua = {}
+---@alias wikiVaribleKey string|number
+---@alias wikiVariableValue string|number|nil
+
+---Fake storage for enviroment simulation
+---@private
+mw.ext.VariablesLua.variablesStorage = {}
+
+---Stores a wiki-variable and returns the empty string
+---@param name wikiVaribleKey
+---@param value wikiVariableValue
+---@return string #always an empty string
+function mw.ext.VariablesLua.vardefine(name, value)
+	mw.ext.VariablesLua.variablesStorage[name] = tostring(value)
+	return ''
+end
+
+---Stores a wiki-variable and returns the stored value
+---@param name wikiVaribleKey Key of the wiki-variable
+---@param value wikiVariableValue Value of the wiki-variable
+---@return string
+function mw.ext.VariablesLua.vardefineecho(name, value)
+	mw.ext.VariablesLua.vardefine(name, value)
+	return mw.ext.VariablesLua.var[name]
+end
+
+---Gets the stored value of a wiki-variable
+---@param name wikiVaribleKey Key of the wiki-variable
+---@return string
+function mw.ext.VariablesLua.var(name)
+	return mw.ext.VariablesLua.variablesStorage[name] or ''
+end
+
+mw.ext.CurrencyExchange = {}
+
+---@param amount number
+---@param fromCurrency string
+---@param toCurrency string
+---@param date? string 
+---@return number
+function mw.ext.CurrencyExchange.currencyexchange(amount, fromCurrency, toCurrency, date)
+	-- Fake mock number
+	return 0.97097276906869
+end
 
 return mw

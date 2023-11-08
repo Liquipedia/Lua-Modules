@@ -18,51 +18,13 @@ local function fileExists(name)
 	end
 end
 
-
-mw = {
-	loadData = function(module)
-		-- Should be expanded with a Meta Table that disallows __index
-		return require(module)
-	end,
-	log = function() end,
-	logObject = function() end,
-	getContentLanguage = function()
-		return {
-			formatNum = function(self, amount)
-				local k
-				local formatted = amount
-				while true do
-					formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
-					if (k == 0) then
-						break
-					end
-				end
-				return formatted
-			end
-		}
-	end,
-}
-mw.ext = {}
-local variablesStorage = {}
-mw.ext.VariablesLua = {
-	vardefine = function(name, value)
-		variablesStorage[name] = tostring(value)
-		return ''
-	end,
-	vardefineecho = function(name, value)
-		variablesStorage[name] = tostring(value)
-		return variablesStorage[name]
-	end,
-	var = function(name) return variablesStorage[name] end,
-}
-mw.ext.CurrencyExchange = {
-	currencyexchange = function(amount, fromCurrency, toCurrency, date) return 0.97097276906869 end
-}
 local function resetMediawiki()
-	variablesStorage = {}
+	mw.ext.VariablesLua.variablesStorage = {}
 end
 
-local function mockRequire()
+local function setupForTesting()
+	require('definitions.mw')
+
 	package.path = '?.lua;' ..
 			'standard/?.lua;' .. -- Load std folder
 			package.path
@@ -96,6 +58,5 @@ local function mockRequire()
 	end
 end
 
-
-require('busted').subscribe({'suite', 'start'}, mockRequire)
+require('busted').subscribe({'suite', 'start'}, setupForTesting)
 require('busted').subscribe({'test', 'start'}, resetMediawiki)
