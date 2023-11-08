@@ -1,4 +1,4 @@
-name: Code Stlye and Unit Tests
+name: Code Style and Unit Tests
 
 on: [pull_request, workflow_dispatch]
 
@@ -26,7 +26,7 @@ jobs:
         run: |
           luacheck ./ |
           luacheck ./ --formatter=JUnit > report.xml
-      
+
       - name: Report lint
         uses: mikepenz/action-junit-report@v3
         if: always()
