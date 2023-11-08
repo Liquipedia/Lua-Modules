@@ -761,7 +761,7 @@ function mw.ustring.len(s) end
 ---@see string.lower
 ---@param s string|number
 ---@return string
-function mw.ustring.lower(s) end
+function mw.ustring.lower(s) return string.lower(s) end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
@@ -789,28 +789,28 @@ function mw.ustring.sub(s, i, j) end
 ---Converts the string to Normalization Form C (also known as Normalization Form Canonical Composition). Returns nil if the string is not valid UTF-8.
 ---@param s  string|number
 ---@return string?
-function mw.ustring.toNFC(s) end
+function mw.ustring.toNFC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form D (also known as Normalization Form Canonical Decomposition). Returns nil if the string is not valid UTF-8.
 ---@param s  string|number
 ---@return string?
-function mw.ustring.toNFD(s) end
+function mw.ustring.toNFD(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KC (also known as Normalization Form Compatibility Composition). Returns nil if the string is not valid UTF-8.
 ---@param s  string|number
 ---@return string?
-function mw.ustring.toNFKC(s) end
+function mw.ustring.toNFKC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KD (also known as Normalization Form Compatibility Decomposition). Returns nil if the string is not valid UTF-8.
 ---@param s  string|number
 ---@return string?
-function mw.ustring.toNFKD(s) end
+function mw.ustring.toNFKD(s) return tostring(s) end
 
 ---Much like string.upper(), except that all characters with uppercase to lowercase definitions in Unicode are converted.
 ---@see string.upper
 ---@param s string|number
 ---@return string
-function mw.ustring.upper(s) end
+function mw.ustring.upper(s) return string.upper(s) end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = {}
@@ -869,5 +869,12 @@ function mw.ext.CurrencyExchange.currencyexchange(amount, fromCurrency, toCurren
 	-- Fake mock number
 	return 0.97097276906869
 end
+
+mw.ext.TeamLiquidIntegration = {}
+
+---comment
+---@param name string
+---@param sortName string?
+function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
 
 return mw

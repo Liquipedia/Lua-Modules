@@ -1,12 +1,12 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('flags', function()
 	local Flags = require('Module:Flags')
+	local Template = require('Module:Template')
 
 	describe('icon', function()
 		it('check', function()
-			local nlOutput = '<span class=\"flag\">[[File:nl_hd.png|Netherlands|link=]]</span>'
-			local nlOutputLink = '<span class=\"flag\">[[File:nl_hd.png|Netherlands|link=Category:Netherlands]]</span>'
-			local unknownCat = '[[Category:Pages with unknown flags]]'
+			local nlOutput = '<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=]]</span>'
+			local nlOutputLink = '<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=Category:Netherlands]]</span>'
 
 			assert.are_equal(nlOutput, Flags.Icon('nl'))
 			assert.are_equal(nlOutput, Flags.Icon('nld'))
@@ -27,12 +27,16 @@ describe('flags', function()
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'nld'})
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'holland'})
 
-			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|link=]]</span>',
+			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|36x24px|link=]]</span>',
 				Flags.Icon{flag = 'tbd'})
 
-			assert.are_equal(('[[Template:Flag/dummy]]' .. unknownCat), Flags.Icon{shouldLink = true, flag = 'dummy'})
-			assert.are_equal(('[[Template:FlagNoLink/dummy]]' .. unknownCat),
-				Flags.Icon{shouldLink = false, flag = 'dummy'})
+			local TemplateMock = stub(Template, "safeExpand")
+
+			Flags.Icon{shouldLink = true, flag = 'dummy'}
+			assert.stub(TemplateMock).was.called_with(nil, 'Flag/dummy')
+
+			Flags.Icon{shouldLink = false, flag = 'dummy'}
+			assert.stub(TemplateMock).was.called_with(nil, 'FlagNoLink/dummy')
 		end)
 	end)
 
@@ -48,9 +52,9 @@ describe('flags', function()
 
 	describe('language icon', function()
 		it('check', function()
-			assert.are_equal('<span class=\"flag\">[[File:UsGb hd.png|English Speaking|link=]]</span>',
+			assert.are_equal('<span class=\"flag\">[[File:UsGb hd.png|36x24px|English Speaking|link=]]</span>',
 				Flags.languageIcon('en'))
-			assert.are_equal('<span class=\"flag\">[[File:nl_hd.png|Netherlands|link=]]</span>',
+			assert.are_equal('<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=]]</span>',
 				Flags.languageIcon('nl'))
 		end)
 	end)
@@ -78,7 +82,7 @@ describe('flags', function()
 	describe('is valid flag', function()
 		it('check', function()
 			assert.is_true(Flags.isValidFlagInput('de'))
-			assert.is_false(Flags.isValidFlagInput('germany'))
+			assert.is_true(Flags.isValidFlagInput('germany'))
 			assert.is_false(Flags.isValidFlagInput('aaaaaaa'))
 		end)
 	end)
