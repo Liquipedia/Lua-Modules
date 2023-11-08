@@ -46,6 +46,10 @@ local function setupForTesting()
 			return require_original('info.commons.info')
 		end
 
+		if newName == 'region' or newName == 'region_data' then
+			return require('region.commons.' .. newName)
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
