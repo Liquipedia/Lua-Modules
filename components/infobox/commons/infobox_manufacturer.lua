@@ -139,6 +139,7 @@ function Manufacturer:setLpdbData(args)
 		extradata = { 
 			status = args.status
 		}
+	}
 		
 	lpdbData = self:addToLpdb(lpdbData, args)
 end
