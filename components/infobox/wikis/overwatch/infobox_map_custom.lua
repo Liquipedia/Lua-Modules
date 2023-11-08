@@ -48,6 +48,10 @@ function CustomInjector:addCustomCells(widgets)
 		content = gameModes,
 	})
 	table.insert(widgets, Cell{
+		name = 'Times',
+		content = {_args.times}
+	})
+	table.insert(widgets, Cell{
 		name = 'Checkpoints',
 		content = {_args.checkpoints}
 	})
