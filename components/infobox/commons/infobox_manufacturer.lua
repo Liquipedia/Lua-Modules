@@ -57,31 +57,11 @@ function Manufacturer:createInfobox()
 			}
 		},
 		Title{name = (args.informationType or 'Manufacturer') .. ' Information'},
-		Customizable{
-			id = 'formernames',
-			children = {
-				Cell{name = 'Former Name(s)', content = {args.formernames}},
-			}
-		},
+		Cell{name = 'Former Name(s)', content = {args.formernames}},
 		Cell{name = 'Description', content = {args.description}},
-		Customizable{
-			id = 'seasons',
-			children = {
-				Cell{name = 'Season(s)', content = {args.seasons}},
-			}
-		},
-		Customizable{
-			id = 'enginetotal',
-			children = {
-				Cell{name = 'Engine Total', content = {args.enginetotal}},
-			}
-		},
-		Customizable{
-			id = 'status',
-			children = {
-				Cell{name = 'Status', content = {args.status}},
-			}
-		},
+		Cell{name = 'Season(s)', content = {args.seasons}},
+		Cell{name = 'Engine Total', content = {args.enginetotal}},
+		Cell{name = 'Status', content = {args.status}},
 		Customizable{
 			id = 'history',
 			children = {
