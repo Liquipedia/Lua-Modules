@@ -3,7 +3,7 @@ name: Unit Tests
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  test-lua:
+  lua-unit-test:
     runs-on: ubuntu-latest
 
     steps:

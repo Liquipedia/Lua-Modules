@@ -3,7 +3,7 @@ name: Code Style
 on: [pull_request, workflow_dispatch]
 
 jobs:
-  test-lua:
+  lua-code-style:
     runs-on: ubuntu-latest
 
     steps:
