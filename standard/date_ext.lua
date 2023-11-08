@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 --[[
