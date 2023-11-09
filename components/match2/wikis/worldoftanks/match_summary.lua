@@ -315,8 +315,6 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
----@param game MatchGroupUtilGame
----@return string
 ---@param showIcon boolean?
 ---@param iconType string?
 ---@return Html
