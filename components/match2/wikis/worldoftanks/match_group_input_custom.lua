@@ -27,7 +27,7 @@ local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t') --[[@as osdate]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -75,7 +75,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 
 	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
 
-	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
