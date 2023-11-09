@@ -88,7 +88,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
