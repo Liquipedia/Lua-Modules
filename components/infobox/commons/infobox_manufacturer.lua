@@ -27,8 +27,7 @@ local Manufacturer = Class.new(BasicInfobox)
 ---@param frame Frame
 ---@return Html
 function Manufacturer.run(frame)
-	local manufacturer = Manufacturer(frame)
-	return manufacturer:createInfobox()
+	return Manufacturer(frame):createInfobox()
 end
 
 ---@return Html
