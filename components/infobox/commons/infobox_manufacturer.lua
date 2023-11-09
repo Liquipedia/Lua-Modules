@@ -114,6 +114,7 @@ function Manufacturer:setLpdbData(args)
 
 	local lpdbData = {
 		name = name,
+		type = 'manufacturer',
 		region = args.region,
 		image = args.image,
 		imagedark = args.imagedark
