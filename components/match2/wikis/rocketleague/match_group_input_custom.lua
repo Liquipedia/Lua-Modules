@@ -186,11 +186,22 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = MatchGroupInput.readCasters(match),
-		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
-		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
+		hasopponent1 = matchFunctions._checkForNonEmptyOpponent(opponent1),
+		hasopponent2 = matchFunctions._checkForNonEmptyOpponent(opponent2),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 	return match
+end
+
+function matchFunctions._checkForNonEmptyOpponent(opponent)
+	if Opponent.typeIsParty(opponent.type) then
+		return Array.any(opponent.match2players, function(player) return Logic.isNotEmpty(player.name) end)
+	elseif opponent.type == Opponent.team then
+		return Logic.isNotEmpty(opponent.template)
+	end
+
+	-- Literal case
+	return false
 end
 
 function matchFunctions.getLinks(match)
