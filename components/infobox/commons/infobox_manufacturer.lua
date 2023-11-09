@@ -115,7 +115,7 @@ function Manufacturer:setLpdbData(args)
 		type = 'manufacturer',
 		region = args.region,
 		image = args.image,
-		imagedark = args.imagedark
+		imagedark = args.imagedark,
 		extradata = {
 			status = args.status,
 			locations = Locale.formatLocations(args),
