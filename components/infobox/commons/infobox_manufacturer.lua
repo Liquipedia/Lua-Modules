@@ -77,10 +77,7 @@ function Manufacturer:createInfobox()
 					end
 				}
 			}
-		},
-		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
-		Customizable{id = 'customcontent', children = {}},
+		}
 	}
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
