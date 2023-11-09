@@ -277,7 +277,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:wikitext(CustomMatchSummary._getMapDisplay(game))
+		:wikitext(Page.makeInternalLink(game.map))
 		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
@@ -317,10 +317,6 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@return string
-function CustomMatchSummary._getMapDisplay(game)
-	return Page.makeInternalLink(game.map)
-end
-
 ---@param showIcon boolean?
 ---@param iconType string?
 ---@return Html
