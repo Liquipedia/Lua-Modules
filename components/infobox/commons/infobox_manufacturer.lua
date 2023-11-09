@@ -46,7 +46,7 @@ function Manufacturer:createInfobox()
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-					subHeader = self:subHeaderDisplay(args),
+					subHeader = args.title,
 					size = args.imagesize,
 				},
 			}
