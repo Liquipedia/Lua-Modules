@@ -133,11 +133,4 @@ function Manufacturer:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
---- Allows for overriding this functionality
----@param args table
----@return string?
-function Manufacturer:subHeaderDisplay(args)
-	return args.title
-end
-
 return Manufacturer
