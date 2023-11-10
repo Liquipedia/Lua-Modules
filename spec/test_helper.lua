@@ -50,6 +50,27 @@ local function setupForTesting()
 			return require('region.commons.' .. newName)
 		end
 
+		if newName == 'opponent' then
+			return require('components.opponent.commons.opponent')
+		end
+
+		if newName == 'feature_flag_config' then
+			return {
+				award_table = {defaultValue = false},
+				debug_import = {defaultValue = false},
+				debug_match_history = {defaultValue = false},
+				debug_placement = {defaultValue = false},
+				debug_query = {defaultValue = false},
+				dev = {defaultValue = false},
+				force_type_check = {defaultValue = false},
+				next = {defaultValue = false},
+				perf = {defaultValue = false},
+				perf_rich_reporter = {defaultValue = true},
+				random_errors = {defaultValue = false},
+				team_list = {defaultValue = false},
+			}
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
