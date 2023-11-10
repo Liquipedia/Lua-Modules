@@ -273,6 +273,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
 	-- Store additional team-templates in extradata
