@@ -17,19 +17,21 @@ local WidgetFactory = Class.new()
 
 ---@param widget Widget
 ---@param injector WidgetInjector
----@return Widget[]
+---@return Html[]
 function WidgetFactory.work(widget, injector)
-	local convertedWidgets = {}
+	local convertedWidgets = {} ---@type Html[]
 
 	if widget == nil then
 		return {}
 	end
 
 	for _, child in ipairs(widget:tryMake() or {}) do
-		if type(child) == 'table' and child['is_a'] and child:is_a(Widget) then
+		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
+			---@cast child Widget
 			child:setContext{injector = injector}
 			Array.extendWith(convertedWidgets, WidgetFactory.work(child, injector))
 		else
+			---@cast child Html
 			table.insert(convertedWidgets, child)
 		end
 	end
