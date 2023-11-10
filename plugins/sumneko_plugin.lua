@@ -7,23 +7,31 @@ local liquipedia = {}
 
 local importFunctions = {}
 importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists'}
-importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.'}
+importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.', array = 'standard.'}
 
-function importFunctions._row(name)
-	local normModuleName =
-		name
-			:gsub('Module:', '') -- Remove starting Module:
-			:gsub('^%u', string.lower) -- Lower case first letter
-			:gsub('%u', '_%0') -- Prefix uppercase letters with an underscore
-			:gsub('/', '_') -- Change slash to underscore
-			:gsub('__', '_') -- Never have two underscores in a row
-			:lower() -- Lowercase everything
+---Transforms a MediaWiki module name, e.g. `Module:Array`, into a lua repository name, e.g. `array`
+---@param name string
+---@return string
+function importFunctions.luaifyModuleName(name)
+	local normModuleName = name
+		:gsub('Module:', '')-- Remove starting Module:
+		:gsub('^%u', string.lower)-- Lower case first letter
+		:gsub('%u', '_%0')-- Prefix uppercase letters with an underscore
+		:gsub('/', '_')-- Change slash to underscore
+		:gsub('__', '_')-- Never have two underscores in a row
+		:lower() -- Lowercase everything
 
 	if importFunctions.prefixModules[normModuleName] then
 		normModuleName = importFunctions.prefixModules[normModuleName] .. normModuleName
 	end
 
-	return ' ---@module \'' .. normModuleName ..'\''
+	return normModuleName
+end
+
+function importFunctions._row(name)
+	local normModuleName = importFunctions.luaifyModuleName(name)
+
+	return ' ---@module \'' .. normModuleName .. '\''
 end
 
 function importFunctions.annotate(text, funcName, diffs)
@@ -57,9 +65,15 @@ function OnSetText(uri, text)
 		return nil
 	end
 
+	if text:sub(1, 8) == '---@meta' then
+		return nil
+	end
+
 	local diffs = {}
 
 	liquipedia.annotate(text, diffs)
 
 	return diffs
 end
+
+return importFunctions
