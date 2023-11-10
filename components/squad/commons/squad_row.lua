@@ -59,10 +59,8 @@ function SquadRow:id(args)
 	cell:addClass('ID')
 
 	local opponent = Opponent.resolve(
-		Opponent.readOpponentArgs(
-			Table.merge(args, {type = Opponent.solo}),
-			nil, {syncPlayer = true}
-		)
+		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo})),
+		nil, {syncPlayer = true}
 	)
 	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
 
