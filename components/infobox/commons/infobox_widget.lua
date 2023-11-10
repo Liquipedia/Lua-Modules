@@ -11,7 +11,7 @@ local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 
----@class Widget
+---@class Widget: BaseClass
 ---@operator call(): Widget
 ---@field public injector WidgetInjector?
 local Widget = Class.new()
@@ -23,19 +23,21 @@ local _ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-wh
 
 ---Asserts the existence of a value and copies it
 ---@param value string
----@return string?
+---@return string
 function Widget:assertExistsAndCopy(value)
 	if value == nil or value == '' then
-		return error('Tried to set a nil value to a mandatory property')
+		error('Tried to set a nil value to a mandatory property')
 	end
 
 	return value
 end
 
+---@return Widget[]|Html[]|nil
 function Widget:make()
-	return error('A Widget must override the make() function!')
+	error('A Widget must override the make() function!')
 end
 
+---@return Widget[]|Html[]|nil
 function Widget:tryMake()
 	local _, output = xpcall(
 		function()
@@ -55,12 +57,10 @@ end
 
 ---Sets the context of a widget
 ---@param context table
----@return nil
 function Widget:setContext(context)
 	self.context = context
-	if context.injector ~= nil and
-		(context.injector['is_a'] == nil or context.injector:is_a(Injector) == false) then
-		return error('Valid Injector from Infobox/Widget/Injector needs to be provided')
+	if context.injector ~= nil and (context.injector['is_a'] == nil or context.injector:is_a(Injector) == false) then
+		error('Valid Injector from Infobox/Widget/Injector needs to be provided')
 	end
 end
 

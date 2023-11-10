@@ -160,6 +160,7 @@ end
 ---@return {category: string?, storeValue: string?}
 function CustomPerson:military(military)
 	if not Logic.readBool(military) then return {} end
+	---@cast military -nil
 
 	military = military:lower()
 	for key, data in pairs(MILITARY_DATA) do
