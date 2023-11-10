@@ -15,7 +15,8 @@ local Table = require('Module:Table')
 local Qualifier = require('Module:TeamCard/Qualifier')
 local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local TeamCardStorage = {}
 

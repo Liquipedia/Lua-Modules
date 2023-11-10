@@ -16,7 +16,8 @@ local Import = Lua.import('Module:PrizePool/Import', {requireDevIfEnabled = true
 local BasePrizePool = Lua.import('Module:PrizePool/Base', {requireDevIfEnabled = true})
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local TableCell = require('Module:Widget/Table/Cell')
 local TableRow = require('Module:Widget/Table/Row')

@@ -11,7 +11,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 

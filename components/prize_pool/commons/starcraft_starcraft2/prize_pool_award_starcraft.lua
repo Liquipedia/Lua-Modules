@@ -20,7 +20,8 @@ local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled
 
 local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 

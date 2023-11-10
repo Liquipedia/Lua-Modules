@@ -20,7 +20,8 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local UNKNOWN_REASON_LOSS_STATUS = 'L'
 local DEFAULT_WIN_STATUS = 'W'
@@ -30,7 +31,7 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t'))
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local TBD = 'tbd'
 local BYE = 'BYE'
 
@@ -319,6 +320,7 @@ function CustomMatchGroupInput._getPlayersFromVariables(teamName)
 		if String.isEmpty(playerName) then
 			break
 		end
+		---@cast playerName -nil
 		table.insert(players, {
 			name = playerName:gsub(' ', '_'),
 			displayname = Variables.varDefault(

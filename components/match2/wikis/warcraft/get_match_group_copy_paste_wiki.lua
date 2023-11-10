@@ -13,7 +13,8 @@ local Table = require('Module:Table')
 
 local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local INDENT = '\t'
 local MODE_CONVERSION = {

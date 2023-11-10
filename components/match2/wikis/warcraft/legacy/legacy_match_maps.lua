@@ -19,7 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
