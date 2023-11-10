@@ -54,6 +54,5 @@ jobs:
           luarocks install --lua-version=5.1 busted
 
       - name: Run test
-        uses: lunarmodules/busted@v2.2.0
-        with:
-          args: --run=ci --lua=/home/runner/.luarocks/share/lua/5.1
+        run: |
+          busted -v --run=ci 
