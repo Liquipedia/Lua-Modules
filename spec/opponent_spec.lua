@@ -100,7 +100,7 @@ describe('logic', function()
 			assert.is_true(Opponent.isEmpty())
 			---intended bad input
 			---@diagnostic disable-next-line: param-type-mismatch
-			assert.is_true(Opponent.isEmpty('someBs')) --invalid input		
+			assert.is_true(Opponent.isEmpty('someBs')) --invalid input
 		end)
 	end)
 
@@ -175,11 +175,11 @@ describe('logic', function()
 	describe('read args', function()
 		it('check', function()
 			assert.are_same({
-				type = Opponent.solo,
-				players = {
-					{displayName = 'test', flag = 'Germany', pageName = 'testLink', team = 'mouz'}
-				}
-			},
+					type = Opponent.solo,
+					players = {
+						{displayName = 'test', flag = 'Germany', pageName = 'testLink', team = 'mouz'}
+					}
+				},
 				Opponent.readOpponentArgs{type = Opponent.solo, p1 = 'test', flag = 'de', link = 'testLink', team = 'mouz'})
 			assert.are_same({
 				type = Opponent.duo,
@@ -234,7 +234,8 @@ describe('logic', function()
 					p1dn = 'Krystianer',
 					p1flag = 'Poland',
 				}
-			}, Opponent.toLpdbStruct(Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo) --[[@as standardOpponent]]))
+			},
+				Opponent.toLpdbStruct(Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo) --[[@as standardOpponent]]))
 			assert.are_same({
 				opponentname = 'Semper / Jig',
 				opponenttype = Opponent.duo,
