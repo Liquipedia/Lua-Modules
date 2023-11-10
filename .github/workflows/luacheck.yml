@@ -56,11 +56,4 @@ jobs:
       - name: Run test
         uses: lunarmodules/busted@v2.2.0
         with:
-          args: --run=ci --output=junit > busted.xml
-
-      - name: Report test
-        uses: mikepenz/action-junit-report@v3
-        if: always()
-        with:
-          report_paths: 'busted.xml'
-          check_name: 'Test Report'
+          args: --run=ci
