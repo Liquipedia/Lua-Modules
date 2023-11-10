@@ -73,7 +73,7 @@ function Class.new(base, init)
 	return instance
 end
 
----@generic T
+---@generic T:table
 ---@param class T
 ---@param options ?table
 ---@return T

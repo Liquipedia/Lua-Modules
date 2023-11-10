@@ -12,7 +12,8 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 

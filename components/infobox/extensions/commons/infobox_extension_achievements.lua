@@ -18,7 +18,8 @@ local Team = require('Module:Team')
 
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_PLAYER_LIMIT = 10
 local DEFAULT_BASE_CONDITIONS = {

@@ -18,7 +18,8 @@ local Table = require('Module:Table')
 
 local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 --- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
