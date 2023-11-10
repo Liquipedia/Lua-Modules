@@ -13,7 +13,7 @@ jobs:
       - name: Setup lua
         uses: leafo/gh-actions-lua@v9
         with:
-          luaVersion: '5.1'
+          luaVersion: "5.1"
 
       - name: Setup luarock
         uses: leafo/gh-actions-luarocks@v4
@@ -44,14 +44,13 @@ jobs:
       - name: Setup lua
         uses: leafo/gh-actions-lua@v9
         with:
-          luaVersion: '5.1'
+          luaVersion: "5.1"
 
       - name: Setup luarocks
         uses: leafo/gh-actions-luarocks@v4
 
       - name: Setup dependencies
         run: |
-          luarocks remove busted --force
           luarocks install --lua-version=5.1 busted
 
       - name: Run test
