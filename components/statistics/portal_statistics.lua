@@ -829,8 +829,8 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 end
 
 
----@param args table?
----@param config table?
+---@param args table
+---@param config table
 ---@return table
 function StatisticsPortal._getOpponentEarningsData(args, config)
 	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'

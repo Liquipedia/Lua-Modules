@@ -60,7 +60,7 @@ function TableRow:make()
 
 	for _, cell in ipairs(self.cells) do
 		for _, node in ipairs(WidgetFactory.work(cell, self.injector)) do
-			row:node(node)
+			row:node(node --[[@as Html]])
 		end
 	end
 

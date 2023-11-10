@@ -48,15 +48,15 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	-- If a custom override for LPDB exists, use it
 	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, lpdbPrefix) or lpdbData
 
-	-- Jsonify the json fields
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
-
 	-- Store into the standardized lpdb fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
 		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName} or Opponent.tbd(Opponent.team),
 		lpdbData.date
-	)))
+	)), {
+		-- Jsonify the json fields
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata),
+		players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
+	})
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)

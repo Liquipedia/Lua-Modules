@@ -152,6 +152,7 @@ function StandingsStorage.toScoreBoardEntry(data)
 
 	-- Using Table.map to filter. Because strangely enough Table.filter has no access to keys...
 	local scoreBoard = Table.mapValues(Table.map(data, filterScoreBoard), tonumber)
+	---@cast scoreBoard {w: number, d: number, l: number}
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')

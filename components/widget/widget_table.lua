@@ -62,7 +62,7 @@ function Table:make()
 
 	for _, row in ipairs(self.rows) do
 		for _, node in ipairs(WidgetFactory.work(row, self.injector)) do
-			displayTable:node(node)
+			displayTable:node(node --[[@as Html]])
 		end
 	end
 

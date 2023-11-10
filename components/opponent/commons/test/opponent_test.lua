@@ -98,7 +98,9 @@ function suite:testIsEmpty()
 	self:assertFalse(Opponent.isEmpty(config.filledSolo))
 	self:assertFalse(Opponent.isEmpty(config.filledDuo))
 	self:assertTrue(Opponent.isEmpty())
-	self:assertTrue(Opponent.isEmpty('someBs'))--invalid input
+	---intended bad input
+	---@diagnostic disable-next-line: param-type-mismatch
+	self:assertTrue(Opponent.isEmpty('someBs'))
 end
 
 function suite:testIsBye()

@@ -567,7 +567,7 @@ function BasePrizePool:_buildTable(isAward)
 	tbl:setContext{self._widgetInjector}
 	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
-		tableNode:node(node)
+		tableNode:node(node --[[@as Html]])
 	end
 
 	return tableNode
@@ -826,10 +826,12 @@ function BasePrizePool:storeData()
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
-		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
-		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
-		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
-		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
+		Table.mergeInto(lpdbEntry, {
+			lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {}),
+			opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {}),
+			players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {}),
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {}),
+		})
 
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
