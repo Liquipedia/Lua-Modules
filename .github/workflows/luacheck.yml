@@ -56,4 +56,4 @@ jobs:
       - name: Run test
         uses: lunarmodules/busted@v2.2.0
         with:
-          args: --run=ci
+          args: --run=ci --lua=lua5.1
