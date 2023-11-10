@@ -16,7 +16,7 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -135,7 +135,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _player.earningsGlobal[tostring(CURRENT_YEAR)]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -344,7 +344,7 @@ end
 function CustomPlayer:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _player.earningsGlobal = CustomPlayer._getEarningsMedalsData(self.pagename)
-	earningsTotal = Math.round{earningsTotal}
+	earningsTotal = Math.round(earningsTotal)
 	return earningsTotal, _player.earningsGlobal
 end
 
