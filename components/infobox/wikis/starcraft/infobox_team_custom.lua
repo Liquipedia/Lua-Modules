@@ -13,7 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -260,7 +260,7 @@ function CustomTeam.getEarningsAndMedalsData(team)
 
 	for _, earningsTable in pairs(earnings) do
 		for key, value in pairs(earningsTable) do
-			earningsTable[key] = Math.round{value}
+			earningsTable[key] = Math.round(value)
 		end
 	end
 

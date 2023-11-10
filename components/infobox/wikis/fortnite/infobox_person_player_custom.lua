@@ -12,7 +12,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local Region = require('Module:Region')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -90,7 +90,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
