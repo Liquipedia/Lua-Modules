@@ -173,13 +173,13 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
-	totalEarnings = MathUtils._round(totalEarnings)
+	totalEarnings = MathUtils.round(totalEarnings)
 
 	if not perYear then
 		return totalEarnings
 	end
 
-	earningsByYear = Table.mapValues(earningsByYear, MathUtils._round)
+	earningsByYear = Table.mapValues(earningsByYear, MathUtils.round)
 
 	return totalEarnings, earningsByYear
 end
