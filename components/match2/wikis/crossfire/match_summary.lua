@@ -18,10 +18,10 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local ICONS = {
-	check = GREEN_CHECK,
+---@enum CrossFireMatchIcons
+local Icon = {
+	CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
 local LINK_DATA = {
@@ -87,7 +87,7 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
+	local score = game.scores[opponentIndex]
 	return mw.html.create('div'):wikitext(score)
 end
 
@@ -118,13 +118,13 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icon.CHECK))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icon.CHECK))
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -156,16 +156,16 @@ function CustomMatchSummary._getMapDisplay(game)
 end
 
 ---@param showIcon boolean?
----@param iconType string?
+---@param iconType CrossFireMatchIcons?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		return container:node(ICONS[iconType])
+		return container:node(iconType)
 	end
-	return container:node(NO_CHECK)
+	return container:node(Icon.EMPTY)
 end
 
 return CustomMatchSummary
