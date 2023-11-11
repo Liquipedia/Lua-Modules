@@ -21,7 +21,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		bo = {
@@ -34,7 +34,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		bo2 = {
@@ -47,7 +47,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		bo3 = {
@@ -60,7 +60,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		bo4 = {
@@ -73,7 +73,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		bocw = {
@@ -86,7 +86,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		cod = {
@@ -99,7 +99,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		cod2 = {
@@ -112,7 +112,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		cod3 = {
@@ -125,7 +125,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		cod4 = {
@@ -138,7 +138,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		codm = {
@@ -151,7 +151,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		ghosts = {
@@ -164,7 +164,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		iw = {
@@ -177,7 +177,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		mw2 = {
@@ -190,7 +190,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		mw2019 = {
@@ -203,7 +203,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		mw3 = {
@@ -216,7 +216,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		mwii = {
@@ -229,7 +229,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		mwiii = {
@@ -242,7 +242,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		vg = {
@@ -255,7 +255,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		waw = {
@@ -268,7 +268,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		wwii = {
@@ -281,7 +281,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		wz = {
@@ -294,7 +294,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		wz2 = {
@@ -307,7 +307,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		wzm = {
@@ -320,7 +320,7 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 		online = {
@@ -333,12 +333,12 @@ return {
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default Lightmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
 	},
 	defaultGame = 'cod',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Call of Duty Default Lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Call of Duty Default Darkmode.png', ---@deprecated
+	defaultTeamLogo = 'Call of Duty Default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Call of Duty Default darkmode.png', ---@deprecated
 }
