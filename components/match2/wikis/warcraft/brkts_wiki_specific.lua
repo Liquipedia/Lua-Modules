@@ -11,7 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
----@class WarcraftBrktsWikiSpecificBase: BrktsWikiSpecificBase
+---@class WarcraftBrktsWikiSpecificBase: BrktsWikiSpecific
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()

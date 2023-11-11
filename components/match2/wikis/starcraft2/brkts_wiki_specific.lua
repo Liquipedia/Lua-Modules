@@ -10,8 +10,10 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
----@class Starcraft2BrktsWikiSpecificBase: BrktsWikiSpecificBase
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true})
+
+---@class Starcraft2BrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
@@ -23,22 +25,24 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
----@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		return Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
+		return MatchList.MatchlistContainer
 	end
-	return Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
+	return Bracket.BracketContainer
 end
 
----@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		return Lua.import(
+		local SingleMatch = Lua.import(
 			'Module:MatchGroup/Display/SingleMatch/Starcraft',
 			{requireDevIfEnabled = true}
-		).SingleMatchContainer
+		)
+		return SingleMatch.SingleMatchContainer
 	end
 end
 

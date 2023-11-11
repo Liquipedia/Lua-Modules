@@ -9,7 +9,7 @@
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
----@class BrktsWikiSpecificBase
+---@class BrktsWikiSpecific
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
@@ -56,7 +56,8 @@ Called from MatchGroup/Util
 -- @returns match
 ]]
 WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	return Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true}).matchFromRecord
+	local MatchUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+	return MatchUtil.matchFromRecord
 end)
 
 --[[
@@ -74,9 +75,12 @@ Called from MatchGroup
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		return Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}) 
+		return MatchList.MatchlistContainer
 	end
-	return Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+	return Bracket.BracketContainer
 end
 
 --[[
@@ -94,7 +98,8 @@ Called from MatchGroup
 function WikiSpecificBase.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
+		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
+		return SingleMatch.SingleMatchContainer
 	end
 end
 
