@@ -345,7 +345,9 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 
 	local details = SubmatchCollapsible()
 	for _, game in ipairs(submatch.games) do
-		details:game(CustomMatchSummary.Game(game, true))
+		if game.map ~= 'Submatch Score Fix' then
+			details:game(CustomMatchSummary.Game(game, true))
+		end
 	end
 
 	return submatchDisplay:addElement(details:create()):css('margin-bottom', '8px')
