@@ -154,6 +154,8 @@ function BaseResultsTable:create()
 	local splitData = Array.groupBy(data, function(placementData)
 		return placementData.date:sub(1,4)
 	end)
+	--we want to insert values for named keys hence table[][] would cause annotation warnings
+	---@cast splitData table[]
 
 	-- Set the header
 	Array.forEach(splitData, function(dataSet)
