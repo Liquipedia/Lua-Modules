@@ -826,12 +826,7 @@ function BasePrizePool:storeData()
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
-		Table.mergeInto(lpdbEntry, {
-			lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {}),
-			opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {}),
-			players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {}),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {}),
-		})
+		lpdbEntry = Json.stringifySubTables(lpdbEntry)
 
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
