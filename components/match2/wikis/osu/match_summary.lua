@@ -326,7 +326,7 @@ function CustomMatchSummary._getMapDisplay(game)
 end
 
 ---@param showIcon boolean?
----@param iconType string?
+---@param iconType OsuMatchIcons?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
