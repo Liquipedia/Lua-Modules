@@ -151,7 +151,6 @@ function StandingsStorage.toScoreBoardEntry(data)
 		return Table.includes(ALLOWED_SCORE_BOARD_KEYS, key)
 	end
 
-	-- Using Table.map to filter. Because strangely enough Table.filter has no access to keys...
 	local scoreBoard = Table.mapValues(Table.filterByKey(data, filterScoreBoard), tonumber)
 
 	if not scoreBoard.w or not scoreBoard.l then
