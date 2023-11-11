@@ -112,10 +112,10 @@ function ConvertMapData.teamMulti(args)
 end
 
 function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, prefix, submatchIndex, mapIndex)
-	local players = {{}, {}}
+	local playersArrays = {{}, {}}
 
 	Array.forEach(Array.range(1, NUMBER_OF_OPPONENTS), function(opponentIndex)
-		ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, prefix, opponentIndex)
+		ConvertMapData._readSubmatchPlayers(args, playersArrays, opponentPlayers, prefix, opponentIndex)
 	end)
 
 	local hasMissingWinner = false
@@ -134,7 +134,7 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 			hasMissingWinner = true
 		end
 
-		Array.forEach(players, function(players, opponentIndex)
+		Array.forEach(playersArrays, function(players, opponentIndex)
 			Array.forEach(players, function(player, playerIndex)
 				parsedArgs[parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex] = player.name
 			end)
@@ -156,7 +156,7 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 	parsedArgs[parsedPrefix .. 'p1score'] = (tonumber(args[prefix .. 'p1score']) or 0) - submatchScores[1]
 	parsedArgs[parsedPrefix .. 'p2score'] = (tonumber(args[prefix .. 'p2score']) or 0) - submatchScores[2]
 
-	Array.forEach(players, function(players, opponentIndex)
+	Array.forEach(playersArrays, function(players, opponentIndex)
 		Array.forEach(players, function(player, playerIndex)
 			parsedArgs[parsedPrefix .. 't' .. opponentIndex .. 'p' .. playerIndex] = player.name
 		end)
