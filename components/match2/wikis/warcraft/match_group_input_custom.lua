@@ -22,7 +22,8 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}

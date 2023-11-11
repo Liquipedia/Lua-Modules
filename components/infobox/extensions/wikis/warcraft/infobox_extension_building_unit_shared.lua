@@ -14,7 +14,7 @@ local AttackIcon = require('Module:AttackIcon')
 local Faction = require('Module:Faction')
 local GameClock = require('Module:GameClock')
 local Logic = require('Module:Logic')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -101,12 +101,12 @@ function CustomBuildingUnit.manaValues(args)
 
 	local initialMana = tonumber(args.manastart) or mana
 	local initialManaDisplay = initialMana ..
-		(manaBonus > 0 and (' (' .. Math.round{value = initialMana / mana * increasedMana, precision = 2} .. ')') or '')
+		(manaBonus > 0 and (' (' .. Math.round(initialMana / mana * increasedMana, 2) .. ')') or '')
 
 	local manaRegen = tonumber(args.manaregen) or 0
 	local manaRegenBonus = tonumber(args.manaregen_bonus) or 0
-	local increasedManaRegen = Math.round{value = manaRegen + manaRegenBonus, precision = 2}
-	local manaRegenDisplay = Math.round{value = manaRegen, precision = 2} ..
+	local increasedManaRegen = Math.round(manaRegen + manaRegenBonus, 2)
+	local manaRegenDisplay = Math.round(manaRegen, 2) ..
 		(manaRegenBonus > 0 and (' (' .. increasedManaRegen .. ')') or '')
 
 	return {

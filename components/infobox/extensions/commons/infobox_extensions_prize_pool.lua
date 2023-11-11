@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -82,8 +82,8 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
-	if varRoundPrecision ~= -1 then
-		prizepoolUsd = Math.round{prizepoolUsd, varRoundPrecision}
+	if varRoundPrecision ~= -1 and prizepoolUsd then
+		prizepoolUsd = Math.round(prizepoolUsd, varRoundPrecision)
 	end
 
 	if setVariables then
@@ -91,7 +91,7 @@ function PrizePoolCurrency.display(args)
 			Variables.varDefine('tournament_currency', currency:upper())
 		end
 
-		Variables.varDefine('tournament_currency_date', date --[[@as string?]])
+		Variables.varDefine('tournament_currency_date', date)
 		Variables.varDefine('tournament_currency_text', text)
 		Variables.varDefine('tournament_prizepoollocal', prizepool)
 		Variables.varDefine('tournament_prizepoolusd', prizepoolUsd)
@@ -101,7 +101,7 @@ function PrizePoolCurrency.display(args)
 		Variables.varDefine('tournament_prizepool_local', prizepool)
 		Variables.varDefine('tournament_prizepool_usd', prizepoolUsd)
 		Variables.varDefine('currency', args.currency and currency)
-		Variables.varDefine('currency date', date --[[@as string?]])
+		Variables.varDefine('currency date', date)
 		Variables.varDefine('currency rate', currencyRate)
 		Variables.varDefine('prizepool', prizepool)
 		Variables.varDefine('prizepool usd', prizepoolUsd)

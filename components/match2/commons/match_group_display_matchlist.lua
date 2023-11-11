@@ -17,7 +17,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 

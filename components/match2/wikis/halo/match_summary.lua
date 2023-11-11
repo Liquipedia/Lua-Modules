@@ -16,7 +16,8 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'

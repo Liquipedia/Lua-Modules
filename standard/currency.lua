@@ -11,7 +11,7 @@ local Arguments = require('Module:Arguments')
 local CurrencyData = mw.loadData('Module:Currency/Data')
 local Info = mw.loadData('Module:Info')
 local Logic = require('Module:Logic')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
@@ -143,9 +143,11 @@ function Currency.formatMoney(value, precision, forceRoundPrecision, dashIfZero)
 	if not Logic.isNumeric(value) or (tonumber(value) == 0 and not forceRoundPrecision) then
 		return dashIfZero and DASH or 0
 	end
+	---@cast value number
+
 	precision = tonumber(precision) or Info.defaultRoundPrecision or DEFAULT_ROUND_PRECISION
 
-	local roundedValue = Math.round{value, precision}
+	local roundedValue = Math.round(value, precision)
 	local integer, decimal = math.modf(roundedValue)
 
 	if precision <= 0 or decimal == 0 and not forceRoundPrecision then

@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
@@ -56,7 +56,7 @@ function CustomInjector:addCustomCells(widgets)
 	--Earnings this Year
 	local currentYearEarnings = _player.earningsPerYear[CURRENT_YEAR]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 

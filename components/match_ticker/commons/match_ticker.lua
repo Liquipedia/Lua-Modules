@@ -14,7 +14,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree

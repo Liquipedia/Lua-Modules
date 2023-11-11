@@ -32,6 +32,7 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class Person: BasicInfobox
 local Person = Class.new(BasicInfobox)
 
 Person.warnings = {}

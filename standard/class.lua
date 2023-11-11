@@ -18,7 +18,7 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 
 ---@class BaseClass
 ---@operator call:self
----@field is_a function
+---@field is_a fun(self, BaseClass):boolean
 
 function Class.new(base, init)
 	local instance = {}
@@ -73,7 +73,7 @@ function Class.new(base, init)
 	return instance
 end
 
----@generic T
+---@generic T:table
 ---@param class T
 ---@param options ?table
 ---@return T

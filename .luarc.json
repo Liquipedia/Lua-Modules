@@ -9,5 +9,9 @@
 	"diagnostics.neededFileStatus": {
         "codestyle-check": "None",
         "name-style-check": "None"
-    }
+    },
+    "workspace.library": [
+        "${3rd}/busted/library",
+        "${3rd}/luassert/library"
+    ]
 }

@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Widgets = require('Module:Infobox/Widget/All')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
@@ -64,7 +64,7 @@ function CustomSeries._getSeriesPrizepools(series)
 	end
 
 	_totalSeriesPrizepool = prizemoney
-	return '$' .. Language:formatNum(Math.round{prizemoney})
+	return '$' .. Language:formatNum(Math.round(prizemoney))
 end
 
 ---@param widgets Widget[]

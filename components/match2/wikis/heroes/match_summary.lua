@@ -31,7 +31,7 @@ local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
-local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
+local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 local VETO_TYPE_TO_TEXT = {
 	ban = 'BAN',

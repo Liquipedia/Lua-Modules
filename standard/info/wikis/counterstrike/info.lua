@@ -73,16 +73,30 @@ local infoData = {
 			name = 'Global Offensive',
 			link = 'Counter-Strike: Global Offensive',
 			logo = {
-				darkMode = 'csgo icon.png',
-				lightMode = 'csgo icon.png',
+				darkMode = 'CSGO gameicon allmode.png',
+				lightMode = 'CSGO gameicon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'CSGO default darkmode.png',
 				lightMode = 'CSGO default lightmode.png',
 			},
 		},
-		cs2 = {
+		csgocs2 = {
 			order = 6,
+			abbreviation = 'CS:GO/CS2',
+			name = 'CS:GO / CS2',
+			link = 'Counter-Strike 2',
+			logo = {
+				darkMode = 'CSGO-CS2 gameicon allmode.png',
+				lightMode = 'CSGO-CS2 gameicon allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Counter-Strike 2 default darkmode.png',
+				lightMode = 'Counter-Strike 2 default lightmode.png',
+			},
+		},
+		cs2 = {
+			order = 7,
 			abbreviation = 'CS2',
 			name = 'Counter-Strike 2',
 			link = 'Counter-Strike 2',
