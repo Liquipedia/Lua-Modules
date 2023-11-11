@@ -20,7 +20,7 @@ local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled 
 local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay 
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Team Principals, Race Engineers, Strategists and more')
 	.. ' & ' .. Abbreviation.make('Owners', 'Founders, Owners, Investors and more')
