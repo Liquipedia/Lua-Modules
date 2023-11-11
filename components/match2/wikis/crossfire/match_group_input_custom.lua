@@ -18,6 +18,7 @@ local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
 
+local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_MAPS = 9
@@ -106,14 +107,8 @@ end
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
-		data.finished == 'skip' or
-		data.finished == 'np' or
-		data.finished == 'cancelled' or
-		data.finished == 'canceled' or
-		data.winner == 'skip' or
-		data.winner == 'np' or
-		data.winner == 'cancelled' or
-		data.winner == 'canceled'
+	Table.includes(NP_STATUSES, data.finished) or
+	Table.includes(NP_STATUSES, data.winner)
 	then
 		data.resulttype = 'np'
 		data.finished = true
@@ -152,7 +147,7 @@ end
 
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
+		for key in pairs(opponents) do
 			opponents[key].placement = 1
 		end
 	elseif specialType == 'default' then
@@ -170,7 +165,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and (winner or '') == '' then
+			if counter == 1 and Logic.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
@@ -288,7 +283,7 @@ function matchFunctions.getTournamentVars(match)
 
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match.game = GAME[match.game or '']
+	match.game = GAME[match.game]
 
 	return match
 end
@@ -412,7 +407,7 @@ function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
 
 	map = MatchGroupInput.getCommonTournamentVars(map)
-	map.game = GAME[map.game or '']
+	map.game = GAME[map.game]
 
 	return map
 end
