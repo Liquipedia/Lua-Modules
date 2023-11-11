@@ -111,6 +111,14 @@ end
 
 ---@param args table
 function LegacyMatchMaps._readMaps(args)
+	local toNewKey = function(prefix, key)
+		local index, newKeyPrefix = string.match(key, '^' .. prefix .. 'p(%d)(%l+)$')
+		if index and newKeyPrefix then
+			return newKeyPrefix .. index
+		end
+		return string.gsub(key, '^' .. prefix, '')
+	end
+
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'map' .. mapIndex
 		local map = Table.filterByKey(args, function(key) return String.startsWith(key, prefix) end)
@@ -126,20 +134,12 @@ function LegacyMatchMaps._readMaps(args)
 			if key == prefix then
 				return 'map', value
 			end
+
 			if key == prefix .. 'win' then
 				return 'winner', value
 			end
-			local heroesOpponentIndex = string.match(key, '^' .. prefix .. 'p(%d)heroes$')
-			if heroesOpponentIndex then
-				return 'heroes' .. heroesOpponentIndex, value
-			end
-			local raceOpponentIndex = string.match(key, '^' .. prefix .. 'p(%d)race$')
-			if raceOpponentIndex then
-				return 'race' .. raceOpponentIndex, value
-			end
 
-			local newKey = string.gsub(key, '^' .. prefix, '')
-			return newKey, value
+			return toNewKey(prefix, key), value
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
