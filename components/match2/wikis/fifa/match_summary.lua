@@ -16,6 +16,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDev
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
 local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
@@ -190,8 +191,8 @@ function CustomMatchSummary._players(players, opponentIndex, winner)
 		:css('padding', '2px 8px')
 		:css('text-align', flip and 'right' or 'left')
 		:css('width', '35%')
-		:node(OpponentDisplay.BlockPlayers{
-			opponent = {players = players},
+		:node(OpponentDisplay.BlockOpponent{
+			opponent = {players = players, type = Opponent.solo},
 			overflow = 'ellipsis',
 			showLink = true,
 		})

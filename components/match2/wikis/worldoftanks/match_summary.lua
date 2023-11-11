@@ -25,7 +25,7 @@ local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
 
----@enum icons
+---@enum WoTMatchIcons
 local Icon = {
 	CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
 	EMPTY = '[[File:NoCheck.png|link=]]',
@@ -45,7 +45,7 @@ local VETO_TYPE_TO_TEXT = {
 local CustomMatchSummary = {}
 
 -- Map Veto Class
----@class self: MatchSummaryRowInterface
+---@class WoTMapVeto: MatchSummaryRowInterface
 ---@operator call: self
 ---@field root Html
 ---@field table Html
