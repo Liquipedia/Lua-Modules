@@ -10,6 +10,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
+---@class StarcraftBrktsWikiSpecificBase: BrktsWikiSpecificBase
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
@@ -22,12 +23,15 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
+---@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+	if matchGroupType == 'matchlist' then
+		return Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
+	end
+	return Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
 end
 
+---@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)

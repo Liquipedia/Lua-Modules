@@ -9,6 +9,7 @@
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
+---@class BrktsWikiSpecificBase
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
@@ -72,9 +73,10 @@ Called from MatchGroup
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+	if matchGroupType == 'matchlist' then
+		return Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
+	end
+	return Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
 end
 
 --[[

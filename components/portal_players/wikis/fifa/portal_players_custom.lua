@@ -129,7 +129,7 @@ function CustomPortalPlayers._getAge(player)
 	})
 
 	if not ageCalculationSuccess then
-		return age
+		return age --[[@as string]]
 	end
 
 	if age.death then

@@ -122,12 +122,12 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
