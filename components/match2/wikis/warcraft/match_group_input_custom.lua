@@ -546,6 +546,20 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		end
 	end
 
+	local winnerInput = tonumber(map.winner)
+	map.winner = winnerInput
+	if Logic.isNotEmpty(map.walkover) then
+		local walkoverInput = tonumber(map.walkover)
+		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
+			map.winner = walkoverInput
+		end
+		map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
+		map.scores = {-1, -1}
+		map.resulttype = 'default'
+
+		return map
+	end
+
 	if hasManualScores then
 		for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
 			if not tonumber(map.winner) then
@@ -554,31 +568,20 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 				break
 			end
 		end
-	else
-		local winnerInput = tonumber(map.winner)
-		if Logic.isNotEmpty(map.walkover) then
-			local walkoverInput = tonumber(map.walkover)
-			if walkoverInput == 1 then
-				map.winner = 1
-			elseif walkoverInput == 2 then
-				map.winner = 2
-			elseif walkoverInput == 0 then
-				map.winner = 0
-			end
-			map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
-			map.scores = {-1, -1}
-			map.resulttype = 'default'
-		elseif map.winner == 'skip' then
-			map.scores = {-1, -1}
-			map.resulttype = 'np'
-		elseif winnerInput == 1 then
-			map.scores = {1, 0}
-		elseif winnerInput == 2 then
-			map.scores = {0, 1}
-		elseif winnerInput == 0 or map.winner == 'draw' then
-			map.scores = {0.5, 0.5}
-			map.resulttype = 'draw'
-		end
+
+		return map
+	end
+
+	if map.winner == 'skip' then
+		map.scores = {-1, -1}
+		map.resulttype = 'np'
+	elseif winnerInput == 1 then
+		map.scores = {1, 0}
+	elseif winnerInput == 2 then
+		map.scores = {0, 1}
+	elseif winnerInput == 0 or map.winner == 'draw' then
+		map.scores = {0.5, 0.5}
+		map.resulttype = 'draw'
 	end
 
 	return map
