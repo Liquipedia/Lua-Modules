@@ -102,17 +102,12 @@ function PlayerIntroduction.playerTeamAuto(args)
 	return PlayerIntroduction(args):queryTransferData(false):returnTeams()
 end
 
---legacy, temp needed to switch the template:PlayerTeamAuto after merge
----@deprecated
-function PlayerIntroduction.main(frame)
-	return PlayerIntroduction.templatePlayerTeamAuto(frame)
-end
-
 --- Init function for PlayerIntroduction
----@param args playerIntroArgsValues
+---@param args playerIntroArgsValues?
 ---@return self
 function PlayerIntroduction:init(args)
-	self.args = args or {}
+	args = args or {}
+	self.args = args
 
 	self.player = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args.player or args[1] or mw.title.getCurrentTitle().text
