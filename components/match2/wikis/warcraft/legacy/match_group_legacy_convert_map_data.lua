@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 
 local TBD = 'TBD'
 local NUMBER_OF_OPPONENTS = 2
-local MAX_NUMBER_OF_SUBATCHES_IN_MULTI = 9
+local MAX_NUMBER_OF_SUBMATCHES_IN_MULTI = 9
 local DEFAULT_WIN = 'W'
 local WALKOVER_INPUT_TO_SCORE_INPUT = {
 	w = DEFAULT_WIN,
@@ -103,7 +103,7 @@ function ConvertMapData.teamMulti(args)
 	local mapIndex = 0
 
 	--the old template allowed missing submatches inbetween, hence need to loop like this
-	Array.forEach(Array.range(1, MAX_NUMBER_OF_SUBATCHES_IN_MULTI), function(prefixIndex)
+	Array.forEach(Array.range(1, MAX_NUMBER_OF_SUBMATCHES_IN_MULTI), function(prefixIndex)
 		local prefix = 'm' .. prefixIndex
 		if args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'map1'] then
 			submatchIndex = submatchIndex + 1
