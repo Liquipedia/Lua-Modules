@@ -14,7 +14,6 @@ local Role = require('Module:Role')
 local Region = require('Module:Region')
 local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
@@ -41,14 +40,7 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 	_player = player
-
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
+	_args.autoTeam = true
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
