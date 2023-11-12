@@ -10,7 +10,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
----@class StarcraftBrktsWikiSpecificBase: BrktsWikiSpecific
+---@class StarcraftBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
