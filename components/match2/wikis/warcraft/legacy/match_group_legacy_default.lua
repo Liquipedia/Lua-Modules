@@ -45,6 +45,7 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 		t2p1heroesNoCheck = 'map$1$p2heroesNoCheck',
 		vod = 'vodgame$1$',
 		subgroup = 'map$1$subgroup',
+		walkover = 'map$1$walkover',
 	}
 
 	if bracketType == 'team' then
