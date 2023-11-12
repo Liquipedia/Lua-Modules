@@ -9,11 +9,20 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local TBD = 'TBD'
 local NUMBER_OF_OPPONENTS = 2
-local MAX_NUMBER_OF_MAPS_IN_MULTI = 9
+local MAX_NUMBER_OF_SUBMATCHES_IN_MULTI = 9
+local DEFAULT_WIN = 'W'
+local WALKOVER_INPUT_TO_SCORE_INPUT = {
+	w = DEFAULT_WIN,
+	skip = 'L',
+	l = 'L',
+	dq = 'DQ',
+	ff = 'FF',
+}
 
 local ConvertMapData = {}
 
@@ -94,7 +103,7 @@ function ConvertMapData.teamMulti(args)
 	local mapIndex = 0
 
 	--the old template allowed missing submatches inbetween, hence need to loop like this
-	Array.forEach(Array.range(1, MAX_NUMBER_OF_MAPS_IN_MULTI), function(prefixIndex)
+	Array.forEach(Array.range(1, MAX_NUMBER_OF_SUBMATCHES_IN_MULTI), function(prefixIndex)
 		local prefix = 'm' .. prefixIndex
 		if args[prefix .. 'p1'] or args[prefix .. 'p2'] or args[prefix .. 'map1'] then
 			submatchIndex = submatchIndex + 1
@@ -145,16 +154,21 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 		end)
 	end
 
-	if not hasMissingWinner then
+	local score1 = ConvertMapData._readSubmatchScore(args, prefix, submatchScores, 1)
+	local score2 = ConvertMapData._readSubmatchScore(args, prefix, submatchScores, 2)
+	local submatchIsNotDefaultWin = Logic.isNumeric(score1) and Logic.isNumeric(score2)
+
+	if submatchIsNotDefaultWin and not hasMissingWinner then
 		return mapIndex
 	end
 
 	mapIndex = mapIndex + 1
 	local parsedPrefix = 'map' .. mapIndex
-	parsedArgs[parsedPrefix] = 'Submatch Score Fix'
 	parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
-	parsedArgs[parsedPrefix .. 'p1score'] = (tonumber(args[prefix .. 'p1score']) or 0) - submatchScores[1]
-	parsedArgs[parsedPrefix .. 'p2score'] = (tonumber(args[prefix .. 'p2score']) or 0) - submatchScores[2]
+	parsedArgs[parsedPrefix .. 'p1score'] = score1
+	parsedArgs[parsedPrefix .. 'p2score'] = score2
+	parsedArgs[parsedPrefix .. 'walkover'] = score1 == DEFAULT_WIN and 1 or score2 == DEFAULT_WIN and 2 or nil
+	parsedArgs[parsedPrefix] = submatchIsNotDefaultWin and 'Submatch Score Fix' or 'Submatch'
 
 	Array.forEach(playersArrays, function(players, opponentIndex)
 		Array.forEach(players, function(player, playerIndex)
@@ -163,6 +177,13 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 	end)
 
 	return mapIndex
+end
+
+function ConvertMapData._readSubmatchScore(args, prefix, submatchScores, opponentIndex)
+	local scoreInput = args[prefix .. 'p' .. opponentIndex .. 'score']
+
+	return WALKOVER_INPUT_TO_SCORE_INPUT[(scoreInput or ''):lower()]
+		or ((tonumber(scoreInput) or 0) - submatchScores[opponentIndex])
 end
 
 function ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, prefix, opponentIndex)
@@ -183,7 +204,7 @@ function ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, pre
 
 	opponentPlayers[opponentIndex][name2] = {
 		name = name2,
-		displayname = args[player2InputPrefix] or name,
+		displayname = args[player2InputPrefix] or name2,
 		flag = args[player2InputPrefix .. 'flag'],
 		race = args[player2InputPrefix .. 'race'],
 	}
