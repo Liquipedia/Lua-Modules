@@ -8,14 +8,19 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Game = Lua.import('Module:Infobox/Manufacturer', {requireDevIfEnabled = true})
+
+local Manufacturer = Lua.import('Module:Infobox/Manufacturer', {requireDevIfEnabled = true})
 
 local CustomManufacturer = Class.new()
 
 ---@param frame Frame
 ---@return Html
-function Manufacturer.run(frame)
-	return Manufacturer(frame):createInfobox()
+function CustomManufacturer.run(frame)
+	local manufacturer = Manufacturer(frame)
+
+	-- add custom code here
+
+	return manufacturer:createInfobox()
 end
 
-return CustomGame
+return CustomManufacturer
