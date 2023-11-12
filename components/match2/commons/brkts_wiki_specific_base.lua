@@ -75,7 +75,7 @@ Called from MatchGroup
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}) 
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
 		return MatchList.MatchlistContainer
 	end
 
