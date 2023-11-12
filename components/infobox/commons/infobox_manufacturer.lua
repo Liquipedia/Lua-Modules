@@ -24,12 +24,6 @@ local Builder = Widgets.Builder
 ---@class ManufacturerInfobox: BasicInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@param frame Frame
----@return Html
-function Manufacturer.run(frame)
-	return Manufacturer(frame):createInfobox()
-end
-
 ---@return Html
 function Manufacturer:createInfobox()
 	local infobox = self.infobox
