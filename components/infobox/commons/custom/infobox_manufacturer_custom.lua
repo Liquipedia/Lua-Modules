@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Game = Lua.import('Module:Infobox/Manufacturer', {requireDevIfEnabled = true})
 
 local CustomManufacturer = Class.new()
 
