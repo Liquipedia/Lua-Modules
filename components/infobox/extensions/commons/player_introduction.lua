@@ -78,7 +78,7 @@ function PlayerIntroduction.templatePlayerIntroduction(frame)
 end
 
 -- module entry point for PlayerIntroduction
----@param args playerIntroArgsValues
+---@param args playerIntroArgsValues?
 ---@return string
 function PlayerIntroduction.run(args)
 	return PlayerIntroduction(args):queryPlayerInfo():queryTransferData(true):adjustData():create()
@@ -95,7 +95,7 @@ function PlayerIntroduction.templatePlayerTeamAuto(frame)
 end
 
 -- module entry point for PlayerTeamAuto
----@param args playerIntroArgsValues
+---@param args playerIntroArgsValues?
 ---@return string?
 ---@return string?
 function PlayerIntroduction.playerTeamAuto(args)
@@ -112,7 +112,7 @@ end
 ---@param args playerIntroArgsValues
 ---@return self
 function PlayerIntroduction:init(args)
-	self.args = args
+	self.args = args or {}
 
 	self.player = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args.player or args[1] or mw.title.getCurrentTitle().text
