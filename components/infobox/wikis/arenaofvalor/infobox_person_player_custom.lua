@@ -12,7 +12,6 @@ local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
