@@ -69,7 +69,7 @@ function Person:createInfobox()
 	end
 
 	if Logic.readBool(args.autoTeam) then
-		local team, team2 = PlayerIntroduction.playerTeamAuto()
+		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
 		args.team = Logic.emptyOr(args.team, team)
 		args.team2 = Logic.emptyOr(args.team2, team2)
 	end
