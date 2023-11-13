@@ -348,7 +348,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	local teamName = opponent.name
 	local playersData = Json.parseIfString(opponent.players) or {}
 
-	local inSertIntoPlayers = function(player)
+	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
 			return
 		end
@@ -364,11 +364,11 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		--players from manual input as `opponnetX_pY`
-		inSertIntoPlayers(Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)))
+		insertIntoPlayers(Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)))
 
 		--players from wiki vars set by teamCard
 		local varPrefix = teamName .. '_p' .. playerIndex
-		inSertIntoPlayers({
+		insertIntoPlayers({
 			name = Variables.varDefault(varPrefix),
 			displayName = Variables.varDefault(varPrefix .. 'dn'),
 			race = Variables.varDefault(varPrefix .. 'race'),
@@ -377,7 +377,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 
 		--players from manual input in `opponent.players`
 		local playerPrefix
-		inSertIntoPlayers({
+		insertIntoPlayers({
 			name = playersData[playerPrefix],
 			displayName = playersData[playerPrefix .. 'dn'],
 			race = playersData[playerPrefix .. 'race'],
