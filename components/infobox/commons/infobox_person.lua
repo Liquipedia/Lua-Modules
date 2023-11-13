@@ -287,6 +287,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
+	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 

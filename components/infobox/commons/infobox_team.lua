@@ -304,6 +304,7 @@ function Team:_setLpdbData(args, links)
 	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
 end
 
