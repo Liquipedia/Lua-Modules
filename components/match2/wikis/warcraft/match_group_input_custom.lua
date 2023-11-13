@@ -346,6 +346,8 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	local teamName = opponent.name
 	local playersData = Json.parseIfString(opponent.players) or {}
 
+	local playerNames = {}
+
 	local players = {}
 
 	for playerIndex = 1, MAX_NUM_PLAYERS do
@@ -365,7 +367,8 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
 			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
 
-		if Table.isNotEmpty(player) or faction then
+		if (Table.isNotEmpty(player) or faction) and not playerNames[player.name] then
+			playerNames[player.name] = true
 			player.extradata = {faction = faction or Faction.defaultFaction}
 			table.insert(players, player)
 		end
