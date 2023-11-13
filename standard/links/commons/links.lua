@@ -115,7 +115,11 @@ local PREFIXES = {
 	instagram = {'https://www.instagram.com/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
-	letsplaylive = {'https://letsplay.live/profile/'},
+	letsplaylive = {
+		'https://old.letsplay.live/event/',
+		team = 'https://old.letsplay.live/team/',
+		player = 'https://old.letsplay.live/profile/',
+	},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
