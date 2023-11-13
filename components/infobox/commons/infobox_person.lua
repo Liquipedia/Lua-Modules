@@ -264,6 +264,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		status = status,
 		type = personType,
 		earnings = self.totalEarnings,
+		earningsbyyear = {},
 		links = links,
 		extradata = {
 			firstname = args.givenname,

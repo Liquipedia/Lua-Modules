@@ -278,6 +278,7 @@ function Team:_setLpdbData(args, links)
 		textlesslogo = args.teamcardimage,
 		textlesslogodark = args.teamcardimagedark,
 		earnings = earnings,
+		earningsbyyear = {},
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
