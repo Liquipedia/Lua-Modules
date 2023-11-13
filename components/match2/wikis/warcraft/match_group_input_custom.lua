@@ -376,7 +376,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		})
 
 		--players from manual input in `opponent.players`
-		local playerPrefix
+		local playerPrefix = 'p' .. playerIndex
 		insertIntoPlayers({
 			name = playersData[playerPrefix],
 			displayName = playersData[playerPrefix .. 'dn'],
