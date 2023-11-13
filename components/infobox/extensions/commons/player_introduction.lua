@@ -130,8 +130,8 @@ end
 
 ---@param queryOnlyIfPlayerInfoIsFound boolean
 ---@return self
-function PlayerIntroduction:queryTransferData(queryOnlyIfPlayerInfoIsFound)
-	if queryOnlyIfPlayerInfoIsFound and Table.isEmpty(self.playerInfo) then
+function PlayerIntroduction:queryTransferData(queryOnlyIfPlayerInfoIsPresent)
+	if queryOnlyIfPlayerInfoIsPresent and Table.isEmpty(self.playerInfo) then
 		return self
 	end
 
