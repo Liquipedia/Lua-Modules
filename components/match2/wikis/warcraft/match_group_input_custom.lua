@@ -343,38 +343,53 @@ end
 ---@param opponent table
 ---@return table
 function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent)
+	local players = {}
+
 	local teamName = opponent.name
 	local playersData = Json.parseIfString(opponent.players) or {}
 
-	local playerNames = {}
-
-	local players = {}
-
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		local player = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)) or {}
-
-		player.name = Logic.emptyOr(player.name, playersData['p' .. playerIndex],
-			Variables.varDefault(teamName .. '_p' .. playerIndex))
-
-		player.name = player.name and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_') or nil
-
-		player.flag = Logic.emptyOr(player.flag, playersData['p' .. playerIndex .. 'flag'],
-			Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag'))
-
-		local faction = Faction.read(Logic.emptyOr(player.race, playersData['p' .. playerIndex .. 'race'],
-			Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')))
-
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if (Table.isNotEmpty(player) or faction) and not playerNames[player.name] then
-			playerNames[player.name] = true
-			player.extradata = {faction = faction or Faction.defaultFaction}
-			table.insert(players, player)
+	local inSertIntoPlayers = function(player)
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
+			return
 		end
+
+		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
+		player.flag = Flags.CountryName(player.flag)
+		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
+		player.extradata = {faction = Faction.read(player.race)}
+
+		players[player.name] = players[player.name] or {}
+		Table.deepMergeInto(players[player.name], player)
 	end
 
-	opponent.match2players = players
+	for playerIndex = 1, MAX_NUM_PLAYERS do
+		--players from manual input as `opponnetX_pY`
+		inSertIntoPlayers(Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)))
+
+		--players from wiki vars set by teamCard
+		local varPrefix = teamName .. '_p' .. playerIndex
+		inSertIntoPlayers({
+			name = Variables.varDefault(varPrefix),
+			displayName = Variables.varDefault(varPrefix .. 'dn'),
+			race = Variables.varDefault(varPrefix .. 'race'),
+			flag = Variables.varDefault(varPrefix .. 'flag'),
+		})
+
+		--players from manual input in `opponent.players`
+		local playerPrefix
+		inSertIntoPlayers({
+			name = playersData[playerPrefix],
+			displayName = playersData[playerPrefix .. 'dn'],
+			race = playersData[playerPrefix .. 'race'],
+			flag = playersData[playerPrefix .. 'flag'],
+		})
+	end
+
+	opponent.match2players = Array.extractValues(players)
+	--set default race for unset races
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata.faction = player.extradata.faction or Faction.defaultFaction
+	end)
 
 	return opponent
 end
