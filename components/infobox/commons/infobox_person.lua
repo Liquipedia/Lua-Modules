@@ -264,6 +264,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		status = status,
 		type = personType,
 		earnings = self.totalEarnings,
+		earningsbyyear = {},
 		links = links,
 		extradata = {
 			firstname = args.givenname,
@@ -273,6 +274,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
 	-- Store additional team-templates in extradata
@@ -285,6 +287,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
+	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear)
 	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
 	local storageType = self:getStorageType(args, personType, status)
 
