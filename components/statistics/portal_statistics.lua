@@ -1020,7 +1020,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 	local function makeOpponentTable(item)
 		local opponentNames = {}
 		if args.opponentType == Opponent.solo then
-			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers, 'p') do
+			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers or {}, 'p') do
 				local name = string.gsub(playerName or '', ' ', '_')
 				table.insert(opponentNames, name)
 			end
