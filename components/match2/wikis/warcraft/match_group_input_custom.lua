@@ -29,7 +29,6 @@ local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 20
 local DEFAULT_BEST_OF = 99
 local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap', 'lrthread'}
 local MODE_MIXED = 'mixed'
@@ -383,9 +382,9 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	end
 
 	--players from manual input in `opponent.players`
-	for _, name, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
 		insertIntoPlayers({
-			name = name,
+			name = playerName,
 			displayName = playersData[playerPrefix .. 'dn'],
 			race = playersData[playerPrefix .. 'race'],
 			flag = playersData[playerPrefix .. 'flag'],
