@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 
@@ -18,18 +17,14 @@ local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
-local Builder = Widgets.Builder
-local Chronology = Widgets.Chronology
 
 local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 local Chronology = Widgets.Chronology
 
-local _args 
+local _args
 local _team
 
 function CustomTeam.run(frame)
@@ -68,11 +63,10 @@ function CustomInjector:addCustomCells()
 			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
 		end
 	end
-	
+
 	if _args.academy then
 		table.insert(widgets, Title{name = 'Academy Team(s)'})
-		table.insert(widgets, Center{content = {_args.academy}})
-		table.insert(widgets, Center{content = {_args.academy2}})
+		table.insert(widgets, Center{content = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team) return Team.team(nil, team) end)})
 	end
 
 	if _args.previous or _args.next then
@@ -92,13 +86,12 @@ function CustomInjector:addCustomCells()
 end
 
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.previous = args.previous
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
 	lpdbData.extradata.next2 = args.next2
-	
+
 	return lpdbData
 end
 
