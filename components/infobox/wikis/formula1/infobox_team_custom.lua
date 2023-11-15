@@ -9,8 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 local Table = require('Module:Table')
+local TeamTemplates = require('Module:Team')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
@@ -66,7 +66,9 @@ function CustomInjector:addCustomCells()
 
 	if _args.academy then
 		table.insert(widgets, Title{name = 'Academy Team(s)'})
-		table.insert(widgets, Center{content = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team) return Team.team(nil, team) end)})
+		table.insert(widgets, Center{content = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
+			return TeamTemplates.team(nil, team)
+		end)})
 	end
 
 	if _args.previous or _args.next then
