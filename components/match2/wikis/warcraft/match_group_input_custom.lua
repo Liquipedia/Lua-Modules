@@ -362,23 +362,30 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		Table.deepMergeInto(players[player.name], player)
 	end
 
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		--players from manual input as `opponnetX_pY`
-		insertIntoPlayers(Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)))
-
-		--players from wiki vars set by teamCard
-		local varPrefix = teamName .. '_p' .. playerIndex
-		insertIntoPlayers({
-			name = Variables.varDefault(varPrefix),
+	local playerIndex = 1
+	local varPrefix = teamName .. '_p' .. playerIndex
+	local name = Variables.varDefault(varPrefix)
+	while name do
+		insertIntoPlayers{
+			name = name,
 			displayName = Variables.varDefault(varPrefix .. 'dn'),
 			race = Variables.varDefault(varPrefix .. 'race'),
 			flag = Variables.varDefault(varPrefix .. 'flag'),
-		})
+		}
+		playerIndex = playerIndex + 1
+		varPrefix = teamName .. '_p' .. playerIndex
+		name = Variables.varDefault(varPrefix)
+	end
 
-		--players from manual input in `opponent.players`
-		local playerPrefix = 'p' .. playerIndex
+	--players from manual input as `opponnetX_pY`
+	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
+		insertIntoPlayers(Json.parseIfString(player))
+	end
+
+	--players from manual input in `opponent.players`
+	for _, name, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
 		insertIntoPlayers({
-			name = playersData[playerPrefix],
+			name = name,
 			displayName = playersData[playerPrefix .. 'dn'],
 			race = playersData[playerPrefix .. 'race'],
 			flag = playersData[playerPrefix .. 'flag'],
