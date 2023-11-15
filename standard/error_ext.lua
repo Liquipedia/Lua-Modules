@@ -140,7 +140,7 @@ function ErrorExt.printErrorJson(error)
 	return Json.stringify({
 			errorShort = string.format('Lua error in %s:%s at line %s:%s.', unpack(mw.text.split(error.error, ':', true))),
 			stackTrace = stackTrace,
-		})
+		}, {asArray = true})
 end
 
 local Stash = {}
