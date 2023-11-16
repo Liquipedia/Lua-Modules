@@ -110,8 +110,8 @@ function ErrorExt.printErrorJson(error)
 		local frameSplit = mw.text.split(frame, ':', true)
 		if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
 			stackEntry.prefix = frameSplit[1]
-			stackEntry.content = table.concat(frameSplit, ':', 2)
-		elseif frameSplit[1] == 'mw.lua' then
+			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
+		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
 			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
 			stackEntry.content =  table.concat(frameSplit, ':', 3)
 		elseif frameSplit[1] == 'Module' then
@@ -132,13 +132,15 @@ function ErrorExt.printErrorJson(error)
 				Array.sub(stackFrames, 2, #stackFrames),
 				function(frame) return String.trim(frame) end
 			),
-			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame, true) end
+			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame, false, true) end
 		)
 		Array.forEach(stackFrames, processStackFrame)
 	end)
 
+	local errorSplit = mw.text.split(error.error, ':', true)
 	return Json.stringify({
-			errorShort = string.format('Lua error in %s:%s at line %s:%s.', unpack(mw.text.split(error.error, ':', true))),
+			errorShort = (#errorSplit == 1) and string.format('Lua error: %s.', error.error)
+				or string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit)),
 			stackTrace = stackTrace,
 		}, {asArray = true})
 end
