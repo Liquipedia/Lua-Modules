@@ -73,7 +73,7 @@ end
 --[[
 Result case
 ]]
----@class Result
+---@class Result: ResultOrError
 ---@field result any
 local Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
@@ -98,7 +98,7 @@ continuation of the stack trace of the error that was handled (and so on).
 This allows error handlers to rethrow the original error without losing the
 stack trace, and is needed to implement :finally().
 ]]
----@class Error
+---@class Error: ResultOrError
 ---@field error string?
 ---@field stacks string[]?
 local Error = Class.new(ResultOrError, function(self, error, stacks)
@@ -112,8 +112,9 @@ function Error:map(_, onError)
 		or ResultOrError.Result()
 end
 
----Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
-function Error:get()
+---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
+---@return string
+function Error:getErrorJson()
 	local stackTrace = {}
 
 	local processStackFrame = function(frame, frameIndex)
@@ -155,13 +156,16 @@ function Error:get()
 	end)
 
 	local errorSplit = mw.text.split(self.error, ':', true)
-	local errorJson = Json.stringify({
+	return Json.stringify({
 			errorShort = (#errorSplit == 1) and string.format('Lua error: %s.', self.error)
 				or string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit)),
 			stackTrace = stackTrace,
 		}, {asArray = true})
+end
 
-	error(errorJson, 0)
+---Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
+function Error:get()
+	error(self:getErrorJson(), 0)
 end
 
 --[[
@@ -174,6 +178,9 @@ can be used when rethrowing an error to include the stack trace of the existing
 error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
 automatically include both stack traces.
 ]]
+---@param f function
+---@param lowerStacks table?
+---@return ResultOrError
 function ResultOrError.try(f, lowerStacks)
 	local resultOrError
 	xpcall(
