@@ -65,10 +65,13 @@ function CustomInjector:addCustomCells()
 	end
 
 	if _args.academy then
-		table.insert(widgets, Title{name = 'Academy Team(s)'})
-		table.insert(widgets, Center{content = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
+		local academyTeams = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
 			return TeamTemplates.team(nil, team)
-		end)})
+		end)
+		Array.extendWith(widgets,
+			{Title{name = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
+			Array.map(academyTeams, function(academyTeam) return Center{content = {academyTeam}} end)
+		)
 	end
 
 	if _args.previous or _args.next then
