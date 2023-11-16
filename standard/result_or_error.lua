@@ -8,6 +8,16 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local FILTERED_ERROR_STACK_ITEMS = {
+	'^Module:ResultOrError:%d+: in function <Module:ResultOrError:%d+>$',
+	'^%[C%]: in function \'xpcall\'$',
+	'^Module:ResultOrError:%d+: in function \'try\'$',
+}
 
 --[[
 A structurally typed, immutable class that represents either a result or an
@@ -102,8 +112,56 @@ function Error:map(_, onError)
 		or ResultOrError.Result()
 end
 
+---Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
 function Error:get()
-	error(require('Module:Error/Ext').printErrorJson(self), 0)
+	local stackTrace = {}
+
+	local processStackFrame = function(frame, frameIndex)
+		if frameIndex == 1 and frame == '[C]: ?' then
+			return
+		end
+
+		local stackEntry = {content = frame}
+		local frameSplit = mw.text.split(frame, ':', true)
+		if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
+			stackEntry.prefix = frameSplit[1]
+			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
+		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
+			stackEntry.content =  table.concat(frameSplit, ':', 3)
+		elseif frameSplit[1] == 'Module' then
+			local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
+				or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'
+			stackEntry.link = {wiki = wiki, title = table.concat(frameSplit, ':', 1, 2), ln = frameSplit[3]}
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 3)
+			stackEntry.content = table.concat(frameSplit, ':', 4)
+		end
+
+		table.insert(stackTrace, stackEntry)
+	end
+
+	Array.forEach(self.stacks, function(stack)
+		local stackFrames = mw.text.split(stack, '\n')
+		stackFrames = Array.filter(
+			Array.map(
+				Array.sub(stackFrames, 2, #stackFrames),
+				function(frame) return String.trim(frame) end
+			),
+			function(frame) return not Table.any(FILTERED_ERROR_STACK_ITEMS, function(_, filter)
+				return string.find(frame, filter) ~= nil
+			end) end
+		)
+		Array.forEach(stackFrames, processStackFrame)
+	end)
+
+	local errorSplit = mw.text.split(self.error, ':', true)
+	local errorJson = Json.stringify({
+			errorShort = (#errorSplit == 1) and string.format('Lua error: %s.', self.error)
+				or string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit)),
+			stackTrace = stackTrace,
+		}, {asArray = true})
+
+	error(errorJson, 0)
 end
 
 --[[
