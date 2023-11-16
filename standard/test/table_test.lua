@@ -130,6 +130,7 @@ end
 function suite:testIncludes()
 	local a = {'testValue', 'testValue2', 'testValue3'}
 	local b = {key1 = 'testValue', key2 = 'testValue2', 'testValue3'}
+	local c = {key1 = '^testValue%d$', '^testValue$', 'rest'}
 	self:assertTrue(Table.includes(a, 'testValue'))
 	self:assertTrue(Table.includes(b, 'testValue'))
 	self:assertTrue(Table.includes(b, 'testValue3'))
@@ -149,6 +150,15 @@ function suite:testIncludes()
 	self:assertTrue(Table.includes(b, '^testValue%d$', true))
 	self:assertFalse(Table.includes(b, '^estValue3$', true))
 	self:assertFalse(Table.includes({'^estValue3$'}, '^estValue3$', true))
+
+	self:assertTrue(Table.includes(c, 'testValue', false, true))
+	self:assertTrue(Table.includes(c, 'testValue2', false, true))
+	self:assertTrue(Table.includes(c, 'rest', false, true))
+	self:assertTrue(Table.includes(c, 'rested', false, true))
+	self:assertFalse(Table.includes(c, 'estValue', false, true))
+	self:assertFalse(Table.includes(c, 'testValue ', false, true))
+	self:assertFalse(Table.includes(c, 'testValueddd', false, true))
+	self:assertFalse(Table.includes(c, 'badValue', false, true))
 end
 
 function suite:testFilterByKey()
