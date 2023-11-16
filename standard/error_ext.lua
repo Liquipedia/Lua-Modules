@@ -132,7 +132,9 @@ function ErrorExt.printErrorJson(error)
 				Array.sub(stackFrames, 2, #stackFrames),
 				function(frame) return String.trim(frame) end
 			),
-			function(frame) return not Table.includes(FILTERED_STACK_ITEMS, frame, false, true) end
+			function(frame) return not Table.any(FILTERED_STACK_ITEMS, function(_, filter)
+				return string.find(frame, filter) ~= nil
+			end) end
 		)
 		Array.forEach(stackFrames, processStackFrame)
 	end)
