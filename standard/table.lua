@@ -27,12 +27,15 @@ end
 
 ---@param tbl table
 ---@param value any
----@param isPattern boolean?
+---@param isPattern boolean? If `value` is a Lua pattern **(mutex: `arePatterns`)**
+---@param arePatterns boolean? If `tbl` contains Lua patterns **(mutex: `isPattern`)**
 ---@return boolean
-function Table.includes(tbl, value, isPattern)
+function Table.includes(tbl, value, isPattern, arePatterns)
+	assert(not (isPattern and arePatterns), "isPattern and arePatterns are mutually exclusive!")
 	for _, entry in pairs(tbl) do
 		if isPattern and string.find(entry, value)
-			or not isPattern and entry == value then
+			or arePatterns and string.find(value, entry)
+			or not (isPattern or arePatterns) and entry == value then
 				return true
 		end
 	end
