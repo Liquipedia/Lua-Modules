@@ -14,7 +14,7 @@ A structurally typed, immutable class that represents either a result or an
 error. Used for representing the outcome of a function that can throw.
 
 Usage:
-
+```
 local socketOrError = ResultOrError.try(function()
 	return socketlib.open()
 end)
@@ -27,7 +27,10 @@ local parsedText = socketOrError
 		socketOrError:map(function(socket) socket:close() end)
 	end)
 	:get()
+```
 ]]
+---@class ResultOrError
+---@field is_a? function
 local ResultOrError = Class.new(function(self)
 	-- ResultOrError is an abstract class. Don't call this constructor directly.
 	--error('Cannot construct abstract class')
@@ -60,6 +63,8 @@ end
 --[[
 Result case
 ]]
+---@class Result
+---@field result any
 local Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
 end)
@@ -83,6 +88,9 @@ continuation of the stack trace of the error that was handled (and so on).
 This allows error handlers to rethrow the original error without losing the
 stack trace, and is needed to implement :finally().
 ]]
+---@class Error
+---@field error string?
+---@field stacks string[]?
 local Error = Class.new(ResultOrError, function(self, error, stacks)
 	self.error = error
 	self.stacks = stacks

@@ -96,7 +96,7 @@ function ErrorExt.makeFullStackTrace(error)
 end
 
 ---Builds a JSON string for using with `liquipedia.customLuaErrors` JS module via error().
----@param error error
+---@param error Error
 ---@return string?
 function ErrorExt.printErrorJson(error)
 	local stackTrace = {}
