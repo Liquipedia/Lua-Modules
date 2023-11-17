@@ -1,0 +1,18 @@
+{
+	"private": true,
+	"dependencies": {
+		"bootstrap": "^4.6.0"
+	},
+	"devDependencies": {
+		"eslint-config-wikimedia": "*",
+		"grunt": "*",
+		"grunt-eslint": "*",
+		"grunt-stylelint": "*",
+		"stylelint-config-wikimedia": "*",
+		"stylelint-less": "*"
+	},
+	"scripts": {
+		"test": "grunt main",
+		"fix": "grunt main --fix"
+	}
+}
