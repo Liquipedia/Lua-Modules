@@ -39,8 +39,7 @@ local parsedText = socketOrError
 	:get()
 ```
 ]]
----@class ResultOrError
----@field is_a? function
+---@class ResultOrError: BaseClass
 local ResultOrError = Class.new(function(self)
 	-- ResultOrError is an abstract class. Don't call this constructor directly.
 	--error('Cannot construct abstract class')
@@ -73,7 +72,7 @@ end
 --[[
 Result case
 ]]
----@class Result
+---@class Result: ResultOrError
 ---@field result any
 local Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
@@ -98,7 +97,7 @@ continuation of the stack trace of the error that was handled (and so on).
 This allows error handlers to rethrow the original error without losing the
 stack trace, and is needed to implement :finally().
 ]]
----@class Error
+---@class Error: ResultOrError
 ---@field error string?
 ---@field stacks string[]?
 local Error = Class.new(ResultOrError, function(self, error, stacks)
