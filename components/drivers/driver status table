@@ -1,0 +1,62 @@
+
+---
+-- @Liquipedia
+-- wiki=formula1
+-- page=Module:Driver status table
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+local p = {}
+local getArgs = require('Module:Arguments').getArgs
+local Template = require('Module:Template')
+local Team = require('Module:Team')
+local frame
+
+function p.getPlayers(status)
+	return mw.ext.LiquipediaDB.lpdb('player', {
+		query = 'pagename, id, nationality, team, extradata',
+		conditions = '[[status::'..status..']]',
+		limit = 5000,
+		offset = 0,
+	})
+end
+
+function p.get(frame)
+	local args = getArgs(frame)
+	
+	args.status = args.status or 'Active'
+	args.limit = args.limit and tonumber(args.limit) or 100
+
+	local data = p.getPlayers(args.status)
+
+	math.randomseed(os.time())
+
+	local randomizedOrder = {}
+	for i, v in ipairs(data) do
+		table.insert(randomizedOrder, math.random(1, i), v) -- Insert the value at a random place in the new table
+	end
+
+	local table = mw.html.create('table'):addClass('wikitable'):addClass('wikitable-striped'):addClass('table-bordered'):addClass('sortable')
+	table:tag('tr')
+		:tag('th'):wikitext(Template.safeExpand(frame, 'Flag/world')):done()
+		:tag('th'):wikitext('Player'):done()
+		:tag('th'):wikitext('<abbr title="Current Team">Team</abbr>'):done()
+		:tag('th'):css('max-width', '120px'):wikitext('Role'):done()
+		:tag('th'):css('max-width', '120px'):wikitext('Role 2'):done()
+
+	if #randomizedOrder < args.limit then
+		args.limit = #randomizedOrder
+	end
+	for i = 1, args.limit do
+		local player = randomizedOrder[i]
+		table:tag('tr'):css('text-align', 'center')
+			:tag('td'):css('padding', '2px 2px 4px 2px'):wikitext(Template.safeExpand(frame, 'Flag/'..(player.nationality or ''):lower())):done()
+			:tag('td'):css('text-align', 'left'):css('padding', '0 4px'):css('line-height', '25px'):wikitext("'''[["..player.pagename.."|"..player.id.."]]'''"):done() 
+			:tag('td'):css('width', '60px'):css('height', '25px'):wikitext((player.team and mw.ext.TeamTemplate.teamexists(player.team) and Team.icon(_, player.team) or '')):done()
+			:tag('td'):wikitext(mw.language.getContentLanguage():ucfirst(player.extradata.role or '')):done()
+			:tag('td'):wikitext(mw.language.getContentLanguage():ucfirst(player.extradata.role2 or '')):done()
+	end
+	return tostring(table)
+end
+
+return p

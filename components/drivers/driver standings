@@ -1,0 +1,628 @@
+---
+-- @Liquipedia
+-- wiki=formula1
+-- page=Module:Drivers standings
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local p = {} -- p stands for package
+
+local countdown = require('Module:Countdown')._create
+local Team = require('Module:Team')
+local Player = require('Module:Player')
+local Flag = require('Module:Flags')
+local Placement = require('Module:Placement')
+
+local POINTS = {
+	['1'] = 25,	
+	['2'] = 18,	
+	['3'] = 15,	
+	['4'] = 12,	
+	['5'] = 10,	
+	['6'] = 8,
+	['7'] = 6,
+	['8'] = 4,
+	['9'] = 2,
+	['10'] = 1,
+	['11'] = 0,
+	['12'] = 0,
+	['13'] = 0,
+	['14'] = 0,
+	['15'] = 0,
+	['16'] = 0,
+	['17'] = 0,
+	['18'] = 0,
+	['19'] = 0,
+	['20'] = 0,
+	['21'] = 0,
+	['22'] = 0,
+	['23'] = 0,
+	['24'] = 0,
+	['25'] = 0,
+	['0'] = 0,
+	['dnf'] = 0,
+	['dns'] = 0,
+	['dnq'] = 0,
+	['dnpq'] = 0,
+	['dsq'] = 0,
+	['dq'] = 0,
+	['wd'] = 0,
+	['nc'] = 0,
+	['ex'] = 0,
+	['-'] = 0,
+}
+
+local BACKGROUND_COLORS = {
+	['1'] = "placement-1 bold-white-text",
+	['2'] = "placement-2 bold-white-text",
+	['3'] = "placement-3 bold-white-text",
+}
+
+-- Get the date
+local globalDate = mw.ext.VariablesLua.var('date')
+if not(globalDate and globalDate ~= '') then
+	globalDate = mw.ext.VariablesLua.var('tournament_enddate')
+	if not(globalDate and globalDate ~= '') then
+		globalDate = mw.ext.VariablesLua.var('tournament_startdate')
+		if not(globalDate and globalDate ~= '') then
+			globalDate = os.date( '%F' )
+		end
+	end
+end
+
+function p.formatDate(date, format)
+	local month,day,year,time=date:match('^(%a+)%s(%d+),?%s?(%d*)%s?-?%s?(.-)$')
+	if time and time ~= '' then
+		local hour,min,timezone=time:match('^(%d+):(%d+)%D-([+-]?%d+:%d+)')
+		return mw.language.getContentLanguage():formatDate( format or 'r', month .. '-' .. day .. ', ' .. year .. ' ' .. hour .. ':' .. min .. (timezone or ''))
+	elseif year and year ~= '' then
+		return mw.language.getContentLanguage():formatDate( format or 'r', month .. '-' .. day .. ', ' .. year )
+	else
+		return mw.language.getContentLanguage():formatDate( format or 'r', date) or date
+	end
+end
+
+
+function p.resolve_ties(args, teamlist, results, date)
+
+	function get_disqualified(team)
+		if team.currentStatus == "DQ" then
+			return 0
+		else
+			return 1
+		end
+	end
+
+	function get_points(team)
+		return team.tiebreaker*10 + team.points
+	end
+
+	local tiebreakers = {}
+	for i = 1,10 do
+		local key = args['tiebreaker' .. tostring(i)] or ''
+		if key == 'points' or key == 'pts' then
+			table.insert(tiebreakers, get_points)
+		end
+	end
+
+	if not next(tiebreakers) then
+		if args.show_p == 'true' then
+			tiebreakers = {
+				get_points,
+			}
+		else
+			tiebreakers = {
+				get_points,
+			}
+		end
+	end
+
+	function get_temp_ties(team)
+		return (team.tiebreaker + team.tempTiebreaker)
+	end
+	
+	table.insert(tiebreakers, 1, get_disqualified)
+	table.insert(tiebreakers, get_temp_ties)
+
+	local ties_resolved = false
+	local tiebreaker_index = 1
+    repeat
+		local start_index, end_index = 1, 1
+	
+		repeat 
+			while (end_index < #teamlist) do
+				end_index = end_index + 1
+			end
+	
+			-- calculate tiebreaker value for each tied team
+			local tied_rankings = {}
+	  
+			if end_index - start_index > 0  then
+					for i = start_index, end_index do
+						results[i].tiebreaker = tiebreakers[tiebreaker_index](results[i])
+						table.insert(tied_rankings, results[i])	
+					end
+
+				table.sort(tied_rankings, function(item1, item2) return 
+					item1.tiebreaker > item2.tiebreaker or (item1.tiebreaker == item2.tiebreaker and string.lower(item1.team) < string.lower(item2.team)) end)
+				for i = start_index, end_index do
+					results[i] = tied_rankings[ i - start_index + 1 ]
+				end
+			end
+			
+			end_index = end_index + 1
+			start_index = end_index
+			
+		until (end_index > #teamlist)
+		tiebreaker_index = tiebreaker_index + 1
+		
+		if (tiebreaker_index > 2 and start_index == 1 and end_index == #teamlist) then
+			ties_resolved = true
+		end
+	until (tiebreaker_index > #tiebreakers or ties_resolved == true)
+
+	-- update teamlist to match results
+	for key, item in ipairs(results) do
+		teamlist[item.team] = key
+	end
+end
+
+
+function p.get(frame, args, data)  
+	local divWrapper
+	local lpdb_conditions
+	local teamlist, aliaslist, aliascriteria = {}, {}, {}
+	local results = {}
+	local tournaments = {}
+	local custom_points = {}
+	local rounds = {}
+	local data = {}
+	local round_no = 1
+
+	if not getArgs then
+		getArgs = require('Module:Arguments').getArgs
+	end
+	args = getArgs(frame)
+
+	-- parse parameters tournamentX and teamX and X-X_p
+	for key, item in pairs(args) do
+		if item == '' or item == '\n' then
+			args[key] = nil
+		end
+		if type(key) == 'string' and item ~= '' then
+
+				  
+			-- paramX associated with teamX
+			if key:match('^r?o?u?n?d?%d-([^%d]*%d*)$') then
+				local round_index, param, team_index = key:match('^r?o?u?n?d?(%d-)([^%d]*)(%d*)$')
+				if round_index == '' then
+					round_index = 0 
+				end
+				round_index, team_index = tonumber(round_index), tonumber(team_index)
+					if not rounds[round_index] then
+						rounds[round_index] = {
+							date = today_date,
+							teams = {},
+							bg = {}
+						}
+					end
+
+				-- playerX
+				if param == 'player' then	
+					if not teamlist[team_index] then
+						teamlist[team_index] = {team, team_arg, flag, teamName}
+					end
+					teamlist[team_index].team = item
+					teamlist[team_index].team_arg = item
+
+				-- flagX
+				elseif param == 'flag' then	
+					if not teamlist[team_index] then
+						teamlist[team_index] = {team, team_arg, flag, teamName}
+					end
+					teamlist[team_index].flag = item
+
+				-- teamX
+				elseif param == 'team' then	
+					if not teamlist[team_index] then
+						teamlist[team_index] = {team, team_arg, flag, teamName}
+					end
+					teamlist[team_index].teamName = item
+
+				-- standingsX
+				elseif param == 'standings'  then
+					if not data[team_index] then
+						data[team_index] = {standings = {}, team = team_index, status = {}, tempPoints = {}, tempTiebreaker, flag, teamName}
+					end
+					item = item .. ","
+					i = 1
+					for w in item:gmatch("(.-),") do
+						data[team_index].standings[i] = w
+						i = i + 1
+					end
+					
+					
+				-- rNstatusX
+				elseif param == 'status'  then
+					if not data[team_index] then
+						data[team_index] = {standings = {}, team = team_index, status = {}, tempPoints = {}, tempTiebreaker, flag, teamName}
+					end
+					data[team_index].status[round_index] = item
+					
+				-- tempTiebreakerX
+				elseif param == 'tempTiebreaker'  then
+					if not data[team_index] then
+						data[team_index] = {standings = {}, team = team_index, status = {}, tempPoints = {}, tempTiebreaker, flag, teamName}
+					end
+					data[team_index].tempTiebreaker = tonumber(item)
+
+				-- rNtempPointsX
+				elseif param == 'tempPoints'  then
+					if not data[team_index] then
+						data[team_index] = {standings = {}, team = team_index, status = {}, tempPoints = {}, tempTiebreaker, flag, teamName}
+					end
+					data[team_index].tempPoints[round_index] = tonumber(item)
+					
+				-- rNdateX
+				elseif param == 'edate' or param == 'date' then
+					rounds[round_index].date = tonumber(p.formatDate(item, 'U'))
+		  
+				-- rNbgX
+				elseif param == 'bg' then
+					rounds[round_index].bg[team_index] = item
+			
+				-- temp_pX
+				elseif param == 'temp_p' and team_index then
+					rounds[round_index].temp_points[team_index] = item
+
+				-- temp_tieX
+				elseif param == 'temp_tie' and team_index then
+					rounds[round_index].temp_tiebreaker[team_index] = item
+
+				-- temp_diffX
+				elseif param == 'temp_diff' and team_index then
+					rounds[round_index].temp_diff[team_index] = item
+
+
+				-- dqX
+				elseif (param == 'dq' or param == 'q') and team_index and item == 'true' then -- TODO: param == 'q' is a temporary fix, resolve it correctly
+				  rounds[round_index].params.disqualified[team_index] = true
+				end
+
+			-- X-Y_p
+			elseif key:match('^(%d+-%d+)_p$') then 
+				table.insert(custom_points, {score1 = key:match('^(%d+)-%d+_p'), score2 = key:match('^%d+-(%d+)_p'), points = item})
+			end
+		end
+	end
+	newData = p.formatData(args, data, rounds, teamlist) 
+	rounds = newData
+	-- parse parameters
+	args.coltitle = args.coltitle or 'Round'
+	args.teamshortname = args.teamshortname or 'true'
+  	args.roundwidth = tonumber(args.roundwidth) or 130
+	local numTeams = 0
+	local placementPointSystem = POINTS
+	
+	while(args['pt' .. tostring(numTeams + 1)] ~= nil) do
+		numTeams = numTeams + 1
+		placementPointSystem[tostring(numTeams)] = tonumber(args['pt' .. tostring(numTeams)]) or placementPointSystem[tostring(numTeams)]
+	end
+	
+	POINTS = placementPointSystem
+
+	if not next(tournaments) then
+		tournaments[1] = string.gsub(mw.title.getCurrentTitle().text,'%s','_')
+	end
+
+	--
+	if type(data) == 'table' then
+		-- final date
+		table.sort(rounds, function(item1, item2) return item1.date < item2.date end)
+		local is_mid_tournament = false
+		local current_round = #rounds
+		local today_date = tonumber(os.date("%s"))
+		local last_date = args.edate and tonumber(p.formatDate(args.edate, 'U')) or today_date
+
+		local team_colspan = 2
+
+		-- create table
+		local class = 'wikitable wikitable-bordered wikitable-striped f1-driver-standings-table'
+		if (args.hide == 'true') then
+			class = class .. ' collapsible collapsed'
+		elseif (args.hide == 'false') then
+			class = class .. ' collapsible'
+		elseif (args.hide) then 
+			class = class .. ' ' .. args.hide
+		end
+	
+		divWrapper = mw.html.create('div')
+			:addClass('table-responsive toggle-area toggle-area-' .. tostring(#rounds))
+			:attr('data-toggle-area',tostring(#rounds))
+			:css('overflow', 'auto')
+			--:css('padding-bottom', tostring(#rounds * 27) .. 'px')
+			--:css('margin-bottom', -tostring(#rounds * 27) .. 'px')
+		output = divWrapper:tag('table')
+			:addClass(class)
+			:css('width', args.width or '550px')
+			:css('margin','0px')
+	
+		local dropdownWrapper = mw.html.create('div')
+			:addClass('dropdown-box-wrapper')	
+			:css('float','left')
+		dropdownWrapper:tag('span')
+			:addClass('dropdown-box-button btn btn-secondary')
+			:css('width',args.roundwidth .. 'px')
+			:css('padding-top', '2px')
+			:css('padding-bottom', '2px')
+			:wikitext((args.coltitle .. ' ' .. tostring(#rounds)) .. ' <span class="caret"></span>')
+		if #rounds <= 1 then
+			dropdownWrapper:css('display','none')
+		end
+		local dropdownButton = dropdownWrapper:tag('div')
+			:addClass('dropdown-box')
+			:css('padding','0px')
+		for i=1,#rounds do
+
+			buttonText = args.coltitle .. ' ' .. tostring(i)
+			dropdownButton:tag('div')
+				:addClass('toggle-area-button btn btn-secondary')
+				:attr('data-toggle-area-btn',tostring(i))
+				:css('width',args.roundwidth .. 'px')
+				:css('padding-top', '2px')
+				:css('padding-bottom', '2px')
+				:wikitext( buttonText)
+		end
+
+		local title = mw.html.create('span')
+			:wikitext(args.title or mw.title.getCurrentTitle().text)
+		if #rounds > 1 then
+			title:css('margin-left', '-70px')
+				:css('vertical-align','middle')
+		end
+
+		local header = output:tag('tr')
+		header:tag('th')
+			:attr('colspan', tostring(2 * #rounds + 4))
+			:wikitext(tostring(title) .. tostring(dropdownWrapper))
+	
+		if args.cutafter then
+			local cutafter = tonumber(args.cutafter)
+			if args.date then
+				cutafter = cutafter + 1
+			end
+			output:addClass('prizepooltable')
+				  :addClass('collapsed')
+				  :attr('data-opentext', 'Show Remaining Placements')
+				  :attr('data-closetext', 'Hide Remaining Placements')
+				  :attr('data-cutafter', cutafter)
+		end
+	
+		-- secondary header for date
+		local dateheader
+		if args.dateheader == 'true' and args.date then
+			dateheader = output:tag('tr')
+			dateheader:tag('td')
+				:attr('colspan', args.colspan or '9')
+				:css('font-size', '85%')
+				:css('line-height', '90%')
+				:css('height', '13px')
+				:css('text-align', 'center')
+				:wikitext(countdown{
+				date = args.date,
+				finished = args.finished,
+				stream = args.stream,
+				twitch = args.twitch,
+				afreeca = args.afreeca,
+				afreecatv = args.afreecatv,
+				dailymotion = args.dailymotion,
+				douyu = args.douyu,
+				huomao = args.huomao,
+				smashcast = args.smashcast,
+				youtube = args.youtube,
+				facebook = args.facebook,
+				pandatv = args.pandatv,
+			})
+		end
+
+		-- secondary header for column information
+		local colheader = output:tag('tr')
+		colheader:tag('th')
+			:wikitext(args.sort or '#')
+		colheader:tag('th')
+			:wikitext('Driver')
+			:attr('colspan', team_colspan)
+		colheader:tag('th')
+			:wikitext('Pts.')
+		for i = 1, #rounds do
+			colheader:tag('th')
+				:wikitext(args['r' .. tostring(i)] or args.coltitle .. ' ' .. tostring(i))
+		end
+		
+	
+		-- get list of unique teams if no set teams
+		if not next(teamlist) then
+			for key, item in ipairs(data) do
+				if not teamlist[item.opponent1] then
+					table.insert(teamlist,{team = item.opponent1, team_arg = item.opponent1:lower()})
+					teamlist[item.opponent1] = #teamlist
+				end
+				if not teamlist[item.opponent2] then
+					table.insert(teamlist,{team = item.opponent2, team_arg = item.opponent2:lower()})
+					teamlist[item.opponent2] = #teamlist
+				end
+			end
+		end
+		-- additional team 'discard' for discarded results
+		teamlist[0] = ''
+		-- initialise templates for each team
+		for key = 1,#teamlist do
+			if not teamlist[key] then
+				error('Missing info for index ' .. key)
+			end
+			if not teamlist[key].team then
+				error('Missing team info for index ' .. key)
+			end
+			results[key] = {
+				index = key,
+				team = type(teamlist[key]) == 'table' and teamlist[key].team or teamlist[key], -- item.team for teamX, item for teams from SMW/LPDB
+				team_template = type(teamlist[key]) == 'table' and teamlist[key].team or teamlist[key], -- item.team for teamX, item for teams from SMW/LPDB
+				team_template_short = type(teamlist[key]) == 'table' and teamlist[key].team or teamlist[key], -- item.team for teamX, item for teams from SMW/LPDB
+				participantText = type(teamlist[key]) == 'table' and (Flag.Icon({flag = teamlist[key].flag, shouldLink = true}) .. ' [[' .. teamlist[key].team .. ']]') or nil,
+				ranking = 0,
+				ranking_change = 0,
+				tiebreaker = 0, -- score used to determine ranking between players
+				points = 0,
+				matches = {
+				},
+				matchresults = {
+				},
+				status = {
+				},
+				tempPoints = {
+				},
+				currentStatus = "ok",
+				tempTiebreaker = 0,
+			}
+			if teamlist[key].teamName ~= nil then
+				results[key].participantText = Team.part(frame, teamlist[key].teamName) .. results[key].participantText
+			end
+		end
+
+		for key, item in ipairs(rounds) do
+			for key2, item2 in ipairs(results) do 
+				local place = mw.text.trim(data[key2].standings[key] or '0')
+				results[key2].matchresults['match' .. key] = place
+				results[key2].status[key] = data[key2].status[key]
+				results[key2].tempTiebreaker = (data[key2].tempTiebreaker or 0)
+				results[key2].tempPoints['match' .. key] = mw.text.trim(data[key2].tempPoints[key] or '0')
+			end
+		end
+
+		-- calculations
+		if not next(results) then
+			p.resolve_ties(args, teamlist, results, today_date)
+			p.printResults(args, output, results, rounds, round_no, nil, team_colspan)
+		end
+
+		for key, item in ipairs(rounds) do
+			for key2, item2 in ipairs(results) do 
+				item2.points = item2.points + (POINTS[item2.matchresults['match' .. key]] or 0) + item2.tempPoints['match' .. key]
+				item2.matches['match' .. key] = item2.matchresults['match' .. key] 
+				if item2.status[key] then
+					item2.currentStatus = item2.status[key]
+				end
+			end
+			p.resolve_ties(args, teamlist, results, today_date)
+			local rank = 1
+			for key, item in ipairs(results) do
+
+					if item.ranking ~= 0 and item.ranking ~= rank and type(item.ranking) == 'number' then
+						item.ranking_change = item.ranking - rank
+
+					else
+						item.ranking_change = 0
+					end
+			  
+					if (item.currentStatus == "DQ") then
+						item.ranking = 'DQ'
+					else
+						item.ranking = rank
+					end
+				
+					if (key == #results or results[key+1].tiebreaker ~= results[key].tiebreaker) then
+						rank = key + 1 
+					end
+				
+			end
+
+			p.printResults(args, output, results, rounds, round_no, team_colspan)
+
+			round_no = round_no + 1
+			if round_no > #rounds then
+				break;
+			end
+		
+		end
+	else
+		error(data)
+	end
+	return divWrapper
+end
+
+function p.printResults(args, output, results, rounds, round_no, team_colspan) 
+	for key, item in ipairs(results) do
+		local teamtext
+		local row = output:tag('tr')
+			:attr('data-toggle-area-content',round_no)
+		-- Replace with Template:Color on wikis where it exists
+
+		row:tag('th')
+			:wikitext(item.ranking ~= 0 and (item.ranking .. '.') or '')
+
+		teamtext = item.participantText
+
+		if (item.currentStatus == "DQ") then
+			teamtext = '<s>' .. teamtext .. '</s>'
+		end
+		
+		local ranking_change = ''
+		ranking_change = item.ranking_change
+		if ranking_change == 0 then
+			ranking_change = ''
+		elseif ranking_change > 0 then
+			ranking_change = '<span class="group-table-rank group-table-rank-change-up" style="float:right; line-height:25px">&#x25B2;' .. ranking_change .. '&nbsp;</span>'
+		else
+			ranking_change = '<span class="group-table-rank group-table-rank-change-down" style="float:right; line-height:25px">&#x25BC;' .. -ranking_change .. '&nbsp;</span>'
+		end
+
+		td = row:tag('td')
+			:addClass('grouptableslot')
+			:css('width', '260px')
+			:attr('colspan', 2)
+			:attr('align', 'left')
+			:wikitext( teamtext .. ranking_change )
+
+		td = row:tag('td')
+				:wikitext(item.points)	
+
+		for i = 1, #rounds do
+			place = mw.language.getContentLanguage():uc(item.matches['match' .. i] or '-')
+			row:tag('td')
+				:addClass(BACKGROUND_COLORS[place])
+				:wikitext(place)				
+				
+		end
+	end
+end
+
+function p.formatData(args, data, rounds, teamlist) 
+
+	newRounds = {}
+	args.rounds = args.rounds or 1
+	for i = 1, args.rounds do
+			newRounds[i] = rounds[i]
+	end
+
+	for key, item in pairs(newRounds) do
+		for key2, item2 in pairs (data) do
+			if not item.teams[key2] then
+				item.teams[key2] = {standings = {}, team = key2, status = {}, tempPoints = {}}
+			end
+			pointValue = (tonumber(item2.standings[key]))
+			item.teams[key2].standings = pointValue
+			if (item2.status[key]) then
+				item.teams[key2].status = item2.status[key]
+			end
+			if (item2.tempTiebreaker) then
+				item.teams[key2].tempTiebreaker = item2.tempTiebreaker
+			end
+		end
+	end
+	return newRounds
+end
+
+
+
+return p
