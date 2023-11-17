@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -18,12 +19,12 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
-local globalVars = PageVariableNamespace({cached = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
-local DEFAULT_MAX_NUM_PLAYERS = 10
+local globalVars = PageVariableNamespace({cached = true})
 
 local MatchGroupInput = {}
 
@@ -456,35 +457,61 @@ end
 function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
 	options = options or {}
 
-	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
 	local opponent = match['opponent' .. opponentIndex]
-	local playersData = Json.parseIfString(opponent.players) or {}
-
 	local players = {}
+	local playersIndex = 0
 
-	for playerIndex = 1, maxNumPlayers do
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-
-		player.name = player.name and options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
-			or player.name
-
-		player.name = player.name and options.applyUnderScores and player.name:gsub(' ', '_') or player.name
-
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if Table.isNotEmpty(player) then
-			table.insert(players, player)
+	local insertIntoPlayers = function(player)
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
+			return
 		end
+
+		player.name = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name) or player.name
+		player.name = options.applyUnderScores and player.name:gsub(' ', '_') or player.name
+		player.flag = Flags.CountryName(player.flag)
+		player.displayName = Logic.emptyOr(player.displayName, player.displayname)
+		playersIndex = playersIndex + 1
+		player.index = playersIndex
+
+		players[player.name] = players[player.name] or {}
+		Table.mergeInto(players[player.name], player)
 	end
 
-	opponent.match2players = players
+	local playerIndex = 1
+	local varPrefix = teamName .. '_p' .. playerIndex
+	local name = Variables.varDefault(varPrefix)
+	while name do
+		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
+		insertIntoPlayers{
+			name = name,
+			displayname = Variables.varDefault(varPrefix .. 'dn'),
+			flag = Variables.varDefault(varPrefix .. 'flag'),
+		}
+		playerIndex = playerIndex + 1
+		varPrefix = teamName .. '_p' .. playerIndex
+		name = Variables.varDefault(varPrefix)
+	end
+
+	--players from manual input as `opponnetX_pY`
+	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
+		insertIntoPlayers(Json.parseIfString(player))
+	end
+
+	--players from manual input in `opponent.players`
+
+	local playersData = Json.parseIfString(opponent.players) or {}
+	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+		insertIntoPlayers({
+			name = playerName,
+			displayname = playersData[playerPrefix .. 'dn'],
+			flag = playersData[playerPrefix .. 'flag'],
+		})
+	end
+
+	opponent.match2players = Array.extractValues(players)
+	Array.sortInPlaceBy(opponent.match2players, function (player)
+		return player.index
+	end)
 
 	return match
 end
