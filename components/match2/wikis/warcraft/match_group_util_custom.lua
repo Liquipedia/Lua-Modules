@@ -30,11 +30,18 @@ CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions)
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = CustomMatchGroupUtil.types.Race,
+	random = 'boolean',
 })
+
+---@class WarcraftMatchGroupUtilGamePlayer: WarcraftStandardPlayer
+---@field matchPlayerIx integer
+---@field heroes string[]?
+---@field position integer
+---@field random boolean
 
 ---@class WarcraftMatchGroupUtilGameOpponent:GameOpponent
 ---@field placement number?
----@field players WarcraftStandardPlayer[]
+---@field players WarcraftMatchGroupUtilGamePlayer[]
 ---@field score number?
 CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	placement = 'number?',
@@ -157,6 +164,7 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 				race = participant.faction,
 				position = tonumber(participant.position),
 				heroes = participant.heroes,
+				random = participant.random,
 			})
 		else
 			return {
@@ -238,27 +246,9 @@ end
 function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
-	-- If the same race was played in all games, display that instead of the
-	-- player's race listed in the match.
-	for opponentIx, opponent in pairs(opponents) do
-		-- Aggregate races among games for each player
-		local playerRaces = {}
-		for _, game in pairs(games) do
-			for playerIx, player in pairs(game.opponents[opponentIx].players) do
-				if not playerRaces[playerIx] then
-					playerRaces[playerIx] = {}
-				end
-				playerRaces[playerIx][player.race] = true
-			end
-		end
-
-		for playerIx, player in pairs(opponent.players) do
-			player.race = Table.uniqueKey(playerRaces[playerIx])
-			if not player.race then
-				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
-				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
-			end
-		end
+	--check the race of the players
+	for opponentIndex in pairs(opponents) do
+		CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
 	end
 
 	-- Sum up scores
@@ -320,6 +310,42 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 		walkover = walkover,
 		winner = winner,
 	}
+end
+
+---@param match WarcraftMatchGroupUtilMatch
+---@param games WarcraftMatchGroupUtilGame[]
+---@param opponents WarcraftMatchGroupUtilGameOpponent[]
+---@param opponentIndex integer
+function CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
+	local opponent = opponents[opponentIndex]
+	local playerRaces = {}
+	Array.forEach(games, function(game)
+		for playerIndex, player in pairs(game.opponents[opponentIndex].players) do
+			playerRaces[playerIndex] = playerRaces[playerIndex] or {}
+			playerRaces[playerIndex][player.race] = true
+		end
+	end)
+
+	local toRace = function(playerIndex, player)
+		local isRandom = Array.any(games, function(game)
+			return game.opponents[opponentIndex].players[playerIndex].random
+		end)
+		if isRandom then return Faction.read('r') end
+
+		local race = Table.uniqueKey(playerRaces[playerIndex])
+		if race then return race end
+
+		if Table.isNotEmpty(playerRaces[playerIndex]) then
+			return Faction.read('m')
+		end
+
+		local matchPlayer = match.opponents[opponentIndex].players[player.matchPlayerIx]
+		return matchPlayer and matchPlayer.race or Faction.defaultFaction
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		player.race = toRace(playerIndex, player)
+	end
 end
 
 ---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
