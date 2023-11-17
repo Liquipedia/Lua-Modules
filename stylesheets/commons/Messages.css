@@ -1,0 +1,65 @@
+/*******************************************************************************
+Template(s): Messages
+Author(s): FO-nTTaX
+Notice: This code is deprecated and not used anymore, it has been superseeded
+by Extension:NetworkNotice and [[Special:NetworkNotice]]
+*******************************************************************************/
+
+/* message on userpages */
+body.ns-2.ns-subject #bodyContent:before {
+	content: "This is a userpage. Userpages do not necessarily meet our guidelines for notability or fact-checking!";
+	padding: 5px;
+	margin-bottom: 20px;
+	color: #a94442;
+	background-color: #f2dede;
+	border-color: #ebccd1;
+	display: block;
+	text-align:center;
+	border-left: 5px solid #ff0000;
+	font-size: 120%;
+}
+
+/* message on uncreated team template pages */
+body.ns-10.ns-subject[class*="page-Template_Team_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_Team2_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamShort_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_Team2_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamBracket_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamIcon_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamPart_"] #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamPage_"] #editform:before {
+	content: "You are currently editing a team template. Liquipedia has a nice tool to create them even faster at Special:CreateTeams which you really should check out!";
+	padding: 5px;
+	margin-bottom: 20px;
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+	display: block;
+	text-align:center;
+	border-left: 5px solid #0000ff;
+	font-size: 120%;
+}
+body.ns-10.ns-subject[class*="page-Template_Team_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_Team2_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamShort_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_Team2_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamBracket_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamIcon_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamPart_"] .mw-newarticletext ~ #editform:before,
+body.ns-10.ns-subject[class*="page-Template_TeamPage_"] .mw-newarticletext ~ #editform:before {
+	content: "You are currently creating a team template. Liquipedia has a nice tool to create them even faster at Special:CreateTeams which you really should check out!";
+}
+
+/* message on creation of new pages */
+body.ns-0.ns-subject .mw-newarticletext ~ #editform:before {
+	content: "Be sure the new page meets our notability guidelines before adding it. Check the help portal in the contribute menu above for more information.";
+	padding: 5px;
+	margin-bottom: 20px;
+	color: #31708f;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+	display: block;
+	text-align:center;
+	border-left: 5px solid #0000ff;
+	font-size: 120%;
+}
