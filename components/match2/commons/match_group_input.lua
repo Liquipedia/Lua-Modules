@@ -508,10 +508,11 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	end
 
 	local oppoentToPlayerRecord = function(soloOpponentInput)
-		soloOpponent = Opponent.readOpponentArgs(Json.parseIfTable(soloOpponentInput) or {})
+		local soloOpponent = Opponent.readOpponentArgs(Json.parseIfTable(soloOpponentInput) or {})
 		if Opponent.isEmpty(soloOpponent) then
 			return
 		end
+		---@cast soloOpponent -nil
 		soloOpponent = Opponent.resolve(soloOpponent, nil, {syncPlayer = true})
 		local soloPlayer = soloOpponent.players[1] or {}
 		return {
@@ -534,6 +535,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		if player then
 			players[player.name] = subbedGames and players[player.name] or nil
 		end
+
 		opponent.extradata = Table.merge({substitutions = {}}, opponent.extradata or {})
 		table.insert(opponent.extradata.substitutions, {
 			substitute = MatchGroupUtil.playerFromRecord(substitute),
@@ -541,9 +543,9 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
 			reason = substitutes['reason' .. index],
 		})
+
 		insertIntoPlayers(substitute)
 	end
-
 
 	--handle substitutes input for opponenets
 	for prefix, substituteOpponent in Table.iter.pairsByPrefix(substitutes, 'sub', {requireIndex = false}) do
