@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -20,8 +21,9 @@ local WarningBox = require('Module:WarningBox')
 local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction', {requireDevIfEnabled = true})
 local Region = Lua.import('Module:Region', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -64,6 +66,12 @@ function Person:createInfobox()
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
+	end
+
+	if Logic.readBool(args.autoTeam) then
+		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
+		args.team = Logic.emptyOr(args.team, team)
+		args.team2 = Logic.emptyOr(args.team2, team2)
 	end
 
 	-- check if non-representing is used and set an according value in self
@@ -286,9 +294,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear)
-	lpdbData.links = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.links)
+	lpdbData = Json.stringifySubTables(lpdbData)
 	local storageType = self:getStorageType(args, personType, status)
 
 	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
