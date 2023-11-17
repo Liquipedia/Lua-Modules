@@ -105,14 +105,5 @@ return {
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
 		},
-	},
-
-	-- only for legacy conversion reasons
-	tierToNumber = {
-		['s-tier'] = 1,
-		['a-tier'] = 2,
-		['b-tier'] = 3,
-		['c-tier'] = 4,
-		['d-tier'] = 5,
 	}
 }
