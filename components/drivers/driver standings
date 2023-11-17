@@ -100,7 +100,7 @@ function p.resolve_ties(args, teamlist, results, date)
 
 	local tiebreakers = {}
 	for i = 1,10 do
-		local key = args['tiebreaker' .. tostring(i)] or ''
+		local key = args['tiebreaker' .. i] or ''
 		if key == 'points' or key == 'pts' then
 			table.insert(tiebreakers, get_points)
 		end
