@@ -498,7 +498,6 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	end
 
 	--players from manual input in `opponent.players`
-
 	local playersData = Json.parseIfString(opponent.players) or {}
 	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
 		insertIntoPlayers({
@@ -518,6 +517,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		}
 	end
 
+	--handle substitutes input for opponenets
 	local substitutes = Json.parseIfTable(opponent.substitutes) or {}
 	for prefix, substituteOpponent in Table.iter.pairsByPrefix(substitutes, 'sub', {requireIndex = false}) do
 		local index = prefix:sub(4)
