@@ -508,6 +508,43 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		})
 	end
 
+	local oppoentToPlayerRecord = function (soloOpponent)
+		soloOpponent = Opponent.resolve(soloOpponent, nil, {syncPlayer = true})
+		local soloPlayer = soloOpponent.players[1] or {}
+		return {
+			name = soloPlayer.pageName,
+			displayname = soloPlayer.displayName,
+			flag = soloPlayer.flag,
+		}
+	end
+
+	local substitutes = Json.parseIfTable(opponent.substitutes) or {}
+	for prefix, substituteOpponent in Table.iter.pairsByPrefix(substitutes, 'sub', {requireIndex = false}) do
+		local index = prefix:sub(4)
+		local subbedGames = substitutes['games' .. index]
+		substituteOpponent = Opponent.readOpponentArgs(Json.parseIfTable(substituteOpponent) or {})
+		if not Opponent.isEmpty(substituteOpponent) then
+			local substitute = oppoentToPlayerRecord(substituteOpponent)
+			local player = {}
+			local playerString = substitutes['player' .. index]
+			if playerString then
+				local playerOpponent = Opponent.readOpponentArgs(Json.parseIfTable(playerString) or {})
+				if not Opponent.isEmpty(playerOpponent) then
+					player = oppoentToPlayerRecord(playerOpponent)
+					players[player.name] = subbedGames and players[player.name] or nil
+				end
+			end
+			opponent.extradata = Table.merge({substitutions = {}}, opponent.extradata or {})
+			table.insert(opponent.extradata.substitutions, {
+				substitute = MatchGroupUtil.playerFromRecord(substitute),
+				player = Table.isNotEmpty(player) and MatchGroupUtil.playerFromRecord(player) or nil,
+				games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
+				reason = substitutes['reason' .. index],
+			})
+			insertIntoPlayers(substitute)
+		end
+	end
+
 	opponent.match2players = Array.extractValues(players)
 	Array.sortInPlaceBy(opponent.match2players, function (player)
 		return player.index
