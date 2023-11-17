@@ -39,8 +39,7 @@ local parsedText = socketOrError
 	:get()
 ```
 ]]
----@class ResultOrError
----@field is_a? function
+---@class ResultOrError: BaseClass
 local ResultOrError = Class.new(function(self)
 	-- ResultOrError is an abstract class. Don't call this constructor directly.
 	--error('Cannot construct abstract class')
@@ -180,7 +179,7 @@ automatically include both stack traces.
 ]]
 ---@param f function
 ---@param lowerStacks table?
----@return ResultOrError
+---@return Result|Error
 function ResultOrError.try(f, lowerStacks)
 	local resultOrError
 	xpcall(
@@ -206,12 +205,16 @@ array of results. Otherwise returns a ResultOrError of the first error. Note
 that this function swaps the types: it converts an array of ResultOrErrors of
 values into a ResultOrError of an array of values.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.all(resultOrErrors)
 	local results = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			table.insert(results, resultOrError.result)
 		else
+			---@cast resultOrError Error
 			return resultOrError
 		end
 	end
@@ -223,12 +226,16 @@ If any input ResultOrErrors is a result, then returns the first such
 ResultOrError. Otherwise, all input ResultOrErrors are errors, and this
 aggregates them together and returns a ResultOrError of the aggregate error.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.any(resultOrErrors)
 	local errors = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			return resultOrError
 		else
+			---@cast resultOrError Error
 			table.insert(errors, resultOrError.error)
 		end
 	end
