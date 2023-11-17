@@ -13,7 +13,6 @@ local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
@@ -42,18 +41,11 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_player = player
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
