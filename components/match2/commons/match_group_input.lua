@@ -516,7 +516,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		soloOpponent = Opponent.resolve(soloOpponent, nil, {syncPlayer = true})
 		local soloPlayer = soloOpponent.players[1] or {}
 		return {
-			name = soloPlayer.pageName,
+			name = options.applyUnderScores and soloPlayer.pageName:gsub(' ', '_') or soloPlayer.pageName,
 			displayname = soloPlayer.displayName,
 			flag = soloPlayer.flag,
 		}
