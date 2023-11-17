@@ -582,7 +582,6 @@ end
 ---@return string
 function MatchSummary.createSubstitutesComment(match)
 	local comment = ''
-	mw.logObject(match)
 	for _, opponent in ipairs(match.opponents) do
 		local substitutions = (opponent.extradata or {}).substitutions
 		if Logic.isNotEmpty(substitutions) then
