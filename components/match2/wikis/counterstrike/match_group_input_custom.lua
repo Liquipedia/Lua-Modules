@@ -505,7 +505,9 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					maxNumPlayers = 5, resolveRedirect = true, applyUnderScores = true
+				})
 			end
 		end
 	end
