@@ -39,7 +39,6 @@ local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _player
 local _args
 
 function CustomPlayer.run(frame)
@@ -51,7 +50,6 @@ function CustomPlayer.run(frame)
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
-	_player = player
 
 	return player:createInfobox()
 end
