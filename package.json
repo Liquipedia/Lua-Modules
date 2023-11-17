@@ -8,6 +8,7 @@
 		"grunt": "*",
 		"grunt-eslint": "*",
 		"grunt-stylelint": "*",
+		"postcss-less": "*",
 		"stylelint-config-wikimedia": "*",
 		"stylelint-less": "*"
 	},
