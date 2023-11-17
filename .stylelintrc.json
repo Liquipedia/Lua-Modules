@@ -12,7 +12,9 @@
 		"selector-max-id": null,
 		"function-name-case": null,
 		"annotation-no-unknown": null,
-		"selector-pseudo-element-colon-notation": null
+		"selector-pseudo-element-colon-notation": null,
+		"no-duplicate-selectors": null,
+		"declaration-no-important": null
 	},
 	"overrides": [ {
 		"files": ["*.css", "**/*.css"],
