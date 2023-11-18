@@ -79,10 +79,9 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 return CustomLeague
