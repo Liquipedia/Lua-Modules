@@ -505,7 +505,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
 		insertIntoPlayers{
 			pageName = playerName,
-			displayname = playersData[playerPrefix .. 'dn'],
+			displayName = playersData[playerPrefix .. 'dn'],
 			flag = playersData[playerPrefix .. 'flag'],
 		}
 	end
