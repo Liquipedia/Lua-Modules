@@ -2698,7 +2698,7 @@ table.runeterra-deck {
 	max-width: 400px;
 	margin-left: auto;
 	margin-right: auto;
- }
+}
 
 @media ( min-width: 970px ) {
 	table.runeterra-deck {
@@ -2706,57 +2706,57 @@ table.runeterra-deck {
 		float: left;
 		margin-right: 10px;
 		margin-left: 0;
- }
+	}
 }
 
 .runeterra-deck tr > th {
 	vertical-align: middle;
- }
+}
 
 .runeterra-deck tr > th > span {
 	font-size: 90%;
 	vertical-align: super;
- }
+}
 
 .runeterra-deck tr.demacia {
 	background-color: #f9f9c7;
- }
+}
 
 .runeterra-deck tr.freljord {
 	background-color: #dee3ef;
- }
+}
 
 .runeterra-deck tr.ionia {
 	background-color: #f4ddea;
- }
+}
 
 .runeterra-deck tr.noxus {
 	background-color: #fbdfdf;
- }
+}
 
 .runeterra-deck tr.piltover-zaun {
 	background-color: #f9dec7;
- }
+}
 
 .runeterra-deck tr.shadow-isles {
 	background-color: #ddf4dd;
- }
+}
 
 .runeterra-deck td.mana {
 	width: 30px;
 	font-weight: bold;
 	text-align: center;
- }
+}
 
 .runeterra-deck td.card {
 	font-weight: bold;
- }
+}
 
 .runeterra-deck td.amount {
 	width: 30px;
 	text-align: center;
 	font-weight: bold;
- }
+}
 
 /*******************************************************************************
 Template(s): Legends of Runeterra Card Patch Note Greyscale
