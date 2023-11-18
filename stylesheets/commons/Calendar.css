@@ -11,9 +11,9 @@ Author(s): PhiLtheFisH
 	position: relative;
 	width: 720px;
 	height: 719px;
-	border: 1px solid #aaa;
-	background: url("/commons/images/a/ae/Calendar_background.png") repeat;
-	padding: 0px;
+	border: 1px solid #aaaaaa;
+	background: url( /commons/images/a/ae/Calendar_background.png ) repeat;
+	padding: 0;
 	overflow: hidden;
 }
 
@@ -22,7 +22,7 @@ Author(s): PhiLtheFisH
 	width: 45px;
 	text-align: right;
 	padding-right: 5px;
-	margin-top:-8px;
+	margin-top: -8px;
 }
 
 .calendar-time-slot {
@@ -32,7 +32,7 @@ Author(s): PhiLtheFisH
 .calendar-event-item {
 	position: absolute;
 	width: 100px;
-	border: 1px solid #aaa;
+	border: 1px solid #aaaaaa;
 	padding: 2px;
 	opacity: 0.8;
 }
@@ -44,5 +44,5 @@ Author(s): PhiLtheFisH
 .calendar-column {
 	width: 103px;
 	text-align: center;
-	float:left;
+	float: left;
 }

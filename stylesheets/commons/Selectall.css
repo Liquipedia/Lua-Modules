@@ -5,6 +5,7 @@ Author(s): Chapatiyaq
 div.selectall-relative {
 	position: relative;
 }
+
 textarea.selectall-duplicate {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

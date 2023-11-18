@@ -55,12 +55,12 @@ table.matchseries-table-2 {
 
 .matchseries-table-2 .team1.color-radiant-left,
 .matchseries-table-2 .team2.color-radiant-right {
-	background: rgb(188, 217, 133);
+	background: rgb( 188, 217, 133 );
 }
 
 .matchseries-table-2 .team1.color-radiant-right,
 .matchseries-table-2 .team2.color-radiant-left {
-	background: rgb(231, 158, 126);
+	background: rgb( 231, 158, 126 );
 }
 
 .matchseries-table-2 .score1,
@@ -71,7 +71,7 @@ table.matchseries-table-2 {
 
 .matchseries-table-2 .score1.winner-1,
 .matchseries-table-2 .score2.winner-2 {
-	background: rgb(204,255,204);
+	background: rgb( 204, 255, 204 );
 }
 
 .matchseries-table-2 .stats-table-container {
@@ -132,6 +132,7 @@ table.matchseries-table-stats > * > tr > td {
 .matchseries-table-stats .scores-header .last-hits {
 	width: 38px;
 }
+
 .matchseries-table-stats .scores-header .lvl,
 .matchseries-table-stats .scores-header .kills,
 .matchseries-table-stats .scores-header .death,
@@ -139,21 +140,24 @@ table.matchseries-table-stats > * > tr > td {
 .matchseries-table-stats .scores-header .denies {
 	width: 26px;
 }
+
 .matchseries-table-stats .scores-header .items {
 	width: 171px;
 }
+
 .matchseries-table-stats .scores-header .gpm,
 .matchseries-table-stats .scores-header .xpm {
 	width: 42px;
 }
 
 .matchseries-table-stats .faction.radiant th {
-	background: rgb(188, 217, 133);
+	background: rgb( 188, 217, 133 );
 }
 
 .matchseries-table-stats .faction.dire th {
-	background: rgb(231, 158, 126);
+	background: rgb( 231, 158, 126 );
 }
+
 .matchseries-table-stats .player-row .hero {
 	padding: 0;
 }

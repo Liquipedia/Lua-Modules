@@ -9,13 +9,13 @@ Author: warnull
 }
 
 .opponent-list {
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	display: inline-grid;
 }
 
-@media (max-width: 435px) {
+@media ( max-width: 435px ) {
 	.opponent-list {
 		min-width: 100% !important;
 	}
@@ -24,7 +24,7 @@ Author: warnull
 .opponent-list-cell {
 	align-items: center;
 	background-color: inherit;
-	border-top: 1px solid var(--table-border-color,#bbbbbb);
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
 	display: flex;
 	min-width: 0;
 	padding: 5px;
@@ -40,10 +40,9 @@ Author: warnull
 
 .opponent-list-title,
 .opponent-list-section-title {
-	background-color: var(--table-header-variant-background-color,#eaecf0);
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
 	font-weight: bold;
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 	text-align: center;
 }
 
@@ -54,13 +53,14 @@ Author: warnull
 @supports not (display: contents) {
 	.opponent-list-section {
 		display: block;
-		grid-column-end: -1;
-		grid-column-start: 1;
+		grid-column: 1 / -1;
 	}
+
 	.opponent-list-party {
 		display: flex;
 		justify-items: stretch;
 	}
+
 	.opponent-list-party > * {
 		flex: 1 1;
 	}
@@ -68,8 +68,7 @@ Author: warnull
 
 .opponent-list-tbd {
 	font-style: italic;
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 	text-align: center;
 }
 
@@ -88,7 +87,7 @@ Author: warnull
 }
 
 .brkts-opponent-hover > .opponent-list-cell::after {
-	clip-path: inset(-5px 0 -5px -1px);
+	clip-path: inset( -5px 0 -5px -1px );
 	content: '';
 	height: 100%;
 	left: 0;
@@ -102,28 +101,27 @@ Author: warnull
 }
 
 .brkts-opponent-hover > .opponent-list-cell:first-child::after {
-	clip-path: inset(-5px 0 -5px -5px);
+	clip-path: inset( -5px 0 -5px -5px );
 }
 
 .brkts-opponent-hover > .opponent-list-cell:last-child::after {
-	clip-path: inset(-5px -5px -5px -1px);
+	clip-path: inset( -5px -5px -5px -1px );
 }
 
 .brkts-opponent-hover > .opponent-list-cell:only-child::after {
-	clip-path: inset(-5px);
+	clip-path: inset( -5px );
 }
 
 .brkts-opponent-hover-active > .opponent-list-cell::after {
-	box-shadow: -1px 0 2px rgba(0, 0, 0, 0.7), 1px 0 2px rgba(0, 0, 0, 0.7), 0 -1px 2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.7);
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
 }
 
-.opponent-list-entry:nth-of-type(2n) {
+.opponent-list-entry:nth-of-type( 2n ) {
 	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) );
 }
 
 .opponent-list-team {
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 	min-width: 120px;
 }
 
@@ -138,11 +136,9 @@ Author: warnull
 
 .opponent-list-literal {
 	font-style: italic;
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 	min-width: 120px;
 }
-
 
 /**
  * Styles specific to starcraft/starcraft2
@@ -158,25 +154,25 @@ Author: warnull
 *******************************************************************************/
 
 .participant-table {
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	display: inline-grid;
 	margin-bottom: 4px;
 	max-width: 100%;
 }
 
-@media (max-width: 415px) {
+@media ( max-width: 415px ) {
 	.participant-table {
 		min-width: 100% !important;
 	}
 }
 
 .participant-table .opponent-list-cell {
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 .participant-table-header {
-	background-color: var(--table-header-variant-background-color,#eaecf0);
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
 	display: contents;
 }
 
@@ -193,13 +189,12 @@ Author: warnull
 	.participant-table-header,
 	.participant-table-section {
 		display: grid;
-		grid-column-end: -1;
-		grid-column-start: 1;
-		grid-template-columns: repeat(3, 1fr);
+		grid-column: 1 / -1;
+		grid-template-columns: repeat( 3, 1fr );
 	}
 }
 
-@media (max-width: 575px) {
+@media ( max-width: 575px ) {
 	.participant-table-entry {
 		padding-right: 0;
 	}
@@ -245,17 +240,17 @@ Author: hjpalpha
 *******************************************************************************/
 
 .participantTable {
-	border-top: 1px solid var(--table-border-color,#bbbbbb);
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
 	margin-bottom: 8px;
 	overflow-x: auto;
 }
 
 .participantTable-title {
 	padding: 4px;
-	background-color: var(--table-header-variant-background-color,#eaecf0);
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	font-weight: bold;
 	width: 100%;
 	text-align: center;
@@ -265,7 +260,7 @@ Author: hjpalpha
 	width: 100% !important;
 }
 
-.participantTable-row:not(.participantTable-faction) {
+.participantTable-row:not( .participantTable-faction ) {
 	width: 100% !important;
 	display: flex;
 	flex-wrap: wrap;
@@ -273,8 +268,8 @@ Author: hjpalpha
 
 .participantTable-entry {
 	background-color: inherit;
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	padding: 8px 4px 4px;
 	text-align: left;
 	transition-property: border-color;
@@ -282,8 +277,8 @@ Author: hjpalpha
 }
 
 .participantTable-tbd {
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	padding: 4px;
 	font-style: italic;
 	text-align: center;
@@ -295,7 +290,7 @@ Author: hjpalpha
 }
 
 @media ( max-width: 900px ) {
-	.participantTable:not(.participantTable-faction) {
+	.participantTable:not( .participantTable-faction ) {
 		width: 100% !important;
 	}
 
@@ -307,7 +302,7 @@ Author: hjpalpha
 		display: none;
 	}
 
-	.participantTable-entry:not(.participantTable-faction) {
+	.participantTable-entry:not( .participantTable-faction ) {
 		flex: 1 0 auto;
 		width: unset !important;
 		min-width: 50%;
@@ -316,7 +311,7 @@ Author: hjpalpha
 }
 
 .participantTable-entry.brkts-opponent-hover-active {
-	box-shadow: -1px 0 2px rgba(0, 0, 0, 0.7) inset, 1px 0 2px rgba(0, 0, 0, 0.7) inset, 0 -1px 2px rgba(0, 0, 0, 0.7) inset, 0 1px 2px rgba(0, 0, 0, 0.7) inset;
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
 }
 
 .participantTable-entry.brkts-opponent-hover::after {
@@ -334,7 +329,7 @@ Author: hjpalpha
 }
 
 .brkts-opponent-hover > .participantTable-entry::after {
-	clip-path: inset(-4px 0 -4px -1px);
+	clip-path: inset( -4px 0 -4px -1px );
 	content: '';
 	height: 100%;
 	left: 0;
@@ -348,19 +343,19 @@ Author: hjpalpha
 }
 
 .brkts-opponent-hover > .participantTable-entry:first-child::after {
-	clip-path: inset(-4px 0 -4px -4px);
+	clip-path: inset( -4px 0 -4px -4px );
 }
 
 .brkts-opponent-hover > .participantTable-entry:last-child::after {
-	clip-path: inset(-4px -4px -4px -1px);
+	clip-path: inset( -4px -4px -4px -1px );
 }
 
 .brkts-opponent-hover > .participantTable-entry:only-child::after {
-	clip-path: inset(-4px);
+	clip-path: inset( -4px );
 }
 
 .brkts-opponent-hover-active > .participantTable-entry::after {
-	box-shadow: -1px 0 2px rgba(0, 0, 0, 0.7) inset, 1px 0 2px rgba(0, 0, 0, 0.7) inset, 0 -1px 2px rgba(0, 0, 0, 0.7) inset, 0 1px 2px rgba(0, 0, 0, 0.7) inset;
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 1px 0 2px rgba( 0, 0, 0, 0.7 ) inset, 0 -1px 2px rgba( 0, 0, 0, 0.7 ) inset, 0 1px 2px rgba( 0, 0, 0, 0.7 ) inset;
 }
 
 /* specific overwrites for faction participant tables */
@@ -370,8 +365,7 @@ Author: hjpalpha
 
 .participantTable-faction > .participantTable-row > .participantTable-tbd,
 .participantTable-faction > .participantTable-row > .participantTable-title {
-	grid-column-end: -1;
-	grid-column-start: 1;
+	grid-column: 1 / -1;
 }
 
 .participantTable-faction > .participantTable-row {

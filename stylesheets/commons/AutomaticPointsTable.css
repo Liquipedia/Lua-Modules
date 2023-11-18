@@ -17,19 +17,19 @@ Author(s): XtratoS
 .automatic-points-table .diagonal-header-div-cell {
 	min-width: 50px;
 	max-width: 50px;
-	transform: translate(63.5px, 74px) rotate(-45deg);
+	transform: translate( 63.5px, 74px ) rotate( -45deg );
 }
 
 .automatic-points-table .diagonal-header-div-cell.ranking {
 	min-width: 35px;
 	max-width: 35px;
-	transform: translate(50.5px, 79px) rotate(-45deg);
+	transform: translate( 50.5px, 79px ) rotate( -45deg );
 }
 
 .automatic-points-table .diagonal-header-div-cell.team {
 	min-width: 225px;
 	max-width: 225px;
-	transform: translate(212px, 12.5px) rotate(-45deg);
+	transform: translate( 212px, 12.5px ) rotate( -45deg );
 }
 
 .automatic-points-table .diagonal-header-div-cell .content {
@@ -55,7 +55,7 @@ Author(s): XtratoS
 .automatic-points-table .divCell > .deduction-box {
 	padding: 0 3px;
 	margin: auto;
-	font-size: .8rem;
+	font-size: 0.8rem;
 	box-shadow: 1px 1px 2px;
 }
 
@@ -71,6 +71,6 @@ Author(s): XtratoS
 	vertical-align: middle;
 }
 
-.automatic-points-table .divCell.centered-cell:not(.name-cell) {
+.automatic-points-table .divCell.centered-cell:not( .name-cell ) {
 	text-align: center;
 }

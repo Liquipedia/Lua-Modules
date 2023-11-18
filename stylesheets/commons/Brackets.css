@@ -1,15 +1,14 @@
-
 /**
  * Styles shared between BracketDisplay, MatchlistDisplay, and MatchSummary
  */
 
- .brkts-match-has-details {
+.brkts-match-has-details {
 	cursor: pointer;
 }
 
 .brkts-match-info-icon {
 	background-color: transparent;
-	background-image: url(data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%202%205%202%205%204%207%204%207%205%204%205%22%2F%3E%3C%2Fsvg%3E);
+	background-image: url( data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%202%205%202%205%204%207%204%207%205%204%205%22%2F%3E%3C%2Fsvg%3E );
 	background-repeat: no-repeat;
 	background-size: contain;
 	height: 12px;
@@ -50,9 +49,9 @@
 	position: relative;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and ( max-width: 768px ) {
 	.brkts-bracket {
-		--match-width: var(--match-width-mobile) !important;
+		--match-width: var( --match-width-mobile ) !important;
 	}
 }
 
@@ -65,18 +64,18 @@
 	border-radius: 2px;
 	border: 1px solid var( --brackets-header-border-color, #aaaaaa );
 	color: var( --clr-on-background );
-	margin-left: calc(~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)");
+	margin-left: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
 	overflow: hidden;
 	padding: 4px;
 	text-align: center;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	width: var(--match-width);
+	width: var( --match-width );
 }
 
 .brkts-header:first-child,
 .brkts-round-center:first-child {
-	margin-left: calc(~"(var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)");
+	margin-left: calc( ~'(var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
 }
 
 .brkts-third-place-header {
@@ -84,7 +83,7 @@
 }
 
 .brkts-qualified-header {
-	margin-left: calc(~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)");
+	margin-left: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)' );
 }
 
 .brkts-header-option {
@@ -105,7 +104,7 @@
 .brkts-round-lower-connectors {
 	align-self: stretch;
 	position: relative;
-	width: calc(~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)");
+	width: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
 }
 
 .brkts-line {
@@ -114,7 +113,7 @@
 }
 
 .brkts-round-center {
-	width: var(--match-width);
+	width: var( --match-width );
 }
 
 .brkts-match {
@@ -126,27 +125,27 @@
 }
 
 .brkts-match.brkts-hover {
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-	border: 1px solid rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
+	border: 1px solid rgba( 0, 0, 0, 0.5 );
 }
 
 .brkts-br-wrapper.brkts-br-wrapper {
-	width: calc(~"var(--match-width) + var(--score-width)");
+	width: calc( ~'var(--match-width) + var(--score-width)' );
 }
 
 .brkts-bracket .brkts-match-info-icon {
-	left: calc(~"var(--match-width) - var(--score-width) - 8px");
+	left: calc( ~'var(--match-width) - var(--score-width) - 8px' );
 	position: absolute;
 }
 
 .brkts-round-qual-connectors {
 	align-self: stretch;
 	position: relative;
-	width: calc(~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)");
+	width: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)' );
 }
 
 .brkts-round-qual {
-	width: var(--match-width);
+	width: var( --match-width );
 }
 
 .brkts-qualified {
@@ -155,7 +154,6 @@
 	border-radius: 2px;
 	font-weight: bold;
 }
-
 
 /**
  * BracketOpponentEntry
@@ -253,7 +251,7 @@
 
 .brkts-opponent-entry .brkts-opponent-block-literal {
 	padding-left: 3px;
-	color: var( --clr-on-background, rgb(55, 55, 55) );
+	color: var( --clr-on-background, rgb( 55, 55, 55 ) );
 }
 
 .brkts-opponent-win .flag + .name {
@@ -264,7 +262,7 @@
 	margin-left: -1px;
 }
 
-@media (max-width:768px) {
+@media ( max-width: 768px ) {
 	.brkts-opponent-entry .block-player > .flag {
 		display: none;
 	}
@@ -275,7 +273,7 @@
 	background-color: var( --brackets-score-background-color, #ebebeb );
 	border-left: 1px solid var( --brackets-border-color, #aaaaaa );
 	display: flex;
-	width: var(--score-width);
+	width: var( --score-width );
 }
 
 .brkts-opponent-score-inner {
@@ -291,7 +289,6 @@
 	color: #ff0000;
 }
 
-
 /**
  * MatchlistDisplay
  */
@@ -300,7 +297,7 @@
 	border: 1px solid var( --table-border-color, #bbbbbb );
 	display: grid;
 	font-size: 13px;
-	grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
+	grid-template-columns: ~'[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr';
 	line-height: 1.48;
 }
 
@@ -308,13 +305,13 @@
 	margin-top: -1px;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-matchlist {
 		max-width: 100%;
 	}
 }
 
-@media (max-width: 415px) {
+@media ( max-width: 415px ) {
 	.brkts-matchlist {
 		width: 100% !important;
 	}
@@ -340,8 +337,8 @@
 }
 
 .brkts-matchlist-collapsed > .brkts-matchlist-title > .brkts-matchlist-hide-button,
-:not(.brkts-matchlist-collapsed) > .brkts-matchlist-title > .brkts-matchlist-show-button {
-	display: none
+:not( .brkts-matchlist-collapsed ) > .brkts-matchlist-title > .brkts-matchlist-show-button {
+	display: none;
 }
 
 .brkts-matchlist-header {
@@ -362,7 +359,7 @@
 	.brkts-matchlist-match {
 		display: grid;
 		grid-column: span 5;
-		grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
+		grid-template-columns: ~'[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr';
 	}
 }
 
@@ -386,32 +383,32 @@
 	border-left: none;
 }
 
-.brkts-matchlist-cell:nth-child(1),
-.brkts-matchlist-cell:nth-child(2) {
+.brkts-matchlist-cell:nth-child( 1 ),
+.brkts-matchlist-cell:nth-child( 2 ) {
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 }
 
-.brkts-matchlist-cell:nth-child(4),
-.brkts-matchlist-cell:nth-child(5) {
+.brkts-matchlist-cell:nth-child( 4 ),
+.brkts-matchlist-cell:nth-child( 5 ) {
 	border-left: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 .brkts-hover > .brkts-matchlist-cell {
-	box-shadow: inset 0 6px 8px -5px rgba(0, 0, 0, 0.4), inset 0 -6px 8px -5px rgba(0, 0, 0, 0.4);
+	box-shadow: inset 0 6px 8px -5px rgba( 0, 0, 0, 0.4 ), inset 0 -6px 8px -5px rgba( 0, 0, 0, 0.4 );
 }
 
 .brkts-matchlist-cell.brkts-opponent-hover-active {
 	border-color: transparent;
 }
 
-.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child(1)::after,
-.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child(4)::after {
-	box-shadow: -1px 0 2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.7), 0 -1px 2px rgba(0, 0, 0, 0.7);
+.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 1 )::after,
+.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 4 )::after {
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 );
 }
 
-.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child(2)::after,
-.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child(5)::after {
-	box-shadow: 1px 0 2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.7), 0 -1px 2px rgba(0, 0, 0, 0.7);
+.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 2 )::after,
+.brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 5 )::after {
+	box-shadow: 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 );
 }
 
 .brkts-matchlist-match > .brkts-match-info-icon {
@@ -435,7 +432,7 @@
 	background-color: #ddf4dd;
 }
 
-.theme--dark .brkts-matchlist-slot-winner:not(.bg-draw) {
+.theme--dark .brkts-matchlist-slot-winner:not( .bg-draw ) {
 	box-shadow: inset 0 0 0 2px var( --table-green-border-color, transparent );
 }
 
@@ -455,20 +452,19 @@
 	font-weight: bold;
 }
 
-
 /**
  * MatchSummary
  */
 
 .brkts-match-info-popup {
 	border-radius: 2px;
-	border: 1px solid rgba(0, 0, 0, 0.5);
-	box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+	border: 1px solid rgba( 0, 0, 0, 0.5 );
+	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
 	position: absolute;
 	z-index: 19;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-match-info-popup {
 		bottom: 45px;
 		left: 1px !important;
@@ -502,21 +498,22 @@
 	flex-wrap: unset;
 }
 
-.brkts-popup:not(.ffa-match-summary) {
-    font-size: 13px;
+.brkts-popup:not( .ffa-match-summary ) {
+	font-size: 13px;
 }
 
 /* Can remove after purge */
-@media (max-width:768px) {
-	.brkts-popup:not(.brkts-match-info-popup) {
+@media ( max-width: 768px ) {
+	.brkts-popup:not( .brkts-match-info-popup ) {
 		width: 100% !important;
 	}
 }
-.brkts-popup:not(.brkts-match-info-popup) {
+
+.brkts-popup:not( .brkts-match-info-popup ) {
 	max-height: unset;
 }
 
-@media (max-width:768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup {
 		max-height: 65vh;
 		overflow: auto;
@@ -566,7 +563,7 @@
 	height: 58px;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and ( max-width: 768px ) {
 	.brkts-popup-body-element-cr-placeholder {
 		height: 50px;
 	}
@@ -584,7 +581,7 @@
 	display: inline-block;
 }
 
-.brkts-popup-body-element:nth-of-type(odd) {
+.brkts-popup-body-element:nth-of-type( odd ) {
 	background-color: var( --table-background-color, #f9f9f9 );
 }
 
@@ -636,7 +633,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 48%;
-	border: 1px solid #DDD;
+	border: 1px solid #dddddd;
 	padding: 5px;
 	border-radius: 5px;
 	line-height: 13px;
@@ -651,7 +648,7 @@
 }
 
 .brkts-popup-header-reset {
-	border-top: 2px solid #DDD;
+	border-top: 2px solid #dddddd;
 }
 
 .brkts-popup-header-score {
@@ -674,7 +671,7 @@
 }
 
 .brkts-popup-header-opponent-score-left {
-	border-right: 1px solid #aaa;
+	border-right: 1px solid #aaaaaa;
 	width: 28px;
 	justify-content: center;
 	align-items: center;
@@ -682,7 +679,7 @@
 }
 
 .brkts-popup-header-opponent-score-right {
-	border-left: 1px solid #aaa;
+	border-left: 1px solid #aaaaaa;
 	width: 28px;
 	justify-content: center;
 	align-items: center;
@@ -712,7 +709,6 @@
 	max-width: 48px;
 }
 
-
 /**
  * Gradient backgrounds and veto display for MatchSummary, by Rathoz.
  * Used by rainbowsix and other wikis.
@@ -722,7 +718,7 @@
 	width: 100%;
 	margin-top: -2px;
 	margin-bottom: -2px;
-	border-top: 1px solid var( --table-border-color, #DDD );
+	border-top: 1px solid var( --table-border-color, #dddddd );
 }
 
 .brkts-popup-mapveto td,
@@ -733,13 +729,13 @@
 }
 
 .brkts-popup-mapveto tr {
-	border-top: 1px dotted #DDD;
+	border-top: 1px dotted #dddddd;
 	height: 10px;
 }
 
 .brkts-popup-mapveto tr:first-child {
-	background-color: var( --table-variant-background-color, #EEE );
-	color: var( --clr-on-background, #000 );
+	background-color: var( --table-variant-background-color, #eeeeee );
+	color: var( --clr-on-background, #000000 );
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetostart {
@@ -747,14 +743,14 @@
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetoround {
-	background-color: #FFF;
+	background-color: #ffffff;
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetotype {
 	font-weight: bold;
-	color: #000;
+	color: #000000;
 	border: none;
-	border-radius: 0px;
+	border-radius: 0;
 	letter-spacing: 0.1em;
 	font-family: 'Source Code Pro', monospace;
 }
@@ -808,8 +804,7 @@
 	height: 18px;
 }
 
-
-@media (hover: hover) {
+@media ( hover: hover ) {
 	.brkts-popup-body-operator-bans a img:hover {
 		-ms-transform: scale( 1.8, 1.8 );
 		-webkit-transform: scale( 1.8, 1.8 );
@@ -819,12 +814,12 @@
 
 .brkts-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65%) !important;
+	background: linear-gradient( to left, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65%) !important;
+	background: linear-gradient( to right, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-draw {
@@ -839,34 +834,22 @@
 
 .brkts-popup-side-color-blue {
 	background-color: #31519c !important;
-	padding-left: 1px;
-	padding-right: 1px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-red {
 	background-color: #b12a2a !important;
-	padding-left: 1px;
-	padding-right: 1px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-purple {
 	background-color: #7865b7 !important;
-	padding-left: 1px;
-	padding-right: 1px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-orange {
 	background-color: #cf793c !important;
-	padding-left: 1px;
-	padding-right: 1px;
-	padding-top: 2px;
-	padding-bottom: 2px;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-radiant {
@@ -887,7 +870,7 @@
 	height: 16px;
 }
 
-@media (hover: hover) {
+@media ( hover: hover ) {
 	.brkts-popup-side-hero-hover img:hover {
 		-ms-transform: scale( 2, 2 );
 		-webkit-transform: scale( 2, 2 );
@@ -896,26 +879,27 @@
 }
 
 /* First case is backwards comptability (Wild Rift, Others?), Second case is the proper usage (League) */
-img.brkts-champion-icon, .brkts-champion-icon img {
+img.brkts-champion-icon,
+ .brkts-champion-icon img {
 	height: 24px;
 	width: 24px;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and ( max-width: 768px ) {
 	img.brkts-champion-icon {
 		height: 20px;
 		width: 20px;
 	}
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-champion-icon img {
 		height: 20px;
 		width: 20px;
 	}
 }
 
-@media (hover: hover) {
+@media ( hover: hover ) {
 	.brkts-champion-icon img:hover {
 		-ms-transform: scale( 2, 2 );
 		-webkit-transform: scale( 2, 2 );
@@ -927,6 +911,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	opacity: 0.5;
 	padding-left: 4px;
 }
+
 .brkts-popup-side-shade-out-flipped {
 	opacity: 0.5;
 	padding-right: 4px;
@@ -939,10 +924,10 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 .ffa-match-summary {
 	background: #f9f9f9;
 	max-height: 80vh;
-	overflow-x: hidden;
-	overflow-y: auto;
+	overflow: hidden auto;
 }
-@media (max-width: 768px) {
+
+@media ( max-width: 768px ) {
 	.ffa-match-summary {
 		max-height: 50vh;
 	}
@@ -955,8 +940,8 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	display: flex;
 }
 
-.brkts-popup:not(.brkts-match-info-flat) {
-    border-top: 1px solid var( --table-border-color, #bbbbbb );
+.brkts-popup:not( .brkts-match-info-flat ) {
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 .ffa-match-summary-grid-left {
@@ -996,7 +981,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	background: #ffffff;
 }
 
-.ffa-match-summary-body-bg-row:nth-of-type(2n) {
+.ffa-match-summary-body-bg-row:nth-of-type( 2n ) {
 	background: #f5f5f5;
 }
 
@@ -1041,7 +1026,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	padding: 3px 10px;
 }
 
-@media (max-width:768px) {
+@media ( max-width: 768px ) {
 	.ffa-match-summary-opponent {
 		padding: 3px 5px;
 	}
@@ -1108,7 +1093,6 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	margin-left: -7px;
 }
 
-
 /**
  * Styles for general components
  */
@@ -1149,7 +1133,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	margin-right: 0;
 }
 
-.note{
+.note {
 	font-size: smaller;
 	line-height: 1;
 	margin-left: 4px;
@@ -1169,7 +1153,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	width: 100%;
 }
 
-@media (max-width:768px) {
+@media ( max-width: 768px ) {
 	.block-team {
 		gap: 2px;
 	}
@@ -1204,7 +1188,7 @@ img.brkts-champion-icon, .brkts-champion-icon img {
 	pointer-events: none;
 }
 
-@media (max-width: 767px) {
+@media ( max-width: 767px ) {
 	.visible-xs.block-team {
 		display: flex !important;
 	}
@@ -1240,10 +1224,8 @@ div.brkts-opponent-hover::after {
 }
 
 div.brkts-opponent-hover-active::after {
-	box-shadow: -1px 0 2px rgba(0, 0, 0, 0.7), 1px 0 2px rgba(0, 0, 0, 0.7), 0 -1px 2px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.7);
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
 }
-
-
 
 /**
  * Bracket designer
@@ -1308,10 +1290,9 @@ div.brkts-opponent-hover-active::after {
 }
 
 .brkts-designer-match-row {
-	align-content: stretch;
+	place-content: stretch space-between;
 	display: flex;
 	height: 22px;
-	justify-content: space-between;
 }
 
 .brkts-designer-small-button.brkts-designer-small-button.brkts-designer-small-button {
@@ -1333,7 +1314,6 @@ div.brkts-opponent-hover-active::after {
 .brkts-designer-gallery-entry.brkts-designer-gallery-entry.brkts-designer-gallery-entry {
 	font-size: 0.9rem;
 }
-
 
 /**
  * Bracket generator
@@ -1376,9 +1356,8 @@ div.brkts-opponent-hover-active::after {
 }
 
 .brkts-dropdown > *:hover {
-	background: rgba(0, 0, 0, 0.1);
+	background: rgba( 0, 0, 0, 0.1 );
 }
-
 
 /**
  * StarcraftBracketDisplay and StarcraftMatchlistDisplay
@@ -1398,7 +1377,7 @@ div.brkts-opponent-hover-active::after {
 	margin-right: 0;
 }
 
-@media (max-width:768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup-sc-submatch .block-player > .flag,
 	.brkts-popup-sc-submatch .block-player > .race {
 		margin: 0 1px;
@@ -1428,7 +1407,6 @@ div.brkts-opponent-hover-active::after {
 	min-width: 0;
 }
 
-
 /**
  * StarcraftMatchSummary, used for starcraft/starcraft2 wikis
  */
@@ -1444,7 +1422,7 @@ div.brkts-opponent-hover-active::after {
 }
 
 .brkts-popup-sc-body {
-	border-top: 1px solid var(--table-border-color,#dddddd);
+	border-top: 1px solid var( --table-border-color, #dddddd );
 	display: block;
 }
 
@@ -1461,14 +1439,14 @@ div.brkts-opponent-hover-active::after {
 	padding: 4px 10px;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup-sc-game {
 		padding: 4px 4px;
 	}
 }
 
 .brkts-popup-sc-game-header {
-	border-top: 1px solid var(--table-border-color,#dddddd);
+	border-top: 1px solid var( --table-border-color, #dddddd );
 	display: block;
 	margin-top: -4px;
 	padding-top: 4px;
@@ -1509,8 +1487,8 @@ div.brkts-opponent-hover-active::after {
 }
 
 .brkts-popup-sc-submatch-header {
-	border-bottom: 1px solid var(--table-border-color,#dddddd);
-	border-top: 1px solid var(--table-border-color,#dddddd);
+	border-bottom: 1px solid var( --table-border-color, #dddddd );
+	border-top: 1px solid var( --table-border-color, #dddddd );
 	display: block;
 	font-weight: bold;
 	text-align: center;
@@ -1557,7 +1535,7 @@ div.brkts-opponent-hover-active::after {
 	padding: 2px 10px;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup-sc-submatch-center > .brkts-popup-sc-game {
 		padding: 2px 4px;
 	}
@@ -1571,7 +1549,7 @@ div.brkts-opponent-hover-active::after {
 	text-align: right;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup-sc-submatch-score {
 		min-width: 16px;
 	}
@@ -1588,7 +1566,7 @@ div.brkts-opponent-hover-active::after {
 	padding: 4px 10px;
 }
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-popup-sc-veto-body {
 		padding: 4px 4px;
 	}
@@ -1611,7 +1589,7 @@ div.brkts-opponent-hover-active::after {
 	border: 1px solid transparent;
 	color: #212529;
 	font-size: 1rem;
-	font-weight: 400;
+	font-weight: normal;
 	line-height: 1.5;
 	padding: 0.375rem 0.75rem;
 	text-align: center;
@@ -1634,7 +1612,7 @@ div.brkts-opponent-hover-active::after {
 }
 
 .button-link:focus {
-	box-shadow: 0 0 0 0 rgba(200, 201, 202, 0.5);
+	box-shadow: 0 0 0 0 rgba( 200, 201, 202, 0.5 );
 	outline: 0;
 }
 
@@ -1644,11 +1622,11 @@ div.brkts-opponent-hover-active::after {
 	opacity: 0.65;
 }
 
-.button-link:not(.disabled) {
+.button-link:not( .disabled ) {
 	cursor: pointer;
 }
 
-.button-link:active:not(.disabled) {
+.button-link:active:not( .disabled ) {
 	background-color: #cdcdcd;
 	border-color: #c6c6c6;
 }
@@ -1658,38 +1636,41 @@ div.brkts-opponent-hover-active::after {
  */
 
 .bracket-popup-wrapper div.matchpage-button {
-    padding: 5px 10px 10px 10px;
-    align-items: center;
+	padding: 5px 10px 10px 10px;
+	align-items: center;
 }
 
 .bracket-popup-wrapper div.matchpage-button button {
-    width: 100%;
-    font-size: 100%;
-    font-weight: 700;
-    background-color: #426ccf;
-    color: #fff;
+	width: 100%;
+	font-size: 100%;
+	font-weight: bold;
+	background-color: #426ccf;
+	color: #ffffff;
 }
 
 /**
  * Adjusted team display styling
  */
 
-@media (max-width: 768px) {
+@media ( max-width: 768px ) {
 	.brkts-bracket {
 		--brkts-team-icon-width: 30px;
 	}
 }
+
 .brkts-opponent-entry .team-template-image-icon,
 .brkts-opponent-entry .team-template-image-legacy {
-	height: calc(~"var(--opponent-height, 22px) - 4px");
-	width: var(--brkts-team-icon-width, 44px);
+	height: calc( ~'var(--opponent-height, 22px) - 4px' );
+	width: var( --brkts-team-icon-width, 44px );
 	justify-content: center;
 	display: inline-flex;
 }
+
 .brkts-opponent-entry .team-template-image-icon img {
 	max-height: 100%;
 	max-width: 90%;
 }
+
 .brkts-opponent-entry .team-template-image-legacy img {
 	max-height: 100%;
 	max-width: 100%;

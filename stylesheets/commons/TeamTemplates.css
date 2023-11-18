@@ -75,13 +75,14 @@ Author(s): FO-nTTaX
 span.team-template-team-bracket {
 	white-space: nowrap;
 	display: inline-block;
-	height: var(--team-template-bracket-height, 21px);
+	height: var( --team-template-bracket-height, 21px );
 }
+
 .team-template-team-bracket .team-template-image-icon,
 .team-template-team-bracket .team-template-image-legacy {
 	vertical-align: 0;
-	height: var(--team-template-bracket-height, 21px);
-	width: calc(~"var(--team-template-bracket-height, 21px) * 2.4");
+	height: var( --team-template-bracket-height, 21px );
+	width: calc( ~'var(--team-template-bracket-height, 21px) * 2.4' );
 }
 
 .team-template-team-bracket .team-template-image-icon img {
@@ -126,13 +127,14 @@ Author(s): iMarbot, Darkrai
 	display: none;
 }
 
-[data-darkreader-scheme="dark"] &,
+[ data-darkreader-scheme='dark' ] &,
 .theme--dark & {
 	.team-template-image-icon.lightmode,
 	.team-template-image-icon.team-template-lightmode,
 	.team-template-image-legacy.team-template-lightmode {
 		display: none;
 	}
+
 	span.team-template-image-icon.darkmode,
 	span.team-template-image-icon.team-template-darkmode,
 	span.team-template-image-legacy.team-template-darkmode {
@@ -144,18 +146,21 @@ Author(s): iMarbot, Darkrai
 Template(s): Group Table Hybrid
 Author(s): iMarbot
 *******************************************************************************/
-@media (max-width: 399px) {
+@media ( max-width: 399px ) {
 	.grouptableslot .team-template-text.mobile-hide {
 		display: none !important;
 	}
+
 	.grouptableslot .team-template-text.mobile-only {
 		display: unset !important;
 	}
 }
-@media (min-width: 400px) {
+
+@media ( min-width: 400px ) {
 	.grouptableslot .team-template-text.mobile-hide {
 		display: unset !important;
 	}
+
 	.grouptableslot .team-template-text.mobile-only {
 		display: none !important;
 	}

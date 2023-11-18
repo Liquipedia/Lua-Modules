@@ -3,204 +3,249 @@ Template(s): All Infoboxes
 Author(s): FO-nTTaX
 *******************************************************************************/
 .fo-nttax-infobox-wrapper {
-	clear:right;
-	float:right;
-	margin:10px 0 10px 10px;
+	clear: right;
+	float: right;
+	margin: 10px 0 10px 10px;
 	font-size: 0.8125rem;
 }
+
 .fo-nttax-infobox-adbox {
-	width:336px;
-	min-height:292px;
-	padding-top:10px;
-	padding-bottom:30px;
-	border-bottom-width:2px;
-	border-bottom-style:solid;
-	border-bottom-color: var( --infobox-header-background-color, var(--wiki-color-light ) );
-	overflow:hidden;
-	text-align:center;
+	width: 336px;
+	min-height: 292px;
+	padding-top: 10px;
+	padding-bottom: 30px;
+	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	overflow: hidden;
+	text-align: center;
 }
+
 .fo-nttax-infobox-adbox > * {
-	margin:0 auto;
+	margin: 0 auto;
 }
+
 .fo-nttax-infobox {
-	width:336px;
-	padding-top:10px;
-	padding-bottom:10px;
-	border-top-width:2px;
-	border-bottom-width:2px;
-	border-top-style:solid;
-	border-bottom-style:solid;
-	border-top-color: var( --infobox-header-background-color, var(--wiki-color-light ) );
-	border-bottom-color: var( --infobox-header-background-color, var(--wiki-color-light ) );
+	width: 336px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	border-top: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
+	border-bottom: 2px solid var( --infobox-header-background-color, var( --wiki-color-light ) );
 }
+
 .fo-nttax-infobox > div {
-	display:table;
-	width:100%;
+	display: table;
+	width: 100%;
 }
-.fo-nttax-infobox > div:nth-child(2n+1) {
+
+.fo-nttax-infobox > div:nth-child( 2n+1 ) {
 	background-color: var( --clr-surface-2, #eeeeee );
 }
-.fo-nttax-infobox > div:nth-child(2n) {
-	background-color: var( --clr-surface-1, #f5f5f5);
+
+.fo-nttax-infobox > div:nth-child( 2n ) {
+	background-color: var( --clr-surface-1, #f5f5f5 );
 }
+
 .fo-nttax-infobox > div:after {
-	clear:both;
+	clear: both;
 }
+
 .fo-nttax-infobox > div > div {
-	width:100%;
-	float:left;
-	height:inherit;
-	padding:5px;
+	width: 100%;
+	float: left;
+	height: inherit;
+	padding: 5px;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-2 {
-	width:50%;
+	width: 50%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-3 {
-	width:33.3333%;
+	width: 33.3333%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-4 {
-	width:25%;
+	width: 25%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-4-5 {
-	width:22.2222%;
+	width: 22.2222%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-5 {
-	width:20%;
+	width: 20%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-6 {
-	width:16.6666%;
+	width: 16.6666%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-7 {
-	width:14.2857%;
+	width: 14.2857%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-8 {
-	width:12.5%;
+	width: 12.5%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-9 {
-	width:11.1111%;
+	width: 11.1111%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-10 {
-	width:10%;
+	width: 10%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-11 {
-	width:9.0909%;
+	width: 9.0909%;
 }
+
 .fo-nttax-infobox > div > div.infobox-cell-12 {
-	width:8.3333%;
+	width: 8.3333%;
 }
+
 .fo-nttax-infobox-wrapper .infobox-header {
-	padding:5px;
-	font-weight:700;
-	text-align:center;
-	font-size:155%;
-	background-color: var( --infobox-header-background-color, var(--wiki-color-light ) );
+	padding: 5px;
+	font-weight: bold;
+	text-align: center;
+	font-size: 155%;
+	background-color: var( --infobox-header-background-color, var( --wiki-color-light ) );
 }
+
 .fo-nttax-infobox-wrapper .infobox-header-2 {
-	font-size:130%;
+	font-size: 130%;
 }
+
 .fo-nttax-infobox-wrapper .infobox-header-3 {
-	font-size:115%;
+	font-size: 115%;
 }
+
 .fo-nttax-infobox > div > div.infobox-description {
-	font-weight:bold;
-	text-align:right;
+	font-weight: bold;
+	text-align: right;
 }
+
 .fo-nttax-infobox > div > div.infobox-image {
-	padding:0;
-	width:100%;
+	padding: 0;
+	width: 100%;
 }
-.fo-nttax-infobox > div > div.infobox-image:not(.infobox-fixed-size-image) img {
-	width:100%;
-	height:auto;
+
+.fo-nttax-infobox > div > div.infobox-image:not( .infobox-fixed-size-image ) img {
+	width: 100%;
+	height: auto;
 }
+
 .fo-nttax-infobox > div > div.infobox-fixed-size-image img {
-	width:auto;
-	height:auto;
+	width: auto;
+	height: auto;
 }
-.fo-nttax-infobox > div > div.infobox-center{
-	text-align:center;
+
+.fo-nttax-infobox > div > div.infobox-center {
+	text-align: center;
 }
+
 .fo-nttax-infobox > div > div.infobox-size-20 {
-	font-size:200%;
+	font-size: 200%;
 }
+
 .fo-nttax-infobox > div > div.infobox-bold {
-	font-weight:bold;
+	font-weight: bold;
 }
+
 .fo-nttax-infobox-wrapper .infobox-header .infobox-buttons {
-	float:right;
-	font-size:60%;
-	font-weight:500;
+	float: right;
+	font-size: 60%;
+	font-weight: 500;
 }
+
 .fo-nttax-infobox-wrapper .infobox-header .infobox-buttons a {
-	background:none repeat scroll 0% 0% transparent !important;
-	padding:0px !important;
+	background: none repeat scroll 0% 0% transparent !important;
+	padding: 0 !important;
 }
+
 .fo-nttax-infobox-wrapper .infobox-icons a {
-	background:none repeat scroll 0% 0% transparent !important;
-	padding:0px !important;
+	background: none repeat scroll 0% 0% transparent !important;
+	padding: 0 !important;
 }
+
 .fo-nttax-infobox-wrapper .infobox-icons {
-	padding-top:2px;
+	padding-top: 2px;
 }
+
 .fo-nttax-infobox-wrapper .infobox-icons .lp-icon {
-	margin-top:3px;
+	margin-top: 3px;
 }
+
 .fo-nttax-infobox-wrapper .infobox-text-left {
-	text-align:left;
+	text-align: left;
 }
+
 .fo-nttax-infobox-wrapper .infobox-text-right {
-	text-align:right;
+	text-align: right;
 }
+
 .fo-nttax-infobox-wrapper .infobox-float-left {
-	float:left;
+	float: left;
 }
+
 .fo-nttax-infobox-wrapper .infobox-float-right {
-	float:right;
+	float: right;
 }
-@media (max-width:600px) {
+
+@media ( max-width: 600px ) {
 	.fo-nttax-infobox-wrapper {
-		width:100%;
-		margin-left:0;
-		float:none;
+		width: 100%;
+		margin-left: 0;
+		float: none;
 	}
+
 	.fo-nttax-infobox {
-		width:100%;
+		width: 100%;
 	}
+
 	.fo-nttax-infobox-adbox {
-		width:100%;
+		width: 100%;
 	}
+
 	.fo-nttax-infobox-wrapper .infobox-image > div > div {
-		text-align:center;
+		text-align: center;
 	}
 }
+
 .fo-nttax-infobox-wrapper .infobox-gold {
-	font-size:11pt;
-	color:#f5c433;
-	text-shadow:-1px 0 #555,0 1px #555,1px 0 #555,0 -1px #555;
+	font-size: 11pt;
+	color: #f5c433;
+	text-shadow: -1px 0 #555555, 0 1px #555555, 1px 0 #555555, 0 -1px #555555;
 }
+
 .fo-nttax-infobox-wrapper .infobox-gradient {
-	background:linear-gradient(to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc) repeat scroll 0% 0% transparent;
-	line-height:0.1px;
+	background: linear-gradient( to right, #ffcccc, #ffddaa, #ffff99, #eeffaa, #ccffcc ) repeat scroll 0% 0% transparent;
+	line-height: 0.1px;
 }
+
 .fo-nttax-infobox-wrapper .infobox-color-always {
-	background-color:#ccffcc;
+	background-color: #ccffcc;
 }
+
 .fo-nttax-infobox-wrapper .infobox-color-very.often {
-	background-color:#eeffaa;
+	background-color: #eeffaa;
 }
+
 .fo-nttax-infobox-wrapper .infobox-color-often {
-	background-color:#ffff99;
+	background-color: #ffff99;
 }
+
 .fo-nttax-infobox-wrapper .infobox-color-seldom {
-	background-color:#ffddaa;
+	background-color: #ffddaa;
 }
+
 .fo-nttax-infobox-wrapper .infobox-color-never {
-	background-color:#ffcccc;
+	background-color: #ffcccc;
 }
+
 .fo-nttax-infobox-wrapper.popout {
-	position:absolute;
-	top:0;
-	left:990px;
+	position: absolute;
+	top: 0;
+	left: 990px;
 }
 
 /** Game colors **/
@@ -259,37 +304,45 @@ Author(s): FO-nTTaX
 
 /* Smash */
 .fo-nttax-infobox-wrapper.infobox-64 .infobox-header {
-	background-color:#d5e5b6;
+	background-color: #d5e5b6;
 }
+
 .fo-nttax-infobox-wrapper.infobox-melee .infobox-header {
-	background-color:#b6e5c6;
+	background-color: #b6e5c6;
 }
+
 .fo-nttax-infobox-wrapper.infobox-brawl .infobox-header {
-	background-color:#b6d5e5;
+	background-color: #b6d5e5;
 }
+
 .fo-nttax-infobox-wrapper.infobox-pm .infobox-header {
-	background-color:#c6b6e5;
+	background-color: #c6b6e5;
 }
+
 .fo-nttax-infobox-wrapper.infobox-wiiu .infobox-header {
-	background-color:#e5c6b6;
+	background-color: #e5c6b6;
 }
+
 .fo-nttax-infobox-wrapper.infobox-ultimate .infobox-header {
-	background-color:#e5b6d5;
+	background-color: #e5b6d5;
 }
 
 /* Counter-Strike */
 .fo-nttax-infobox-wrapper.infobox-csgo .infobox-header {
-	background-color:#cde5b6;
+	background-color: #cde5b6;
 }
+
 .fo-nttax-infobox-wrapper.infobox-css .infobox-header {
-	background-color:#deb0b0;
+	background-color: #deb0b0;
 }
+
 .fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header {
-	background-color:#f2e8b8;
+	background-color: #f2e8b8;
 }
+
 .fo-nttax-infobox-wrapper.infobox-cscz .infobox-header {
-	background-color:#b6cfe5;
+	background-color: #b6cfe5;
 }
 
 /*******************************************************************************
@@ -297,9 +350,9 @@ Template(s): Infobox arrows
 Author(s): Rapture
 *******************************************************************************/
 .infobox-arrow-icon img {
-	max-width:9px;
-	max-height:18px;
-	image-rendering:-webkit-optimize-contrast;
+	max-width: 9px;
+	max-height: 18px;
+	image-rendering: -webkit-optimize-contrast;
 }
 
 /*******************************************************************************
@@ -311,19 +364,23 @@ Author(s): salle, Ricci
 	width: 336px;
 	white-space: nowrap;
 }
-@media(max-width:600px) {
+
+@media ( max-width: 600px ) {
 	.fo-nttax-infobox > div > div.infobox-image.infobox-double-image > div {
 		width: 100%;
 	}
 }
+
 .infobox-double-image div .center {
 	display: inline-block;
 	width: auto;
 }
+
 .infobox-double-image div .center:first-child .floatnone a img {
 	margin-left: 40px;
 	margin-right: 10px;
 }
+
 .infobox-double-image div .center:last-child .floatnone a img {
 	margin-left: 10px;
 	margin-right: 40px;
@@ -335,40 +392,47 @@ Author(s): iMarbot
 *******************************************************************************/
 .infobox-image {
 	& img {
-		&[src*="allmode"],
-		&[src*="darkmode"],
-		&[src*="lightmode"] {
+		&[ src*='allmode' ],
+		&[ src*='darkmode' ],
+		&[ src*='lightmode' ] {
 			max-height: 500px;
 			max-width: 100%;
 			width: auto !important;
 			height: auto !important;
-			&:not([src*="padded"]) {
+
+			&:not( [ src*='padded' ] ) {
 				padding: 15px;
 			}
 		}
 	}
+
 	&.darkmode {
-		html:not([data-darkreader-scheme="dark"]):not(.theme--dark) .fo-nttax-infobox-wrapper:not(.infobox-darkmodeforced) & {
+		html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) .fo-nttax-infobox-wrapper:not( .infobox-darkmodeforced ) & {
 			display: none;
 		}
-		html:not([data-darkreader-scheme="dark"]):not(.theme--dark) .infobox-darkmodeforced & {
+
+		html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) .infobox-darkmodeforced & {
 			background: #1e2021;
 		}
+
 		.infobox-darkmodeforced & img {
 			background-position: center;
 			background-size: cover;
-			&[src*="ESL_Pro_League"] {
-				background-image: url("//liquipedia.net/commons/images/6/6d/ESL_Pro_League_2019_background.png");
+
+			&[ src*='ESL_Pro_League' ] {
+				background-image: url( //liquipedia.net/commons/images/6/6d/ESL_Pro_League_2019_background.png );
 			}
-			&[src*="ESL_Challenger_League"] {
-				background-image: url("//liquipedia.net/commons/images/4/4e/ESL_Challenger_League_background.jpg");
+
+			&[ src*='ESL_Challenger_League' ] {
+				background-image: url( //liquipedia.net/commons/images/4/4e/ESL_Challenger_League_background.jpg );
 			}
 		}
 	}
+
 	&.lightmode {
-		html[data-darkreader-scheme="dark"] &,
+		html[ data-darkreader-scheme='dark' ] &,
 		html.theme--dark &,
-  		.infobox-darkmodeforced & {
+		.infobox-darkmodeforced & {
 			display: none;
 		}
 	}

@@ -6,8 +6,8 @@ Author(s): Elysienna
 .panel-table {
 	display: flex;
 	flex-direction: column;
-	border-top: 0.0625rem solid rgba(0,0,0,0.08);
-	border-left: 0.0625rem solid rgba(0,0,0,0.08);
+	border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+	border-left: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 	width: 100%;
 
 	&__sort {
@@ -17,8 +17,8 @@ Author(s): Elysienna
 	&__navigate {
 		position: absolute;
 		width: 2.5rem;
-		background-color: #F5F5F5;
-		border: 0.0625rem solid rgba(0,0,0,0.08);
+		background-color: #f5f5f5;
+		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -40,7 +40,7 @@ Author(s): Elysienna
 		/* Modifiers */
 		&.row {
 			&--header {
-				font-weight: 700;
+				font-weight: bold;
 				background-color: #f5f5f5;
 
 				& .panel-table__cell__game-placement {
@@ -53,24 +53,22 @@ Author(s): Elysienna
 			}
 
 			&--green {
-				background-color: #FAFFFA;
+				background-color: #fafffa;
 			}
 
 			&--red {
-				background-color: #FFFAFA;
+				background-color: #fffafa;
 			}
 		}
 	}
 
 	&__cell {
-		border-right: 0.0625rem solid rgba(0,0,0,0.08);
-		border-bottom: 0.0625rem solid rgba(0,0,0,0.08);
+		border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		padding: 0.75rem 1rem;
 		display: flex;
 		align-items: center;
-		flex-shrink: 0;
-		flex-grow: 0;
-		flex-basis: auto;
+		flex: 0 0 auto;
 
 		.panel-table__row.row--header & {
 			align-items: flex-end;
@@ -97,7 +95,7 @@ Author(s): Elysienna
 		&__game {
 			&-head {
 				flex: 1 1 100%;
-				border-bottom: 0.0625rem solid rgba(0,0,0,0.08);
+				border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 				padding: 0.75rem 1rem;
 				text-align: right;
 			}
@@ -116,7 +114,7 @@ Author(s): Elysienna
 			}
 
 			&-date {
-				font-weight: 400;
+				font-weight: normal;
 				font-style: italic;
 				margin: 0;
 				min-height: 1.5rem;
@@ -126,8 +124,8 @@ Author(s): Elysienna
 			}
 
 			&-placement {
-				flex: 1 0 calc(50% - 0.0625rem);
-				border-right: 0.0625rem solid rgba(0,0,0,0.08);
+				flex: 1 0 calc( 50% - 0.0625rem );
+				border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -157,7 +155,7 @@ Author(s): Elysienna
 				&-details {
 					width: 100%;
 					flex: 1 1 100%;
-					border-bottom: 0.0625rem solid rgba(0,0,0,0.08);
+					border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 					padding: 0.75rem 1rem;
 					text-align: right;
 
@@ -166,7 +164,7 @@ Author(s): Elysienna
 					}
 
 					&-date {
-						font-weight: 400;
+						font-weight: normal;
 						font-style: italic;
 						margin: 0;
 						min-height: 1.5rem;
@@ -177,8 +175,8 @@ Author(s): Elysienna
 				}
 
 				&-placement {
-					flex: 1 0 calc(50% - 0.0625rem);
-					border-right: 0.0625rem solid rgba(0,0,0,0.08);
+					flex: 1 0 calc( 50% - 0.0625rem );
+					border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 					display: flex;
 					justify-content: center;
 					align-items: center;
@@ -204,14 +202,14 @@ Author(s): Elysienna
 			}
 
 			&--out {
-				color: var( --clr-semantic-negative-20, #5C0A0A );
+				color: var( --clr-semantic-negative-20, #5c0a0a );
 			}
 		}
 
 		/* Modifier - icons */
 		.icon {
 			&--gold {
-				color: var( --clr-semantic-gold-40, #CCAB00 );
+				color: var( --clr-semantic-gold-40, #ccab00 );
 			}
 
 			&--silver {
@@ -219,19 +217,19 @@ Author(s): Elysienna
 			}
 
 			&--bronze {
-				color: var( --clr-semantic-bronze-40, #80704C );
+				color: var( --clr-semantic-bronze-40, #80704c );
 			}
 
 			&--copper {
-				color: var( --clr-semantic-copper-40, #CC7800 );
+				color: var( --clr-semantic-copper-40, #cc7800 );
 			}
 
 			&--green {
-				color: var( --clr-semantic-positive-30, #1D7C1D );
+				color: var( --clr-semantic-positive-30, #1d7c1d );
 			}
 
 			&--red {
-				color: var( --clr-semantic-negative-30, #B81414 );
+				color: var( --clr-semantic-negative-30, #b81414 );
 			}
 		}
 	}
@@ -239,19 +237,19 @@ Author(s): Elysienna
 	/* Modifier - cell */
 	.cell {
 		&--gold {
-			background-color: #FFF7D6;
+			background-color: #fff7d6;
 		}
 
 		&--silver {
-			background-color: #E7EDEE;
+			background-color: #e7edee;
 		}
 
 		&--copper {
-			background-color: #FFEFD6;
+			background-color: #ffefd6;
 		}
 
 		&--bronze {
-			background-color: #EFEEE6;
+			background-color: #efeee6;
 		}
 
 		&--game {
@@ -263,7 +261,7 @@ Author(s): Elysienna
 
 		&--status {
 			padding: 0;
-			font-weight: 700;
+			font-weight: bold;
 			flex-basis: 2rem;
 			flex-grow: 0;
 			display: flex;
@@ -294,7 +292,7 @@ Author(s): Elysienna
 			flex-basis: 10.625rem;
 			flex-grow: 0;
 			justify-content: flex-end;
-			font-weight: 700;
+			font-weight: bold;
 		}
 
 		&--placements {

@@ -3,31 +3,34 @@ Template(s): Team Cards
 Author(s): ???
 *******************************************************************************/
 .teamcard {
-	position:relative;
-	width:200px;
+	position: relative;
+	width: 200px;
 }
+
 .teamcard > center {
-	white-space:nowrap;
-	overflow:hidden;
-	text-overflow:ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
 .teamcard table.list,
 .teamcard table.logo {
-	height:121px;
-	margin-top:0;
-	width:200px;
+	height: 121px;
+	margin-top: 0;
+	width: 200px;
 }
+
 .teamcard table.list,
 .teamcard.teamcard-opened table.list.former,
 .teamcard.teamcard-opened table.list.subs {
-	opacity:0 !important;
-	filter:alpha(opacity=0) !important;
-	position:absolute;
-	z-index:2;
-	table-layout:fixed
+	opacity: 0 !important;
+	filter: alpha( opacity=0 ) !important;
+	position: absolute;
+	z-index: 2;
+	table-layout: fixed;
 }
 
-@media(min-width:601px) {
+@media ( min-width: 601px ) {
 	.teamcard table.list:hover,
 	.teamcard table.list.active:hover,
 	.teamcard.teamcard-opened table.list,
@@ -36,8 +39,8 @@ Author(s): ???
 	.teamcard.teamcard-former-opened:hover table.list.former,
 	.teamcard.teamcard-subs-opened:hover table.list.subs {
 		opacity: 1 !important;
-		filter: alpha(opacity=100) !important;
-		background-color: var( --clr-surface-3, rgba(249,249,249,0.95) ) !important;
+		filter: alpha( opacity=100 ) !important;
+		background-color: var( --clr-surface-3, rgba( 249, 249, 249, 0.95 ) ) !important;
 	}
 
 	.teamcard.teamcard-former-opened table.list.active,
@@ -46,114 +49,139 @@ Author(s): ???
 	.teamcard.teamcard-subs-opened table.list.former {
 		display: none !important;
 		opacity: 0 !important;
-		filter: alpha(opacity=0) !important;
+		filter: alpha( opacity=0 ) !important;
 	}
 }
+
 .teamcard table.logo td {
-	padding:0;
+	padding: 0;
 }
-.teamcard table.list td, .teamcard table.list th {
-	padding:2px;
+
+.teamcard table.list td,
+ .teamcard table.list th {
+	padding: 2px;
 }
+
 .teamcard table.list th {
-	width:20px;
+	width: 20px;
 }
+
 .teamcard table.list td {
-	white-space:nowrap;
-	text-overflow:ellipsis;
-	overflow:hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
+
 .teamcard .teamcard-placement {
-	padding:0 !important;
+	padding: 0 !important;
 }
+
 .teamcard .teamcard-placement table.teamcard-placement-table {
-	width:100%;
-	text-align:center;
-	height:29px;
+	width: 100%;
+	text-align: center;
+	height: 29px;
 }
+
 .teamcard .teamcard-qualifier {
-	text-align:center;
-	font-weight:bold;
-	height:25px;
+	text-align: center;
+	font-weight: bold;
+	height: 25px;
 }
+
 .teamcard .teamcard-preview {
-	text-align:center;
+	text-align: center;
 }
-@media(max-width:600px) {
-	.teamcard:not(.teamcard-nomobile) table.logo {
-		width:100%;
+
+@media ( max-width: 600px ) {
+	.teamcard:not( .teamcard-nomobile ) table.logo {
+		width: 100%;
 	}
-	.teamcard:not(.teamcard-nomobile) table.logo img:not([src$=".svg"]) {
-		width:auto;
-		height:auto;
-		max-width:90%;
-		max-height:90%;
+
+	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$='.svg' ] ) {
+		width: auto;
+		height: auto;
+		max-width: 90%;
+		max-height: 90%;
 	}
-	.teamcard:not(.teamcard-nomobile) {
-		position:relative;
-		width:100%;
+
+	.teamcard:not( .teamcard-nomobile ) {
+		position: relative;
+		width: 100%;
 	}
-	.teamcard:not(.teamcard-nomobile) .teamcard-inner {
-		position:relative;
+
+	.teamcard:not( .teamcard-nomobile ) .teamcard-inner {
+		position: relative;
 	}
-	.teamcard:not(.teamcard-nomobile) table.logo div.center {
-		width:40% !important;
+
+	.teamcard:not( .teamcard-nomobile ) table.logo div.center {
+		width: 40% !important;
 	}
-	.teamcard:not(.teamcard-nomobile) table.list {
-		opacity:1 !important;
-		filter:alpha(opacity=1) !important;
-		table-layout:fixed;
-		position:absolute;
-		top:0px;
-		width:60% !important;
-		left:40%;
+
+	.teamcard:not( .teamcard-nomobile ) table.list {
+		opacity: 1 !important;
+		filter: alpha( opacity=1 ) !important;
+		table-layout: fixed;
+		position: absolute;
+		top: 0;
+		width: 60% !important;
+		left: 40%;
 	}
-	.teamcard:not(.teamcard-former-opened) table.list.former,
-	.teamcard:not(.teamcard-subs-opened) table.list.subs,
+
+	.teamcard:not( .teamcard-former-opened ) table.list.former,
+	.teamcard:not( .teamcard-subs-opened ) table.list.subs,
 	.teamcard.teamcard-former-opened table.list.active,
 	.teamcard.teamcard-former-opened table.list.subs,
 	.teamcard.teamcard-subs-opened table.list.active,
 	.teamcard.teamcard-subs-opened table.list.former {
-		display:none !important;
+		display: none !important;
 	}
 
-	.teamcard:not(.teamcard-nomobile) .league-icon-small-image img {
-		max-width:25px !important;
-		max-height:25px !important;
+	.teamcard:not( .teamcard-nomobile ) .league-icon-small-image img {
+		max-width: 25px !important;
+		max-height: 25px !important;
 	}
 }
+
 .teamcard-toggle-button {
-	height:40px;
-	overflow:hidden;
+	height: 40px;
+	overflow: hidden;
 }
-.teamcard-toggle-button::after{
-	content:" ";
-	display:block;
-	clear:left;
+
+.teamcard-toggle-button::after {
+	content: ' ';
+	display: block;
+	clear: left;
 }
+
 .teamcard-toggle-button button {
-	float:right;
-	margin:0 0 10px 10px;
-	width:fit-content;
+	float: right;
+	margin: 0 0 10px 10px;
+	width: fit-content;
 }
-@media(max-width:600px) {
+
+@media ( max-width: 600px ) {
 	.teamcard-toggle-button {
-		display:none !important;
+		display: none !important;
 	}
 }
-.teamcard-former-toggle-button button, .teamcard-subs-toggle-button button, .teamcard-active-toggle-button button {
-	padding:0 !important;
-	width:157px;
-	height:25px;
-	margin-left:25px;
-	transform:rotate(90deg);
-	transform-origin:top left
+
+.teamcard-former-toggle-button button,
+ .teamcard-subs-toggle-button button,
+ .teamcard-active-toggle-button button {
+	padding: 0 !important;
+	width: 157px;
+	height: 25px;
+	margin-left: 25px;
+	transform: rotate( 90deg );
+	transform-origin: top left;
 }
+
 .wiki-apexlegends .teamcard-former-toggle-button button {
-	width:121px;
+	width: 121px;
 }
+
 .wiki-teamfortress .teamcard-former-toggle-button button {
-	width:181px;
+	width: 181px;
 }
 
 .teamcard {
@@ -164,6 +192,7 @@ Author(s): ???
 		max-height: 20px;
 		vertical-align: baseline;
 	}
+
 	& .team-template-image-legacy img {
 		width: 48px;
 		height: 20px;
@@ -171,6 +200,7 @@ Author(s): ???
 		margin-right: -5px;
 		vertical-align: baseline;
 	}
+
 	& .team-template-team-part,
 	& span.team-template-image-icon,
 	& span.team-template-image-legacy, {
@@ -180,47 +210,59 @@ Author(s): ???
 }
 
 .teamcard-button-separator {
-	border-right: 1px solid var( --table-border-color, rgb(187, 187, 187) )!important;
+	border-right: 1px solid var( --table-border-color, rgb( 187, 187, 187 ) ) !important;
 }
 
 /*******************************************************************************
 Template(s): Responsive TeamCard columns
 Author(s): iMarbot
 *******************************************************************************/
-.teamcard-columns, .teamcard-columns-3, .teamcard-columns-4, .teamcard-columns-5 {
+.teamcard-columns,
+ .teamcard-columns-3,
+ .teamcard-columns-4,
+ .teamcard-columns-5 {
 	width: 100%;
 }
-@media (min-width: 700px) {
+
+@media ( min-width: 700px ) {
 	.teamcard-columns-3 {
 		width: 700px;
 	}
 }
-@media (min-width: 950px) {
-	.teamcard-columns, .teamcard-columns-4 {
+
+@media ( min-width: 950px ) {
+	.teamcard-columns,
+ .teamcard-columns-4 {
 		width: 950px;
 	}
 }
-@media (min-width: 1540px) {
+
+@media ( min-width: 1540px ) {
 	.teamcard-columns-5 {
 		width: 1170px;
 	}
 }
-@media (min-width: 2100px) {
+
+@media ( min-width: 2100px ) {
 	.teamcard-columns-3 {
 		width: 1400px;
 	}
 }
-@media (min-width: 2600px) {
-	.teamcard-columns, .teamcard-columns-4 {
+
+@media ( min-width: 2600px ) {
+	.teamcard-columns,
+ .teamcard-columns-4 {
 		width: 1900px;
 	}
 }
-@media (min-width: 3000px) {
+
+@media ( min-width: 3000px ) {
 	.teamcard-columns-5 {
 		width: 2330px;
 	}
 }
-@media (min-width: 2800px) {
+
+@media ( min-width: 2800px ) {
 	.teamcard-columns-3 {
 		width: 2100px;
 	}
@@ -238,11 +280,12 @@ Author(s): iMarbot
 Template(s): TeamCard Dark Reader support
 Author(s): iMarbot
 *******************************************************************************/
-[data-darkreader-scheme="dark"] &,
+[ data-darkreader-scheme='dark' ] &,
 .theme--dark & {
 	.teamcard span.logo-lightmode {
 		display: none !important;
 	}
+
 	.teamcard span.logo-darkmode {
 		display: unset !important;
 	}
@@ -274,7 +317,7 @@ Author: warnull
 	border: 1px solid var( --clr-border, #bbbbbb );
 }
 
-@media (max-width: 415px) {
+@media ( max-width: 415px ) {
 	.rts-team-list-card {
 		width: 100% !important;
 	}
@@ -333,7 +376,7 @@ Author: warnull
 	min-width: 0;
 }
 
-.rts-team-list-entry:nth-of-type(2n) {
+.rts-team-list-entry:nth-of-type( 2n ) {
 	background: var( --clr-surface-2, #f5f5f5 );
 }
 
@@ -364,7 +407,6 @@ Author: warnull
 	margin-right: 2px;
 	text-transform: uppercase;
 }
-
 
 /**
  * RtsTeamList/TableDisplay
@@ -397,8 +439,7 @@ Author: warnull
 }
 
 .rts-team-table-header-row-players {
-	grid-column-end: -1;
-	grid-column-start: entry 1;
+	grid-column: entry 1 / -1;
 	min-width: 100px;
 }
 
@@ -406,7 +447,7 @@ Author: warnull
 	display: contents;
 }
 
-.rts-team-table-team-row:nth-of-type(2n+1) {
+.rts-team-table-team-row:nth-of-type( 2n+1 ) {
 	background: var( --clr-surface-2, #f5f5f5 );
 }
 
@@ -419,8 +460,7 @@ Author: warnull
 
 .rts-team-table-tbd-entry {
 	font-style: italic;
-	grid-column-end: -1;
-	grid-column-start: entry 1;
+	grid-column: entry 1 / -1;
 	min-width: 100px;
 	text-align: center;
 }
@@ -439,8 +479,8 @@ Template(s): TeamCard inotes class
 Author(s): iMarbot
 *******************************************************************************/
 .inotes-box {
-	box-shadow: 3px 3px 5px 0px rgba(0, 0, 0, 0.5);
-	max-width: calc(100% - 20px);
+	box-shadow: 3px 3px 5px 0 rgba( 0, 0, 0, 0.5 );
+	max-width: calc( 100% - 20px );
 	margin-top: -5px;
 	margin-left: 0 !important;
 	position: absolute;
@@ -461,8 +501,9 @@ Template(s): TeamCard inotes class
 Author(s): iMarbot via ???
 *******************************************************************************/
 .teamcard-bg-dnp {
-	background-color: rgba(229, 229, 229, 0.5);
+	background-color: rgba( 229, 229, 229, 0.5 );
 }
+
 .teamcard-bg-leave {
-	background-color: rgba(249, 199, 199, 0.5);
+	background-color: rgba( 249, 199, 199, 0.5 );
 }

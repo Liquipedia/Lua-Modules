@@ -4,11 +4,11 @@ Author: warnull
 *******************************************************************************/
 
 .group-table {
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 }
 
-@media (max-width: 435px) {
+@media ( max-width: 435px ) {
 	.group-table {
 		width: 100% !important;
 	}
@@ -22,13 +22,13 @@ Author: warnull
 
 .group-table-header {
 	align-items: center;
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
-	border-top: 1px solid var(--table-border-color,#bbbbbb);
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
 	display: flex;
 	gap: 5px;
 	justify-content: space-between;
 	padding: 5px;
-	background-color: var(--clr-surface-2);
+	background-color: var( --clr-surface-2 );
 }
 
 .group-table-header * + .general-collapsible-default-toggle {
@@ -49,9 +49,9 @@ Author: warnull
 }
 
 .group-table-countdown {
-	background-color: var(--table-header-variant-background-color,#f2f2f2) !important;
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
-	border-top: 1px solid var(--table-border-color,#bbbbbb);
+	background-color: var( --table-header-variant-background-color, #f2f2f2 ) !important;
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
 	font-size: 85%;
 	line-height: 1.1;
 	padding: 3px 5px;
@@ -82,9 +82,8 @@ Author: warnull
 	.group-table-header-row,
 	.group-table-result-row {
 		display: grid;
-		grid-column-end: -1;
-		grid-column-start: 1;
-		grid-template-columns: 36px 1fr repeat(8, auto);
+		grid-column: 1 / -1;
+		grid-template-columns: 36px 1fr repeat( 8, auto );
 	}
 }
 
@@ -99,8 +98,8 @@ Author: warnull
 .group-table-cell {
 	align-items: center;
 	background-color: inherit;
-	border-left: 1px solid var(--table-border-color,#bbbbbb);
-	border-top: 1px solid var(--table-border-color,#bbbbbb);
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
 	display: flex;
 	justify-content: center;
 	min-width: 0;
@@ -173,7 +172,6 @@ Author: warnull
 	color: #ff00ff !important;
 }
 
-
 /**
  * Styles for SwissTableLeague
  */
@@ -184,8 +182,8 @@ Author: warnull
 }
 
 .swiss-table {
-	border-bottom: 1px solid var(--table-border-color,#bbbbbb);
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	display: inline-grid;
 }
 
@@ -194,7 +192,7 @@ Author: warnull
 }
 
 .swiss-table-header-row {
-	background: var(--clr-surface-2,#eaecf0);
+	background: var( --clr-surface-2, #eaecf0 );
 	display: contents;
 	font-weight: bold;
 }
@@ -213,8 +211,7 @@ Author: warnull
 	.swiss-table-header-row,
 	.swiss-table-body-row {
 		display: grid;
-		grid-column-end: -1;
-		grid-column-start: 1;
+		grid-column: 1 / -1;
 		grid-template-columns: 50% 50%;
 	}
 
@@ -226,17 +223,17 @@ Author: warnull
 	.swiss-table-match-header-row,
 	.swiss-table-match-row {
 		display: grid;
-		grid-template-columns: repeat(100, auto);
+		grid-template-columns: repeat( 100, auto );
 	}
 }
 
-.swiss-table-body-row:nth-of-type(2n) {
-	background: var(--table-striped-background-color,#f5f5f5);
+.swiss-table-body-row:nth-of-type( 2n ) {
+	background: var( --table-striped-background-color, #f5f5f5 );
 }
 
 .swiss-table-header-row > .group-table-header-row > .group-table-cell:last-child,
 .swiss-table-body-row > .group-table-result-row > .group-table-cell:last-child {
-	border-right: 1px solid var(--table-border-color,#bbbbbb);
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
 }
 
 .swiss-table-match {

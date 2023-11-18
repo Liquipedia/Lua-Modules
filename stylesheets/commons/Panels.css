@@ -15,13 +15,13 @@ Author(s): FO-nTTaX
 	border-bottom: 0.0625rem solid var( --panel-header-background-color, var( --wiki-bordercolor-light ) );
 }
 
-.panel-box-heading:not(:first-child) {
+.panel-box-heading:not( :first-child ) {
 	border-top: 1px solid;
 	border-top-color: inherit;
 }
 
 .panel-box-heading > small {
-        font-weight: bold;
+	font-weight: bold;
 }
 
 .panel-box-body {

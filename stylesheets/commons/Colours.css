@@ -68,15 +68,15 @@ ul.nav-tabs li.game-none,
 }
 
 .gray-theme-light-text {
-	color: var( --clr-moon-40, #e6e6e6);
+	color: var( --clr-moon-40, #e6e6e6 );
 }
 
 .gray-theme-light-bg {
-	background-color: var( --clr-moon-40, #e6e6e6);
+	background-color: var( --clr-moon-40, #e6e6e6 );
 }
 
 .gray-theme-light-bg-striped {
-	background:repeating-linear-gradient(135deg, var( --clr-moon-40, #e6e6e6), var( --clr-moon-40, #e6e6e6) 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px), linear-gradient(0deg,var( --clr-moon-40, #e6e6e6),var( --clr-moon-40, #e6e6e6));
+	background: repeating-linear-gradient( 135deg, var( --clr-moon-40, #e6e6e6 ), var( --clr-moon-40, #e6e6e6 ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, var( --clr-moon-40, #e6e6e6 ), var( --clr-moon-40, #e6e6e6 ) );
 }
 
 .gray-theme-light-alt-text,
@@ -161,16 +161,16 @@ div.NavPic,
 }
 
 .cinnabar-theme-dark-alt-bg {
-	background-color:#FF4A4A;
+	background-color: #ff4a4a;
 }
 
 .cinnabar-theme-dark-alt-bg-striped {
-	background:repeating-linear-gradient(135deg, #FF4A4A, #FF4A4A 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px),
-		linear-gradient(0deg,#FF4A4A,#FF4A4A);
+	background:
+ repeating-linear-gradient( 135deg, #ff4a4a, #ff4a4a 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ),linear-gradient( 0deg, #ff4a4a, #ff4a4a );
 }
 
 .cinnabar-theme-dark-alt-text {
-	color: #FF4A4A;
+	color: #ff4a4a;
 }
 
 /* RED VIOLET */
@@ -220,11 +220,11 @@ ul.nav-tabs li.game-ultimate,
 .vivid-violet-theme-light-bg,
 .fo-nttax-infobox-wrapper.infobox-pm .infobox-header,
 ul.nav-tabs li.game-pm,
-.overview.game-pm{
+.overview.game-pm {
 	background-color: var( --clr-vividviolet-background-color, #e8ddef );
 }
 
-.vivid-violet-bg-important{
+.vivid-violet-bg-important {
 	background-color: var( --clr-vividviolet-background-color, #e8ddef ) !important;
 }
 
@@ -324,8 +324,8 @@ div.NavFrame div.NavHead,
 }
 
 .sapphire-alt-bg-striped {
-	background:repeating-linear-gradient(135deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ) 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px),
-		linear-gradient(0deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ));
+	background:
+ repeating-linear-gradient( 135deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ),linear-gradient( 0deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ) );
 }
 /* ELM */
 .elm-text,
@@ -381,7 +381,7 @@ ul.nav-tabs li.game-brawl,
 }
 
 .bg-seedup {
-	background-color: var( --clr-forestgreen-90, rgb(219,237,237) );
+	background-color: var( --clr-forestgreen-90, rgb( 219, 237, 237 ) );
 }
 
 .forest-green-bg,
@@ -409,7 +409,8 @@ ul.nav-tabs li.game-melee,
 	background-color: var( --clr-forestgreen-20, #1e7a1d );
 }
 
-.forest-green-dark-alt-bg, .forest-green-theme-dark-alt-bg {
+.forest-green-dark-alt-bg,
+ .forest-green-theme-dark-alt-bg {
 	background-color: var( --clr-forest-30, #3ea34c );
 }
 
@@ -426,8 +427,8 @@ ul.nav-tabs li.game-melee,
 }
 
 .forest-green-theme-dark-alt-bg-striped {
-	background:repeating-linear-gradient(135deg, var( --clr-forest-30, #3ea34c ), var( --clr-forest-30, #3ea34c ) 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px),
-		linear-gradient(0deg,var( --clr-forest-30, #3ea34c ),var( --clr-forest-30, #3ea34c ));
+	background:
+ repeating-linear-gradient( 135deg, var( --clr-forest-30, #3ea34c ), var( --clr-forest-30, #3ea34c ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ),linear-gradient( 0deg, var( --clr-forest-30, #3ea34c ), var( --clr-forest-30, #3ea34c ) );
 }
 
 /* ATLANTIS */
@@ -558,8 +559,8 @@ ul.nav-tabs li.game-64,
 }
 
 .bright-sun-0-bg-striped {
-	background:repeating-linear-gradient(135deg, var( --clr-sun-40, #e9ca37 ), var( --clr-sun-40, #e9ca37 ) 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px),
-		linear-gradient(0deg,var( --clr-sun-40, #e9ca37 ),var( --clr-sun-40, #e9ca37 ));
+	background:
+ repeating-linear-gradient( 135deg, var( --clr-sun-40, #e9ca37 ), var( --clr-sun-40, #e9ca37 ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ),linear-gradient( 0deg, var( --clr-sun-40, #e9ca37 ), var( --clr-sun-40, #e9ca37 ) );
 }
 
 /* GOLD */
@@ -600,8 +601,8 @@ ul.nav-tabs li.game-64,
 	background-color: var( --clr-tuliptree-background-color, #f9e8c7 );
 }
 
-.tulip-tree-bg-important{
-	background-color: var(--clr-tuliptree-background-color, #f9e8c7 ) !important;
+.tulip-tree-bg-important {
+	background-color: var( --clr-tuliptree-background-color, #f9e8c7 ) !important;
 }
 
 .tulip-theme-dark-text {
@@ -670,13 +671,14 @@ ul.nav-tabs li.game-wiiu,
 .transparent-bg {
 	background: transparent !important;
 }
+
 .inherit-bg {
 	background: inherit !important;
 }
-.transparent-bg-striped {
-	background:repeating-linear-gradient(135deg, transparent, transparent 4px, rgba(0,0,0,0.5) 4px, rgba(0,0,0,0.5) 8px);
-}
 
+.transparent-bg-striped {
+	background: repeating-linear-gradient( 135deg, transparent, transparent 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px );
+}
 
 /* BORDER COLOURS */
 .ambox-blue {
@@ -693,12 +695,18 @@ ul.nav-tabs li.game-wiiu,
 
 /* ICON IN VISITED LINK COLOR FIX */
 .brkts-popup-body-element a:visited {
-	& .fad, & .fas, & .far, & .liquipedia-custom-icon-duotone {
-		&:before, &:after {
+	& .fad,
+ & .fas,
+ & .far,
+ & .liquipedia-custom-icon-duotone {
+		&:before,
+ &:after {
 			color: #7451f5;
+
 			html.theme--light & {
 				color: #4787ba;
 			}
+
 			html.theme--dark & {
 				color: #86b0d1;
 			}

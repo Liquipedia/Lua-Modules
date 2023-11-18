@@ -254,7 +254,7 @@ td.bracket-game {
 	cursor: pointer;
 	height: 12px;
 	width: 12px;
-	background-image: url( 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%202%205%202%205%204%207%204%207%205%204%205%22%2F%3E%3C%2Fsvg%3E' );
+	background-image: url( data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%202%205%202%205%204%207%204%207%205%204%205%22%2F%3E%3C%2Fsvg%3E );
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-color: transparent;
@@ -454,7 +454,7 @@ Author(s): FO-nTTaX, salle
 }
 
 // exception for when the popup is inside a .bracket-game div
-.bracket-game > .bracket-popup-wrapper:not(.bracket-popup-mobile) {
+.bracket-game > .bracket-popup-wrapper:not( .bracket-popup-mobile ) {
 	//transform: translateY(-50%);
 }
 
@@ -566,11 +566,13 @@ Author(s): FO-nTTaX, salle
 	width: 37%;
 	padding: 0 7px 0 5px;
 }
+
 .wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .lengthTeam, {
 	display: inline-block;
 	vertical-align: middle;
 	width: 26%;
 }
+
 .wiki-ageofempires .bracket-popup-body .bracket-popup-body-match .rightTeam, {
 	display: inline-block;
 	text-align: left;
@@ -1004,8 +1006,8 @@ Author(s): FO-nTTaX, salle
 }
 
 .wiki-ageofempires div.draft {
-    position: initial;
-    width: initial;
+	position: initial;
+	width: initial;
 }
 
 .bracket-popup .left .check {
@@ -1088,13 +1090,13 @@ Author(s): FO-nTTaX, salle
 .wiki-runeterra .bracket-popup div.draft img,
 .wiki-ageofempires .bracket-popup div.draft img,
 .wiki-wildrift .bracket-popup div.draft img {
-    border: 0;
-    margin: 0;
+	border: 0;
+	margin: 0;
 }
 
 .wiki-ageofempires .bracket-popup div.draft img {
-    height: 18px;
-    width: 18px;
+	height: 18px;
+	width: 18px;
 }
 
 .bracket-popup div.draft.dire img {
@@ -1626,7 +1628,6 @@ Author(s): spazer
 	width: 4px;
 	float: right;
 }
-
 
 /*******************************************************************************
 Template(s): Group tables and colors
