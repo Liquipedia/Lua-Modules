@@ -773,7 +773,7 @@ ul + table.toc {
 
 /* Bold white text style for the placement texts */
 .bold-white-text,
- td.bold-white-text {
+td.bold-white-text {
 	color: #ffffff;
 	font-weight: bold;
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
@@ -792,7 +792,7 @@ ul + table.toc {
 
 /* align reflist */
 .mw-content-ltr ol,
- .mw-content-rtl .mw-content-ltr ol {
+.mw-content-rtl .mw-content-ltr ol {
 	margin-left: 1.6em !important;
 }
 
@@ -951,18 +951,18 @@ Author(s): spazer
 	}
 
 	.tournament-card > div > div.EventDetails-Left-35,
- .tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Left-40,
 	.tournament-card > div > div.EventDetails-Left-45,
- .tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Left-50,
 	.tournament-card > div > div.EventDetails-Left-55,
- .tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Left-60,
 	.tournament-card > div > div.EventDetails-Left-65,
 	.tournament-card > div > div.EventDetails-Right-35,
- .tournament-card > div > div.EventDetails-Right-40,
+	.tournament-card > div > div.EventDetails-Right-40,
 	.tournament-card > div > div.EventDetails-Right-45,
- .tournament-card > div > div.EventDetails-Right-50,
+	.tournament-card > div > div.EventDetails-Right-50,
 	.tournament-card > div > div.EventDetails-Right-55,
- .tournament-card > div > div.EventDetails-Right-60,
+	.tournament-card > div > div.EventDetails-Right-60,
 	.tournament-card > div > div.EventDetails-Right-65 {
 		display: inline-block;
 		font-size: 80%;
@@ -1371,7 +1371,7 @@ Author(s): QuadratClown
 }
 
 .rl-responsive-table th,
- .rl-responsive-table td {
+.rl-responsive-table td {
 	padding: 0.625em;
 	text-align: center;
 	border-bottom: 1px solid var( --table-border-color, lightgray );
@@ -1612,7 +1612,7 @@ table.fmbox {
 }
 
 th.mbox-text,
- td.mbox-text {
+td.mbox-text {
 	border: none;
 	padding: 0.25em 0.9em;
 	width: 100%;
@@ -1990,23 +1990,23 @@ Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 321px ) {
 	.grouptable-team-mobile,
- .matchlist-team-mobile {
+	.matchlist-team-mobile {
 		display: none;
 	}
 }
 
 @media ( max-width: 320px ) {
 	.grouptable-team-full,
- .matchlist-team-full {
+	.matchlist-team-full {
 		display: none;
 	}
 }
 
 @media ( max-width: 435px ) {
 	.table.table-bordered.grouptable,
- .wikitable.matchlist,
- .wikitable.wikitable-bordered.grouptable,
- .table.table-bordered.matchlist {
+	.wikitable.matchlist,
+	.wikitable.wikitable-bordered.grouptable,
+	.table.table-bordered.matchlist {
 		width: 100% !important;
 	}
 }
@@ -2121,9 +2121,9 @@ img.player-role-icon {
 }
 
 .player-role-icon img[ title='Captain' ],
- .player-role-icon img[ title='In-Game Leader' ],
+.player-role-icon img[ title='In-Game Leader' ],
 img.player-role-icon[ alt='Captain' ],
- img.player-role-icon[ alt='In-Game Leader' ] {
+img.player-role-icon[ alt='In-Game Leader' ] {
 	height: 13px;
 	width: 18px;
 	vertical-align: baseline;
@@ -2693,57 +2693,70 @@ Template(s): Runeterra Deck List
 Author(s): Darkrai, salle
 *******************************************************************************/
 table.runeterra-deck {
-min-width: 320px;
- width: 100%;
- max-width: 400px;
- margin-left: auto;
- margin-right: auto; }
+	min-width: 320px;
+	width: 100%;
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+ }
 
 @media ( min-width: 970px ) {
 	table.runeterra-deck {
-width: 320px;
- float: left;
- margin-right: 10px;
- margin-left: 0; }
+		width: 320px;
+		float: left;
+		margin-right: 10px;
+		margin-left: 0;
  }
+}
 
 .runeterra-deck tr > th {
-vertical-align: middle; }
+	vertical-align: middle;
+ }
 
 .runeterra-deck tr > th > span {
-font-size: 90%;
- vertical-align: super; }
+	font-size: 90%;
+	vertical-align: super;
+ }
 
 .runeterra-deck tr.demacia {
-background-color: #f9f9c7; }
+	background-color: #f9f9c7;
+ }
 
 .runeterra-deck tr.freljord {
-background-color: #dee3ef; }
+	background-color: #dee3ef;
+ }
 
 .runeterra-deck tr.ionia {
-background-color: #f4ddea; }
+	background-color: #f4ddea;
+ }
 
 .runeterra-deck tr.noxus {
-background-color: #fbdfdf; }
+	background-color: #fbdfdf;
+ }
 
 .runeterra-deck tr.piltover-zaun {
-background-color: #f9dec7; }
+	background-color: #f9dec7;
+ }
 
 .runeterra-deck tr.shadow-isles {
-background-color: #ddf4dd; }
+	background-color: #ddf4dd;
+ }
 
 .runeterra-deck td.mana {
-width: 30px;
- font-weight: bold;
- text-align: center; }
+	width: 30px;
+	font-weight: bold;
+	text-align: center;
+ }
 
 .runeterra-deck td.card {
-font-weight: bold; }
+	font-weight: bold;
+ }
 
 .runeterra-deck td.amount {
-width: 30px;
- text-align: center;
-font-weight: bold; }
+	width: 30px;
+	text-align: center;
+	font-weight: bold;
+ }
 
 /*******************************************************************************
 Template(s): Legends of Runeterra Card Patch Note Greyscale
@@ -3203,7 +3216,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: "Exo", 'Trebuchet MS', "Helvetica", sans-serif;
+	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
@@ -3217,7 +3230,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: "Exo", 'Trebuchet MS', "Helvetica", sans-serif;
+	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #b12a2a;
@@ -3599,7 +3612,7 @@ Author(s): Vogan
 }
 
 .fb-match-page-header-score,
- .fb-match-page-header-divider {
+.fb-match-page-header-divider {
 	font-size: 250%;
 	font-weight: bold;
 }
@@ -3719,7 +3732,7 @@ Author(s): Vogan
 }
 
 .fb-match-page-valorant-stats-player,
- .fb-match-page-valorant-stats-player-name {
+.fb-match-page-valorant-stats-player-name {
 	text-align: left !important;
 	padding-left: 10px;
 }
@@ -3884,7 +3897,7 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-game-veto-overview-ban,
- .match-bm-lol-game-veto-overview-pick {
+.match-bm-lol-game-veto-overview-pick {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
@@ -3892,12 +3905,12 @@ Author(s): Rathoz
 }
 
 ul.match-bm-lol-game-veto-overview-ban,
- ul.match-bm-lol-game-veto-overview-pick {
+ul.match-bm-lol-game-veto-overview-pick {
 	margin: 0;
 }
 
 .match-bm-lol-game-veto-overview-ban,
- .match-bm-lol-game-veto-order-ban {
+.match-bm-lol-game-veto-order-ban {
 	opacity: 0.5;
 }
 
@@ -3908,7 +3921,7 @@ ul.match-bm-lol-game-veto-overview-ban,
 }
 
 .match-bm-lol-game-veto-pick-bar-blue,
- .match-bm-lol-game-veto-pick-bar-red {
+.match-bm-lol-game-veto-pick-bar-red {
 	width: 24px;
 	height: 4px;
 }
@@ -4121,7 +4134,7 @@ ul.match-bm-lol-game-veto-overview-ban,
 
 @media ( max-width: 413px ) {
 	.match-bm-lol-players-player-avatar,
- .match-bm-lol-players-player-icon > a > img {
+	.match-bm-lol-players-player-icon > a > img {
 		width: 32px;
 		height: 32px;
 	}
@@ -4140,7 +4153,7 @@ ul.match-bm-lol-game-veto-overview-ban,
 
 @media ( min-width: 414px ) {
 	.match-bm-lol-players-player-avatar,
- .match-bm-lol-players-player-icon > a > img {
+	.match-bm-lol-players-player-icon > a > img {
 		width: 48px;
 		height: 48px;
 	}
@@ -4391,16 +4404,16 @@ Template(s): Darkmode images on file pages
 Author(s): FO-nTTaX, iMarbot
 *******************************************************************************/
 html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
-	#file img[ src*="darkmode" ]:not( :hover ),
-	.searchResultImage img[ src*="darkmode" ],
-	.gallerybox img[ src*="darkmode" ] {
+	#file img[ src*='darkmode' ]:not( :hover ),
+	.searchResultImage img[ src*='darkmode' ],
+	.gallerybox img[ src*='darkmode' ] {
 		background-color: #272727;
 	}
 }
 
-#file img[ src*="lightmode" ]:not( :hover ),
-.searchResultImage img[ src*="lightmode" ],
-.gallerybox img[ src*="lightmode" ] {
+#file img[ src*='lightmode' ]:not( :hover ),
+.searchResultImage img[ src*='lightmode' ],
+.gallerybox img[ src*='lightmode' ] {
 	[ data-darkreader-scheme='dark' ] & {
 		background-color: #808080;
 	}
@@ -4410,8 +4423,8 @@ html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
 	}
 }
 
-.filehistory a img[ src*="darkmode" ],
-#file img[ src*="darkmode" ]:hover {
+.filehistory a img[ src*='darkmode' ],
+#file img[ src*='darkmode' ]:hover {
 	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
 }
 
@@ -4548,7 +4561,7 @@ Author(s): iMarbot
 [ data-darkreader-scheme='dark' ],
 .theme--dark {
 	& .vodlink img,
- .group-table-header-right img {
+	.group-table-header-right img {
 		&[ src*='VOD_Icon' ],
 		&[ src*='Match_Info_Stats' ],
 		&[ src*='/Trial.png' ],
@@ -4565,7 +4578,7 @@ Author(s): iMarbot
 	}
 
 	& img.player-role-icon,
- .rts-team-list-icon-tag img {
+	.rts-team-list-icon-tag img {
 		&[ src*='/Trial.png' ],
 		&[ src*='/Substitution.png' ],
 		&[ src*='Captain_Icon' ] {
@@ -4692,8 +4705,8 @@ Template(s): App notices
 Author(s): FO-nTTaX
 *******************************************************************************/
 .appnotice-sm,
- .appnotice-md,
- .appnotice-lg {
+.appnotice-md,
+.appnotice-lg {
 	display: none;
 }
 

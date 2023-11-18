@@ -1,8 +1,8 @@
 /* Style for horizontal lists (separator following item) */
 ol.hlist,
- ul.hlist,
+ul.hlist,
 .hlist ol,
- .hlist ul {
+.hlist ul {
 	margin: 0;
 	padding: 0;
 }
@@ -74,7 +74,7 @@ tr + tr > .navbox-list {
 }
 
 .navbox,
- .navbox-subgroup {
+.navbox-subgroup {
 	background: var( --clr-surface-4, #fdfdfd );     /* Background color */
 }
 
@@ -107,13 +107,13 @@ tr + tr > .navbox-list {
     word-spacing: -0.125em;
 } */
 .navbox-inner,
- .navbox-subgroup {
+.navbox-subgroup {
 	width: 100%;
 }
 
 .hlist dd,
- .hlist dt,
- .hlist li {
+.hlist dt,
+.hlist li {
 	margin: 0;
 	display: inline;
 }

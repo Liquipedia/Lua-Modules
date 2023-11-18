@@ -172,7 +172,7 @@ html.theme--dark .tournaments-list-tag > * {
 
 /* transfer box */
 .divTable.mainpage-transfer.Ref .divCell.Empty,
- .mainpage-transfer .divCell.Empty {
+.mainpage-transfer .divCell.Empty {
 	width: 20px;
 	min-height: 20px;
 }
@@ -397,35 +397,29 @@ span.countdown.match-countdown-countdown {
 /* result gradients for match boxes */
 table.infobox_matches_content.winner-left,
 .background-gradient-winner-left {
-	background-image:
- linear-gradient( to right, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, transparent 45%, transparent 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to right, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, transparent 45%, transparent 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) !important;
 }
 
 table.infobox_matches_content.winner-right,
 .background-gradient-winner-right {
-	background-image:
- linear-gradient( to left, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, transparent 45%, transparent 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to left, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, transparent 45%, transparent 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) !important;
 }
 
 table.infobox_matches_content.winner-draw,
 .background-gradient-winner-draw {
-	background-image:
- linear-gradient( to left, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 25%, transparent 45%, transparent 55%, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to left, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 25%, transparent 45%, transparent 55%, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 75% ) !important;
 }
 
 table.infobox_matches_content.publisher-match.winner-left {
-	background-image:
- linear-gradient( to right, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to right, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) !important;
 }
 
 table.infobox_matches_content.publisher-match.winner-right {
-	background-image:
- linear-gradient( to left, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to left, var( --table-green-background-color, rgba( 0, 172, 0, 0.133 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --table-red-background-color, rgba( 223, 0, 0, 0.125 ) ) 75% ) !important;
 }
 
 table.infobox_matches_content.publisher-match.winner-draw {
-	background-image:
- linear-gradient( to left, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 75% ) 		 !important;
+	background-image: linear-gradient( to left, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 25%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 45%, var( --publisher-premier-highlight-background-color, rgba( 255, 255, 0, 0.2 ) ) 55%, var( --clr-pear-background-color, rgba( 227, 227, 0, 0.219 ) ) 75% ) !important;
 }
 
 /* editlinks */
@@ -463,7 +457,7 @@ body.page-Main_Page .rankingtable tr:nth-of-type( n + 7 ) {
 	display: none;
 }
 
-label[ for^="tournaments-list-filter-" ] {
+label[ for^='tournaments-list-filter-' ] {
 	cursor: pointer;
 	vertical-align: middle;
 	width: calc( ~'100% / 4' );
@@ -472,39 +466,39 @@ label[ for^="tournaments-list-filter-" ] {
 	margin: 0;
 }
 
-label[ for^="tournaments-list-filter-" ]:before {
+label[ for^='tournaments-list-filter-' ]:before {
 	padding: 5px;
 }
 
-label[ for="tournaments-list-filter-64" ] {
+label[ for='tournaments-list-filter-64' ] {
 	background-color: #d5e5b6;
 }
 
-label[ for="tournaments-list-filter-64" ]:before {
+label[ for='tournaments-list-filter-64' ]:before {
 	content: '64';
 }
 
-label[ for="tournaments-list-filter-melee" ] {
+label[ for='tournaments-list-filter-melee' ] {
 	background-color: #b6e5c6;
 }
 
-label[ for="tournaments-list-filter-melee" ]:before {
+label[ for='tournaments-list-filter-melee' ]:before {
 	content: 'Melee';
 }
 
-label[ for="tournaments-list-filter-pm" ] {
+label[ for='tournaments-list-filter-pm' ] {
 	background-color: #c6b6e5;
 }
 
-label[ for="tournaments-list-filter-pm" ]:before {
+label[ for='tournaments-list-filter-pm' ]:before {
 	content: 'Project M';
 }
 
-label[ for="tournaments-list-filter-ultimate" ] {
+label[ for='tournaments-list-filter-ultimate' ] {
 	background-color: #e5b6d5;
 }
 
-label[ for="tournaments-list-filter-ultimate" ]:before {
+label[ for='tournaments-list-filter-ultimate' ]:before {
 	content: 'Ultimate';
 }
 
@@ -513,10 +507,10 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 .tournaments-list .filter-pm,
 .tournaments-list .filter-ultimate,
 .tournaments-list .filter-none,
-#tournaments-list-filter-64:not( :checked ) ~ label[ for="tournaments-list-filter-64" ],
-#tournaments-list-filter-melee:not( :checked ) ~ label[ for="tournaments-list-filter-melee" ],
-#tournaments-list-filter-pm:not( :checked ) ~ label[ for="tournaments-list-filter-pm" ],
-#tournaments-list-filter-ultimate:not( :checked ) ~ label[ for="tournaments-list-filter-ultimate" ] {
+#tournaments-list-filter-64:not( :checked ) ~ label[ for='tournaments-list-filter-64' ],
+#tournaments-list-filter-melee:not( :checked ) ~ label[ for='tournaments-list-filter-melee' ],
+#tournaments-list-filter-pm:not( :checked ) ~ label[ for='tournaments-list-filter-pm' ],
+#tournaments-list-filter-ultimate:not( :checked ) ~ label[ for='tournaments-list-filter-ultimate' ] {
 	opacity: 0.5;
 	transition: 0.5s;
 }
@@ -530,11 +524,11 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 #tournaments-list-filter-melee:checked ~ .tournaments-list .filter-melee,
 #tournaments-list-filter-pm:checked ~ .tournaments-list .filter-pm,
 #tournaments-list-filter-ultimate:checked ~ .tournaments-list .filter-ultimate,
-#tournaments-list-filter-64:not( :checked ) ~ #tournaments-list-filter-melee:not( :checked ) ~ #tournaments-list-filter-pm:not( :checked ) ~ #tournaments-list-filter-ultimate:not( :checked ) ~ label[ for^="tournaments-list-filter-" ],
-#tournaments-list-filter-64:checked ~ label[ for="tournaments-list-filter-64" ],
-#tournaments-list-filter-melee:checked ~ label[ for="tournaments-list-filter-melee" ],
-#tournaments-list-filter-pm:checked ~ label[ for="tournaments-list-filter-pm" ],
-#tournaments-list-filter-ultimate:checked ~ label[ for="tournaments-list-filter-ultimate" ] {
+#tournaments-list-filter-64:not( :checked ) ~ #tournaments-list-filter-melee:not( :checked ) ~ #tournaments-list-filter-pm:not( :checked ) ~ #tournaments-list-filter-ultimate:not( :checked ) ~ label[ for^='tournaments-list-filter-' ],
+#tournaments-list-filter-64:checked ~ label[ for='tournaments-list-filter-64' ],
+#tournaments-list-filter-melee:checked ~ label[ for='tournaments-list-filter-melee' ],
+#tournaments-list-filter-pm:checked ~ label[ for='tournaments-list-filter-pm' ],
+#tournaments-list-filter-ultimate:checked ~ label[ for='tournaments-list-filter-ultimate' ] {
 	opacity: 1;
 	transition: 0.5s;
 }
@@ -549,19 +543,19 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 }
 
 .mainpage-icons-10 img,
- .mainpage-icons-14 img {
+.mainpage-icons-14 img {
 	height: inherit;
 	margin-bottom: 0;
 }
 
 .mainpage-icons-10 > p,
- .mainpage-icons-14 > p {
+.mainpage-icons-14 > p {
 	margin: 0;
 }
 
 @media ( max-width: 580px ) {
 	.mainpage-icons-10 img,
- .mainpage-icons-14 img {
+	.mainpage-icons-14 img {
 		margin-bottom: 3px;
 	}
 
@@ -587,9 +581,9 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 
 /* h2/h3 headings */
 .panel-box-heading h2,
- .portal-pills h2,
- .panel-box-heading h3,
- .portal-pills h3 {
+.portal-pills h2,
+.panel-box-heading h3,
+.portal-pills h3 {
 	border-bottom: 0;
 	margin-top: 0;
 	margin-bottom: 0;
@@ -600,13 +594,13 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 }
 
 .panel-box-heading h2,
- .panel-box-heading h3 {
+.panel-box-heading h3 {
 	font-size: 18px;
 	color: var( --wiki-color-dark );
 }
 
 .portal-pills h2,
- .portal-pills h3 {
+.portal-pills h3 {
 	font-size: 0.875rem;
 	color: var( --wiki-color-medium );
 }
@@ -625,7 +619,7 @@ Author(s): Inflicted
 
 @media ( max-width: 641px ) {
 	.hlist-overview li,
- .hlist-links li {
+	.hlist-links li {
 		display: list-item !important;
 		margin-left: 1.3em !important;
 		float: left !important;
@@ -633,12 +627,12 @@ Author(s): Inflicted
 	}
 
 	.hlist-overview li:after,
- .hlist-links li:after {
+	.hlist-links li:after {
 		content: none !important;
 	}
 
 	.hlist-overview ul,
- .hlist-links ul {
+	.hlist-links ul {
 		clear: both !important;
 	}
 
@@ -673,11 +667,11 @@ Author(s): iMarbot
 Template(s): Commons latest uploads
 Author(s): FO-nTTaX
 *******************************************************************************/
-#latest-uploads img[ src*="darkmode" ] {
+#latest-uploads img[ src*='darkmode' ] {
 	background-color: #272727;
 	padding: 5px;
 }
 
-#images-taken-on-this-day img[ src*="darkmode" ] {
+#images-taken-on-this-day img[ src*='darkmode' ] {
 	background-color: #272727;
 }

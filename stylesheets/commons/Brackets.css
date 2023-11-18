@@ -880,7 +880,7 @@
 
 /* First case is backwards comptability (Wild Rift, Others?), Second case is the proper usage (League) */
 img.brkts-champion-icon,
- .brkts-champion-icon img {
+.brkts-champion-icon img {
 	height: 24px;
 	width: 24px;
 }

@@ -9,12 +9,12 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 
 .techtree ul {
 	padding-top: 20px;
- position: relative;
+	position: relative;
 }
 
 .techtree li {
 	float: left;
- text-align: center;
+	text-align: center;
 	list-style-type: none !important;
 	list-style-image: none !important;
 	position: relative;
@@ -22,29 +22,29 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 }
 
 .techtree li::before,
- .techtree li::after {
+.techtree li::after {
 	content: '';
 	position: absolute;
- top: 0;
- right: 50%;
+	top: 0;
+	right: 50%;
 	border-top: 1px solid #aaaaaa;
 	width: 50%;
- height: 20px;
+	height: 20px;
 }
 
 .techtree li::after {
 	right: auto;
- left: 50%;
+	left: 50%;
 	border-left: 1px solid #aaaaaa;
 }
 
 .techtree li:only-child::after,
- .techtree li:only-child::before {
+.techtree li:only-child::before {
 	display: none;
 }
 
 .techtree li:first-child::before,
- .techtree li:last-child::after {
+.techtree li:last-child::after {
 	border: 0 none;
 }
 
@@ -64,11 +64,11 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 .techtree ul ul::before {
 	content: '';
 	position: absolute;
- top: 0;
- left: 50%;
+	top: 0;
+	left: 50%;
 	border-left: 1px solid #aaaaaa;
 	width: 0;
- height: 20px;
+	height: 20px;
 }
 
 .techtree li span {

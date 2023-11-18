@@ -163,7 +163,7 @@ table.crosstable {
 	}
 
 	table.stats,
- table.maps {
+	table.maps {
 		tr > td {
 			border-top: 1px dotted var( --table-border-color, var( --clr-border, #bbbbbb ) );
 		}

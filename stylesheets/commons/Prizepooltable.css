@@ -13,7 +13,7 @@ table.prizepooltable.collapsed .prizepooltablehide {
 }
 
 .prizepooltable-col-player,
- .prizepooltable-col-team {
+.prizepooltable-col-team {
 	min-width: 150px;
 }
 
@@ -208,20 +208,24 @@ body:not( .skin-bruinen ) div.background-color-fourth-place > *.prizepooltable-p
 }
 
 tr.background-color-disqualified,
- div.background-color-disqualified {
- background-color: rgb( 222, 227, 239 ); }
+div.background-color-disqualified {
+	background-color: rgb( 222, 227, 239 );
+ }
 
 tr.background-color-win,
- div.background-color-win {
- background-color: rgb( 221, 244, 221 ); }
+div.background-color-win {
+	background-color: rgb( 221, 244, 221 );
+ }
 
 tr.background-color-lose,
- div.background-color-lose {
- background-color: rgb( 251, 223, 223 ); }
+div.background-color-lose {
+	background-color: rgb( 251, 223, 223 );
+ }
 
 tr.background-color-highlight,
- div.background-color-highlight {
- background-color: rgb( 204, 229, 234 ); }
+div.background-color-highlight {
+	background-color: rgb( 204, 229, 234 );
+ }
 
 .prizepooltable-background-variant {
 	background-color: var( --prize-pool-variant-background-color, #f2f2f2 );

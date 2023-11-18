@@ -3,7 +3,7 @@ Template(s): Tab Templates
 Author(s): FO-nTTaX
 *******************************************************************************/
 div.tabs-static,
- div.tabs-dynamic {
+div.tabs-dynamic {
 	overflow: hidden;
 }
 

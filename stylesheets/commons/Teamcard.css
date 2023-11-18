@@ -58,7 +58,7 @@ Author(s): ???
 }
 
 .teamcard table.list td,
- .teamcard table.list th {
+.teamcard table.list th {
 	padding: 2px;
 }
 
@@ -166,8 +166,8 @@ Author(s): ???
 }
 
 .teamcard-former-toggle-button button,
- .teamcard-subs-toggle-button button,
- .teamcard-active-toggle-button button {
+.teamcard-subs-toggle-button button,
+.teamcard-active-toggle-button button {
 	padding: 0 !important;
 	width: 157px;
 	height: 25px;
@@ -218,9 +218,9 @@ Template(s): Responsive TeamCard columns
 Author(s): iMarbot
 *******************************************************************************/
 .teamcard-columns,
- .teamcard-columns-3,
- .teamcard-columns-4,
- .teamcard-columns-5 {
+.teamcard-columns-3,
+.teamcard-columns-4,
+.teamcard-columns-5 {
 	width: 100%;
 }
 
@@ -232,7 +232,7 @@ Author(s): iMarbot
 
 @media ( min-width: 950px ) {
 	.teamcard-columns,
- .teamcard-columns-4 {
+	.teamcard-columns-4 {
 		width: 950px;
 	}
 }
@@ -251,7 +251,7 @@ Author(s): iMarbot
 
 @media ( min-width: 2600px ) {
 	.teamcard-columns,
- .teamcard-columns-4 {
+	.teamcard-columns-4 {
 		width: 1900px;
 	}
 }
