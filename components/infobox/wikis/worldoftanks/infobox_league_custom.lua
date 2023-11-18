@@ -71,11 +71,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_publishertier', args['publisherpremier'])
+	Variables.varDefine('tournament_publishertier', args.publisherpremier)
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['publisherpremier'])
+	return Logic.readBool(args.publisherpremier)
 end
 
 function CustomLeague:_createNoWrappingSpan(content)
