@@ -56,6 +56,14 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
+---@param opponentIndex integer
+---@return Html
+function CustomMatchSummary._gameScore(game, opponentIndex)
+	local score = game.scores[opponentIndex] or ''
+	return mw.html.create('div'):wikitext(score)
+end
+
+---@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
@@ -64,12 +72,24 @@ function CustomMatchSummary._createGame(game)
 		:css('font-size', '84%')
 		:css('padding', '4px')
 		:css('min-height', '32px')
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(mw.html.create('div')
+
+	local leftNode = mw.html.create('div')
+		:addClass('brkts-popup-spaced')
+	    :node(CustomMatchSummary._createCheckMark(game.winner == 1))
+		:node(CustomMatchSummary._gameScore(game, 1))
+
+	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(game.map)
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+
+	local rightNode = mw.html.create('div')
+		:addClass('brkts-popup-spaced')
+		:node(CustomMatchSummary._gameScore(game, 2))
+		:node(CustomMatchSummary._createCheckMark(game.winner == 2))
+
+	row:addElement(leftNode)
+		:addElement(centerNode)
+		:addElement(rightNode)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
