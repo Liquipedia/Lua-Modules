@@ -31,9 +31,11 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
+local _player
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	_player = player
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -47,17 +49,13 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
-		local automatedHistory = TeamHistoryAuto._results({
-			convertrole = 'true',
-			player = _pagename,
-			addlpdbdata = 'true'
-		})
-		automatedHistory = tostring(automatedHistory)
-		if automatedHistory == _EMPTY_AUTO_HISTORY then
-			automatedHistory = nil
-		end
+		local automatedHistory = TeamHistoryAuto._results{
+			convertrole = true,
+			player = _player.pagename,
+			addlpdbdata = true
+		}
 
-		if not (String.isEmpty(manualHistory) and String.isEmpty(automatedHistory)) then
+		if manualHistory or automatedHistory then
 			return {
 				Title{name = 'History'},
 				Center{content = {manualHistory}},
