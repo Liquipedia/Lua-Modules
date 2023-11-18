@@ -25,7 +25,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnable
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local globalVars = PageVariableNamespace({cached = true})
+local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInput = {}
 
