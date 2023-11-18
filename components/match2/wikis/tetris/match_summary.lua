@@ -59,8 +59,7 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
-	return mw.html.create('div'):wikitext(score)
+	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
 end
 
 ---@param game MatchGroupUtilGame
