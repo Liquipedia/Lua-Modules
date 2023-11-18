@@ -19,6 +19,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -462,14 +463,15 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	local playersIndex = 0
 
 	local insertIntoPlayers = function(player)
-		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name or player.pageName) then
 			return
 		end
 
+		player.name = Logic.emptyOr(player.name, player.pageName) --[[@as string]]
 		player.name = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name) or player.name
 		player.name = options.applyUnderScores and player.name:gsub(' ', '_') or player.name
 		player.flag = Flags.CountryName(player.flag)
-		player.displayName = Logic.emptyOr(player.displayName, player.displayname)
+		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
 		playersIndex = playersIndex + 1
 		player.index = playersIndex
 
@@ -483,8 +485,8 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 		insertIntoPlayers{
-			name = name,
-			displayname = Variables.varDefault(varPrefix .. 'dn'),
+			pageName = name,
+			displayName = Variables.varDefault(varPrefix .. 'dn'),
 			flag = Variables.varDefault(varPrefix .. 'flag'),
 		}
 		playerIndex = playerIndex + 1
@@ -494,52 +496,52 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 
 	--players from manual input as `opponnetX_pY`
 	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
-		insertIntoPlayers(Json.parseIfString(player))
+		local playerTable = Json.parseIfString(player) or {}
+		insertIntoPlayers(playerTable)
 	end
 
 	--players from manual input in `opponent.players`
 	local playersData = Json.parseIfString(opponent.players) or {}
 	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
-		insertIntoPlayers({
-			name = playerName,
+		insertIntoPlayers{
+			pageName = playerName,
 			displayname = playersData[playerPrefix .. 'dn'],
 			flag = playersData[playerPrefix .. 'flag'],
-		})
+		}
 	end
 
-	local oppoentToPlayerRecord = function(soloOpponentInput)
-		local soloOpponent = Opponent.readOpponentArgs(Json.parseIfTable(soloOpponentInput) or {})
-		if Opponent.isEmpty(soloOpponent) then
-			return
-		end
-		---@cast soloOpponent -nil
-		soloOpponent = Opponent.resolve(soloOpponent, nil, {syncPlayer = true})
-		local soloPlayer = soloOpponent.players[1] or {}
-		return {
-			name = options.applyUnderScores and soloPlayer.pageName:gsub(' ', '_') or soloPlayer.pageName,
-			displayname = soloPlayer.displayName,
-			flag = soloPlayer.flag,
+	---@return standardPlayer?
+	local getStandardPlayer = function(standardPlayerInput)
+		local playerJson = Json.parseIfTable(standardPlayerInput) or {}
+		local player = {
+			displayName = Logic.emptyOr(playerJson.displayName, playerJson.displayName, playerJson[1] or playerJson.name),
+			pageName = Logic.emptyOr(playerJson.pageName or playerJson.pageName or playerJson.link),
+			flag = playerJson.flag,
 		}
+		if Logic.isEmpty(player.displayName) then return end
+		player = PlayerExt.populatePlayer(player)
+		player.pageName = options.applyUnderScores and player.pageName:gsub(' ', '_') or player.pageName
+		return player
 	end
 
 	local substitutes = Json.parseIfTable(opponent.substitutes) or {}
 
-	local readSubstitute = function(prefix, substituteOpponent)
+	local readSubstitute = function(prefix, substituteInput)
 		local index = prefix:sub(4)
-		local substitute = oppoentToPlayerRecord(substituteOpponent)
+		local substitute = getStandardPlayer(substituteInput)
 		if not substitute then return end
 
 		local subbedGames = substitutes['games' .. index]
 
-		local player = oppoentToPlayerRecord(substitutes['player' .. index])
+		local player = getStandardPlayer(substitutes['player' .. index])
 		if player then
-			players[player.name] = subbedGames and players[player.name] or nil
+			players[player.pageName] = subbedGames and players[player.pageName] or nil
 		end
 
 		opponent.extradata = Table.merge({substitutions = {}}, opponent.extradata or {})
 		table.insert(opponent.extradata.substitutions, {
-			substitute = MatchGroupUtil.playerFromRecord(substitute),
-			player = player and MatchGroupUtil.playerFromRecord(player) or nil,
+			substitute = substitute,
+			player = player,
 			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
 			reason = substitutes['reason' .. index],
 		})
