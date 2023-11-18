@@ -19,7 +19,7 @@ local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _ROLES = {
+local ROLES = {
 	-- Players
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
 
@@ -33,7 +33,7 @@ local _ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
 	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
-_ROLES['in-game leader'] = _ROLES.igl
+ROLES['in-game leader'] = ROLES.igl
 
 local CustomPlayer = Class.new()
 
@@ -103,7 +103,7 @@ function CustomPlayer._createRole(key, role)
 		return nil
 	end
 
-	local roleData = _ROLES[role:lower()]
+	local roleData = ROLES[role:lower()]
 	if not roleData then
 		return nil
 	end
@@ -118,12 +118,12 @@ function CustomPlayer._createRole(key, role)
 end
 
 function CustomPlayer._isNotPlayer(role)
-	local roleData = _ROLES[(role or ''):lower()]
+	local roleData = ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
 end
 
 function CustomPlayer:getPersonType(args)
-	local roleData = _ROLES[(args.role or ''):lower()]
+	local roleData = ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.staff then
 			return {store = 'staff', category = 'Staff'}
