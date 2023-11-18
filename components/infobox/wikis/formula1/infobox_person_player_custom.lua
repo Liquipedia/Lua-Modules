@@ -20,9 +20,6 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _role
-local _role2
-
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
@@ -58,12 +55,10 @@ function CustomInjector:parse(id, widgets)
 				Center{content = {manualHistory}},
 				Center{content = {automatedHistory}},
 			}
-			end
+		end
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = 'Role(s)', content = {Role.run({role = _args.role}).display, Role.run({role = _args.role2}).display}}
 		}
 	end
 	return widgets
@@ -100,10 +95,11 @@ function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
+function CustomPlayer:adjustLPDB(lpdbData, args)
+	local role = Role.run{role = args.role}
+	lpdbData.extradata.isplayer = role.isPlayer or 'true'
+	lpdbData.extradata.role = role.role
+	lpdbData.extradata.role2 = Role.run{role = args.role2}.role
 	return lpdbData
 end
 
