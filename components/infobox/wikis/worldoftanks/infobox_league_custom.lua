@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
@@ -53,7 +54,9 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomInjector:parse(id, widgets)
-	if id == 'customcontent' then
+	if id == 'gamesettings' then
+		return {Cell{name = 'Game', content = {Game.name{game = _args.game}}}}
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(_args.map1) then
 			local maps = Array.map(_league:getAllArgsForBase(_args, 'map'), function(map)
 				return tostring(CustomLeague:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
@@ -67,11 +70,13 @@ end
 
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.game = Game.name{game = args.game}
 	return lpdbData
 end
 
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_publishertier', args.publisherpremier)
+	Variables.varDefine('tournament_game', Game.name{game = args.game})
 end
 
 function CustomLeague:liquipediaTierHighlighted(args)
