@@ -252,6 +252,7 @@ local ALIASES = {
 	huyatv = {'huya'},
 	letsplaylive = {'cybergamer'},
 	rules = {'rulebook'},
+	replay = {'replays'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
 	zhanqitv = {'zhanqi'},
