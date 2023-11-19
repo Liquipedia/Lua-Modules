@@ -397,8 +397,8 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if bestof limit was reached
         match.finished = Logic.readBool(match.finished)
 		or isScoreSet and (
-			Array.any(opponents, function(opponent) return tonumber(opponent.score or 0) > match.bestof/2 end)
-			or Array.all(opponents, function(opponent) return tonumber(opponent.score or 0) == match.bestof/2 end)
+			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
+			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)
 		)
 
 	-- see if match should actually be finished if score is set
