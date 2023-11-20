@@ -72,7 +72,7 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	widgets = {Cell{name = 'Abbreviations', content = {_args.abbreviations}}}
+	table.insert(widgets, Cell{name = 'Abbreviations', content = {_args.abbreviations}})
 	local statisticsCells = {
 		races = {order = 1, name = 'Races'},
 		wins = {order = 2, name = 'Wins'},
