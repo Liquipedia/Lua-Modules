@@ -14,6 +14,7 @@
 		"annotation-no-unknown": null,
 		"selector-pseudo-element-colon-notation": null,
 		"no-duplicate-selectors": null,
+		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null
 	},
 	"overrides": [ {
