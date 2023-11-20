@@ -33,17 +33,17 @@ Author(s): Elysienna
 .filter-button:hover {
 	background-color: var( --clr-primary, #3366cc );
 	border-color: var( --clr-primary, #3366cc );
-	color: var( --clr-on-primary, white );
+	color: var( --clr-on-primary, #ffffff );
 	cursor: pointer;
 }
 
 .filter-button:focus {
-	outline: none;
+	outline: 0;
 	box-shadow: 0 0.5rem 0.625rem 0.125rem rgba( 0, 0, 0, 0.1 ), 0 0 0 0.1875rem #c2d1f0;
 }
 
 .filter-button--active {
-	color: var( --clr-on-primary-container, white );
+	color: var( --clr-on-primary-container, #ffffff );
 	background-color: var( --clr-primary-container, #1f3d7a );
 	border-color: var( --clr-primary-container, #1f3d7a );
 }
@@ -71,39 +71,40 @@ Author(s): Elysienna
 }
 
 @keyframes bounceIn {
-	from,
-	20%,
-	40%,
-	60%,
-	80%,
-	to {
+	from {
 		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	0% {
 		opacity: 0;
 		transform: scale3d( 0.3, 0.3, 0.3 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	20% {
 		transform: scale3d( 1.1, 1.1, 1.1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	40% {
 		transform: scale3d( 0.9, 0.9, 0.9 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	60% {
 		opacity: 1;
 		transform: scale3d( 1.03, 1.03, 1.03 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	80% {
 		transform: scale3d( 0.97, 0.97, 0.97 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	to {
 		opacity: 1;
 		transform: scale3d( 1, 1, 1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 }

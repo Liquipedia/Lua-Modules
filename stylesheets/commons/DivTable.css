@@ -271,11 +271,11 @@ Author(s): iMarbot
 		align-content: flex-start;
 		text-align: center;
 		height: fit-content;
-		border: 2px solid var( --table-border-color, lightgray );
+		border: 2px solid var( --table-border-color, #d3d3d3 );
 	}
 
 	.gridTable.tournamentCard .gridCell {
-		border-bottom: none;
+		border-bottom: 0;
 	}
 
 	.gridTable.tournamentCard .gridRow .gridCell.Position {
@@ -314,7 +314,7 @@ Author(s): iMarbot
 	}
 
 	.gridTable.tournamentCard .gridCell.Tournament {
-		border-bottom: 1px dashed var( --table-border-color, lightgray );
+		border-bottom: 1px dashed var( --table-border-color, #d3d3d3 );
 		justify-content: center;
 		flex-basis: 85%;
 		flex-grow: 100;

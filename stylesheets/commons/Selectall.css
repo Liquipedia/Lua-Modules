@@ -9,7 +9,7 @@ div.selectall-relative {
 textarea.selectall-duplicate {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	background: white;
+	background: #ffffff;
 	border: 1px solid transparent;
 	position: absolute;
 	top: 0;

@@ -28,7 +28,7 @@ tr.dota-stat-row > td {
 }
 
 .dota-stat-popup {
-	border: 1px solid darkgray;
+	border: 1px solid #a9a9a9;
 	width: calc( ~'100% - 5px' );
 	min-width: 1150px;
 	background: var( --clr-background, #f8f9fa );
@@ -50,9 +50,9 @@ tr.dota-stat-row > td {
 }
 
 .dota-stat-popup-button {
-	background: lightgray;
-	background-color: lightgray !important;
-	border: none !important;
+	background: #d3d3d3;
+	background-color: #d3d3d3 !important;
+	border: 0 !important;
 	box-shadow: 2px 2px 2px rgba( 0, 0, 0, 0.1 );
 	font-size: 10px;
 	overflow: hidden;

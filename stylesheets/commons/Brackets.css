@@ -251,7 +251,7 @@
 
 .brkts-opponent-entry .brkts-opponent-block-literal {
 	padding-left: 3px;
-	color: var( --clr-on-background, rgb( 55, 55, 55 ) );
+	color: var( --clr-on-background, #373737 );
 }
 
 .brkts-opponent-win .flag + .name {
@@ -375,12 +375,12 @@
 	justify-content: center;
 	min-width: 0;
 	padding: 5px;
-	transition-property: box-shadow, border-color;
 	transition: 0.5s;
+	transition-property: box-shadow, border-color;
 }
 
 .brkts-matchlist-cell:first-child {
-	border-left: none;
+	border-left: 0;
 }
 
 .brkts-matchlist-cell:nth-child( 1 ),
@@ -441,7 +441,7 @@
 }
 
 .brkts-matchlist .brkts-opponent-block-literal {
-	color: dimgray;
+	color: #696969;
 }
 
 .brkts-matchlist-score {
@@ -749,7 +749,7 @@
 .brkts-popup-mapveto .brkts-popup-mapveto-vetotype {
 	font-weight: bold;
 	color: #000000;
-	border: none;
+	border: 0;
 	border-radius: 0;
 	letter-spacing: 0.1em;
 	font-family: 'Source Code Pro', monospace;
@@ -764,7 +764,7 @@
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-defaultban {
-	background-color: var( --clr-sapphire-background-color, rgb( 196, 197, 211 ) ) !important;
+	background-color: var( --clr-sapphire-background-color, #c4c5d3 ) !important;
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-decider {
@@ -814,22 +814,22 @@
 
 .brkts-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65% ) !important;
+	background: linear-gradient( to left, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
 }
 
 .brkts-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, rgb( 251, 223, 223 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 65% ) !important;
+	background: linear-gradient( to right, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
 }
 
 .brkts-popup-body-gradient-draw {
 	padding: 4px 0;
-	background: linear-gradient( to left, rgb( 249, 249, 199 ) 35%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 249, 249, 199 ) 65% ) !important;
+	background: linear-gradient( to left, #f9f9c7 35%, #ffffff 35%, #ffffff 65%, #f9f9c7 65% ) !important;
 }
 
 .brkts-popup-body-gradient-default {
 	padding: 4px 0;
-	background: rgb( 255, 255, 255 ) !important;
+	background: #ffffff !important;
 }
 
 .brkts-popup-side-color-blue {
@@ -1066,7 +1066,7 @@ img.brkts-champion-icon,
 }
 
 .ffa-match-summary-unique-map:last-child {
-	border-bottom: none;
+	border-bottom: 0;
 }
 
 .ffa-match-summary-game-comment {
@@ -1217,8 +1217,8 @@ div.brkts-opponent-hover::after {
 	pointer-events: none;
 	position: absolute;
 	top: 0;
-	transition-property: box-shadow;
 	transition: 0.5s;
+	transition-property: box-shadow;
 	width: 100%;
 	z-index: 5;
 }
@@ -1606,7 +1606,7 @@ div.brkts-opponent-hover-active::after {
 
 .button-link:hover,
 .button-link:focus {
-	background-color: lightgray;
+	background-color: #d3d3d3;
 	border-color: #cdcdcd;
 	text-decoration: none;
 }

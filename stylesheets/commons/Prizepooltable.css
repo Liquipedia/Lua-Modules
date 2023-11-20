@@ -97,7 +97,7 @@ tr.bg-p1,
 div.bg-p1,
 tr.background-color-first-place,
 div.background-color-first-place {
-	background-color: var( --prize-pool-background-color, rgb( 255, 233, 130 ) );
+	background-color: var( --prize-pool-background-color, #ffe982 );
 }
 
 body:not( .skin-bruinen ) tr.bg-first,
@@ -126,7 +126,7 @@ tr.bg-p2,
 div.bg-p2,
 tr.background-color-second-place,
 div.background-color-second-place {
-	background-color: var( --prize-pool-background-color, rgb( 238, 238, 238 ) );
+	background-color: var( --prize-pool-background-color, #eeeeee );
 }
 
 body:not( .skin-bruinen ) tr.bg-second,
@@ -155,7 +155,7 @@ tr.bg-p3,
 div.bg-p3,
 tr.background-color-third-place,
 div.background-color-third-place:not( :first-child ) {
-	background-color: var( --prize-pool-background-color, rgb( 249, 232, 199 ) );
+	background-color: var( --prize-pool-background-color, #f9e8c7 );
 }
 
 body:not( .skin-bruinen ) tr.bg-third,
@@ -184,7 +184,7 @@ tr.bg-p4,
 div.bg-p4,
 tr.background-color-fourth-place,
 div.background-color-fourth-place {
-	background-color: var( --prize-pool-background-color, rgb( 249, 222, 199 ) );
+	background-color: var( --prize-pool-background-color, #f9dec7 );
 }
 
 body:not( .skin-bruinen ) tr.bg-fourth,
@@ -209,22 +209,22 @@ body:not( .skin-bruinen ) div.background-color-fourth-place > *.prizepooltable-p
 
 tr.background-color-disqualified,
 div.background-color-disqualified {
-	background-color: rgb( 222, 227, 239 );
+	background-color: #dee3ef;
 }
 
 tr.background-color-win,
 div.background-color-win {
-	background-color: rgb( 221, 244, 221 );
+	background-color: #ddf4dd;
 }
 
 tr.background-color-lose,
 div.background-color-lose {
-	background-color: rgb( 251, 223, 223 );
+	background-color: #fbdfdf;
 }
 
 tr.background-color-highlight,
 div.background-color-highlight {
-	background-color: rgb( 204, 229, 234 );
+	background-color: #cce5ea;
 }
 
 .prizepooltable-background-variant {
@@ -367,7 +367,7 @@ Author: warnull
 
 .prize-pool-entry > .prize-pool-player:not( [ data-player-index='1' ] ),
 .prize-pool-entry > .prize-pool-player-team:not( [ data-player-index='1' ] ) {
-	border-top: none;
+	border-top: 0;
 }
 
 .prize-pool-team {
@@ -386,8 +386,8 @@ Author: warnull
 
 .brkts-opponent-hover > .prize-pool-cell {
 	position: relative;
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .brkts-opponent-hover-active > .prize-pool-cell {
@@ -402,8 +402,8 @@ Author: warnull
 	pointer-events: none;
 	position: absolute;
 	top: 0;
-	transition-property: box-shadow;
 	transition: 0.5s;
+	transition-property: box-shadow;
 	width: 100%;
 	z-index: 5;
 }

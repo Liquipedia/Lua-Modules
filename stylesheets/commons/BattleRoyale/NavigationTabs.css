@@ -37,7 +37,9 @@ Author(s): Elysienna
 			color: var( --clr-on-background, #ffffff );
 		}
 
-		&:visited {}
+		&:visited {
+			// TODO
+		}
 
 		@media ( hover: hover ) {
 			&:not( .tab--active ):hover {

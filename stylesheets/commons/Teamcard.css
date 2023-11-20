@@ -210,7 +210,7 @@ Author(s): ???
 }
 
 .teamcard-button-separator {
-	border-right: 1px solid var( --table-border-color, rgb( 187, 187, 187 ) ) !important;
+	border-right: 1px solid var( --table-border-color, #bbbbbb ) !important;
 }
 
 /*******************************************************************************

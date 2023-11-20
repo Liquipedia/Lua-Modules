@@ -379,7 +379,7 @@ ul.nav-tabs li.game-brawl,
 }
 
 .bg-seedup {
-	background-color: var( --clr-forestgreen-90, rgb( 219, 237, 237 ) );
+	background-color: var( --clr-forestgreen-90, #dbeded );
 }
 
 .forest-green-bg,

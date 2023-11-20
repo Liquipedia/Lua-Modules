@@ -235,7 +235,7 @@ Author(s): FO-nTTaX, Elysienna
 	height: 0;
 	border-top: 4px solid transparent;
 	border-bottom: 4px solid transparent;
-	border-right: 5px solid white;
+	border-right: 5px solid #ffffff;
 }
 
 .menu-italic {
@@ -809,7 +809,7 @@ td.bold-white-text {
 }
 
 .broadcast-talent-partner-list-frame {
-	border: none !important;
+	border: 0 !important;
 }
 
 /* tournament overview page boxes */
@@ -888,7 +888,7 @@ Author(s): spazer
 .tournament-card > div > div.FirstPlaceBlank {
 	max-width: 155px;
 	width: 155px;
-	border: none;
+	border: 0;
 }
 
 .tournament-card > div > div.QualifiedPlace {
@@ -910,10 +910,10 @@ Author(s): spazer
 		display: block;
 		position: relative;
 		text-align: center;
-		border-top: 2px solid lightgray;
-		border-bottom: 2px solid lightgray;
-		border-left: 2px solid lightgray;
-		border-right: 2px solid lightgray;
+		border-top: 2px solid #d3d3d3;
+		border-bottom: 2px solid #d3d3d3;
+		border-left: 2px solid #d3d3d3;
+		border-right: 2px solid #d3d3d3;
 		overflow: auto;
 	}
 
@@ -1144,7 +1144,7 @@ Author(s): spazer
 
 	.tournament-card > div > div.FirstPlace {
 		display: inline-block;
-		border-bottom: 1px solid lightgray !important;
+		border-bottom: 1px solid #d3d3d3 !important;
 	}
 
 	.tournament-card > div > div.SecondPlace {
@@ -1320,7 +1320,7 @@ Author(s): Vogan
 	.divCell.Status {
 		display: block;
 		float: initial;
-		border-top: none !important;
+		border-top: 0 !important;
 		margin-bottom: -31px;
 		margin-top: 5px;
 	}
@@ -1362,7 +1362,7 @@ Author(s): QuadratClown
 }
 
 .rl-responsive-table tbody {
-	outline: 1px solid var( --table-border-color, darkgray );
+	outline: 1px solid var( --table-border-color, #a9a9a9 );
 }
 
 .rl-responsive-table tr {
@@ -1374,8 +1374,8 @@ Author(s): QuadratClown
 .rl-responsive-table td {
 	padding: 0.625em;
 	text-align: center;
-	border-bottom: 1px solid var( --table-border-color, lightgray );
-	border-left: 1px solid var( --table-border-color, darkgray );
+	border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
+	border-left: 1px solid var( --table-border-color, #a9a9a9 );
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
@@ -1391,15 +1391,15 @@ Author(s): QuadratClown
 .rl-responsive-table th {
 	text-align: center;
 	font-weight: bold;
-	border-bottom: 1px solid var( --table-border-color, darkgray );
+	border-bottom: 1px solid var( --table-border-color, #a9a9a9 );
 }
 
 .rl-responsive-table th:first-child {
-	border-left: none;
+	border-left: 0;
 }
 
 .rl-responsive-table td:first-child {
-	border-left: none;
+	border-left: 0;
 }
 
 .rl-responsive-table-left-align {
@@ -1414,14 +1414,14 @@ Author(s): QuadratClown
 
 @media screen and ( max-width: 947px ) {
 	.rl-responsive-table tbody {
-		outline: none;
+		outline: 0;
 	}
 
 	.rl-responsive-table tr {
-		border: 1px black;
+		border: 1px #000000;
 		display: block;
 		margin-bottom: 1em;
-		outline: 1px solid var( --table-border-color, darkgray );
+		outline: 1px solid var( --table-border-color, #a9a9a9 );
 	}
 
 	.rl-responsive-table tr:first-child {
@@ -1433,15 +1433,15 @@ Author(s): QuadratClown
 	}
 
 	.rl-responsive-table td {
-		border-bottom: 1px solid var( --table-border-color, lightgray );
+		border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
 		display: block;
 		font-size: 0.8em;
 		text-align: right;
-		border-left: none;
+		border-left: 0;
 	}
 
 	.rl-responsive-table tr:last-child td {
-		border-bottom: 1px solid var( --table-border-color, lightgray );
+		border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
 	}
 
 	.rl-responsive-table tr:last-child td:last-child {
@@ -1471,22 +1471,22 @@ Author(s): QuadratClown
 }
 
 .rl-responsive-table-sortable tbody {
-	outline: 1px solid darkgray;
+	outline: 1px solid #a9a9a9;
 }
 
 .rl-responsive-table-sortable th,
 .rl-responsive-table-sortable td {
 	padding: 5px 10px 5px 10px;
 	text-align: center;
-	border-bottom: 1px solid lightgray;
-	border-left: 1px solid darkgray;
+	border-bottom: 1px solid #d3d3d3;
+	border-left: 1px solid #a9a9a9;
 	text-overflow: ellipsis;
 	overflow: hidden;
 }
 
 .rl-responsive-table-sortable thead tr {
-	outline: 1px solid darkgray;
-	border-bottom: none;
+	outline: 1px solid #a9a9a9;
+	border-bottom: 0;
 }
 
 .rl-responsive-table-sortable th {
@@ -1495,11 +1495,11 @@ Author(s): QuadratClown
 }
 
 .rl-responsive-table-sortable th:first-child {
-	border-left: none;
+	border-left: 0;
 }
 
 .rl-responsive-table-sortable td:first-child {
-	border-left: none;
+	border-left: 0;
 }
 
 .rl-responsive-table-sortable-left-align {
@@ -1512,13 +1512,13 @@ Author(s): QuadratClown
 	}
 
 	.rl-responsive-table-sortable tbody {
-		outline: none;
+		outline: 0;
 	}
 
 	.rl-responsive-table-sortable thead tr {
 		overflow: hidden;
 		background: none;
-		outline: none;
+		outline: 0;
 		box-shadow: none;
 		float: right;
 		padding: 1px;
@@ -1526,18 +1526,18 @@ Author(s): QuadratClown
 	}
 
 	.rl-responsive-table-sortable tr {
-		border: 1px black;
+		border: 1px #000000;
 		display: block;
 		margin-bottom: 1em;
-		outline: 1px solid darkgray;
+		outline: 1px solid #a9a9a9;
 	}
 
 	.rl-responsive-table-sortable th {
-		border: none;
+		border: 0;
 		padding: 5px 10px 5px 10px;
 		margin-right: 5px;
 		margin-bottom: 8px;
-		outline: 1px solid darkgray;
+		outline: 1px solid #a9a9a9;
 		white-space: nowrap;
 		background: #e0e0e0;
 		overflow: hidden;
@@ -1549,15 +1549,15 @@ Author(s): QuadratClown
 	}
 
 	.rl-responsive-table-sortable td {
-		border-bottom: 1px solid lightgray;
+		border-bottom: 1px solid #d3d3d3;
 		display: block;
 		font-size: 0.8em;
 		text-align: right;
-		border-left: none;
+		border-left: 0;
 	}
 
 	.rl-responsive-table-sortable tr:last-child td {
-		border-bottom: 1px solid lightgray;
+		border-bottom: 1px solid #d3d3d3;
 	}
 
 	.rl-responsive-table-sortable tr:last-child td:last-child {
@@ -1613,7 +1613,7 @@ table.fmbox {
 
 th.mbox-text,
 td.mbox-text {
-	border: none;
+	border: 0;
 	padding: 0.25em 0.9em;
 	width: 100%;
 }
@@ -1767,7 +1767,7 @@ Author(s): Rapture
 		width: 100%;
 		text-align: center;
 		clear: both;
-		border-right: none;
+		border-right: 0;
 	}
 
 	.roster-card > tbody > tr.Player > td > .MobileStuff {
@@ -1778,7 +1778,7 @@ Author(s): Rapture
 		display: block;
 		width: 100%;
 		clear: both;
-		border-right: none;
+		border-right: 0;
 	}
 
 	.roster-card > tbody > tr.Player > td > div.MobileStuffDate {
@@ -1800,7 +1800,7 @@ Author(s): Rapture
 		display: inline-block;
 		text-align: left;
 		font-style: italic;
-		border-right: none;
+		border-right: 0;
 	}
 }
 
@@ -2150,7 +2150,7 @@ kbd {
 	padding: 1px 2px;
 	border-radius: 3px;
 	font-weight: 500;
-	font-family: 'Open sans';
+	font-family: 'Open Sans', sans-serif;
 }
 
 /*******************************************************************************
@@ -2158,7 +2158,7 @@ Template(s): Artifact decks background
 Author(s): Ricci
 *******************************************************************************/
 
-.artifact-deck-black {
+.artifact-deck-#000000 {
 	background-color: #d3d3d3;
 	text-align: center;
 }
@@ -2190,12 +2190,12 @@ Author(s): spazer, Lafungo
 .placement-text {
 	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
 	font-weight: bold;
-	color: white;
+	color: #ffffff;
 }
 
-.placement-text-black {
+.placement-text-#000000 {
 	font-weight: bold;
-	color: black;
+	color: #000000;
 }
 
 .placement-1 {
@@ -2362,7 +2362,7 @@ Author(s):Rapture
 		display: inline;
 		line-height: 1.42857143;
 		padding: 0;
-		border: none !important;
+		border: 0 !important;
 	}
 
 	.match-card > tbody > tr.Match > td.Date {
@@ -2535,7 +2535,7 @@ Author(s): salle, Ricci, iMarbot
 	}
 
 	.lor-deck .divCell {
-		border-top: none;
+		border-top: 0;
 	}
 
 	.lor-deck-row {
@@ -2835,7 +2835,7 @@ Author(s): Rapture
 	height: auto;
 	padding: 0;
 	margin: 3px 0 0 5px;
-	border: none;
+	border: 0;
 	box-shadow: none;
 }
 
@@ -3662,7 +3662,7 @@ Author(s): Vogan
 	text-align: center;
 	vertical-align: middle;
 	height: 45px;
-	border-top: none !important;
+	border-top: 0 !important;
 }
 
 .fb-match-page-map-scores > .divRow > .divCell {
@@ -4385,9 +4385,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-.match-bm-lol-match-additional {
-}
-
 .match-bm-lol-match-additional-list {
 	display: flex;
 	flex-direction: row;
@@ -4647,16 +4644,16 @@ Author(s): iMarbot
 	background: #e6e6ff;
 }
 
-.color-black {
-	color: black;
+.color-#000000 {
+	color: #000000;
 }
 
 .color-dimgray {
-	color: dimgray;
+	color: #696969;
 }
 
 .color-darkred {
-	color: darkred;
+	color: #8b0000;
 }
 
 /*******************************************************************************
@@ -4664,17 +4661,17 @@ Template(s): Template:Team matches table
 Author(s): iMarbot via ???
 *******************************************************************************/
 .recent-matches-bg-win {
-	background-color: var( --table-green-background-color, rgb( 240, 255, 240 ) ) !important;
+	background-color: var( --table-green-background-color, #f0fff0 ) !important;
 	//background: rgb(240, 255, 240) !important;
 }
 
 .recent-matches-bg-tie {
 	//background: var( --clr-sun-10, rgb(249, 249, 199) ) !important;
-	background-color: rgb( 249, 249, 199 ) !important;
+	background-color: #f9f9c7 !important;
 }
 
 .recent-matches-bg-lose {
-	background-color: var( --table-red-background-color, rgb( 249, 240, 242 ) ) !important;
+	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
 	//background: rgb(249, 240, 242) !important;
 }
 
@@ -4695,7 +4692,7 @@ Template(s): Example title popup hover
 Author(s): iMarbot via ???
 *******************************************************************************/
 .example-title-popup {
-	border: black 1px solid;
+	border: #000000 1px solid;
 	padding: 2px;
 	background-color: #fffbe1;
 }

@@ -108,8 +108,8 @@ Author: warnull
 }
 
 .group-table-cell.brkts-opponent-hover {
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .group-table-cell.brkts-opponent-hover-active {

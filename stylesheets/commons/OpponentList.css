@@ -29,8 +29,8 @@ Author: warnull
 	min-width: 0;
 	padding: 5px;
 	text-align: left;
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .opponent-list-cell-content {
@@ -78,8 +78,8 @@ Author: warnull
 
 .brkts-opponent-hover > .opponent-list-cell {
 	position: relative;
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .brkts-opponent-hover-active > .opponent-list-cell {
@@ -94,8 +94,8 @@ Author: warnull
 	pointer-events: none;
 	position: absolute;
 	top: 0;
-	transition-property: box-shadow;
 	transition: 0.5s;
+	transition-property: box-shadow;
 	width: 100%;
 	z-index: 5;
 }
@@ -221,8 +221,8 @@ Author: warnull
 }
 
 .participant-table-entry.brkts-opponent-hover {
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .participant-table-entry.brkts-opponent-hover-active {
@@ -272,8 +272,8 @@ Author: hjpalpha
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	padding: 8px 4px 4px;
 	text-align: left;
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .participantTable-tbd {
@@ -320,8 +320,8 @@ Author: hjpalpha
 
 .brkts-opponent-hover > .participantTable-entry {
 	position: relative;
-	transition-property: border-color;
 	transition: 0.5s;
+	transition-property: border-color;
 }
 
 .brkts-opponent-hover-active > .participantTable-entry {
@@ -336,8 +336,8 @@ Author: hjpalpha
 	pointer-events: none;
 	position: absolute;
 	top: 0;
-	transition-property: box-shadow;
 	transition: 0.5s;
+	transition-property: box-shadow;
 	width: 100%;
 	z-index: 5;
 }

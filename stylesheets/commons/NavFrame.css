@@ -12,7 +12,7 @@ div.NavFrame {
 }
 
 div.NavFrame + div.NavFrame {
-	border-top-style: none;
+	border-top-style: 0;
 	border-top-style: hidden;
 }
 

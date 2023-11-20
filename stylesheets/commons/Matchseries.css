@@ -55,12 +55,12 @@ table.matchseries-table-2 {
 
 .matchseries-table-2 .team1.color-radiant-left,
 .matchseries-table-2 .team2.color-radiant-right {
-	background: rgb( 188, 217, 133 );
+	background: #bcd985;
 }
 
 .matchseries-table-2 .team1.color-radiant-right,
 .matchseries-table-2 .team2.color-radiant-left {
-	background: rgb( 231, 158, 126 );
+	background: #e79e7e;
 }
 
 .matchseries-table-2 .score1,
@@ -71,7 +71,7 @@ table.matchseries-table-2 {
 
 .matchseries-table-2 .score1.winner-1,
 .matchseries-table-2 .score2.winner-2 {
-	background: rgb( 204, 255, 204 );
+	background: #ccffcc;
 }
 
 .matchseries-table-2 .stats-table-container {
@@ -151,11 +151,11 @@ table.matchseries-table-stats > * > tr > td {
 }
 
 .matchseries-table-stats .faction.radiant th {
-	background: rgb( 188, 217, 133 );
+	background: #bcd985;
 }
 
 .matchseries-table-stats .faction.dire th {
-	background: rgb( 231, 158, 126 );
+	background: #e79e7e;
 }
 
 .matchseries-table-stats .player-row .hero {

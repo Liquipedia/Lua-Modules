@@ -1138,7 +1138,7 @@ Author(s): FO-nTTaX, salle
 }
 
 .grouptable-start-date {
-	background-color: rgb( 242, 242, 242 );
+	background-color: #f2f2f2;
 	font-size: 85%;
 	line-height: 90%;
 	height: 13px;
@@ -1612,13 +1612,13 @@ Author(s): spazer
 
 .bracket-line-split-topright-red {
 	border-top-right-radius: 3px;
-	border: solid red;
+	border: solid #ff0000;
 	border-width: 1px 2px 0 0;
 }
 
 .bracket-line-bottomleft-red {
 	border-bottom-left-radius: 3px;
-	border: solid red;
+	border: solid #ff0000;
 	border-width: 0 0 2px 2px;
 }
 
@@ -1638,50 +1638,50 @@ Author(s): spazer
 .bg-up,
 .bg-proceed,
 .bg-win {
-	background-color: var( --clr-forestgreen-background-color, rgb( 221, 244, 221 ) ) !important;
+	background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
 }
 
 .bg-su,
 .bg-stayup {
-	background-color: var( --clr-atlantis-background-color, rgb( 229, 244, 198 ) ) !important;
+	background-color: var( --clr-atlantis-background-color, #e5f4c6 ) !important;
 }
 
 .bg-s,
 .bg-stay {
-	background-color: var( --clr-sun-background-color, rgb( 249, 240, 199 ) ) !important;
+	background-color: var( --clr-sun-background-color, #f9f0c7 ) !important;
 }
 
 .bg-draw {
-	background-color: var( --clr-pear-background-color, rgb( 249, 249, 199 ) ) !important;
+	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
 }
 
 .bg-sd,
 .bg-staydown {
-	background-color: var( --clr-california-background-color, rgb( 249, 222, 199 ) ) !important;
+	background-color: var( --clr-california-background-color, #f9dec7 ) !important;
 }
 
 .bg-d,
 .bg-down,
 .bg-drop {
-	background-color: var( --clr-cinnabar-background-color, rgb( 251, 223, 223 ) ) !important;
+	background-color: var( --clr-cinnabar-background-color, #fbdfdf ) !important;
 }
 
 .bg-neutral {
-	background-color: var( --clr-moon-background-color, rgb( 240, 240, 240 ) ) !important;
+	background-color: var( --clr-moon-background-color, #f0f0f0 ) !important;
 }
 
 .bg-seedup {
-	background-color: var( --clr-elm-background-color, rgb( 219, 237, 237 ) ) !important;
+	background-color: var( --clr-elm-background-color, #dbeded ) !important;
 }
 
 .bg-byeup {
-	background-color: var( --clr-vividviolet-background-color, rgb( 232, 221, 239 ) ) !important;
+	background-color: var( --clr-vividviolet-background-color, #e8ddef ) !important;
 }
 
 .bg-dq,
 .bg-disqualified,
 .bg-lightblue {
-	background-color: var( --clr-sapphire-background-color, rgb( 222, 227, 239 ) ) !important;
+	background-color: var( --clr-sapphire-background-color, #dee3ef ) !important;
 }
 
 .matchlistslot.bg-draw,
@@ -1690,7 +1690,7 @@ Author(s): spazer
 }
 
 .matchlistdate {
-	background-color: rgb( 242, 242, 242 );
+	background-color: #f2f2f2;
 	font-weight: bold;
 	font-size: 85%;
 	line-height: 90%;
@@ -1844,22 +1844,22 @@ Author(s): spazer
 
 .wiki-rainbowsix .bracket-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, rgb( 251, 223, 223 ) 15%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 85% ) !important;
+	background: linear-gradient( to left, #fbdfdf 15%, #ffffff 35%, #ffffff 65%, #ddf4dd 85% ) !important;
 }
 
 .wiki-rainbowsix .bracket-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, rgb( 251, 223, 223 ) 15%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 221, 244, 221 ) 85% ) !important;
+	background: linear-gradient( to right, #fbdfdf 15%, #ffffff 35%, #ffffff 65%, #ddf4dd 85% ) !important;
 }
 
 .wiki-rainbowsix .bracket-popup-body-gradient-draw {
 	padding: 4px 0;
-	background: linear-gradient( to left, rgb( 249, 249, 199 ) 15%, rgb( 255, 255, 255 ) 35%, rgb( 255, 255, 255 ) 65%, rgb( 249, 249, 199 ) 85% ) !important;
+	background: linear-gradient( to left, #f9f9c7 15%, #ffffff 35%, #ffffff 65%, #f9f9c7 85% ) !important;
 }
 
 .wiki-rainbowsix .bracket-popup-body-gradient-default {
 	padding: 4px 0;
-	background: rgb( 255, 255, 255 ) !important;
+	background: #ffffff !important;
 }
 
 .wiki-rainbowsix.bracket-popup-body-operator-bans-left {
