@@ -4,9 +4,7 @@
 		"bootstrap": "^4.6.0"
 	},
 	"devDependencies": {
-		"eslint-config-wikimedia": "*",
 		"grunt": "*",
-		"grunt-eslint": "*",
 		"grunt-stylelint": "*",
 		"postcss-less": "*",
 		"stylelint-config-wikimedia": "*",

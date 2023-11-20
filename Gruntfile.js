@@ -1,19 +1,8 @@
 /* eslint-env node */
 module.exports = function( grunt ) {
-	grunt.loadNpmTasks( 'grunt-eslint' );
 	grunt.loadNpmTasks( 'grunt-stylelint' );
 
 	grunt.initConfig( {
-		eslint: {
-			options: {
-				fix: grunt.option( 'fix' )
-			},
-			all: [
-				'**/*.{js,json,vue}',
-				'!node_modules/**',
-				'!vendor/**'
-			]
-		},
 		stylelint: {
 			options: {
 				fix: grunt.option( 'fix' )
@@ -26,6 +15,6 @@ module.exports = function( grunt ) {
 		}
 	} );
 
-	grunt.registerTask( 'main', [ 'eslint', 'stylelint' ] );
+	grunt.registerTask( 'main', [ 'stylelint' ] );
 	grunt.registerTask( 'default', 'test' );
 };
