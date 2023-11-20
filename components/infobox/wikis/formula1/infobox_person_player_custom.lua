@@ -27,6 +27,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _player
 
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_player = player
@@ -40,6 +42,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox(frame)
 end
 
+---@return CustomInjector
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
@@ -64,6 +67,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells()
 	local widgets = {Cell{name = 'Abbreviations', content = {_args.abbreviations}}}
 	local statisticsCells = {
@@ -91,10 +96,14 @@ function CustomInjector:addCustomCells()
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args)
 	local role = Role.run{role = args.role}
 	lpdbData.extradata.isplayer = role.isPlayer or 'true'
