@@ -697,6 +697,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				position = playerIndex,
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'heroesNoCheck']),
+				playedRandom = Logic.readBool(map[prefix .. 'random']),
 			}
 		end
 	end
@@ -717,6 +718,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 					player.name,
 					currentPlayer.heroesCheckDisabled
 				),
+				random = currentPlayer.playedRandom,
 			}
 		end
 	end
