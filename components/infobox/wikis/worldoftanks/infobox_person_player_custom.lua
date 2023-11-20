@@ -41,6 +41,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
@@ -54,6 +56,9 @@ function CustomPlayer.run(frame)
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
@@ -79,18 +84,23 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(_args.role) and 'false' or 'true'
+	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
 
 	return lpdbData
 end
 
+---@return string[]
 function CustomPlayer._getStatusContents()
 	if String.isEmpty(_args.status) then
 		return {}
@@ -98,10 +108,14 @@ function CustomPlayer._getStatusContents()
 	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
 end
 
+---@param key string
+---@param role string?
+---@return string?
 function CustomPlayer._createRole(key, role)
 	if String.isEmpty(role) then
 		return nil
 	end
+	---@cast role -nil
 
 	local roleData = ROLES[role:lower()]
 	if not roleData then
@@ -117,11 +131,15 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
+---@param role string?
+---@return boolean
 function CustomPlayer._isNotPlayer(role)
 	local roleData = ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
 end
 
+---@param args table
+---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
 	local roleData = ROLES[(args.role or ''):lower()]
 	if roleData then

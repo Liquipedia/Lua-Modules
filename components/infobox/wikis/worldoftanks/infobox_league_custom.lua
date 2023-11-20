@@ -29,6 +29,8 @@ local CustomInjector = Class.new(Injector)
 local _args
 local _league
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
@@ -42,10 +44,13 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{name = 'Number of teams', content = {_args.team_number}},
@@ -53,6 +58,9 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {Cell{name = 'Game', content = {Game.name{game = _args.game}}}}
@@ -68,21 +76,29 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 	lpdbData.game = Game.name{game = args.game}
 	return lpdbData
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_publishertier', args.publisherpremier)
 	Variables.varDefine('tournament_game', Game.name{game = args.game})
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
