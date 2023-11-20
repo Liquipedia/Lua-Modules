@@ -52,8 +52,6 @@ for file in $files; do
 
   page="MediaWiki:Common.css/${file}"
 
-  echo '...magic comment found - updating wiki...'
-
   echo "...page = $page"
 
   # Edit page
