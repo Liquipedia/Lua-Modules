@@ -202,7 +202,7 @@ end
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
-		table.insert(list, item)
+		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list
