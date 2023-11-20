@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Links/PriorityGroups
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 return {
 	core = {
 		'home',
