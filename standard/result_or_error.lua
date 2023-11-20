@@ -111,8 +111,9 @@ function Error:map(_, onError)
 		or ResultOrError.Result()
 end
 
----Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
-function Error:get()
+---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
+---@return string
+function Error:getErrorJson()
 	local stackTrace = {}
 
 	local processStackFrame = function(frame, frameIndex)
@@ -154,13 +155,16 @@ function Error:get()
 	end)
 
 	local errorSplit = mw.text.split(self.error, ':', true)
-	local errorJson = Json.stringify({
+	return Json.stringify({
 			errorShort = (#errorSplit == 1) and string.format('Lua error: %s.', self.error)
 				or string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit)),
 			stackTrace = stackTrace,
 		}, {asArray = true})
+end
 
-	error(errorJson, 0)
+---Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
+function Error:get()
+	error(self:getErrorJson(), 0)
 end
 
 --[[
@@ -173,6 +177,9 @@ can be used when rethrowing an error to include the stack trace of the existing
 error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
 automatically include both stack traces.
 ]]
+---@param f function
+---@param lowerStacks table?
+---@return Result|Error
 function ResultOrError.try(f, lowerStacks)
 	local resultOrError
 	xpcall(
@@ -198,12 +205,16 @@ array of results. Otherwise returns a ResultOrError of the first error. Note
 that this function swaps the types: it converts an array of ResultOrErrors of
 values into a ResultOrError of an array of values.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.all(resultOrErrors)
 	local results = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			table.insert(results, resultOrError.result)
 		else
+			---@cast resultOrError Error
 			return resultOrError
 		end
 	end
@@ -215,12 +226,16 @@ If any input ResultOrErrors is a result, then returns the first such
 ResultOrError. Otherwise, all input ResultOrErrors are errors, and this
 aggregates them together and returns a ResultOrError of the aggregate error.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.any(resultOrErrors)
 	local errors = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			return resultOrError
 		else
+			---@cast resultOrError Error
 			table.insert(errors, resultOrError.error)
 		end
 	end
