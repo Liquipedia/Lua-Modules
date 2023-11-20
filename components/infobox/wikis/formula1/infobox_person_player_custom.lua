@@ -42,7 +42,7 @@ function CustomPlayer.run(frame)
 	return player:createInfobox(frame)
 end
 
----@param id streing
+---@param id string
 ---@param widgets Widget[]
 ---@rreturn Widget[]
 function CustomInjector:parse(id, widgets)
