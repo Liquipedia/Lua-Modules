@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
@@ -87,7 +87,7 @@ function CustomInjector:addCustomCells(widgets)
 		{key = 'salary', name = 'Reported Salary'},
 		{key = 'contract', name = 'Current Contract'},
 	}
-	if Array.all(statisticsCells, function(cellData) return args[cellData.key] == nil end) then
+	if Array.all(statisticsCells, function(cellData) return not _args[cellData.key] end) then
 		return widgets
 	end
 
