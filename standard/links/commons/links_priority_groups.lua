@@ -47,6 +47,7 @@ return {
 		'bracket',
 		'rules',
 		'rulebook',
+		'replay',
 	},
 	social = {
 		'discord',
