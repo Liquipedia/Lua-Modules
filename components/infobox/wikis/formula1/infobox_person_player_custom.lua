@@ -42,7 +42,9 @@ function CustomPlayer.run(frame)
 	return player:createInfobox(frame)
 end
 
----@return CustomInjector
+---@param id streing
+---@param widgets Widget[]
+---@rreturn Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
@@ -69,8 +71,8 @@ end
 
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells()
-	local widgets = {Cell{name = 'Abbreviations', content = {_args.abbreviations}}}
+function CustomInjector:addCustomCells(widgets)
+	widgets = {Cell{name = 'Abbreviations', content = {_args.abbreviations}}}
 	local statisticsCells = {
 		races = {order = 1, name = 'Races'},
 		wins = {order = 2, name = 'Wins'},
@@ -85,12 +87,14 @@ function CustomInjector:addCustomCells()
 		salary = {order = 11, name = 'Reported Salary'},
 		contract = {order = 12, name = 'Current Contract'},
 	}
-	if Table.any(_args, function(key) return statisticsCells[key] end) then
-		table.insert(widgets, Title{name = 'Driver Statistics'})
-		local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-		for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
-			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
-		end
+	if not Table.any(_args, function(key) return statisticsCells[key] end) then
+		return widgets
+	end
+
+	table.insert(widgets, Title{name = 'Driver Statistics'})
+	local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
+	for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
+		table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
 	end
 
 	return widgets
