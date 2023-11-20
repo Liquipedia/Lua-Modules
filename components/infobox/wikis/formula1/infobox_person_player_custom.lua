@@ -95,7 +95,8 @@ function CustomInjector:addCustomCells(widgets)
 		{Title{name = 'Driver Statistics'}},
 		Array.map(statisticsCells, function(cellData)
 			return Cell{name = cellData.name, content = {_args[cellData.key]}}
-	))
+		end)
+	)
 end
 
 ---@return WidgetInjector
