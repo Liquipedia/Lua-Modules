@@ -1,8 +1,5 @@
 {
 	"private": true,
-	"dependencies": {
-		"bootstrap": "^4.6.0"
-	},
 	"devDependencies": {
 		"grunt": "*",
 		"grunt-stylelint": "*",
