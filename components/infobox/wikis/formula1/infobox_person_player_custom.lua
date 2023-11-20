@@ -74,30 +74,28 @@ end
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Abbreviations', content = {_args.abbreviations}})
 	local statisticsCells = {
-		races = {order = 1, name = 'Races'},
-		wins = {order = 2, name = 'Wins'},
-		podiums = {order = 3, name = 'Podiums'},
-		poles = {order = 4, name = 'Pole positions'},
-		fastestlaps = {order = 5, name = 'Fastest Laps'},
-		points = {order = 6, name = 'Career Points'},
-		firstrace = {order = 7, name = 'First race'},
-		lastrace = {order = 8, name = 'Last race'},
-		firstwin = {order = 9, name = 'First win'},
-		lastwin = {order = 10, name = 'Last win'},
-		salary = {order = 11, name = 'Reported Salary'},
-		contract = {order = 12, name = 'Current Contract'},
+		{key = 'races', name = 'Races'},
+		{key = 'wins', name = 'Wins'},
+		{key = 'podiums', name = 'Podiums'},
+		{key = 'poles', name = 'Pole positions'},
+		{key = 'fastestlaps', name = 'Fastest Laps'},
+		{key = 'points', name = 'Career Points'},
+		{key = 'firstrace', name = 'First race'},
+		{key = 'lastrace', name = 'Last race'},
+		{key = 'firstwin', name = 'First win'},
+		{key = 'lastwin', name = 'Last win'},
+		{key = 'salary', name = 'Reported Salary'},
+		{key = 'contract', name = 'Current Contract'},
 	}
-	if not Table.any(_args, function(key) return statisticsCells[key] end) then
+	if Array.all(statisticsCells, function(cellData) return args[cellData.key] == nil end) then
 		return widgets
 	end
 
-	table.insert(widgets, Title{name = 'Driver Statistics'})
-	local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-	for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
-		table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
-	end
-
-	return widgets
+	return Array.extendWith(widgets,
+		{Title{name = 'Driver Statistics'}},
+		Array.map(statisticsCells, function(cellData)
+			return Cell{name = cellData.name, content = {_args[cellData.key]}}
+	))
 end
 
 ---@return WidgetInjector
