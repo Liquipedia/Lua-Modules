@@ -225,7 +225,19 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
----@param props BlockOpponentProps
+---@class BlockPlayerProps
+---@field flip boolean?
+---@field opponent {players: standardPlayer[]?}
+---@field overflow OverflowModes?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field playerClass string?
+---@field dq boolean?
+---@field note string|number|nil
+
+---@param props BlockPlayerProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent

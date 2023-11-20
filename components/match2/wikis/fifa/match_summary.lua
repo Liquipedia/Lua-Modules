@@ -191,8 +191,8 @@ function CustomMatchSummary._players(players, opponentIndex, winner)
 		:css('padding', '2px 8px')
 		:css('text-align', flip and 'right' or 'left')
 		:css('width', '35%')
-		:node(OpponentDisplay.BlockOpponent{
-			opponent = {players = players, type = Opponent.solo},
+		:node(OpponentDisplay.BlockPlayers{
+			opponent = {players = players},
 			overflow = 'ellipsis',
 			showLink = true,
 		})
