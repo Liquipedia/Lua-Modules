@@ -98,9 +98,9 @@ function Table.isNotEmpty(tbl)
 end
 
 ---Shallow copies a table
----@generic K, V
----@param tbl {[K]: V}
----@return {[K]: V}
+---@generic T:table
+---@param tbl T
+---@return T
 function Table.copy(tbl)
 	local result = {}
 

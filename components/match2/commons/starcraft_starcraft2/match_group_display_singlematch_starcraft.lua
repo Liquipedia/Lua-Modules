@@ -18,6 +18,9 @@ local StarcraftSingleMatchDisplay = {propTypes = {}}
 
 function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+
+	assert(bracketId, 'Missing or invalid matchId')
+
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 
 	return match

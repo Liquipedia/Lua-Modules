@@ -101,7 +101,7 @@ function WikiCopyPaste._mapDetails(opponents, mode)
 	local lines = {''}
 
 	Array.forEach(Array.range(1, opponents), function(opponentIndex)
-		Array.forEach(Array.range(1, Opponent.partySize(mode[1])), function(playerIndex)
+		Array.forEach(Array.range(1, Opponent.partySize(mode[1]) --[[@as integer]]), function(playerIndex)
 			local prefix = '|t' .. opponentIndex .. 'p' .. playerIndex
 			local player = mode.isTeamMatch and (prefix .. '=') or ''
 			table.insert(lines, INDENT .. INDENT .. player .. prefix .. 'heroes=')
@@ -126,7 +126,7 @@ function WikiCopyPaste._getOpponent(mode, score)
 	end
 
 	local players = ''
-	Array.forEach(Array.range(1, Opponent.partySize(mode[1])), function(playerIndex)
+	Array.forEach(Array.range(1, Opponent.partySize(mode[1]) --[[@as integer]]), function(playerIndex)
 		players = players .. '|p' .. playerIndex .. '=' .. '|p' .. playerIndex .. 'race='
 	end)
 

@@ -457,12 +457,12 @@ function BaseResultsTable:opponentDisplay(data, options)
 		}
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data),
+			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 		}
 	elseif self.config.displayDefaultLogoAsIs then
 		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data),
+			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 			teamStyle = 'icon',
 		}
