@@ -5,9 +5,7 @@
 		"wikimedia/mediawiki"
 	],
 	"globals": {
-		"require": "readonly",
-		"module": "readonly",
-		"OO": "readonly",
+		"liquipedia": "readonly",
 		"jQuery": "readonly"
 	},
 	"rules": {
