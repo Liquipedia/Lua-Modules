@@ -1,0 +1,12 @@
+{
+	"private": true,
+	"devDependencies": {
+		"eslint-config-wikimedia": "*",
+		"grunt": "*",
+		"grunt-eslint": "*"
+	},
+	"scripts": {
+		"test": "grunt main",
+		"fix": "grunt main --fix"
+	}
+}
