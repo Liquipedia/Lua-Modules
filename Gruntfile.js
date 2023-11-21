@@ -9,9 +9,7 @@ module.exports = function( grunt ) {
 				fix: grunt.option( 'fix' )
 			},
 			all: [
-				'**/*.{js,json,vue}',
-				'!node_modules/**',
-				'!vendor/**'
+				'javascript/**/*.{js,json,vue}'
 			]
 		},
 		stylelint: {
@@ -19,9 +17,7 @@ module.exports = function( grunt ) {
 				fix: grunt.option( 'fix' )
 			},
 			all: [
-				'**/*.{css,scss,less}',
-				'!node_modules/**',
-				'!vendor/**'
+				'stylesheets/**/*.{css,scss,less}'
 			]
 		}
 	} );
