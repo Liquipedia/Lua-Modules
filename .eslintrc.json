@@ -22,7 +22,8 @@
 		"es-x/no-array-prototype-includes": "off",
 		"es-x/no-array-prototype-findindex": "off",
 		"es-x/no-spread-elements": "off",
-		"es-x/no-property-shorthands": "off"
+		"es-x/no-property-shorthands": "off",
+		"max-len": ["warn", { "code": 120 }]
 	},
 	"parserOptions": {
 		"ecmaVersion": 2017

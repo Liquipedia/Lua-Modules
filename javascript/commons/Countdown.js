@@ -60,7 +60,8 @@ liquipedia.countdown = {
 		liquipedia.countdown.timeoutFunctions.set( liquipedia.countdown.runCountdown, 1000 );
 	},
 	setCountdownString: function( timerObjectNode ) {
-		let datestr = '', streamsarr = [ ], live = 'LIVE!';
+		const streamsarr = [ ];
+		let datestr = '', live = 'LIVE!';
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
 			live = timerObjectNode.dataset.countdownEndText;
 		}
@@ -72,15 +73,14 @@ liquipedia.countdown = {
 				}
 			} else {
 				let differenceInSecondsMath = differenceInSeconds;
-				let weeks, days, hours, minutes, seconds;
-				weeks = Math.floor( differenceInSecondsMath / 604800 );
+				const weeks = Math.floor( differenceInSecondsMath / 604800 );
 				differenceInSecondsMath = differenceInSecondsMath % 604800;
-				days = Math.floor( differenceInSecondsMath / 86400 );
+				const days = Math.floor( differenceInSecondsMath / 86400 );
 				differenceInSecondsMath = differenceInSecondsMath % 86400;
-				hours = Math.floor( differenceInSecondsMath / 3600 );
+				const hours = Math.floor( differenceInSecondsMath / 3600 );
 				differenceInSecondsMath = differenceInSecondsMath % 3600;
-				minutes = Math.floor( differenceInSecondsMath / 60 );
-				seconds = Math.floor( differenceInSecondsMath % 60 );
+				const minutes = Math.floor( differenceInSecondsMath / 60 );
+				const seconds = Math.floor( differenceInSecondsMath % 60 );
 				if ( differenceInSeconds >= 604800 ) {
 					datestr = weeks + 'w ' + days + 'd';
 				} else if ( differenceInSeconds >= 86400 ) {

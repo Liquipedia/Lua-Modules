@@ -51,17 +51,17 @@ liquipedia.calendar = {
 
 			// Add events
 			calendarEvents.querySelectorAll( '.calendar-event-item' ).forEach( function( calendarItem ) {
-				let startDate, endDate, eventLength, leftOffset, abbr, ttz, el;
+				let eventLength, leftOffset, abbr, ttz, el;
 
 				el = calendarItem.querySelector( '.start-datetime' );
 				abbr = el.querySelector( 'abbr' );
 				ttz = abbr !== null ? abbr.title : false;
-				startDate = liquipedia.calendar.stringToDate( el, ttz );
+				const startDate = liquipedia.calendar.stringToDate( el, ttz );
 
 				el = calendarItem.querySelector( '.end-datetime' );
 				abbr = el.querySelector( 'abbr' );
 				ttz = abbr !== null ? abbr.title : false;
-				endDate = liquipedia.calendar.stringToDate( el, ttz );
+				const endDate = liquipedia.calendar.stringToDate( el, ttz );
 
 				// Check if dates are properly entered
 				if (
@@ -78,7 +78,7 @@ liquipedia.calendar = {
 						let clone;
 						// event was yesterday or more than a week in the future
 						if ( leftOffset < -1 || topOffset < -2 || leftOffset > WIDTH_OF_COLUMN * ( NUMBER_OF_DAYS - 1 ) + 1 || topOffset > HEIGHT_OF_CALENDAR ) {
-							if ( eventLength + topOffset > 0 && leftOffset == -( WIDTH_OF_COLUMN - 1 ) ) {
+							if ( eventLength + topOffset > 0 && leftOffset === -( WIDTH_OF_COLUMN - 1 ) ) {
 								clone = calendarItem.cloneNode( true );
 								calendarItem.parentNode.insertBefore( clone, calendarItem );
 								clone.style.top = ( topOffset - HEIGHT_OF_CALENDAR ) + 'px';
@@ -115,7 +115,11 @@ liquipedia.calendar = {
 			tempPosTimezone,
 			UTCTime = 0;
 
-		if ( tempDate.childNodes !== undefined && typeof tempDate.childNodes[ 1 ] !== 'undefined' && typeof tempDate.childNodes[ 1 ].childNodes[ 0 ] !== 'undefined' && tempDate.childNodes[ 1 ].childNodes[ 0 ].nodeValue !== null ) {
+		if ( tempDate.childNodes !== undefined &&
+			typeof tempDate.childNodes[ 1 ] !== 'undefined' &&
+			typeof tempDate.childNodes[ 1 ].childNodes[ 0 ] !== 'undefined' &&
+			tempDate.childNodes[ 1 ].childNodes[ 0 ].nodeValue !== null ) {
+
 			tempDateinnerhTML = tempDate.childNodes[ 0 ].nodeValue + tempDate.childNodes[ 1 ].childNodes[ 0 ].nodeValue;
 		} else {
 			tempDateinnerhTML = tempDate.childNodes[ 0 ].nodeValue;
@@ -138,13 +142,15 @@ liquipedia.calendar = {
 		}
 
 		if ( tempDateinnerhTML === null ) {
-			throw new DateError( 'Date is null' );
+			throw new Error( 'Date is null' );
 		}
 
 		// Creating DateObject from tempDate
 		let str = tempDateinnerhTML.trim().split( ' ' );
 
-		for ( let j = 0; j < str.length; j++ ) { str[ j ] = str[ j ].trim(); }
+		for ( let j = 0; j < str.length; j++ ) {
+			str[ j ] = str[ j ].trim();
+		}
 
 		str = str.filter( function( e ) {
 			return e;
@@ -162,14 +168,20 @@ liquipedia.calendar = {
 				if ( index2 !== -1 ) {
 					str.splice( index2, 1 );
 				}
-				if ( str.length === 6 ) { str.splice( str.length - 2, 1, 'GMT' ); }
-				if ( str.length === 5 ) { str.splice( str.length - 1, 1, 'GMT' ); }
-				if ( str.length === 4 ) { str.splice( str.length, 1, 'GMT' ); }
+				if ( str.length === 6 ) {
+					str.splice( str.length - 2, 1, 'GMT' );
+				}
+				if ( str.length === 5 ) {
+					str.splice( str.length - 1, 1, 'GMT' );
+				}
+				if ( str.length === 4 ) {
+					str.splice( str.length, 1, 'GMT' );
+				}
 
-				const date_temp_2 = str.join( ' ' );
+				const dateTemp2 = str.join( ' ' );
 
 				// Get the UTC time, and setHours according to it
-				endTime = new Date( date_temp_2 );
+				endTime = new Date( dateTemp2 );
 				endTime.setHours( endTime.getHours() - UTCTime );
 			}
 			return endTime;

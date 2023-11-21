@@ -339,16 +339,16 @@ liquipedia.bracket = {
 				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
 				if ( !window.matchMedia( '(max-width: 767px)' ).matches ) {
 					popup.classList.remove( 'bracket-popup-mobile' );
-					const detailsHeight = parseInt( window.getComputedStyle( popup ).height );
+					// const detailsHeight = parseInt( window.getComputedStyle( popup ).height );
 					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
 					const popupBoxPosition = popupBox.getBoundingClientRect();
 					const spaceOnTheRight = windowWidth - ( popupBoxPosition.right + detailsWidth );
-					const icon = popupBox.querySelector( '.icon' );
+					// const icon = popupBox.querySelector( '.icon' );
 
 					const bracketWrapper = popup.closest( '.bracket-wrapper' );
 					const topPosition = ( popupBox.offsetHeight / 2 ) - ( popup.offsetHeight / 2 );
-				  	const popupBoxY = document.documentElement.scrollTop + popupBoxPosition.top;
-				  	popup.style.top = topPosition + 'px';
+					// const popupBoxY = document.documentElement.scrollTop + popupBoxPosition.top;
+					popup.style.top = topPosition + 'px';
 					popup.style.bottom = '';
 
 					const wrapperTop = bracketWrapper.getBoundingClientRect().top;
@@ -356,7 +356,9 @@ liquipedia.bracket = {
 					const popupTop = popup.getBoundingClientRect().top;
 					const posDiff = pBoxTop - wrapperTop;
 					const hasXScrollbar = bracketWrapper.scrollWidth > bracketWrapper.clientWidth;
-					const scrollBarHeight = hasXScrollbar ? bracketWrapper.offsetHeight - bracketWrapper.clientHeight : 0;
+					const scrollBarHeight = hasXScrollbar ?
+						bracketWrapper.offsetHeight - bracketWrapper.clientHeight :
+						0;
 
 					// Add min-height to bracket-wrapper if the popup is higher than the bracket-wrapper
 					if ( bracketWrapper.offsetHeight <= popup.offsetHeight + 1 ) {

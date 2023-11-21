@@ -97,7 +97,7 @@ liquipedia.filterButtons = {
 			if ( button.classList.contains( this.activeButtonClass ) ) {
 				this.toggleAllItems( filterGroup );
 			}
-			button.addEventListener( 'click', function( event ) {
+			button.addEventListener( 'click', function() {
 				this.toggleAllItems( filterGroup );
 				this.setLocalStorage();
 				liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
@@ -153,7 +153,7 @@ liquipedia.filterButtons = {
 			// console.log('filterGroup', filterGroup, this.activeFilters[filterGroup]);
 			// User has filter preferences. Remove all pre-set active classes and build from localstorage instead.
 			button.classList.remove( this.activeButtonClass );
-			if ( Array.isArray( localStorageValue[ filterGroup ] ) && localStorageValue[ filterGroup ].length == 0 ) {
+			if ( Array.isArray( localStorageValue[ filterGroup ] ) && localStorageValue[ filterGroup ].length === 0 ) {
 				// this.hideAllItems(filterGroup);
 				// console.log('if array empty', filterGroup, localStorageValue[filterGroup]);
 			}
@@ -226,11 +226,15 @@ liquipedia.filterButtons = {
 	filterItems: function( button, isInit ) {
 		const filterCategory = button.getAttribute( 'data-filter-on' );
 		const filterGroup = button.closest( '[data-filter]' ).getAttribute( 'data-filter-group' ) || this.bcFilterGroup;
-		if ( !( filterGroup in this.activeFilters ) ) { return; }
+		if ( !( filterGroup in this.activeFilters ) ) {
+			return;
+		}
 
 		const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
 		if ( index > -1 ) {
-			if ( isInit === true ) { return; }
+			if ( isInit === true ) {
+				return;
+			}
 			this.activeFilters[ filterGroup ].splice( index, 1 );
 			button.classList.remove( this.activeButtonClass );
 			if ( this.buttonFilterAll[ filterGroup ] ) {

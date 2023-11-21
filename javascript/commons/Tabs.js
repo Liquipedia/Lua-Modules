@@ -9,12 +9,12 @@ liquipedia.tabs = {
 			const tabContents = [];
 			for ( let i = 0; i < tabs.children.length; i++ ) {
 				if ( tabs.children[ i ].classList.contains( 'tabs-content' ) ) {
-					for ( var j = 0; j < tabs.children[ i ].children.length; j++ ) {
+					for ( let j = 0; j < tabs.children[ i ].children.length; j++ ) {
 						tabs.children[ i ].children[ j ].dataset.count = j + 1;
 						tabContents.push( tabs.children[ i ].children[ j ] );
 					}
 				} else {
-					for ( var j = 0; j < tabs.children[ i ].children.length; j++ ) {
+					for ( let j = 0; j < tabs.children[ i ].children.length; j++ ) {
 						tabs.children[ i ].children[ j ].dataset.count = j + 1;
 						tabItems.push( tabs.children[ i ].children[ j ] );
 					}

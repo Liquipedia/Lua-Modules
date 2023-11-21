@@ -61,8 +61,8 @@ liquipedia.commonstools = {
 					wikiData = liquipedia.commonstools.wikis[ wiki ];
 					listElement = document.createElement( 'li' );
 					checkForPageExistenceResultList.append( listElement );
-				  	liquipedia.commonstools.timeoutPageExistenceApi( i, wiki, wikiData, title, listElement );
-				  	i++;
+					liquipedia.commonstools.timeoutPageExistenceApi( i, wiki, wikiData, title, listElement );
+					i++;
 				}
 			}
 		}
@@ -151,8 +151,8 @@ liquipedia.commonstools = {
 									wikiData = liquipedia.commonstools.wikis[ wiki ];
 									listElement = document.createElement( 'li' );
 									checkPageTextResultList.append( listElement );
-								  	liquipedia.commonstools.timeoutPageTextApi( i, wiki, wikiData, title, sourceWiki, listElement );
-				  					i++;
+									liquipedia.commonstools.timeoutPageTextApi( i, wiki, wikiData, title, sourceWiki, listElement );
+									i++;
 								}
 							}
 						}

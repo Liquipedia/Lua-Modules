@@ -58,13 +58,20 @@ liquipedia.teamcard = {
 		const showformer = 'Show Former';
 		const hideformer = 'Hide Former';
 		const showformerShort = 'Former';
+		const showsubs = 'Show Substitutes';
+		const hidesubs = 'Hide Substitutes';
+		const showsubsShort = 'Subs';
 		document.querySelectorAll( '.teamcard-former-toggle-button' ).forEach( function( wrap ) {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 ) { button.innerHTML = showformerShort; } else { button.innerHTML = showformer; }
+				if ( width < 156 ) {
+					button.innerHTML = showformerShort;
+				} else {
+					button.innerHTML = showformer;
+				}
 			} else {
 				button.innerHTML = showformer;
 			}
@@ -74,8 +81,12 @@ liquipedia.teamcard = {
 				if ( teamcard.classList.contains( 'teamcard-former-opened' ) ) {
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showformerShort;
+							} else {
+								btn.innerHTML = showformer;
+							}
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-former-opened' );
@@ -85,8 +96,12 @@ liquipedia.teamcard = {
 					} );
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showsubsShort;
+							} else {
+								btn.innerHTML = showsubs;
+							}
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-subs-opened' );
@@ -95,16 +110,18 @@ liquipedia.teamcard = {
 			} );
 			wrap.appendChild( button );
 		} );
-		var showsubs = 'Show Substitutes';
-		const hidesubs = 'Hide Substitutes';
-		var showsubsShort = 'Subs';
+
 		document.querySelectorAll( '.teamcard-subs-toggle-button' ).forEach( function( wrap ) {
 			const teamcard = wrap.closest( '.teamcard' );
 			const button = document.createElement( 'button' );
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 ) { button.innerHTML = showsubsShort; } else { button.innerHTML = showsubs; }
+				if ( width < 156 ) {
+					button.innerHTML = showsubsShort;
+				} else {
+					button.innerHTML = showsubs;
+				}
 			} else {
 				button.innerHTML = showsubs;
 			}
@@ -114,8 +131,12 @@ liquipedia.teamcard = {
 				if ( teamcard.classList.contains( 'teamcard-subs-opened' ) ) {
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showsubsShort;
+							} else {
+								btn.innerHTML = showsubs;
+							}
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-subs-opened' );
@@ -125,8 +146,12 @@ liquipedia.teamcard = {
 					} );
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showformerShort;
+							} else {
+								btn.innerHTML = showformer;
+							}
 						}
 					} );
 					teamcard.classList.add( 'teamcard-subs-opened' );
@@ -143,7 +168,11 @@ liquipedia.teamcard = {
 			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 ) { button.innerHTML = showactiveShort; } else { button.innerHTML = showactive; }
+				if ( width < 156 ) {
+					button.innerHTML = showactiveShort;
+				} else {
+					button.innerHTML = showactive;
+				}
 			} else {
 				button.innerHTML = showactive;
 			}
@@ -155,14 +184,22 @@ liquipedia.teamcard = {
 					teamcard.classList.remove( 'teamcard-subs-opened' );
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showformerShort;
+							} else {
+								btn.innerHTML = showformer;
+							}
 						}
 					} );
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							const width = parseInt( btn.dataset.width );
-							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
+							const btnWidth = parseInt( btn.dataset.width );
+							if ( btnWidth < 156 ) {
+								btn.innerHTML = showsubsShort;
+							} else {
+								btn.innerHTML = showsubs;
+							}
 						}
 					} );
 				}

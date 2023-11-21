@@ -43,8 +43,8 @@ liquipedia.commonsmainpage = {
 						iiurlheight: 150,
 						format: 'json'
 					} ).done( function( imageData ) {
-						let imageUrls = [ ];
-						imageUrls = imageUrls.reverse();
+						// let imageUrls = [ ];
+						// imageUrls = imageUrls.reverse();
 						let output = '';
 						let counter = 0;
 						Object.keys( imageData.query.pages ).reverse().forEach( function( key ) {
