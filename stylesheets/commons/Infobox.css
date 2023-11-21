@@ -437,3 +437,18 @@ Author(s): iMarbot
 		}
 	}
 }
+
+/*******************************************************************************
+Template(s): Player photos (cutout shots) styling
+Author(s): iMarbot
+*******************************************************************************/
+.infobox-image img[ src*='playerphoto' ] {
+	max-height: 500px;
+	max-width: 100%;
+	width: auto !important;
+	height: auto !important;
+
+	&:not( [ src*='padded' ] ) {
+		padding: 15px 15px 0;
+	}
+}

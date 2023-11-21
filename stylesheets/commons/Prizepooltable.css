@@ -21,18 +21,13 @@ table.prizepooltable.collapsed .prizepooltablehide {
 	min-width: 300px;
 }
 
-.prizepooltable-col-team {
-	padding-right: 10px !important;
-}
-
-@media ( max-width: 750px ) {
+@media ( max-width: 600px ) {
 	.prizepooltable-col-team a:nth-child( 2 ) {
 		display: none;
 	}
 
 	.prizepooltable-col-team {
 		min-width: 65px;
-		padding-right: 0.2em !important;
 	}
 }
 
@@ -549,4 +544,10 @@ Author: iMarbot
 	display: flex;
 	flex-flow: row wrap;
 	gap: 1em;
+}
+
+@media ( max-width: 600px ) {
+	.prizepool-section-tables > div {
+		min-width: 100%;
+	}
 }
