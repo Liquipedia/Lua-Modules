@@ -188,7 +188,10 @@ function LegacyMatchMaps._readTeamOpponents(args)
 	Array.forEach(Array.range(1, NUMBER_OF_OPPONENTS), function(opponentIndex)
 		local template = args['team' .. opponentIndex]
 		args['team' .. opponentIndex] = nil
-		if template:upper() == BYE then
+		if not template then
+			args['opponent' .. opponentIndex] = Opponent.blank(Opponent.literal)
+			return
+		elseif template:upper() == BYE then
 			args['opponent' .. opponentIndex] = {type = Opponent.literal, name = BYE}
 			return
 		end
