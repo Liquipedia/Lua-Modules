@@ -55,7 +55,7 @@ liquipedia.bracket = {
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
 				element.addEventListener( 'mouseover', function() {
 					if ( liquipedia.bracket.highlighting.filteredSelectors.indexOf( element.dataset.highlightingkey ) === -1 ) {
-						liquipedia.bracket.highlighting.hoverCache[element.dataset.highlightingkey].forEach( function( node ) {
+						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( function( node ) {
 							node.classList.add( 'bracket-hover' );
 							if ( typeof node.dataset.backgroundColorHover !== 'undefined' ) {
 								node.style.backgroundColor = node.dataset.backgroundColorHover;
@@ -64,7 +64,7 @@ liquipedia.bracket = {
 					}
 				} );
 				element.addEventListener( 'mouseleave', function() {
-					liquipedia.bracket.highlighting.hoverCache[element.dataset.highlightingkey].forEach( function( node ) {
+					liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( function( node ) {
 						node.classList.remove( 'bracket-hover' );
 						if ( typeof node.dataset.backgroundColor !== 'undefined' ) {
 							node.style.backgroundColor = node.dataset.backgroundColor;
@@ -74,23 +74,23 @@ liquipedia.bracket = {
 			} );
 		},
 		getImageSelector: function( url ) {
-			var urlparts = url.split( '/' );
-			var value = urlparts[urlparts.length - 1];
+			const urlparts = url.split( '/' );
+			let value = urlparts[ urlparts.length - 1 ];
 			value.replace( '-icon', '_std' );
 			if ( value.indexOf( '-' ) !== -1 ) {
 				value = value.replace( '-logo', '' ).replace( '-std', '' );
 				value = value.split( '-' );
-				value = value[value.length - 1];
+				value = value[ value.length - 1 ];
 			}
 			return value;
 		},
 		getTextSelector: function( node ) {
-			var clonedNode = node.cloneNode( true );
-			var children = clonedNode.querySelectorAll( 'div.bracket-score, div.team-template-team-bracket' );
+			const clonedNode = node.cloneNode( true );
+			const children = clonedNode.querySelectorAll( 'div.bracket-score, div.team-template-team-bracket' );
 			children.forEach( function( child ) {
 				clonedNode.removeChild( child );
 			} );
-			var value = clonedNode.innerHTML;
+			let value = clonedNode.innerHTML;
 			value = value.replace( /<.*?>/g, '' );
 			value = value.replace( /&nbsp;/g, '' );
 			value = value.trim();
@@ -98,12 +98,12 @@ liquipedia.bracket = {
 		},
 		binds: { },
 		createBinds: function() {
-			var bindingtemplates = document.querySelectorAll( '.bind-highlighting' );
+			const bindingtemplates = document.querySelectorAll( '.bind-highlighting' );
 			bindingtemplates.forEach( function( element ) {
-				var from = element.querySelector( '.bind-highlighting-from' );
-				var to = element.querySelector( '.bind-highlighting-to' );
-				var fromteamicon = from.querySelector( '.team-template-image img' );
-				var fromselector;
+				const from = element.querySelector( '.bind-highlighting-from' );
+				const to = element.querySelector( '.bind-highlighting-to' );
+				const fromteamicon = from.querySelector( '.team-template-image img' );
+				let fromselector;
 				if ( fromteamicon === null ) {
 					// Player highlighting
 					fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
@@ -114,8 +114,8 @@ liquipedia.bracket = {
 						fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
 					}
 				}
-				var toteamicon = to.querySelector( '.team-template-image img' );
-				var toselector;
+				const toteamicon = to.querySelector( '.team-template-image img' );
+				let toselector;
 				if ( toteamicon === null ) {
 					// Player highlighting
 					toselector = liquipedia.bracket.highlighting.getTextSelector( to );
@@ -126,18 +126,18 @@ liquipedia.bracket = {
 						toselector = liquipedia.bracket.highlighting.getTextSelector( to );
 					}
 				}
-				liquipedia.bracket.highlighting.binds[fromselector] = toselector;
+				liquipedia.bracket.highlighting.binds[ fromselector ] = toselector;
 			} );
 		},
 		hoverCache: { },
 		createHoverCache: function() {
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
-				var teamicon = element.querySelector( '.team-template-image img' );
-				var selector;
+				const teamicon = element.querySelector( '.team-template-image img' );
+				let selector;
 				if ( teamicon === null ) {
 					// Player highlighting
 					selector = liquipedia.bracket.highlighting.getTextSelector( element );
-					var backgroundcolor = element.style.backgroundColor;
+					const backgroundcolor = element.style.backgroundColor;
 					switch ( backgroundcolor ) {
 						case 'rgb(242, 184, 184)':
 							// Zerg/Orc
@@ -173,12 +173,12 @@ liquipedia.bracket = {
 					}
 				}
 				if ( selector in liquipedia.bracket.highlighting.binds ) {
-					selector = liquipedia.bracket.highlighting.binds[selector];
+					selector = liquipedia.bracket.highlighting.binds[ selector ];
 				}
-				if ( !Array.isArray( liquipedia.bracket.highlighting.hoverCache[selector] ) ) {
-					liquipedia.bracket.highlighting.hoverCache[selector] = [ ];
+				if ( !Array.isArray( liquipedia.bracket.highlighting.hoverCache[ selector ] ) ) {
+					liquipedia.bracket.highlighting.hoverCache[ selector ] = [ ];
 				}
-				liquipedia.bracket.highlighting.hoverCache[selector].push( element );
+				liquipedia.bracket.highlighting.hoverCache[ selector ].push( element );
 				element.dataset.highlightingkey = selector;
 			} );
 		}
@@ -192,12 +192,12 @@ liquipedia.bracket = {
 		popupBox: null,
 		createIcons: function() {
 			document.querySelectorAll( '.bracket-game' ).forEach( function( element ) {
-				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					var icon = document.createElement( 'div' );
+					const icon = document.createElement( 'div' );
 					icon.classList.add( 'icon' );
 					icon.style.top = ( parseInt( window.getComputedStyle( element.querySelector( ':first-child' ) ).height ) - 6 ) + 'px';
-					var score = element.querySelector( '.bracket-score' );
+					const score = element.querySelector( '.bracket-score' );
 					if ( score !== null ) {
 						icon.style.right = ( parseInt( window.getComputedStyle( score ).width ) - 5 ) + 'px';
 					} else {
@@ -211,15 +211,15 @@ liquipedia.bracket = {
 				}
 			} );
 			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
-				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					var icon = document.createElement( 'div' );
+					const icon = document.createElement( 'div' );
 					icon.style.position = 'relative';
-					var iconinner = document.createElement( 'div' );
+					const iconinner = document.createElement( 'div' );
 					iconinner.classList.add( 'match-row-icon' );
 					icon.appendChild( iconinner );
-					var iconHolder;
-					var i = 0;
+					let iconHolder;
+					let i = 0;
 					element.childNodes.forEach( function( node ) {
 						if ( typeof node.tagName !== 'undefined' && node.tagName.toLowerCase() === 'td' ) {
 							i++;
@@ -240,11 +240,11 @@ liquipedia.bracket = {
 				}
 			} );
 			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
-				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					var icon = document.createElement( 'div' );
+					const icon = document.createElement( 'div' );
 					icon.style.position = 'relative';
-					var iconinner = document.createElement( 'div' );
+					const iconinner = document.createElement( 'div' );
 					iconinner.classList.add( 'icon' );
 					icon.appendChild( iconinner );
 					element.appendChild( icon );
@@ -268,7 +268,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-inner, .bracket-game .icon' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					var newPopupWrapper = element.closest( '.bracket-game' );
+					const newPopupWrapper = element.closest( '.bracket-game' );
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -277,7 +277,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -290,7 +290,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					var newPopupWrapper = element;
+					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -299,7 +299,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -312,7 +312,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					var newPopupWrapper = element;
+					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -321,7 +321,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -334,16 +334,16 @@ liquipedia.bracket = {
 		},
 		positionBracketPopup: function() {
 			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.icon' ) !== null ) {
-				var popupBox = liquipedia.bracket.popup.popupBox;
-				var popup = popupBox.querySelector( '.bracket-popup-wrapper' );
-				var windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
+				const popupBox = liquipedia.bracket.popup.popupBox;
+				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
+				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
 				if ( !window.matchMedia( '(max-width: 767px)' ).matches ) {
 					popup.classList.remove( 'bracket-popup-mobile' );
-					var detailsHeight = parseInt( window.getComputedStyle( popup ).height );
-					var detailsWidth = parseInt( window.getComputedStyle( popup ).width );
-					var popupBoxPosition = popupBox.getBoundingClientRect();
-					var spaceOnTheRight = windowWidth - ( popupBoxPosition.right + detailsWidth );
-					var icon = popupBox.querySelector( '.icon' );
+					const detailsHeight = parseInt( window.getComputedStyle( popup ).height );
+					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
+					const popupBoxPosition = popupBox.getBoundingClientRect();
+					const spaceOnTheRight = windowWidth - ( popupBoxPosition.right + detailsWidth );
+					const icon = popupBox.querySelector( '.icon' );
 
 					const bracketWrapper = popup.closest( '.bracket-wrapper' );
 					const topPosition = ( popupBox.offsetHeight / 2 ) - ( popup.offsetHeight / 2 );
@@ -365,7 +365,7 @@ liquipedia.bracket = {
 						bracketWrapper.style.minHeight = '';
 					}
 
-					if ( ( posDiff ) < (topPosition * -1) ) {
+					if ( ( posDiff ) < ( topPosition * -1 ) ) {
 						// Positioned above the wrapper, move it down
 						popup.style.top = ( posDiff * -1 ) + 'px';
 					}
@@ -395,18 +395,18 @@ liquipedia.bracket = {
 		},
 		positionGroupTablePopup: function() {
 			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.match-row-icon' ) !== null ) {
-				var popupBox = liquipedia.bracket.popup.popupBox;
-				var popup = popupBox.querySelector( '.bracket-popup-wrapper' );
-				var windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
-				var mainContentCol = document.querySelector( '.main-content-column' );
+				const popupBox = liquipedia.bracket.popup.popupBox;
+				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
+				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
+				const mainContentCol = document.querySelector( '.main-content-column' );
 				if ( windowWidth > 600 ) {
 					popup.classList.remove( 'bracket-popup-mobile' );
-					var detailsWidth = parseInt( window.getComputedStyle( popup ).width );
-					var popupBoxPosition = popupBox.getBoundingClientRect();
-					//popup.style.top = ( popupBoxPosition.top + popupBoxPosition.height ) + 'px';
-					popup.style.top = document.documentElement.scrollTop + (popupBoxPosition.bottom - mainContentCol.offsetTop )  + 'px';
-					//var left = popupBoxPosition.left + popupBoxPosition.width / 2 - detailsWidth / 2;
-					var left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left + ( popupBoxPosition.width / 2 - detailsWidth / 2 );
+					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
+					const popupBoxPosition = popupBox.getBoundingClientRect();
+					// popup.style.top = ( popupBoxPosition.top + popupBoxPosition.height ) + 'px';
+					popup.style.top = document.documentElement.scrollTop + ( popupBoxPosition.bottom - mainContentCol.offsetTop ) + 'px';
+					// var left = popupBoxPosition.left + popupBoxPosition.width / 2 - detailsWidth / 2;
+					let left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left + ( popupBoxPosition.width / 2 - detailsWidth / 2 );
 					if ( left < 10 ) {
 						left = 10;
 					}
@@ -421,7 +421,7 @@ liquipedia.bracket = {
 		createEventListeners: function() {
 			if ( document.querySelector( '.bracket .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
-				var bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				const bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenBracketScroll !== null ) {
 					bruinenBracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				}
@@ -432,7 +432,7 @@ liquipedia.bracket = {
 			}
 			if ( document.querySelector( '.matchlist .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
-				var bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				const bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenGroupScroll !== null ) {
 					bruinenGroupScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
 				}

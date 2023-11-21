@@ -5,9 +5,9 @@
 liquipedia.tabs = {
 	init: function() {
 		document.querySelectorAll( '.tabs-dynamic' ).forEach( function( tabs ) {
-			var tabItems = [];
-			var tabContents = [];
-			for ( var i = 0; i < tabs.children.length; i++ ) {
+			const tabItems = [];
+			const tabContents = [];
+			for ( let i = 0; i < tabs.children.length; i++ ) {
 				if ( tabs.children[ i ].classList.contains( 'tabs-content' ) ) {
 					for ( var j = 0; j < tabs.children[ i ].children.length; j++ ) {
 						tabs.children[ i ].children[ j ].dataset.count = j + 1;
@@ -21,7 +21,7 @@ liquipedia.tabs = {
 				}
 			}
 			tabContents.forEach( function( tabContent, i ) {
-				var heading = document.createElement( 'h6' );
+				const heading = document.createElement( 'h6' );
 				heading.style.display = 'none';
 				heading.innerHTML = tabItems[ i ].innerHTML;
 				tabContent.insertAdjacentElement( 'afterbegin', heading );
@@ -59,21 +59,21 @@ liquipedia.tabs = {
 		window.addEventListener( 'hashchange', liquipedia.tabs.onHashChange, false );
 	},
 	onHashChange: function() {
-		var hash = location.hash.slice( 1 );
-		var tabno;
-		var scrollto;
-		if ( hash.substring( 0, 4 ) === 'tab-' ) {
-			var hasharr = hash.split( '-scrollto-' );
-			tabno = hasharr[0].replace( 'tab-', '' );
+		const hash = location.hash.slice( 1 );
+		let tabno;
+		let scrollto;
+		if ( hash.slice( 0, 4 ) === 'tab-' ) {
+			const hasharr = hash.split( '-scrollto-' );
+			tabno = hasharr[ 0 ].replace( 'tab-', '' );
 			scrollto = null;
 			if ( hasharr.length === 2 ) {
-				scrollto = '#' + hasharr[1];
+				scrollto = '#' + hasharr[ 1 ];
 			}
 			liquipedia.tabs.showDynamicTab( tabno, scrollto );
 		} else {
 			scrollto = location.hash.replace( /(\.)/g, '\\\\$1' );
 			if ( scrollto.length > 0 ) {
-				var tabs = document.getElementById( scrollto.substr( 1 ) );
+				const tabs = document.getElementById( scrollto.slice( 1 ) );
 				if ( tabs !== null && tabs.closest( '.tabs-dynamic > .tabs-content > div' ) !== null ) {
 					tabno = tabs.closest( '.tabs-dynamic > .tabs-content > div' ).dataset.count;
 					if ( typeof tabno !== 'undefined' ) {
@@ -84,12 +84,12 @@ liquipedia.tabs = {
 		}
 	},
 	showDynamicTab: function( tabno, scrollto ) {
-		var scrolltoelement = null;
+		let scrolltoelement = null;
 		if ( scrollto !== null ) {
-			scrolltoelement = document.getElementById( scrollto.substr( 1 ) );
+			scrolltoelement = document.getElementById( scrollto.slice( 1 ) );
 		}
 		if ( scrolltoelement !== null ) {
-			var tabs = scrolltoelement.closest( '.tabs-dynamic' );
+			const tabs = scrolltoelement.closest( '.tabs-dynamic' );
 			tabs.querySelectorAll( '.nav-tabs li' ).forEach( function( listelement ) {
 				listelement.classList.remove( 'active' );
 			} );

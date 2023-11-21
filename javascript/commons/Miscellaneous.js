@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.timeline = {
 	init: function() {
-		var timeline = document.querySelector( '.scrollTimeline' );
+		const timeline = document.querySelector( '.scrollTimeline' );
 		if ( timeline !== null ) {
 			timeline.scrollLeft = timeline.scrollWidth;
 		}
@@ -18,21 +18,21 @@ liquipedia.core.modules.push( 'timeline' );
  ******************************************************************************/
 liquipedia.teamcard = {
 	init: function() {
-		var teamcardsopened = false;
+		let teamcardsopened = false;
 		document.querySelectorAll( '.teamcard-toggle-button' ).forEach( function( wrap ) {
-			var showplayers;
+			let showplayers;
 			if ( wrap.dataset.showAllText !== undefined ) {
 				showplayers = wrap.dataset.showAllText;
 			} else {
 				showplayers = 'Show Players';
 			}
-			var hideplayers;
+			let hideplayers;
 			if ( wrap.dataset.hideAllText !== undefined ) {
 				hideplayers = wrap.dataset.hideAllText;
 			} else {
 				hideplayers = 'Hide Players';
 			}
-			var button = document.createElement( 'button' );
+			const button = document.createElement( 'button' );
 			button.innerHTML = showplayers;
 			button.addEventListener( 'click', function() {
 				if ( teamcardsopened ) {
@@ -55,19 +55,16 @@ liquipedia.teamcard = {
 			} );
 			wrap.appendChild( button );
 		} );
-		var showformer = 'Show Former';
-		var hideformer = 'Hide Former';
-		var showformerShort = 'Former';
+		const showformer = 'Show Former';
+		const hideformer = 'Hide Former';
+		const showformerShort = 'Former';
 		document.querySelectorAll( '.teamcard-former-toggle-button' ).forEach( function( wrap ) {
-			var teamcard = wrap.closest( '.teamcard' );
-			var button = document.createElement( 'button' );
-			var width = 156;
+			const teamcard = wrap.closest( '.teamcard' );
+			const button = document.createElement( 'button' );
+			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 )
-					button.innerHTML = showformerShort;
-				else
-					button.innerHTML = showformer;
+				if ( width < 156 ) { button.innerHTML = showformerShort; } else { button.innerHTML = showformer; }
 			} else {
 				button.innerHTML = showformer;
 			}
@@ -77,11 +74,8 @@ liquipedia.teamcard = {
 				if ( teamcard.classList.contains( 'teamcard-former-opened' ) ) {
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showformerShort;
-							else
-								btn.innerHTML = showformer;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-former-opened' );
@@ -91,11 +85,8 @@ liquipedia.teamcard = {
 					} );
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showsubsShort;
-							else
-								btn.innerHTML = showsubs;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-subs-opened' );
@@ -105,18 +96,15 @@ liquipedia.teamcard = {
 			wrap.appendChild( button );
 		} );
 		var showsubs = 'Show Substitutes';
-		var hidesubs = 'Hide Substitutes';
+		const hidesubs = 'Hide Substitutes';
 		var showsubsShort = 'Subs';
 		document.querySelectorAll( '.teamcard-subs-toggle-button' ).forEach( function( wrap ) {
-			var teamcard = wrap.closest( '.teamcard' );
-			var button = document.createElement( 'button' );
-			var width = 156;
+			const teamcard = wrap.closest( '.teamcard' );
+			const button = document.createElement( 'button' );
+			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 )
-					button.innerHTML = showsubsShort;
-				else
-					button.innerHTML = showsubs;
+				if ( width < 156 ) { button.innerHTML = showsubsShort; } else { button.innerHTML = showsubs; }
 			} else {
 				button.innerHTML = showsubs;
 			}
@@ -126,11 +114,8 @@ liquipedia.teamcard = {
 				if ( teamcard.classList.contains( 'teamcard-subs-opened' ) ) {
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showsubsShort;
-							else
-								btn.innerHTML = showsubs;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
 						}
 					} );
 					teamcard.classList.remove( 'teamcard-subs-opened' );
@@ -140,11 +125,8 @@ liquipedia.teamcard = {
 					} );
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showformerShort;
-							else
-								btn.innerHTML = showformer;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
 						}
 					} );
 					teamcard.classList.add( 'teamcard-subs-opened' );
@@ -153,18 +135,15 @@ liquipedia.teamcard = {
 			} );
 			wrap.appendChild( button );
 		} );
-		var showactive = 'Show Active';
-		var showactiveShort = 'Active';
+		const showactive = 'Show Active';
+		const showactiveShort = 'Active';
 		document.querySelectorAll( '.teamcard-active-toggle-button' ).forEach( function( wrap ) {
-			var teamcard = wrap.closest( '.teamcard' );
-			var button = document.createElement( 'button' );
-			var width = 156;
+			const teamcard = wrap.closest( '.teamcard' );
+			const button = document.createElement( 'button' );
+			let width = 156;
 			if ( typeof wrap.dataset.width !== 'undefined' ) {
 				width = parseInt( wrap.dataset.width );
-				if ( width < 156 )
-					button.innerHTML = showactiveShort;
-				else
-					button.innerHTML = showactive;
+				if ( width < 156 ) { button.innerHTML = showactiveShort; } else { button.innerHTML = showactive; }
 			} else {
 				button.innerHTML = showactive;
 			}
@@ -176,20 +155,14 @@ liquipedia.teamcard = {
 					teamcard.classList.remove( 'teamcard-subs-opened' );
 					teamcard.querySelectorAll( '.teamcard-former-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showformerShort;
-							else
-								btn.innerHTML = showformer;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showformerShort; } else { btn.innerHTML = showformer; }
 						}
 					} );
 					teamcard.querySelectorAll( '.teamcard-subs-toggle-button button' ).forEach( function( btn ) {
 						if ( typeof btn.dataset.width !== 'undefined' ) {
-							var width = parseInt( btn.dataset.width );
-							if ( width < 156 )
-								btn.innerHTML = showsubsShort;
-							else
-								btn.innerHTML = showsubs;
+							const width = parseInt( btn.dataset.width );
+							if ( width < 156 ) { btn.innerHTML = showsubsShort; } else { btn.innerHTML = showsubs; }
 						}
 					} );
 				}
@@ -230,7 +203,7 @@ liquipedia.participantstable = {
 				buttonLeft.classList.add( 'inactive' );
 				buttonLeft.addEventListener( 'click', function() {
 					if ( window.innerWidth < 600 ) {
-						var scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
+						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
 						scroller.scrollLeft = scroller.scrollLeft - 0.83 * window.innerWidth;
 					}
 				} );
@@ -238,16 +211,16 @@ liquipedia.participantstable = {
 			document.querySelectorAll( '.participants-table-button-right' ).forEach( function( buttonRight ) {
 				buttonRight.addEventListener( 'click', function() {
 					if ( window.innerWidth < 600 ) {
-						var scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
+						const scroller = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-scroller' );
 						scroller.scrollLeft = scroller.scrollLeft + 0.83 * window.innerWidth;
 					}
 				} );
 			} );
 			document.querySelectorAll( '.participants-table-scroller' ).forEach( function( scroller ) {
 				scroller.addEventListener( 'scroll', function() {
-					var buttonLeft = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-left' );
+					const buttonLeft = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-left' );
 					buttonLeft.classList.remove( 'inactive' );
-					var buttonRight = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-right' );
+					const buttonRight = this.closest( '.participants-table-wrapper' ).querySelector( '.participants-table-button-right' );
 					buttonRight.classList.remove( 'inactive' );
 					if ( this.scrollLeft === 0 ) {
 						buttonLeft.classList.add( 'inactive' );
@@ -270,7 +243,7 @@ liquipedia.heroesportal = {
 	init: function() {
 		document.querySelectorAll( '.hexagon-button' ).forEach( function( button ) {
 			button.addEventListener( 'click', function() {
-				var hexagon = this.closest( '.hexagon' );
+				const hexagon = this.closest( '.hexagon' );
 				if ( hexagon.classList.contains( 'show-' + this.dataset.show ) ) {
 					hexagon.classList.remove( 'show-' + this.dataset.show );
 				} else {
@@ -307,9 +280,9 @@ liquipedia.core.modules.push( 'decktables' );
  ******************************************************************************/
 liquipedia.talenttemplate = {
 	init: function() {
-		var talent = document.getElementById( 'talent-1' );
+		let talent = document.getElementById( 'talent-1' );
 		if ( talent !== null ) {
-			var talentContent = document.getElementById( 'talent-1-content' );
+			let talentContent = document.getElementById( 'talent-1-content' );
 			document.querySelectorAll( '.talent' ).forEach( function( element ) {
 				element.addEventListener( 'mouseover', function() {
 					this.style.cursor = 'pointer';
@@ -347,15 +320,15 @@ liquipedia.creepspot = {
 		if ( document.querySelector( '.creep-spot' ) !== null ) {
 			mw.loader.using( 'skins.bruinen.scripts' ).then( function() {
 				document.querySelectorAll( '.creep-spot' ).forEach( function( cs ) {
-					var $this = $( cs );
-					var options = {
+					const $this = $( cs );
+					const options = {
 						content: $this.find( '.creep-spot-popup-body' ).html(),
 						html: true,
 						placement: 'bottom',
 						template: '<div class="popover" role="tooltip" style="max-width:400px;"><div class="arrow"></div><h3 class="popover-header"></h3><div class="popover-body"></div></div>',
 						title: $this.find( '.creep-spot-popup-header' ).html(),
 						trigger: 'focus',
-						sanitize: false,
+						sanitize: false
 					};
 					$this
 						.attr( 'tabindex', '0' )
@@ -396,24 +369,24 @@ liquipedia.console = {
 		liquipedia.console.selfXSSWarning();
 	},
 	selfXSSWarning: function() {
-		var heading = 'Self-XSS';
-		var message = '\nDo not paste any code into this window unless you know what you are doing!\nPasting code into this window can lead to other people gaining access to your account and other private data!\nSee https://en.wikipedia.org/wiki/Self-XSS for more information.';
+		const heading = 'Self-XSS';
+		const message = '\nDo not paste any code into this window unless you know what you are doing!\nPasting code into this window can lead to other people gaining access to your account and other private data!\nSee https://en.wikipedia.org/wiki/Self-XSS for more information.';
 		liquipedia.console.info( message, heading );
 	},
 	getStyles: function( main, sub ) {
 		return {
-			'display': 'block',
-			'padding': '10px',
-			'margin': '0 10px 0 0',
+			display: 'block',
+			padding: '10px',
+			margin: '0 10px 0 0',
 			'background-color': sub,
-			'color': main,
+			color: main,
 			'border-left': '5px solid ' + main
 		};
 	},
 	getParsedStyleString: function( styles ) {
-		var style = '';
-		for ( var key in styles ) {
-			style += key + ':' + styles[key] + ';';
+		let style = '';
+		for ( const key in styles ) {
+			style += key + ':' + styles[ key ] + ';';
 		}
 		return style;
 	},
@@ -421,32 +394,32 @@ liquipedia.console = {
 		if ( heading === null ) {
 			heading = 'Liquipedia Error';
 		}
-		var styles = liquipedia.console.getStyles( '#ff0000', '#ffcccc' );
-		var style = liquipedia.console.getParsedStyleString( styles );
+		const styles = liquipedia.console.getStyles( '#ff0000', '#ffcccc' );
+		const style = liquipedia.console.getParsedStyleString( styles );
 		console.error( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	info: function( text, heading ) {
 		if ( heading === null ) {
 			heading = 'Liquipedia Info';
 		}
-		var styles = liquipedia.console.getStyles( '#0000ff', '#ccccff' );
-		var style = liquipedia.console.getParsedStyleString( styles );
+		const styles = liquipedia.console.getStyles( '#0000ff', '#ccccff' );
+		const style = liquipedia.console.getParsedStyleString( styles );
 		console.info( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	log: function( text, heading ) {
 		if ( heading === null ) {
 			heading = 'Liquipedia Log';
 		}
-		var styles = liquipedia.console.getStyles( '#042b4c', '#ffffff' );
-		var style = liquipedia.console.getParsedStyleString( styles );
+		const styles = liquipedia.console.getStyles( '#042b4c', '#ffffff' );
+		const style = liquipedia.console.getParsedStyleString( styles );
 		console.log( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	warn: function( text, heading ) {
 		if ( heading === null ) {
 			heading = 'Liquipedia Warning';
 		}
-		var styles = liquipedia.console.getStyles( '#666600', '#ffffcc' );
-		var style = liquipedia.console.getParsedStyleString( styles );
+		const styles = liquipedia.console.getStyles( '#666600', '#ffffcc' );
+		const style = liquipedia.console.getParsedStyleString( styles );
 		console.warn( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	}
 };
@@ -468,7 +441,7 @@ liquipedia.tracker = {
 			if ( typeof nonInteraction === 'undefined' ) {
 				nonInteraction = false;
 			}
-			var eventType = 'user event ';
+			let eventType = 'user event ';
 			if ( nonInteraction ) {
 				eventType += 'passive';
 			} else {
@@ -482,9 +455,9 @@ liquipedia.tracker = {
 				1
 			] );
 			gtag( 'event', 'click', {
-				'event_category': subject,
-				'non_interaction': nonInteraction,
-				'send_to': 'UA-576564-4'
+				event_category: subject,
+				non_interaction: nonInteraction,
+				send_to: 'UA-576564-4'
 			} );
 		}
 	},
@@ -708,53 +681,53 @@ liquipedia.core.modules.push( 'tracker' );
  ******************************************************************************/
 liquipedia.customLuaErrors = {
 	init: function() {
-		mw.loader.using('jquery.ui', function() {
-			var $dialog = $('<div>').dialog({
-				title: mw.msg('scribunto-parser-dialog-title'),
+		mw.loader.using( 'jquery.ui', function() {
+			const $dialog = $( '<div>' ).dialog( {
+				title: mw.msg( 'scribunto-parser-dialog-title' ),
 				autoOpen: false
-			});
-			$('.scribunto-error').each(function() {
+			} );
+			$( '.scribunto-error' ).each( function() {
 				try {
-				var parsedError = JSON.parse(this.innerHTML.toString().replace(/Lua error(: | in )/, '').slice(0, -1));
-				var $backtraceList = $('<ol>', {class: 'scribunto-trace'});
-				parsedError.stackTrace.forEach(function(stackItem) {
-					var $backtraceItem = $('<li>');
-					var $prefix = $('<b>');
-					var prefixText = $('<div>').html(stackItem.prefix).text();
-					if (stackItem.link instanceof Object) {
-					$('<a>', {
-						text: prefixText,
-						href: '/' + stackItem.link.wiki + '/' + stackItem.link.title + '#mw-ce-l' + stackItem.link.ln,
-						target: '_blank'
-					}).appendTo($prefix);
-					} else {
-					$prefix.text(prefixText);
-					}
-					$backtraceItem.append($prefix);
-					$backtraceItem.append(document.createTextNode(': ' + $('<div>').html(stackItem.content).text()));
-					$backtraceItem.appendTo($backtraceList);
-				});
-				var $errorDiv = $('<div>').append(
-					$('<p>', {text: parsedError.errorShort})
-				).append(
-					$('<p>', {text: 'Backtrace:'})
-				).append(
-					$backtraceList
-				);
-				var $newError = $('<span>', {text: parsedError.errorShort, class: 'scribunto-error'});
-				$(this).replaceWith($newError);
-				$newError.on('click', function(e) {
-					$dialog.dialog('close').html($errorDiv).dialog('option', 'position', [e.clientX + 5, e.clientY + 5]).dialog('open');
-				});
-				} catch (ignored) {}
-			});
-		});
+					const parsedError = JSON.parse( this.innerHTML.toString().replace( /Lua error(: | in )/, '' ).slice( 0, -1 ) );
+					const $backtraceList = $( '<ol>', { class: 'scribunto-trace' } );
+					parsedError.stackTrace.forEach( function( stackItem ) {
+						const $backtraceItem = $( '<li>' );
+						const $prefix = $( '<b>' );
+						const prefixText = $( '<div>' ).html( stackItem.prefix ).text();
+						if ( stackItem.link instanceof Object ) {
+							$( '<a>', {
+								text: prefixText,
+								href: '/' + stackItem.link.wiki + '/' + stackItem.link.title + '#mw-ce-l' + stackItem.link.ln,
+								target: '_blank'
+							} ).appendTo( $prefix );
+						} else {
+							$prefix.text( prefixText );
+						}
+						$backtraceItem.append( $prefix );
+						$backtraceItem.append( document.createTextNode( ': ' + $( '<div>' ).html( stackItem.content ).text() ) );
+						$backtraceItem.appendTo( $backtraceList );
+					} );
+					const $errorDiv = $( '<div>' ).append(
+						$( '<p>', { text: parsedError.errorShort } )
+					).append(
+						$( '<p>', { text: 'Backtrace:' } )
+					).append(
+						$backtraceList
+					);
+					const $newError = $( '<span>', { text: parsedError.errorShort, class: 'scribunto-error' } );
+					$( this ).replaceWith( $newError );
+					$newError.on( 'click', function( e ) {
+						$dialog.dialog( 'close' ).html( $errorDiv ).dialog( 'option', 'position', [ e.clientX + 5, e.clientY + 5 ] ).dialog( 'open' );
+					} );
+				} catch ( ignored ) {}
+			} );
+		} );
 	}
 };
-liquipedia.core.modules.push('customLuaErrors');
+liquipedia.core.modules.push( 'customLuaErrors' );
 
 /* Test */
 window.addEventListener( 'error', function( e ) {
-  console.info( 'EL' );
-  console.info( e );
+	console.info( 'EL' );
+	console.info( e );
 } );

@@ -33,236 +33,247 @@
 
 liquipedia.filterButtons = {
 
-    buttonContainerElements: {},
-    buttonFilterAll: {},
-    filterEffect: {},
-    activeButtonClass: 'filter-button--active',
-    hiddenCategoryClass: 'filter-category--hidden',
-    bcFilterGroup: 'filter-group-fallback-common',
-    buttons: {},
-    items: {},
-    activeFilters: {},
-    localStorageKey: null,
-    localStorageValue: {},
+	buttonContainerElements: {},
+	buttonFilterAll: {},
+	filterEffect: {},
+	activeButtonClass: 'filter-button--active',
+	hiddenCategoryClass: 'filter-category--hidden',
+	bcFilterGroup: 'filter-group-fallback-common',
+	buttons: {},
+	items: {},
+	activeFilters: {},
+	localStorageKey: null,
+	localStorageValue: {},
 
-    init: function() {
+	init: function() {
 
-        this.localStorageKey = this.buildLocalStorageKey();
+		this.localStorageKey = this.buildLocalStorageKey();
 
-        /**
-        * Get all elements with data-filter attribute
-        **/
-        const elements = document.querySelectorAll('[data-filter]');
-        if(elements.length === 0) {
-            return;
-        }
+		/**
+		 * Get all elements with data-filter attribute
+		 */
+		const elements = document.querySelectorAll( '[data-filter]' );
+		if ( elements.length === 0 ) {
+			return;
+		}
 
-        elements.forEach(function(element) {
-            const filterGroup = element.dataset.filterGroup || this.bcFilterGroup;
-            this.buttonContainerElements[filterGroup] = element;
-            // Start with empty activeFilters
-            this.activeFilters[filterGroup] = [];
+		elements.forEach( function( element ) {
+			const filterGroup = element.dataset.filterGroup || this.bcFilterGroup;
+			this.buttonContainerElements[ filterGroup ] = element;
+			// Start with empty activeFilters
+			this.activeFilters[ filterGroup ] = [];
 
-            // Get buttons except for 'all' (direct childs only, this avoids catching the dropdown button
-            this.buttons[filterGroup] = this.buttonContainerElements[filterGroup].querySelectorAll(':scope > [data-filter-on]:not([data-filter-on=all])');
-            // Get only 'all' button
-            this.buttonFilterAll[filterGroup] = this.buttonContainerElements[filterGroup].querySelector('[data-filter-on=all]');
+			// Get buttons except for 'all' (direct childs only, this avoids catching the dropdown button
+			this.buttons[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelectorAll( ':scope > [data-filter-on]:not([data-filter-on=all])' );
+			// Get only 'all' button
+			this.buttonFilterAll[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelector( '[data-filter-on=all]' );
 
-            var itemQS = '[data-filter-group='+filterGroup+'][data-filter-category]';
-            if(filterGroup === this.bcFilterGroup) {
-                itemQS = '[data-filter-category]:not([data-filter-group])';
-            }
-            this.items[filterGroup] = document.querySelectorAll(itemQS);
-            this.filterEffect[filterGroup] = this.buttonContainerElements[filterGroup].dataset.filterEffect || 'none';
-
-            //Handler for 'all' button and standard buttons
-            this.filterButtonAllInit(this.buttonFilterAll[filterGroup], filterGroup);
-            this.filterButtonsInit(this.buttons[filterGroup], filterGroup);
-        }.bind(this));
-    },
-
-    /**
-    * Handles the 'all' button.
-    *
-    * If button contains activeClass from start, toggle items.
-    * When a button is clicked for the first time it will be added to the local storage to remember selection.
-    **/
-    filterButtonAllInit: function(button, filterGroup) {
-        if (button) {
-            this.setTabIndex(button);
-
-            if(button.classList.contains(this.activeButtonClass)) {
-                this.toggleAllItems(filterGroup);
-            }
-            button.addEventListener('click', function(event) {
-                this.toggleAllItems(filterGroup);
-                this.setLocalStorage();
-                liquipedia.tracker.track('Filter button clicked: ' + button.textContent, true);
-            }.bind(this));
-            button.addEventListener('keypress', function(event) {
-                if(event.key === 'Enter') {
-                    this.toggleAllItems(filterGroup);
-                    this.setLocalStorage();
-                    liquipedia.tracker.track('Filter button clicked: ' + button.textContent, true);
-                }
-            }.bind(this));
-        }
-    },
-
-    /**
-    * Handles buttons except for the 'all' button.
-    * Filter items on click and Enter key and write to localStorage.
-    **/
-    filterButtonsInit: function(buttons, filterGroup) {
-        buttons.forEach(function(button) {
-            this.setTabIndex(button);
-            this.initButtonState(filterGroup, button);
-
-            button.addEventListener('click', function (event) {
-                this.filterItems(event.target);
-                this.setLocalStorage();
-                liquipedia.tracker.track('Filter button clicked: ' + button.textContent, true);
-            }.bind(this));
-
-            button.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    this.filterItems(event.target);
-                    this.setLocalStorage();
-                    liquipedia.tracker.track('Filter button clicked: ' + button.textContent, true);
-                }
-            }.bind(this));
-        }.bind(this));
-    },
-
-    /**
-    * Initial check if button states need to be changed
-    **/
-    initButtonState: function(filterGroup, button) {
-        // Check for data in local storage
-        const localStorageValue = this.getLocalStorage();
-        if(filterGroup in localStorageValue) {
-			//console.log('filterGroup', filterGroup, this.activeFilters[filterGroup]);
-            // User has filter preferences. Remove all pre-set active classes and build from localstorage instead.
-            button.classList.remove(this.activeButtonClass);
-			if (Array.isArray(localStorageValue[filterGroup]) && localStorageValue[filterGroup].length == 0) {
-				//this.hideAllItems(filterGroup);
-				//console.log('if array empty', filterGroup, localStorageValue[filterGroup]);
+			let itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
+			if ( filterGroup === this.bcFilterGroup ) {
+				itemQS = '[data-filter-category]:not([data-filter-group])';
 			}
-            if(localStorageValue[filterGroup].includes(button.getAttribute('data-filter-on'))) {
-                // User has this filterGroup in localstorage, meaning they have marked a preference, so this takes priority.
-                // If the button is in the localstorage array, filter on it.
-                this.filterItems(button, true);
-            }
-        } else if(!(filterGroup in localStorageValue) && button.classList.contains(this.activeButtonClass)) {
-            // If the user does not have a localstorage array for this filterGroup it means they have
-            // not interacted with the filters, so we fall back to the defaults set by html 'active' classes
-            this.filterItems(button, true);
-        }
-    },
+			this.items[ filterGroup ] = document.querySelectorAll( itemQS );
+			this.filterEffect[ filterGroup ] = this.buttonContainerElements[ filterGroup ].dataset.filterEffect || 'none';
 
-    toggleItems: function(filterGroup) {
-        this.items[filterGroup].forEach(function(item) {
-            const filterCategory = item.getAttribute('data-filter-category');
+			// Handler for 'all' button and standard buttons
+			this.filterButtonAllInit( this.buttonFilterAll[ filterGroup ], filterGroup );
+			this.filterButtonsInit( this.buttons[ filterGroup ], filterGroup );
+		}.bind( this ) );
+	},
 
-            const index = this.activeFilters[filterGroup].indexOf(filterCategory);
-            if(index > -1) {
-                item.classList.add('filter-effect-' + this.filterEffect[filterGroup]);
-                item.classList.remove(this.hiddenCategoryClass);
-            } else {
-                item.classList.remove('filter-effect-' + this.filterEffect[filterGroup]);
-                item.classList.add(this.hiddenCategoryClass);
-            }
-        }.bind(this));
-    },
+	/**
+	 * Handles the 'all' button.
+	 *
+	 * If button contains activeClass from start, toggle items.
+	 * When a button is clicked for the first time it will be added to the local storage to remember selection.
+	 *
+	 * @param button
+	 * @param filterGroup
+	 */
+	filterButtonAllInit: function( button, filterGroup ) {
+		if ( button ) {
+			this.setTabIndex( button );
 
-    showAllItems: function(filterGroup) {
-        this.activeFilters[filterGroup] = [];
+			if ( button.classList.contains( this.activeButtonClass ) ) {
+				this.toggleAllItems( filterGroup );
+			}
+			button.addEventListener( 'click', function( event ) {
+				this.toggleAllItems( filterGroup );
+				this.setLocalStorage();
+				liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+			}.bind( this ) );
+			button.addEventListener( 'keypress', function( event ) {
+				if ( event.key === 'Enter' ) {
+					this.toggleAllItems( filterGroup );
+					this.setLocalStorage();
+					liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+				}
+			}.bind( this ) );
+		}
+	},
 
-        this.buttons[filterGroup].forEach(function(button) {
-            button.classList.add(this.activeButtonClass);
-            this.activeFilters[filterGroup].push(button.getAttribute('data-filter-on'));
-        }.bind(this));
+	/**
+	 * Handles buttons except for the 'all' button.
+	 * Filter items on click and Enter key and write to localStorage.
+	 *
+	 * @param buttons
+	 * @param filterGroup
+	 */
+	filterButtonsInit: function( buttons, filterGroup ) {
+		buttons.forEach( function( button ) {
+			this.setTabIndex( button );
+			this.initButtonState( filterGroup, button );
 
-        this.items[filterGroup].forEach(function(item) {
-            item.classList.add('filter-effect-' + this.filterEffect[filterGroup]);
-            item.classList.remove(this.hiddenCategoryClass);
-        }.bind(this));
+			button.addEventListener( 'click', function ( event ) {
+				this.filterItems( event.target );
+				this.setLocalStorage();
+				liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+			}.bind( this ) );
 
-        this.buttonFilterAll[filterGroup].classList.add(this.activeButtonClass);
-    },
+			button.addEventListener( 'keypress', function ( event ) {
+				if ( event.key === 'Enter' ) {
+					this.filterItems( event.target );
+					this.setLocalStorage();
+					liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+				}
+			}.bind( this ) );
+		}.bind( this ) );
+	},
 
-    hideAllItems: function(filterGroup) {
-        this.activeFilters[filterGroup] = [];
+	/**
+	 * Initial check if button states need to be changed
+	 *
+	 * @param filterGroup
+	 * @param button
+	 */
+	initButtonState: function( filterGroup, button ) {
+		// Check for data in local storage
+		const localStorageValue = this.getLocalStorage();
+		if ( filterGroup in localStorageValue ) {
+			// console.log('filterGroup', filterGroup, this.activeFilters[filterGroup]);
+			// User has filter preferences. Remove all pre-set active classes and build from localstorage instead.
+			button.classList.remove( this.activeButtonClass );
+			if ( Array.isArray( localStorageValue[ filterGroup ] ) && localStorageValue[ filterGroup ].length == 0 ) {
+				// this.hideAllItems(filterGroup);
+				// console.log('if array empty', filterGroup, localStorageValue[filterGroup]);
+			}
+			if ( localStorageValue[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) ) {
+				// User has this filterGroup in localstorage, meaning they have marked a preference, so this takes priority.
+				// If the button is in the localstorage array, filter on it.
+				this.filterItems( button, true );
+			}
+		} else if ( !( filterGroup in localStorageValue ) && button.classList.contains( this.activeButtonClass ) ) {
+			// If the user does not have a localstorage array for this filterGroup it means they have
+			// not interacted with the filters, so we fall back to the defaults set by html 'active' classes
+			this.filterItems( button, true );
+		}
+	},
 
-        this.buttons[filterGroup].forEach(function(button) {
-            button.classList.remove(this.activeButtonClass);
-        }.bind(this));
+	toggleItems: function( filterGroup ) {
+		this.items[ filterGroup ].forEach( function( item ) {
+			const filterCategory = item.getAttribute( 'data-filter-category' );
 
-        this.items[filterGroup].forEach(function(item) {
-            item.classList.remove('filter-effect-' + this.filterEffect[filterGroup]);
-            item.classList.add(this.hiddenCategoryClass);
-        }.bind(this));
+			const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
+			if ( index > -1 ) {
+				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.remove( this.hiddenCategoryClass );
+			} else {
+				item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.add( this.hiddenCategoryClass );
+			}
+		}.bind( this ) );
+	},
 
-        this.buttonFilterAll[filterGroup].classList.remove(this.activeButtonClass);
-    },
+	showAllItems: function( filterGroup ) {
+		this.activeFilters[ filterGroup ] = [];
 
-    toggleAllItems: function(filterGroup) {
-        if(this.activeFilters[filterGroup].length === this.buttons[filterGroup].length) {
-            this.hideAllItems(filterGroup);
-        } else {
-            this.showAllItems(filterGroup);
-        }
-    },
+		this.buttons[ filterGroup ].forEach( function( button ) {
+			button.classList.add( this.activeButtonClass );
+			this.activeFilters[ filterGroup ].push( button.getAttribute( 'data-filter-on' ) );
+		}.bind( this ) );
 
-    filterItems: function(button, isInit) {
-        const filterCategory = button.getAttribute('data-filter-on');
-        const filterGroup = button.closest('[data-filter]').getAttribute('data-filter-group') || this.bcFilterGroup;
-        if(!(filterGroup in this.activeFilters)) return;
+		this.items[ filterGroup ].forEach( function( item ) {
+			item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+			item.classList.remove( this.hiddenCategoryClass );
+		}.bind( this ) );
 
-        const index = this.activeFilters[filterGroup].indexOf(filterCategory);
-        if(index > -1) {
-            if(isInit === true) return;
-            this.activeFilters[filterGroup].splice(index, 1);
-            button.classList.remove(this.activeButtonClass);
-            if (this.buttonFilterAll[filterGroup]) {
-                this.buttonFilterAll[filterGroup].classList.remove(this.activeButtonClass);
-            }
-            this.toggleItems(filterGroup);
-        } else {
-            this.activeFilters[filterGroup].push(filterCategory);
-            button.classList.add(this.activeButtonClass);
-            if(this.buttonFilterAll[filterGroup] && this.activeFilters[filterGroup].length === this.buttons[filterGroup].length) {
-                this.buttonFilterAll[filterGroup].classList.add(this.activeButtonClass);
-            }
-            this.toggleItems(filterGroup);
-        }
-    },
+		this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
+	},
 
-    getLocalStorage: function() {
-        const check = window.localStorage.getItem(this.localStorageKey);
-        return check ? JSON.parse(window.localStorage.getItem(this.localStorageKey)) : {};
-    },
+	hideAllItems: function( filterGroup ) {
+		this.activeFilters[ filterGroup ] = [];
 
-    /**
-    * Set local storage value with activeFilters
-    **/
-    setLocalStorage: function() {
-        window.localStorage.setItem( this.localStorageKey, JSON.stringify(this.activeFilters) );
-    },
+		this.buttons[ filterGroup ].forEach( function( button ) {
+			button.classList.remove( this.activeButtonClass );
+		}.bind( this ) );
 
-    /**
-    * Add tabindex attribute to element
-    **/
-    setTabIndex: function(element) {
-        element.setAttribute('tabindex', '0');
-    },
+		this.items[ filterGroup ].forEach( function( item ) {
+			item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+			item.classList.add( this.hiddenCategoryClass );
+		}.bind( this ) );
 
-    buildLocalStorageKey: function() {
-        const base = 'LiquipediaFilterButtons';
-        const scriptPath = mw.config.get('wgScriptPath').replace(/[\W]/g,'');
-        const pageName = mw.config.get('wgPageName');
+		this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
+	},
 
-        return base + '-' + scriptPath + '-' + pageName;
-    }
+	toggleAllItems: function( filterGroup ) {
+		if ( this.activeFilters[ filterGroup ].length === this.buttons[ filterGroup ].length ) {
+			this.hideAllItems( filterGroup );
+		} else {
+			this.showAllItems( filterGroup );
+		}
+	},
+
+	filterItems: function( button, isInit ) {
+		const filterCategory = button.getAttribute( 'data-filter-on' );
+		const filterGroup = button.closest( '[data-filter]' ).getAttribute( 'data-filter-group' ) || this.bcFilterGroup;
+		if ( !( filterGroup in this.activeFilters ) ) { return; }
+
+		const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
+		if ( index > -1 ) {
+			if ( isInit === true ) { return; }
+			this.activeFilters[ filterGroup ].splice( index, 1 );
+			button.classList.remove( this.activeButtonClass );
+			if ( this.buttonFilterAll[ filterGroup ] ) {
+				this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
+			}
+			this.toggleItems( filterGroup );
+		} else {
+			this.activeFilters[ filterGroup ].push( filterCategory );
+			button.classList.add( this.activeButtonClass );
+			if ( this.buttonFilterAll[ filterGroup ] && this.activeFilters[ filterGroup ].length === this.buttons[ filterGroup ].length ) {
+				this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
+			}
+			this.toggleItems( filterGroup );
+		}
+	},
+
+	getLocalStorage: function() {
+		const check = window.localStorage.getItem( this.localStorageKey );
+		return check ? JSON.parse( window.localStorage.getItem( this.localStorageKey ) ) : {};
+	},
+
+	/**
+	 * Set local storage value with activeFilters
+	 */
+	setLocalStorage: function() {
+		window.localStorage.setItem( this.localStorageKey, JSON.stringify( this.activeFilters ) );
+	},
+
+	/**
+	 * Add tabindex attribute to element
+	 *
+	 * @param element
+	 */
+	setTabIndex: function( element ) {
+		element.setAttribute( 'tabindex', '0' );
+	},
+
+	buildLocalStorageKey: function() {
+		const base = 'LiquipediaFilterButtons';
+		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
+		const pageName = mw.config.get( 'wgPageName' );
+
+		return base + '-' + scriptPath + '-' + pageName;
+	}
 };
 liquipedia.core.modules.push( 'filterButtons' );

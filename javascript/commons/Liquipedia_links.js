@@ -21,7 +21,7 @@ liquipedia.liquipedialinks = {
 				badgeTooltip.innerHTML = 'Find me on ' + countOtherWikis + ' other wikis too!';
 			} else {
 				badgeTooltip.innerHTML = 'Find me on ' + countOtherWikis + ' other wiki too!';
-			};
+			}
 
 			document.getElementById( 'brand-desktop' ).append( badge, badgeTooltip );
 		}

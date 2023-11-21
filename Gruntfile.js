@@ -12,7 +12,7 @@ module.exports = function( grunt ) {
 				'!node_modules/**',
 				'!vendor/**'
 			]
-		},
+		}
 	} );
 
 	grunt.registerTask( 'main', [ 'eslint' ] );

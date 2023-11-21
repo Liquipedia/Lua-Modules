@@ -9,28 +9,28 @@ liquipedia.commonstools = {
 	},
 	wikis: null,
 	createForms: function() {
-		var checkForPageExistenceForm = document.getElementById( 'checkforpageexistence' );
+		const checkForPageExistenceForm = document.getElementById( 'checkforpageexistence' );
 		if ( checkForPageExistenceForm !== null ) {
 			checkForPageExistenceForm.innerHTML = '<form id="checkforpageexistenceform"><input id="checkforpageexistenceinput" placeholder="Name of page" class="form-control"><button id="checkforpageexistencebutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkforpageexistenceresult"></div>';
 		}
-		var checkPageTextForm = document.getElementById( 'checkpagetext' );
+		const checkPageTextForm = document.getElementById( 'checkpagetext' );
 		if ( checkPageTextForm !== null ) {
 			checkPageTextForm.innerHTML = '<form id="checkpagetextform"><input id="checkpagetextforminputname" placeholder="Name of page" class="form-control"><input id="checkpagetextforminputsource" placeholder="Source wiki" class="form-control"><button id="checkpagetextbutton" class="btn btn-primary" type="submit">Search</button></form><div id="checkpagetextresult"></div>';
 		}
 	},
 	createCallbacks: function() {
-		var checkForPageExistenceForm = document.getElementById( 'checkforpageexistenceform' );
+		const checkForPageExistenceForm = document.getElementById( 'checkforpageexistenceform' );
 		if ( checkForPageExistenceForm !== null ) {
 			checkForPageExistenceForm.addEventListener( 'submit', liquipedia.commonstools.checkForPageExistence );
 		}
-		var checkPageTextForm = document.getElementById( 'checkpagetextform' );
+		const checkPageTextForm = document.getElementById( 'checkpagetextform' );
 		if ( checkPageTextForm !== null ) {
 			checkPageTextForm.addEventListener( 'submit', liquipedia.commonstools.checkPageText );
 		}
 	},
 	setupWikisWithCallback: function( callback ) {
 		if ( liquipedia.commonstools.wikis === null ) {
-			var api = new mw.ForeignApi( '/api.php' );
+			const api = new mw.ForeignApi( '/api.php' );
 			api.get( {
 				action: 'listwikis'
 			} ).done( function( data ) {
@@ -48,15 +48,15 @@ liquipedia.commonstools = {
 		} );
 	},
 	checkForPageExistenceReal: function() {
-		var title = document.getElementById( 'checkforpageexistenceinput' ).value;
-		var wikiData = null;
-		var listElement = null;
-		var checkForPageExistenceResult = document.getElementById( 'checkforpageexistenceresult' );
-		var i = 1;
+		const title = document.getElementById( 'checkforpageexistenceinput' ).value;
+		let wikiData = null;
+		let listElement = null;
+		const checkForPageExistenceResult = document.getElementById( 'checkforpageexistenceresult' );
+		let i = 1;
 		if ( checkForPageExistenceResult !== null ) {
 			checkForPageExistenceResult.innerHTML = '<ul id="checkforpageexistenceresultlist"></ul>';
-			var checkForPageExistenceResultList = document.getElementById( 'checkforpageexistenceresultlist' );
-			for ( var wiki in liquipedia.commonstools.wikis ) {
+			const checkForPageExistenceResultList = document.getElementById( 'checkforpageexistenceresultlist' );
+			for ( const wiki in liquipedia.commonstools.wikis ) {
 				if ( liquipedia.commonstools.wikis.hasOwnProperty( wiki ) ) {
 					wikiData = liquipedia.commonstools.wikis[ wiki ];
 					listElement = document.createElement( 'li' );
@@ -68,7 +68,7 @@ liquipedia.commonstools = {
 		}
 	},
 	checkForPageExistenceApiCall: function( wiki, wikiData, title, listElement ) {
-		var api = new mw.Api( { ajax: { url: wikiData.api } } );
+		const api = new mw.Api( { ajax: { url: wikiData.api } } );
 		api.get( {
 			action: 'query',
 			prop: 'revisions',
@@ -80,10 +80,10 @@ liquipedia.commonstools = {
 			if ( !data.hasOwnProperty( 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
-				var page = data.query.pages[ 0 ];
-				var link = document.createElement( 'a' );
-				var editLink = document.createElement( 'a' );
-				var span = document.createElement( 'span' );
+				const page = data.query.pages[ 0 ];
+				const link = document.createElement( 'a' );
+				const editLink = document.createElement( 'a' );
+				const span = document.createElement( 'span' );
 				link.href = '/' + wiki + '/' + page.title;
 				editLink.href = '/' + wiki + '/index.php?title=' + page.title + '&action=edit';
 				editLink.innerHTML = 'Edit';
@@ -116,16 +116,16 @@ liquipedia.commonstools = {
 	},
 	checkPageTextRealSourceText: null,
 	checkPageTextReal: function() {
-		var title = document.getElementById( 'checkpagetextforminputname' ).value;
-		var sourceWiki = document.getElementById( 'checkpagetextforminputsource' ).value;
-		var wikiData = null;
-		var listElement = null;
-		var checkPageTextResult = document.getElementById( 'checkpagetextresult' );
-		var i = 1;
+		const title = document.getElementById( 'checkpagetextforminputname' ).value;
+		const sourceWiki = document.getElementById( 'checkpagetextforminputsource' ).value;
+		let wikiData = null;
+		let listElement = null;
+		const checkPageTextResult = document.getElementById( 'checkpagetextresult' );
+		let i = 1;
 		if ( checkPageTextResult !== null ) {
 			checkPageTextResult.innerHTML = '<ul id="checkpagetextresultlist"></ul>';
-			var checkPageTextResultList = document.getElementById( 'checkpagetextresultlist' );
-			var api = new mw.Api( { ajax: { url: '/' + sourceWiki + '/api.php' } } );
+			const checkPageTextResultList = document.getElementById( 'checkpagetextresultlist' );
+			const api = new mw.Api( { ajax: { url: '/' + sourceWiki + '/api.php' } } );
 			api.get( {
 				action: 'query',
 				prop: 'revisions',
@@ -137,7 +137,7 @@ liquipedia.commonstools = {
 				if ( !data.hasOwnProperty( 'query' ) ) {
 					listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 				} else {
-					var page = data.query.pages[ 0 ];
+					const page = data.query.pages[ 0 ];
 					if ( page.hasOwnProperty( 'missing' ) && page.missing ) {
 						listElement = document.createElement( 'li' );
 						listElement.style.color = '#0000ff';
@@ -145,7 +145,7 @@ liquipedia.commonstools = {
 						checkPageTextResultList.append( listElement );
 					} else {
 						liquipedia.commonstools.checkPageTextRealSourceText = page.revisions[ 0 ].content;
-						for ( var wiki in liquipedia.commonstools.wikis ) {
+						for ( const wiki in liquipedia.commonstools.wikis ) {
 							if ( liquipedia.commonstools.wikis.hasOwnProperty( wiki ) ) {
 								if ( sourceWiki !== wiki ) {
 									wikiData = liquipedia.commonstools.wikis[ wiki ];
@@ -162,7 +162,7 @@ liquipedia.commonstools = {
 		}
 	},
 	checkPageTextApiCall: function( wiki, wikiData, title, sourceWiki, listElement ) {
-		var api = new mw.Api( { ajax: { url: wikiData.api } } );
+		const api = new mw.Api( { ajax: { url: wikiData.api } } );
 		api.get( {
 			action: 'query',
 			prop: 'revisions',
@@ -174,10 +174,10 @@ liquipedia.commonstools = {
 			if ( !data.hasOwnProperty( 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
-				var page = data.query.pages[ 0 ];
-				var link = document.createElement( 'a' );
-				var postButton = document.createElement( 'button' );
-				var span = document.createElement( 'span' );
+				const page = data.query.pages[ 0 ];
+				const link = document.createElement( 'a' );
+				const postButton = document.createElement( 'button' );
+				const span = document.createElement( 'span' );
 				link.href = '/' + wiki + '/' + page.title;
 				postButton.type = 'button';
 				postButton.innerHTML = 'Transfer';
@@ -204,14 +204,14 @@ liquipedia.commonstools = {
 					}
 				}
 				postButton.addEventListener( 'click', function() {
-					var api = new mw.Api( { ajax: { url: wikiData.api } } );
+					const api = new mw.Api( { ajax: { url: wikiData.api } } );
 					api.get( {
 						action: 'query',
 						meta: 'tokens'
 					} ).done( function( data ) {
-						var editToken = data.query.tokens.csrftoken;
+						const editToken = data.query.tokens.csrftoken;
 						if ( editToken === '+\\' ) {
-							var errorMessage = document.createElement( 'p' );
+							const errorMessage = document.createElement( 'p' );
 							errorMessage.style.color = '#ff0000';
 							errorMessage.innerHTML = 'Not logged in on destination wiki';
 							listElement.append( errorMessage );
@@ -222,7 +222,7 @@ liquipedia.commonstools = {
 								text: liquipedia.commonstools.checkPageTextRealSourceText,
 								token: editToken
 							} ).done( function( data ) {
-								var successMessage = document.createElement( 'p' );
+								const successMessage = document.createElement( 'p' );
 								successMessage.style.color = '#006400';
 								successMessage.innerHTML = 'Transferred!';
 								listElement.append( successMessage );
@@ -233,12 +233,12 @@ liquipedia.commonstools = {
 			}
 		} );
 	},
-	timeoutPageExistenceApi: function( i, wiki, wikiData, title, listElement ){
+	timeoutPageExistenceApi: function( i, wiki, wikiData, title, listElement ) {
 		setTimeout( function() {
 			liquipedia.commonstools.checkForPageExistenceApiCall( wiki, wikiData, title, listElement );
 		}, i * 1000 );
 	},
-	timeoutPageTextApi: function( i, wiki, wikiData, title, sourceWiki, listElement ){
+	timeoutPageTextApi: function( i, wiki, wikiData, title, sourceWiki, listElement ) {
 		setTimeout( function() {
 			liquipedia.commonstools.checkPageTextApiCall( wiki, wikiData, title, sourceWiki, listElement );
 		}, i * 1000 );
