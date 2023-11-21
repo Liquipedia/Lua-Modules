@@ -49,8 +49,9 @@ for file in $files; do
   fi
   echo "== Checking $file =="
   fileContents=$(cat "$file")
+  fileName=$(basename "$file")
 
-  page="MediaWiki:Common.css/${file}"
+  page="MediaWiki:Common.css/${fileName}"
 
   echo "...page = $page"
 
