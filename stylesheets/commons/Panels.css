@@ -1,0 +1,29 @@
+/*******************************************************************************
+Template(s): Panels
+Author(s): FO-nTTaX
+*******************************************************************************/
+.panel-box {
+	margin-bottom: 10px;
+	border: 0.0625rem solid var( --panel-box-border-color, var( --wiki-bordercolor-light ) );
+}
+
+.panel-box-heading {
+	font-size: 18px;
+	font-weight: bold;
+	padding: 5px 10px;
+	background-color: var( --panel-header-background-color, var( --wiki-color-light ) );
+	border-bottom: 0.0625rem solid var( --panel-header-background-color, var( --wiki-bordercolor-light ) );
+}
+
+.panel-box-heading:not( :first-child ) {
+	border-top: 1px solid;
+	border-top-color: inherit;
+}
+
+.panel-box-heading > small {
+	font-weight: bold;
+}
+
+.panel-box-body {
+	padding: 10px;
+}

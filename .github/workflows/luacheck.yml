@@ -1,4 +1,4 @@
-name: Code Style and Unit Tests
+name: Lua Code Style and Unit Tests
 
 on: [pull_request, workflow_dispatch]
 
@@ -56,7 +56,7 @@ jobs:
       - name: Run test
         run: |
           busted -v --run=ci --output=junit > busted.xml
-  
+
       - name: Report test
         uses: mikepenz/action-junit-report@v3
         if: always()

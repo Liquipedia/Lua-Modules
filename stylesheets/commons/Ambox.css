@@ -1,0 +1,32 @@
+/*******************************************************************************
+Template(s): Amboxes
+Author(s): FO-nTTaX
+*******************************************************************************/
+.ambox-wrapper {
+	overflow: hidden;
+}
+
+@media ( max-width: 600px ) {
+	.ambox-wrapper {
+		clear: both;
+	}
+}
+
+.ambox {
+	margin: 0 auto 5px auto;
+	width: 100%;
+	max-width: 600px;
+	min-width: 250px;
+	border-width: 0 0 0 5px;
+	padding: 4px;
+	border-style: solid;
+	overflow: hidden;
+}
+
+.ambox-fa-icon {
+	font-size: 40px;
+}
+
+.ambox-text {
+	padding: 5px;
+}
