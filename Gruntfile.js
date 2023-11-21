@@ -1,6 +1,7 @@
 /* eslint-env node */
 module.exports = function( grunt ) {
 	grunt.loadNpmTasks( 'grunt-eslint' );
+	grunt.loadNpmTasks( 'grunt-stylelint' );
 
 	grunt.initConfig( {
 		eslint: {
@@ -12,9 +13,19 @@ module.exports = function( grunt ) {
 				'!node_modules/**',
 				'!vendor/**'
 			]
+		},
+		stylelint: {
+			options: {
+				fix: grunt.option( 'fix' )
+			},
+			all: [
+				'**/*.{css,scss,less}',
+				'!node_modules/**',
+				'!vendor/**'
+			]
 		}
 	} );
 
-	grunt.registerTask( 'main', [ 'eslint' ] );
+	grunt.registerTask( 'main', [ 'eslint', 'stylelint' ] );
 	grunt.registerTask( 'default', 'test' );
 };

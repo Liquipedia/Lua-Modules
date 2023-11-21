@@ -1,0 +1,123 @@
+/*******************************************************************************
+Template(s): NavFrame
+Author(s): Standard Navigationsleisten, aka box hiding thingy from .de.  Documentation at [[Wikipedia:NavFrame]]
+*******************************************************************************/
+div.NavFrame {
+	margin: 0;
+	padding: 4px;
+	border: 1px solid #aaaaaa;
+	text-align: center;
+	border-collapse: collapse;
+	font-size: 95%;
+}
+
+div.NavFrame + div.NavFrame {
+	border-top-style: 0;
+	border-top-style: hidden;
+}
+
+div.NavPic {
+	background-color: #ffffff;
+	margin: 0;
+	padding: 2px;
+	float: left;
+}
+
+div.NavFrame div.NavHead {
+	height: 1.6em;
+	font-weight: bold;
+	background-color: #ccccff;
+	position: relative;
+}
+
+div.NavFrame p,
+div.NavFrame div.NavContent,
+div.NavFrame div.NavContent p {
+	font-size: 100%;
+}
+
+div.NavEnd {
+	margin: 0;
+	padding: 0;
+	line-height: 1px;
+	clear: both;
+}
+
+a.NavToggle {
+	position: absolute;
+	top: 0;
+	right: 3px;
+	font-weight: normal;
+	font-size: 90%;
+}
+
+/* NavFrame fix to enable them next to ads */
+.NavFrame {
+	overflow: auto hidden;
+}
+
+html.client-js .NavFrame.collapsed .NavContent {
+	display: none;
+}
+
+.NavFrame.collapsed > .NavHead > .collapseButtonHide,
+.NavFrame:not( .collapsed ) > .NavHead > .collapseButtonShow {
+	display: none;
+}
+
+.NavFrame:not( .collapsed ) > .NavHead > .collapseButtonHide,
+.NavFrame.collapsed > .NavHead > .collapseButtonShow {
+	display: block;
+}
+
+/*******************************************************************************
+Template(s): CSS for Collapsibles
+Author(s): FO-nTTaX
+*******************************************************************************/
+html.client-js .collapsible.collapsed > thead > tr:nth-child( n+2 ),
+html.client-js .collapsible.collapsed > thead + tbody,
+html.client-js .collapsible.collapsed > tbody > tr:nth-child( n+2 ),
+html.client-js .collapsible.collapsed > tfoot,
+html.client-js .collapsible.collapsed > tr:nth-child( n+2 ) {
+	display: none;
+}
+
+.collapsible.collapsed .collapseButtonHide,
+.collapsible:not( .collapsed ) .collapseButtonShow {
+	display: none;
+}
+
+.collapsible:not( .collapsed ) .collapsible.collapsed .collapseButtonShow {
+	display: block;
+}
+
+.collapsible .collapseButtonMapsShow,
+.collapsible .collapseButtonMapsHide {
+	display: none;
+}
+
+.collapsible:not( .collapsed ):not( .uncollapsed-maps ) .collapseButtonMapsShow,
+.collapsible:not( .collapsed ).uncollapsed-maps .collapseButtonMapsHide {
+	display: block;
+}
+
+.collapsible:not( .uncollapsed-maps ) .maprow {
+	display: none;
+}
+
+.collapseButton {
+	float: right;
+	font-weight: normal;
+	text-align: right;
+	width: auto;
+	min-width: 40px;
+}
+
+.broadcast-talent-partner-list-frame .collapseButton {
+	float: unset;
+	text-align: center;
+}
+
+.collapseCenterFix {
+	padding-left: 40px;
+}

@@ -1,5 +1,6 @@
 {
 	"recommendations": [
-		"sumneko.lua"
+		"sumneko.lua",
+		"stylelint.vscode-stylelint"
 	]
 }

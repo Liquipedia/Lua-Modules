@@ -1,0 +1,110 @@
+/*******************************************************************************
+Template(s): Filter buttons
+Author(s): Elysienna
+*******************************************************************************/
+.filter-category--hidden {
+	clip: rect( 0 0 0 0 );
+	clip-path: inset( 50% );
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+	opacity: 0;
+}
+
+.filter-buttons {
+	display: flex;
+}
+
+.filter-button {
+	padding: 0.25rem 0.75rem;
+	background-color: transparent;
+	border: 0.125rem solid var( --clr-primary-container, #c1cee8 );
+	color: var( --clr-primary, #3366cc );
+	border-radius: 0.25rem;
+	transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.filter-button:not( :last-child ) {
+	margin-right: 0.5rem;
+}
+
+.filter-button:hover {
+	background-color: var( --clr-primary, #3366cc );
+	border-color: var( --clr-primary, #3366cc );
+	color: var( --clr-on-primary, #ffffff );
+	cursor: pointer;
+}
+
+.filter-button:focus {
+	outline: 0;
+	box-shadow: 0 0.5rem 0.625rem 0.125rem rgba( 0, 0, 0, 0.1 ), 0 0 0 0.1875rem #c2d1f0;
+}
+
+.filter-button--active {
+	color: var( --clr-on-primary-container, #ffffff );
+	background-color: var( --clr-primary-container, #1f3d7a );
+	border-color: var( --clr-primary-container, #1f3d7a );
+}
+
+.filter-effect-fade {
+	animation-name: fadeIn;
+	animation-duration: 0.8s;
+}
+
+.filter-effect-bounce {
+	animation-name: bounceIn;
+	animation-duration: 0.8s;
+}
+
+/* Keyframes filter effects */
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes bounceIn {
+	from {
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	0% {
+		opacity: 0;
+		transform: scale3d( 0.3, 0.3, 0.3 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	20% {
+		transform: scale3d( 1.1, 1.1, 1.1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	40% {
+		transform: scale3d( 0.9, 0.9, 0.9 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	60% {
+		opacity: 1;
+		transform: scale3d( 1.03, 1.03, 1.03 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	80% {
+		transform: scale3d( 0.97, 0.97, 0.97 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+
+	to {
+		opacity: 1;
+		transform: scale3d( 1, 1, 1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
+	}
+}
