@@ -259,7 +259,7 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 	for _, game in pairs(games) do
 		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
 			for opponentIndex, score in pairs(scores) do
-				scores[opponentIndex] = score + (game.scores[opponentIndex] or 0)
+				scores[opponentIndex] = score + (tonumber(game.scores[opponentIndex]) or 0)
 			end
 		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
