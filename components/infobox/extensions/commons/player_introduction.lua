@@ -128,7 +128,7 @@ function PlayerIntroduction:queryPlayerInfo()
 	return self
 end
 
----@param queryOnlyIfPlayerInfoIsFound boolean
+---@param queryOnlyIfPlayerInfoIsPresent boolean
 ---@return self
 function PlayerIntroduction:queryTransferData(queryOnlyIfPlayerInfoIsPresent)
 	if queryOnlyIfPlayerInfoIsPresent and Table.isEmpty(self.playerInfo) then
