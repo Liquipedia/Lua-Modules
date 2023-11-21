@@ -28,6 +28,8 @@ jobs:
         with:
           files: |
             stylesheets/**/*.css
+            stylesheets/**/*.less
+            stylesheets/**/*.scss
 
       - name: CSS Deploy
         if: steps.css-changed-files.outputs.any_changed == 'true'
