@@ -282,7 +282,7 @@ Author(s): iMarbot
 		justify-content: center;
 
 		&::before {
-			content: '#';
+			content: "#";
 		}
 	}
 

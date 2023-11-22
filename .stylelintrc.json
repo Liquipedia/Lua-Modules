@@ -1,7 +1,8 @@
 {
 	"extends": "stylelint-config-wikimedia",
 	"plugins": [
-		"stylelint-less"
+		"stylelint-less",
+		"stylelint-stylistic"
 	],
 	"customSyntax": "postcss-less",
 	"rules": {
@@ -15,13 +16,9 @@
 		"selector-pseudo-element-colon-notation": null,
 		"no-duplicate-selectors": null,
 		"function-url-no-scheme-relative": null,
-		"declaration-no-important": null
-	},
-	"overrides": [ {
-		"files": ["*.css", "**/*.css"],
-		"rules": {
-			"function-no-unknown": null
-		}
-	} ]
+		"declaration-no-important": null,
+		"stylistic/string-quotes": "double",
+		"function-no-unknown": null
+	}
 }
 

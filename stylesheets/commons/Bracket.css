@@ -282,13 +282,13 @@ td.bracket-game .icon {
 }
 
 .table-battleroyale-results-round .icon {
-	right: calc( ~'50% - 5px' );
+	right: calc( ~"50% - 5px" );
 }
 
 .table-battleroyale-results-round .bracket-popup-wrapper {
 	position: absolute;
 	top: 5px;
-	left: calc( ~'50% - 165px' );
+	left: calc( ~"50% - 165px" );
 }
 
 /* Archon mode brackets */
@@ -481,7 +481,7 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-left,
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-right {
-	width: calc( ~'50% - 2px' );
+	width: calc( ~"50% - 2px" );
 	padding: 5px;
 	display: inline-block;
 	white-space: nowrap;
@@ -547,7 +547,7 @@ Author(s): FO-nTTaX, salle
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header-vs:after,
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -601,7 +601,7 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -621,7 +621,7 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-time:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -633,7 +633,7 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-bans:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -648,14 +648,14 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-comment:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-body:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -669,7 +669,7 @@ Author(s): FO-nTTaX, salle
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-footer:after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	width: 100%;
 	display: block;
 }
@@ -682,7 +682,7 @@ Author(s): FO-nTTaX, salle
 }
 
 .bracket-popup-wrapper .bracket-popup .bracket-popup-header .bracket-popup-header-center {
-	width: calc( ~'100% - 2px' );
+	width: calc( ~"100% - 2px" );
 	padding: 2.5px;
 	display: inline-block;
 	white-space: nowrap;
@@ -1565,7 +1565,7 @@ Author(s): FO-nTTaX
 		width: calc( 11 * 68px + 10 * 10px + 22px + 10px ) !important;
 	}
 
-	.bracket-doubles .bracket-column-matches-s2 .bracket-score[ style*='right' ][ style*='39px' ] {
+	.bracket-doubles .bracket-column-matches-s2 .bracket-score[ style*="right" ][ style*="39px" ] {
 		right: 22px !important;
 	}
 }

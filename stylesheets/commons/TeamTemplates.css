@@ -82,7 +82,7 @@ span.team-template-team-bracket {
 .team-template-team-bracket .team-template-image-legacy {
 	vertical-align: 0;
 	height: var( --team-template-bracket-height, 21px );
-	width: calc( ~'var(--team-template-bracket-height, 21px) * 2.4' );
+	width: calc( ~"var(--team-template-bracket-height, 21px) * 2.4" );
 }
 
 .team-template-team-bracket .team-template-image-icon img {
@@ -127,7 +127,7 @@ Author(s): iMarbot, Darkrai
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.team-template-image-icon.lightmode,
 	.team-template-image-icon.team-template-lightmode,

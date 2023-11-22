@@ -94,7 +94,7 @@ Author: hjpalpha
 
 .brkts-opponent-hover > .participantTable-entry::after {
 	clip-path: inset( -4px 0 -4px -1px );
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;
@@ -129,7 +129,7 @@ Author: hjpalpha
 
 .participantTable-faction > .participantTable-row > .participantTable-tbd,
 .participantTable-faction > .participantTable-row > .participantTable-title {
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 }
 
 .participantTable-faction > .participantTable-row {
