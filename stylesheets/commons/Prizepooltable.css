@@ -279,7 +279,7 @@ Author: warnull
 
 .prize-pool-toggle-expand.prize-pool-toggle-expand.prize-pool-toggle-expand.prize-pool-toggle-expand > * {
 	color: unset;
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 	text-decoration: none;
 }
 
@@ -366,13 +366,13 @@ Author: warnull
 }
 
 .prize-pool-team {
-	grid-column: prime / -1;
+	grid-column: ~"prime / -1";
 	text-align: left;
 }
 
 .prize-pool-literal {
 	font-style: italic;
-	grid-column: prime / -1;
+	grid-column: ~"prime / -1";
 }
 
 .prize-pool-entry.brkts-opponent-hover::after {
@@ -423,7 +423,7 @@ Author: warnull
 	.prize-pool-header,
 	.prize-pool-slot-area,
 	.prize-pool-toggle-expand {
-		grid-column: 1 / -1;
+		grid-column: ~"1 / -1";
 	}
 
 	.prize-pool-header {
@@ -453,7 +453,7 @@ Author: warnull
  */
 
 .starcraft-prize-pool-special-prize {
-	grid-column: prime / usd-prize;
+	grid-column: ~"prime / usd-prize";
 }
 
 .starcraft-prize-pool-archon-race {
@@ -526,7 +526,7 @@ Author: Rathoz
 }
 
 .ppt-toggle-expand {
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 }
 
 /*******************************************************************************
