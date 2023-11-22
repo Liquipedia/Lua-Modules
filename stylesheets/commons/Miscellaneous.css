@@ -4883,10 +4883,6 @@ Author(s): hjpalpha
 	background: linear-gradient( to right, #fbdfdf, #fbdfdf 47%, #dee3ef 53%, #dee3ef );
 }
 
-.theme--dark .participant-table-race-header.Random .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Protoss .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Zerg .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Terran .opponent-list-cell-content img,
 .theme--dark img[ title='Protoss' ],
 .theme--dark img[ title='Zerg' ],
 .theme--dark img[ title='Terran' ],
