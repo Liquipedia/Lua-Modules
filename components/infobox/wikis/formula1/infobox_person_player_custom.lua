@@ -108,9 +108,7 @@ end
 ---@param args table
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args)
-	local role = Role.run{role = args.role}
-	lpdbData.extradata.isplayer = role.isPlayer or 'true'
-	lpdbData.extradata.role = role.role
+	lpdbData.extradata.role = Role.run{role = args.role}.role
 	lpdbData.extradata.role2 = Role.run{role = args.role2}.role
 	return lpdbData
 end
