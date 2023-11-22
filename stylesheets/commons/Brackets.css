@@ -1304,6 +1304,8 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 	width: 22px;
 	margin: 1px;
+	border-radius: 0;
+	min-height: 0;
 }
 
 .brkts-designer-gallery-grid {
