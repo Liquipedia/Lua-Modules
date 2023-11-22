@@ -25,13 +25,11 @@ local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _player
 
 ---@param frame Frame
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	_player = player
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
