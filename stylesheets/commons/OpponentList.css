@@ -42,7 +42,7 @@ Author: warnull
 .opponent-list-section-title {
 	background-color: var( --table-header-variant-background-color, #eaecf0 );
 	font-weight: bold;
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 	text-align: center;
 }
 
@@ -53,7 +53,7 @@ Author: warnull
 @supports not (display: contents) {
 	.opponent-list-section {
 		display: block;
-		grid-column: 1 / -1;
+		grid-column: ~"1 / -1";
 	}
 
 	.opponent-list-party {
@@ -68,7 +68,7 @@ Author: warnull
 
 .opponent-list-tbd {
 	font-style: italic;
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 	text-align: center;
 }
 
@@ -121,7 +121,7 @@ Author: warnull
 }
 
 .opponent-list-team {
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 	min-width: 120px;
 }
 
@@ -136,7 +136,7 @@ Author: warnull
 
 .opponent-list-literal {
 	font-style: italic;
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 	min-width: 120px;
 }
 
@@ -189,7 +189,7 @@ Author: warnull
 	.participant-table-header,
 	.participant-table-section {
 		display: grid;
-		grid-column: 1 / -1;
+		grid-column: ~"1 / -1";
 		grid-template-columns: repeat( 3, 1fr );
 	}
 }
@@ -365,7 +365,7 @@ Author: hjpalpha
 
 .participantTable-faction > .participantTable-row > .participantTable-tbd,
 .participantTable-faction > .participantTable-row > .participantTable-title {
-	grid-column: 1 / -1;
+	grid-column: ~"1 / -1";
 }
 
 .participantTable-faction > .participantTable-row {

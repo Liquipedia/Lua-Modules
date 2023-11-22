@@ -82,7 +82,7 @@ Author: warnull
 	.group-table-header-row,
 	.group-table-result-row {
 		display: grid;
-		grid-column: 1 / -1;
+		grid-column: ~"1 / -1";
 		grid-template-columns: 36px 1fr repeat( 8, auto );
 	}
 }
@@ -211,7 +211,7 @@ Author: warnull
 	.swiss-table-header-row,
 	.swiss-table-body-row {
 		display: grid;
-		grid-column: 1 / -1;
+		grid-column: ~"1 / -1";
 		grid-template-columns: 50% 50%;
 	}
 

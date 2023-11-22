@@ -435,7 +435,7 @@ Author: warnull
 }
 
 .rts-team-table-header-row-players {
-	grid-column: entry 1 / -1;
+	grid-column: ~"entry 1 / -1";
 	min-width: 100px;
 }
 
@@ -456,7 +456,7 @@ Author: warnull
 
 .rts-team-table-tbd-entry {
 	font-style: italic;
-	grid-column: entry 1 / -1;
+	grid-column: ~"entry 1 / -1";
 	min-width: 100px;
 	text-align: center;
 }
