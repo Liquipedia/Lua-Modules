@@ -47,18 +47,14 @@ end
 ---@rreturn Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
-		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = true,
-			player = _player.pagename,
-			addlpdbdata = true
+		return {
+			Title{name = 'History'},
+			Center{content = {TeamHistoryAuto._results{
+				convertrole = true,
+				addlpdbdata = true
+			}}},
 		}
 
-		if automatedHistory then
-			return {
-				Title{name = 'History'},
-				Center{content = {automatedHistory}},
-			}
-		end
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role(s)', content = {Role.run({role = _args.role}).display, Role.run({role = _args.role2}).display}}
