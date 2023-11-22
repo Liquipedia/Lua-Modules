@@ -155,7 +155,7 @@ function Error:getErrorJson()
 	end)
 
 	local errorSplit = mw.text.split(self.error, ':', true)
-	local errorText = ''
+	local errorText
 	if #errorSplit == 4 then
 		errorText = string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit))
 	elseif #errorSplit > 4 then
