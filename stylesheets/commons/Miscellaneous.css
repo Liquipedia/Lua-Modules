@@ -204,7 +204,7 @@ Author(s): FO-nTTaX, Elysienna
 	color: #676767;
 	border-radius: 0.25rem;
 	font-size: 0.75rem;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-weight: bold;
 	padding: 0.125rem 0.25rem;
 	top: 0.0625rem;
@@ -227,7 +227,7 @@ Author(s): FO-nTTaX, Elysienna
 }
 
 .liquipedia-links-badge--tooltip:before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0.25rem;
 	left: -0.3125rem;
@@ -279,7 +279,7 @@ Template(s): TeamHistory
 Author(s): FO-nTTaX
 *******************************************************************************/
 .th-mono {
-	font-family: 'Droid Sans Mono', monospace;
+	font-family: "Droid Sans Mono", monospace;
 	letter-spacing: -1.4px;
 }
 
@@ -296,8 +296,8 @@ Author(s): FO-nTTaX
 	margin: 0;
 }
 
-#sidebar-toc .row > [ class*='col-' ],
-#scroll-wrapper-toc .row > [ class*='col-' ] {
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
 	padding-left: 5px;
 	padding-right: 5px;
 }
@@ -320,7 +320,7 @@ Author(s): FO-nTTaX
 
 .participants-table-buttons::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	display: block;
 }
 
@@ -446,7 +446,7 @@ span.icon-small.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.league-icon-small-image.lightmode,
 	span.icon-small.lightmode {
@@ -511,7 +511,7 @@ Author(s): FO-nTTaX
 }
 
 .timeline-row > div:nth-of-type( 2 ) {
-	width: calc( ~'100% - 150px' );
+	width: calc( ~"100% - 150px" );
 }
 
 .timeline-period {
@@ -689,7 +689,7 @@ Author(s): FO-nTTaX, Rapture
 
 .spellcard-description {
 	display: inline-block;
-	width: calc( ~'100% - 124px' );
+	width: calc( ~"100% - 124px" );
 	border-width: 1px 0;
 	border-style: solid;
 	padding: 5px 0;
@@ -1197,7 +1197,7 @@ Author(s): spazer
 	border-style: solid;
 	padding-left: 2px;
 	margin: 5px 0 0 5px;
-	width: calc( ~'100% - 10px' );
+	width: calc( ~"100% - 10px" );
 	text-align: center;
 }
 
@@ -1257,14 +1257,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.darkmode {
 		display: inline-block;
@@ -1275,14 +1275,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.darkmode {
 		display: inline;
@@ -1353,7 +1353,7 @@ Author(s): QuadratClown
 .rl-responsive-table {
 	border-collapse: collapse;
 	margin: 0;
-	width: calc( ~'100% - 347px' );
+	width: calc( ~"100% - 347px" );
 	table-layout: fixed;
 }
 
@@ -1466,7 +1466,7 @@ Author(s): QuadratClown
 .rl-responsive-table-sortable {
 	border-collapse: collapse;
 	margin: 0;
-	width: calc( ~'100% - 347px' );
+	width: calc( ~"100% - 347px" );
 	table-layout: fixed;
 }
 
@@ -1642,7 +1642,7 @@ Author(s): Rapture
 	background-color: var( --table-header-background-color, var( --clr-surface-4, #f5f5f5 ) );
 }
 
-.roster-card > tbody > tr > th.large-only[ colspan='1' ] {
+.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
 	display: none;
 }
 
@@ -1707,11 +1707,11 @@ Author(s): Rapture
 		border: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
 	}
 
-	.roster-card > tbody > tr > th.large-only[ colspan='10' ] {
+	.roster-card > tbody > tr > th.large-only[ colspan="10" ] {
 		display: none;
 	}
 
-	.roster-card > tbody > tr > th.large-only[ colspan='1' ] {
+	.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
 		display: table-cell;
 	}
 
@@ -1819,7 +1819,7 @@ Author(s): Rapture
 	padding: 5px;
 }
 
-.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 	display: none;
 }
 
@@ -1849,11 +1849,11 @@ Author(s): Rapture
 		border: 1px solid var( --clr-border, #bbbbbb );
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='10' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
 		display: none;
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 		display: table-cell;
 	}
 
@@ -2041,7 +2041,7 @@ Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 650px ) {
 	.roster-notes-squash div {
-		max-width: calc( ~'100% - 350px' );
+		max-width: calc( ~"100% - 350px" );
 	}
 }
 
@@ -2120,10 +2120,10 @@ img.player-role-icon {
 	image-rendering: -webkit-optimize-contrast;
 }
 
-.player-role-icon img[ title='Captain' ],
-.player-role-icon img[ title='In-Game Leader' ],
-img.player-role-icon[ alt='Captain' ],
-img.player-role-icon[ alt='In-Game Leader' ] {
+.player-role-icon img[ title="Captain" ],
+.player-role-icon img[ title="In-Game Leader" ],
+img.player-role-icon[ alt="Captain" ],
+img.player-role-icon[ alt="In-Game Leader" ] {
 	height: 13px;
 	width: 18px;
 	vertical-align: baseline;
@@ -2150,7 +2150,7 @@ kbd {
 	padding: 1px 2px;
 	border-radius: 3px;
 	font-weight: 500;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 }
 
 /*******************************************************************************
@@ -2831,7 +2831,7 @@ Author(s): Rapture
 	padding: 0 !important;
 }
 
-#main-content-column .form-field-tokens input[ type='search' ] {
+#main-content-column .form-field-tokens input[ type="search" ] {
 	height: auto;
 	padding: 0;
 	margin: 3px 0 0 5px;
@@ -2878,7 +2878,7 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.icon-16px.lightmode {
 		display: none;
@@ -3216,7 +3216,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
@@ -3230,7 +3230,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #b12a2a;
@@ -3349,8 +3349,8 @@ Author(s): salle
 }
 
 .team-portal-list .tp-rank-card .tp-photo {
-	height: calc( ~'19vw / 4 * 3 - 5px' );
-	width: calc( ~'19vw - 5px' );
+	height: calc( ~"19vw / 4 * 3 - 5px" );
+	width: calc( ~"19vw - 5px" );
 	text-align: center;
 	overflow: hidden;
 }
@@ -4400,18 +4400,18 @@ ul.match-bm-lol-game-veto-overview-pick {
 Template(s): Darkmode images on file pages
 Author(s): FO-nTTaX, iMarbot
 *******************************************************************************/
-html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
-	#file img[ src*='darkmode' ]:not( :hover ),
-	.searchResultImage img[ src*='darkmode' ],
-	.gallerybox img[ src*='darkmode' ] {
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
+	#file img[ src*="darkmode" ]:not( :hover ),
+	.searchResultImage img[ src*="darkmode" ],
+	.gallerybox img[ src*="darkmode" ] {
 		background-color: #272727;
 	}
 }
 
-#file img[ src*='lightmode' ]:not( :hover ),
-.searchResultImage img[ src*='lightmode' ],
-.gallerybox img[ src*='lightmode' ] {
-	[ data-darkreader-scheme='dark' ] & {
+#file img[ src*="lightmode" ]:not( :hover ),
+.searchResultImage img[ src*="lightmode" ],
+.gallerybox img[ src*="lightmode" ] {
+	[ data-darkreader-scheme="dark" ] & {
 		background-color: #808080;
 	}
 
@@ -4420,8 +4420,8 @@ html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
 	}
 }
 
-.filehistory a img[ src*='darkmode' ],
-#file img[ src*='darkmode' ]:hover {
+.filehistory a img[ src*="darkmode" ],
+#file img[ src*="darkmode" ]:hover {
 	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
 }
 
@@ -4498,12 +4498,12 @@ Author(s): hjpalpha
 *******************************************************************************/
 
 .show-when-dark-mode,
-[ data-darkreader-scheme='dark' ] .show-when-light-mode,
+[ data-darkreader-scheme="dark" ] .show-when-light-mode,
 .theme--dark .show-when-light-mode {
 	display: none !important;
 }
 
-[ data-darkreader-scheme='dark' ] .show-when-dark-mode,
+[ data-darkreader-scheme="dark" ] .show-when-dark-mode,
 .theme--dark .show-when-dark-mode {
 	display: unset !important;
 }
@@ -4530,7 +4530,7 @@ Author(s): hjpalpha
 Template: Matchpage Lightmode/Darkmode class
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.lightmode,
 	.matchpage div.logo.lightmode {
@@ -4543,7 +4543,7 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.darkmode,
 	.matchpage div.logo.darkmode {
@@ -4555,39 +4555,39 @@ Author(s): iMarbot
 Template: Darkmode 32px icons
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ],
+[ data-darkreader-scheme="dark" ],
 .theme--dark {
 	& .vodlink img,
 	.group-table-header-right img {
-		&[ src*='VOD_Icon' ],
-		&[ src*='Match_Info_Stats' ],
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Reviews32' ],
-		&[ src*='Preview_Icon32' ],
-		&[ src*='LiveReport32' ],
-		&[ src*='Interview32' ],
-		&[ src*='Highlights_Icon32' ],
-		&[ src*='Captain_Icon' ],
-		&[ src*='Recap_Icon' ] {
+		&[ src*="VOD_Icon" ],
+		&[ src*="Match_Info_Stats" ],
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Reviews32" ],
+		&[ src*="Preview_Icon32" ],
+		&[ src*="LiveReport32" ],
+		&[ src*="Interview32" ],
+		&[ src*="Highlights_Icon32" ],
+		&[ src*="Captain_Icon" ],
+		&[ src*="Recap_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
 
 	& img.player-role-icon,
 	.rts-team-list-icon-tag img {
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Captain_Icon' ] {
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Captain_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
 }
 
 .theme--dark img.player-role-icon {
-	&[ src*='/Trial.png' ],
-	&[ src*='/Substitution.png' ],
-	&[ src*='Captain_Icon' ] {
+	&[ src*="/Trial.png" ],
+	&[ src*="/Substitution.png" ],
+	&[ src*="Captain_Icon" ] {
 		filter: invert( 1 );
 	}
 }
@@ -4887,10 +4887,10 @@ Author(s): hjpalpha
 .theme--dark .participant-table-race-header.Protoss .opponent-list-cell-content img,
 .theme--dark .participant-table-race-header.Zerg .opponent-list-cell-content img,
 .theme--dark .participant-table-race-header.Terran .opponent-list-cell-content img,
-.theme--dark img[ title='Protoss' ],
-.theme--dark img[ title='Zerg' ],
-.theme--dark img[ title='Terran' ],
-.theme--dark img[ title='Random' ] {
+.theme--dark img[ title="Protoss" ],
+.theme--dark img[ title="Zerg" ],
+.theme--dark img[ title="Terran" ],
+.theme--dark img[ title="Random" ] {
 	filter: grayscale( 100% ) brightness( 40 );
 }
 
@@ -5136,7 +5136,7 @@ Author(s): salle
 }
 
 .tyre-graph-bar {
-	width: calc( ~'100% - 80px' );
+	width: calc( ~"100% - 80px" );
 	border-left: 1px solid var( --clr-secondary-39, #646464 );
 	height: 12px;
 	display: inline-flex;

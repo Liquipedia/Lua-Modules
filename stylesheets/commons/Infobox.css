@@ -392,26 +392,26 @@ Author(s): iMarbot
 *******************************************************************************/
 .infobox-image {
 	& img {
-		&[ src*='allmode' ],
-		&[ src*='darkmode' ],
-		&[ src*='lightmode' ] {
+		&[ src*="allmode" ],
+		&[ src*="darkmode" ],
+		&[ src*="lightmode" ] {
 			max-height: 500px;
 			max-width: 100%;
 			width: auto !important;
 			height: auto !important;
 
-			&:not( [ src*='padded' ] ) {
+			&:not( [ src*="padded" ] ) {
 				padding: 15px;
 			}
 		}
 	}
 
 	&.darkmode {
-		html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) .fo-nttax-infobox-wrapper:not( .infobox-darkmodeforced ) & {
+		html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) .fo-nttax-infobox-wrapper:not( .infobox-darkmodeforced ) & {
 			display: none;
 		}
 
-		html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) .infobox-darkmodeforced & {
+		html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) .infobox-darkmodeforced & {
 			background: #1e2021;
 		}
 
@@ -419,18 +419,18 @@ Author(s): iMarbot
 			background-position: center;
 			background-size: cover;
 
-			&[ src*='ESL_Pro_League' ] {
+			&[ src*="ESL_Pro_League" ] {
 				background-image: url( //liquipedia.net/commons/images/6/6d/ESL_Pro_League_2019_background.png );
 			}
 
-			&[ src*='ESL_Challenger_League' ] {
+			&[ src*="ESL_Challenger_League" ] {
 				background-image: url( //liquipedia.net/commons/images/4/4e/ESL_Challenger_League_background.jpg );
 			}
 		}
 	}
 
 	&.lightmode {
-		html[ data-darkreader-scheme='dark' ] &,
+		html[ data-darkreader-scheme="dark" ] &,
 		html.theme--dark &,
 		.infobox-darkmodeforced & {
 			display: none;
@@ -442,13 +442,13 @@ Author(s): iMarbot
 Template(s): Player photos (cutout shots) styling
 Author(s): iMarbot
 *******************************************************************************/
-.infobox-image img[ src*='playerphoto' ] {
+.infobox-image img[ src*="playerphoto" ] {
 	max-height: 500px;
 	max-width: 100%;
 	width: auto !important;
 	height: auto !important;
 
-	&:not( [ src*='padded' ] ) {
+	&:not( [ src*="padded" ] ) {
 		padding: 15px 15px 0;
 	}
 }

@@ -23,7 +23,7 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 
 .techtree li::before,
 .techtree li::after {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	right: 50%;
@@ -62,7 +62,7 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 }
 
 .techtree ul ul::before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0;
 	left: 50%;
