@@ -29,7 +29,7 @@ tr.dota-stat-row > td {
 
 .dota-stat-popup {
 	border: 1px solid #a9a9a9;
-	width: calc( ~'100% - 5px' );
+	width: calc( ~"100% - 5px" );
 	min-width: 1150px;
 	background: var( --clr-background, #f8f9fa );
 	position: absolute;

@@ -97,7 +97,7 @@ Author(s): ???
 		width: 100%;
 	}
 
-	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$='.svg' ] ) {
+	.teamcard:not( .teamcard-nomobile ) table.logo img:not( [ src$=".svg" ] ) {
 		width: auto;
 		height: auto;
 		max-width: 90%;
@@ -148,7 +148,7 @@ Author(s): ???
 }
 
 .teamcard-toggle-button::after {
-	content: ' ';
+	content: " ";
 	display: block;
 	clear: left;
 }
@@ -280,7 +280,7 @@ Author(s): iMarbot
 Template(s): TeamCard Dark Reader support
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.teamcard span.logo-lightmode {
 		display: none !important;

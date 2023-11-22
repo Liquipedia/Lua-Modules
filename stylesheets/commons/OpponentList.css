@@ -88,7 +88,7 @@ Author: warnull
 
 .brkts-opponent-hover > .opponent-list-cell::after {
 	clip-path: inset( -5px 0 -5px -1px );
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;
@@ -330,7 +330,7 @@ Author: hjpalpha
 
 .brkts-opponent-hover > .participantTable-entry::after {
 	clip-path: inset( -4px 0 -4px -1px );
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;
