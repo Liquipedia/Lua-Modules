@@ -4760,17 +4760,18 @@ Author(s): Elysienna
 	border-color: #00005d;
 }
 
-.theme--dark .portal-map {
-	background-color: var( --clr-secondary-16 );
-	border-color: var( --clr-secondary-25 );
-}
-
-.theme--dark .portal-map .dynamicmap > div:first-child {
-	background-color: #000000;
-}
-
-.theme--dark .portal-map .dynamicmap > div > img {
-	filter: invert( 1 );
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.portal-map {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
+	.portal-map .dynamicmap > div:first-child {
+		background-color: #000000;
+	}
+	.portal-map .dynamicmap > div > img {
+		filter: invert( 1 );
+	}
 }
 
 /*******************************************************************************
@@ -4786,15 +4787,6 @@ Author(s): hjpalpha
 	background: var( --clr-forestgreen-90, #d1ffcc ) !important;
 }
 
-.theme--dark .Protoss,
-.theme--dark .warcraft-nightelf,
-.theme--dark .Protoss th,
-.theme--dark .warcraft-nightelf th,
-.theme--dark .Protoss td,
-.theme--dark .warcraft-nightelf td {
-	background: var( --clr-forestgreen-20, #d1ffcc ) !important;
-}
-
 .Zerg,
 .warcraft-orc,
 .Zerg th,
@@ -4802,15 +4794,6 @@ Author(s): hjpalpha
 .Zerg td,
 .warcraft-orc td {
 	background: var( --clr-cinnabar-90, #fad1d1 ) !important;
-}
-
-.theme--dark .Zerg,
-.theme--dark .warcraft-orc,
-.theme--dark .Zerg th,
-.theme--dark .warcraft-orc th,
-.theme--dark .Zerg td,
-.theme--dark .warcraft-orc td {
-	background: var( --clr-cinnabar-20, #fad1d1 ) !important;
 }
 
 .Terran,
@@ -4822,25 +4805,10 @@ Author(s): hjpalpha
 	background: var( --clr-sapphire-90, #cce1ff ) !important;
 }
 
-.theme--dark .Terran,
-.theme--dark .warcraft-human,
-.theme--dark .Terran th,
-.theme--dark .warcraft-human th,
-.theme--dark .Terran td,
-.theme--dark .warcraft-human td {
-	background: var( --clr-sapphire-20, #cce1ff ) !important;
-}
-
 .Random,
 .Random th,
 .Random td {
 	background: var( --clr-sun-90, #fff7cc ) !important;
-}
-
-.theme--dark .Random,
-.theme--dark .Random th,
-.theme--dark .Random td {
-	background: var( --clr-sun-20, #fff7cc ) !important;
 }
 
 .warcraft-multirace,
@@ -4852,25 +4820,10 @@ Author(s): hjpalpha
 	background: var( --clr-moon-90, #e6e6e6 ) !important;
 }
 
-.theme--dark .warcraft-multirace,
-.theme--dark .warcraft-multirace th,
-.theme--dark .warcraft-multirace td,
-.theme--dark .Bye,
-.theme--dark .Bye th,
-.theme--dark .Bye td {
-	background: var( --clr-moon-40, #e6e6e6 ) !important;
-}
-
 .warcraft-undead,
 .warcraft-undead th,
 .warcraft-undead td {
 	background: var( --clr-vividviolet-90, #f1d2fa ) !important;
-}
-
-.theme--dark .warcraft-undead,
-.theme--dark .warcraft-undead th,
-.theme--dark .warcraft-undead td {
-	background: var( --clr-vividviolet-30, #200033 ) !important;
 }
 
 .nyd,
@@ -4879,15 +4832,56 @@ Author(s): hjpalpha
 	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) ) !important;
 }
 
-.terran-zerg-gradient {
-	background: linear-gradient( to right, #fbdfdf, #fbdfdf 47%, #dee3ef 53%, #dee3ef );
-}
-
-.theme--dark img[ title="Protoss" ],
-.theme--dark img[ title="Zerg" ],
-.theme--dark img[ title="Terran" ],
-.theme--dark img[ title="Random" ] {
-	filter: grayscale( 100% ) brightness( 40 );
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	img[ title="Protoss" ],
+	img[ title="Zerg" ],
+	img[ title="Terran" ],
+	img[ title="Random" ] {
+		filter: grayscale( 100% ) brightness( 40 );
+	}
+	.warcraft-undead,
+	.warcraft-undead th,
+	.warcraft-undead td {
+		background: var( --clr-vividviolet-30, #200033 ) !important;
+	}
+	.warcraft-multirace,
+	.warcraft-multirace th,
+	.warcraft-multirace td,
+	.Bye,
+	.Bye th,
+	.Bye td {
+		background: var( --clr-moon-40, #e6e6e6 ) !important;
+	}
+	.Random,
+	.Random th,
+	.Random td {
+		background: var( --clr-sun-20, #fff7cc ) !important;
+	}
+	.Terran,
+	.warcraft-human,
+	.Terran th,
+	.warcraft-human th,
+	.Terran td,
+	.warcraft-human td {
+		background: var( --clr-sapphire-20, #cce1ff ) !important;
+	}
+	.Zerg,
+	.warcraft-orc,
+	.Zerg th,
+	.warcraft-orc th,
+	.Zerg td,
+	.warcraft-orc td {
+		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
+	}
+	.Protoss,
+	.warcraft-nightelf,
+	.Protoss th,
+	.warcraft-nightelf th,
+	.Protoss td,
+	.warcraft-nightelf td {
+		background: var( --clr-forestgreen-20, #d1ffcc ) !important;
+	}
 }
 
 /*******************************************************************************
