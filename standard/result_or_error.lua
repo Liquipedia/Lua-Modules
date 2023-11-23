@@ -155,9 +155,17 @@ function Error:getErrorJson()
 	end)
 
 	local errorSplit = mw.text.split(self.error, ':', true)
+	local errorText
+	if #errorSplit == 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit))
+	elseif #errorSplit > 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s', unpack(Array.sub(errorSplit, 1, 4)))
+		errorText = errorText .. ':' .. table.concat(Array.sub(errorSplit, 5), ':') .. '.'
+	else
+		errorText = string.format('Lua error: %s.', self.error)
+	end
 	return Json.stringify({
-			errorShort = (#errorSplit == 1) and string.format('Lua error: %s.', self.error)
-				or string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit)),
+			errorShort = errorText,
 			stackTrace = stackTrace,
 		}, {asArray = true})
 end
