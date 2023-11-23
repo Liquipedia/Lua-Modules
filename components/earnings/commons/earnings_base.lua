@@ -10,12 +10,13 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
-local MathUtils = require('Module:Math')
+local MathUtils = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_DATE = '1970-01-01 00:00:00'
 
@@ -173,13 +174,13 @@ function Earnings.calculate(conditions, queryYear, mode, perYear, aliases, isPla
 	}
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
-	totalEarnings = MathUtils._round(totalEarnings)
+	totalEarnings = MathUtils.round(totalEarnings)
 
 	if not perYear then
 		return totalEarnings
 	end
 
-	earningsByYear = Table.mapValues(earningsByYear, MathUtils._round)
+	earningsByYear = Table.mapValues(earningsByYear, MathUtils.round)
 
 	return totalEarnings, earningsByYear
 end

@@ -57,7 +57,7 @@ function ParticipantTable:read()
 end
 
 ---@class ParticipantTableConfig
----@field lpdbPrefix string
+---@field lpdbPrefix string?
 ---@field noStorage boolean
 ---@field matchGroupSpec table?
 ---@field syncPlayers boolean
@@ -81,7 +81,7 @@ end
 function ParticipantTable.readConfig(args, parentConfig)
 	parentConfig = parentConfig or {}
 	local config = {
-		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix') or '',
+		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
 		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
 			Variables.varDefault('disable_LPDB_storage') or not Namespace.isMain()),
 		matchGroupSpec = TournamentStructure.readMatchGroupsSpec(args),
@@ -213,12 +213,12 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
@@ -286,7 +286,8 @@ end
 ---@param lpdbData table
 ---@return string
 function ParticipantTable:objectName(lpdbData)
-	return 'ranking_' .. self.config.lpdbPrefix .. '_' .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
+	local lpdbPrefix = self.config.lpdbPrefix and ('_' .. self.config.lpdbPrefix) or ''
+	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
 end
 
 ---@param lpdbData table

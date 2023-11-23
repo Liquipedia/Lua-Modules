@@ -259,14 +259,14 @@ function MatchesTable._applyCustomAbbreviations(matchHeader)
 	return matchHeader
 end
 
----@param opponent standardOpponent
+---@param opponent table
 ---@param flip boolean
 ---@param side string
 ---@return Html
 function MatchesTable._buildOpponent(opponent, flip, side)
 	local opponentCell = mw.html.create('td'):addClass('Team' .. side)
 
-	opponent = Opponent.fromMatch2Record(opponent)
+	opponent = Opponent.fromMatch2Record(opponent) --[[@as standardOpponent]]
 
 	if Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then
 		opponent = Opponent.tbd(Opponent.literal)

@@ -19,7 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -110,28 +111,35 @@ end
 
 ---@param args table
 function LegacyMatchMaps._readMaps(args)
+	local toNewKey = function(prefix, key)
+		local index, newKeyPrefix = string.match(key, '^' .. prefix .. 'p(%d)(%l+)$')
+		if index and newKeyPrefix then
+			return newKeyPrefix .. index
+		end
+		return string.gsub(key, '^' .. prefix, '')
+	end
+
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'map' .. mapIndex
 		local map = Table.filterByKey(args, function(key) return String.startsWith(key, prefix) end)
 		map = Table.map(map, function(key, value)
 			args[key] = nil
+
+			local noCheckIndex = string.match(key, '^' .. prefix .. 'p(%d)heroesNoCheck$')
+			if noCheckIndex then
+				--2v2 submatches never had heroes data so no check needed for those
+				return 't' .. noCheckIndex .. 'p1heroesNoCheck', value
+			end
+
 			if key == prefix then
 				return 'map', value
 			end
+
 			if key == prefix .. 'win' then
 				return 'winner', value
 			end
-			local heroesOpponentIndex = string.match(key, '^' .. prefix .. 'p(%d)heroes$')
-			if heroesOpponentIndex then
-				return 'heroes' .. heroesOpponentIndex, value
-			end
-			local raceOpponentIndex = string.match(key, '^' .. prefix .. 'p(%d)race$')
-			if raceOpponentIndex then
-				return 'race' .. raceOpponentIndex, value
-			end
 
-			local newKey = string.gsub(key, '^' .. prefix, '')
-			return newKey, value
+			return toNewKey(prefix, key), value
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
@@ -180,7 +188,10 @@ function LegacyMatchMaps._readTeamOpponents(args)
 	Array.forEach(Array.range(1, NUMBER_OF_OPPONENTS), function(opponentIndex)
 		local template = args['team' .. opponentIndex]
 		args['team' .. opponentIndex] = nil
-		if template:upper() == BYE then
+		if not template then
+			args['opponent' .. opponentIndex] = Opponent.blank(Opponent.literal)
+			return
+		elseif template:upper() == BYE then
 			args['opponent' .. opponentIndex] = {type = Opponent.literal, name = BYE}
 			return
 		end

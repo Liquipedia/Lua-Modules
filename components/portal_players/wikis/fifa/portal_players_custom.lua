@@ -19,7 +19,8 @@ local Team = require('Module:Team')
 local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
 local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
 	.. ' & ' .. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')
@@ -128,7 +129,7 @@ function CustomPortalPlayers._getAge(player)
 	})
 
 	if not ageCalculationSuccess then
-		return age
+		return age --[[@as string]]
 	end
 
 	if age.death then

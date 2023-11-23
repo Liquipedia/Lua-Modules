@@ -186,11 +186,22 @@ function matchFunctions.getExtraData(match)
 		showh2h = showh2h,
 		isfeatured = matchFunctions.isFeatured(match),
 		casters = MatchGroupInput.readCasters(match),
-		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
-		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
+		hasopponent1 = matchFunctions._checkForNonEmptyOpponent(opponent1),
+		hasopponent2 = matchFunctions._checkForNonEmptyOpponent(opponent2),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 	return match
+end
+
+function matchFunctions._checkForNonEmptyOpponent(opponent)
+	if Opponent.typeIsParty(opponent.type) then
+		return Array.any(opponent.match2players, function(player) return Logic.isNotEmpty(player.name) end)
+	elseif opponent.type == Opponent.team then
+		return Logic.isNotEmpty(opponent.template)
+	end
+
+	-- Literal case
+	return false
 end
 
 function matchFunctions.getLinks(match)
@@ -298,7 +309,7 @@ function matchFunctions.getOpponents(args)
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400

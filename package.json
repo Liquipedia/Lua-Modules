@@ -1,0 +1,14 @@
+{
+	"private": true,
+	"devDependencies": {
+		"grunt": "*",
+		"grunt-stylelint": "*",
+		"postcss-less": "*",
+		"stylelint-config-wikimedia": "*",
+		"stylelint-less": "*"
+	},
+	"scripts": {
+		"test": "grunt main",
+		"fix": "grunt main --fix"
+	}
+}

@@ -20,10 +20,21 @@ end
 
 ---Json-stringifies a given table.
 ---@param obj table
----@param pretty boolean?
+---@param options? {pretty: boolean?, asArray: boolean?}
 ---@return string
-function Json.stringify(obj, pretty)
-	return mw.text.jsonEncode(obj, pretty == true and mw.text.JSON_PRETTY or nil)
+---@overload fun(obj: any, options: table?): any
+function Json.stringify(obj, options)
+	if type(obj) ~= 'table' then
+		return obj
+	end
+
+	options = options or {}
+
+	if options.pretty or options.asArray then
+		return mw.text.jsonEncode(obj, options.pretty and mw.text.JSON_PRETTY or nil)
+	end
+
+	return mw.ext.LiquipediaDB.lpdb_create_json(obj)
 end
 
 ---Json-stringifies subtables of a given table.
@@ -34,7 +45,7 @@ function Json.stringifySubTables(obj, pretty)
 	local objectWithStringifiedSubtables = {}
 	for key, item in pairs(obj) do
 		if type(item) == 'table' then
-			objectWithStringifiedSubtables[key] = Json.stringify(item, pretty)
+			objectWithStringifiedSubtables[key] = Json.stringify(item, {pretty = pretty})
 		else
 			objectWithStringifiedSubtables[key] = item
 		end

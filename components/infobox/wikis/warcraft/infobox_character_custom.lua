@@ -12,7 +12,7 @@ local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
@@ -116,7 +116,7 @@ function CustomInjector:addCustomCells(widgets)
 			function(gainFactor) return CustomCharacter._calculateArmor(gainFactor, true) end, '[[Armor]]:')),
 		BreakDown(CustomCharacter._toLevelChangesRow(CustomCharacter._calculateDamage, '[[Attack Damage|Damage]]:')),
 		BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
-			return Math.round{CustomCharacter._calculateCooldown(gainFactor), 2} end, '[[Attack Speed|Cooldown]]:'))
+			return Math.round(CustomCharacter._calculateCooldown(gainFactor), 2) end, '[[Attack Speed|Cooldown]]:'))
 	)
 end
 
@@ -150,7 +150,7 @@ function CustomCharacter._getArmorAttribute()
 		- 2 + (tonumber(_args.basearmor) or 0)
 
 	return ATTRIBUTE_ICONS.armor
-		.. '<br>' .. Abbreviation.make(Math.round{armorValue, 0}, armorValue)
+		.. '<br>' .. Abbreviation.make(Math.round(armorValue, 0), armorValue)
 end
 
 ---@return string
@@ -197,7 +197,7 @@ function CustomCharacter._calculateArmor(gainFactor, abbreviate)
 		- 2 + (tonumber(_args.basearmor) or 0)
 
 	if abbreviate then
-		return Abbreviation.make(Math.round{armor, 0}, armor)
+		return Abbreviation.make(Math.round(armor, 0), armor)
 	end
 
 	return armor
@@ -332,10 +332,10 @@ end
 ---@return number[]
 function CustomCharacter._calculateEhp(args)
 	local toEhp = function(gainFactor)
-		return Math.round{
+		return Math.round(
 			CustomCharacter._calculateHitPoints(gainFactor) * (1 + 0.06 * CustomCharacter._calculateArmor(gainFactor)),
 			0
-		}
+		)
 	end
 
 	return {toEhp(0), toEhp(4), toEhp(9)}

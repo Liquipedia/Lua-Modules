@@ -14,6 +14,7 @@ local GameModeLookup = require('Module:GameModeLookup')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
+local MatchTicker = require('Module:Matches Tournament')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -32,6 +33,8 @@ local Center = Widgets.Center
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local SECONDS_PER_DAY = 86400
+
 local _league
 local categories = {}
 
@@ -46,6 +49,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.createBottomContent = CustomLeague.createBottomContent
 
 	return league:createInfobox()
 end
@@ -115,6 +119,17 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+function CustomLeague:createBottomContent()
+	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
+
+	if yesterday <= Variables.varDefault('tournament_enddate', '1970-01-01') then
+		return MatchTicker.get{args={
+			parent = _league.pagename,
+			limit = tonumber(_league.args.matchtickerlimit) or 7,
+			noInfoboxWrapper = true
+		}}
+	end
+end
 
 function CustomLeague:getWikiCategories(args)
 	if String.isEmpty(args.game) then

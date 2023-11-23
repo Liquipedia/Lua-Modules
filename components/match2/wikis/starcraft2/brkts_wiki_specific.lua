@@ -10,7 +10,10 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true})
+
+---@class Starcraft2BrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
@@ -23,20 +26,30 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 end)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true}).BracketContainer
+	if matchGroupType == 'matchlist' then
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
+		return MatchList.MatchlistContainer
+	end
+
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
+	return Bracket.BracketContainer
 end
 
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		return Lua.import(
+		local SingleMatch = Lua.import(
 			'Module:MatchGroup/Display/SingleMatch/Starcraft',
 			{requireDevIfEnabled = true}
-		).SingleMatchContainer
+		)
+		return SingleMatch.SingleMatchContainer
 	end
 end
+
+WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+	return StarcraftMatchGroupUtil.matchHasDetails
+end)
 
 --Default Logo for Teams without Team Template
 WikiSpecific.defaultIcon = 'StarCraft 2 Default logo.png'

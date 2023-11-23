@@ -21,7 +21,7 @@ local FIRST_MATCH_KEY = 'R01-M001'
 
 --- Fetches and adjusts matches so they can be displayed in the shortened format
 ---@param props {bracketId: string, shortTemplate: string, args: table}
----@return table
+---@return string
 function ShortenBracket.adjustMatchesAndBracketId(props)
 	local shortTemplate = 'Bracket/' .. string.gsub(props.shortTemplate, '^[bB]racket/', '')
 	local matches = MatchGroupUtil.fetchMatchRecords(props.bracketId)

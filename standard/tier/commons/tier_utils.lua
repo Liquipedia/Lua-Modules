@@ -19,6 +19,7 @@ local TierData = mw.loadData('Module:Tier/Data')
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
 
+---@class TierUtils
 local Tier = {}
 
 --- Converts input to standardized identifier format

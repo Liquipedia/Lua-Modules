@@ -37,10 +37,15 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 		winner = 'map$1$win',
 		race1 = 'map$1$p1race',
 		race2 = 'map$1$p2race',
+		score1 = 'map$1$p1score',
+		score2 = 'map$1$p2score',
 		heroes1 = 'map$1$p1heroes',
 		heroes2 = 'map$1$p2heroes',
+		t1p1heroesNoCheck = 'map$1$p1heroesNoCheck',
+		t2p1heroesNoCheck = 'map$1$p2heroesNoCheck',
 		vod = 'vodgame$1$',
 		subgroup = 'map$1$subgroup',
+		walkover = 'map$1$walkover',
 	}
 
 	if bracketType == 'team' then

@@ -85,6 +85,7 @@ end
 
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{name = 'Number of Players', content = {_args.player_number}})
+	table.insert(widgets, Cell{name = 'Number of Teams', content = {_args.team_number}})
 
 	return widgets
 end

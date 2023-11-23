@@ -484,8 +484,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 			local opponent = Opponent.fromLpdbStruct(item)
 			if not opponent then
 				mw.logObject({pageName = tournamentData.pagename, place = item.placement}, 'Invalid Prize Pool Data returned from')
-			end
-			if Opponent.isTbd(opponent) then
+			elseif Opponent.isTbd(opponent) then
 				opponent = Opponent.tbd(Opponent.team)
 			end
 			table.insert(placements[place], opponent)

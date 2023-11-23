@@ -202,7 +202,7 @@ end
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
-		table.insert(list, item)
+		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list
@@ -243,26 +243,22 @@ function Match.copyRecords(matchRecord)
 	})
 end
 
-local function stringifyIfTable(tbl)
-	return type(tbl) == 'table' and Json.stringify(tbl) or nil
-end
-
 function Match.encodeJson(matchRecord)
-	matchRecord.match2bracketdata = stringifyIfTable(matchRecord.match2bracketdata)
-	matchRecord.stream = stringifyIfTable(matchRecord.stream)
-	matchRecord.links = stringifyIfTable(matchRecord.links)
-	matchRecord.extradata = stringifyIfTable(matchRecord.extradata)
+	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata, {asArray = true})
+	matchRecord.stream = Json.stringify(matchRecord.stream)
+	matchRecord.links = Json.stringify(matchRecord.links)
+	matchRecord.extradata = Json.stringify(matchRecord.extradata)
 
 	for _, opponentRecord in ipairs(matchRecord.match2opponents) do
-		opponentRecord.extradata = stringifyIfTable(opponentRecord.extradata)
+		opponentRecord.extradata = Json.stringify(opponentRecord.extradata)
 		for _, playerRecord in ipairs(opponentRecord.match2players) do
-			playerRecord.extradata = stringifyIfTable(playerRecord.extradata)
+			playerRecord.extradata = Json.stringify(playerRecord.extradata)
 		end
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
-		gameRecord.extradata = stringifyIfTable(gameRecord.extradata)
-		gameRecord.participants = stringifyIfTable(gameRecord.participants)
-		gameRecord.scores = stringifyIfTable(gameRecord.scores)
+		gameRecord.extradata = Json.stringify(gameRecord.extradata)
+		gameRecord.participants = Json.stringify(gameRecord.participants)
+		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
 end
 

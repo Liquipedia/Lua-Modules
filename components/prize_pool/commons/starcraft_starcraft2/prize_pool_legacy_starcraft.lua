@@ -20,7 +20,8 @@ local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabl
 local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
 local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local StarcraftLegacyPrizePool = {}
 

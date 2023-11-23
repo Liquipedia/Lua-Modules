@@ -14,6 +14,7 @@ local Table = require('Module:Table')
 
 local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
 
+---@class WarcraftTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
 local NON_BREAKING_SPACE = '&nbsp;'

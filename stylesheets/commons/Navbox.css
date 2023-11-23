@@ -1,0 +1,132 @@
+/* Style for horizontal lists (separator following item) */
+ol.hlist,
+ul.hlist,
+.hlist ol,
+.hlist ul {
+	margin: 0;
+	padding: 0;
+}
+
+.hlist li {
+	margin: 0;
+	display: inline;
+}
+
+.hlist li:after {
+	content: " · ";
+	font-weight: bold;
+	margin: 0 0.25em 0 0.3em;
+}
+
+.hlist li:last-child:after {
+	content: none;
+}
+
+/* Default skin for navigation boxes */
+div.navbox,
+table.navbox {            /* Navbox container style */
+	width: 100%;
+	margin: auto;
+	clear: both;
+	font-size: 95%;
+	text-align: center;
+	padding: 1px;
+}
+
+table.navbox + table.navbox {  /* Single pixel border between adjacent navboxes */
+	margin-top: -1px;          /* (doesn't work for IE6, but that's okay)       */
+}
+
+ol + table.navbox,
+ul + table.navbox,
+div.reflist + table.navbox {
+	margin-top: 11px;        /* Additional margin when below ordered/unordered lists */
+}
+
+.navbox-title,
+.navbox-abovebelow,
+table.navbox th {
+	text-align: center;      /* Title and above/below styles */
+	padding: 0.3em 1em 0.3em 1em;
+	width: 100%;
+}
+
+tr + tr > .navbox-abovebelow,
+tr + tr > .navbox-group,
+tr + tr > .navbox-image,
+tr + tr > .navbox-list {
+	border-top: 2px solid var( --clr-border, #fdfdfd );
+}
+
+.navbox-group {              /* Group style */
+	white-space: nowrap;
+	text-align: right;
+	font-weight: bold;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+@media ( max-width: 767px ) {
+	.navbox-group {
+		padding-left: 0.25em;
+		padding-right: 0.25em;
+	}
+}
+
+.navbox,
+.navbox-subgroup {
+	background: var( --clr-surface-4, #fdfdfd );     /* Background color */
+}
+
+.navbox-list {
+	border-color: var( --clr-surface-4, #fdfdfd );   /* Must match background color */
+}
+
+.navbox-even {
+	background: var( --clr-surface-5, #f7f7f7 );     /* Even row striping */
+}
+
+.navbox-odd {
+	background: transparent; /* Odd row striping */
+}
+
+.navbox .collapseButton {  /* In navboxes, the show/hide button balances */
+	width: 6em;            /* the vde links from [[Template:Navbar]],    */
+}                          /* so they need to be the same width.         */
+
+.navbox-navbar {                  /* Navbox template links */
+	font-size: 95%;        /* Default font-size */
+	font-weight: normal;
+	background: none;
+}
+
+.navbox .navbox-navbar {
+	font-size: 100%;       /* Font-size when nested within navbox */
+}
+/* .navbar li {
+    word-spacing: -0.125em;
+} */
+.navbox-inner,
+.navbox-subgroup {
+	width: 100%;
+}
+
+.hlist dd,
+.hlist dt,
+.hlist li {
+	margin: 0;
+	display: inline;
+}
+
+.hlist-group {
+	text-align: left;
+	border-left-width: 2px;
+	border-left-style: solid;
+}
+
+/* hide images in navbox on mobile */
+@media ( max-width: 600px ) {
+	.navbox .image {
+		display: none;
+	}
+}

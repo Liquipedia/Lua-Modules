@@ -12,7 +12,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local Region = require('Module:Region')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
@@ -40,6 +40,7 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 	_player = player
+	_args.autoTeam = true
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -51,7 +52,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = 'true',
+			addlpdbdata = true,
+			convertrole = true,
 			player = _pagename
 		}
 
@@ -80,7 +82,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 

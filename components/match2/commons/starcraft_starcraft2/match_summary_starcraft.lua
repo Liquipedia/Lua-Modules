@@ -318,7 +318,7 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 		local opponent = submatch.opponents[opponentIndex]
 		local node = opponent
 			and OpponentDisplay.BlockOpponent({
-				opponent = opponent,
+				opponent = opponent --[[@as standardOpponent]],
 				flip = opponentIndex == 1,
 			})
 			or mw.html.create('div'):wikitext('&nbsp;')

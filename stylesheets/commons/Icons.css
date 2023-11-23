@@ -1,0 +1,213 @@
+/*******************************************************************************
+Template(s): Infobox Icons
+Author(s): PhiLtheFisH, FO-nTTaX
+Note: When adding a new icon, please add to
+ https://liquipedia.net/commons/Infobox_Icons
+*******************************************************************************/
+.lp-icon {
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: middle;
+	width: 32px;
+	height: 32px;
+	background-image: url( //liquipedia.net/commons/images/7/77/InfoboxIcon_Alert.png );
+	// todo: should be back to 64px eventually
+	background-size: auto 64px;
+	background-position: 0 -32px;
+
+	.darkmode &,
+	.theme--dark &,
+	[ data-darkreader-scheme="dark" ] & {
+		background-position: -32px -32px;
+	}
+	// Sizes
+	.icon-make-size( 18 );
+	.icon-make-size( 21 );
+	.icon-make-size( 25 );
+	.icon-make-size( 50 );
+	.icon-make-size( 64 );
+	.icon-make-size( 100 );
+	.icon-make-size( 128 );
+	.icon-make-size( 256 );
+
+	&:hover {
+		background-position: 0 0;
+
+		.darkmode &,
+		.theme--dark &,
+		[ data-darkreader-scheme="dark" ] & {
+			background-position: -32px 0;
+		}
+	}
+	// Images
+	.icon-make-image( 5ewin, "//liquipedia.net/commons/images/c/cf/InfoboxIcon_5Ewin.png" );
+	.icon-make-image( abios, "//liquipedia.net/commons/images/2/21/InfoboxIcon_Abios.png" );
+	.icon-make-image( afreeca, "//liquipedia.net/commons/images/7/7c/InfoboxIcon_Afreeca.png" );
+	.icon-make-image( afreecatv, "//liquipedia.net/commons/images/7/7c/InfoboxIcon_Afreeca.png" );
+	.icon-make-image( aligulac, "//liquipedia.net/commons/images/7/74/InfoboxIcon_Aligulac.png" );
+	.icon-make-image( aoezone, "//liquipedia.net/commons/images/e/ea/InfoboxIcon_AoEZone.png" );
+	.icon-make-image( apexlegendsstatus, "//liquipedia.net/commons/images/e/e7/InfoboxIcon_ApexLegendsStatus.png" );
+	.icon-make-image( apple-podcasts, "//liquipedia.net/commons/images/0/06/InfoboxIcon_Apple_Podcasts.png" );
+	.icon-make-image( ask-fm, "//liquipedia.net/commons/images/b/b8/InfoboxIcon_AskFM.png" );
+	.icon-make-image( azubu, "//liquipedia.net/commons/images/6/62/InfoboxIcon_Azubu.png" );
+	.icon-make-image( b5csgo, "//liquipedia.net/commons/images/5/52/InfoboxIcon_B5csgo.png" );
+	.icon-make-image( battlefy, "//liquipedia.net/commons/images/9/96/InfoboxIcon_BATTLEFY.png" );
+	.icon-make-image( best-gg, "//liquipedia.net/commons/images/0/01/InfoboxIcon_BESTGG.png" );
+	.icon-make-image( bilibili, "//liquipedia.net/commons/images/5/50/InfoboxIcon_bilibili.png" );
+	.icon-make-image( binary-beast, "//liquipedia.net/commons/images/a/af/InfoboxIcon_BinaryBeast.png" );
+	.icon-make-image( booyah, "//liquipedia.net/commons/images/b/bb/InfoboxIcon_BOOYAH.png" );
+	.icon-make-image( bracket, "//liquipedia.net/commons/images/d/d5/InfoboxIcon_Bracket.png" );
+	.icon-make-image( cafe-daum, "//liquipedia.net/commons/images/c/c9/InfoboxIcon_Daum.png" );
+	.icon-make-image( caffeine, "//liquipedia.net/commons/images/4/4b/InfoboxIcon_Caffeine.png" );
+	.icon-make-image( cc, "//liquipedia.net/commons/images/4/46/InfoboxIcon_cc.png" );
+	.icon-make-image( challengermode, "//liquipedia.net/commons/images/1/19/InfoboxIcon_Challengermode.png" );
+	.icon-make-image( challonge, "//liquipedia.net/commons/images/c/cd/InfoboxIcon_Challonge.png" );
+	.icon-make-image( cntft, "//liquipedia.net/commons/images/e/ea/InfoboxIcon_CNTFT.png" );
+	.icon-make-image( corestrike, "//liquipedia.net/commons/images/a/aa/InfoboxIcon_CoreStrike.png" );
+	.icon-make-image( cybergamer, "//liquipedia.net/commons/images/4/4e/InfoboxIcon_CyberGamer.png" );
+	.icon-make-image( dailymotion, "//liquipedia.net/commons/images/0/07/InfoboxIcon_Dailymotion.png" );
+	.icon-make-image( datdota, "//liquipedia.net/commons/images/2/24/InfoboxIcon_Datdota.png" );
+	.icon-make-image( discord, "//liquipedia.net/commons/images/c/c6/InfoboxIcon_Discord.png" );
+	.icon-make-image( dlive, "//liquipedia.net/commons/images/4/43/InfoboxIcon_DLive.png" );
+	.icon-make-image( dotabuff, "//liquipedia.net/commons/images/9/90/InfoboxIcon_Dotabuff.png" );
+	.icon-make-image( douyu, "//liquipedia.net/commons/images/b/bc/InfoboxIcon_DouyuTV.png" );
+	.icon-make-image( douyutv, "//liquipedia.net/commons/images/b/bc/InfoboxIcon_DouyuTV.png" );
+	.icon-make-image( douyin, "//liquipedia.net/commons/images/4/47/InfoboxIcon_TikTok.png" ); // Intended to be TikTok
+	.icon-make-image( email, "//liquipedia.net/commons/images/2/2f/InfoboxIcon_Email.png" );
+	.icon-make-image( escharts, "//liquipedia.net/commons/images/9/99/InfoboxIcon_EsportsCharts.png" );
+	.icon-make-image( esea, "//liquipedia.net/commons/images/9/99/InfoboxIcon_ESEA.png" );
+	.icon-make-image( esea-league, "//liquipedia.net/commons/images/8/8e/InfoboxIcon_ESEA_League.png" );
+	.icon-make-image( esl, "//liquipedia.net/commons/images/4/44/InfoboxIcon_ESL.png" );
+	.icon-make-image( esportal, "//liquipedia.net/commons/images/c/c2/InfoboxIcon_Esportal.png" );
+	.icon-make-image( etf2l, "//liquipedia.net/commons/images/6/61/InfoboxIcon_ETF2L.png" );
+	.icon-make-image( facebook, "//liquipedia.net/commons/images/1/1e/InfoboxIcon_Facebook.png" );
+	.icon-make-image( facebook-gaming, "//liquipedia.net/commons/images/8/8d/InfoboxIcon_Facebook_Gaming.png" );
+	.icon-make-image( faceit, "//liquipedia.net/commons/images/e/e6/InfoboxIcon_FACEIT.png" );
+	.icon-make-image( factor, "//liquipedia.net/commons/images/1/15/InfoboxIcon_Factor.png" );
+	.icon-make-image( fanclub, "//liquipedia.net/commons/images/f/fe/InfoboxIcon_TLFanPage.png" );
+	.icon-make-image( flickr, "//liquipedia.net/commons/images/d/d2/InfoboxIcon_Flickr.png" );
+	.icon-make-image( gamersclub, "//liquipedia.net/commons/images/a/a5/InfoboxIcon_Gamers_Club.png" );
+	.icon-make-image( garena, "//liquipedia.net/commons/images/6/6b/InfoboxIcon_Garena.png" );
+	.icon-make-image( github, "//liquipedia.net/commons/images/f/fc/InfoboxIcon_GitHub.png" );
+	.icon-make-image( google-plus, "//liquipedia.net/commons/images/4/40/InfoboxIcon_Google%2B.png" );
+	.icon-make-image( gosugamers, "//liquipedia.net/commons/images/f/f0/InfoboxIcon_GosuGamers.png" );
+	.icon-make-image( halodatahive, "//liquipedia.net/commons/images/e/e9/InfoboxIcon_HaloDataHive.png" );
+	.icon-make-image( haojiao, "//liquipedia.net/commons/images/6/68/InfoboxIcon_Haojiao.png" );
+	.icon-make-image( hitbox, "//liquipedia.net/commons/images/b/b6/InfoboxIcon_HitboxTV.png" );
+	.icon-make-image( home, "//liquipedia.net/commons/images/2/2f/InfoboxIcon_Website.png" );
+	.icon-make-image( huomao, "//liquipedia.net/commons/images/4/46/InfoboxIcon_HuomaoTV.png" );
+	.icon-make-image( huomaotv, "//liquipedia.net/commons/images/4/46/InfoboxIcon_HuomaoTV.png" );
+	.icon-make-image( huya, "//liquipedia.net/commons/images/0/05/InfoboxIcon_HuyaTV.png" );
+	.icon-make-image( huyatv, "//liquipedia.net/commons/images/0/05/InfoboxIcon_HuyaTV.png" );
+	.icon-make-image( iccup, "//liquipedia.net/commons/images/2/2c/InfoboxIcon_ICCUP.png" );
+	.icon-make-image( instagram, "//liquipedia.net/commons/images/7/7d/InfoboxIcon_Instagram.png" );
+	.icon-make-image( king-kong, "//liquipedia.net/commons/images/4/43/InfoboxIcon_King_Kong.png" );
+	.icon-make-image( kick, "//liquipedia.net/commons/images/5/57/InfoboxIcon_Kick.png" );
+	.icon-make-image( kuaishou, "//liquipedia.net/commons/images/f/f9/InfoboxIcon_Kuaishou.png" );
+	.icon-make-image( letsplaylive, "//liquipedia.net/commons/images/2/2c/InfoboxIcon_LetsPlay.Live.png" );
+	.icon-make-image( linkedin, "//liquipedia.net/commons/images/9/97/InfoboxIcon_LinkedIn.png" );
+	.icon-make-image( liquipedia, "//liquipedia.net/commons/images/d/de/InfoboxIcon_Liquipedia.png" );
+	.icon-make-image( loco, "//liquipedia.net/commons/images/0/06/InfoboxIcon_Loco.png" );
+	.icon-make-image( lolchess, "//liquipedia.net/commons/images/0/0f/InfoboxIcon_LoLCHESS.png" );
+	.icon-make-image( masteroverwatch, "//liquipedia.net/commons/images/6/60/InfoboxIcon_MasterOverwatch.png" );
+	.icon-make-image( matcherino, "//liquipedia.net/commons/images/8/8c/InfoboxIcon_Matcherino.png" );
+	.icon-make-image( mildom, "//liquipedia.net/commons/images/8/81/InfoboxIcon_Mildom.png" );
+	.icon-make-image( mixer, "//liquipedia.net/commons/images/8/85/InfoboxIcon_Mixer.png" );
+	.icon-make-image( music, "//liquipedia.net/commons/images/3/37/InfoboxIcon_Music.png" );
+	.icon-make-image( niconico, "//liquipedia.net/commons/images/b/bf/InfoboxIcon_Niconico.png" );
+	.icon-make-image( nimotv, "//liquipedia.net/commons/images/f/f7/InfoboxIcon_NimoTV.png" );
+	.icon-make-image( nwc3l, "//liquipedia.net/commons/images/1/1c/InfoboxIcon_NWC3L.png" );
+	.icon-make-image( octane, "//liquipedia.net/commons/images/d/da/InfoboxIcon_Octane.png" );
+	.icon-make-image( openrec, "//liquipedia.net/commons/images/9/98/InfoboxIcon_OPENREC.png" );
+	.icon-make-image( opgg, "//liquipedia.net/commons/images/b/b6/InfoboxIcon_OPGG.png" );
+	.icon-make-image( osu, "//liquipedia.net/commons/images/e/e2/InfoboxIcon_osu.png" );
+	.icon-make-image( pandatv, "//liquipedia.net/commons/images/d/d3/InfoboxIcon_PandaTV.png" );
+	.icon-make-image( patreon, "//liquipedia.net/commons/images/b/b1/InfoboxIcon_Patreon.png" );
+	.icon-make-image( play2live, "//liquipedia.net/commons/images/a/a0/InfoboxIcon_Play2Live.png" );
+	.icon-make-image( reddit, "//liquipedia.net/commons/images/5/59/InfoboxIcon_Reddit.png" );
+	.icon-make-image( replay, "//liquipedia.net/commons/images/5/52/InfoboxIcon_Replay.png" );
+	.icon-make-image( rgl, "//liquipedia.net/commons/images/9/91/InfoboxIcon_RGL.png" );
+	.icon-make-image( royaleapi, "//liquipedia.net/commons/images/7/74/InfoboxIcon_RoyaleAPI.png" );
+	.icon-make-image( rules, "//liquipedia.net/commons/images/d/d0/InfoboxIcon_Rules.png" );
+	.icon-make-image( shift, "//liquipedia.net/commons/images/6/61/InfoboxIcon_Shift.png" );
+	.icon-make-image( siegegg, "//liquipedia.net/commons/images/e/e2/InfoboxIcon_SiegeGG.png" );
+	.icon-make-image( skgaming, "//liquipedia.net/commons/images/0/01/InfoboxIcon_SK.png" );
+	.icon-make-image( skype, "//liquipedia.net/commons/images/2/29/InfoboxIcon_Skype.png" );
+	.icon-make-image( smashboards, "//liquipedia.net/commons/images/a/aa/InfoboxIcon_SmashBoards.png" );
+	.icon-make-image( smashcast, "//liquipedia.net/commons/images/d/db/InfoboxIcon_Smashcast.png" );
+	.icon-make-image( smash-gg, "//liquipedia.net/commons/images/3/3c/InfoboxIcon_SmashGG.png" );
+	.icon-make-image( start-gg, "//liquipedia.net/commons/images/9/9d/InfoboxIcon_StartGG.png" );
+	.icon-make-image( snapchat, "//liquipedia.net/commons/images/f/fc/InfoboxIcon_Snapchat.png" );
+	.icon-make-image( sostronk, "//liquipedia.net/commons/images/4/4e/InfoboxIcon_SoStronk.png" );
+	.icon-make-image( spotify, "//liquipedia.net/commons/images/1/14/InfoboxIcon_Spotify.png" );
+	.icon-make-image( steam, "//liquipedia.net/commons/images/d/d0/InfoboxIcon_Steam.png" );
+	.icon-make-image( stratz, "//liquipedia.net/commons/images/3/3e/InfoboxIcon_Stratz.png" );
+	.icon-make-image( stream, "//liquipedia.net/commons/images/c/c2/InfoboxIcon_Stream.png" );
+	.icon-make-image( strikr, "//liquipedia.net/commons/images/0/06/InfoboxIcon_Strikr.png" );
+	.icon-make-image( telegram, "//liquipedia.net/commons/images/e/e7/InfoboxIcon_Telegram.png" );
+	.icon-make-image( tencent, "//liquipedia.net/commons/images/4/42/InfoboxIcon_Tencent.png" );
+	.icon-make-image( tencent-games, "//liquipedia.net/commons/images/b/b5/InfoboxIcon_Tencent_Games.png" );
+	.icon-make-image( tftv, "//liquipedia.net/commons/images/2/2b/InfoboxIcon_tftv.png" );
+	.icon-make-image( threads, "//liquipedia.net/commons/images/0/0d/InfoboxIcon_Threads.png" );
+	.icon-make-image( tiktok, "//liquipedia.net/commons/images/4/47/InfoboxIcon_TikTok.png" );
+	.icon-make-image( tlpd, "//liquipedia.net/commons/images/0/07/InfoboxIcon_TLPDInt.png" );
+	.icon-make-image( tlpd-hots, "//liquipedia.net/commons/images/e/e3/InfoboxIcon_TLPDHoTS.png" );
+	.icon-make-image( tlpd-wol, "//liquipedia.net/commons/images/0/07/InfoboxIcon_TLPDInt.png" );
+	.icon-make-image( tlpd-wol-korea, "//liquipedia.net/commons/images/7/78/InfoboxIcon_TLPDKor.png" );
+	.icon-make-image( tlpd-sospa, "//liquipedia.net/commons/images/9/9d/InfoboxIcon_TLPDSonic.png" );
+	.icon-make-image( tlprofile, "//liquipedia.net/commons/images/f/f3/InfoboxIcon_TLProfile.png" );
+	.icon-make-image( tlstream, "//liquipedia.net/commons/images/b/b3/InfoboxIcon_TLStream.png" );
+	.icon-make-image( tonamel, "//liquipedia.net/commons/images/e/e1/InfoboxIcon_Tonamel.png" );
+	.icon-make-image( toornament, "//liquipedia.net/commons/images/c/cb/InfoboxIcon_Toornament.png" );
+	.icon-make-image( tournament, "//liquipedia.net/commons/images/a/a8/InfoboxIcon_Trophy.png" );
+	.icon-make-image( trackmania-io, "//liquipedia.net/commons/images/3/31/InfoboxIcon_TrackmaniaIO.png" );
+	.icon-make-image( trovo, "//liquipedia.net/commons/images/0/02/InfoboxIcon_Trovo.png" );
+	.icon-make-image( twitch, "//liquipedia.net/commons/images/6/61/InfoboxIcon_Twitch.png" );
+	.icon-make-image( twitch2, "//liquipedia.net/commons/images/6/61/InfoboxIcon_Twitch.png" );
+	.icon-make-image( twitter, "//liquipedia.net/commons/images/1/19/InfoboxIcon_Twitter.png" );
+	.icon-make-image( vidio, "//liquipedia.net/commons/images/6/62/InfoboxIcon_Vidio.png" );
+	.icon-make-image( vod, "//liquipedia.net/commons/images/5/56/InfoboxIcon_Vod.png" );
+	.icon-make-image( vk, "//liquipedia.net/commons/images/d/d7/InfoboxIcon_VK.png" );
+	.icon-make-image( vkontakte, "//liquipedia.net/commons/images/d/d7/InfoboxIcon_VK.png" );
+	.icon-make-image( vlr, "//liquipedia.net/commons/images/f/f7/InfoboxIcon_VLR.png" );
+	.icon-make-image( weibo, "//liquipedia.net/commons/images/9/92/InfoboxIcon_Weibo.png" );
+	.icon-make-image( yandexefir, "//liquipedia.net/commons/images/6/6c/InfoboxIcon_Yandex_Efir.png" );
+	.icon-make-image( youku, "//liquipedia.net/commons/images/8/8e/InfoboxIcon_Youku.png" );
+	.icon-make-image( youtube, "//liquipedia.net/commons/images/6/6c/InfoboxIcon_YouTube.png" );
+	.icon-make-image( zhangyutv, "//liquipedia.net/commons/images/c/cf/InfoboxIcon_ZhangyuTV.png" );
+	.icon-make-image( zhanqitv, "//liquipedia.net/commons/images/b/b0/InfoboxIcon_ZhanqiTV.png" );
+}
+
+.icon-make-size( @size ) {
+	@size1x: @size * 1px;
+	@size2x: @size * 2px;
+	&.lp-icon-@{size} {
+		width: @size1x;
+		height: @size1x;
+		// todo: should be back to @size2x eventually
+		background-size: auto @size2x;
+		background-position: 0 -@size1x;
+
+		.darkmode &,
+		.theme--dark &,
+		[ data-darkreader-scheme="dark" ] & {
+			background-position: -@size1x -@size1x;
+		}
+
+		&:hover {
+			background-position: 0 0;
+
+			.darkmode &,
+			.theme--dark &,
+			[ data-darkreader-scheme="dark" ] & {
+				background-position: -@size1x 0;
+			}
+		}
+	}
+}
+.icon-make-image( @class, @url ) {
+	@prefix: lp-;
+	&.@{prefix}@{class} {
+		background-image: url( @url );
+	}
+}

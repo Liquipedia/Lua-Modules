@@ -1,0 +1,24 @@
+{
+	"extends": "stylelint-config-wikimedia",
+	"plugins": [
+		"stylelint-less",
+		"stylelint-stylistic"
+	],
+	"customSyntax": "postcss-less",
+	"rules": {
+		"color-hex-length": "long",
+		"unit-disallowed-list": null,
+		"declaration-property-unit-disallowed-list": {},
+		"no-descending-specificity": null,
+		"selector-max-id": null,
+		"function-name-case": null,
+		"annotation-no-unknown": null,
+		"selector-pseudo-element-colon-notation": null,
+		"no-duplicate-selectors": null,
+		"function-url-no-scheme-relative": null,
+		"declaration-no-important": null,
+		"stylistic/string-quotes": "double",
+		"function-no-unknown": null
+	}
+}
+

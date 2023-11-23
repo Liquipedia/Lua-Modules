@@ -13,7 +13,8 @@ local Medal = require('Module:Medal')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_TIERS = {'1', '2', '3'}
 local DEFAULT_EXCLUDED_TIER_TYPES = {'Qualifier'}
