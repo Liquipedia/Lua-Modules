@@ -4766,9 +4766,11 @@ Author(s): Elysienna
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
 	}
+
 	.portal-map .dynamicmap > div:first-child {
 		background-color: #000000;
 	}
+
 	.portal-map .dynamicmap > div > img {
 		filter: invert( 1 );
 	}
@@ -4840,11 +4842,13 @@ Author(s): hjpalpha
 	img[ title="Random" ] {
 		filter: grayscale( 100% ) brightness( 40 );
 	}
+
 	.warcraft-undead,
 	.warcraft-undead th,
 	.warcraft-undead td {
 		background: var( --clr-vividviolet-30, #200033 ) !important;
 	}
+
 	.warcraft-multirace,
 	.warcraft-multirace th,
 	.warcraft-multirace td,
@@ -4853,11 +4857,13 @@ Author(s): hjpalpha
 	.Bye td {
 		background: var( --clr-moon-40, #e6e6e6 ) !important;
 	}
+
 	.Random,
 	.Random th,
 	.Random td {
 		background: var( --clr-sun-20, #fff7cc ) !important;
 	}
+
 	.Terran,
 	.warcraft-human,
 	.Terran th,
@@ -4866,6 +4872,7 @@ Author(s): hjpalpha
 	.warcraft-human td {
 		background: var( --clr-sapphire-20, #cce1ff ) !important;
 	}
+
 	.Zerg,
 	.warcraft-orc,
 	.Zerg th,
@@ -4874,6 +4881,7 @@ Author(s): hjpalpha
 	.warcraft-orc td {
 		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
 	}
+
 	.Protoss,
 	.warcraft-nightelf,
 	.Protoss th,
