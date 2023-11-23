@@ -110,7 +110,7 @@ function Game:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain then
+	if Namespace.isMain() then
 		infobox:categories('Games')
 		self:_setLpdbData(args, links)
 	end
