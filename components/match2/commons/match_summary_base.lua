@@ -581,43 +581,47 @@ end
 ---@param match table
 ---@return string
 function MatchSummary.createSubstitutesComment(match)
-	local comment = ''
-	for _, opponent in ipairs(match.opponents) do
+	local comment = {}
+	Array.forEach(match.opponents, function(opponent)
 		local substitutions = (opponent.extradata or {}).substitutions
-		if Logic.isNotEmpty(substitutions) then
-			for _, substitution in ipairs(substitutions) do
-				local subString = ''
-				if Logic.isEmpty(substitution.player) and not Logic.isEmpty(substitution.substitute) then
-					subString = string.format('%s stands in',
-						tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
-					)
-				elseif not Logic.isEmpty(substitution.substitute) then
-					subString = string.format('%s stands in for %s',
-						tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute}),
-						tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
-					)
-				end
-				if opponent.type == Opponent.team then
-					local team = require('Module:Team').queryRaw(opponent.template)
-					if team then
-						subString = string.format('%s on \'\'\'[[%s|%s]]\'\'\'', subString, team.page, team.shortname)
-					end
-				end
-				if Table.isNotEmpty(substitution.games) then
-					local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
-					subString = string.format('%s on %s %s', subString, gamesNoun, mw.text.listToText(substitution.games))
-				end
-				if String.isNotEmpty(substitution.reason) then
-					subString = string.format('%s due to %s.', subString, substitution.reason)
-				else
-					subString = subString .. '.'
-				end
-				comment = comment .. (Logic.isNotEmpty(comment) and tostring(Break():create()) or '') .. subString
-			end
+		if Logic.isEmpty(substitutions) then
+			return
 		end
-	end
 
-	return comment
+		for _, substitution in ipairs(substitutions) do
+			local subString = {}
+			if Logic.isEmpty(substitution.player) and not Logic.isEmpty(substitution.substitute) then
+				table.insert(subString, string.format('%s stands in',
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
+				))
+			elseif not Logic.isEmpty(substitution.substitute) then
+				table.insert(subString, string.format('%s stands in for %s',
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute}),
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
+				))
+			end
+
+			if opponent.type == Opponent.team then
+				local team = require('Module:Team').queryRaw(opponent.template)
+				if team then
+					table.insert(subString, string.format('on \'\'\'%s\'\'\'', Page.makeInternalLink(team.shortname, team.page)))
+				end
+			end
+
+			if Table.isNotEmpty(substitution.games) then
+				local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
+				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
+			end
+
+			if String.isNotEmpty(substitution.reason) then
+				table.insert(subString, string.format('due to %s', substitution.reason))
+			end
+
+			table.insert(comment, table.concat(subString, ' ') .. '.')
+		end
+	end)
+
+	return table.concat(comment, tostring(Break():create()))
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
