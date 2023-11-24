@@ -39,6 +39,7 @@ function CustomPatch.run(frame)
 	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
 	customPatch.getChronologyData = CustomPatch.getChronologyData
 	customPatch.addToLpdb = CustomPatch.addToLpdb
+	customPatch.setLpdbData = CustomPatch.setLpdbData
 
 	return customPatch:createInfobox()
 end
