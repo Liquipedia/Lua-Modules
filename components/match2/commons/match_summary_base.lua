@@ -608,7 +608,7 @@ function MatchSummary.createSubstitutesComment(match)
 			if opponent.type == Opponent.team then
 				local team = require('Module:Team').queryRaw(opponent.template)
 				if team then
-					table.insert(subString, string.format('on \'\'\'%s\'\'\'', Page.makeInternalLink(team.shortname, team.page)))
+					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end
 			end
 
