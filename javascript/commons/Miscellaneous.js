@@ -729,7 +729,7 @@ liquipedia.customLuaErrors = {
 	init: function() {
 		mw.loader.using( 'jquery.ui', function() {
 			const $dialog = $( '<div>' ).dialog( {
-				title: mw.msg( 'scribunto-parser-dialog-title' ),
+				title: mw.msg( 'Script error' ),
 				autoOpen: false
 			} );
 			$( '.scribunto-error' ).each( function() {
@@ -743,7 +743,8 @@ liquipedia.customLuaErrors = {
 						if ( stackItem.link instanceof Object ) {
 							$( '<a>' )
 								.text( prefixText )
-								.attr( 'href', '/' + stackItem.link.wiki + '/' + stackItem.link.title + '#mw-ce-l' + stackItem.link.ln ).attr( 'target', '_blank' )
+								.attr( 'href', '/' + stackItem.link.wiki + '/index.php?title=' + stackItem.link.title + '&action=edit#mw-ce-l' + stackItem.link.ln )
+								.attr( 'target', '_blank' )
 								.appendTo( $prefix );
 						} else {
 							$prefix.text( prefixText );
