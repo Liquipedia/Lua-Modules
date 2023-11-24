@@ -89,7 +89,7 @@ function MatchMapsLegacy.convertMaps(args, details)
 	for index = 1, MAX_NUMBER_OF_MAPS do
 		if details['match' .. index] then
 			-- match corresponds to MatchLua
-			match = Json.parseIfString(details['match' .. index] or '{}')
+			local match = Json.parseIfString(details['match' .. index] or '{}')
 			if Logic.isEmpty(match['win']) then
 				match['win'] = args['map' .. index .. 'win']
 			end
