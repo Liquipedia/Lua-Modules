@@ -101,6 +101,18 @@ done
 if [ "$allDeployed" != true ]; then
   echo "DEBUG: Some files were not deployed!"
   exit 1
+else
+  curNum=$(
+    curl \
+      -s \
+      -b "$ckf" \
+      -c "$ckf" \
+      -H "User-Agent: ${userAgent}" \
+      -X GET "${WIKI_BASE_URL}/commons/Special:LiquipediaMediaWikiMessages/edit/22" \
+      | sed -r 's/.*<textarea.*>(.*)<\/textarea>.*/\1/'
+  )
+  newNum=$((curNum+1))
+  echo "Updating cache from $(curNum) to $(newNum)"
 fi
 
 rm -f cookie_*
