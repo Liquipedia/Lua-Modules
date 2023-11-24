@@ -221,6 +221,7 @@ liquipedia.tournamentstable = {
 				if ( $.fn.tablesorter ) {
 					$( '.tournamentstable' ).tablesorter( { sortList: [ { 1: 'desc' }, { 0: 'desc' } ] } );
 				} else {
+					// eslint-disable-next-line no-console
 					console.error( 'Table sorter timed out :(' );
 				}
 			} );
@@ -303,6 +304,7 @@ liquipedia.decktables = {
 				if ( $.fn.tablesorter ) {
 					$( '.decktable' ).tablesorter( { sortList: [ { 3: 'asc' }, { 2: 'asc' } ] } );
 				} else {
+					// eslint-disable-next-line no-console
 					console.error( 'Table sorter timed out :(' );
 				}
 			} );
@@ -433,6 +435,7 @@ liquipedia.console = {
 		}
 		const styles = liquipedia.console.getStyles( '#ff0000', '#ffcccc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
+		// eslint-disable-next-line no-console
 		console.error( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	info: function( text, heading ) {
@@ -441,6 +444,7 @@ liquipedia.console = {
 		}
 		const styles = liquipedia.console.getStyles( '#0000ff', '#ccccff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
+		// eslint-disable-next-line no-console
 		console.info( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	log: function( text, heading ) {
@@ -449,6 +453,7 @@ liquipedia.console = {
 		}
 		const styles = liquipedia.console.getStyles( '#042b4c', '#ffffff' );
 		const style = liquipedia.console.getParsedStyleString( styles );
+		// eslint-disable-next-line no-console
 		console.log( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	},
 	warn: function( text, heading ) {
@@ -457,6 +462,7 @@ liquipedia.console = {
 		}
 		const styles = liquipedia.console.getStyles( '#666600', '#ffffcc' );
 		const style = liquipedia.console.getParsedStyleString( styles );
+		// eslint-disable-next-line no-console
 		console.warn( '%c' + heading + ':%c' + text, style + 'font-weight:bold;font-size:200%;', style + 'padding-top:0;font-size:150%;' );
 	}
 };
@@ -492,8 +498,11 @@ liquipedia.tracker = {
 				1
 			] );
 			gtag( 'event', 'click', {
+				// eslint-disable-next-line camelcase
 				event_category: subject,
+				// eslint-disable-next-line camelcase
 				non_interaction: nonInteraction,
+				// eslint-disable-next-line camelcase
 				send_to: 'UA-576564-4'
 			} );
 		}
@@ -726,17 +735,16 @@ liquipedia.customLuaErrors = {
 			$( '.scribunto-error' ).each( function() {
 				try {
 					const parsedError = JSON.parse( this.innerHTML.toString().replace( /Lua error(: | in )/, '' ).slice( 0, -1 ) );
-					const $backtraceList = $( '<ol>', { class: 'scribunto-trace' } );
+					const $backtraceList = $( '<ol>' ).addClass( 'scribunto-trace' );
 					parsedError.stackTrace.forEach( function( stackItem ) {
 						const $backtraceItem = $( '<li>' );
 						const $prefix = $( '<b>' );
 						const prefixText = $( '<div>' ).html( stackItem.prefix ).text();
 						if ( stackItem.link instanceof Object ) {
-							$( '<a>', {
-								text: prefixText,
-								href: '/' + stackItem.link.wiki + '/' + stackItem.link.title + '#mw-ce-l' + stackItem.link.ln,
-								target: '_blank'
-							} ).appendTo( $prefix );
+							$( '<a>' )
+								.text( prefixText )
+								.attr( 'href', '/' + stackItem.link.wiki + '/' + stackItem.link.title + '#mw-ce-l' + stackItem.link.ln ).attr( 'target', '_blank' )
+								.appendTo( $prefix );
 						} else {
 							$prefix.text( prefixText );
 						}
@@ -745,13 +753,13 @@ liquipedia.customLuaErrors = {
 						$backtraceItem.appendTo( $backtraceList );
 					} );
 					const $errorDiv = $( '<div>' ).append(
-						$( '<p>', { text: parsedError.errorShort } )
+						$( '<p>' ).text( parsedError.errorShort )
 					).append(
-						$( '<p>', { text: 'Backtrace:' } )
+						$( '<p>' ).text( 'Backtrace:' )
 					).append(
 						$backtraceList
 					);
-					const $newError = $( '<span>', { text: parsedError.errorShort, class: 'scribunto-error' } );
+					const $newError = $( '<span>' ).text( parsedError.errorShort ).addClass( 'scribunto-error' );
 					$( this ).replaceWith( $newError );
 					$newError.on( 'click', function( e ) {
 						$dialog.dialog( 'close' ).html( $errorDiv ).dialog( 'option', 'position', [ e.clientX + 5, e.clientY + 5 ] ).dialog( 'open' );
@@ -762,9 +770,3 @@ liquipedia.customLuaErrors = {
 	}
 };
 liquipedia.core.modules.push( 'customLuaErrors' );
-
-/* Test */
-window.addEventListener( 'error', function( e ) {
-	console.info( 'EL' );
-	console.info( e );
-} );

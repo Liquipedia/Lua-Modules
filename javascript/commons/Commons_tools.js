@@ -57,7 +57,7 @@ liquipedia.commonstools = {
 			checkForPageExistenceResult.innerHTML = '<ul id="checkforpageexistenceresultlist"></ul>';
 			const checkForPageExistenceResultList = document.getElementById( 'checkforpageexistenceresultlist' );
 			for ( const wiki in liquipedia.commonstools.wikis ) {
-				if ( liquipedia.commonstools.wikis.hasOwnProperty( wiki ) ) {
+				if ( Object.prototype.hasOwnProperty.call( liquipedia.commonstools.wikis, wiki ) ) {
 					wikiData = liquipedia.commonstools.wikis[ wiki ];
 					listElement = document.createElement( 'li' );
 					checkForPageExistenceResultList.append( listElement );
@@ -77,7 +77,7 @@ liquipedia.commonstools = {
 			formatversion: 2,
 			titles: title
 		} ).done( function( data ) {
-			if ( !data.hasOwnProperty( 'query' ) ) {
+			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
 				const page = data.query.pages[ 0 ];
@@ -88,7 +88,7 @@ liquipedia.commonstools = {
 				editLink.href = '/' + wiki + '/index.php?title=' + page.title + '&action=edit';
 				editLink.innerHTML = 'Edit';
 				span.innerHTML = ' - ';
-				if ( page.hasOwnProperty( 'missing' ) && page.missing ) {
+				if ( Object.prototype.hasOwnProperty.call( page, 'missing' ) && page.missing ) {
 					link.innerHTML = wikiData.name + ': No';
 					link.style.backgroundColor = '#f8cbcb';
 					editLink.style.backgroundColor = '#f8cbcb';
@@ -134,11 +134,11 @@ liquipedia.commonstools = {
 				formatversion: 2,
 				titles: title
 			} ).done( function( data ) {
-				if ( !data.hasOwnProperty( 'query' ) ) {
+				if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 					listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 				} else {
 					const page = data.query.pages[ 0 ];
-					if ( page.hasOwnProperty( 'missing' ) && page.missing ) {
+					if ( Object.prototype.hasOwnProperty.call( page, 'missing' ) && page.missing ) {
 						listElement = document.createElement( 'li' );
 						listElement.style.color = '#0000ff';
 						listElement.innerHTML = 'Page does not exist on source wiki';
@@ -146,7 +146,7 @@ liquipedia.commonstools = {
 					} else {
 						liquipedia.commonstools.checkPageTextRealSourceText = page.revisions[ 0 ].content;
 						for ( const wiki in liquipedia.commonstools.wikis ) {
-							if ( liquipedia.commonstools.wikis.hasOwnProperty( wiki ) ) {
+							if ( Object.prototype.hasOwnProperty.call( liquipedia.commonstools.wikis, wiki ) ) {
 								if ( sourceWiki !== wiki ) {
 									wikiData = liquipedia.commonstools.wikis[ wiki ];
 									listElement = document.createElement( 'li' );
@@ -171,7 +171,7 @@ liquipedia.commonstools = {
 			formatversion: 2,
 			titles: title
 		} ).done( function( data ) {
-			if ( !data.hasOwnProperty( 'query' ) ) {
+			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
 				const page = data.query.pages[ 0 ];
@@ -182,7 +182,7 @@ liquipedia.commonstools = {
 				postButton.type = 'button';
 				postButton.innerHTML = 'Transfer';
 				span.innerHTML = ' - ';
-				if ( page.hasOwnProperty( 'missing' ) && page.missing ) {
+				if ( Object.prototype.hasOwnProperty.call( page, 'missing' ) && page.missing ) {
 					link.innerHTML = wikiData.name + ': Page does not exist';
 					link.style.color = '#ff0000';
 					span.style.color = '#ff0000';
@@ -204,24 +204,24 @@ liquipedia.commonstools = {
 					}
 				}
 				postButton.addEventListener( 'click', function() {
-					const api = new mw.Api( { ajax: { url: wikiData.api } } );
-					api.get( {
+					const api2 = new mw.Api( { ajax: { url: wikiData.api } } );
+					api2.get( {
 						action: 'query',
 						meta: 'tokens'
-					} ).done( function( data ) {
-						const editToken = data.query.tokens.csrftoken;
+					} ).done( function( data2 ) {
+						const editToken = data2.query.tokens.csrftoken;
 						if ( editToken === '+\\' ) {
 							const errorMessage = document.createElement( 'p' );
 							errorMessage.style.color = '#ff0000';
 							errorMessage.innerHTML = 'Not logged in on destination wiki';
 							listElement.append( errorMessage );
 						} else {
-							api.post( {
+							api2.post( {
 								action: 'edit',
 								title: title,
 								text: liquipedia.commonstools.checkPageTextRealSourceText,
 								token: editToken
-							} ).done( function( data ) {
+							} ).done( function() {
 								const successMessage = document.createElement( 'p' );
 								successMessage.style.color = '#006400';
 								successMessage.innerHTML = 'Transferred!';

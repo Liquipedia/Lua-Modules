@@ -233,7 +233,7 @@ liquipedia.bracket = {
 						node.style.cursor = 'pointer';
 						node.title = 'Click for further information';
 						node.querySelectorAll( 'a' ).forEach( function( link ) {
-							link.href = 'javascript:;';
+							link.href = '#';
 							link.classList.remove( 'new' );
 						} );
 					} );

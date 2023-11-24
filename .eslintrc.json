@@ -6,7 +6,9 @@
 	],
 	"globals": {
 		"liquipedia": "readonly",
-		"jQuery": "readonly"
+		"_paq": "readonly",
+		"gtag": "readonly",
+		"Share": "readonly"
 	},
 	"rules": {
 		"space-before-function-paren": "off",
