@@ -590,13 +590,15 @@ function MatchSummary.createSubstitutesComment(match)
 			return
 		end
 
-		for _, substitution in ipairs(substitutions) do
+		Array.forEach(substitutions, function(substitution)
 			local subString = {}
-			if Logic.isEmpty(substitution.player) and not Logic.isEmpty(substitution.substitute) then
+			if Logic.isEmpty(substitution.substitute) then
+				return
+			elseif Logic.isNotEmpty(substitution.player) then
 				table.insert(subString, string.format('%s stands in',
 					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
 				))
-			elseif not Logic.isEmpty(substitution.substitute) then
+			else
 				table.insert(subString, string.format('%s stands in for %s',
 					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute}),
 					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
@@ -620,7 +622,7 @@ function MatchSummary.createSubstitutesComment(match)
 			end
 
 			table.insert(comment, table.concat(subString, ' ') .. '.')
-		end
+		end)
 	end)
 
 	return table.concat(comment, tostring(Break():create()))
