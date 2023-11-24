@@ -729,7 +729,7 @@ liquipedia.customLuaErrors = {
 	init: function() {
 		mw.loader.using( 'jquery.ui', function() {
 			const $dialog = $( '<div>' ).dialog( {
-				title: mw.msg( 'Script error' ),
+				title: 'Script error',
 				autoOpen: false
 			} );
 			$( '.scribunto-error' ).each( function() {
