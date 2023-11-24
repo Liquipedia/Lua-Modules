@@ -33,7 +33,6 @@ local ROLES = {
 	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
 	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
-ROLES['in-game leader'] = ROLES.igl
 
 local CustomPlayer = Class.new()
 
@@ -47,7 +46,6 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
-	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getPersonType = CustomPlayer.getPersonType
 
@@ -64,9 +62,6 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
 	elseif id == 'role' then
 		return {
@@ -89,22 +84,8 @@ function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
-
-	return lpdbData
-end
-
 ---@return string[]
 function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
-		return {}
-	end
 	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
 end
 
