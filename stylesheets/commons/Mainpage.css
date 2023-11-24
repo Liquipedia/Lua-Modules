@@ -610,6 +610,10 @@ label[ for="tournaments-list-filter-ultimate" ]:before {
 	padding: 1rem;
 }
 
+.big-portal .lp-row {
+	justify-content: center;
+}
+
 .big-portal .lp-col {
 	padding: 1rem;
 }
