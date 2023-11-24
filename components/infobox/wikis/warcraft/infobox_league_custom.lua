@@ -13,7 +13,9 @@ local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MapsData = mw.loadData('Module:Maps/data')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local PageLink = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
@@ -358,13 +360,20 @@ function CustomLeague._getMaps(prefix)
 	end
 	local mapArgs = _league:getAllArgsForBase(_args, prefix)
 
-	return Table.map(mapArgs, function(mapIndex, map)
+	local maps = Table.map(mapArgs, function(mapIndex, map)
 		local splitMap = mw.text.split(map, '|')
+
+		splitMap[1] = (MapsData[splitMap[1]:lower()] or {}).name or splitMap[1]
+
 		return mapIndex, {
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(splitMap[1]),
 			displayname = _args[prefix .. mapIndex .. 'display'] or splitMap[#splitMap],
 		}
 	end)
+
+	Array.sortInPlaceBy(maps, Operator.property('link'))
+
+	return maps
 end
 
 ---@param lpdbData table
