@@ -595,13 +595,13 @@ function MatchSummary.createSubstitutesComment(match)
 			if Logic.isEmpty(substitution.substitute) then
 				return
 			elseif Logic.isNotEmpty(substitution.player) then
-				table.insert(subString, string.format('%s stands in',
-					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
-				))
-			else
 				table.insert(subString, string.format('%s stands in for %s',
 					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute}),
 					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
+				))
+			else
+				table.insert(subString, string.format('%s stands in',
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
 				))
 			end
 
