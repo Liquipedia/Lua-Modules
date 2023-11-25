@@ -127,11 +127,10 @@ function MatchMapsLegacy.convertMaps(args, details)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		local map = MatchSubobjects.luaGetMap{
+		return MatchSubobjects.luaGetMap{
 			winner = args['map' .. index .. 'win'],
 			map = DUMMY_MAP_NAME
 		}
-		return map
 	end
 
 	Array.mapIndexes(function (index)
