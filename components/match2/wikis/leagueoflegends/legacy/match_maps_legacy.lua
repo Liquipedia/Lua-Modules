@@ -127,7 +127,7 @@ end
 
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
----@return string
+---@return string?
 function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
 	local details = Json.parseIfString(args.details or '{}')
@@ -142,7 +142,6 @@ function MatchMapsLegacy.convertMatch(frame)
 		return Json.stringify(args)
 	else
 		Template.stashReturnValue(args, 'LegacyMatchlist')
-		return ''
 	end
 end
 
