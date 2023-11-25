@@ -149,7 +149,8 @@ end
 ---@return table
 function MatchMapsLegacy.handleLocation(args)
 	if args.location then
-		local locationComment = 'Match ' .. (Logic.readBool(args.finished) and 'was' or 'being') .. ' played in ' .. args.location
+		local matchStatus = Logic.readBool(args.finished) and 'was' or 'being'
+		local locationComment = 'Match ' .. matchStatus .. ' played in ' .. args.location
 		args.comment = args.comment and (args.comment .. '<br>' .. locationComment) or locationComment
 		args.location = nil
 	end
