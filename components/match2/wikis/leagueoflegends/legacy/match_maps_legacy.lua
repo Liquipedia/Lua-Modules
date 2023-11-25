@@ -91,8 +91,7 @@ end
 ---@return table
 function MatchMapsLegacy.handleLiteralsForOpponents(args)
 	for index = 1, MAX_NUMBER_OF_OPPONENTS do
-		local opponent = args['opponent' .. index]
-		if Logic.isEmpty(opponent) then
+		if Logic.isEmpty(args['opponent' .. index]) then
 			args['opponent' .. index] = {
 				['type'] = 'literal', template = 'tbd', name = args['opponent' .. index .. 'literal']
 			}
