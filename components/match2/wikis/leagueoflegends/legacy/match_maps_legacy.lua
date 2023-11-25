@@ -192,8 +192,7 @@ function MatchMapsLegacy.matchList(frame)
 	args.hide = nil
 	args.lpdb_title = nil
 
-	--pass the adjusted arguments to the MatchGroup
-	return MatchGroup.TemplateMatchlist(args)
+	return MatchGroup.MatchList(args)
 end
 
 -- invoked by Template:MatchListStart
