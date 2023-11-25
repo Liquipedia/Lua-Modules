@@ -77,7 +77,7 @@ function AwardsTable:buildRow(placement)
 			placement.pagename
 		))
 
-	row:tag('td'):css('text-align', 'center'):wikitext(placement.extradata.award)
+	row:tag('td'):wikitext(placement.extradata.award)
 
 	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
 		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
