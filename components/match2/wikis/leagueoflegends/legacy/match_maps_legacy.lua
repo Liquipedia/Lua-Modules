@@ -27,6 +27,8 @@ local MAX_NUMBER_OF_MAPS = 9
 local MAX_NUMBER_OF_MATCHES = 30
 local DUMMY_MAP_NAME = 'null'
 local DEFAULT = 'default'
+local DEFAULT_WIN = 'W'
+local DEFAULT_LOSS = 'L'
 
 ---@param args table
 ---@return table
@@ -60,12 +62,12 @@ function MatchMapsLegacy.convertOpponents(args)
 			template = string.lower(template)
 		end
 		local score
-		if args.walkover and tonumber(args.walkover) ~= 0 then
-			if tonumber(args.walkover) == index then
-				score = 'W'
-			else
-				score = 'L'
+		if args.walkover then
+			if tonumber(args.walkover) ~= 0 then
+				score = tonumber(args.walkover) == index and DEFAULT_WIN or DEFAULT_LOSS
 			end
+		else
+			score = tonumber(args['score' .. index])
 		end
 
 		args['opponent' .. index] = {
@@ -107,6 +109,15 @@ function MatchMapsLegacy.convertMaps(args, details)
 
 			args['map' .. index .. 'win'] = nil
 			details['match' .. index] = nil
+		elseif args['map' .. index .. 'win'] then
+			local map = MatchSubobjects.luaGetMap{
+				winner = args['map' .. index .. 'win'],
+				map = DUMMY_MAP_NAME
+			}
+			map['map'] = nil
+			args['map' .. index] = map
+
+			args['map' .. index .. 'win'] = nil
 		else
 			break
 		end
