@@ -62,12 +62,15 @@ function MatchMapsLegacy.convertOpponents(args)
 			template = string.lower(template)
 		end
 		local score
+		local winner = tonumber(args.winner)
 		if args.walkover then
 			if tonumber(args.walkover) ~= 0 then
 				score = tonumber(args.walkover) == index and DEFAULT_WIN or DEFAULT_LOSS
 			end
-		else
+		elseif args['score' .. index] then
 			score = tonumber(args['score' .. index])
+		elseif not args.mapWinnersSet and winner then
+			score = winner == index and DEFAULT_WIN or DEFAULT_LOSS
 		end
 
 		if template ~= TBD then
@@ -83,6 +86,7 @@ function MatchMapsLegacy.convertOpponents(args)
 		args.walkover = nil
 		args['score' .. index] = nil
 	end
+	args.mapWinnersSet = nil
 
 	return args
 end
@@ -135,6 +139,9 @@ function MatchMapsLegacy.convertMaps(args, details)
 
 	Array.mapIndexes(function (index)
 		local map = getMapFromDetails(index) or getMapOnlyWithWinner(index)
+		if map and map.winner then
+			args.mapWinnersSet = true
+		end
 		args['map' .. index] = map
 		args['map' .. index .. 'win'] = nil
 		details['match' .. index] = nil
@@ -162,9 +169,9 @@ function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
 	local details = Json.parseIfString(args.details or '{}')
 
+	args, details = MatchMapsLegacy.convertMaps(args, details)
 	args = MatchMapsLegacy.convertOpponents(args)
 	args = MatchMapsLegacy.handleLiteralsForOpponents(args)
-	args, details = MatchMapsLegacy.convertMaps(args, details)
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy.copyDetailsToArgs(args, details)
 	args = MatchMapsLegacy.handleLocation(args)
