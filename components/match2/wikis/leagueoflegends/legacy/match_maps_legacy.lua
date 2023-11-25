@@ -29,6 +29,7 @@ local DUMMY_MAP_NAME = 'null'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
+local TBD = 'tbd'
 
 ---@param args table
 ---@return table
@@ -57,7 +58,7 @@ function MatchMapsLegacy.convertOpponents(args)
 	for index = 1, MAX_NUMBER_OF_OPPONENTS do
 		local template = args['team' .. index]
 		if (not template) or template == '&nbsp;' then
-			template = 'tbd'
+			template = TBD
 		else
 			template = string.lower(template)
 		end
@@ -70,17 +71,34 @@ function MatchMapsLegacy.convertOpponents(args)
 			score = tonumber(args['score' .. index])
 		end
 
-		args['opponent' .. index] = {
-			score = score,
-			template = template,
-			type = 'team',
-		}
+		if template ~= TBD then
+			args['opponent' .. index] = {
+				score = score,
+				template = template,
+				type = 'team',
+			}
+		end
+		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'league']
 
 		args['team' .. index] = nil
 		args.walkover = nil
 		args['score' .. index] = nil
 	end
 
+	return args
+end
+
+---@param args table
+---@return table
+function MatchMapsLegacy.handleLiteralsForOpponents(args)
+	for index = 1, MAX_NUMBER_OF_OPPONENTS do
+		local opponent = args['opponent' .. index]
+		if Logic.isEmpty(opponent) then
+			args['opponent' .. index] = {
+				['type'] = 'literal', template = 'tbd', name = args['opponent' .. index .. 'literal']
+			}
+		end
+	end
 	return args
 end
 
@@ -133,6 +151,7 @@ function MatchMapsLegacy.convertMatch(frame)
 	local details = Json.parseIfString(args.details or '{}')
 
 	args = MatchMapsLegacy.convertOpponents(args)
+	args = MatchMapsLegacy.handleLiteralsForOpponents(args)
 	args, details = MatchMapsLegacy.convertMaps(args, details)
 
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
