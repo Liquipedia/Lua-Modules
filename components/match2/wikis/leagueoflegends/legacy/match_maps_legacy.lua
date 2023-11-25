@@ -92,19 +92,19 @@ function MatchMapsLegacy.convertMaps(args, details)
 		if details['match' .. index] then
 			-- match corresponds to MatchLua
 			local match = Json.parseIfString(details['match' .. index] or '{}')
-			if Logic.isEmpty(match['win']) then
-				match['win'] = args['map' .. index .. 'win']
+			if Logic.isEmpty(match.win) then
+				match.win = args['map' .. index .. 'win']
 			end
-			match['winner'] = match['win']
-			match['win'] = nil
+			match.winner = match.win
+			match.win = nil
 
-			if match['length'] and match['length']:lower() == DEFAULT then
-				match['walkover'] = match['winner']
+			if match.length and match.length:lower() == DEFAULT then
+				match.walkover = match.winner
 			end
 
-			match['map'] = DUMMY_MAP_NAME
+			match.map = DUMMY_MAP_NAME
 			local map = MatchSubobjects.luaGetMap(match)
-			map['map'] = nil
+			map.map = nil
 			args['map' .. index] = map
 
 			args['map' .. index .. 'win'] = nil
@@ -114,7 +114,7 @@ function MatchMapsLegacy.convertMaps(args, details)
 				winner = args['map' .. index .. 'win'],
 				map = DUMMY_MAP_NAME
 			}
-			map['map'] = nil
+			map.map = nil
 			args['map' .. index] = map
 
 			args['map' .. index .. 'win'] = nil
