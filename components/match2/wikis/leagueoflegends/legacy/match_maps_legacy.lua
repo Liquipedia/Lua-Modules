@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchSubobjects = Lua.import('Module:Match/Subobjects', { requireDevIfEnabled = true })
@@ -23,8 +24,6 @@ local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
-local MAX_NUMBER_OF_MAPS = 9
-local MAX_NUMBER_OF_MATCHES = 30
 local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
@@ -106,38 +105,43 @@ end
 ---@param details table
 ---@return table, table
 function MatchMapsLegacy.convertMaps(args, details)
-	for index = 1, MAX_NUMBER_OF_MAPS do
-		if details['match' .. index] then
-			-- match corresponds to MatchLua
-			local match = Json.parseIfString(details['match' .. index] or '{}')
-			if Logic.isEmpty(match.win) then
-				match.win = args['map' .. index .. 'win']
-			end
-			match.winner = match.win
-			match.win = nil
-
-			if match.length and match.length:lower() == DEFAULT then
-				match.walkover = match.winner
-			end
-
-			match.map = DUMMY_MAP_NAME
-			local map = MatchSubobjects.luaGetMap(match)
-			args['map' .. index] = map
-
-			args['map' .. index .. 'win'] = nil
-			details['match' .. index] = nil
-		elseif args['map' .. index .. 'win'] then
-			local map = MatchSubobjects.luaGetMap{
-				winner = args['map' .. index .. 'win'],
-				map = DUMMY_MAP_NAME
-			}
-			args['map' .. index] = map
-
-			args['map' .. index .. 'win'] = nil
-		else
-			break
+	local getMapFromDetails = function (index)
+		if not details['match' .. index] then
+			return nil
 		end
+		local match = Json.parseIfString(details['match' .. index])
+		if Logic.isEmpty(match.win) then
+			match.win = args['map' .. index .. 'win']
+		end
+		match.winner = match.win
+		match.win = nil
+
+		if match.length and match.length:lower() == DEFAULT then
+			match.walkover = match.winner
+		end
+
+		match.map = DUMMY_MAP_NAME
+		return MatchSubobjects.luaGetMap(match)
 	end
+
+	local getMapOnlyWithWinner = function (index)
+		if not args['map' .. index .. 'win'] then
+			return nil
+		end
+		local map = MatchSubobjects.luaGetMap{
+			winner = args['map' .. index .. 'win'],
+			map = DUMMY_MAP_NAME
+		}
+		return map
+	end
+
+	Array.mapIndexes(function (index)
+		local map = getMapFromDetails(index) or getMapOnlyWithWinner(index)
+		args['map' .. index] = map
+		args['map' .. index .. 'win'] = nil
+		details['match' .. index] = nil
+		return map
+	end)
 	return args, details
 end
 
@@ -186,20 +190,15 @@ function MatchMapsLegacy.matchList(frame)
 	if Logic.readBoolOrNil(matchsection) ~= false then
 		args.matchsection = matchsection
 	end
-
 	matchlistVars:set('isOldMatchList', 'true')
 	globalVars:set('islegacy', 'true')
 
-	for matchIndex = 1, MAX_NUMBER_OF_MATCHES do
-		if args['match' .. matchIndex] then
-			local match = Json.parse(args['match' .. matchIndex])
-			args['M' .. matchIndex .. 'header'] = match.header
-			match.header = nil
-			args['M' .. matchIndex] = Json.stringify(match)
-			args['match' .. matchIndex] = nil
-		else
-			break
-		end
+	for matchKey, matchJson, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
+		local match = Json.parse(matchJson)
+		args['M' .. matchIndex .. 'header'] = match.header
+		args['M' .. matchIndex] = Json.stringify(match)
+		match.header = nil
+		args[matchKey] = nil
 	end
 
 	matchlistVars:delete('isOldMatchList')
