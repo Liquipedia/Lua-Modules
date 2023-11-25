@@ -36,9 +36,7 @@ function Manufacturer:createInfobox()
 				Header{
 					name = self:nameDisplay(args),
 					image = args.image,
-					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
-					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 					subHeader = args.title,
 					size = args.imagesize,
 				},
@@ -104,10 +102,10 @@ function Manufacturer:setLpdbData(args)
 	local lpdbData = {
 		name = name,
 		type = 'manufacturer',
-		region = args.region,
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = {
+			region = args.region,
 			status = args.status,
 			locations = Locale.formatLocations(args),
 		}
