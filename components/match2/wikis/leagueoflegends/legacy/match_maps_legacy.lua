@@ -276,6 +276,13 @@ function MatchMapsLegacy.matchListEnd()
 		args['M' .. matchIndex] = Json.stringify(match)
 	end)
 
+	matchlistVars:delete('store')
+	matchlistVars:delete('bracketid')
+	matchlistVars:delete('matchListTitle')
+	matchlistVars:delete('width')
+	matchlistVars:delete('hide')
+	matchlistVars:delete('patch')
+	matchlistVars:delete('matchsection')
 	globalVars:delete('islegacy')
 
 	return MatchGroup.MatchList(args)
