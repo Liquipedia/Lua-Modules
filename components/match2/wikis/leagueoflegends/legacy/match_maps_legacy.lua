@@ -145,6 +145,17 @@ function MatchMapsLegacy.convertMaps(args, details)
 	return args, details
 end
 
+---@param args table
+---@return table
+function MatchMapsLegacy.handleLocation(args)
+	if args.location then
+		local locationComment = 'Match ' .. (Logic.readBool(args.finished) and 'was' or 'being') .. ' played in ' .. args.location
+		args.comment = args.comment and (args.comment .. '<br>' .. locationComment) or locationComment
+		args.location = nil
+	end
+	return args
+end
+
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
 ---@return string?
@@ -155,9 +166,9 @@ function MatchMapsLegacy.convertMatch(frame)
 	args = MatchMapsLegacy.convertOpponents(args)
 	args = MatchMapsLegacy.handleLiteralsForOpponents(args)
 	args, details = MatchMapsLegacy.convertMaps(args, details)
-
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy.copyDetailsToArgs(args, details)
+	args = MatchMapsLegacy.handleLocation(args)
 
 	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(args)
