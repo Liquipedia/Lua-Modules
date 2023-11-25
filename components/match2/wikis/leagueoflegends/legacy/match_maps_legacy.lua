@@ -25,7 +25,7 @@ local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUMBER_OF_MAPS = 9
 local MAX_NUMBER_OF_MATCHES = 30
-local DUMMY_MAP_NAME = 'null'
+local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
@@ -122,7 +122,6 @@ function MatchMapsLegacy.convertMaps(args, details)
 
 			match.map = DUMMY_MAP_NAME
 			local map = MatchSubobjects.luaGetMap(match)
-			map.map = nil
 			args['map' .. index] = map
 
 			args['map' .. index .. 'win'] = nil
@@ -132,7 +131,6 @@ function MatchMapsLegacy.convertMaps(args, details)
 				winner = args['map' .. index .. 'win'],
 				map = DUMMY_MAP_NAME
 			}
-			map.map = nil
 			args['map' .. index] = map
 
 			args['map' .. index .. 'win'] = nil
