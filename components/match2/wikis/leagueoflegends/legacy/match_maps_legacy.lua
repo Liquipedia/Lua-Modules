@@ -31,6 +31,7 @@ local DEFAULT_LOSS = 'L'
 local TBD = 'tbd'
 
 ---@param args table
+---@param details table
 ---@return table
 function MatchMapsLegacy.copyDetailsToArgs(args, details)
 	for key, value in pairs(details) do
