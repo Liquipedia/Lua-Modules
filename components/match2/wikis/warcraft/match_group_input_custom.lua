@@ -638,7 +638,8 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 		return
 	end
 
-	local opponentRaces, playerNameArray heroesData = CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
+	local opponentRaces, playerNameArray, heroesData
+		= CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
 	map.extradata = Table.merge(map.extradata, heroesData)
 	if tonumber(map.winner) == 1 then
 		map.extradata.winnerfaction = opponentRaces[1]
