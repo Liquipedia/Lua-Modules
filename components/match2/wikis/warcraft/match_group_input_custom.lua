@@ -638,7 +638,9 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 		return
 	end
 
-	local opponentRaces, playerNameArray = CustomMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
+	local opponentRaces, playerNameArray, heroesData
+		= CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
+	map.extradata = Table.merge(map.extradata, heroesData)
 	if tonumber(map.winner) == 1 then
 		map.extradata.winnerfaction = opponentRaces[1]
 		map.extradata.loserfaction = opponentRaces[2]
@@ -653,17 +655,21 @@ end
 ---@param participants table<string, table>
 ---@return table<integer, string>
 ---@return table<integer, string>
-function CustomMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
-	local opponentRaces, playerNameArray = {}, {}
+---@return table<string, string>
+function CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
+	local opponentRaces, playerNameArray, heroesData = {}, {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
 		-- opponentIndex can not be nil due to the format of the participants keys
 		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
+		Array.forEach(participantData.heroes, function(hero, heroIndex)
+			heroesData['opponent' .. opponentIndex .. 'hero' .. heroIndex] = hero
+		end)
 	end
 
-	return opponentRaces, playerNameArray
+	return opponentRaces, playerNameArray, heroesData
 end
 
 ---@param players table[]
