@@ -117,6 +117,9 @@ function Manufacturer:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('manufacturer_' .. self.name, lpdbData.extradata)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function Manufacturer:addToLpdb(lpdbData, args)
 	return lpdbData
 end
