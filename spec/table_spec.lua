@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('Page', function()
+describe('Table', function()
 	local Data = mw.loadData('Module:Flags/MasterData')
 	local Logic = require('Module:Logic')
 	local Table = require('Module:Table')
