@@ -51,7 +51,7 @@ for file in $files; do
   fileContents=$(cat "$file")
   fileName=$(basename "$file")
 
-  if [[ $file == *.js ]]
+  if [[ $file == *.js ]]; then
     page="MediaWiki:Common.js/${fileName}"
   else
     page="MediaWiki:Common.css/${fileName}"
