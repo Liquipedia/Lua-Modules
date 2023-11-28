@@ -202,6 +202,9 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
+--- Include the full functionality for faking
+mw.html = require('3rd.mw.html')
+
 ---@class Language
 mw.language = {}
 
@@ -877,7 +880,7 @@ mw.ext.CurrencyExchange = {}
 ---@param amount number
 ---@param fromCurrency string
 ---@param toCurrency string
----@param date? string 
+---@param date? string
 ---@return number
 function mw.ext.CurrencyExchange.currencyexchange(amount, fromCurrency, toCurrency, date)
 	-- Fake mock number

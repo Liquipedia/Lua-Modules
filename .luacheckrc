@@ -29,7 +29,8 @@ std = {
 }
 exclude_files = {
 	".install", -- package files
-	".luarocks" -- package manager files
+	".luarocks", -- package manager files
+	"/3rd", -- 3rd party
 }
 
 -- https://luacheck.readthedocs.io/en/stable/warnings.html#list-of-warnings

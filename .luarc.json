@@ -13,5 +13,9 @@
     "workspace.library": [
         "${3rd}/busted/library",
         "${3rd}/luassert/library"
-    ]
+    ],
+	"workspace.ignoreDir": [
+		".vscode",
+		"3rd"
+	]
 }
