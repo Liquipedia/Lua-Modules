@@ -287,7 +287,13 @@ function mw.language:uc(str) end
 ---Converts the first character of the string to uppercase.
 ---@param str string
 ---@return string
-function mw.language:ucfirst(str) end
+function mw.language:ucfirst(str)
+	-- TODO: UTF8 support in fake
+	if str == 'übung' then
+		return 'Übung'
+	end
+	return (str:gsub("^%l", string.upper))
+end
 
 ---Converts the string to a representation appropriate for case-insensitive comparison. Note that the result may not make any sense when displayed.
 ---@param str string
@@ -529,7 +535,10 @@ function mw.text.tag(name, attrs, content) end
 ---@param s string
 ---@param charset string?
 ---@return string
-function mw.text.trim(s, charset) end
+function mw.text.trim(s, charset)
+	-- TODO: UTF8 support in fake
+	return string.match( s, '^()%s*$' ) and '' or string.match( s, '^%s*(.*%S)' )
+end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
 ---@param text string
@@ -877,7 +886,7 @@ mw.ext.CurrencyExchange = {}
 ---@param amount number
 ---@param fromCurrency string
 ---@param toCurrency string
----@param date? string 
+---@param date? string
 ---@return number
 function mw.ext.CurrencyExchange.currencyexchange(amount, fromCurrency, toCurrency, date)
 	-- Fake mock number
