@@ -1,37 +1,41 @@
+---@diagnostic disable: param-type-mismatch
 --- Triple Comment to Enable our LLS Plugin
 describe('Variables', function()
 	local Variables = require('Module:Variables')
-
 	local DateExt = require('Module:Date/Ext')
 
-	local LanguageMock
+	local FormatDateSub
 
 	before_each(function()
 		-- Because of the complex nature of `formatDate`, a lot of the tests are just "check it has been called"
-		LanguageMock = mock(mw.language, true)
+		FormatDateSub = stub(mw.language, "formatDate")
+	end)
+
+	after_each(function()
+		FormatDateSub:revert()
 	end)
 
 	describe('read timestamp', function()
 		it('verify', function()
 			DateExt.readTimestamp('2021-10-17 17:40 <abbr data-tz="-4:00">EDT</abbr>')
-			assert.stub(LanguageMock.formatDate).was.called_with(LanguageMock, 'U', '20211017 17:40 -4:00')
+			assert.stub(FormatDateSub).was.called_with(mw.language, 'U', '20211017 17:40 -4:00')
 
 			DateExt.readTimestamp('2021-10-17 21:40')
-			assert.stub(LanguageMock.formatDate).was.called_with(LanguageMock, 'U', '20211017 21:40')
+			assert.stub(FormatDateSub).was.called_with(mw.language, 'U', '20211017 21:40')
 		end)
 	end)
 
 	describe('format', function()
 		it('verify', function()
 			DateExt.formatTimestamp('c', 1634506800)
-			assert.stub(LanguageMock.formatDate).was.called_with(LanguageMock, 'c', '@' .. 1634506800)
+			assert.stub(FormatDateSub).was.called_with(mw.language, 'c', '@' .. 1634506800)
 		end)
 	end)
 
 	describe('toYmdInUtc', function()
 		it('verify', function()
 			DateExt.toYmdInUtc('November 08, 2021 - 13:00 <abbr data-tz="+2:00">CET</abbr>')
-			assert.stub(LanguageMock.formatDate).was.called_with(LanguageMock, 'Y-m-d', '@')
+			assert.stub(FormatDateSub).was.called_with(mw.language, 'Y-m-d', '@')
 		end)
 	end)
 
