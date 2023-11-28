@@ -78,7 +78,7 @@ end
 ---Applies a function to each element in an array and places the results in a new array.
 ---@generic V, T
 ---@param elements V[]
----@param funct fun(element: V, index?: integer): T
+---@param funct fun(element: V, index?: integer): T|nil
 ---@return T[]
 function Array.map(elements, funct)
 	local mappedArray = {}
@@ -127,8 +127,6 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
----@deprecated
----Use `Array.flatten(Array.map(tbl, funct))` instead
 ---@generic T
 ---@param tbl T[]
 ---@param funct any
