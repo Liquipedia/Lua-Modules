@@ -1,0 +1,37 @@
+{
+	"extends": [
+		"wikimedia/client",
+		"wikimedia/jquery",
+		"wikimedia/mediawiki"
+	],
+	"globals": {
+		"liquipedia": "readonly",
+		"_paq": "readonly",
+		"gtag": "readonly",
+		"Share": "readonly"
+	},
+	"rules": {
+		"space-before-function-paren": "off",
+		"no-jquery/no-global-selector": "off",
+		"vars-on-top": "off",
+		"one-var": "off",
+		"es/no-array-from": "off",
+		"mediawiki/class-doc": "off",
+		"mediawiki/no-nodelist-unsupported-methods": "off",
+		"es-x/no-block-scoped-variables": "off",
+		"es-x/no-string-prototype-startswith": "off",
+		"es-x/no-string-prototype-includes": "off",
+		"es-x/no-array-prototype-includes": "off",
+		"es-x/no-array-prototype-findindex": "off",
+		"es-x/no-spread-elements": "off",
+		"es-x/no-property-shorthands": "off",
+		"max-len": ["warn", { "code": 120 }]
+	},
+	"parserOptions": {
+		"ecmaVersion": 2017
+	},
+	"env": {
+		"es6": true
+	}
+}
+

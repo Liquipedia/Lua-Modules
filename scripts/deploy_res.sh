@@ -51,7 +51,11 @@ for file in $files; do
   fileContents=$(cat "$file")
   fileName=$(basename "$file")
 
-  page="MediaWiki:Common.css/${fileName}"
+  if [[ $file == *.js ]]
+    page="MediaWiki:Common.js/${fileName}"
+  else
+    page="MediaWiki:Common.css/${fileName}"
+  fi
 
   echo "...page = $page"
 
