@@ -664,7 +664,7 @@ function CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
 		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
-		Array.forEach(participantData.heroes, function(hero, heroIndex)
+		Array.forEach(participantData.heroes or {}, function(hero, heroIndex)
 			heroesData['opponent' .. opponentIndex .. 'hero' .. heroIndex] = hero
 		end)
 	end
