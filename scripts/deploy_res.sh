@@ -105,6 +105,26 @@ done
 if [ "$allDeployed" != true ]; then
   echo "DEBUG: Some files were not deployed!"
   exit 1
+else
+  cacheResult=$(
+    curl \
+      -s \
+      -b "$ckf" \
+      -c "$ckf" \
+      --data-urlencode "messagename=Resourceloaderarticles-cacheversion" \
+      --data-urlencode "value=$(git log -1 --pretty='%h')" \
+      -H "User-Agent: ${userAgent}" \
+      -H 'Accept-Encoding: gzip' \
+      -X POST "${wikiApiUrl}?format=json&action=updatelpmwmessageapi" \
+      | gunzip \
+      | jq ".updatelpmwmessageapi.message" -r
+  )
+  if [[ "${cacheResult}" == "Successfully changed the message value" ]]; then
+  	echo "Resource cache version updated succesfully!"
+  else
+    echo "DEBUG: Resource cache version unable to be updated!"
+    exit 1
+  fi
 fi
 
 rm -f cookie_*
