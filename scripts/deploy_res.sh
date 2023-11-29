@@ -43,6 +43,7 @@ curl \
   > /dev/null
 
 allDeployed=true
+changesMade=false
 for file in $files; do
   if [[ -n "$1" ]]; then
     file="./$file"
@@ -89,8 +90,12 @@ for file in $files; do
       | gunzip
   )
   result=$(echo "$rawResult" | jq ".edit.result" -r)
+  newRevId=$(echo "$rawResult" | jq ".edit.newrevid" -r)
   echo "DEBUG: ...${rawResult}"
   if [[ "${result}" == "Success" ]]; then
+    if [[ "${newRevId}" != "null" ]]; then
+      changesMade=true
+    fi
     echo "...${result}"
     echo '...done'
   else
@@ -103,9 +108,9 @@ for file in $files; do
 done
 
 if [ "$allDeployed" != true ]; then
-  echo "DEBUG: Some files were not deployed!"
+  echo "DEBUG: Some files were not deployed; resource cache version not updated!"
   exit 1
-else
+elif [ "$changesMade" == true ]; then
   cacheResult=$(
     curl \
       -s \
