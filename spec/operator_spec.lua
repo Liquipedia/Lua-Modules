@@ -38,7 +38,7 @@ describe('operator', function()
 		end)
 	end)
 
-	describe('methid', function()
+	describe('method', function()
 		it('check', function()
 			local foo = {
 				{
