@@ -5196,3 +5196,176 @@ Author(s): Scribunto developer(s)
 .scribunto-error:focus {
 	text-decoration: underline;
 }
+
+/*******************************************************************************
+Hexagon portraits
+Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
+Author(s): PhiLtheFisH, FO-nTTaX, salle
+*******************************************************************************/
+.wiki-heroes .hexagon-container,
+.wiki-illuvium .hexagon-container {
+	height: 1200px;
+	position: relative;
+	margin-bottom: 24px;
+}
+.wiki-heroes .hexagon-row,
+.wiki-illuvium .hexagon-row {
+	line-height: 240px;
+	margin-bottom: -24px;
+	position: absolute;
+}
+.wiki-heroes .hexagon-row:nth-child(2),
+.wiki-illuvium .hexagon-row:nth-child(2) {
+	margin-left: 69px;
+	top: 120px;
+}
+.wiki-heroes .hexagon-tile,
+.wiki-illuvium .hexagon-tile {
+	clip-path: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><clipPath id=\'heroPolygon\'><polygon points=\'72 0, 134 36, 134 108, 72 144, 10 108, 10 36\'></polygon></clipPath></svg>#heroPolygon");
+	clip-path: polygon(72px 0px, 134px 36px, 134px 108px, 72px 144px, 10px 108px, 10px 36px);
+	display: inline-block;
+	margin-left: -5px;
+	margin-right: -5px;
+	opacity: 1;
+	position: relative;
+	transition: 1s;
+	z-index: 100;
+}
+.wiki-heroes .hexagon-buttons-class,
+.wiki-illuvium .hexagon-buttons-affinity {
+	float: left;
+}
+.wiki-heroes .hexagon-buttons-faction,
+.wiki-illuvium .hexagon-buttons-class {
+	float: right;
+}
+.wiki-heroes .hexagon-button,
+.wiki-illuvium .hexagon-button {
+	cursor: pointer;
+}
+.wiki-heroes .hexagon:not(.show-assassin) .hexagon-tile-assassin,
+.wiki-heroes .hexagon:not(.show-specialist) .hexagon-tile-specialist,
+.wiki-heroes .hexagon:not(.show-support) .hexagon-tile-support,
+.wiki-heroes .hexagon:not(.show-warrior) .hexagon-tile-warrior,
+.wiki-heroes .hexagon:not(.show-multiclass) .hexagon-tile-multiclass,
+.wiki-heroes .hexagon:not(.show-starcraft) .hexagon-tile-starcraft,
+.wiki-heroes .hexagon:not(.show-warcraft) .hexagon-tile-warcraft,
+.wiki-heroes .hexagon:not(.show-diablo) .hexagon-tile-diablo,
+.wiki-illuvium .hexagon:not(.show-fire) .hexagon-tile-fire,
+.wiki-illuvium .hexagon:not(.show-nature) .hexagon-tile-nature,
+.wiki-illuvium .hexagon:not(.show-air) .hexagon-tile-air,
+.wiki-illuvium .hexagon:not(.show-water) .hexagon-tile-water,
+.wiki-illuvium .hexagon:not(.show-earth) .hexagon-tile-earth,
+.wiki-illuvium .hexagon:not(.show-fighter) .hexagon-tile-fighter,
+.wiki-illuvium .hexagon:not(.show-psion) .hexagon-tile-psion,
+.wiki-illuvium .hexagon:not(.show-empath) .hexagon-tile-empath,
+.wiki-illuvium .hexagon:not(.show-rogue) .hexagon-tile-rogue,
+.wiki-illuvium .hexagon:not(.show-bulwark) .hexagon-tile-bulwark,
+.wiki-heroes .hexagon:not(.show-other) .hexagon-tile-other,
+.wiki-illuvium .hexagon:not(.show-other) .hexagon-tile-other {
+	opacity: 0.5;
+	transition: 1s;
+}
+.wiki-heroes .hexagon:not(.show-assassin):not(.show-specialist):not(.show-support):not(.show-warrior):not(.show-multiclass):not(.show-starcraft):not(.show-warcraft):not(.show-diablo):not(.show-other) .hexagon-tile,
+.wiki-illuvium .hexagon:not(.show-fire):not(.show-nature):not(.show-air):not(.show-water):not(.show-earth):not(.show-fighter):not(.show-psion):not(.show-empath):not(.show-rogue):not(.show-bulwark):not(.show-other) .hexagon-tile {
+	opacity: 1;
+	transition: 1s;
+}
+.wiki-heroes .hexagon.show-assassin .hexagon-tile-assassin,
+.wiki-heroes .hexagon.show-specialist .hexagon-tile-specialist,
+.wiki-heroes .hexagon.show-support .hexagon-tile-support,
+.wiki-heroes .hexagon.show-warrior .hexagon-tile-warrior,
+.wiki-heroes .hexagon.show-multiclass .hexagon-tile-multiclass,
+.wiki-heroes .hexagon.show-starcraft .hexagon-tile-starcraft,
+.wiki-heroes .hexagon.show-warcraft .hexagon-tile-warcraft,
+.wiki-heroes .hexagon.show-diablo .hexagon-tile-diablo,
+.wiki-illuvium .hexagon.show-fire .hexagon-tile-fire,
+.wiki-illuvium .hexagon.show-nature .hexagon-tile-nature,
+.wiki-illuvium .hexagon.show-air .hexagon-tile-air,
+.wiki-illuvium .hexagon.show-water .hexagon-tile-water,
+.wiki-illuvium .hexagon.show-earth .hexagon-tile-earth,
+.wiki-illuvium .hexagon.show-fighter .hexagon-tile-fighter,
+.wiki-illuvium .hexagon.show-psion .hexagon-tile-psion,
+.wiki-illuvium .hexagon.show-empath .hexagon-tile-empath,
+.wiki-illuvium .hexagon.show-rogue .hexagon-tile-rogue,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-tile-bulwark,
+.wiki-heroes .hexagon.show-other .hexagon-tile-other,
+.wiki-illuvium .hexagon.show-other .hexagon-tile-other {
+	opacity: 1;
+	transition: 1s;
+}
+.wiki-heroes .hexagon-button img,
+.wiki-illuvium .hexagon-button img {
+	background-color: initial;
+	transition: 1s;
+}
+.wiki-heroes .hexagon.show-assassin .hexagon-button[data-show=assassin] img,
+.wiki-heroes .hexagon.show-specialist .hexagon-button[data-show=specialist] img,
+.wiki-heroes .hexagon.show-support .hexagon-button[data-show=support] img,
+.wiki-heroes .hexagon.show-warrior .hexagon-button[data-show=warrior] img,
+.wiki-heroes .hexagon.show-multiclass .hexagon-button[data-show=multiclass] img,
+.wiki-heroes .hexagon.show-starcraft .hexagon-button[data-show=starcraft] img,
+.wiki-heroes .hexagon.show-warcraft .hexagon-button[data-show=warcraft] img,
+.wiki-heroes .hexagon.show-diablo .hexagon-button[data-show=diablo] img,
+.wiki-illuvium .hexagon.show-fire .hexagon-button[data-show=fire] img,
+.wiki-illuvium .hexagon.show-nature .hexagon-button[data-show=nature] img,
+.wiki-illuvium .hexagon.show-air .hexagon-button[data-show=air] img,
+.wiki-illuvium .hexagon.show-water .hexagon-button[data-show=water] img,
+.wiki-illuvium .hexagon.show-earth .hexagon-button[data-show=earth] img,
+.wiki-illuvium .hexagon.show-fighter .hexagon-button[data-show=fighter] img,
+.wiki-illuvium .hexagon.show-psion .hexagon-button[data-show=psion] img,
+.wiki-illuvium .hexagon.show-empath .hexagon-button[data-show=empath] img,
+.wiki-illuvium .hexagon.show-rogue .hexagon-button[data-show=rogue] img,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-button[data-show=bulwark] img,
+.wiki-heroes .hexagon.show-other .hexagon-button[data-show=other] img,
+.wiki-illuvium .hexagon.show-other .hexagon-button[data-show=other] img {
+	background-color: #cccccc;
+	transition: 1s;
+}
+.wiki-heroes .hexagon-tile:hover,
+.wiki-illuvium .hexagon-tile:hover {
+	opacity: 0.75;
+	transition: 1s;
+}
+.wiki-heroes .hexagon-tile a img,
+.wiki-illuvium .hexagon-tile a img {
+	margin-top: -100px;
+}
+.wiki-heroes .hexagon-tile-clear,
+.wiki-illuvium .hexagon-tile-clear {
+	visibility: hidden;
+}
+.wiki-heroes .hexagon-tile-name,
+.wiki-illuvium .hexagon-tile-name {
+	color: #ffffff;
+	font-weight: bold;
+	left: 10px;
+	line-height: 12px;
+	position: absolute;
+	text-shadow: -1px 1px #000000;
+	top: 98px;
+	transform: rotate(-30deg);
+	transform-origin: -115px -35px 0;
+}
+.wiki-heroes .hexagon label,
+.wiki-illuvium .hexagon label {
+	cursor: pointer;
+}
+.wiki-heroes .hexagon label > input,
+.wiki-illuvium .hexagon label > input {
+	display: none;
+}
+.wiki-heroes .hexagon label > span,
+.wiki-illuvium .hexagon label > span {
+	background-color: #aaaaaa;
+	border: 1px solid #aaaaaa;
+	border-radius: 5px;
+	margin: 5px;
+	padding: 5px;
+	transition: 0.5s;
+}
+.wiki-heroes .hexagon label > input:checked + span,
+.wiki-illuvium .hexagon label > input:checked + span {
+	background-color: #cccccc;
+	transition: 0.5s;
+}
