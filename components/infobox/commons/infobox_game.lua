@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Json = require('Module:Json')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
@@ -132,7 +133,7 @@ function Game:_setLpdbData(args)
 	local addToExtradata = function(prefix)
 		local data = Table.map(self:getAllArgsForBase(args, prefix),
 			function(idx, value) return prefix .. idx, value end
-		) 
+		)
 		extradata = Table.merge(extradata, data)
 	end
 
