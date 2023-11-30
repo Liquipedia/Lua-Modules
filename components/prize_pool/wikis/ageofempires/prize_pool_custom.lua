@@ -76,7 +76,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
-	if lpdbData.liquipediatiertype == QUALIFIER and lpdbData.qualified == 1 then
+	if Variables.varDefault('tournament_liquipediatiertype') == QUALIFIER and lpdbData.qualified == 1 then
 		lpdbData.extradata.notabilitymod = '0'
 	end
 
