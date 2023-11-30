@@ -1,0 +1,31 @@
+--- Triple Comment to Enable our LLS Plugin
+describe('math', function()
+	local MathUtil = require('Module:MathUtil')
+
+	describe('i log 2', function()
+		it('check', function()
+			assert.are_equal(3, MathUtil.ilog2(8))
+			assert.are_equal(4, MathUtil.ilog2(24))
+		end)
+	end)
+
+	describe('sum', function()
+		it('check', function()
+			assert.are_equal(12, MathUtil.sum{3, 5, 4})
+			assert.are_equal(0, MathUtil.sum{})
+		end)
+	end)
+
+	describe('partial sum', function()
+		it('check', function()
+			assert.are_same({0, 3, 8, 12}, MathUtil.partialSums{3, 5, 4})
+			assert.are_same({0}, MathUtil.partialSums{})
+		end)
+	end)
+
+	describe('dot product', function()
+		it('check', function()
+			assert.are_equal(55, MathUtil.dotProduct({3, 2, 4}, {5, 6, 7}))
+		end)
+	end)
+end)

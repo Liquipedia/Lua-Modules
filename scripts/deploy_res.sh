@@ -8,7 +8,7 @@ if [[ -n "$1" ]]; then
   files=$1
   gitDeployReason="\"$(git log -1 --pretty='%h %s')\""
 else
-  files=$(find . -type f -name '*.css')
+  files=$(find stylesheets javascript -type f -name '*.css' -o -name '*.js')
   gitDeployReason='Automated Weekly Re-Sync'
 fi
 
@@ -51,7 +51,11 @@ for file in $files; do
   fileContents=$(cat "$file")
   fileName=$(basename "$file")
 
-  page="MediaWiki:Common.css/${fileName}"
+  if [[ $file == *.js ]]; then
+    page="MediaWiki:Common.js/${fileName}"
+  else
+    page="MediaWiki:Common.css/${fileName}"
+  fi
 
   echo "...page = $page"
 
