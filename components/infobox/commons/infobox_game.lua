@@ -144,7 +144,7 @@ function Game:_setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Json.stringifySubTables(lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality
