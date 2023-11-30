@@ -35,7 +35,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	padding: 0 5px;
 }
 
-#mw-content-text .row > [ class*='col-' ] {
+#mw-content-text .row > [ class*="col-" ] {
 	padding-left: 5px;
 	padding-right: 5px;
 }
@@ -72,7 +72,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	width: calc( ~'100% - 120px' );
+	width: calc( ~"100% - 120px" );
 	display: inline-block;
 	margin-bottom: -5px;
 	padding-left: 35px;
@@ -237,7 +237,7 @@ body.page-Main_Page .mainpage-transfer .divRow:nth-of-type( n + 17 ) {
 	.mainpage-transfer > div > div.Name {
 		display: inline-block;
 		float: none;
-		width: calc( ~'100% - 125px' ) !important;
+		width: calc( ~"100% - 125px" ) !important;
 		text-align: left;
 		border: 0 !important;
 	}
@@ -275,7 +275,7 @@ body.page-Main_Page .mainpage-transfer .divRow:nth-of-type( n + 17 ) {
 	background-color: var( --matches-transfer-green-background-color, rgba( 0, 255, 0, 0.065 ) ) !important;
 }
 
-[ data-darkreader-scheme='dark' ] .mainpage-transfer .mainpage-transfer-to-team,
+[ data-darkreader-scheme="dark" ] .mainpage-transfer .mainpage-transfer-to-team,
 .theme--dark .mainpage-transfer .mainpage-transfer-to-team {
 	background-color: var( --matches-transfer-green-background-color, rgba( 0, 172, 0, 0.133 ) ) !important;
 }
@@ -284,7 +284,7 @@ body.page-Main_Page .mainpage-transfer .divRow:nth-of-type( n + 17 ) {
 	background-color: var( --matches-transfer-red-background-color, rgba( 153, 0, 34, 0.065 ) ) !important;
 }
 
-[ data-darkreader-scheme='dark' ] .mainpage-transfer .mainpage-transfer-from-team,
+[ data-darkreader-scheme="dark" ] .mainpage-transfer .mainpage-transfer-from-team,
 .theme--dark .mainpage-transfer .mainpage-transfer-from-team {
 	background-color: var( --matches-transfer-red-background-color, rgba( 223, 0, 0, 0.125 ) ) !important;
 }
@@ -457,49 +457,49 @@ body.page-Main_Page .rankingtable tr:nth-of-type( n + 7 ) {
 	display: none;
 }
 
-label[ for^='tournaments-list-filter-' ] {
+label[ for^="tournaments-list-filter-" ] {
 	cursor: pointer;
 	vertical-align: middle;
-	width: calc( ~'100% / 4' );
+	width: calc( ~"100% / 4" );
 	text-align: center;
 	padding: 10px 0;
 	margin: 0;
 }
 
-label[ for^='tournaments-list-filter-' ]:before {
+label[ for^="tournaments-list-filter-" ]:before {
 	padding: 5px;
 }
 
-label[ for='tournaments-list-filter-64' ] {
+label[ for="tournaments-list-filter-64" ] {
 	background-color: #d5e5b6;
 }
 
-label[ for='tournaments-list-filter-64' ]:before {
-	content: '64';
+label[ for="tournaments-list-filter-64" ]:before {
+	content: "64";
 }
 
-label[ for='tournaments-list-filter-melee' ] {
+label[ for="tournaments-list-filter-melee" ] {
 	background-color: #b6e5c6;
 }
 
-label[ for='tournaments-list-filter-melee' ]:before {
-	content: 'Melee';
+label[ for="tournaments-list-filter-melee" ]:before {
+	content: "Melee";
 }
 
-label[ for='tournaments-list-filter-pm' ] {
+label[ for="tournaments-list-filter-pm" ] {
 	background-color: #c6b6e5;
 }
 
-label[ for='tournaments-list-filter-pm' ]:before {
-	content: 'Project M';
+label[ for="tournaments-list-filter-pm" ]:before {
+	content: "Project M";
 }
 
-label[ for='tournaments-list-filter-ultimate' ] {
+label[ for="tournaments-list-filter-ultimate" ] {
 	background-color: #e5b6d5;
 }
 
-label[ for='tournaments-list-filter-ultimate' ]:before {
-	content: 'Ultimate';
+label[ for="tournaments-list-filter-ultimate" ]:before {
+	content: "Ultimate";
 }
 
 .tournaments-list .filter-64,
@@ -507,10 +507,10 @@ label[ for='tournaments-list-filter-ultimate' ]:before {
 .tournaments-list .filter-pm,
 .tournaments-list .filter-ultimate,
 .tournaments-list .filter-none,
-#tournaments-list-filter-64:not( :checked ) ~ label[ for='tournaments-list-filter-64' ],
-#tournaments-list-filter-melee:not( :checked ) ~ label[ for='tournaments-list-filter-melee' ],
-#tournaments-list-filter-pm:not( :checked ) ~ label[ for='tournaments-list-filter-pm' ],
-#tournaments-list-filter-ultimate:not( :checked ) ~ label[ for='tournaments-list-filter-ultimate' ] {
+#tournaments-list-filter-64:not( :checked ) ~ label[ for="tournaments-list-filter-64" ],
+#tournaments-list-filter-melee:not( :checked ) ~ label[ for="tournaments-list-filter-melee" ],
+#tournaments-list-filter-pm:not( :checked ) ~ label[ for="tournaments-list-filter-pm" ],
+#tournaments-list-filter-ultimate:not( :checked ) ~ label[ for="tournaments-list-filter-ultimate" ] {
 	opacity: 0.5;
 	transition: 0.5s;
 }
@@ -524,22 +524,22 @@ label[ for='tournaments-list-filter-ultimate' ]:before {
 #tournaments-list-filter-melee:checked ~ .tournaments-list .filter-melee,
 #tournaments-list-filter-pm:checked ~ .tournaments-list .filter-pm,
 #tournaments-list-filter-ultimate:checked ~ .tournaments-list .filter-ultimate,
-#tournaments-list-filter-64:not( :checked ) ~ #tournaments-list-filter-melee:not( :checked ) ~ #tournaments-list-filter-pm:not( :checked ) ~ #tournaments-list-filter-ultimate:not( :checked ) ~ label[ for^='tournaments-list-filter-' ],
-#tournaments-list-filter-64:checked ~ label[ for='tournaments-list-filter-64' ],
-#tournaments-list-filter-melee:checked ~ label[ for='tournaments-list-filter-melee' ],
-#tournaments-list-filter-pm:checked ~ label[ for='tournaments-list-filter-pm' ],
-#tournaments-list-filter-ultimate:checked ~ label[ for='tournaments-list-filter-ultimate' ] {
+#tournaments-list-filter-64:not( :checked ) ~ #tournaments-list-filter-melee:not( :checked ) ~ #tournaments-list-filter-pm:not( :checked ) ~ #tournaments-list-filter-ultimate:not( :checked ) ~ label[ for^="tournaments-list-filter-" ],
+#tournaments-list-filter-64:checked ~ label[ for="tournaments-list-filter-64" ],
+#tournaments-list-filter-melee:checked ~ label[ for="tournaments-list-filter-melee" ],
+#tournaments-list-filter-pm:checked ~ label[ for="tournaments-list-filter-pm" ],
+#tournaments-list-filter-ultimate:checked ~ label[ for="tournaments-list-filter-ultimate" ] {
 	opacity: 1;
 	transition: 0.5s;
 }
 
 /* icon list */
 .mainpage-icons-10 img {
-	width: calc( ~'10% - 3.45px' );
+	width: calc( ~"10% - 3.45px" );
 }
 
 .mainpage-icons-14 img {
-	width: calc( ~'7.1% - 3.45px' );
+	width: calc( ~"7.1% - 3.45px" );
 }
 
 .mainpage-icons-10 img,
@@ -560,17 +560,17 @@ label[ for='tournaments-list-filter-ultimate' ]:before {
 	}
 
 	.mainpage-icons-10 img {
-		width: calc( ~'20% - 3.45px' );
+		width: calc( ~"20% - 3.45px" );
 	}
 
 	.mainpage-icons-14 img {
-		width: calc( ~'14.2% - 3.45px' );
+		width: calc( ~"14.2% - 3.45px" );
 	}
 }
 
 @media ( max-width: 380px ) {
 	.mainpage-icons-14 img {
-		width: calc( ~'20% - 3.45px' );
+		width: calc( ~"20% - 3.45px" );
 	}
 }
 
@@ -603,6 +603,28 @@ label[ for='tournaments-list-filter-ultimate' ]:before {
 .portal-pills h3 {
 	font-size: 0.875rem;
 	color: var( --wiki-color-medium );
+}
+
+/* Big Game Portal design */
+.big-portal {
+	padding: 1rem;
+}
+
+.big-portal .lp-row {
+	justify-content: center;
+}
+
+.big-portal .lp-col {
+	padding: 1rem;
+}
+
+.big-portal .portal-pills a {
+	padding: 5rem;
+	font-size: 1.25rem;
+}
+
+.big-portal .portal-pills .panel-icon {
+	font-size: 4rem;
 }
 
 /*******************************************************************************
@@ -667,11 +689,11 @@ Author(s): iMarbot
 Template(s): Commons latest uploads
 Author(s): FO-nTTaX
 *******************************************************************************/
-#latest-uploads img[ src*='darkmode' ] {
+#latest-uploads img[ src*="darkmode" ] {
 	background-color: #272727;
 	padding: 5px;
 }
 
-#images-taken-on-this-day img[ src*='darkmode' ] {
+#images-taken-on-this-day img[ src*="darkmode" ] {
 	background-color: #272727;
 }

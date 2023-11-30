@@ -204,7 +204,7 @@ Author(s): FO-nTTaX, Elysienna
 	color: #676767;
 	border-radius: 0.25rem;
 	font-size: 0.75rem;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 	font-weight: bold;
 	padding: 0.125rem 0.25rem;
 	top: 0.0625rem;
@@ -227,7 +227,7 @@ Author(s): FO-nTTaX, Elysienna
 }
 
 .liquipedia-links-badge--tooltip:before {
-	content: '';
+	content: "";
 	position: absolute;
 	top: 0.25rem;
 	left: -0.3125rem;
@@ -279,7 +279,7 @@ Template(s): TeamHistory
 Author(s): FO-nTTaX
 *******************************************************************************/
 .th-mono {
-	font-family: 'Droid Sans Mono', monospace;
+	font-family: "Droid Sans Mono", monospace;
 	letter-spacing: -1.4px;
 }
 
@@ -296,8 +296,8 @@ Author(s): FO-nTTaX
 	margin: 0;
 }
 
-#sidebar-toc .row > [ class*='col-' ],
-#scroll-wrapper-toc .row > [ class*='col-' ] {
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
 	padding-left: 5px;
 	padding-right: 5px;
 }
@@ -320,7 +320,7 @@ Author(s): FO-nTTaX
 
 .participants-table-buttons::after {
 	clear: both;
-	content: ' ';
+	content: " ";
 	display: block;
 }
 
@@ -446,7 +446,7 @@ span.icon-small.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.league-icon-small-image.lightmode,
 	span.icon-small.lightmode {
@@ -511,7 +511,7 @@ Author(s): FO-nTTaX
 }
 
 .timeline-row > div:nth-of-type( 2 ) {
-	width: calc( ~'100% - 150px' );
+	width: calc( ~"100% - 150px" );
 }
 
 .timeline-period {
@@ -689,7 +689,7 @@ Author(s): FO-nTTaX, Rapture
 
 .spellcard-description {
 	display: inline-block;
-	width: calc( ~'100% - 124px' );
+	width: calc( ~"100% - 124px" );
 	border-width: 1px 0;
 	border-style: solid;
 	padding: 5px 0;
@@ -1197,7 +1197,7 @@ Author(s): spazer
 	border-style: solid;
 	padding-left: 2px;
 	margin: 5px 0 0 5px;
-	width: calc( ~'100% - 10px' );
+	width: calc( ~"100% - 10px" );
 	text-align: center;
 }
 
@@ -1257,14 +1257,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	span.vodlink.darkmode {
 		display: inline-block;
@@ -1275,14 +1275,14 @@ span.vodlink.darkmode {
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.lightmode {
 		display: none;
 	}
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.vodlink span.darkmode {
 		display: inline;
@@ -1353,7 +1353,7 @@ Author(s): QuadratClown
 .rl-responsive-table {
 	border-collapse: collapse;
 	margin: 0;
-	width: calc( ~'100% - 347px' );
+	width: calc( ~"100% - 347px" );
 	table-layout: fixed;
 }
 
@@ -1466,7 +1466,7 @@ Author(s): QuadratClown
 .rl-responsive-table-sortable {
 	border-collapse: collapse;
 	margin: 0;
-	width: calc( ~'100% - 347px' );
+	width: calc( ~"100% - 347px" );
 	table-layout: fixed;
 }
 
@@ -1642,7 +1642,7 @@ Author(s): Rapture
 	background-color: var( --table-header-background-color, var( --clr-surface-4, #f5f5f5 ) );
 }
 
-.roster-card > tbody > tr > th.large-only[ colspan='1' ] {
+.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
 	display: none;
 }
 
@@ -1707,11 +1707,11 @@ Author(s): Rapture
 		border: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
 	}
 
-	.roster-card > tbody > tr > th.large-only[ colspan='10' ] {
+	.roster-card > tbody > tr > th.large-only[ colspan="10" ] {
 		display: none;
 	}
 
-	.roster-card > tbody > tr > th.large-only[ colspan='1' ] {
+	.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
 		display: table-cell;
 	}
 
@@ -1819,7 +1819,7 @@ Author(s): Rapture
 	padding: 5px;
 }
 
-.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 	display: none;
 }
 
@@ -1849,11 +1849,11 @@ Author(s): Rapture
 		border: 1px solid var( --clr-border, #bbbbbb );
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='10' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
 		display: none;
 	}
 
-	.stand-in-card > tbody > tr > th.large-only[ colspan='1' ] {
+	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
 		display: table-cell;
 	}
 
@@ -2041,7 +2041,7 @@ Author(s): iMarbot
 *******************************************************************************/
 @media ( min-width: 650px ) {
 	.roster-notes-squash div {
-		max-width: calc( ~'100% - 350px' );
+		max-width: calc( ~"100% - 350px" );
 	}
 }
 
@@ -2120,10 +2120,10 @@ img.player-role-icon {
 	image-rendering: -webkit-optimize-contrast;
 }
 
-.player-role-icon img[ title='Captain' ],
-.player-role-icon img[ title='In-Game Leader' ],
-img.player-role-icon[ alt='Captain' ],
-img.player-role-icon[ alt='In-Game Leader' ] {
+.player-role-icon img[ title="Captain" ],
+.player-role-icon img[ title="In-Game Leader" ],
+img.player-role-icon[ alt="Captain" ],
+img.player-role-icon[ alt="In-Game Leader" ] {
 	height: 13px;
 	width: 18px;
 	vertical-align: baseline;
@@ -2150,7 +2150,7 @@ kbd {
 	padding: 1px 2px;
 	border-radius: 3px;
 	font-weight: 500;
-	font-family: 'Open Sans', sans-serif;
+	font-family: "Open Sans", sans-serif;
 }
 
 /*******************************************************************************
@@ -2831,7 +2831,7 @@ Author(s): Rapture
 	padding: 0 !important;
 }
 
-#main-content-column .form-field-tokens input[ type='search' ] {
+#main-content-column .form-field-tokens input[ type="search" ] {
 	height: auto;
 	padding: 0;
 	margin: 3px 0 0 5px;
@@ -2878,7 +2878,7 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.icon-16px.lightmode {
 		display: none;
@@ -3216,7 +3216,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #3622f2;
@@ -3230,7 +3230,7 @@ div.battleground-banner {
 	padding-left: 26px;
 	line-height: 104px;
 	color: #f8f8f9 !important;
-	font-family: 'Exo', 'Trebuchet MS', 'Helvetica', sans-serif;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
 	font-size: 390%;
 	font-weight: 600;
 	text-shadow: 0 0 25px #b12a2a;
@@ -3349,8 +3349,8 @@ Author(s): salle
 }
 
 .team-portal-list .tp-rank-card .tp-photo {
-	height: calc( ~'19vw / 4 * 3 - 5px' );
-	width: calc( ~'19vw - 5px' );
+	height: calc( ~"19vw / 4 * 3 - 5px" );
+	width: calc( ~"19vw - 5px" );
 	text-align: center;
 	overflow: hidden;
 }
@@ -4400,18 +4400,18 @@ ul.match-bm-lol-game-veto-overview-pick {
 Template(s): Darkmode images on file pages
 Author(s): FO-nTTaX, iMarbot
 *******************************************************************************/
-html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
-	#file img[ src*='darkmode' ]:not( :hover ),
-	.searchResultImage img[ src*='darkmode' ],
-	.gallerybox img[ src*='darkmode' ] {
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
+	#file img[ src*="darkmode" ]:not( :hover ),
+	.searchResultImage img[ src*="darkmode" ],
+	.gallerybox img[ src*="darkmode" ] {
 		background-color: #272727;
 	}
 }
 
-#file img[ src*='lightmode' ]:not( :hover ),
-.searchResultImage img[ src*='lightmode' ],
-.gallerybox img[ src*='lightmode' ] {
-	[ data-darkreader-scheme='dark' ] & {
+#file img[ src*="lightmode" ]:not( :hover ),
+.searchResultImage img[ src*="lightmode" ],
+.gallerybox img[ src*="lightmode" ] {
+	[ data-darkreader-scheme="dark" ] & {
 		background-color: #808080;
 	}
 
@@ -4420,8 +4420,8 @@ html:not( [ data-darkreader-scheme='dark' ] ):not( .theme--dark ) & {
 	}
 }
 
-.filehistory a img[ src*='darkmode' ],
-#file img[ src*='darkmode' ]:hover {
+.filehistory a img[ src*="darkmode" ],
+#file img[ src*="darkmode" ]:hover {
 	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
 }
 
@@ -4498,12 +4498,12 @@ Author(s): hjpalpha
 *******************************************************************************/
 
 .show-when-dark-mode,
-[ data-darkreader-scheme='dark' ] .show-when-light-mode,
+[ data-darkreader-scheme="dark" ] .show-when-light-mode,
 .theme--dark .show-when-light-mode {
 	display: none !important;
 }
 
-[ data-darkreader-scheme='dark' ] .show-when-dark-mode,
+[ data-darkreader-scheme="dark" ] .show-when-dark-mode,
 .theme--dark .show-when-dark-mode {
 	display: unset !important;
 }
@@ -4530,7 +4530,7 @@ Author(s): hjpalpha
 Template: Matchpage Lightmode/Darkmode class
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.lightmode,
 	.matchpage div.logo.lightmode {
@@ -4543,7 +4543,7 @@ Author(s): iMarbot
 	display: none;
 }
 
-[ data-darkreader-scheme='dark' ] &,
+[ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
 	.matchpage span.banner.darkmode,
 	.matchpage div.logo.darkmode {
@@ -4555,39 +4555,39 @@ Author(s): iMarbot
 Template: Darkmode 32px icons
 Author(s): iMarbot
 *******************************************************************************/
-[ data-darkreader-scheme='dark' ],
+[ data-darkreader-scheme="dark" ],
 .theme--dark {
 	& .vodlink img,
 	.group-table-header-right img {
-		&[ src*='VOD_Icon' ],
-		&[ src*='Match_Info_Stats' ],
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Reviews32' ],
-		&[ src*='Preview_Icon32' ],
-		&[ src*='LiveReport32' ],
-		&[ src*='Interview32' ],
-		&[ src*='Highlights_Icon32' ],
-		&[ src*='Captain_Icon' ],
-		&[ src*='Recap_Icon' ] {
+		&[ src*="VOD_Icon" ],
+		&[ src*="Match_Info_Stats" ],
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Reviews32" ],
+		&[ src*="Preview_Icon32" ],
+		&[ src*="LiveReport32" ],
+		&[ src*="Interview32" ],
+		&[ src*="Highlights_Icon32" ],
+		&[ src*="Captain_Icon" ],
+		&[ src*="Recap_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
 
 	& img.player-role-icon,
 	.rts-team-list-icon-tag img {
-		&[ src*='/Trial.png' ],
-		&[ src*='/Substitution.png' ],
-		&[ src*='Captain_Icon' ] {
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Captain_Icon" ] {
 			filter: invert( 1 );
 		}
 	}
 }
 
 .theme--dark img.player-role-icon {
-	&[ src*='/Trial.png' ],
-	&[ src*='/Substitution.png' ],
-	&[ src*='Captain_Icon' ] {
+	&[ src*="/Trial.png" ],
+	&[ src*="/Substitution.png" ],
+	&[ src*="Captain_Icon" ] {
 		filter: invert( 1 );
 	}
 }
@@ -4760,17 +4760,20 @@ Author(s): Elysienna
 	border-color: #00005d;
 }
 
-.theme--dark .portal-map {
-	background-color: var( --clr-secondary-16 );
-	border-color: var( --clr-secondary-25 );
-}
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.portal-map {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 
-.theme--dark .portal-map .dynamicmap > div:first-child {
-	background-color: #000000;
-}
+	.portal-map .dynamicmap > div:first-child {
+		background-color: #000000;
+	}
 
-.theme--dark .portal-map .dynamicmap > div > img {
-	filter: invert( 1 );
+	.portal-map .dynamicmap > div > img {
+		filter: invert( 1 );
+	}
 }
 
 /*******************************************************************************
@@ -4786,15 +4789,6 @@ Author(s): hjpalpha
 	background: var( --clr-forestgreen-90, #d1ffcc ) !important;
 }
 
-.theme--dark .Protoss,
-.theme--dark .warcraft-nightelf,
-.theme--dark .Protoss th,
-.theme--dark .warcraft-nightelf th,
-.theme--dark .Protoss td,
-.theme--dark .warcraft-nightelf td {
-	background: var( --clr-forestgreen-20, #d1ffcc ) !important;
-}
-
 .Zerg,
 .warcraft-orc,
 .Zerg th,
@@ -4802,15 +4796,6 @@ Author(s): hjpalpha
 .Zerg td,
 .warcraft-orc td {
 	background: var( --clr-cinnabar-90, #fad1d1 ) !important;
-}
-
-.theme--dark .Zerg,
-.theme--dark .warcraft-orc,
-.theme--dark .Zerg th,
-.theme--dark .warcraft-orc th,
-.theme--dark .Zerg td,
-.theme--dark .warcraft-orc td {
-	background: var( --clr-cinnabar-20, #fad1d1 ) !important;
 }
 
 .Terran,
@@ -4822,25 +4807,10 @@ Author(s): hjpalpha
 	background: var( --clr-sapphire-90, #cce1ff ) !important;
 }
 
-.theme--dark .Terran,
-.theme--dark .warcraft-human,
-.theme--dark .Terran th,
-.theme--dark .warcraft-human th,
-.theme--dark .Terran td,
-.theme--dark .warcraft-human td {
-	background: var( --clr-sapphire-20, #cce1ff ) !important;
-}
-
 .Random,
 .Random th,
 .Random td {
 	background: var( --clr-sun-90, #fff7cc ) !important;
-}
-
-.theme--dark .Random,
-.theme--dark .Random th,
-.theme--dark .Random td {
-	background: var( --clr-sun-20, #fff7cc ) !important;
 }
 
 .warcraft-multirace,
@@ -4852,25 +4822,10 @@ Author(s): hjpalpha
 	background: var( --clr-moon-90, #e6e6e6 ) !important;
 }
 
-.theme--dark .warcraft-multirace,
-.theme--dark .warcraft-multirace th,
-.theme--dark .warcraft-multirace td,
-.theme--dark .Bye,
-.theme--dark .Bye th,
-.theme--dark .Bye td {
-	background: var( --clr-moon-40, #e6e6e6 ) !important;
-}
-
 .warcraft-undead,
 .warcraft-undead th,
 .warcraft-undead td {
 	background: var( --clr-vividviolet-90, #f1d2fa ) !important;
-}
-
-.theme--dark .warcraft-undead,
-.theme--dark .warcraft-undead th,
-.theme--dark .warcraft-undead td {
-	background: var( --clr-vividviolet-30, #200033 ) !important;
 }
 
 .nyd,
@@ -4879,19 +4834,62 @@ Author(s): hjpalpha
 	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) ) !important;
 }
 
-.terran-zerg-gradient {
-	background: linear-gradient( to right, #fbdfdf, #fbdfdf 47%, #dee3ef 53%, #dee3ef );
-}
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	img[ title="Protoss" ],
+	img[ title="Zerg" ],
+	img[ title="Terran" ],
+	img[ title="Random" ] {
+		filter: grayscale( 100% ) brightness( 40 );
+	}
 
-.theme--dark .participant-table-race-header.Random .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Protoss .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Zerg .opponent-list-cell-content img,
-.theme--dark .participant-table-race-header.Terran .opponent-list-cell-content img,
-.theme--dark img[ title='Protoss' ],
-.theme--dark img[ title='Zerg' ],
-.theme--dark img[ title='Terran' ],
-.theme--dark img[ title='Random' ] {
-	filter: grayscale( 100% ) brightness( 40 );
+	.warcraft-undead,
+	.warcraft-undead th,
+	.warcraft-undead td {
+		background: var( --clr-vividviolet-30, #200033 ) !important;
+	}
+
+	.warcraft-multirace,
+	.warcraft-multirace th,
+	.warcraft-multirace td,
+	.Bye,
+	.Bye th,
+	.Bye td {
+		background: var( --clr-moon-40, #e6e6e6 ) !important;
+	}
+
+	.Random,
+	.Random th,
+	.Random td {
+		background: var( --clr-sun-20, #fff7cc ) !important;
+	}
+
+	.Terran,
+	.warcraft-human,
+	.Terran th,
+	.warcraft-human th,
+	.Terran td,
+	.warcraft-human td {
+		background: var( --clr-sapphire-20, #cce1ff ) !important;
+	}
+
+	.Zerg,
+	.warcraft-orc,
+	.Zerg th,
+	.warcraft-orc th,
+	.Zerg td,
+	.warcraft-orc td {
+		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
+	}
+
+	.Protoss,
+	.warcraft-nightelf,
+	.Protoss th,
+	.warcraft-nightelf th,
+	.Protoss td,
+	.warcraft-nightelf td {
+		background: var( --clr-forestgreen-20, #d1ffcc ) !important;
+	}
 }
 
 /*******************************************************************************
@@ -5136,7 +5134,7 @@ Author(s): salle
 }
 
 .tyre-graph-bar {
-	width: calc( ~'100% - 80px' );
+	width: calc( ~"100% - 80px" );
 	border-left: 1px solid var( --clr-secondary-39, #646464 );
 	height: 12px;
 	display: inline-flex;
@@ -5197,4 +5195,196 @@ Author(s): Scribunto developer(s)
 .scribunto-error:hover,
 .scribunto-error:focus {
 	text-decoration: underline;
+}
+
+/*******************************************************************************
+Hexagon portraits
+Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
+Author(s): PhiLtheFisH, FO-nTTaX, salle
+*******************************************************************************/
+.wiki-heroes .hexagon-container,
+.wiki-illuvium .hexagon-container {
+	height: 1200px;
+	position: relative;
+	margin-bottom: 24px;
+}
+
+.wiki-heroes .hexagon-row,
+.wiki-illuvium .hexagon-row {
+	line-height: 240px;
+	margin-bottom: -24px;
+	position: absolute;
+}
+
+.wiki-heroes .hexagon-row:nth-child( 2 ),
+.wiki-illuvium .hexagon-row:nth-child( 2 ) {
+	margin-left: 69px;
+	top: 120px;
+}
+
+.wiki-heroes .hexagon-tile,
+.wiki-illuvium .hexagon-tile {
+	clip-path: url( data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><clipPath id=\'heroPolygon\'><polygon points=\'72 0, 134 36, 134 108, 72 144, 10 108, 10 36\'></polygon></clipPath></svg>#heroPolygon );
+	clip-path: polygon( 72px 0, 134px 36px, 134px 108px, 72px 144px, 10px 108px, 10px 36px );
+	display: inline-block;
+	margin-left: -5px;
+	margin-right: -5px;
+	opacity: 1;
+	position: relative;
+	transition: 1s;
+	z-index: 100;
+}
+
+.wiki-heroes .hexagon-buttons-class,
+.wiki-illuvium .hexagon-buttons-affinity {
+	float: left;
+}
+
+.wiki-heroes .hexagon-buttons-faction,
+.wiki-illuvium .hexagon-buttons-class {
+	float: right;
+}
+
+.wiki-heroes .hexagon-button,
+.wiki-illuvium .hexagon-button {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ) .hexagon-tile-assassin,
+.wiki-heroes .hexagon:not( .show-specialist ) .hexagon-tile-specialist,
+.wiki-heroes .hexagon:not( .show-support ) .hexagon-tile-support,
+.wiki-heroes .hexagon:not( .show-warrior ) .hexagon-tile-warrior,
+.wiki-heroes .hexagon:not( .show-multiclass ) .hexagon-tile-multiclass,
+.wiki-heroes .hexagon:not( .show-starcraft ) .hexagon-tile-starcraft,
+.wiki-heroes .hexagon:not( .show-warcraft ) .hexagon-tile-warcraft,
+.wiki-heroes .hexagon:not( .show-diablo ) .hexagon-tile-diablo,
+.wiki-illuvium .hexagon:not( .show-fire ) .hexagon-tile-fire,
+.wiki-illuvium .hexagon:not( .show-nature ) .hexagon-tile-nature,
+.wiki-illuvium .hexagon:not( .show-air ) .hexagon-tile-air,
+.wiki-illuvium .hexagon:not( .show-water ) .hexagon-tile-water,
+.wiki-illuvium .hexagon:not( .show-earth ) .hexagon-tile-earth,
+.wiki-illuvium .hexagon:not( .show-fighter ) .hexagon-tile-fighter,
+.wiki-illuvium .hexagon:not( .show-psion ) .hexagon-tile-psion,
+.wiki-illuvium .hexagon:not( .show-empath ) .hexagon-tile-empath,
+.wiki-illuvium .hexagon:not( .show-rogue ) .hexagon-tile-rogue,
+.wiki-illuvium .hexagon:not( .show-bulwark ) .hexagon-tile-bulwark,
+.wiki-heroes .hexagon:not( .show-other ) .hexagon-tile-other,
+.wiki-illuvium .hexagon:not( .show-other ) .hexagon-tile-other {
+	opacity: 0.5;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ):not( .show-specialist ):not( .show-support ):not( .show-warrior ):not( .show-multiclass ):not( .show-starcraft ):not( .show-warcraft ):not( .show-diablo ):not( .show-other ) .hexagon-tile,
+.wiki-illuvium .hexagon:not( .show-fire ):not( .show-nature ):not( .show-air ):not( .show-water ):not( .show-earth ):not( .show-fighter ):not( .show-psion ):not( .show-empath ):not( .show-rogue ):not( .show-bulwark ):not( .show-other ) .hexagon-tile {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-tile-assassin,
+.wiki-heroes .hexagon.show-specialist .hexagon-tile-specialist,
+.wiki-heroes .hexagon.show-support .hexagon-tile-support,
+.wiki-heroes .hexagon.show-warrior .hexagon-tile-warrior,
+.wiki-heroes .hexagon.show-multiclass .hexagon-tile-multiclass,
+.wiki-heroes .hexagon.show-starcraft .hexagon-tile-starcraft,
+.wiki-heroes .hexagon.show-warcraft .hexagon-tile-warcraft,
+.wiki-heroes .hexagon.show-diablo .hexagon-tile-diablo,
+.wiki-illuvium .hexagon.show-fire .hexagon-tile-fire,
+.wiki-illuvium .hexagon.show-nature .hexagon-tile-nature,
+.wiki-illuvium .hexagon.show-air .hexagon-tile-air,
+.wiki-illuvium .hexagon.show-water .hexagon-tile-water,
+.wiki-illuvium .hexagon.show-earth .hexagon-tile-earth,
+.wiki-illuvium .hexagon.show-fighter .hexagon-tile-fighter,
+.wiki-illuvium .hexagon.show-psion .hexagon-tile-psion,
+.wiki-illuvium .hexagon.show-empath .hexagon-tile-empath,
+.wiki-illuvium .hexagon.show-rogue .hexagon-tile-rogue,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-tile-bulwark,
+.wiki-heroes .hexagon.show-other .hexagon-tile-other,
+.wiki-illuvium .hexagon.show-other .hexagon-tile-other {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-button img,
+.wiki-illuvium .hexagon-button img {
+	background-color: initial;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-button[ data-show="assassin" ] img,
+.wiki-heroes .hexagon.show-specialist .hexagon-button[ data-show="specialist" ] img,
+.wiki-heroes .hexagon.show-support .hexagon-button[ data-show="support" ] img,
+.wiki-heroes .hexagon.show-warrior .hexagon-button[ data-show="warrior" ] img,
+.wiki-heroes .hexagon.show-multiclass .hexagon-button[ data-show="multiclass" ] img,
+.wiki-heroes .hexagon.show-starcraft .hexagon-button[ data-show="starcraft" ] img,
+.wiki-heroes .hexagon.show-warcraft .hexagon-button[ data-show="warcraft" ] img,
+.wiki-heroes .hexagon.show-diablo .hexagon-button[ data-show="diablo" ] img,
+.wiki-illuvium .hexagon.show-fire .hexagon-button[ data-show="fire" ] img,
+.wiki-illuvium .hexagon.show-nature .hexagon-button[ data-show="nature" ] img,
+.wiki-illuvium .hexagon.show-air .hexagon-button[ data-show="air" ] img,
+.wiki-illuvium .hexagon.show-water .hexagon-button[ data-show="water" ] img,
+.wiki-illuvium .hexagon.show-earth .hexagon-button[ data-show="earth" ] img,
+.wiki-illuvium .hexagon.show-fighter .hexagon-button[ data-show="fighter" ] img,
+.wiki-illuvium .hexagon.show-psion .hexagon-button[ data-show="psion" ] img,
+.wiki-illuvium .hexagon.show-empath .hexagon-button[ data-show="empath" ] img,
+.wiki-illuvium .hexagon.show-rogue .hexagon-button[ data-show="rogue" ] img,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-button[ data-show="bulwark" ] img,
+.wiki-heroes .hexagon.show-other .hexagon-button[ data-show="other" ] img,
+.wiki-illuvium .hexagon.show-other .hexagon-button[ data-show="other" ] img {
+	background-color: #cccccc;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile:hover,
+.wiki-illuvium .hexagon-tile:hover {
+	opacity: 0.75;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile a img,
+.wiki-illuvium .hexagon-tile a img {
+	margin-top: -100px;
+}
+
+.wiki-heroes .hexagon-tile-clear,
+.wiki-illuvium .hexagon-tile-clear {
+	visibility: hidden;
+}
+
+.wiki-heroes .hexagon-tile-name,
+.wiki-illuvium .hexagon-tile-name {
+	color: #ffffff;
+	font-weight: bold;
+	left: 10px;
+	line-height: 12px;
+	position: absolute;
+	text-shadow: -1px 1px #000000;
+	top: 98px;
+	transform: rotate( -30deg );
+	transform-origin: -115px -35px 0;
+}
+
+.wiki-heroes .hexagon label,
+.wiki-illuvium .hexagon label {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon label > input,
+.wiki-illuvium .hexagon label > input {
+	display: none;
+}
+
+.wiki-heroes .hexagon label > span,
+.wiki-illuvium .hexagon label > span {
+	background-color: #aaaaaa;
+	border: 1px solid #aaaaaa;
+	border-radius: 5px;
+	margin: 5px;
+	padding: 5px;
+	transition: 0.5s;
+}
+
+.wiki-heroes .hexagon label > input:checked + span,
+.wiki-illuvium .hexagon label > input:checked + span {
+	background-color: #cccccc;
+	transition: 0.5s;
 }

@@ -64,7 +64,7 @@
 	border-radius: 2px;
 	border: 1px solid var( --brackets-header-border-color, #aaaaaa );
 	color: var( --clr-on-background );
-	margin-left: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
+	margin-left: calc( ~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)" );
 	overflow: hidden;
 	padding: 4px;
 	text-align: center;
@@ -75,7 +75,7 @@
 
 .brkts-header:first-child,
 .brkts-round-center:first-child {
-	margin-left: calc( ~'(var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
+	margin-left: calc( ~"(var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)" );
 }
 
 .brkts-third-place-header {
@@ -83,7 +83,7 @@
 }
 
 .brkts-qualified-header {
-	margin-left: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)' );
+	margin-left: calc( ~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)" );
 }
 
 .brkts-header-option {
@@ -104,7 +104,7 @@
 .brkts-round-lower-connectors {
 	align-self: stretch;
 	position: relative;
-	width: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)' );
+	width: calc( ~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--skip-round)" );
 }
 
 .brkts-line {
@@ -130,18 +130,18 @@
 }
 
 .brkts-br-wrapper.brkts-br-wrapper {
-	width: calc( ~'var(--match-width) + var(--score-width)' );
+	width: calc( ~"var(--match-width) + var(--score-width)" );
 }
 
 .brkts-bracket .brkts-match-info-icon {
-	left: calc( ~'var(--match-width) - var(--score-width) - 8px' );
+	left: calc( ~"var(--match-width) - var(--score-width) - 8px" );
 	position: absolute;
 }
 
 .brkts-round-qual-connectors {
 	align-self: stretch;
 	position: relative;
-	width: calc( ~'var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)' );
+	width: calc( ~"var(--round-horizontal-margin) + (var(--match-width) + var(--round-horizontal-margin)) * var(--qual-skip)" );
 }
 
 .brkts-round-qual {
@@ -297,7 +297,7 @@
 	border: 1px solid var( --table-border-color, #bbbbbb );
 	display: grid;
 	font-size: 13px;
-	grid-template-columns: ~'[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr';
+	grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
 	line-height: 1.48;
 }
 
@@ -359,7 +359,7 @@
 	.brkts-matchlist-match {
 		display: grid;
 		grid-column: span 5;
-		grid-template-columns: ~'[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr';
+		grid-template-columns: ~"[opponent] 4fr [score] minmax(30px, 1fr) [icon] 0px [score] minmax(30px, 1fr) [opponent] 4fr";
 	}
 }
 
@@ -752,7 +752,7 @@
 	border: 0;
 	border-radius: 0;
 	letter-spacing: 0.1em;
-	font-family: 'Source Code Pro', monospace;
+	font-family: "Source Code Pro", monospace;
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-pick {
@@ -1211,7 +1211,7 @@ div.brkts-opponent-hover {
 }
 
 div.brkts-opponent-hover::after {
-	content: '';
+	content: "";
 	height: 100%;
 	left: 0;
 	pointer-events: none;
@@ -1304,6 +1304,8 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 	width: 22px;
 	margin: 1px;
+	border-radius: 0;
+	min-height: 0;
 }
 
 .brkts-designer-gallery-grid {
@@ -1660,7 +1662,7 @@ div.brkts-opponent-hover-active::after {
 
 .brkts-opponent-entry .team-template-image-icon,
 .brkts-opponent-entry .team-template-image-legacy {
-	height: calc( ~'var(--opponent-height, 22px) - 4px' );
+	height: calc( ~"var(--opponent-height, 22px) - 4px" );
 	width: var( --brkts-team-icon-width, 44px );
 	justify-content: center;
 	display: inline-flex;

@@ -242,6 +242,7 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	local game = Table.deepCopy(match)
 	game.winner = game2.winner
 	game.vod = game2.vod
+	game.map = game2.map
 
 	game2.scores = game2.scores or {}
 	game.opponent1score = game2.scores[1]

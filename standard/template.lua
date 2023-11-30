@@ -41,7 +41,7 @@ Stores a value that a function would otherwise return in a place to be later
 retrieved by Template.retrieveReturnValues. Used to return values across
 template boundaries.
 ]]
----@param value table
+---@param value wikiVariableValue|table
 ---@param namespace string
 ---@return string
 function Template.stashReturnValue(value, namespace)
