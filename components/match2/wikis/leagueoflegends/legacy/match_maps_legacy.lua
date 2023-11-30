@@ -28,6 +28,7 @@ local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
+local FORFEIT = 'FF'
 local TBD = 'tbd'
 
 ---@param args table
@@ -66,7 +67,7 @@ function MatchMapsLegacy.convertOpponents(args)
 		local winner = tonumber(args.winner)
 		if args.walkover then
 			if tonumber(args.walkover) ~= 0 then
-				score = tonumber(args.walkover) == index and DEFAULT_WIN or DEFAULT_LOSS
+				score = tonumber(args.walkover) == index and DEFAULT_WIN or FORFEIT
 			end
 		elseif args['score' .. index] then
 			score = tonumber(args['score' .. index])
@@ -84,9 +85,9 @@ function MatchMapsLegacy.convertOpponents(args)
 		args['opponent' .. index .. 'literal'] = args['team' .. index .. 'league']
 
 		args['team' .. index] = nil
-		args.walkover = nil
 		args['score' .. index] = nil
 	end
+	args.walkover = nil
 	args.mapWinnersSet = nil
 
 	return args
@@ -165,7 +166,7 @@ end
 
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
----@return string?
+---@return string|Html
 function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
 	local details = Json.parseIfString(args.details or '{}')
@@ -181,6 +182,7 @@ function MatchMapsLegacy.convertMatch(frame)
 		return Json.stringify(args)
 	else
 		Template.stashReturnValue(args, 'LegacyMatchlist')
+		return mw.html.create('div'):css('display', 'none')
 	end
 end
 
