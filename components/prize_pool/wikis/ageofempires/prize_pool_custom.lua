@@ -25,6 +25,7 @@ local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
@@ -75,8 +76,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
-	if lpdbData.qualified == 1 then
-		-- Avoid duplicate score of qualified persons (qualifier+main event)
+	if lpdbData.liquipediatiertype == QUALIFIER and lpdbData.qualified == 1 then
 		lpdbData.extradata.notabilitymod = '0'
 	end
 
