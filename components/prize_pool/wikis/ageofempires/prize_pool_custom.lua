@@ -75,6 +75,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
+	if lpdbData.qualified == 1 then
+		-- Avoid duplicate score of qualified persons (qualifier+main event)
+		lpdbData.extradata.notabilitymod = '0'
+	end
 
 	-- Variable to communicate with TeamCards
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
