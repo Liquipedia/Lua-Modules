@@ -112,15 +112,14 @@ function Game:createInfobox()
 
 	if Namespace.isMain() then
 		infobox:categories('Games')
-		self:_setLpdbData(args, links)
+		self:_setLpdbData(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 ---@param args table
----@param links table
-function Game:_setLpdbData(args, links)
+function Game:_setLpdbData(args)
 	local lpdbData = {
 		name = args.romanized_name or self.name,
 		image = args.image,
@@ -131,10 +130,10 @@ function Game:_setLpdbData(args, links)
 
 	local extradata = {}
 	local addToExtradata = function(prefix)
-		args[prefix .. 1] = args[prefix .. 1] or Table.extract(args, prefix)
-		extradata = Table.merge(extradata, Table.filterByKey(
-			args, function(key) return string.match(key, '^' .. prefix .. '%d+$') end)
-		)
+		local data = Table.map(self:getAllArgsForBase(args, prefix),
+			function(idx, value) return prefix .. idx, value end
+		) 
+		extradata = Table.merge(extradata, data)
 	end
 
 	addToExtradata('publisher')
@@ -145,9 +144,7 @@ function Game:_setLpdbData(args, links)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Table.merge(lpdbData, {
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata),
-	}))
+	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Json.stringifySubTables(lpdbData)
 end
 
 --- Allows for overriding this functionality
