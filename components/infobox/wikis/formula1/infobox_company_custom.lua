@@ -19,7 +19,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomTeam = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
