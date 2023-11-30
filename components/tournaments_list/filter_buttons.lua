@@ -20,6 +20,8 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field order? fun(a: string, b: string): boolean
 ---@field load? fun(cat: FilterButtonCategory): FilterButtonCategory
 
+---Builds filterbuttons based on config stored in Module:FilterButtons/Config
+---Can be used from wikicode
 ---@return Html
 function FilterButtons.getFromConfig()
 	return FilterButtons.get(require('Module:FilterButtons/Config').categories)
@@ -29,7 +31,7 @@ end
 ---@param categories FilterButtonCategory[]
 ---@return Html
 function FilterButtons.get(categories)
-	Array.forEach(categories, FilterButtons._loadCategories)
+	Array.mapValues(categories, FilterButtons._loadCategory)
 
 	local div = mw.html.create('div')
 
@@ -47,10 +49,11 @@ function FilterButtons.get(categories)
 end
 
 ---@param category FilterButtonCategory
-function FilterButtons._loadCategories(category)
+---@return FilterButtonCategory
+function FilterButtons._loadCategory(category)
 	if category.load then
-		category.load(category)
-		return
+		category = category.load(category)
+		return category
 	end
 
 	if category.order then
@@ -58,6 +61,8 @@ function FilterButtons._loadCategories(category)
 	end
 
 	category.defaultItems = Logic.emptyOr(category.defaultItems, category.items)
+
+	return category
 end
 
 ---@param category FilterButtonCategory
