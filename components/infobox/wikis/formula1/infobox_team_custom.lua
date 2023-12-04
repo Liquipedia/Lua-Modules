@@ -27,6 +27,19 @@ local Chronology = Widgets.Chronology
 local _args
 local _team
 
+local STATISTICS = {
+	{name = 'races', name = 'Races'},
+	{name = 'wins', name = 'Wins'},
+	{name = 'podiums', name = 'Podiums'},
+	{name = 'poles', name = 'Pole positions'},
+	{name = 'fastestlaps', name = 'Fastest Laps'},
+	{name = 'points', name = 'Career Points'},
+	{name = 'firstentry', name = 'First entry'},
+	{name = 'firstwin', name = 'First win'},
+	{name = 'lastentry', name = 'Last entry'},
+}
+
+---@param frame Frame
 function CustomTeam.run(frame)
 	local team = Team(frame)
 	_team = team
@@ -39,31 +52,16 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomTeam:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {}
-	local statisticsCells = {
-		races = {order = 1, name = 'Races'},
-		wins = {order = 2, name = 'Wins'},
-		podiums = {order = 3, name = 'Podiums'},
-		poles = {order = 4, name = 'Pole positions'},
-		fastestlaps = {order = 5, name = 'Fastest Laps'},
-		points = {order = 6, name = 'Career Points'},
-		firstentry = {order = 7, name = 'First entry'},
-		firstwin = {order = 8, name = 'First win'},
-		lastentry = {order = 9, name = 'Last entry'},
-	}
-	if Table.any(_args, function(key) return statisticsCells[key] end) then
-		table.insert(widgets, Title{name = 'Team Statistics'})
-		local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-		for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
-			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
-		end
-	end
-
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
+	Array.extendWith(widgets, CustomTeam._statisticsCells(_args))
+end
 	if _args.academy then
 		local academyTeams = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
 			return TeamTemplates.team(nil, team)
@@ -87,9 +85,22 @@ function CustomInjector:addCustomCells()
 		)
 	end
 
+---@param args table
+---@return Widget[]
+function CustomTeam._statisticsCells(args)
+	if Array.all(STATISTICS, function(statsData) return args[statsData.key] == nil end) then
+		return {}
+	end
+	local widgets = {Title{name = 'Team Statistics'}}
+	Array.forEach(STATISTICS, function(statsData) 
+		table.insert(widgets, Cell{name = statsData.name, content = {args[statsData.key]}})
+	end)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.previous = args.previous
