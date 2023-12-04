@@ -5202,11 +5202,18 @@ Hexagon portraits
 Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
 Author(s): PhiLtheFisH, FO-nTTaX, salle
 *******************************************************************************/
-.wiki-heroes .hexagon-container,
-.wiki-illuvium .hexagon-container {
+.wiki-heroes .hexagon-container {
 	height: 1200px;
 	position: relative;
 	margin-bottom: 24px;
+	z-index: 1;
+}
+
+.wiki-illuvium .hexagon-container {
+	height: 2500px;
+	position: relative;
+	margin-bottom: 24px;
+	z-index: 1;
 }
 
 .wiki-heroes .hexagon-row,

@@ -479,13 +479,13 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
+	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+
 	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = {template = teamTemplate, type = Opponent.team},
+		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},
 		flip = options.flip,
 		teamStyle = 'icon',
 	}
-
-	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
 	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
