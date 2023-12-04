@@ -40,7 +40,6 @@ local _MODES = {
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
-	_league = league
 
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
