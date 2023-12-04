@@ -8,6 +8,7 @@ describe('abbreviation', function()
 			assert.is_nil(Abbreviation.make(''))
 		end)
 		it('Only one input returns nil', function()
+			---@diagnostic disable-next-line: param-type-mismatch
 			assert.is_nil(Abbreviation.make('Abc', nil))
 			assert.is_nil(Abbreviation.make('', 'Def'))
 		end)

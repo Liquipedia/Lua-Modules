@@ -29,7 +29,6 @@ local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 20
 local DEFAULT_BEST_OF = 99
 local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap', 'lrthread'}
 local MODE_MIXED = 'mixed'
@@ -343,38 +342,60 @@ end
 ---@param opponent table
 ---@return table
 function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent)
+	local players = {}
+
 	local teamName = opponent.name
 	local playersData = Json.parseIfString(opponent.players) or {}
 
-	local playerNames = {}
-
-	local players = {}
-
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		local player = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex .. '_p' .. playerIndex)) or {}
-
-		player.name = Logic.emptyOr(player.name, playersData['p' .. playerIndex],
-			Variables.varDefault(teamName .. '_p' .. playerIndex))
-
-		player.name = player.name and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_') or nil
-
-		player.flag = Logic.emptyOr(player.flag, playersData['p' .. playerIndex .. 'flag'],
-			Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag'))
-
-		local faction = Faction.read(Logic.emptyOr(player.race, playersData['p' .. playerIndex .. 'race'],
-			Variables.varDefault(teamName .. '_p' .. playerIndex .. 'race')))
-
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if (Table.isNotEmpty(player) or faction) and not playerNames[player.name] then
-			playerNames[player.name] = true
-			player.extradata = {faction = faction or Faction.defaultFaction}
-			table.insert(players, player)
+	local insertIntoPlayers = function(player)
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
+			return
 		end
+
+		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
+		player.flag = Flags.CountryName(player.flag)
+		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
+		player.extradata = {faction = Faction.read(player.race)}
+
+		players[player.name] = players[player.name] or {}
+		Table.deepMergeInto(players[player.name], player)
 	end
 
-	opponent.match2players = players
+	local playerIndex = 1
+	local varPrefix = teamName .. '_p' .. playerIndex
+	local name = Variables.varDefault(varPrefix)
+	while name do
+		insertIntoPlayers{
+			name = name,
+			displayName = Variables.varDefault(varPrefix .. 'dn'),
+			race = Variables.varDefault(varPrefix .. 'race'),
+			flag = Variables.varDefault(varPrefix .. 'flag'),
+		}
+		playerIndex = playerIndex + 1
+		varPrefix = teamName .. '_p' .. playerIndex
+		name = Variables.varDefault(varPrefix)
+	end
+
+	--players from manual input as `opponnetX_pY`
+	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
+		insertIntoPlayers(Json.parseIfString(player))
+	end
+
+	--players from manual input in `opponent.players`
+	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+		insertIntoPlayers({
+			name = playerName,
+			displayName = playersData[playerPrefix .. 'dn'],
+			race = playersData[playerPrefix .. 'race'],
+			flag = playersData[playerPrefix .. 'flag'],
+		})
+	end
+
+	opponent.match2players = Array.extractValues(players)
+	--set default race for unset races
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata.faction = player.extradata.faction or Faction.defaultFaction
+	end)
 
 	return opponent
 end
@@ -617,7 +638,9 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 		return
 	end
 
-	local opponentRaces, playerNameArray = CustomMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
+	local opponentRaces, playerNameArray, heroesData
+		= CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
+	map.extradata = Table.merge(map.extradata, heroesData)
 	if tonumber(map.winner) == 1 then
 		map.extradata.winnerfaction = opponentRaces[1]
 		map.extradata.loserfaction = opponentRaces[2]
@@ -632,17 +655,21 @@ end
 ---@param participants table<string, table>
 ---@return table<integer, string>
 ---@return table<integer, string>
-function CustomMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
-	local opponentRaces, playerNameArray = {}, {}
+---@return table<string, string>
+function CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
+	local opponentRaces, playerNameArray, heroesData = {}, {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
 		-- opponentIndex can not be nil due to the format of the participants keys
 		---@cast opponentIndex -nil
 		opponentRaces[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
+		Array.forEach(participantData.heroes or {}, function(hero, heroIndex)
+			heroesData['opponent' .. opponentIndex .. 'hero' .. heroIndex] = hero
+		end)
 	end
 
-	return opponentRaces, playerNameArray
+	return opponentRaces, playerNameArray, heroesData
 end
 
 ---@param players table[]
@@ -697,6 +724,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				position = playerIndex,
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'heroesNoCheck']),
+				playedRandom = Logic.readBool(map[prefix .. 'random']),
 			}
 		end
 	end
@@ -717,6 +745,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 					player.name,
 					currentPlayer.heroesCheckDisabled
 				),
+				random = currentPlayer.playedRandom,
 			}
 		end
 	end

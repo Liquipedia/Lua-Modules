@@ -48,6 +48,7 @@ function CustomPrizePool.run(frame)
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
+	args.placementsExtendImportLimit = Logic.emptyOr(args.placementsExtendImportLimit, true)
 
 	-- overwrite some wiki vars for this PrizePool call
 	_tournament_name = args['tournament name']

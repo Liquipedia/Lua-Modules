@@ -1,0 +1,711 @@
+/*******************************************************************************
+Template(s): LPColors
+Author(s): Wo1fwood, salle
+
+This file provide two different kinds of classes, functional categories that are determined by what the use is of a colour, and then there is the full LPColors colour palette using 12 named hues and then key words for their intended use, on Special:LPColors you can see three main categories Core, Faction, and Theme core is the default use for these names, if it's for a faction the keyword "faction" is added before:
+* "text" to be used for text of regular text size.
+* "non-text" which can be used for icons and headers for example.
+* "bg" for setting a background colour.
+
+For the theme (meaning the colours of the different skins on the wiki) the set up is slightly different, first the keyword "theme" is used, then there is three different categories:
+* "dark" to set the dark colour, this can either be as "bg" or "text"
+* "light" to also set the text or background color to light or dark.
+* "light-alt" is for use with the alternate light colour which is a little bit more saturated.
+
+The twelve colours names are: Cinnabar, Red Violet, Vivid Violet, Gigas, Sapphire, Elm, Forest Green, Atlantis, Pear, Bright Sun, Tulip Tree, and California.
+The final class names are all lower case with all spaces made into hyphens "-" so an example is "forest-green-faction-text"
+
+Besides these twelve there is Gray which will fit in with them very well. There is also White, and Black if you wish to use a dark background element with white text for example, or white background with dark text. (as a child element of something that is already coloured, this will use the default text and background colours.) There is also a Gold colour, this one stands out within the colour palette that was developed so it should only be used
+*******************************************************************************/
+
+/* GRAY */
+.gray-text {
+	color: #616161;
+}
+
+.gray-non-text {
+	color: #919191;
+}
+
+.second-place-text {
+	color: #9a9a9a;
+}
+
+.gray-bg,
+.gray-theme-light-alt-bg,
+ul.nav-tabs li.game-none,
+.overview.game-none {
+	background-color: #d3d3d3;
+}
+
+.gray-bg-alt,
+.matchlistdate,
+.fo-nttax-infobox > div:nth-child( 2n ),
+.bracket-popup-wrapper .bracket-popup,
+.bracket-popup-wrapper .bracket-popup .bracket-popup-footer,
+.grouptable-start-date {
+	background-color: #f9f9f9;
+}
+
+.background-color-second-place,
+.bg-second,
+.bg-p2,
+.bg-neutral,
+.grouptable-start-date,
+.fo-nttax-infobox > div:nth-child( 2n+1 ),
+.bracket-popup-wrapper .bracket-popup .bracket-popup-header,
+.bracket-popup-wrapper .bracket-popup .bracket-popup-body .bracket-popup-body-match:nth-of-type( 2n ) {
+	background-color: var( --clr-moon-background-color, #eeeeee );
+}
+
+.gray-theme-dark-text,
+.bracket-popup-wrapper .bracket-popup {
+	color: #484848;
+}
+
+.gray-theme-dark-bg {
+	background-color: #484848;
+}
+
+.gray-theme-light-text {
+	color: var( --clr-moon-40, #e6e6e6 );
+}
+
+.gray-theme-light-bg {
+	background-color: var( --clr-moon-40, #e6e6e6 );
+}
+
+.gray-theme-light-bg-striped {
+	background: repeating-linear-gradient( 135deg, var( --clr-moon-40, #e6e6e6 ), var( --clr-moon-40, #e6e6e6 ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, var( --clr-moon-40, #e6e6e6 ), var( --clr-moon-40, #e6e6e6 ) );
+}
+
+.gray-theme-light-alt-text,
+.techtreename a {
+	color: #d3d3d3;
+}
+
+/* WHITE */
+.white-text {
+	color: #ffffff;
+}
+
+.white-bg,
+.tabs-portal .tabs-portal-content,
+.nav-tabs > li.active,
+.nav-tabs > li > span > span > strong,
+div.NavPic,
+.navbox,
+.navbox-subgroup,
+.navbox-list {
+	background-color: #ffffff;
+}
+
+/* BLACK */
+.black-text {
+	color: #272727;
+}
+
+.black-non-text {
+	color: #2c2c2c;
+}
+
+.black-bg {
+	background-color: #272727;
+}
+
+.black-border {
+	border-color: #272727;
+}
+
+/* CINNABAR */
+.cinnabar-text,
+.cinnabar-non-text,
+.cinnabar-theme-dark-text,
+.bracket-popup div.wow-popup-center > .wow-game-damp abbr {
+	color: var( --clr-cinnabar-40, #b12a2a );
+}
+
+.cinnabar-bg,
+.cinnabar-theme-light-bg,
+.background-color-lose,
+.bg-d,
+.bg-down,
+.bg-lose,
+.bg-drop,
+.swisstable .swisstable-bgc-lose,
+.fo-nttax-infobox-wrapper .infobox-color-never,
+.fo-nttax-infobox-wrapper.infobox-hots .infobox-header,
+.fo-nttax-infobox-wrapper.infobox-css .infobox-header,
+.ambox-red {
+	background-color: var( --clr-cinnabar-background-color, #fbdfdf );
+}
+
+.cinnabar-theme-dark-bg,
+.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.red,
+.wiki-battlerite .bracket-popup-body-match .match-row .draft.red,
+.wiki-arenaofvalor .bracket-popup-body-match .match-row .draft.red,
+.wiki-wildrift .bracket-popup-body-match .match-row .draft.red {
+	background-color: var( --clr-cinnabar-40, #b12a2a );
+}
+
+.cinnabar-theme-light-text {
+	color: var( --clr-cinnabar-90, #fbdfdf );
+}
+
+.cinnabar-theme-light-alt-text {
+	color: var( --clr-cinnabar-90, #f9c7c7 );
+}
+
+.cinnabar-theme-light-alt-bg {
+	background-color: var( --clr-cinnabar-90, #f9c7c7 );
+}
+
+.cinnabar-theme-dark-alt-bg {
+	background-color: #ff4a4a;
+}
+
+.cinnabar-theme-dark-alt-bg-striped {
+	background: repeating-linear-gradient( 135deg, #ff4a4a, #ff4a4a 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, #ff4a4a, #ff4a4a );
+}
+
+.cinnabar-theme-dark-alt-text {
+	color: #ff4a4a;
+}
+
+/* RED VIOLET */
+.red-violet-text,
+.red-violet-non-text {
+	color: var( --clr-redviolet-40, #bb2c7d );
+}
+
+.red-violet-bg,
+.red-violet-theme-light-bg,
+.fo-nttax-infobox-wrapper.infobox-ultimate .infobox-header,
+ul.nav-tabs li.game-ultimate,
+.overview.game-ultimate,
+.bracket-popup div.side .popup-progress > div.bar.bg-color {
+	background-color: var( --clr-redviolet-background-color, #f4ddea );
+}
+
+.red-violet-theme-dark-text {
+	color: var( --clr-redviolet-30, #a4276e );
+}
+
+.red-violet-theme-dark-bg {
+	background-color: var( --clr-redviolet-30, #a4276e );
+}
+
+.red-violet-theme-light-text {
+	color: var( --clr-redviolet-90, #f4ddea );
+}
+
+.red-violet-theme-light-alt-text {
+	color: var( --clr-redviolet-80, #ecc4db );
+}
+
+.red-violet-theme-light-alt-bg {
+	background-color: var( --clr-redviolet-80, #ecc4db );
+}
+
+/* VIVID VIOLET */
+.vivid-violet-text,
+.vivid-violet-non-text,
+.vivid-violet-theme-dark-text {
+	color: var( --clr-vividviolet-40, #732b9c );
+}
+
+.bg-byeup,
+.vivid-violet-bg,
+.vivid-violet-theme-light-bg,
+.fo-nttax-infobox-wrapper.infobox-pm .infobox-header,
+ul.nav-tabs li.game-pm,
+.overview.game-pm {
+	background-color: var( --clr-vividviolet-background-color, #e8ddef );
+}
+
+.vivid-violet-bg-important {
+	background-color: var( --clr-vividviolet-background-color, #e8ddef ) !important;
+}
+
+.vivid-violet-theme-dark-bg {
+	background-color: var( --clr-vividviolet-30, #732b9c );
+}
+
+.vivid-violet-theme-light-text {
+	color: var( --clr-vividviolet-90, #e8ddef );
+}
+
+.vivid-violet-theme-light-alt-text {
+	color: var( --clr-vividviolet-80, #d8c4e3 );
+}
+
+.vivid-violet-theme-light-alt-bg {
+	background-color: var( --clr-vividviolet-80, #d8c4e3 );
+}
+
+/* GIGAS */
+.gigas-text,
+.gigas-non-text,
+.gigas-theme-dark-text {
+	color: var( --clr-gigas-40, #4d34a0 );
+}
+
+.gigas-bg,
+.gigas-theme-light-bg,
+div.NavFrame div.NavHead,
+.ambox-blue {
+	background-color: var( --clr-gigas-background-color, #e2def0 );
+}
+
+.gigas-theme-dark-bg {
+	background-color: var( --clr-gigas-40, #4d34a0 );
+}
+
+.gigas-theme-light-text {
+	color: var( --clr-gigas-90, #e2def0 );
+}
+
+.gigas-theme-light-alt-text {
+	color: var( --clr-gigas-80, #cdc6e5 );
+}
+
+.gigas-theme-light-alt-bg {
+	background-color: var( --clr-gigas-80, #cdc6e5 );
+}
+
+/* SAPPHIRE */
+.sapphire-text,
+.sapphire-non-text,
+.sapphire-theme-dark-text {
+	color: var( --clr-sapphire-40, #31519c );
+}
+
+.sapphire-alt-non-text {
+	color: var( --clr-sapphire-40, #0d71bf );
+}
+
+.sapphire-alt-bg {
+	background-color: var( --clr-sapphire-40, #0d71bf );
+}
+
+.sapphire-bg,
+.sapphire-theme-light-bg,
+.background-color-disqualified,
+.swisstable .swisstable-bgc-overturned,
+.bg-lightblue,
+.fo-nttax-infobox-wrapper.infobox-wol .infobox-header,
+.fo-nttax-infobox-wrapper.infobox-cscz .infobox-header {
+	background-color: var( --clr-sapphire-background-color, #dee3ef );
+}
+
+.sapphire-theme-dark-bg,
+.wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.blue,
+.wiki-battlerite .bracket-popup-body-match .match-row .draft.blue,
+.wiki-arenaofvalor .bracket-popup-body-match .match-row .draft.blue,
+.wiki-wildrift .bracket-popup-body-match .match-row .draft.blue {
+	background-color: var( --clr-sapphire-40, #31519c );
+}
+
+.sapphire-theme-light-text {
+	color: var( --clr-sapphire-90, #dee3ef );
+}
+
+.sapphire-theme-light-alt-text {
+	color: var( --clr-sapphire-80, #c6cfe3 );
+}
+
+.sapphire-theme-light-alt-bg {
+	background-color: var( --clr-sapphire-90, #c6cfe3 );
+}
+
+.sapphire-a2 {
+	background-color: var( --clr-sapphire-40, #5789ff );
+}
+
+.sapphire-alt-bg-striped {
+	background: repeating-linear-gradient( 135deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, var( --clr-sapphire-40, #0d71bf ), var( --clr-sapphire-40, #0d71bf ) );
+}
+/* ELM */
+.elm-text,
+.elm-faction-text {
+	color: var( --clr-elm-30, #1e7d7d );
+}
+
+.elm-non-text {
+	color: var( --clr-elm-40, #218c8c );
+}
+
+.elm-bg,
+.elm-theme-light-bg,
+.background-color-highlight,
+.fo-nttax-infobox-wrapper.infobox-brawl .infobox-header,
+ul.nav-tabs li.game-brawl,
+.overview.game-brawl {
+	background-color: var( --clr-elm-background-color, #dbeded );
+}
+
+.elm-theme-dark-text {
+	color: var( --clr-elm-20, #196b6b );
+}
+
+.elm-theme-dark-bg {
+	background-color: var( --clr-elm-20, #196b6b );
+}
+
+.elm-theme-light-text {
+	color: var( --clr-elm-90, #dbeded );
+}
+
+.elm-theme-light-alt-text {
+	color: var( --clr-elm-80, #c1dfdf );
+}
+
+.elm-theme-light-alt-bg {
+	background-color: var( --clr-elm-80, #c1dfdf );
+}
+
+/* FOREST GREEN */
+.forest-green-text,
+.forest-theme-dark-text {
+	color: var( --clr-forestgreen-20, #1e7a1d );
+}
+
+.forest-green-faction-text {
+	color: var( --clr-forestgreen-20, #1f821f );
+}
+
+.forest-green-non-text {
+	color: var( --clr-forest-30, #3ea34c );
+}
+
+.bg-seedup {
+	background-color: var( --clr-forestgreen-90, #dbeded );
+}
+
+.forest-green-bg,
+.forest-theme-light-bg,
+.background-color-win,
+.bg-u,
+.bg-up,
+.bg-proceed,
+.bg-win,
+.swisstable .swisstable-bgc-win,
+.fo-nttax-infobox-wrapper .infobox-color-always,
+.fo-nttax-infobox-wrapper.infobox-lotv .infobox-header,
+.fo-nttax-infobox-wrapper.infobox-melee .infobox-header,
+ul.nav-tabs li.game-melee,
+.overview.game-melee,
+.ambox-green {
+	background-color: var( --clr-forestgreen-background-color, #ddf4dd );
+}
+
+.bg-win-important {
+	background-color: var( --clr-forestgreen-background-color, #ddf4dd ) !important;
+}
+
+.forest-theme-dark-bg {
+	background-color: var( --clr-forestgreen-20, #1e7a1d );
+}
+
+.forest-green-dark-alt-bg,
+.forest-green-theme-dark-alt-bg {
+	background-color: var( --clr-forest-30, #3ea34c );
+}
+
+.forest-theme-light-text {
+	color: var( --clr-forestgreen-90, #ddf4dd );
+}
+
+.forest-theme-light-alt-text {
+	color: var( --clr-forestgreen-80, #c4ecc4 );
+}
+
+.forest-theme-light-alt-bg {
+	background-color: var( --clr-forestgreen-80, #c4ecc4 );
+}
+
+.forest-green-theme-dark-alt-bg-striped {
+	background: repeating-linear-gradient( 135deg, var( --clr-forest-30, #3ea34c ), var( --clr-forest-30, #3ea34c ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, var( --clr-forest-30, #3ea34c ), var( --clr-forest-30, #3ea34c ) );
+}
+
+/* ATLANTIS */
+.atlantis-text {
+	color: var( --clr-atlantis-30, #5d7a1d );
+}
+
+.atlantis-non-text {
+	color: var( --clr-atlantis-40, #7d9c36 );
+}
+
+.atlantis-bg,
+.atlantis-theme-light-alt-bg,
+.bg-su,
+.bg-stayup,
+.fo-nttax-infobox-wrapper .infobox-color-very.often,
+.fo-nttax-infobox-wrapper.infobox-csgo .infobox-header,
+.fo-nttax-infobox-wrapper.infobox-64 .infobox-header,
+ul.nav-tabs li.game-64,
+.overview.game-64 {
+	background-color: var( --clr-atlantis-background-color, #e5f4c6 );
+}
+
+.atlantis-theme-dark-text {
+	color: var( --clr-atlantis-30, #54711b );
+}
+
+.atlantis-theme-dark-bg {
+	background-color: var( --clr-atlantis-30, #54711b );
+}
+
+.atlantis-theme-light-text {
+	color: var( --clr-atlantis-90, #f0f9de );
+}
+
+.atlantis-theme-light-bg {
+	background-color: var( --clr-atlantis-90, #f0f9de );
+}
+
+.atlantis-theme-light-alt-text {
+	color: var( --clr-atlantis-80, #e5f4c6 );
+}
+
+/* PEAR */
+.pear-text {
+	color: var( --clr-pear-20, #75751c );
+}
+
+.pear-non-text {
+	color: var( --clr-pear-30, #969530 );
+}
+
+.pear-bg,
+.pear-theme-light-alt-bg,
+.bg-draw,
+.fo-nttax-infobox-wrapper .infobox-color-often,
+.swisstable .swisstable-bgc-draw {
+	background-color: var( --clr-pear-background-color, #f9f9c7 );
+}
+
+.bg-draw-important {
+	background-color: var( --clr-pear-background-color, #f9f9c7 ) !important;
+}
+
+.pear-theme-dark-text {
+	color: var( --clr-pear-20, #5d5d16 );
+}
+
+.pear-theme-dark-bg {
+	background-color: var( --clr-pear-20, #5d5d16 );
+}
+
+.pear-theme-light-text {
+	color: var( --clr-pear-90, #fbfbd7 );
+}
+
+.pear-theme-light-bg {
+	background-color: var( --clr-pear-90, #fbfbd7 );
+}
+
+.pear-theme-light-alt-text {
+	color: var( --clr-pear-80, #f9f9c7 );
+}
+
+/* BRIGHT SUN */
+.bright-sun-text {
+	color: var( --clr-sun-30, #857220 );
+}
+
+.bright-sun-non-text {
+	color: var( --clr-sun-40, #a69032 );
+}
+
+.bright-sun-bg,
+.bright-theme-light-alt-bg,
+.bg-s,
+.bg-stay,
+.fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header {
+	background-color: var( --clr-sun-background-color, #f9f0c7 );
+}
+
+.bright-theme-dark-text {
+	color: var( --clr-sun-20, #7a691d );
+}
+
+.bright-theme-dark-bg {
+	background-color: var( --clr-sun-20, #7a691d );
+}
+
+.bright-theme-light-text {
+	color: var( --clr-sun-90, #fbf6df );
+}
+
+.bright-theme-light-bg {
+	background-color: var( --clr-sun-90, #fbf6df );
+}
+
+.bright-theme-light-alt-text {
+	color: var( --clr-sun-80, #f9f0c7 );
+}
+
+.bright-sun-0 {
+	background-color: var( --clr-sun-40, #e9ca37 );
+}
+
+.bright-sun-0-text {
+	color: var( --clr-sun-40, #e9ca37 );
+}
+
+.bright-sun-0-bg-striped {
+	background: repeating-linear-gradient( 135deg, var( --clr-sun-40, #e9ca37 ), var( --clr-sun-40, #e9ca37 ) 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px ), linear-gradient( 0deg, var( --clr-sun-40, #e9ca37 ), var( --clr-sun-40, #e9ca37 ) );
+}
+
+/* GOLD */
+.gold-text,
+.first-place-text,
+.fo-nttax-infobox-wrapper .infobox-gold {
+	color: var( --clr-semantic-gold-40, #ffdd3c );
+}
+
+.gold-bg {
+	background-color: var( --clr-semantic-gold-90, #fff6c9 );
+}
+
+.gold-bg-alt,
+.background-color-first-place,
+.bg-first,
+.bg-p1 {
+	background-color: var( --clr-semantic-gold-80, #ffe982 );
+}
+
+/* TULIP TREE */
+.tulip-tree-text,
+.third-place-text {
+	color: var( --clr-tuliptree-40, #b1842a );
+}
+
+.tulip-tree-non-text {
+	color: var( --clr-tuliptree-40, #b1842a );
+}
+
+.tulip-tree-bg,
+.tulip-theme-light-alt-bg,
+.background-color-third-place,
+.bg-third,
+.bg-p3,
+.fo-nttax-infobox-wrapper .infobox-color-seldom,
+.fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
+	background-color: var( --clr-tuliptree-background-color, #f9e8c7 );
+}
+
+.tulip-tree-bg-important {
+	background-color: var( --clr-tuliptree-background-color, #f9e8c7 ) !important;
+}
+
+.tulip-theme-dark-text {
+	color: var( --clr-tuliptree-30, #7a5a1d );
+}
+
+.tulip-theme-dark-bg {
+	background-color: var( --clr-tuliptree-30, #7a5a1d );
+}
+
+.tulip-theme-light-text {
+	color: var( --clr-tuliptree-90, #fbf2df );
+}
+
+.tulip-theme-light-bg {
+	background-color: var( --clr-tuliptree-90, #fbf2df );
+}
+
+.tulip-theme-light-alt-text {
+	color: var( --clr-tuliptree-80, #f9e8c7 );
+}
+
+/* CALIFORNIA */
+.california-text {
+	color: var( --clr-california-30, #a86028 );
+}
+
+.california-non-text {
+	color: var( --clr-california-40, #cf793c );
+}
+
+.california-bg,
+.california-theme-light-alt-bg,
+.background-color-fourth-place,
+.bg-fourth,
+.bg-p4,
+.bg-sd,
+.bg-staydown,
+.fo-nttax-infobox-wrapper.infobox-wiiu .infobox-header,
+ul.nav-tabs li.game-wiiu,
+.overview.game-wiiu {
+	background-color: var( --clr-california-background-color, #f9dec7 );
+}
+
+.california-theme-dark-text {
+	color: var( --clr-california-30, #955623 );
+}
+
+.california-theme-dark-bg {
+	background-color: var( --clr-california-30, #955623 );
+}
+
+.california-theme-light-text {
+	color: var( --clr-california-90, #fbecdf );
+}
+
+.california-theme-light-bg {
+	background-color: var( --clr-california-90, #fbecdf );
+}
+
+.california-theme-light-alt-text {
+	color: var( --clr-california-80, #f9dec7 );
+}
+
+/* OTHER */
+.transparent-bg {
+	background: transparent !important;
+}
+
+.inherit-bg {
+	background: inherit !important;
+}
+
+.transparent-bg-striped {
+	background: repeating-linear-gradient( 135deg, transparent, transparent 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px );
+}
+
+/* BORDER COLOURS */
+.ambox-blue {
+	border-color: var( --clr-gigas-80, #7865b7 );
+}
+
+.ambox-green {
+	border-color: var( --clr-forestgreen-40, #5ecb5e );
+}
+
+.ambox-red {
+	border-color: var( --clr-cinnabar-80, #ee6767 );
+}
+
+/* ICON IN VISITED LINK COLOR FIX */
+.brkts-popup-body-element a:visited {
+	& .fad,
+	& .fas,
+	& .far,
+	& .liquipedia-custom-icon-duotone {
+		&:before,
+		&:after {
+			color: #7451f5;
+
+			html.theme--light & {
+				color: #4787ba;
+			}
+
+			html.theme--dark & {
+				color: #86b0d1;
+			}
+		}
+	}
+}

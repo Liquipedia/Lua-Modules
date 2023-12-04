@@ -29,11 +29,14 @@ function suite:testExpandTemplate()
 end
 
 function suite:testStashArgsRetrieve()
+	---@diagnostic disable-next-line: missing-fields
 	Template.stashArgs{foo = 3, bar = 5, namespace = 'Foo'}
 	self:assertDeepEquals({}, Template.retrieveReturnValues('Bar'))
 	self:assertDeepEquals({{foo = 3, bar = 5}}, Template.retrieveReturnValues('Foo'))
 	self:assertDeepEquals({}, Template.retrieveReturnValues('Foo'))
+	---@diagnostic disable-next-line: missing-fields
 	Template.stashArgs{foo = 3, bar = 5, namespace = 'Foo'}
+	---@diagnostic disable-next-line: missing-fields
 	Template.stashArgs{foo = 1, bar = 9, namespace = 'Foo'}
 	self:assertDeepEquals({{foo = 3, bar = 5}, {foo = 1, bar = 9}}, Template.retrieveReturnValues('Foo'))
 end

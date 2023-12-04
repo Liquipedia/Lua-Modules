@@ -17,7 +17,6 @@ local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -78,10 +77,7 @@ local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 function CustomPlayer.run(frame)
 	_player = Player(frame)
 	_args = _player.args
-	-- Automatic team, history
-	if String.isEmpty(_args.team) then
-		_args.team = PlayerTeamAuto._main{team = 'team'}
-	end
+	_args.autoTeam = true
 	local automatedHistory = TeamHistoryAuto.results{player=_player.pagename, convertrole=true, addlpdbdata=true}
 	if String.isEmpty(_args.history) then
 		_args.history = automatedHistory

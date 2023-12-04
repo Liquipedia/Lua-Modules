@@ -1,0 +1,443 @@
+/*******************************************************************************
+Template(s): Div Tables
+Author(s): salle
+*******************************************************************************/
+.divTable {
+	display: table;
+	width: auto;
+	background-color: var( --table-background-color, #ffffff );
+	border-spacing: 2px; /* cellspacing: poor IE support for this */
+	/* border-collapse: separate; */
+	border-collapse: collapse;
+}
+
+.divRow {
+	display: table-row;
+	width: auto;
+	line-height: 1.42857143;
+}
+
+.divHeaderRow {
+	line-height: 1.42857143;
+	font-weight: bold;
+	display: table-row;
+	color: var( --clr-on-background, #484848 );
+	font-size: 0.875rem;
+}
+
+.divCell {
+	display: table-cell;
+	padding: 5px;
+	line-height: 1.42857143;
+}
+
+.divRow > .divCell {
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+}
+
+.divRow:last-child > .divCell {
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+}
+
+.divTable > .divHeaderRow,
+.divTable.table-striped > .divRow:nth-child( 2n+1 ) {
+	background-color: var( --table-header-variant-background-color, #f5f5f5 );
+}
+
+.border-color-grey {
+	border-color: var( --table-border-color, #bbbbbb );
+}
+
+/*******************************************************************************
+Template(s): Grid Tables
+Author(s): iMarbot
+*******************************************************************************/
+.gridTable {
+	display: grid;
+	background-color: var( --table-background-color, #ffffff );
+}
+
+.gridRow,
+.gridHeader {
+	display: contents;
+}
+
+.gridCell {
+	padding: 5px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+}
+
+.gridHeader > .gridCell {
+	background-color: var( --table-header-variant-background-color, #f5f5f5 );
+	color: var( --clr-on-background, #484848 );
+	font-size: 0.875rem;
+	font-weight: bold;
+}
+
+.gridTable.tournamentCard {
+	grid-template-columns: minmax( 65px, max-content ) 20px 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+	width: 100%;
+	width: -webkit-fill-available;
+	width: -moz-available;
+	overflow-x: auto;
+}
+
+.gridTable.tournamentCard.HasOrganizer {
+	grid-template-columns: minmax( 65px, max-content ) 20px 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.NoGameIcon {
+	grid-template-columns: minmax( 65px, max-content ) 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.NoGameIcon.HasOrganizer {
+	grid-template-columns: minmax( 65px, max-content ) 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked {
+	grid-template-columns: 20px minmax( 65px, max-content ) 20px 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.HasOrganizer {
+	grid-template-columns: 20px minmax( 65px, max-content ) 20px 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.NoGameIcon {
+	grid-template-columns: 20px minmax( 65px, max-content ) 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.NoGameIcon.HasOrganizer {
+	grid-template-columns: 20px minmax( 65px, max-content ) 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Qualifiers {
+	grid-template-columns: minmax( 65px, max-content ) 20px 30px repeat( 5, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.HasOrganizer {
+	grid-template-columns: minmax( 65px, max-content ) 20px 30px repeat( 6, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.NoGameIcon {
+	grid-template-columns: minmax( 65px, max-content ) 30px repeat( 5, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.NoGameIcon.HasOrganizer {
+	grid-template-columns: minmax( 65px, max-content ) 30px repeat( 6, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Tierless {
+	grid-template-columns: 20px 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Tierless.HasOrganizer {
+	grid-template-columns: 20px 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Tierless.NoGameIcon {
+	grid-template-columns: 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Tierless.NoGameIcon.HasOrganizer {
+	grid-template-columns: 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Qualifiers.Tierless {
+	grid-template-columns: 20px 30px repeat( 5, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.Tierless.HasOrganizer {
+	grid-template-columns: 20px 30px repeat( 6, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.Tierless.NoGameIcon {
+	grid-template-columns: 30px repeat( 5, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Qualifiers.Tierless.NoGameIcon.HasOrganizer {
+	grid-template-columns: 30px repeat( 6, auto ) minmax( min-content, 500px );
+}
+
+.gridTable.tournamentCard.Ranked.Tierless {
+	grid-template-columns: 20px 20px 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.Tierless.HasOrganizer {
+	grid-template-columns: 20px 20px 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.Tierless.NoGameIcon {
+	grid-template-columns: 20px 30px repeat( 5, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard.Ranked.Tierless.NoGameIcon.HasOrganizer {
+	grid-template-columns: 20px 30px repeat( 6, auto ) minmax( min-content, 250px ) minmax( min-content, 250px );
+}
+
+.gridTable.tournamentCard .gridRow.tournament-highlighted-bg .gridCell {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+}
+
+.gridTable.tournamentCard .gridRow.tournament-highlighted-bg {
+	background-color: transparent !important;
+}
+
+.gridTable.tournamentCard > div.gridRow > div > .Medal,
+.gridTable.tournamentCard > div.gridRow > div > .PlayerNumberSuffix,
+.gridTable.tournamentCard > div.gridRow > div > .CountryText,
+.gridTable.tournamentCard > div.gridRow > div > .MobileOnly {
+	display: none;
+}
+
+.gridTable.tournamentCard .gridCell.Position,
+.gridTable.tournamentCard .gridCell.Tier,
+.gridTable.tournamentCard .gridCell.Game,
+.gridTable.tournamentCard .gridCell.Series,
+.gridTable.tournamentCard .gridCell.Prize,
+.gridTable.tournamentCard .gridCell.GameSeries {
+	justify-content: center;
+}
+
+.gridTable.tournamentCard .gridRow .gridCell.Position {
+	justify-content: flex-end;
+	font-weight: bold;
+}
+
+.gridTable.tournamentCard .gridCell.GameSeries {
+	grid-column: span 2;
+}
+
+.gridTable.tournamentCard .gridCell.Tier {
+	flex-wrap: nowrap;
+	white-space: nowrap;
+}
+
+.gridTable.tournamentCard .gridCell.Tier > .GameIcon {
+	display: none;
+}
+
+.gridTable.tournamentCard .gridCell.Tournament {
+	grid-column: span 2;
+	flex-wrap: nowrap;
+}
+
+.gridTable.tournamentCard .gridCell.Location {
+	justify-content: center;
+	align-items: flex-start;
+	flex-direction: column;
+}
+
+.gridTable.tournamentCard .gridCell.Location > .FlagText {
+	white-space: nowrap;
+}
+
+.gridTable.tournamentCard .gridCell.Placement > .Participants {
+	flex-flow: column wrap;
+	display: flex;
+	gap: 3px;
+}
+
+.gridTable.tournamentCard .gridCell.Placement > .Participants > *,
+.gridTable.tournamentCard .gridCell.Placement > .team-template-team-short {
+	white-space: nowrap;
+}
+
+.gridTable.tournamentCard:not( .Qualifiers ) .Placement.Qualified,
+.gridTable.tournamentCard:not( .Qualifiers ) .EventStatus {
+	grid-column: span 2;
+}
+
+.gridTable.tournamentCard .gridCell.Placement.Qualified > .Participants {
+	flex-direction: row;
+}
+
+@media ( max-width: 1100px ) {
+	.gridTable.tournamentCard {
+		grid-template-columns: repeat( 2, auto ) !important;
+		overflow-x: unset;
+		gap: 15px;
+	}
+
+	.gridTable.tournamentCard > div.gridHeader {
+		display: none;
+	}
+
+	.gridTable.tournamentCard > div.gridRow {
+		display: flex;
+		flex-flow: row wrap;
+		align-content: flex-start;
+		text-align: center;
+		height: fit-content;
+		border: 2px solid var( --table-border-color, #d3d3d3 );
+	}
+
+	.gridTable.tournamentCard .gridCell {
+		border-bottom: 0;
+	}
+
+	.gridTable.tournamentCard .gridRow .gridCell.Position {
+		justify-content: center;
+
+		&::before {
+			content: "#";
+		}
+	}
+
+	.gridTable.tournamentCard .gridRow .gridCell.Organizer {
+		display: none;
+	}
+
+	.gridTable.tournamentCard .gridCell.Header {
+		background-color: var( --table-header-variant-background-color, #f5f5f5 ) !important;
+		font-weight: bold;
+	}
+
+	.gridTable.tournamentCard .gridRow.tournament-highlighted-bg .gridCell.Tournament {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc ) !important;
+	}
+
+	.gridTable.tournamentCard .gridRow.tournament-highlighted-bg .gridCell.Position {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc ) !important;
+	}
+
+	.gridTable.tournamentCard .gridCell.Position {
+		border-bottom: 1px dashed var( --table-border-color, #d3d3d3 );
+		border-right: 1px dashed var( --table-border-color, #d3d3d3 );
+		justify-content: center;
+		flex-wrap: nowrap;
+		flex-basis: 10%;
+		flex-grow: 2;
+		order: 1;
+	}
+
+	.gridTable.tournamentCard .gridCell.Tournament {
+		border-bottom: 1px dashed var( --table-border-color, #d3d3d3 );
+		justify-content: center;
+		flex-basis: 85%;
+		flex-grow: 100;
+		order: 1;
+	}
+
+	.gridTable.tournamentCard .gridCell.Date {
+		justify-content: center;
+		flex-basis: 50%;
+		order: 2;
+	}
+
+	.gridTable.tournamentCard .gridCell.Game {
+		display: none;
+	}
+
+	.gridTable.tournamentCard .gridCell.Tier {
+		justify-content: center;
+		flex-basis: 50%;
+		padding: 0;
+		order: 3;
+	}
+
+	.gridTable.tournamentCard .gridCell.Tier > .GameIcon {
+		display: inline-block;
+		padding-right: 20px;
+	}
+
+	.gridTable.tournamentCard .gridCell.Location {
+		justify-content: center;
+		align-items: center;
+		flex-basis: 50%;
+		padding-top: 0;
+		order: 4;
+	}
+
+	.gridTable.tournamentCard .gridCell.Prize,
+	.gridTable.tournamentCard .gridCell.PlayerNumber {
+		justify-content: center;
+		flex-basis: auto;
+		padding-top: 0;
+		flex-grow: 1;
+		order: 5;
+	}
+
+	.gridTable.tournamentCard.Tierless .gridCell.Prize {
+		flex-basis: 50%;
+	}
+
+	.gridTable.tournamentCard.Tierless .gridCell.Location {
+		padding-top: 5px;
+	}
+
+	.gridTable.tournamentCard .gridCell.Location > .FlagText > .CountryFlag {
+		vertical-align: middle;
+	}
+
+	.gridTable.tournamentCard .gridCell.Location > .FlagText > .flag {
+		vertical-align: middle;
+	}
+
+	.gridTable.tournamentCard.Tierless .gridCell.PlayerNumber {
+		flex-basis: 50%;
+	}
+
+	.gridTable.tournamentCard .gridCell.EventDetails {
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement,
+	.gridTable.tournamentCard .gridCell.EventStatus {
+		border-top: 1px solid var( --table-border-color, #bbbbbb );
+		background-color: transparent !important;
+		justify-content: flex-start;
+		text-align: left;
+		flex-basis: 50%;
+		flex-grow: 1;
+		order: 6;
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement {
+		grid-template-columns: 30px auto;
+		display: grid;
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement.Qualified {
+		flex-basis: 100%;
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement.SecondPlace {
+		border-left: 1px dashed var( --table-border-color, #bbbbbb );
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement > .Participants {
+		flex-direction: row;
+	}
+
+	.gridTable.tournamentCard .gridCell.Placement > .Medal {
+		display: flex;
+	}
+
+	.gridTable.tournamentCard > div.gridRow > div > .Medal,
+	.gridTable.tournamentCard > div.gridRow > div > .PlayerNumberSuffix,
+	.gridTable.tournamentCard > div.gridRow > div > .CountryText,
+	.gridTable.tournamentCard > div.gridRow > div > .MobileOnly {
+		display: initial;
+	}
+
+	.gridTable.tournamentCard .gridCell.Blank {
+		display: none;
+	}
+}
+
+@media ( max-width: 900px ) {
+	.gridTable.tournamentCard {
+		grid-template-columns: repeat( 1, auto ) !important;
+	}
+}
+
+@media ( min-width: 300px ) and ( max-width: 900px ) {
+	.gridTable.tournamentCard {
+		min-width: 300px;
+	}
+}

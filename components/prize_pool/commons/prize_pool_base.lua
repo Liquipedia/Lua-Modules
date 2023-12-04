@@ -814,6 +814,10 @@ function BasePrizePool:storeData()
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		prizepoolindex = prizePoolIndex,
+		lastvsdata = {},
+		opponentplayers = {},
+		players = {},
+		extradata = {},
 	}
 
 	local lpdbData = {}

@@ -185,12 +185,18 @@ function ScoreBoard:opponent(opponent, isWinner, flip)
 		opponent = Opponent.tbd(Opponent.literal)
 	end
 
+	local opponentName = Opponent.toName(opponent)
+	if not opponentName then
+		mw.logObject(opponent, 'Invalid Opponent, Opponent.toName returns nil')
+		opponentName = ''
+	end
+
 	local opponentDispaly = mw.html.create('td')
 		:node(OpponentDisplay.InlineOpponent{
 			opponent = opponent,
 			teamStyle = 'short',
 			flip = flip,
-			showLink = Opponent.toName(opponent):gsub('_', ' ') ~= CURRENT_PAGE
+			showLink = opponentName:gsub('_', ' ') ~= CURRENT_PAGE
 		})
 
 	if isWinner then

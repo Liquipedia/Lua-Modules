@@ -247,13 +247,14 @@ end
 
 ---Determines the opponent type based on a given number of players
 ---@param numberOfPlayers integer
----@return string?
+---@return string
 function CustomResultsTable._getOpponentType(numberOfPlayers)
 	for opponentType, playerNumber in pairs(Opponent.partySizes) do
 		if playerNumber == numberOfPlayers then
 			return opponentType
 		end
 	end
+	error('invalid number of players ' .. numberOfPlayers)
 end
 
 return CustomResultsTable
