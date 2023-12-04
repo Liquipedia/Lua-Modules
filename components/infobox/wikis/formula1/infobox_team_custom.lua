@@ -61,7 +61,6 @@ end
 ---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	Array.extendWith(widgets, CustomTeam._statisticsCells(_args))
-end
 	if _args.academy then
 		local academyTeams = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
 			return TeamTemplates.team(nil, team)
@@ -84,7 +83,7 @@ end
 			}}
 		)
 	end
-
+end
 ---@param args table
 ---@return Widget[]
 function CustomTeam._statisticsCells(args)
