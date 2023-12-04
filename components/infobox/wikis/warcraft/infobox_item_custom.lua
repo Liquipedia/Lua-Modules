@@ -32,7 +32,7 @@ local CustomInjector = Class.new(Injector)
 
 local SELL_FACTOR = 0.6
 local MISCELLANEOUS = 'Miscellaneous'
-local GOBLIN_MERCHANT = 'Goblin Merchant Items'
+local GOBLIN_MERCHANT = 'Goblin Merchant'
 local PURCHASABLE = 'Purchasable'
 local CLASSES = {
 	p = 'Permanent',
@@ -163,7 +163,7 @@ function CustomItem:setLpdbData(args)
 		stockstart = args.stockstart,
 		stockreplenish = args.stockreplenish,
 		requirement = args.requirement,
-		purchasedfromgoblinshop = tostring(class == PURCHASABLE and not String.contains(args.soldfrom, GOBLIN_MERCHANT)),
+		purchasedfromgoblinshop = tostring(class == PURCHASABLE and String.contains(args.soldfrom, GOBLIN_MERCHANT)),
 	}
 
 	Array.forEach(args.soldFrom, function(soldFrom, index)
