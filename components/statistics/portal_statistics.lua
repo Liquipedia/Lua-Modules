@@ -932,7 +932,7 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 
 	if groupBy == 'game' and Logic.readBool(args.abbreviateGame) then
 		chartData = Array.map(chartData, function(entry)
-			entry.name = Game.abbreviation{game=entry.name} or entry.name
+			entry.name = Game.abbreviation{game = entry.name} or entry.name
 			return entry
 		end)
 	end
