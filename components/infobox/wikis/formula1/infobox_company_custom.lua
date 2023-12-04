@@ -50,7 +50,7 @@ function CustomInjector:addCustomCells(widgets)
 		{key = 'circuitsportdirector', name = 'Circuit Sport Director'},
 		{key = 'roadsportdirector', name = 'Road Sport Director'},
 	}
-	if Array.all(staffInfoCells, function(cellData) return not _args[cellData.key] end) then
+	if not Array.any(staffInfoCells, function(cellData) return _args[cellData.key] end) then
 		return widgets
 	end
 
