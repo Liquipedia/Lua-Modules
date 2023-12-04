@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local DateExt = require('Module:Date/Ext')
+local Game = require('Module:Game')
 local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lpdb = require('Module:Lpdb')
@@ -928,6 +929,13 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 	local chartData = Array.map(Array.extractValues(groupValues), function(value)
 		return prizes[value:lower()]
 	end)
+	
+	if groupBy == 'game' and Logic.readBool(args.abbreviateGame) then
+		chartData = Array.map(chartData, function(entry)
+			entry.name = Game.abbreviation{game=entry.name}
+			return entry
+		end)
+	end
 
 	return StatisticsPortal._drawPieChart(args, chartData)
 end
