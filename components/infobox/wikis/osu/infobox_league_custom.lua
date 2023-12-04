@@ -18,14 +18,11 @@ local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _league
 
 local _MODES = {
 	standard = 'Standard[[Category:osu!standard Tournaments]]',
