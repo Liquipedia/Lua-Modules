@@ -374,7 +374,7 @@ table.infobox_matches_content {
 }
 
 .infobox_matches_content:last-child {
-	margin-bottom: 0;
+	margin-bottom: 0 !important;
 }
 
 .infobox_matches_content .table {
