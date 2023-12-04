@@ -1,0 +1,17 @@
+{
+	"$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
+	"runtime.version": "Lua 5.1",
+	"runtime.plugin": "plugins/sumneko_plugin.lua",
+	"completion.autoRequire": false,
+	"diagnostics.severity": {
+		"trailing-space": "Error"
+	},
+	"diagnostics.neededFileStatus": {
+        "codestyle-check": "None",
+        "name-style-check": "None"
+    },
+    "workspace.library": [
+        "${3rd}/busted/library",
+        "${3rd}/luassert/library"
+    ]
+}

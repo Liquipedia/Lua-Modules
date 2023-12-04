@@ -30,11 +30,18 @@ CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions)
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = CustomMatchGroupUtil.types.Race,
+	random = 'boolean',
 })
+
+---@class WarcraftMatchGroupUtilGamePlayer: WarcraftStandardPlayer
+---@field matchplayerIndex integer
+---@field heroes string[]?
+---@field position integer
+---@field random boolean
 
 ---@class WarcraftMatchGroupUtilGameOpponent:GameOpponent
 ---@field placement number?
----@field players WarcraftStandardPlayer[]
+---@field players WarcraftMatchGroupUtilGamePlayer[]
 ---@field score number?
 CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	placement = 'number?',
@@ -106,9 +113,9 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 
 	-- Add vetoes
 	match.vetoes = {}
-	for vetoIx = 1, math.huge do
-		local map = Table.extract(extradata, 'veto' .. vetoIx)
-		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIx .. 'by'))
+	for vetoIndex = 1, math.huge do
+		local map = Table.extract(extradata, 'veto' .. vetoIndex)
+		local by = tonumber(Table.extract(extradata, 'veto' .. vetoIndex .. 'by'))
 		if not map then break end
 
 		table.insert(match.vetoes, {map = map, by = by})
@@ -149,19 +156,20 @@ end
 ---@param matchOpponents WarcraftStandardOpponent[]
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local function playerFromParticipant(opponentIx, matchPlayerIx, participant)
-		local matchPlayer = matchOpponents[opponentIx].players[matchPlayerIx]
+	local function playerFromParticipant(opponentIndex, matchplayerIndex, participant)
+		local matchPlayer = matchOpponents[opponentIndex].players[matchplayerIndex]
 		if matchPlayer then
 			return Table.merge(matchPlayer, {
-				matchPlayerIx = matchPlayerIx,
+				matchplayerIndex = matchplayerIndex,
 				race = participant.faction,
 				position = tonumber(participant.position),
 				heroes = participant.heroes,
+				random = participant.random,
 			})
 		else
 			return {
 				displayName = 'TBD',
-				matchPlayerIx = matchPlayerIx,
+				matchplayerIndex = matchplayerIndex,
 				race = Faction.defaultFaction,
 			}
 		end
@@ -170,29 +178,29 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	-- Convert participants list to players array
 	local opponentPlayers = {}
 	for key, participant in pairs(game.participants) do
-		local opponentIx, matchPlayerIx = key:match('(%d+)_(%d+)')
-		opponentIx = tonumber(opponentIx)
-		-- opponentIx can not be nil due to the format of the participants keys
-		---@cast opponentIx -nil
-		matchPlayerIx = tonumber(matchPlayerIx)
+		local opponentIndex, matchplayerIndex = key:match('(%d+)_(%d+)')
+		opponentIndex = tonumber(opponentIndex)
+		-- opponentIndex can not be nil due to the format of the participants keys
+		---@cast opponentIndex -nil
+		matchplayerIndex = tonumber(matchplayerIndex)
 
-		local player = playerFromParticipant(opponentIx, matchPlayerIx, participant)
+		local player = playerFromParticipant(opponentIndex, matchplayerIndex, participant)
 
-		if not opponentPlayers[opponentIx] then
-			opponentPlayers[opponentIx] = {}
+		if not opponentPlayers[opponentIndex] then
+			opponentPlayers[opponentIndex] = {}
 		end
-		table.insert(opponentPlayers[opponentIx], player)
+		table.insert(opponentPlayers[opponentIndex], player)
 	end
 
 	local modeParts = mw.text.split(game.mode or '', 'v')
 
 	-- Create game opponents
 	local opponents = {}
-	for opponentIx = 1, #modeParts do
+	for opponentIndex = 1, #modeParts do
 		local opponent = {
-			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIx)),
-			players = opponentPlayers[opponentIx] or {},
-			score = game.scores[opponentIx],
+			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIndex)),
+			players = opponentPlayers[opponentIndex] or {},
+			score = game.scores[opponentIndex],
 		}
 		if opponent.placement and (opponent.placement < 1 or 99 <= opponent.placement) then
 			opponent.placement = nil
@@ -204,7 +212,7 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	for _, opponent in pairs(opponents) do
 		-- Sort players by the order they appear in the match opponent players list
 		table.sort(opponent.players, function(a, b)
-			return a.matchPlayerIx < b.matchPlayerIx
+			return a.matchplayerIndex < b.matchplayerIndex
 		end)
 	end
 
@@ -238,38 +246,20 @@ end
 function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
-	-- If the same race was played in all games, display that instead of the
-	-- player's race listed in the match.
-	for opponentIx, opponent in pairs(opponents) do
-		-- Aggregate races among games for each player
-		local playerRaces = {}
-		for _, game in pairs(games) do
-			for playerIx, player in pairs(game.opponents[opponentIx].players) do
-				if not playerRaces[playerIx] then
-					playerRaces[playerIx] = {}
-				end
-				playerRaces[playerIx][player.race] = true
-			end
-		end
-
-		for playerIx, player in pairs(opponent.players) do
-			player.race = Table.uniqueKey(playerRaces[playerIx])
-			if not player.race then
-				local matchPlayer = match.opponents[opponentIx].players[player.matchPlayerIx]
-				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
-			end
-		end
+	--check the race of the players
+	for opponentIndex in pairs(opponents) do
+		CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
 	end
 
 	-- Sum up scores
 	local scores = {}
-	for opponentIx, _ in pairs(opponents) do
-		scores[opponentIx] = 0
+	for opponentIndex, _ in pairs(opponents) do
+		scores[opponentIndex] = 0
 	end
 	for _, game in pairs(games) do
 		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
-			for opponentIx, score in pairs(scores) do
-				scores[opponentIx] = score + (game.scores[opponentIx] or 0)
+			for opponentIndex, score in pairs(scores) do
+				scores[opponentIndex] = score + (tonumber(game.scores[opponentIndex]) or 0)
 			end
 		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
@@ -322,6 +312,42 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 	}
 end
 
+---@param match WarcraftMatchGroupUtilMatch
+---@param games WarcraftMatchGroupUtilGame[]
+---@param opponents WarcraftMatchGroupUtilGameOpponent[]
+---@param opponentIndex integer
+function CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
+	local opponent = opponents[opponentIndex]
+	local playerRaces = {}
+	Array.forEach(games, function(game)
+		for playerIndex, player in pairs(game.opponents[opponentIndex].players) do
+			playerRaces[playerIndex] = playerRaces[playerIndex] or {}
+			playerRaces[playerIndex][player.race] = true
+		end
+	end)
+
+	local toRace = function(playerIndex, player)
+		local isRandom = Array.any(games, function(game)
+			return game.opponents[opponentIndex].players[playerIndex].random
+		end)
+		if isRandom then return Faction.read('r') end
+
+		local race = Table.uniqueKey(playerRaces[playerIndex])
+		if race then return race end
+
+		if Table.isNotEmpty(playerRaces[playerIndex]) then
+			return Faction.read('m')
+		end
+
+		local matchPlayer = match.opponents[opponentIndex].players[player.matchplayerIndex]
+		return matchPlayer and matchPlayer.race or Faction.defaultFaction
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		player.race = toRace(playerIndex, player)
+	end
+end
+
 ---Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
 ---Returns the races played if at least one player chose an offrace or nil if otherwise.
 ---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
@@ -330,8 +356,8 @@ end
 function CustomMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
 	local gameRaces = {}
 	local hasOffrace = false
-	for playerIx, gamePlayer in ipairs(gameOpponent.players) do
-		local referencePlayer = referenceOpponent.players[playerIx]
+	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do
+		local referencePlayer = referenceOpponent.players[playerIndex]
 		table.insert(gameRaces, gamePlayer.race)
 		hasOffrace = hasOffrace or gamePlayer.race ~= referencePlayer.race
 	end

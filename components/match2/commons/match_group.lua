@@ -112,6 +112,10 @@ function MatchGroup.MatchGroupById(args)
 		config = BracketDisplay.configFromArgs(args)
 	end
 
+	if Logic.readBool(args.suppressDetails) then
+		config.matchHasDetails = function() return false end
+	end
+
 	MatchGroupInput.applyOverrideArgs(matches, args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)

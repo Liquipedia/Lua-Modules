@@ -16,21 +16,39 @@ jobs:
         with:
           fetch-depth: 2
 
-      - id: changed-files
+      - id: lua-changed-files
         uses: tj-actions/changed-files@v32
         with:
           files: |
             components/**/*.lua
             standard/**/*.lua
 
-      - name: Deploy
-        if: steps.changed-files.outputs.any_changed == 'true'
+      - id: res-changed-files
+        uses: tj-actions/changed-files@v32
+        with:
+          files: |
+            stylesheets/**/*.css
+            stylesheets/**/*.less
+            stylesheets/**/*.scss
+            javascript/**/*.js
+
+      - name: Resource Deploy
+        if: steps.res-changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.LP_USER }}
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+        run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
+
+      - name: Lua Deploy
+        if: steps.lua-changed-files.outputs.any_changed == 'true'
+        env:
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+        run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"
 
   dev-deploy:
     name: Dev Wikis

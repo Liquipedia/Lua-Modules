@@ -11,7 +11,6 @@ local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
 local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
 
@@ -23,7 +22,6 @@ function StarcraftMatchlistDisplay.MatchlistContainer(props, matches)
 			MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer,
 			Opponent = StarcraftMatchlistDisplay.Opponent,
 			Score = StarcraftMatchlistDisplay.Score,
-			matchHasDetails = StarcraftMatchGroupUtil.matchHasDetails,
 		}),
 		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
 	})

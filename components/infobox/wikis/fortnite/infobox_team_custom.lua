@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -136,7 +136,7 @@ function CustomTeam.calculateEarnings(args)
 
 	Variables.varDefine('earnings', earnings.team.total or 0)
 
-	return Math.round{earnings.team.total or 0}, Math.round{playerEarnings or 0}
+	return Math.round(earnings.team.total or 0), Math.round(playerEarnings or 0)
 end
 
 function CustomTeam._addPlacementToEarnings(earnings, playerEarnings, data)

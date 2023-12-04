@@ -1,0 +1,5397 @@
+/*******************************************************************************
+This forces a new stacking context for the content area of the wiki. This should
+lead to things from the content area not being able to overlap things outside of
+it. Putting it here so we can easily remove it again in case things break...
+Author(s): FO-nTTaX
+*******************************************************************************/
+#mw-content-text {
+	/* isolation: isolate; */
+}
+
+/*******************************************************************************
+Template(s): Images without license information
+Author(s): FO-nTTaX
+*******************************************************************************/
+.logged-in img.image-license-issue {
+	border: 5px solid #ff0000 !important;
+	box-sizing: border-box !important;
+}
+
+/*******************************************************************************
+Template(s): Documentation
+Author(s): FO-nTTaX
+*******************************************************************************/
+.documentation {
+	clear: both;
+	border: 1px solid #aaaaaa;
+	background-color: #ecfcf4;
+	padding: 5px;
+}
+
+/*******************************************************************************
+Template(s): Countdowns
+Author(s): FO-nTTaX
+*******************************************************************************/
+.timer-object-countdown-live {
+	color: #008000;
+	font-weight: bold;
+}
+
+.timer-object-countdown-only .timer-object-date,
+.timer-object-countdown-only .timer-object-separator {
+	display: none;
+}
+
+.timer-object-datetime-only .timer-object-countdown-time,
+.timer-object-datetime-only .timer-object-separator {
+	display: none;
+}
+
+/*******************************************************************************
+Template(s): info-icon
+Author(s): FO-nTTaX
+*******************************************************************************/
+.info-icon {
+	cursor: pointer;
+	height: 12px;
+	width: 12px;
+	background-image: url( data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cdefs%3E%3Cstyle%3E.c%7Bfill%3A%23616161%7D.i%7Bfill%3A%23fff%7D%3C%2Fstyle%3E%3C%2Fdefs%3E%3Ccircle%20class%3D%22c%22%20cx%3D%226%22%20cy%3D%226%22%20r%3D%226%22%2F%3E%3Crect%20class%3D%22i%22%20x%3D%225%22%20y%3D%222%22%20width%3D%222%22%20height%3D%222%22%2F%3E%3Cpolygon%20class%3D%22i%22%20points%3D%224%205%204%206%205%206%205%209%204%209%204%2010%208%2010%208%209%207%209%207%205%204%205%22%2F%3E%3C%2Fsvg%3E );
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	image-rendering: -webkit-optimize-contrast;
+	display: inline-block;
+}
+
+/*******************************************************************************
+Template(s): Flags
+Author(s): FO-nTTaX, salle
+*******************************************************************************/
+.flag img {
+	width: 18px;
+	height: 12px;
+	vertical-align: -1px;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+.bracket-game .flag img {
+	vertical-align: -3px;
+}
+/*******************************************************************************
+Template(s): Flag/, FlagNoLink/
+Author(s): salle
+*******************************************************************************/
+.flag-template img {
+	height: 12px;
+	width: 18px;
+	vertical-align: baseline;
+}
+
+/*******************************************************************************
+Template(s): Toggle button
+Author(s): FO-nTTaX
+*******************************************************************************/
+.toggle-area {
+	.toggle-area-loop(50);
+
+	.toggle-area-button {
+		cursor: pointer;
+	}
+}
+.toggle-area-loop(@counter) when (@counter > 0) {
+	.toggle-area-loop((@counter - 1));
+	.toggle-area-func(@counter);
+}
+.toggle-area-func(@no) {
+	&:not(.toggle-area-@{no}) {
+		[data-toggle-area-content='@{no}'] {
+			display: none;
+		}
+	}
+}
+/*******************************************************************************
+Template(s): Flex Table
+Author(s): FO-nTTaX
+*******************************************************************************/
+.flextable-wrap {
+	margin-bottom: 10px;
+
+	.flextable {
+		display: flex;
+		flex-flow: row wrap;
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+		border-bottom: 1px solid var( --clr-border, #bbbbbb );
+		border-left: 1px solid var( --clr-border, #bbbbbb );
+
+		.flextable-fw {
+			width: 100%;
+			background-color: #eaecf0;
+			border-right: 1px solid var( --clr-border, #bbbbbb );
+			padding: 5px;
+		}
+
+		.flextable-cell {
+			flex-grow: 1;
+			border-top: 1px solid var( --clr-border, #bbbbbb );
+			border-right: 1px solid var( --clr-border, #bbbbbb );
+			padding: 5px;
+		}
+	}
+}
+
+/*******************************************************************************
+Template(s): Liquipedia links
+Author(s): FO-nTTaX, Elysienna
+*******************************************************************************/
+@keyframes badgePopAnimation {
+	0% {
+		transform: scale( 0 );
+	}
+
+	50% {
+		transform: scale( 1.2 );
+	}
+
+	100% {
+		transform: scale( 1 );
+	}
+}
+
+@keyframes badgeTooltipAnimation {
+	0% {
+		transform: translateX( 97% );
+		opacity: 0;
+	}
+
+	20% {
+		transform: translateX( 100% );
+		opacity: 1;
+	}
+
+	90% {
+		transform: translateX( 100% );
+		opacity: 1;
+	}
+
+	99% {
+		transform: translateX( 97% );
+		opacity: 0;
+	}
+
+	100% {
+		visibility: hidden;
+		pointer-events: none;
+	}
+}
+
+.liquipedia-links-badge {
+	position: absolute;
+	top: 0.0625rem;
+	padding: 0.125rem 0.25rem;
+	right: 0;
+	font-size: 0.75rem;
+	display: flex;
+	animation-name: badgePopAnimation;
+	animation-delay: 1s;
+	animation-duration: 0.4s;
+	animation-fill-mode: forwards;
+	transform: scale( 0 );
+}
+
+.liquipedia-links-badge--tooltip {
+	background-color: #ffffff;
+	position: absolute;
+	color: #676767;
+	border-radius: 0.25rem;
+	font-size: 0.75rem;
+	font-family: "Open Sans", sans-serif;
+	font-weight: bold;
+	padding: 0.125rem 0.25rem;
+	top: 0.0625rem;
+	right: -0.5rem;
+	z-index: 1;
+	opacity: 0;
+	box-shadow: 0 0 0.625rem 0 rgba( 0, 0, 0, 0.5 );
+	animation-name: badgeTooltipAnimation;
+	animation-delay: 2s;
+	animation-duration: 4s;
+	animation-fill-mode: forwards;
+	line-height: 1.2;
+}
+
+@media screen and ( max-width: 767px ) {
+	.liquipedia-links-badge--tooltip {
+		width: 30vw;
+		white-space: normal;
+	}
+}
+
+.liquipedia-links-badge--tooltip:before {
+	content: "";
+	position: absolute;
+	top: 0.25rem;
+	left: -0.3125rem;
+	width: 0;
+	height: 0;
+	border-top: 4px solid transparent;
+	border-bottom: 4px solid transparent;
+	border-right: 5px solid #ffffff;
+}
+
+.menu-italic {
+	font-style: italic;
+}
+
+.liquipedia-links-badge-mobile {
+	position: relative;
+	top: -5px;
+	padding: 2px 4px;
+	left: 0;
+	margin-right: 3px;
+}
+
+/*******************************************************************************
+Template(s): Box
+Author(s): FO-nTTaX
+*******************************************************************************/
+@media ( min-width: 601px ) {
+	.template-box {
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 0 0 0;
+		box-sizing: content-box;
+		max-width: 100%;
+	}
+
+	.template-box > * {
+		box-sizing: border-box;
+	}
+}
+
+@media ( max-width: 600px ) {
+	.template-box {
+		padding-right: 0 !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): TeamHistory
+Author(s): FO-nTTaX
+*******************************************************************************/
+.th-mono {
+	font-family: "Droid Sans Mono", monospace;
+	letter-spacing: -1.4px;
+}
+
+/*******************************************************************************
+Template(s): Fake TOC
+Author(s): FO-nTTaX
+*******************************************************************************/
+#mw-content-text .faketoc {
+	display: none;
+}
+
+#sidebar-toc .row,
+#scroll-wrapper-toc .row {
+	margin: 0;
+}
+
+#sidebar-toc .row > [ class*="col-" ],
+#scroll-wrapper-toc .row > [ class*="col-" ] {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#scroll-wrapper-toc .liquipedia-custom-icon-box {
+	font-size: 51px !important;
+}
+
+/*******************************************************************************
+Template(s): Participants Tables
+Author(s): FO-nTTaX
+*******************************************************************************/
+.participants-table-scroller {
+	overflow: auto;
+}
+
+.participants-table .participants-row .participants-cell {
+	width: 200px;
+}
+
+.participants-table-buttons::after {
+	clear: both;
+	content: " ";
+	display: block;
+}
+
+.participants-table-buttons {
+	display: none;
+	font-size: 200%;
+}
+
+.participants-table-button-left {
+	float: left;
+	cursor: pointer;
+}
+
+.participants-table-button-right {
+	float: right;
+	cursor: pointer;
+}
+
+.participants-table-button-left.inactive,
+.participants-table-button-right.inactive {
+	opacity: 0.5;
+	cursor: initial;
+}
+
+@media ( max-width: 600px ) {
+	.participants-table .participants-row .participants-cell {
+		min-width: 200px;
+	}
+
+	.participants-table-columns-2 .participants-row .participants-cell {
+		width: 50%;
+	}
+
+	.participants-table-columns-3 .participants-row .participants-cell {
+		width: 33%;
+	}
+
+	.participants-table-columns-4 .participants-row .participants-cell {
+		width: 25%;
+	}
+
+	.participants-table-columns-2 {
+		width: 180% !important;
+	}
+
+	.participants-table-columns-3 {
+		width: 270% !important;
+	}
+
+	.participants-table-columns-4 {
+		width: 360% !important;
+	}
+
+	.participants-table-buttons {
+		display: block;
+	}
+}
+
+/*******************************************************************************
+Template(s): Prizepool Tables
+Author(s): FO-nTTaX
+*******************************************************************************/
+@media ( max-width: 767px ) {
+	.prizepooltable {
+		min-width: 100%;
+	}
+}
+
+/*******************************************************************************
+Template(s): Upcoming and ongoing games of
+Author(s): FO-nTTaX
+*******************************************************************************/
+.infobox-upcoming-ongoing-matches {
+	width: 100%;
+}
+
+@media ( min-width: 601px ) {
+	.infobox-upcoming-ongoing-matches {
+		float: right;
+		clear: right;
+		max-width: 300px;
+		margin: 0 0 10px 10px;
+	}
+}
+
+.infobox-upcoming-ongoing-matches .infobox-upcoming-ongoing-matches-header {
+	font-size: 130%;
+	font-weight: bold;
+	text-align: center;
+	padding: 2px;
+}
+
+/*******************************************************************************
+Template(s): LeagueIconSmall
+Author(s): FO-nTTaX
+*******************************************************************************/
+span.league-icon-small-image,
+span.icon-small {
+	vertical-align: middle;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 25px;
+	min-width: 25px;
+}
+
+.league-icon-small-image img,
+.icon-small img {
+	max-width: 25px;
+	max-height: 25px;
+	height: auto;
+	width: auto;
+}
+
+.league-icon-small-image a,
+.icon-small a {
+	display: contents;
+}
+
+/* LeagueIconSmall dark mode support */
+span.league-icon-small-image.darkmode,
+span.icon-small.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	span.league-icon-small-image.lightmode,
+	span.icon-small.lightmode {
+		display: none;
+	}
+
+	span.league-icon-small-image.darkmode,
+	span.icon-small.darkmode {
+		display: inline-flex;
+	}
+}
+
+/*******************************************************************************
+Template(s): Race icons on the Warcraft wiki
+Author(s): FO-nTTaX
+*******************************************************************************/
+.wiki-warcraft .race-icon-small img {
+	width: 19px;
+	height: 19px;
+}
+
+/*******************************************************************************
+Template(s): Timelines
+Author(s): FO-nTTaX
+*******************************************************************************/
+.timeline {
+	border: 1px solid #dddddd;
+	vertical-align: middle;
+}
+
+.timeline-inner {
+	overflow: hidden;
+}
+
+.timeline-heading {
+	font-size: 200%;
+	text-align: center;
+	vertical-align: middle;
+	border-bottom: 1px solid #dddddd;
+}
+
+.timeline-row {
+	vertical-align: middle;
+}
+
+.timeline-row:nth-of-type( 2n ) {
+	background-color: #eeeeee;
+}
+
+.timeline-row > div {
+	vertical-align: middle;
+	display: inline-block;
+	position: relative;
+	height: 35px;
+	padding: 4px;
+}
+
+.timeline-row > div:nth-of-type( 1 ) {
+	width: 150px;
+	line-height: 27px;
+	font-weight: bold;
+}
+
+.timeline-row > div:nth-of-type( 2 ) {
+	width: calc( ~"100% - 150px" );
+}
+
+.timeline-period {
+	position: absolute;
+	top: 5px;
+	height: 25px;
+	background-color: #bbbbbb;
+}
+
+.timeline-lines {
+	display: flex;
+	justify-content: space-between;
+	padding-left: 150px;
+}
+
+.timeline-line {
+	width: 0;
+	border-left: 1px solid #333333;
+	opacity: 0.5;
+	height: 5000px;
+	margin-top: -5000px;
+	pointer-events: none;
+}
+
+.timeline-footer {
+	display: flex;
+	justify-content: space-between;
+	height: 92px;
+	padding-left: 150px;
+	border-top: 1px solid #dddddd;
+}
+
+.timeline-footer-date {
+	width: 24px;
+}
+
+.timeline-footer-date-inner {
+	padding: 4px;
+	transform: rotate( 90deg );
+	margin-top: 0;
+}
+
+.timeline-header-sc {
+	padding: 0;
+	text-align: center;
+	margin: 0 0 0 0 !important;
+	float: right;
+	table-layout: fixed;
+}
+
+.timeline-now-sc {
+	position: absolute;
+	height: 100%;
+	border-right: 1px dotted #9a9a9a;
+	width: 1px;
+}
+
+.timeline-team-element-sc {
+	border: 1px solid #9a9a9a;
+	padding-top: 5px;
+	height: 40px;
+	background-color: #eeeeee;
+	text-align: center;
+}
+
+/*******************************************************************************
+Template(s): Progress bars
+Author(s): FO-nTTaX
+*******************************************************************************/
+.progress {
+	border-radius: 5px;
+	width: 100%;
+	height: 24px;
+	border: 1px solid var( --clr-border, #bbbbbb );
+	position: relative;
+	text-align: center;
+	margin-bottom: 0;
+}
+
+.progress > div.bar {
+	height: 22px;
+	border-radius: 4px;
+	float: left;
+	line-height: 17px;
+}
+
+.progress > div.bar.bg-color {
+	background-color: var( --clr-surface-variant, #e5b6c0 );
+}
+
+.progress > div.bar-text {
+	height: 22px;
+	width: 100%;
+	border-radius: 5px;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.progress > div.bar-text.bar-text-left {
+	text-align: left;
+	padding-left: 5px;
+}
+
+.progress > div.bar-text.bar-text-right {
+	text-align: right;
+	padding-right: 5px;
+}
+
+/*******************************************************************************
+Template(s): Dropdown box
+Author(s): Rapture
+*******************************************************************************/
+.dropdown-box-wrapper {
+	position: relative;
+	display: inline-block;
+}
+
+.dropdown-box {
+	display: none;
+	position: absolute;
+	top: 100%;
+	left: 0;
+	z-index: 1000;
+	float: left;
+	margin: 0;
+	padding: 5px;
+	border: 1px solid var( --clr-border, #d3d3d3 );
+	background-color: var( --clr-surface, #ffffff );
+}
+
+.dropdown-box-visible {
+	display: block;
+}
+
+/*******************************************************************************
+Template(s): SpellCard
+Author(s): FO-nTTaX, Rapture
+*******************************************************************************/
+.spellcard-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	margin: 10px 0;
+}
+
+@media ( max-width: 600px ) {
+	.spellcard-wrapper {
+		display: block;
+	}
+}
+
+.spellcard {
+	display: inline-block;
+	max-width: 550px;
+	clear: both;
+	border-width: 1px;
+	border-style: solid;
+	background-color: var( --clr-surface-2, #eeeeee );
+	margin-right: 1em;
+}
+
+@media ( max-width: 600px ) {
+	.spellcard {
+		margin-right: 0;
+		max-width: none;
+	}
+}
+/* spazer's test changes */
+/* Make spellcards wider for wide screens */
+@media ( min-width: 2560px ) {
+	.spellcard {
+		max-width: 700px;
+	}
+}
+
+.spellcard-description {
+	display: inline-block;
+	width: calc( ~"100% - 124px" );
+	border-width: 1px 0;
+	border-style: solid;
+	padding: 5px 0;
+	margin: 0 5px;
+}
+
+@media ( max-width: 600px ) {
+	.spellcard-description {
+		width: auto;
+	}
+}
+
+.spellcard-infotable {
+	display: block;
+	clear: left;
+	vertical-align: top;
+	padding-bottom: 5px;
+	margin: 5px 5px 0 5px;
+}
+
+.spellcard-infotable th {
+	display: inline;
+	padding-right: 5px;
+	vertical-align: top;
+	white-space: nowrap;
+}
+
+.spellcard-infotable td {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.spellcard-interactions {
+	display: block;
+	vertical-align: top;
+}
+
+.spellcard-interactions th {
+	padding: 3px 5px 0 0;
+	vertical-align: top;
+}
+
+.spellcard-interactions td {
+	padding-top: 3px;
+	vertical-align: top;
+}
+
+.spellcard-notes {
+	display: inline-block;
+	vertical-align: top;
+	flex: 1 0 400px;
+	padding-top: 5px;
+}
+
+@media ( max-width: 600px ) {
+	.spellcard-notes {
+		flex: none;
+	}
+}
+
+/* Allow limiting of which header levels are shown in a TOC;
+	 <div class="toclimit-3">, for instance, will limit to
+	 showing ==headings== and ===headings=== but no further
+	 (as long as there are no =headings= on the page, which
+	 there shouldn't be according to the MoS).
+ */
+.toclimit-2 .toclevel-1 ul,
+.toclimit-3 .toclevel-2 ul,
+.toclimit-4 .toclevel-3 ul,
+.toclimit-5 .toclevel-4 ul,
+.toclimit-6 .toclevel-5 ul,
+.toclimit-7 .toclevel-6 ul {
+	display: none !important;
+}
+
+/* Add an additional margin between ordered/unordered lists and the TOC table */
+ol + table.toc,
+ul + table.toc {
+	margin-top: 11px;
+}
+
+/* Bold white text style for the placement texts */
+.bold-white-text,
+td.bold-white-text {
+	color: #ffffff;
+	font-weight: bold;
+	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
+}
+
+.bold-white-text b {
+	font-weight: bold;
+}
+
+/* Highlight tournament */
+.tournament-highlighted-bg,
+.valvepremier-highlighted,
+.valvemajor-highlighted {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc ) !important;
+}
+
+/* align reflist */
+.mw-content-ltr ol,
+.mw-content-rtl .mw-content-ltr ol {
+	margin-left: 1.6em !important;
+}
+
+.mw-references-columns {
+	-webkit-column-width: auto;
+	-moz-column-width: auto;
+	column-width: auto;
+}
+
+/* Broadcast talent partner list */
+.broadcast-talent-partner-list {
+	margin-left: -0.5em;
+	text-align: left;
+}
+
+.broadcast-talent-partner-list-frame {
+	border: 0 !important;
+}
+
+/* tournament overview page boxes */
+.tournament-image-link {
+	text-align: center;
+	display: inline-block;
+	margin: 0 3em 4em;
+}
+
+/*******************************************************************************
+Template(s): WC3 Creep Spots
+Author(s): FO-nTTaX, turbosau
+*******************************************************************************/
+.creep-spot img {
+	cursor: pointer;
+}
+
+.creep-spot-popup {
+	display: none;
+}
+
+/*******************************************************************************
+Template(s): Tournament Cards
+Author(s): spazer
+*******************************************************************************/
+.tournament-card {
+	width: 100%;
+}
+
+.tournament-card > div.tournament-card-premier {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+}
+
+.tournament-card > div > div {
+	vertical-align: middle;
+}
+
+.tournament-card > div > div > .Medal,
+.tournament-card > div.divRow > div > .PlayerNumberSuffix,
+.tournament-card > div.divRow > div > .CountryText,
+.tournament-card > div.divRow > div > .MobileOnly {
+	display: none;
+}
+
+.tournament-card > div.divRow > div > .Tier {
+	display: inline;
+	width: 64px;
+	padding: 0 5px 0 0;
+	float: left;
+}
+
+.tournament-card > div.divRow > div > .Name {
+	display: inline;
+	padding: 0;
+	float: none;
+}
+
+.BlankCell {
+	width: 0;
+	padding: 0;
+	font-size: 0;
+}
+
+.tournament-card > div > div.LeftPlace {
+	text-align: right;
+}
+
+.tournament-card > div > div.RightPlace {
+	text-align: left;
+}
+
+.tournament-card > div > div.Score {
+	text-align: center;
+}
+
+.tournament-card > div > div.FirstPlaceBlank {
+	max-width: 155px;
+	width: 155px;
+	border: 0;
+}
+
+.tournament-card > div > div.QualifiedPlace {
+	margin-left: -155px;
+	margin-top: -0.5px;
+	display: block;
+}
+
+@media ( max-width: 601px ) {
+	.tournament-card {
+		width: 100% !important;
+	}
+
+	.tournament-card > .divRow > .divCell {
+		border: 0;
+	}
+
+	.tournament-card > div {
+		display: block;
+		position: relative;
+		text-align: center;
+		border-top: 2px solid #d3d3d3;
+		border-bottom: 2px solid #d3d3d3;
+		border-left: 2px solid #d3d3d3;
+		border-right: 2px solid #d3d3d3;
+		overflow: auto;
+	}
+
+	.tournament-card > div.tournament-card-premier {
+		background-color: transparent;
+	}
+
+	.tournament-card > div:not( :last-of-type ) {
+		margin-bottom: 15px;
+	}
+
+	.tournament-card > div > div.Header {
+		background-color: #f5f5f5;
+		font-weight: bold;
+	}
+
+	.tournament-card > div.tournament-card-premier > div.Header {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+		font-weight: bold;
+	}
+
+	.tournament-card > div > div.Header-Premier {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+		font-weight: bold;
+	}
+
+	.tournament-card > div > div.EventDetails {
+		display: inline-block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Left-65,
+	.tournament-card > div > div.EventDetails-Right-35,
+	.tournament-card > div > div.EventDetails-Right-40,
+	.tournament-card > div > div.EventDetails-Right-45,
+	.tournament-card > div > div.EventDetails-Right-50,
+	.tournament-card > div > div.EventDetails-Right-55,
+	.tournament-card > div > div.EventDetails-Right-60,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		display: inline-block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Left-65 {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 18px;
+	}
+
+	.tournament-card > div > div.EventDetails-Right-35,
+	.tournament-card > div > div.EventDetails-Right-40,
+	.tournament-card > div > div.EventDetails-Right-45,
+	.tournament-card > div > div.EventDetails-Right-50,
+	.tournament-card > div > div.EventDetails-Right-55,
+	.tournament-card > div > div.EventDetails-Right-60,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		float: right;
+		text-align: right;
+		padding: 0 18px 2px 0;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Right-35 {
+		width: 35%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Right-40 {
+		width: 40%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Right-45 {
+		width: 45%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Right-50 {
+		width: 50%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Right-55 {
+		width: 55%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Right-60 {
+		width: 60%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-65,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		width: 65%;
+	}
+
+	.tournament-card > div > div.Tier {
+		display: block;
+		float: none;
+		width: 100% !important;
+		font-size: 80%;
+		padding: 0;
+	}
+
+	.tournament-card > div > div.Tournament {
+		display: block;
+		float: none;
+		width: 100% !important;
+	}
+
+	.tournament-card > div > div > div.Tier {
+		width: auto !important;
+		font-size: 90%;
+	}
+	/* organizer */
+	.tournament-card > div > div.Organizer {
+		text-align: left;
+		padding: 0 36px 2px 36px;
+		width: 100%;
+		white-space: normal;
+	}
+	/* rank */
+	.tournament-card > div > div.Rank {
+		float: left;
+	}
+	/* date */
+	.tournament-card > div > div.Date {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 36px;
+		width: 55%;
+	}
+	/* prize */
+	.tournament-card > div > div.Prize {
+		float: right;
+		text-align: right;
+		padding: 0 36px 2px 0;
+		width: 45%;
+	}
+	/* additional prize */
+	.tournament-card > div > div.Prize2 {
+		float: right;
+		text-align: right;
+		padding: 0 36px 0 0;
+		width: 45%;
+	}
+	/* entrant numbers */
+	.tournament-card > div.divRow > div.PlayerNumber {
+		float: right;
+		text-align: right;
+		padding: 0 36px 2px 0;
+		width: 40%;
+	}
+	/* location */
+	.tournament-card > div.divRow > div.Location {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 36px;
+		width: 60%;
+	}
+
+	.NoIcon,
+	.tournament-card > div.divRow > div > .CountryFlag,
+	.tournament-card > div.divRow > div > .WideOnly {
+		display: none;
+	}
+
+	.tournament-card > div.divRow > div > .PlayerNumberSuffix,
+	.tournament-card > div.divRow > div > .CountryText,
+	.tournament-card > div > div > span.Medal,
+	.tournament-card > div > div > span.Player,
+	.tournament-card > div.divRow > div > .MobileOnly {
+		display: inline-block;
+		text-indent: 0;
+	}
+
+	.tournament-card > div.divRow > div > .NonMobileOnly {
+		display: none;
+	}
+	/* Player Placements */
+	.tournament-card > div > div.Placement {
+		float: none;
+		width: 100% !important;
+		height: 35px;
+		text-indent: 1em;
+		text-align: left;
+		padding: 7px 1px 1px 1px;
+	}
+
+	.tournament-card > div > div.LeftPlace,
+	.tournament-card > div > div.RightPlace {
+		display: inline-block;
+		width: 39%;
+	}
+
+	.tournament-card > div.divRow > div > span > .Heads {
+		display: none;
+	}
+
+	.tournament-card > div > div.Score {
+		display: inline-block;
+		width: 20%;
+		font-weight: bold;
+		font-size: 120%;
+	}
+
+	.tournament-card > div > div.FirstPlace {
+		display: inline-block;
+		border-bottom: 1px solid #d3d3d3 !important;
+	}
+
+	.tournament-card > div > div.SecondPlace {
+		display: inline-block;
+	}
+
+	.tournament-card > div.divHeaderRow,
+	.tournament-card > div > div.FirstPlaceBlank {
+		display: none;
+	}
+
+	.tournament-card > div > div.QualifiedPlace {
+		margin-left: unset;
+		display: inline-block;
+		height: auto;
+	}
+}
+
+/*******************************************************************************
+Template(s): Player Info Cards
+Author(s): spazer
+*******************************************************************************/
+.player-info-card {
+	width: 100% !important;
+	display: inline-block;
+	min-width: 200px;
+	padding: 10px 0;
+}
+
+.player-info-card-title {
+	font-size: 150%;
+	font-weight: bold;
+	text-align: center;
+}
+
+.player-info-card-realname {
+	font-style: italic;
+	text-align: center;
+	padding-bottom: 5px;
+}
+
+.player-info-card-main {
+	background-color: #eeeeee;
+	width: 100%;
+}
+
+.player-info-card-main-top {
+	display: inline-block;
+	border-width: 0 0 2px 0;
+	border-style: solid;
+	padding-left: 2px;
+	margin: 5px 0 0 5px;
+	width: calc( ~"100% - 10px" );
+	text-align: center;
+}
+
+.player-info-card-main-bottom {
+	display: inline-block;
+	margin: 5px 5px 5px 5px;
+	padding-right: 5px;
+}
+
+.player-info-card-main-top {
+	padding-bottom: 5px;
+}
+
+.player-info-card-main-bottom > table {
+	width: 100%;
+	margin: 5px 5px 5px 5px;
+}
+
+.player-info-card-main-bottom > table > tbody > tr > th {
+	text-align: right;
+	padding-right: 10px;
+	vertical-align: middle;
+	max-width: 175px;
+	white-space: nowrap;
+	padding-bottom: 5px;
+	margin-bottom: 5px;
+	height: 30px;
+}
+
+.player-info-card-main-bottom > table > tbody > tr > td {
+	vertical-align: middle;
+	padding-bottom: 5px;
+	height: 30px;
+}
+
+@media ( max-width: 601px ) {
+	.player-info-card {
+		width: 100% !important;
+		max-width: 100% !important;
+		display: inline-block;
+		padding: 10px 0;
+	}
+}
+
+/*******************************************************************************
+Template(s): Vodlink
+Author(s): salle
+*******************************************************************************/
+.vodlink img {
+	max-height: 16px;
+	max-width: 16px;
+	height: auto;
+	width: auto;
+}
+
+span.vodlink.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	span.vodlink.lightmode {
+		display: none;
+	}
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	span.vodlink.darkmode {
+		display: inline-block;
+	}
+}
+
+.vodlink span.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.vodlink span.lightmode {
+		display: none;
+	}
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.vodlink span.darkmode {
+		display: inline;
+	}
+}
+
+/* random bits */
+.statstable {
+	white-space: nowrap;
+}
+
+/*******************************************************************************
+Template(s): Rumour row
+Author(s): Vogan
+*******************************************************************************/
+.StatusIcon {
+	font-size: 1.2em;
+}
+
+.RumourRow {
+	display: table-row;
+	width: auto;
+	line-height: 1.42857143;
+}
+
+.RumourRow:nth-child( 2n+1 ) {
+	background-color: var( --table-striped-background-color, #f9f9f9 );
+}
+
+.RumourRow .divCell {
+	border-top: 1px solid var( --clr-border, #bbbbbb );
+}
+
+@media ( max-width: 560px ) {
+	.divCell.Status {
+		display: block;
+		float: initial;
+		border-top: 0 !important;
+		margin-bottom: -31px;
+		margin-top: 5px;
+	}
+}
+
+/*******************************************************************************
+Template(s): OffSeasonOverview
+Author(s): Vogan
+*******************************************************************************/
+.OffSeasonOverview {
+	padding: 0;
+	margin: 0;
+	width: 70%;
+	margin-bottom: -1px;
+}
+
+@media ( max-width: 560px ) {
+	.OffSeasonOverview {
+		padding: 0;
+		margin: 0;
+		width: 100%;
+		margin-bottom: -1px;
+	}
+}
+
+/*******************************************************************************
+Template(s): Rocket League Responsive Table
+Author(s): QuadratClown
+*******************************************************************************/
+.rl-responsive-table {
+	border-collapse: collapse;
+	margin: 0;
+	width: calc( ~"100% - 347px" );
+	table-layout: fixed;
+}
+
+.rl-responsive-table caption {
+	text-align: center;
+}
+
+.rl-responsive-table tbody {
+	outline: 1px solid var( --table-border-color, #a9a9a9 );
+}
+
+.rl-responsive-table tr {
+	background: var( --table-background-color, #f5f5f5 );
+	padding: 0.35em;
+}
+
+.rl-responsive-table th,
+.rl-responsive-table td {
+	padding: 0.625em;
+	text-align: center;
+	border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
+	border-left: 1px solid var( --table-border-color, #a9a9a9 );
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.rl-responsive-table tr:first-child {
+	background: var( --table-header-variant-background-color, #e0e0e0 );
+}
+
+.rl-responsive-table tr:last-child td {
+	border-bottom: 0;
+}
+
+.rl-responsive-table th {
+	text-align: center;
+	font-weight: bold;
+	border-bottom: 1px solid var( --table-border-color, #a9a9a9 );
+}
+
+.rl-responsive-table th:first-child {
+	border-left: 0;
+}
+
+.rl-responsive-table td:first-child {
+	border-left: 0;
+}
+
+.rl-responsive-table-left-align {
+	text-align: left !important;
+}
+
+@media screen and ( max-width: 600px ) {
+	.rl-responsive-table {
+		width: 100%;
+	}
+}
+
+@media screen and ( max-width: 947px ) {
+	.rl-responsive-table tbody {
+		outline: 0;
+	}
+
+	.rl-responsive-table tr {
+		border: 1px #000000;
+		display: block;
+		margin-bottom: 1em;
+		outline: 1px solid var( --table-border-color, #a9a9a9 );
+	}
+
+	.rl-responsive-table tr:first-child {
+		display: none;
+	}
+
+	.rl-responsive-table th {
+		display: none;
+	}
+
+	.rl-responsive-table td {
+		border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
+		display: block;
+		font-size: 0.8em;
+		text-align: right;
+		border-left: 0;
+	}
+
+	.rl-responsive-table tr:last-child td {
+		border-bottom: 1px solid var( --table-border-color, #d3d3d3 );
+	}
+
+	.rl-responsive-table tr:last-child td:last-child {
+		border-bottom: 0;
+	}
+
+	.rl-responsive-table td:before {
+		content: attr( data-label );
+		float: left;
+		font-weight: bold;
+	}
+
+	.rl-responsive-table td:last-child {
+		border-bottom: 0;
+	}
+
+	.rl-responsive-table-left-align {
+		text-align: right !important;
+	}
+}
+
+.rl-responsive-table-sortable {
+	border-collapse: collapse;
+	margin: 0;
+	width: calc( ~"100% - 347px" );
+	table-layout: fixed;
+}
+
+.rl-responsive-table-sortable tbody {
+	outline: 1px solid #a9a9a9;
+}
+
+.rl-responsive-table-sortable th,
+.rl-responsive-table-sortable td {
+	padding: 5px 10px 5px 10px;
+	text-align: center;
+	border-bottom: 1px solid #d3d3d3;
+	border-left: 1px solid #a9a9a9;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
+.rl-responsive-table-sortable thead tr {
+	outline: 1px solid #a9a9a9;
+	border-bottom: 0;
+}
+
+.rl-responsive-table-sortable th {
+	text-align: center;
+	font-weight: bold;
+}
+
+.rl-responsive-table-sortable th:first-child {
+	border-left: 0;
+}
+
+.rl-responsive-table-sortable td:first-child {
+	border-left: 0;
+}
+
+.rl-responsive-table-sortable-left-align {
+	text-align: left !important;
+}
+
+@media screen and ( max-width: 947px ) {
+	.rl-responsive-table-sortable {
+		width: 600px;
+	}
+
+	.rl-responsive-table-sortable tbody {
+		outline: 0;
+	}
+
+	.rl-responsive-table-sortable thead tr {
+		overflow: hidden;
+		background: none;
+		outline: 0;
+		box-shadow: none;
+		float: right;
+		padding: 1px;
+		margin-bottom: 4px;
+	}
+
+	.rl-responsive-table-sortable tr {
+		border: 1px #000000;
+		display: block;
+		margin-bottom: 1em;
+		outline: 1px solid #a9a9a9;
+	}
+
+	.rl-responsive-table-sortable th {
+		border: 0;
+		padding: 5px 10px 5px 10px;
+		margin-right: 5px;
+		margin-bottom: 8px;
+		outline: 1px solid #a9a9a9;
+		white-space: nowrap;
+		background: #e0e0e0;
+		overflow: hidden;
+		display: inline-block;
+	}
+
+	.rl-responsive-table-sortable th:last-child {
+		margin-right: 0;
+	}
+
+	.rl-responsive-table-sortable td {
+		border-bottom: 1px solid #d3d3d3;
+		display: block;
+		font-size: 0.8em;
+		text-align: right;
+		border-left: 0;
+	}
+
+	.rl-responsive-table-sortable tr:last-child td {
+		border-bottom: 1px solid #d3d3d3;
+	}
+
+	.rl-responsive-table-sortable tr:last-child td:last-child {
+		border-bottom: 0;
+	}
+
+	.rl-responsive-table-sortable td:before {
+		content: attr( data-label );
+		float: left;
+		font-weight: bold;
+	}
+
+	.rl-responsive-table-sortable td:last-child {
+		border-bottom: 0;
+	}
+
+	.rl-responsive-table-sortable-left-align {
+		text-align: right !important;
+	}
+}
+
+@media screen and ( max-width: 600px ) {
+	.rl-responsive-table-sortable {
+		width: 100%;
+	}
+}
+
+/*******************************************************************************
+Template(s): Documentation
+Author(s): Wikipedia
+*******************************************************************************/
+.template-startbox {
+	padding-bottom: 3px;
+	border-bottom: 1px solid #aaaaaa;
+	margin-bottom: 1ex;
+}
+
+.template-documentation {
+	clear: both;
+	margin: 1em 0 0 0;
+	border: 1px solid var( --clr-border, #a2a9b1 );
+	background-color: var( --clr-background, #f8f9fa );
+	padding: 1em;
+}
+
+table.fmbox {
+	clear: both;
+	margin: 0.2em 0;
+	width: 100%;
+	border: 1px solid var( --clr-border, #a2a9b1 );
+	background: var( --clr-surface-2, #f8f9fa );
+}
+
+th.mbox-text,
+td.mbox-text {
+	border: 0;
+	padding: 0.25em 0.9em;
+	width: 100%;
+}
+
+/*******************************************************************************
+Template(s): Roster Cards (SquadPlayer_start; SquadPlayer)
+Author(s): Rapture
+*******************************************************************************/
+.roster-card {
+	display: table;
+	margin: 0 0 10px 0;
+	white-space: nowrap;
+}
+
+.roster-card > tbody > tr > th {
+	background-color: var( --clr-surface-4, #f5f5f5 );
+	font-weight: bold;
+	padding: 5px;
+}
+
+.roster-card > tbody > tr.HeaderRow > th {
+	background-color: var( --table-subheader-background-color, var( --clr-surface-4, #f5f5f5 ) );
+}
+
+.roster-card > tbody > tr:not( .HeaderRow ) > th {
+	background-color: var( --table-header-background-color, var( --clr-surface-4, #f5f5f5 ) );
+}
+
+.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
+	display: none;
+}
+
+.roster-card > tbody > tr.Player {
+	display: table-row;
+	border-top: 1px solid var( --clr-border, #bbbbbb );
+}
+
+.roster-card > tbody > tr.Player > td {
+	display: table-cell;
+	line-height: 1.42857143;
+	padding: 5px;
+}
+
+.roster-card > tbody > tr.Player > td.Team2 {
+	padding: 2px 0 0 0;
+}
+
+.roster-card > tbody > tr.Player > td.Position {
+	text-align: center;
+}
+
+.roster-card > tbody > tr.Player > td.PositionWoTeam2 {
+	text-align: center;
+}
+
+.roster-card > tbody > tr.Player > td.NewTeam {
+	padding: 2px 5px 2px 5px;
+}
+
+.roster-card > tbody > tr.Player > td > .MobileStuff {
+	display: none;
+}
+
+.roster-card > tbody > tr.Player > td > div.MobileStuffDate {
+	display: none;
+}
+
+.roster-card > tbody > tr.Player > td > div.Date {
+	font-style: italic;
+	text-align: center;
+}
+
+.roster-card > tbody > tr.Player > td.NewTeam > div.NewTeamRole {
+	text-align: center;
+	font-style: italic;
+}
+
+.roster-none,
+.roster-coach {
+	background-color: var( --table-variant-background-color, var( --clr-surface-variant, #e5e5e5 ) ) !important;
+}
+
+.roster-title-row2-border {
+	border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
+}
+
+@media screen and ( max-width: 750px ) {
+	.roster-card {
+		width: 100% !important;
+		max-width: 425px;
+		border: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
+	}
+
+	.roster-card > tbody > tr > th.large-only[ colspan="10" ] {
+		display: none;
+	}
+
+	.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
+		display: table-cell;
+	}
+
+	.roster-card > tbody > tr.HeaderRow {
+		display: none;
+	}
+
+	.roster-card > tbody > tr.Player {
+		display: block;
+		padding: 5px;
+	}
+
+	.roster-card > tbody > tr.Player > td {
+		display: inline-block;
+		line-height: 1.42857143;
+		border: 0 !important;
+		padding: 0;
+	}
+
+	.roster-card > tbody > tr.Player > td.ID {
+		float: left;
+		padding: 0 5px 0 0;
+	}
+
+	.roster-card > tbody > tr.Player > td.Name {
+		font-style: italic;
+		font-size: small;
+		float: left;
+		margin-top: 1px;
+	}
+
+	.roster-card > tbody > tr.Player > td.Team2 {
+		float: right;
+	}
+
+	.roster-card > tbody > tr.Player > td.Position {
+		font-style: italic;
+		text-align: left;
+		font-size: small;
+		clear: left;
+		float: left;
+	}
+
+	.roster-card > tbody > tr.Player > td.PositionWoTeam2 {
+		font-style: italic;
+		text-align: right;
+		font-size: small;
+		float: right;
+	}
+
+	.roster-card > tbody > tr.Player > td.NewTeam {
+		display: block;
+		width: 100%;
+		text-align: center;
+		clear: both;
+		border-right: 0;
+	}
+
+	.roster-card > tbody > tr.Player > td > .MobileStuff {
+		display: inline-block;
+	}
+
+	.roster-card > tbody > tr.Player > td.Date {
+		display: block;
+		width: 100%;
+		clear: both;
+		border-right: 0;
+	}
+
+	.roster-card > tbody > tr.Player > td > div.MobileStuffDate {
+		display: inline-block;
+		width: 50%;
+		text-align: right;
+		font-style: italic;
+		float: left;
+	}
+
+	.roster-card > tbody > tr.Player > td > div.Date {
+		display: inline-block;
+		width: 50%;
+		text-align: left;
+		font-style: italic;
+	}
+
+	.roster-card > tbody > tr.Player > td.NewTeam > div.NewTeamRole {
+		display: inline-block;
+		text-align: left;
+		font-style: italic;
+		border-right: 0;
+	}
+}
+
+/*******************************************************************************
+Template(s): Stand-in table
+Author(s): Rapture
+*******************************************************************************/
+.stand-in-card {
+	margin: 0 0 10px 0;
+	white-space: nowrap;
+}
+
+.stand-in-card > tbody > tr > th {
+	background-color: var( --clr-surface-4, #f5f5f5 );
+	font-weight: bold;
+	padding: 5px;
+}
+
+.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
+	display: none;
+}
+
+.stand-in-card > tbody > tr.Players {
+	display: table-row;
+	border-top: 1px solid #bbbbbb;
+}
+
+.stand-in-card > tbody > tr.Players > td {
+	display: table-cell;
+	line-height: 1.42857143;
+	padding: 5px;
+}
+
+.stand-in-card > tbody > tr.Players > td.TeamPlayerIn {
+	padding: 2px 0 0 0;
+}
+
+.stand-in-card > tbody > tr.Players > td > .MobileStuff {
+	display: none;
+}
+
+@media screen and ( max-width: 750px ) {
+	.stand-in-card {
+		width: 100% !important;
+		max-width: 425px;
+		border: 1px solid var( --clr-border, #bbbbbb );
+	}
+
+	.stand-in-card > tbody > tr > th.large-only[ colspan="10" ] {
+		display: none;
+	}
+
+	.stand-in-card > tbody > tr > th.large-only[ colspan="1" ] {
+		display: table-cell;
+	}
+
+	.stand-in-card > tbody > tr.HeaderRow {
+		display: none;
+	}
+
+	.stand-in-card > tbody > tr.Players {
+		display: block;
+		padding: 5px;
+	}
+
+	.stand-in-card > tbody > tr.Players > td {
+		display: inline-block;
+		line-height: 1.42857143;
+		border: 0;
+		padding: 0;
+	}
+
+	.stand-in-card > tbody > tr.Players > td.Player {
+		clear: left;
+		float: left;
+		padding: 0 5px 5px 0;
+	}
+
+	.stand-in-card > tbody > tr.Players > td.PlayerName {
+		font-style: italic;
+		font-size: small;
+		float: left;
+		margin-top: 1px;
+		padding-bottom: 5px;
+	}
+
+	.stand-in-card > tbody > tr.Players > td.PlayerTeam {
+		float: right;
+	}
+
+	.stand-in-card > tbody > tr.Players > td.Tournaments {
+		display: block;
+		width: auto;
+		text-align: left;
+		padding: 5px 0 0 10px;
+		margin: 0 5px;
+		border-top: 1px solid var( --clr-border, #bbbbbb );
+		clear: both;
+	}
+
+	.stand-in-card > tbody > tr.Players > td > .MobileStuff {
+		display: inline-block;
+	}
+}
+
+/*******************************************************************************
+Template(s): SMW EventCalendar
+Author(s): Inflicted
+*******************************************************************************/
+.srf-eventcalendar img {
+	width: 18px;
+	vertical-align: top;
+	image-rendering: -webkit-optimize-contrast;
+	float: left;
+}
+
+.srf-eventcalendar .fc-view-agendaDay .fc-event-title {
+	float: left;
+	margin-right: 2px;
+}
+
+.srf-eventcalendar .fc-view-agendaDay span.srf-fc-description {
+	font-size: 80%;
+}
+
+/*******************************************************************************
+Template(s): Match history tables
+Author(s): Inflicted
+*******************************************************************************/
+.match-history {
+	height: 35px;
+	width: 150px;
+	padding: 5px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: clip;
+	margin: -5px;
+}
+
+.match-history img {
+	width: 28px;
+	height: 28px;
+	border: 2px solid transparent;
+	margin-top: -2px;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+/*******************************************************************************
+Template(s): Page Form Checkboxes
+Author(s): Inflicted
+*******************************************************************************/
+.checkboxLabel {
+	padding-right: 10px;
+}
+
+/*******************************************************************************
+Template(s): Gradient colours for Fortnite rarities
+Author(s): Ricci
+*******************************************************************************/
+.fortnitebg-rarity-common {
+	background: radial-gradient( circle at 80% 30%, #bdc0c3, #7b8187 );
+}
+
+.fortnitebg-rarity-uncommon {
+	background: radial-gradient( circle at 80% 30%, #8bc281, #188604 );
+}
+
+.fortnitebg-rarity-rare {
+	background: radial-gradient( circle at 80% 30%, #7fb0e2, #0062c5 );
+}
+
+.fortnitebg-rarity-epic {
+	background: radial-gradient( circle at 80% 30%, #bf98eb, #8032d7 );
+}
+
+.fortnitebg-rarity-legendary {
+	background: radial-gradient( circle at 80% 30%, #e2aa80, #c55602 );
+}
+
+.fortnitebg-rarity-epic-skin {
+	background-image: radial-gradient( rgba( 0, 0, 0, 0.01 ), rgba( 0, 0, 0, 0.5 ) ), linear-gradient( 170deg, #8032d7, #8032d7 25%, #bf98eb 25%, #bf98eb 75%, #8032d7 75%, #8032d7 );
+}
+
+/*******************************************************************************
+Template(s): Mobile Group Tables, Match Lists & Showmatches
+Author(s): iMarbot
+*******************************************************************************/
+@media ( min-width: 321px ) {
+	.grouptable-team-mobile,
+	.matchlist-team-mobile {
+		display: none;
+	}
+}
+
+@media ( max-width: 320px ) {
+	.grouptable-team-full,
+	.matchlist-team-full {
+		display: none;
+	}
+}
+
+@media ( max-width: 435px ) {
+	.table.table-bordered.grouptable,
+	.wikitable.matchlist,
+	.wikitable.wikitable-bordered.grouptable,
+	.table.table-bordered.matchlist {
+		width: 100% !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.toggle-group .table-responsive {
+		padding-bottom: 0;
+	}
+}
+
+@media ( min-width: 431px ) {
+	.showmatch-team-mobile {
+		display: none;
+	}
+}
+
+@media ( max-width: 430px ) {
+	.showmatch-team-full {
+		display: none;
+	}
+}
+
+@media ( min-width: 300px ) {
+	.popover {
+		min-width: 275px;
+	}
+}
+
+/*******************************************************************************
+Template(s): Misc Mobile Improvements
+Author(s): iMarbot
+*******************************************************************************/
+@media ( min-width: 650px ) {
+	.roster-notes-squash div {
+		max-width: calc( ~"100% - 350px" );
+	}
+}
+
+@media ( max-width: 600px ) {
+	.mobile-hide {
+		display: none !important;
+	}
+
+	.mobile-unset-max-width {
+		max-width: unset !important;
+	}
+
+	.wikitable.collapsible {
+		width: 100%;
+	}
+
+	.teamcard + .toccolours.mw-collapsible {
+		margin-left: -10px !important;
+		width: 100%;
+	}
+
+	.mobile-max-width {
+		width: 100% !important;
+	}
+
+	.mobile-min-width {
+		width: 1px;
+	}
+}
+
+@media ( max-width: 800px ) {
+	.mobile-wide-hide {
+		display: none !important;
+	}
+
+	.mobile-wide-unset-max-width {
+		max-width: unset !important;
+	}
+
+	.mobile-wide-max-width {
+		width: 100% !important;
+	}
+
+	.mobile-wide-min-width {
+		width: 1px;
+	}
+}
+
+@media ( max-width: 430px ) {
+	.wikitable.showmatch {
+		width: 100% !important;
+	}
+}
+
+@media ( min-width: 601px ) {
+	.mobile-only {
+		display: none !important;
+	}
+}
+
+@media ( min-width: 801px ) {
+	.mobile-wide-only {
+		display: none !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Player Role Icons
+Author(s): salle
+*******************************************************************************/
+.player-role-icon > img,
+img.player-role-icon {
+	height: 13px;
+	width: 13px;
+	vertical-align: baseline;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+.player-role-icon img[ title="Captain" ],
+.player-role-icon img[ title="In-Game Leader" ],
+img.player-role-icon[ alt="Captain" ],
+img.player-role-icon[ alt="In-Game Leader" ] {
+	height: 13px;
+	width: 18px;
+	vertical-align: baseline;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+.faction img {
+	width: 18px;
+	height: 18px;
+	vertical-align: middle;
+	image-rendering: -webkit-optimize-contrast;
+}
+/*******************************************************************************
+Template(s): Building settings table, Button translation
+Author(s): salle
+*******************************************************************************/
+
+kbd {
+	background-color: #0f0f0f;
+	color: #f0f0f0;
+	border-style: solid;
+	border-color: #666666;
+	border-width: 2px 3px 3px 3px;
+	padding: 1px 2px;
+	border-radius: 3px;
+	font-weight: 500;
+	font-family: "Open Sans", sans-serif;
+}
+
+/*******************************************************************************
+Template(s): Artifact decks background
+Author(s): Ricci
+*******************************************************************************/
+
+.artifact-deck-#000000 {
+	background-color: #d3d3d3;
+	text-align: center;
+}
+
+.artifact-deck-blue {
+	background-color: #dee3ef;
+	text-align: center;
+}
+
+.artifact-deck-green {
+	background-color: #ddf4dd;
+	text-align: center;
+}
+
+.artifact-deck-red {
+	background-color: #fbdfdf;
+	text-align: center;
+}
+
+.artifact-deck-yellow {
+	background-color: #f9f9c7;
+	text-align: center;
+}
+
+/*******************************************************************************
+Template(s): Achievement Table Placement Numbers
+Author(s): spazer, Lafungo
+*******************************************************************************/
+.placement-text {
+	text-shadow: 1px 1px rgba( 64, 64, 64, 0.4 ), 1px -1px rgba( 64, 64, 64, 0.4 ), -1px -1px rgba( 64, 64, 64, 0.4 ), -1px 1px rgba( 64, 64, 64, 0.4 );
+	font-weight: bold;
+	color: #ffffff;
+}
+
+.placement-text-#000000 {
+	font-weight: bold;
+	color: #000000;
+}
+
+.placement-1 {
+	background-color: var( --achievement-placement-1, #ffd739 ); //rgb(255, 221, 60);
+}
+
+.placement-2 {
+	background-color: var( --achievement-placement-2, #bebebe ); //rgb(154, 154, 154);
+}
+
+.placement-3 {
+	background-color: var( --achievement-placement-3, #bb8644 ); //rgb(177, 132, 42);
+}
+
+.placement-4 {
+	background-color: var( --achievement-placement-4, #f8996b );
+}
+
+.placement-lightblue {
+	background-color: var( --achievement-placement-lightblue, #007f99 );
+}
+
+.placement-blue {
+	background-color: var( --achievement-placement-blue, #166f82 );
+}
+
+.placement-darkblue {
+	background-color: var( --achievement-placement-darkblue, #2d606b );
+}
+
+.placement-darkgrey {
+	background-color: var( --achievement-placement-darkgrey, #445154 );
+}
+
+.placement-win {
+	background-color: var( --achievement-placement-win, #009e60 );
+}
+
+.placement-draw {
+	background-color: var( --achievement-placement-draw, #d2b48c );
+}
+
+.placement-lose {
+	background-color: var( --achievement-placement-lose, #dddddd );
+}
+
+.placement-up {
+	background-color: var( --achievement-placement-up, #89e069 );
+}
+
+.placement-stay {
+	background-color: var( --achievement-placement-stay, #fede68 );
+}
+
+.placement-down {
+	background-color: var( --achievement-placement-down, #ff6f6f );
+}
+
+.placement-dnp {
+	background-color: var( --achievement-placement-dnp, #d0d0d0 );
+}
+
+.green-check {
+	color: #00a901;
+	font-size: 14px;
+	vertical-align: middle;
+}
+
+/*******************************************************************************
+Template(s): Mobile LeagueCards
+Author(s): iMarbot
+*******************************************************************************/
+@media ( max-width: 600px ) {
+	.teamcard.leaguecard {
+		width: 100% !important;
+	}
+
+	.teamcard.leaguecard .table.table.table-bordered.logo {
+		width: 100% !important;
+	}
+
+	.teamcard.leaguecard:not( .teamcard-nomobile ) table.logo div.center {
+		width: 100% !important;
+	}
+
+	.teamcard.leaguecard:not( .teamcard-nomobile ) table.list {
+		background-color: rgba( 249, 249, 249, 0.95 );
+		width: 100% !important;
+		left: 0% !important;
+	}
+
+	.leaguecard .template-box {
+		display: inline-block;
+		vertical-align: top;
+		margin: 0 0 0 0;
+		box-sizing: content-box;
+		max-width: 100%;
+	}
+
+	.leaguecard .template-box > * {
+		box-sizing: border-box;
+	}
+
+	.leaguecard .template-box {
+		padding-right: 0.5em !important;
+		padding-bottom: 0.25em !important;
+	}
+}
+
+/*******************************************************************************
+Template(s):Bracket Match Cards
+Author(s):Rapture
+*******************************************************************************/
+.match-card > tbody > tr.Match {
+	display: table-row;
+}
+
+.match-card > tbody > tr.Match > td {
+	display: table-cell;
+	line-height: 1.42857143;
+	padding: 5px;
+	text-align: center;
+}
+
+.match-card > tbody > tr.Match > td.TeamLeft {
+	text-align: right;
+}
+
+.match-card > tbody > tr.Match > td.TeamRight {
+	text-align: left;
+}
+
+.match-card > tbody > tr.Match > td.Date {
+	text-align: right;
+}
+
+.match-card > tbody > tr.Match > td.Round {
+	text-align: left;
+	padding-left: 4px;
+}
+
+@media screen and ( max-width: 700px ) {
+	.match-card {
+		width: 100% !important;
+		max-width: 425px;
+		border: 1px solid #bbbbbb;
+		text-align: center;
+	}
+
+	.match-card > thead > tr.HeaderRow {
+		display: none;
+	}
+
+	.match-card > tbody > tr.Match {
+		display: block;
+		padding: 3px 5px 5px 5px;
+	}
+
+	.match-card > tbody > tr.Match:not( :last-of-type ) {
+		border-bottom: 1px solid #bbbbbb;
+	}
+
+	.match-card > tbody > tr.Match > td {
+		display: inline;
+		line-height: 1.42857143;
+		padding: 0;
+		border: 0 !important;
+	}
+
+	.match-card > tbody > tr.Match > td.Date {
+		display: block;
+		font-size: 80%;
+		color: #757575;
+	}
+
+	.match-card > tbody > tr.Match > td.Round {
+		display: block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+		padding-bottom: 3px;
+	}
+
+	.match-card > tbody > tr.Match > td.Round-solo {
+		display: block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+	}
+
+	.match-card > tbody > tr.Match > td.TeamLeft {
+		display: inline-block;
+		width: 42%;
+		text-align: right;
+	}
+
+	.match-card > tbody > tr.Match > td.Score {
+		display: inline-block;
+		width: 16%;
+	}
+
+	.match-card > tbody > tr.Match > td.TeamRight {
+		display: inline-block;
+		width: 42%;
+		text-align: left;
+	}
+
+	.match-card > tbody > tr.Match > td.Date {
+		text-align: center;
+	}
+
+	.match-card > tbody > tr.Match > td.Round {
+		text-align: center;
+		padding-left: 0;
+	}
+
+	.match-card > tbody > tr.Match > td.MatchPage > a > span.fa-stack {
+		font-size: 75%;
+	}
+}
+
+/*******************************************************************************
+Template(s): Match Page CSS
+Author(s): iMarbot
+*******************************************************************************/
+tr.stats-row:nth-child( 2n+1 ) {
+	background-color: #f5f5f5;
+}
+
+@media ( max-width: 599px ) {
+	.matchpage-vscell {
+		padding: 0 10px;
+	}
+}
+
+@media ( min-width: 600px ) {
+	.matchpage-teamcell {
+		font-size: 200%;
+	}
+
+	.matchpage-vscell {
+		padding: 0 20px;
+		font-size: 150%;
+	}
+}
+
+@media ( max-width: 989px ) {
+	.matchpage-team2col {
+		order: 2;
+	}
+}
+
+@media ( min-width: 990px ) {
+	.matchpage-team2col {
+		order: 4;
+	}
+}
+
+/*******************************************************************************
+Template(s): InfoboxIconSmall
+Author(s): iMarbot
+*******************************************************************************/
+.infobox-icon-small img {
+	max-width: 20px;
+	max-height: 20px;
+	vertical-align: top;
+}
+
+.infobox-icon-small .team-template-image img {
+	max-width: unset;
+	max-height: unset;
+}
+
+.infobox-icon-small span.league-icon-small-image {
+	width: 20px;
+	height: 20px;
+}
+
+/*******************************************************************************
+Template(s): Legends of Runeterra region colors
+Author(s): Darkrai
+*******************************************************************************/
+.lor-region-bilgewater {
+	background-color: #f9dec7;
+}
+
+.lor-region-demacia {
+	background-color: #f9f9c7;
+}
+
+.lor-region-freljord {
+	background-color: #dee3ef;
+}
+
+.lor-region-ionia {
+	background-color: #f4ddea;
+}
+
+.lor-region-piltover-zaun {
+	background-color: #f9e8c7;
+}
+
+.lor-region-noxus {
+	background-color: #fbdfdf;
+}
+
+.lor-region-shadow-isles {
+	background-color: #ddf4dd;
+}
+
+.lor-cost {
+	float: right;
+	background-color: #1367fa;
+	width: 20px;
+	border-radius: 50%;
+	color: #98d7f3;
+	margin-left: 5px;
+}
+
+.lor-amount {
+	float: left;
+	width: 35px;
+	background-color: #daa520;
+	border: 1px solid #000000;
+	margin-right: 4px;
+	border-radius: 20%;
+	color: #000000;
+}
+
+/*******************************************************************************
+Template(s): Legends of Runeterra deck lists
+Author(s): salle, Ricci, iMarbot
+*******************************************************************************/
+@media ( max-width: 599px ) {
+	.lor-deck .hoverimage {
+		display: none;
+	}
+
+	.lor-deck .divCell {
+		border-top: 0;
+	}
+
+	.lor-deck-row {
+		min-width: 300px;
+		max-width: 450px;
+		margin: 0 auto;
+		height: 100px;
+		border: 1px solid #bbbbbb;
+		padding: 5px;
+		vertical-align: top;
+		text-align: center;
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.lor-deck-player {
+		width: 80%;
+		padding-left: 20%;
+		font-weight: bold;
+		font-size: 110%;
+		order: 1;
+	}
+
+	.lor-deck-player-title {
+		display: none;
+	}
+
+	.lor-deck-playstyle {
+		width: 10%;
+		order: 3;
+		padding-top: 0;
+		text-align: left;
+	}
+
+	.lor-deck-playstyle i {
+		font-size: 250% !important;
+		position: absolute;
+	}
+
+	.lor-deck-playstyle-title {
+		display: none;
+	}
+
+	.lor-deck-subtype {
+		width: 90%;
+		padding-right: 10%;
+		margin-top: 0;
+		padding-top: 0;
+		order: 4;
+		text-align: center;
+	}
+
+	.lor-deck-subtype-title {
+		display: none;
+	}
+
+	.lor-deck-champions {
+		width: 100%;
+		order: 5;
+		padding-top: 0;
+	}
+
+	.lor-deck-champions-title {
+		display: none;
+	}
+
+	.lor-deck-links {
+		width: 20%;
+		order: 2;
+	}
+
+	.lor-deck-links-title {
+		display: none;
+	}
+}
+
+@media ( min-width: 600px ) {
+	.lor-deck-row {
+		margin-top: 10px;
+		border: 1px solid #bbbbbb;
+		vertical-align: top;
+		text-align: center;
+	}
+
+	.lor-deck-player {
+		width: 180px;
+		padding: 5px;
+		border-right: 1px solid #bbbbbb;
+		text-align: left;
+	}
+
+	.lor-deck-player-title {
+		width: 180px;
+		text-align: center;
+	}
+
+	.lor-deck-playstyle {
+		width: 25px;
+		padding: 5px;
+		border-right: 1px solid #bbbbbb;
+	}
+
+	.lor-deck-playstyle-title {
+		width: 25px;
+	}
+
+	.lor-deck-subtype {
+		width: 300px;
+		padding: 5px;
+		border-right: 1px solid #bbbbbb;
+		text-align: left;
+	}
+
+	.lor-deck-subtype-title {
+		width: 245px;
+		text-align: center;
+	}
+
+	.lor-deck-champions {
+		width: 180px;
+		padding: 5px;
+		border-right: 1px solid #bbbbbb;
+	}
+
+	.lor-deck-champions-title {
+		width: 180px;
+		text-align: center;
+	}
+
+	.lor-deck-links {
+		width: 90px;
+		padding: 5px;
+	}
+
+	.lor-deck-links-title {
+		width: 90px;
+		text-align: center;
+	}
+}
+
+/*******************************************************************************
+Template(s): Copy to clipboard
+Author(s): FO-nTTaX
+*******************************************************************************/
+.copy-to-clipboard .copy-this {
+	display: none;
+}
+
+.copy-to-clipboard .see-this {
+	cursor: copy;
+}
+
+/*******************************************************************************
+Template(s): Runeterra Deck List
+Author(s): Darkrai, salle
+*******************************************************************************/
+table.runeterra-deck {
+	min-width: 320px;
+	width: 100%;
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+@media ( min-width: 970px ) {
+	table.runeterra-deck {
+		width: 320px;
+		float: left;
+		margin-right: 10px;
+		margin-left: 0;
+	}
+}
+
+.runeterra-deck tr > th {
+	vertical-align: middle;
+}
+
+.runeterra-deck tr > th > span {
+	font-size: 90%;
+	vertical-align: super;
+}
+
+.runeterra-deck tr.demacia {
+	background-color: #f9f9c7;
+}
+
+.runeterra-deck tr.freljord {
+	background-color: #dee3ef;
+}
+
+.runeterra-deck tr.ionia {
+	background-color: #f4ddea;
+}
+
+.runeterra-deck tr.noxus {
+	background-color: #fbdfdf;
+}
+
+.runeterra-deck tr.piltover-zaun {
+	background-color: #f9dec7;
+}
+
+.runeterra-deck tr.shadow-isles {
+	background-color: #ddf4dd;
+}
+
+.runeterra-deck td.mana {
+	width: 30px;
+	font-weight: bold;
+	text-align: center;
+}
+
+.runeterra-deck td.card {
+	font-weight: bold;
+}
+
+.runeterra-deck td.amount {
+	width: 30px;
+	text-align: center;
+	font-weight: bold;
+}
+
+/*******************************************************************************
+Template(s): Legends of Runeterra Card Patch Note Greyscale
+Author(s): iMarbot
+*******************************************************************************/
+.lor-graycard img {
+	filter: grayscale( 80% );
+}
+/*******************************************************************************
+Template(s): Miscellaneous Fixes/Changes
+Author(s): iMarbot
+*******************************************************************************/
+@media ( min-width: 601px ) {
+	.hlist li {
+		white-space: nowrap;
+	}
+}
+
+.img-responsive img {
+	max-width: 100%;
+	height: auto;
+}
+
+.grouptable td.prizepooltabletoggle {
+	text-align: center;
+}
+
+.prizepooltable hr {
+	background-color: #bbbbbb;
+}
+
+/* Stats */
+.stats-title {
+	display: inline-block;
+	font-weight: bold;
+}
+
+.stats-subtitle {
+	padding: 2px 0 0 10px;
+	font-weight: bold;
+}
+
+.stats-value {
+	float: right;
+	text-align: right;
+}
+
+.stats-pcnt {
+	display: inline-block;
+	float: right;
+	width: 64px;
+	text-align: right;
+}
+
+.mw-content-ltr dd,
+.mw-content-rtl .mw-content-ltr dd {
+	margin-bottom: 0.1em;
+}
+
+/*******************************************************************************
+Form: Match history
+Author(s): Rapture
+*******************************************************************************/
+#main-content-column .form-field,
+#main-content-column #pfForm select.form-field {
+	width: 100% !important;
+	margin: 0 !important;
+}
+
+#main-content-column .form-field-tokens,
+#main-content-column #pfForm select.form-field-tokens {
+	padding: 0 !important;
+}
+
+#main-content-column .form-field-tokens input[ type="search" ] {
+	height: auto;
+	padding: 0;
+	margin: 3px 0 0 5px;
+	border: 0;
+	box-shadow: none;
+}
+
+#main-content-column .form-field-combobox,
+#main-content-column #pfForm select.form-field-combobox {
+	height: 28px;
+	padding: 0 8px;
+}
+
+#main-content-column .select2-search--inline {
+	height: 29px;
+}
+
+/*******************************************************************************
+Template(s): 16px Icons
+Author(s): iMarbot
+*******************************************************************************/
+.icon-16px {
+	vertical-align: middle;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 16px;
+	min-width: 16px;
+}
+
+.icon-16px img {
+	max-width: 16px;
+	max-height: 16px;
+	height: auto;
+	width: auto;
+}
+
+.icon-16px a {
+	display: contents;
+}
+
+/* dark mode support */
+.icon-16px.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.icon-16px.lightmode {
+		display: none;
+	}
+
+	.icon-16px.darkmode {
+		display: inline-flex;
+	}
+}
+
+/*******************************************************************************
+Template(s): Responsive floats
+Author(s): FO-nTTaX
+*******************************************************************************/
+.pull-right {
+	float: right;
+}
+
+@media ( min-width: 768px ) {
+	.pull-right-sm {
+		float: right;
+	}
+}
+
+@media ( min-width: 992px ) {
+	.pull-right-md {
+		float: right;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.pull-right-lg {
+		float: right;
+	}
+}
+
+@media ( min-width: 1620px ) {
+	.pull-right-xl {
+		float: right;
+	}
+}
+
+/*******************************************************************************
+Template(s): Visibility classes
+Author(s): Bootstrap 3
+*******************************************************************************/
+.visible-xs,
+.visible-sm,
+.visible-md,
+.visible-lg {
+	display: none !important;
+}
+
+.visible-xs-block,
+.visible-xs-inline,
+.visible-xs-inline-block,
+.visible-sm-block,
+.visible-sm-inline,
+.visible-sm-inline-block,
+.visible-md-block,
+.visible-md-inline,
+.visible-md-inline-block,
+.visible-lg-block,
+.visible-lg-inline,
+.visible-lg-inline-block {
+	display: none !important;
+}
+
+@media ( max-width: 767px ) {
+	.visible-xs {
+		display: block !important;
+	}
+
+	table.visible-xs {
+		display: table !important;
+	}
+
+	tr.visible-xs {
+		display: table-row !important;
+	}
+
+	th.visible-xs,
+	td.visible-xs {
+		display: table-cell !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.visible-xs-block {
+		display: block !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.visible-xs-inline {
+		display: inline !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.visible-xs-inline-block {
+		display: inline-block !important;
+	}
+}
+
+@media ( min-width: 768px ) and ( max-width: 991px ) {
+	.visible-sm {
+		display: block !important;
+	}
+
+	table.visible-sm {
+		display: table !important;
+	}
+
+	tr.visible-sm {
+		display: table-row !important;
+	}
+
+	th.visible-sm,
+	td.visible-sm {
+		display: table-cell !important;
+	}
+}
+
+@media ( min-width: 768px ) and ( max-width: 991px ) {
+	.visible-sm-block {
+		display: block !important;
+	}
+}
+
+@media ( min-width: 768px ) and ( max-width: 991px ) {
+	.visible-sm-inline {
+		display: inline !important;
+	}
+}
+
+@media ( min-width: 768px ) and ( max-width: 991px ) {
+	.visible-sm-inline-block {
+		display: inline-block !important;
+	}
+}
+
+@media ( min-width: 992px ) and ( max-width: 1319px ) {
+	.visible-md {
+		display: block !important;
+	}
+
+	table.visible-md {
+		display: table !important;
+	}
+
+	tr.visible-md {
+		display: table-row !important;
+	}
+
+	th.visible-md,
+	td.visible-md {
+		display: table-cell !important;
+	}
+}
+
+@media ( min-width: 992px ) and ( max-width: 1319px ) {
+	.visible-md-block {
+		display: block !important;
+	}
+}
+
+@media ( min-width: 992px ) and ( max-width: 1319px ) {
+	.visible-md-inline {
+		display: inline !important;
+	}
+}
+
+@media ( min-width: 992px ) and ( max-width: 1319px ) {
+	.visible-md-inline-block {
+		display: inline-block !important;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.visible-lg {
+		display: block !important;
+	}
+
+	table.visible-lg {
+		display: table !important;
+	}
+
+	tr.visible-lg {
+		display: table-row !important;
+	}
+
+	th.visible-lg,
+	td.visible-lg {
+		display: table-cell !important;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.visible-lg-block {
+		display: block !important;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.visible-lg-inline {
+		display: inline !important;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.visible-lg-inline-block {
+		display: inline-block !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.hidden-xs {
+		display: none !important;
+	}
+}
+
+@media ( min-width: 768px ) and ( max-width: 991px ) {
+	.hidden-sm {
+		display: none !important;
+	}
+}
+
+@media ( min-width: 992px ) and ( max-width: 1319px ) {
+	.hidden-md {
+		display: none !important;
+	}
+}
+
+@media ( min-width: 1320px ) {
+	.hidden-lg {
+		display: none !important;
+	}
+}
+
+.visible-print {
+	display: none !important;
+}
+
+@media print {
+	.visible-print {
+		display: block !important;
+	}
+
+	table.visible-print {
+		display: table !important;
+	}
+
+	tr.visible-print {
+		display: table-row !important;
+	}
+
+	th.visible-print,
+	td.visible-print {
+		display: table-cell !important;
+	}
+}
+
+.visible-print-block {
+	display: none !important;
+}
+
+@media print {
+	.visible-print-block {
+		display: block !important;
+	}
+}
+
+.visible-print-inline {
+	display: none !important;
+}
+
+@media print {
+	.visible-print-inline {
+		display: inline !important;
+	}
+}
+
+.visible-print-inline-block {
+	display: none !important;
+}
+
+@media print {
+	.visible-print-inline-block {
+		display: inline-block !important;
+	}
+}
+
+@media print {
+	.hidden-print {
+		display: none !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Battleground/Map Portal Banners (initially created for Heroes wiki)
+Author(s): salle
+*******************************************************************************/
+div.battleground-banner {
+	position: relative;
+	height: 104px;
+	width: 960px;
+	background-color: #040006;
+	text-align: left;
+	overflow: hidden;
+	border: 1px solid #000000;
+}
+
+.wiki-valorant div.battleground-banner {
+	position: relative;
+	height: 100px;
+	width: 456px;
+	background-color: #040006;
+	text-align: left;
+	overflow: hidden;
+	border: 1px solid #000000;
+}
+
+.battleground-banner > div {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.block-link > a {
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 100%;
+	padding-left: 26px;
+	line-height: 104px;
+	color: #f8f8f9 !important;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+	font-size: 390%;
+	font-weight: 600;
+	text-shadow: 0 0 25px #3622f2;
+}
+
+.wiki-valorant .block-link > a {
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 100%;
+	padding-left: 26px;
+	line-height: 104px;
+	color: #f8f8f9 !important;
+	font-family: "Exo", "Trebuchet MS", "Helvetica", sans-serif;
+	font-size: 390%;
+	font-weight: 600;
+	text-shadow: 0 0 25px #b12a2a;
+}
+
+.block-link > a:active,
+.block-link > a:hover {
+	text-decoration: none;
+	text-shadow: 0 0 25px #fffec8;
+}
+
+@media ( max-width: 750px ) {
+	.block-link > a {
+		font-size: 300%;
+	}
+}
+
+@media ( max-width: 570px ) {
+	.block-link > a {
+		font-size: 200%;
+	}
+}
+
+@media ( max-width: 400px ) {
+	.block-link > a {
+		font-size: 150%;
+	}
+}
+
+/* Table Header diagonal CSS */
+.diagonal-table-header {
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
+	border-top: hidden;
+}
+
+.diagonal-table-cell-variant {
+	background-color: var( --table-variant-background-color, #eaeaea );
+}
+
+.table-header-col {
+	border-right: hidden !important;
+	transform: translate( 29px, 26px ) rotate( 315deg );
+	max-width: 50px;
+}
+
+.table-header-div {
+	border-bottom: 1px solid #aaaaaa;
+	text-align: left;
+	height: 30px;
+	width: 141px;
+	background-color: var( --table-header-variant-background-color, #eaecf0 );
+}
+
+/*******************************************************************************
+Template(s): Team Portal Boxes
+Author(s): salle
+*******************************************************************************/
+.team-portal-list {
+	max-width: 970px;
+}
+
+.team-portal-list .tp-rank-card {
+	min-height: 35px;
+	margin-bottom: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-rank-card-title {
+	border: 1px solid var( --clr-border, #d3d3d3 );
+	background-color: var( --table-header-background-color, #eeeeee );
+	padding: 5px 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-team-name {
+	font-size: 150%;
+}
+
+.team-portal-list .tp-rank-card .tp-rank-number {
+	font-size: 150%;
+	margin-right: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-total-earnings {
+	float: right;
+	margin-right: 10px;
+	font-size: 120%;
+	margin-top: 2px;
+}
+
+.team-portal-list .tp-rank-card .tp-total-earnings-text {
+	display: none;
+}
+
+.team-portal-list .tp-rank-card .tp-team-box {
+	background-color: var( --table-background-color, #f9f9f9 );
+	border-width: 0 1px 1px 1px;
+	border-style: solid;
+	border-color: var( --clr-border, #d3d3d3 );
+	min-height: 250px;
+	padding: 5px;
+}
+
+.team-portal-list .tp-rank-card .tp-player-row-5 {
+	display: flex;
+	justify-content: space-between;
+	padding-bottom: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-1,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-2,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-3,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-4,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-5 {
+	width: 19.5%;
+	height: 0;
+	padding-bottom: 17.5%;
+}
+
+.team-portal-list .tp-rank-card .tp-photo {
+	height: calc( ~"19vw / 4 * 3 - 5px" );
+	width: calc( ~"19vw - 5px" );
+	text-align: center;
+	overflow: hidden;
+}
+
+.team-portal-list .tp-rank-card .tp-photo > a > img {
+	object-fit: contain;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
+
+.team-portal-list .tp-rank-card .tp-name {
+	text-align: center;
+	font-weight: bold;
+}
+
+.team-portal-list .tp-rank-card .tp-sub-title {
+	text-align: center;
+	font-size: 120%;
+	border-top: 1px solid var( --clr-border, #d3d3d3 );
+	padding-right: 5px;
+	padding-top: 5px;
+}
+
+.team-portal-list .tp-rank-card .tp-next-match .tp-sub-title {
+	margin-left: -5px;
+}
+
+.team-portal-list .tp-rank-card .tp-latest-transfer .tp-sub-title {
+	margin-right: -5px;
+}
+
+.team-portal-list .tp-rank-card .tp-tournament {
+	text-align: center;
+	font-size: 80%;
+}
+
+.team-portal-list .tp-rank-card .tp-countdown {
+	text-align: center;
+	font-size: 70%;
+}
+
+.team-portal-list .tp-rank-card .tp-transfer {
+	text-align: center;
+	font-size: 70%;
+}
+
+.team-portal-list .tp-rank-card .tp-next-match {
+	width: 50%;
+	float: left;
+}
+
+.team-portal-list .tp-rank-card .tp-latest-transfer {
+	width: 50%;
+	float: right;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row {
+	display: flex;
+	justify-content: space-between;
+	clear: both;
+	padding-top: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a {
+	width: 33%;
+	border: 1px solid var( --clr-border, #d3d3d3 );
+	background-color: var( --button-background-color, #eeeeee );
+	color: var( --button-color );
+	padding: 5px 10px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:hover {
+	background-color: var( --button-background-color-hover );
+	color: var( --button-color );
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:focus {
+	background-color: var( --button-background-color-focus );
+	color: var( --button-color );
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:active {
+	background-color: var( --button-background-color-active );
+	color: var( --button-color );
+}
+
+@media ( min-width: 620px ) {
+	.team-portal-list .tp-rank-card .tp-total-earnings-text {
+		display: inline;
+	}
+}
+
+@media ( min-width: 1000px ) {
+	.team-portal-list .tp-rank-card .tp-photo {
+		width: 100%;
+		height: 140px;
+	}
+}
+
+.team-portal-list .tp-rank-card .br-tp-button-row {
+	display: flex;
+	justify-content: center;
+	clear: both;
+	padding-top: 10px;
+}
+
+.team-portal-list .tp-rank-card .br-tp-button-row > a {
+	width: 33%;
+	border: 1px solid #d3d3d3;
+	background-color: #eeeeee;
+	padding: 5px 10px;
+	text-align: center;
+	font-weight: bold;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+/*******************************************************************************
+Template(s): Hiding Legend box for mobiles
+Author(s): Ricci
+*******************************************************************************/
+@media ( max-width: 415px ) {
+	.legend-box-mobile {
+		display: none !important;
+	}
+}
+
+/* hat note */
+.hatnote {
+	padding-left: 1.6em;
+	margin-bottom: 0.5em;
+	font-style: italic;
+}
+
+/* Heroes / Weapons Portal */
+ul.halfbox {
+	width: 100%;
+	padding: 5px;
+	box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+}
+
+ul.halfbox > li {
+	background: none repeat scroll 0 0 #f2f2f2;
+	border: 1px solid #aaaaaa;
+	display: block;
+	float: left;
+	font-weight: bold;
+	height: 70px;
+	margin: 5px;
+	width: 125px;
+}
+
+.wiki-counterstrike ul.halfbox > li {
+	height: 150px;
+	width: 200px;
+}
+
+.wiki-leagueoflegends ul.halfbox > li {
+	height: 120px;
+	width: 120px;
+}
+
+.halfbox li img {
+	height: 100%;
+	width: 100%;
+}
+
+.halfbox li span a {
+	color: #ffffff;
+	text-shadow: 1px 1px 0 #000000, -1px 1px 0 #000000, -1px -1px 0 #000000, 1px -1px 0 #000000;
+	position: absolute;
+	min-width: 121px;
+	text-align: center;
+	margin: -19px 0 0 1px;
+}
+
+.wiki-leagueoflegends .halfbox li span a {
+	min-width: 116px;
+}
+
+.halfbox li span a.new {
+	color: #dd0000;
+}
+
+/*******************************************************************************
+Template(s): Module:ParticipantTable
+Author(s): Rapture
+*******************************************************************************/
+.participanttable .team-template-image img {
+	height: 20px;
+	width: 48px;
+}
+
+@media ( max-width: 767px ) {
+	.wiki-ageofempires .participanttable .player-row {
+		display: flex;
+		flex-wrap: wrap;
+	}
+
+	.wiki-ageofempires .participanttable .player-row > td {
+		flex: 1 0 auto;
+		width: unset !important;
+		min-width: 50%;
+		min-height: 35px;
+		border-width: 1px 1px 0 0 !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Esports wiki team portal
+Author(s): Vogan, salle
+*******************************************************************************/
+.esports-team-game-list {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.esports-team-game-list > p {
+	margin-bottom: 20px !important;
+	margin-top: 10px !important;
+}
+
+.esports-team-game {
+	display: inline-block;
+	margin: 5px;
+	font-weight: bold;
+	width: 160px;
+}
+
+/*******************************************************************************
+Template(s): BigMatch
+Author(s): Vogan
+*******************************************************************************/
+.fb-match-page-header {
+	display: flex;
+	flex-direction: column;
+	border: 2px solid #eeeeee;
+	margin-bottom: 16px;
+}
+
+.fb-match-page-header-tournament {
+	display: flex;
+	justify-content: center;
+	background-color: #f5f5f5;
+	padding: 8px;
+}
+
+.fb-match-page-header-teams {
+	width: 100%;
+	justify-content: center;
+	padding: 12px !important;
+	text-align: center;
+	flex-wrap: nowrap;
+}
+
+.fb-match-page-header-score,
+.fb-match-page-header-divider {
+	font-size: 250%;
+	font-weight: bold;
+}
+
+.fb-match-page-header-separator {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	width: 100px;
+}
+
+.fb-match-page-header-live {
+	height: 30px;
+}
+
+.fb-match-page-header-format {
+	height: 35px;
+	color: #9a9a9a;
+}
+
+.fb-match-page-header-team-container {
+	display: flex;
+	align-items: center;
+}
+
+.fb-match-page-header-team {
+	width: 100%;
+	font-size: 125%;
+	font-weight: bold;
+}
+
+.fb-match-page-overview {
+	display: flex;
+	margin-bottom: 16px;
+}
+
+.fb-match-page-overview > * + * {
+	margin-left: 16px;
+}
+
+.fb-match-page-box {
+	width: 100%;
+	border: 2px solid #eeeeee;
+}
+
+.fb-match-page-box > .divRow > .divCell {
+	text-align: center;
+	vertical-align: middle;
+	height: 45px;
+	border-top: 0 !important;
+}
+
+.fb-match-page-map-scores > .divRow > .divCell {
+	width: 20%;
+}
+
+.fb-match-page-map-scores > .divRow > .map-win {
+	font-weight: bold;
+}
+
+.fb-match-page-map-scores > .divRow > .map-pick {
+	color: #9a9a9a;
+}
+
+.fb-match-page-map-scores > .divRow > .not-played {
+	text-decoration: line-through;
+}
+
+@media ( max-width: 768px ) {
+	.fb-match-page-overview {
+		flex-direction: column;
+	}
+
+	.fb-match-page-box-left {
+		margin-right: 0;
+		margin-bottom: 16px;
+	}
+}
+
+.fb-match-page-valorant-stats {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.fb-match-page-valorant-stats-table {
+	width: 100%;
+	max-width: 500px;
+}
+
+.fb-match-page-valorant-stats-table > .divHeaderRow > .divCell {
+	width: 60px;
+	text-align: center;
+}
+
+.fb-match-page-valorant-stats-table > .divRow > .divCell {
+	width: 60px;
+	text-align: center;
+}
+
+.fb-match-page-valorant-stats-agent > a > img {
+	height: 20px;
+	width: 20px;
+}
+
+.fb-match-page-valorant-stats-banner {
+	background-color: #f5f5f5;
+	width: 100%;
+	max-width: 500px;
+	display: flex;
+	justify-content: space-between;
+	border: 1px solid #bbbbbb;
+	padding: 10px;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	font-size: 20px;
+}
+
+.fb-match-page-valorant-stats-player,
+.fb-match-page-valorant-stats-player-name {
+	text-align: left !important;
+	padding-left: 10px;
+}
+
+.fb-match-page-timeline {
+	margin-bottom: 16px;
+}
+
+.fb-match-page-economy-timeline {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.fb-match-page-players {
+	display: flex;
+	margin-bottom: 16px;
+}
+
+.fb-match-page-players > * + * {
+	margin-left: 16px;
+}
+
+/*******************************************************************************
+Template(s): BigMatch v2
+Author(s): Rathoz
+*******************************************************************************/
+.match-bm-lol-match-header {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-match-header-overview {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	padding: 16px;
+}
+
+.match-bm-lol-match-header-team {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	font-weight: bold;
+}
+
+@media ( min-width: 768px ) {
+	.match-bm-lol-match-header-team-short {
+		display: none !important;
+	}
+}
+
+@media ( max-width: 767px ) {
+	.match-bm-lol-match-header-team-long {
+		display: none !important;
+	}
+}
+
+.match-bm-lol-match-header-result {
+	padding: 16px;
+	font-weight: bold;
+	text-align: center;
+	white-space: nowrap;
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-match-header-result {
+		font-size: 32px;
+	}
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-match-header-result {
+		font-size: 24px;
+	}
+}
+
+.match-bm-lol-match-header-tournament {
+	display: flex;
+	justify-content: center;
+	padding: 8px;
+	background: #f5f5f5;
+	border-top: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-match-header-date {
+	display: flex;
+	justify-content: center;
+	padding: 4px;
+	background: #f5f5f5;
+	border-top: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-match-mvp {
+	display: flex;
+	justify-content: center;
+	padding: 8px;
+	gap: 4px;
+	background: #f5f5f5;
+	border: 1px solid #bbbbbb;
+}
+
+/* >= ??px icons in 1→2 columns */
+@media ( min-width: 646px ) {
+	.match-bm-lol-game-veto-overview {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		padding: 0;
+		align-self: stretch;
+	}
+}
+
+@media ( max-width: 645px ) {
+	.match-bm-lol-game-veto-overview {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 0;
+		align-self: stretch;
+	}
+}
+
+.match-bm-lol-game-veto {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.match-bm-lol-game-veto img {
+	width: 24px;
+	height: 24px;
+}
+
+.match-bm-lol-game-veto-overview-team {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid #bbbbbb;
+	width: 100%;
+}
+
+.match-bm-lol-game-veto-overview-team-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px;
+	background: #f5f5f5;
+}
+
+.match-bm-lol-game-veto-overview-team-veto {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	padding: 8px;
+	gap: 8px;
+	border-top: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-game-veto-overview-ban,
+.match-bm-lol-game-veto-overview-pick {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 2px;
+}
+
+ul.match-bm-lol-game-veto-overview-ban,
+ul.match-bm-lol-game-veto-overview-pick {
+	margin: 0;
+}
+
+.match-bm-lol-game-veto-overview-ban,
+.match-bm-lol-game-veto-order-ban {
+	opacity: 0.5;
+}
+
+.match-bm-lol-game-veto-overview-item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.match-bm-lol-game-veto-pick-bar-blue,
+.match-bm-lol-game-veto-pick-bar-red {
+	width: 24px;
+	height: 4px;
+}
+
+.match-bm-lol-game-veto-pick-bar-blue {
+	background: #0d71bf;
+}
+
+.match-bm-lol-game-veto-pick-bar-red {
+	background: #b81414;
+}
+
+.match-bm-lol-game-veto-order-toggle {
+	padding: 4px;
+	background: #f5f5f5;
+	border: 1px solid #bbbbbb;
+	width: 100%;
+}
+
+/* >= 768px reflow picks/bans order */
+@media ( max-width: 767px ) {
+	@media ( min-width: 646px ) {
+		/* Header not needed when both in 2 col mode */
+		.match-bm-lol-game-veto-order-team-header {
+			display: none !important;
+		}
+	}
+
+	.match-bm-lol-game-veto-order-team-choices {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 8px;
+		gap: 8px;
+		border: 1px solid #bbbbbb;
+		width: 100%;
+	}
+
+	.match-bm-lol-game-veto-order-team-choice-group {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.match-bm-lol-game-veto-order-list {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		align-self: stretch;
+	}
+
+	.match-bm-lol-game-veto-order-team {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-self: stretch;
+		width: 100%;
+	}
+}
+
+@media ( min-width: 768px ) {
+	.match-bm-lol-game-veto-order-team-choices {
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding: 8px;
+		gap: 8px;
+		border: 1px solid #bbbbbb;
+		width: 100%;
+	}
+
+	.match-bm-lol-game-veto-order-team-choice-group {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+	}
+
+	.match-bm-lol-game-veto-order-list {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 0;
+		align-self: stretch;
+	}
+
+	.match-bm-lol-game-veto-order-team {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		width: 100%;
+	}
+}
+
+.match-bm-lol-game-veto-order-team-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px;
+	background: #f5f5f5;
+	border: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-game-veto-order-team-choice {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	line-height: 1;
+}
+
+.match-bm-lol-game-veto-order-step {
+	width: 24px;
+	height: 24px;
+	background: #202122;
+	color: #ffffff;
+	justify-content: center;
+	align-items: center;
+	display: flex;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.match-bm-lol-game-veto-order-step-blue {
+	background: #0d71bf;
+}
+
+.match-bm-lol-game-veto-order-step-red {
+	background: #b81414;
+}
+
+/* >= 834 2 column player layout */
+@media ( max-width: 833px ) {
+	.match-bm-lol-players-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 16px;
+	}
+}
+
+@media ( min-width: 834px ) {
+	.match-bm-lol-players-wrapper {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 16px;
+	}
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-players-wrapper {
+		font-size: 12px;
+	}
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-players-wrapper {
+		font-size: 15px;
+	}
+}
+
+.match-bm-lol-players-team {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	width: 100%;
+}
+
+.match-bm-lol-players-team-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px;
+	background: #eaecf0;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+}
+
+.match-bm-lol-players-player {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	padding: 16px;
+	gap: 16px;
+	background: #ffffff;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+}
+
+.match-bm-lol-players-player-details {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	align-self: stretch;
+}
+
+.match-bm-lol-players-player-character {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	position: relative;
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-players-player-avatar,
+	.match-bm-lol-players-player-icon > a > img {
+		width: 32px;
+		height: 32px;
+	}
+
+	.match-bm-lol-players-player-role {
+		padding: 1px;
+	}
+
+	.match-bm-lol-players-player-role > img {
+		width: 14px;
+		height: 14px;
+		left: 20px;
+		top: 22px;
+	}
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-players-player-avatar,
+	.match-bm-lol-players-player-icon > a > img {
+		width: 48px;
+		height: 48px;
+	}
+
+	.match-bm-lol-players-player-role {
+		padding: 2px;
+	}
+
+	.match-bm-lol-players-player-role > img {
+		width: 20px;
+		height: 20px;
+		left: 30px;
+		top: 32px;
+	}
+}
+
+.match-bm-lol-players-player-role > img {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 10px;
+	position: absolute;
+	border-radius: 2px;
+}
+
+.match-bm-lol-players-player-icon > a > img {
+	position: absolute;
+	left: 0;
+	top: 0;
+	border-radius: 40px;
+}
+
+.match-bm-lol-players-player-name {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+}
+
+.match-bm-lol-players-player-name > a {
+	font-weight: bold;
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-players-player-loadout img {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-players-player-loadout img {
+		width: 24px;
+		height: 24px;
+	}
+}
+
+.match-bm-lol-players-player-loadout {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 16px;
+}
+
+.match-bm-lol-players-player-loadout-rs-wrap {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 4px;
+}
+
+.match-bm-lol-players-player-loadout-rs {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+}
+
+.match-bm-lol-players-player-loadout-items {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+}
+
+.match-bm-lol-players-player-loadout-item {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 2px;
+}
+
+.match-bm-lol-players-player-stats {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 16px;
+	align-self: stretch;
+}
+
+.match-bm-lol-players-player-stat {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	gap: 4px;
+	width: 88px;
+}
+
+.match-bm-lol-h2h {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	font-weight: bold;
+}
+
+.match-bm-lol-h2h-header {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	background: #eaecf0;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+}
+
+.match-bm-lol-h2h-header-team {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 16px;
+	width: 100%;
+}
+
+.match-bm-lol-h2h-section {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+}
+
+.match-bm-lol-h2h-stat {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+	text-align: center;
+	padding: 8px;
+	align-self: stretch;
+}
+
+.match-bm-lol-h2h-stat-title {
+	width: 80px;
+}
+
+.match-bm-lol-game-overview {
+	border: 1px solid #bbbbbb;
+}
+
+.match-bm-lol-game-summary {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+.match-bm-lol-game-summary-team {
+	display: flex;
+	align-items: center;
+	padding: 16px;
+	gap: 4px;
+}
+
+.match-bm-lol-game-summary-center {
+	display: flex;
+	align-items: center;
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-game-summary-faction {
+		width: 20px;
+		height: 20px;
+	}
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-game-summary-faction {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.match-bm-lol-game-summary-score-holder {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	padding: 16px;
+	gap: 4px;
+	text-align: center;
+}
+
+.match-bm-lol-game-summary-score {
+	font-weight: bold;
+	line-height: 100%;
+}
+
+.match-bm-lol-game-summary-length {
+	line-height: 100%;
+}
+
+@media ( min-width: 414px ) {
+	.match-bm-lol-game-summary-score {
+		font-size: 20px;
+	}
+
+	.match-bm-lol-game-summary-length {
+		font-size: 15px;
+	}
+}
+
+@media ( max-width: 413px ) {
+	.match-bm-lol-game-summary-score {
+		font-size: 15px;
+	}
+
+	.match-bm-lol-game-summary-length {
+		font-size: 12px;
+	}
+}
+
+.match-bm-lol-match-additional-list {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 4px;
+	gap: 4px;
+	border: 1px solid #bbbbbb;
+	background: #f5f5f5;
+}
+
+/*******************************************************************************
+Template(s): Darkmode images on file pages
+Author(s): FO-nTTaX, iMarbot
+*******************************************************************************/
+html:not( [ data-darkreader-scheme="dark" ] ):not( .theme--dark ) & {
+	#file img[ src*="darkmode" ]:not( :hover ),
+	.searchResultImage img[ src*="darkmode" ],
+	.gallerybox img[ src*="darkmode" ] {
+		background-color: #272727;
+	}
+}
+
+#file img[ src*="lightmode" ]:not( :hover ),
+.searchResultImage img[ src*="lightmode" ],
+.gallerybox img[ src*="lightmode" ] {
+	[ data-darkreader-scheme="dark" ] & {
+		background-color: #808080;
+	}
+
+	.theme--dark & {
+		background-color: #d8d8d8;
+	}
+}
+
+.filehistory a img[ src*="darkmode" ],
+#file img[ src*="darkmode" ]:hover {
+	background: url( data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAAAAAA6mKC9AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAHElEQVQY02MUZoAADijNxIAG6CPAArP/x8C6AwCutQE9GsmfRAAAAABJRU5ErkJggg== ) repeat;
+}
+
+/*******************************************************************************
+Template/Module: Recent games // Recent matches (for new Bracket/Match System)
+Author(s): hjpalpha
+*******************************************************************************/
+.recent-matches-left {
+	background-image: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-right {
+	background-image: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-forestgreen-background-color, #ddf4dd ) 75% ) !important;
+}
+
+.recent-matches-draw {
+	background-image: linear-gradient( to left, var( --clr-pear-background-color, #f9f9c7 ) 25%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 45%, var( --table-background-color, var( --clr-surface-1, #ffffff ) ) 55%, var( --clr-pear-background-color, #f9f9c7 ) 75% ) !important;
+}
+
+.recent-matches-left-publishertier {
+	background-image: linear-gradient( to left, #fbdfdf 25%, #ffffcc 45%, #ffffff 55%, #ddf4dd 75% ) !important;
+}
+
+.recent-matches-right-publishertier {
+	background-image: linear-gradient( to right, #fbdfdf 25%, #ffffcc 45%, #ffffff 55%, #ddf4dd 75% ) !important;
+}
+
+.recent-matches-draw-publishertier {
+	background-image: linear-gradient( to left, #f9f9c7 25%, #ffffcc 45%, #ffffff 55%, #f9f9c7 75% ) !important;
+}
+
+/*******************************************************************************
+Template // Module: Key/Key2 // Hotkey
+Author(s): hjpalpha
+*******************************************************************************/
+.hotkey-key {
+	background-color: #f0f0f0;
+	width: 32px;
+	font-size: 9pt;
+	border-style: outset;
+	border-width: 2px;
+	margin: 0;
+	padding: 0 3px 0 3px;
+	clear: none;
+}
+
+/*******************************************************************************
+Template: Sad box for main page
+Author(s): FO-nTTaX
+*******************************************************************************/
+.sadbox {
+	border: 1px solid #000000;
+	color: #ffffff;
+	font-size: 18px;
+	margin-bottom: 10px;
+	text-align: center;
+}
+
+.sadbox a {
+	background-color: #464646;
+	color: #ffffff !important;
+	display: block;
+	padding: 10px;
+}
+
+.sadbox a:hover {
+	background-color: #232323;
+}
+
+/*******************************************************************************
+Template: LightModeDarkMode
+Use case: Display images, text, ... only in light or only in darkmode
+Author(s): hjpalpha
+*******************************************************************************/
+
+.show-when-dark-mode,
+[ data-darkreader-scheme="dark" ] .show-when-light-mode,
+.theme--dark .show-when-light-mode {
+	display: none !important;
+}
+
+[ data-darkreader-scheme="dark" ] .show-when-dark-mode,
+.theme--dark .show-when-dark-mode {
+	display: unset !important;
+}
+
+/*******************************************************************************
+Template: GroupTableLeague
+Use case: up/down arrows to indicate a ranking change between rounds
+Author(s): hjpalpha
+*******************************************************************************/
+
+.ranking-change-up {
+	float: right;
+	color: #3ea34c !important;
+	font-size: 0.9em;
+}
+
+.ranking-change-down {
+	float: right;
+	color: #b12a2a !important;
+	font-size: 0.9em;
+}
+
+/*******************************************************************************
+Template: Matchpage Lightmode/Darkmode class
+Author(s): iMarbot
+*******************************************************************************/
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.matchpage span.banner.lightmode,
+	.matchpage div.logo.lightmode {
+		display: none;
+	}
+}
+
+.matchpage span.banner.darkmode,
+.matchpage div.logo.darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.matchpage span.banner.darkmode,
+	.matchpage div.logo.darkmode {
+		display: unset !important;
+	}
+}
+
+/*******************************************************************************
+Template: Darkmode 32px icons
+Author(s): iMarbot
+*******************************************************************************/
+[ data-darkreader-scheme="dark" ],
+.theme--dark {
+	& .vodlink img,
+	.group-table-header-right img {
+		&[ src*="VOD_Icon" ],
+		&[ src*="Match_Info_Stats" ],
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Reviews32" ],
+		&[ src*="Preview_Icon32" ],
+		&[ src*="LiveReport32" ],
+		&[ src*="Interview32" ],
+		&[ src*="Highlights_Icon32" ],
+		&[ src*="Captain_Icon" ],
+		&[ src*="Recap_Icon" ] {
+			filter: invert( 1 );
+		}
+	}
+
+	& img.player-role-icon,
+	.rts-team-list-icon-tag img {
+		&[ src*="/Trial.png" ],
+		&[ src*="/Substitution.png" ],
+		&[ src*="Captain_Icon" ] {
+			filter: invert( 1 );
+		}
+	}
+}
+
+.theme--dark img.player-role-icon {
+	&[ src*="/Trial.png" ],
+	&[ src*="/Substitution.png" ],
+	&[ src*="Captain_Icon" ] {
+		filter: invert( 1 );
+	}
+}
+
+/*******************************************************************************
+Template: Bans filter
+Author(s): trev
+*******************************************************************************/
+.bans-filter {
+	filter: grayscale( 0.8 ) contrast( 0.8 );
+}
+
+/*******************************************************************************
+Template: General Collapsible
+Author: warnull
+*******************************************************************************/
+.general-collapsible-default-toggle {
+	display: inline-block;
+	min-width: 48px;
+	text-align: right;
+}
+
+.collapsed .general-collapsible-default-toggle > .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .general-collapsible-default-toggle > .general-collapsible-expand-button {
+	display: none;
+}
+
+.general-collapsible-default-placeholder {
+	display: inline-block;
+	min-width: 48px;
+}
+
+.collapsed > .should-collapse {
+	display: none;
+}
+
+/*******************************************************************************
+Usage: Only dispaly for admins
+Author: hjpalpha
+*******************************************************************************/
+.show-when-admin {
+	display: none !important;
+}
+
+.user-is-sysop .show-when-admin {
+	display: unset !important;
+}
+
+/*******************************************************************************
+Template(s): Random background and text colors
+Author(s): iMarbot
+*******************************************************************************/
+.bg-color-e6e6ff {
+	background: #e6e6ff;
+}
+
+.color-#000000 {
+	color: #000000;
+}
+
+.color-dimgray {
+	color: #696969;
+}
+
+.color-darkred {
+	color: #8b0000;
+}
+
+/*******************************************************************************
+Template(s): Template:Team matches table
+Author(s): iMarbot via ???
+*******************************************************************************/
+.recent-matches-bg-win {
+	background-color: var( --table-green-background-color, #f0fff0 ) !important;
+	//background: rgb(240, 255, 240) !important;
+}
+
+.recent-matches-bg-tie {
+	//background: var( --clr-sun-10, rgb(249, 249, 199) ) !important;
+	background-color: #f9f9c7 !important;
+}
+
+.recent-matches-bg-lose {
+	background-color: var( --table-red-background-color, #f9f0f2 ) !important;
+	//background: rgb(249, 240, 242) !important;
+}
+
+/*******************************************************************************
+Template(s): white-space as classes
+Author(s): iMarbot
+*******************************************************************************/
+.white-space-pre {
+	white-space: pre;
+}
+
+.white-space-normal {
+	white-space: normal;
+}
+
+/*******************************************************************************
+Template(s): Example title popup hover
+Author(s): iMarbot via ???
+*******************************************************************************/
+.example-title-popup {
+	border: #000000 1px solid;
+	padding: 2px;
+	background-color: #fffbe1;
+}
+
+/*******************************************************************************
+Template(s): App notices
+Author(s): FO-nTTaX
+*******************************************************************************/
+.appnotice-sm,
+.appnotice-md,
+.appnotice-lg {
+	display: none;
+}
+
+@media ( max-width: 320px ) {
+	.appnotice-sm {
+		display: inline;
+	}
+}
+
+@media ( min-width: 321px ) and ( max-width: 390px ) {
+	.appnotice-md {
+		display: inline;
+	}
+}
+
+@media ( min-width: 391px ) {
+	.appnotice-lg {
+		display: inline;
+	}
+}
+
+/*******************************************************************************
+Template(s): Head2HeadOverview
+Author(s): Elysienna
+*******************************************************************************/
+.matchlist-gradient-green {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 105, 211, 105, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.matchlist-gradient-red {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 234, 88, 83, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.matchlist-gradient-yellow {
+	background: linear-gradient( 90deg, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 0%, rgba( 237, 208, 80, 1 ) 75%, var( --table-header-variant-background-color, rgba( 234, 236, 240, 1 ) ) 100% );
+}
+
+.matchlist-header {
+	border-bottom: 0.125rem solid var( --table-border-color, #bbbbbb );
+}
+
+.matchlist-header > th {
+	background-color: var( --matchlist-header-background-color, #fbf2df ) !important;
+}
+
+/*******************************************************************************
+Map on Portal:Players
+Author(s): Elysienna
+*******************************************************************************/
+.portal-map {
+	background-color: #b6cfe5;
+	border-style: solid;
+	border-width: 2px;
+	border-color: #00005d;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.portal-map {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
+
+	.portal-map .dynamicmap > div:first-child {
+		background-color: #000000;
+	}
+
+	.portal-map .dynamicmap > div > img {
+		filter: invert( 1 );
+	}
+}
+
+/*******************************************************************************
+StarCraft(2)/Warcraft race colors
+Author(s): hjpalpha
+*******************************************************************************/
+.warcraft-nightelf,
+.Protoss,
+.warcraft-nightelf th,
+.Protoss th,
+.warcraft-nightelf td,
+.Protoss td {
+	background: var( --clr-forestgreen-90, #d1ffcc ) !important;
+}
+
+.Zerg,
+.warcraft-orc,
+.Zerg th,
+.warcraft-orc th,
+.Zerg td,
+.warcraft-orc td {
+	background: var( --clr-cinnabar-90, #fad1d1 ) !important;
+}
+
+.Terran,
+.warcraft-human,
+.Terran th,
+.warcraft-human th,
+.Terran td,
+.warcraft-human td {
+	background: var( --clr-sapphire-90, #cce1ff ) !important;
+}
+
+.Random,
+.Random th,
+.Random td {
+	background: var( --clr-sun-90, #fff7cc ) !important;
+}
+
+.warcraft-multirace,
+.warcraft-multirace th,
+.warcraft-multirace td,
+.Bye,
+.Bye th,
+.Bye td {
+	background: var( --clr-moon-90, #e6e6e6 ) !important;
+}
+
+.warcraft-undead,
+.warcraft-undead th,
+.warcraft-undead td {
+	background: var( --clr-vividviolet-90, #f1d2fa ) !important;
+}
+
+.nyd,
+.nyd th,
+.nyd td {
+	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) ) !important;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	img[ title="Protoss" ],
+	img[ title="Zerg" ],
+	img[ title="Terran" ],
+	img[ title="Random" ] {
+		filter: grayscale( 100% ) brightness( 40 );
+	}
+
+	.warcraft-undead,
+	.warcraft-undead th,
+	.warcraft-undead td {
+		background: var( --clr-vividviolet-30, #200033 ) !important;
+	}
+
+	.warcraft-multirace,
+	.warcraft-multirace th,
+	.warcraft-multirace td,
+	.Bye,
+	.Bye th,
+	.Bye td {
+		background: var( --clr-moon-40, #e6e6e6 ) !important;
+	}
+
+	.Random,
+	.Random th,
+	.Random td {
+		background: var( --clr-sun-20, #fff7cc ) !important;
+	}
+
+	.Terran,
+	.warcraft-human,
+	.Terran th,
+	.warcraft-human th,
+	.Terran td,
+	.warcraft-human td {
+		background: var( --clr-sapphire-20, #cce1ff ) !important;
+	}
+
+	.Zerg,
+	.warcraft-orc,
+	.Zerg th,
+	.warcraft-orc th,
+	.Zerg td,
+	.warcraft-orc td {
+		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
+	}
+
+	.Protoss,
+	.warcraft-nightelf,
+	.Protoss th,
+	.warcraft-nightelf th,
+	.Protoss td,
+	.warcraft-nightelf td {
+		background: var( --clr-forestgreen-20, #d1ffcc ) !important;
+	}
+}
+
+/*******************************************************************************
+Template: Driver Standings (F1 Wiki)
+Use case: Moving styling from inline to css file.
+Author(s): salle
+*******************************************************************************/
+
+table.f1-driver-standings-table > tbody > tr > td:nth-child( n+3 ) {
+	text-align: center;
+	white-space: pre;
+}
+
+table.f1-driver-standings-table > tbody > tr > th:nth-child( n+3 ) {
+	width: 41px;
+}
+
+table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) {
+	height: 40px;
+}
+
+table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > th:first-child {
+	width: 28px;
+}
+
+table.f1-driver-standings-table > tbody > tr:nth-child( n+3 ) > td:nth-child( 3 ) {
+	font-weight: bold;
+}
+
+/*******************************************************************************
+Template: Next Circuit  (F1 Wiki)
+Use case: Main page styling with custom break-point.
+Author(s): salle
+*******************************************************************************/
+
+.next-circuit-image {
+	display: flex;
+	font-size: 14px;
+}
+
+.next-circuit-boxes {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.next-circuit-boxes > div {
+	display: flex;
+	height: 25%;
+}
+
+.next-circuit-boxes > div > div {
+	padding: 8px 12px;
+}
+
+.next-circuit-boxes > div:first-child > div {
+	border-bottom: 1px solid #bbbbbb;
+}
+
+.next-circuit-boxes > div > div:only-child {
+	width: 100%;
+}
+
+.next-circuit-boxes > div > div:not( :only-child ) {
+	width: 50%;
+	border-bottom: 1px solid #bbbbbb;
+}
+
+.next-circuit-boxes > div > div:nth-child( n+2 ) {
+	border-left: 1px solid #bbbbbb;
+}
+
+@media ( max-width: 569px ) {
+	.next-circuit-image {
+		flex-direction: column;
+	}
+
+	.next-circuit-image > div:first-child {
+		display: flex;
+		justify-content: center;
+		padding: 0;
+	}
+
+	.next-circuit-boxes {
+		border-top: 1px solid #bbbbbb;
+		border-left: 0;
+	}
+}
+
+@media ( min-width: 570px ) {
+	.next-circuit-image {
+		flex-direction: row;
+	}
+
+	.next-circuit-image > div:first-child {
+		padding: 12px;
+		display: block;
+	}
+
+	.next-circuit-boxes {
+		border-left: 1px solid #bbbbbb;
+		border-top: 0;
+	}
+}
+
+/*******************************************************************************
+Template: StreamPage (SC2)
+Use case: Stream Pages on sc2
+Author(s): hjpalpha
+*******************************************************************************/
+.sc2-stream-page-oppponent-info {
+	width: 20%;
+	flex: 0 0 20%;
+	padding: 5px;
+	order: 1;
+}
+
+.sc2-stream-page-oppponent-info2 {
+	width: 20%;
+	flex: 0 0 20%;
+	padding: 5px;
+	order: 3;
+}
+
+.sc2-stream-page-middle {
+	width: 60%;
+	flex: 0 0 60%;
+	order: 2;
+}
+
+.sc2-stream-page-middle-column,
+.sc2-stream-page-middle-column1,
+.sc2-stream-page-middle-column2 {
+	width: 33.3333333333%;
+	flex: 0 0 33.3333333333%;
+	padding: 5px;
+}
+
+.sc2-stream-page-middle-column-no-form,
+.sc2-stream-page-middle-column1-no-form {
+	width: 50% !important;
+	flex: 0 0 50% !important;
+}
+
+.sc2-stream-page-middle-column1 .opponent-form {
+	display: none;
+}
+
+@media screen and ( max-width: 1620px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2 {
+		width: 25%;
+		flex: 0 0 25%;
+	}
+
+	.sc2-stream-page-middle,
+	.sc2-stream-page-middle-column,
+	.sc2-stream-page-middle-column1 {
+		width: 50%;
+		flex: 0 0 50%;
+	}
+
+	.sc2-stream-page-middle-column2 {
+		display: none !important;
+	}
+
+	.sc2-stream-page-middle-column1 .opponent-form {
+		display: unset;
+	}
+}
+
+@media screen and ( max-width: 992px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2 {
+		width: 50%;
+		flex: 0 0 50%;
+		order: unset;
+	}
+
+	.sc2-stream-page-middle {
+		width: 100%;
+		flex: 0 0 100%;
+	}
+}
+
+@media screen and ( max-width: 576px ) {
+	.sc2-stream-page-oppponent-info,
+	.sc2-stream-page-oppponent-info2,
+	.sc2-stream-page-middle,
+	.sc2-stream-page-middle-column,
+	.sc2-stream-page-middle-column1 {
+		width: 100%;
+		flex: 0 0 100%;
+	}
+
+	.sc2-stream-page-middle-column1 {
+		order: 2;
+	}
+
+	.sc2-stream-page-middle-column {
+		order: 1;
+	}
+}
+
+/*******************************************************************************
+Template(s): TyreGraph
+Author(s): salle
+*******************************************************************************/
+
+.tyre-graph-key-label {
+	font-size: 14px;
+	font-weight: bold;
+	width: 100%;
+	text-align: center;
+}
+
+.tyre-graph-key-row {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+}
+
+.tyre-graph-key-cell {
+	border: 1px solid var( --clr-secondary-39, #646464 );
+	width: 14%;
+	height: 12px;
+}
+
+.tyre-graph-row {
+	height: 25px;
+	align-items: center;
+	display: flex;
+}
+
+.tyre-graph-driver {
+	width: 40px;
+	text-align: left;
+	display: inline-flex;
+	padding: 0 5px;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.tyre-graph-bar {
+	width: calc( ~"100% - 80px" );
+	border-left: 1px solid var( --clr-secondary-39, #646464 );
+	height: 12px;
+	display: inline-flex;
+}
+
+.tyre-graph-cell {
+	display: inline-flex;
+	height: 12px;
+	border: 1px solid var( --clr-secondary-39, #646464 );
+	border-left: 0;
+	position: relative;
+}
+
+.tyre-graph-pit-lap {
+	position: absolute;
+	width: 16px;
+	font-size: 10px;
+	display: flex;
+	height: 16px;
+	right: 0;
+	transform: translate( 50%, -90% );
+	top: 0;
+	border-radius: 100%;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	z-index: 1;
+}
+
+.tyre-graph-raced-laps {
+	width: 32px;
+	display: inline-flex;
+	text-align: center;
+	padding: 0 5px;
+	font-size: 14px;
+	font-weight: bold;
+	margin-right: 8px;
+	justify-content: flex-end;
+}
+
+/*******************************************************************************
+"Match Page" font-awesome stacked icon correction
+Author(s): salle
+*******************************************************************************/
+
+span.fa-stack i.fas.fa-info.fa-stack-1x:last-child {
+	padding-top: 0.2em;
+}
+
+/*******************************************************************************
+.scribunto-error when not added via <style> tags
+Author(s): Scribunto developer(s)
+*******************************************************************************/
+.scribunto-error {
+	cursor: pointer;
+}
+
+.scribunto-error:hover,
+.scribunto-error:focus {
+	text-decoration: underline;
+}
+
+/*******************************************************************************
+Hexagon portraits
+Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
+Author(s): PhiLtheFisH, FO-nTTaX, salle
+*******************************************************************************/
+.wiki-heroes .hexagon-container {
+	height: 1200px;
+	position: relative;
+	margin-bottom: 24px;
+	z-index: 1;
+}
+
+.wiki-illuvium .hexagon-container {
+	height: 2500px;
+	position: relative;
+	margin-bottom: 24px;
+	z-index: 1;
+}
+
+.wiki-heroes .hexagon-row,
+.wiki-illuvium .hexagon-row {
+	line-height: 240px;
+	margin-bottom: -24px;
+	position: absolute;
+}
+
+.wiki-heroes .hexagon-row:nth-child( 2 ),
+.wiki-illuvium .hexagon-row:nth-child( 2 ) {
+	margin-left: 69px;
+	top: 120px;
+}
+
+.wiki-heroes .hexagon-tile,
+.wiki-illuvium .hexagon-tile {
+	clip-path: url( data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><clipPath id=\'heroPolygon\'><polygon points=\'72 0, 134 36, 134 108, 72 144, 10 108, 10 36\'></polygon></clipPath></svg>#heroPolygon );
+	clip-path: polygon( 72px 0, 134px 36px, 134px 108px, 72px 144px, 10px 108px, 10px 36px );
+	display: inline-block;
+	margin-left: -5px;
+	margin-right: -5px;
+	opacity: 1;
+	position: relative;
+	transition: 1s;
+	z-index: 100;
+}
+
+.wiki-heroes .hexagon-buttons-class,
+.wiki-illuvium .hexagon-buttons-affinity {
+	float: left;
+}
+
+.wiki-heroes .hexagon-buttons-faction,
+.wiki-illuvium .hexagon-buttons-class {
+	float: right;
+}
+
+.wiki-heroes .hexagon-button,
+.wiki-illuvium .hexagon-button {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ) .hexagon-tile-assassin,
+.wiki-heroes .hexagon:not( .show-specialist ) .hexagon-tile-specialist,
+.wiki-heroes .hexagon:not( .show-support ) .hexagon-tile-support,
+.wiki-heroes .hexagon:not( .show-warrior ) .hexagon-tile-warrior,
+.wiki-heroes .hexagon:not( .show-multiclass ) .hexagon-tile-multiclass,
+.wiki-heroes .hexagon:not( .show-starcraft ) .hexagon-tile-starcraft,
+.wiki-heroes .hexagon:not( .show-warcraft ) .hexagon-tile-warcraft,
+.wiki-heroes .hexagon:not( .show-diablo ) .hexagon-tile-diablo,
+.wiki-illuvium .hexagon:not( .show-fire ) .hexagon-tile-fire,
+.wiki-illuvium .hexagon:not( .show-nature ) .hexagon-tile-nature,
+.wiki-illuvium .hexagon:not( .show-air ) .hexagon-tile-air,
+.wiki-illuvium .hexagon:not( .show-water ) .hexagon-tile-water,
+.wiki-illuvium .hexagon:not( .show-earth ) .hexagon-tile-earth,
+.wiki-illuvium .hexagon:not( .show-fighter ) .hexagon-tile-fighter,
+.wiki-illuvium .hexagon:not( .show-psion ) .hexagon-tile-psion,
+.wiki-illuvium .hexagon:not( .show-empath ) .hexagon-tile-empath,
+.wiki-illuvium .hexagon:not( .show-rogue ) .hexagon-tile-rogue,
+.wiki-illuvium .hexagon:not( .show-bulwark ) .hexagon-tile-bulwark,
+.wiki-heroes .hexagon:not( .show-other ) .hexagon-tile-other,
+.wiki-illuvium .hexagon:not( .show-other ) .hexagon-tile-other {
+	opacity: 0.5;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ):not( .show-specialist ):not( .show-support ):not( .show-warrior ):not( .show-multiclass ):not( .show-starcraft ):not( .show-warcraft ):not( .show-diablo ):not( .show-other ) .hexagon-tile,
+.wiki-illuvium .hexagon:not( .show-fire ):not( .show-nature ):not( .show-air ):not( .show-water ):not( .show-earth ):not( .show-fighter ):not( .show-psion ):not( .show-empath ):not( .show-rogue ):not( .show-bulwark ):not( .show-other ) .hexagon-tile {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-tile-assassin,
+.wiki-heroes .hexagon.show-specialist .hexagon-tile-specialist,
+.wiki-heroes .hexagon.show-support .hexagon-tile-support,
+.wiki-heroes .hexagon.show-warrior .hexagon-tile-warrior,
+.wiki-heroes .hexagon.show-multiclass .hexagon-tile-multiclass,
+.wiki-heroes .hexagon.show-starcraft .hexagon-tile-starcraft,
+.wiki-heroes .hexagon.show-warcraft .hexagon-tile-warcraft,
+.wiki-heroes .hexagon.show-diablo .hexagon-tile-diablo,
+.wiki-illuvium .hexagon.show-fire .hexagon-tile-fire,
+.wiki-illuvium .hexagon.show-nature .hexagon-tile-nature,
+.wiki-illuvium .hexagon.show-air .hexagon-tile-air,
+.wiki-illuvium .hexagon.show-water .hexagon-tile-water,
+.wiki-illuvium .hexagon.show-earth .hexagon-tile-earth,
+.wiki-illuvium .hexagon.show-fighter .hexagon-tile-fighter,
+.wiki-illuvium .hexagon.show-psion .hexagon-tile-psion,
+.wiki-illuvium .hexagon.show-empath .hexagon-tile-empath,
+.wiki-illuvium .hexagon.show-rogue .hexagon-tile-rogue,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-tile-bulwark,
+.wiki-heroes .hexagon.show-other .hexagon-tile-other,
+.wiki-illuvium .hexagon.show-other .hexagon-tile-other {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-button img,
+.wiki-illuvium .hexagon-button img {
+	background-color: initial;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-button[ data-show="assassin" ] img,
+.wiki-heroes .hexagon.show-specialist .hexagon-button[ data-show="specialist" ] img,
+.wiki-heroes .hexagon.show-support .hexagon-button[ data-show="support" ] img,
+.wiki-heroes .hexagon.show-warrior .hexagon-button[ data-show="warrior" ] img,
+.wiki-heroes .hexagon.show-multiclass .hexagon-button[ data-show="multiclass" ] img,
+.wiki-heroes .hexagon.show-starcraft .hexagon-button[ data-show="starcraft" ] img,
+.wiki-heroes .hexagon.show-warcraft .hexagon-button[ data-show="warcraft" ] img,
+.wiki-heroes .hexagon.show-diablo .hexagon-button[ data-show="diablo" ] img,
+.wiki-illuvium .hexagon.show-fire .hexagon-button[ data-show="fire" ] img,
+.wiki-illuvium .hexagon.show-nature .hexagon-button[ data-show="nature" ] img,
+.wiki-illuvium .hexagon.show-air .hexagon-button[ data-show="air" ] img,
+.wiki-illuvium .hexagon.show-water .hexagon-button[ data-show="water" ] img,
+.wiki-illuvium .hexagon.show-earth .hexagon-button[ data-show="earth" ] img,
+.wiki-illuvium .hexagon.show-fighter .hexagon-button[ data-show="fighter" ] img,
+.wiki-illuvium .hexagon.show-psion .hexagon-button[ data-show="psion" ] img,
+.wiki-illuvium .hexagon.show-empath .hexagon-button[ data-show="empath" ] img,
+.wiki-illuvium .hexagon.show-rogue .hexagon-button[ data-show="rogue" ] img,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-button[ data-show="bulwark" ] img,
+.wiki-heroes .hexagon.show-other .hexagon-button[ data-show="other" ] img,
+.wiki-illuvium .hexagon.show-other .hexagon-button[ data-show="other" ] img {
+	background-color: #cccccc;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile:hover,
+.wiki-illuvium .hexagon-tile:hover {
+	opacity: 0.75;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile a img,
+.wiki-illuvium .hexagon-tile a img {
+	margin-top: -100px;
+}
+
+.wiki-heroes .hexagon-tile-clear,
+.wiki-illuvium .hexagon-tile-clear {
+	visibility: hidden;
+}
+
+.wiki-heroes .hexagon-tile-name,
+.wiki-illuvium .hexagon-tile-name {
+	color: #ffffff;
+	font-weight: bold;
+	left: 10px;
+	line-height: 12px;
+	position: absolute;
+	text-shadow: -1px 1px #000000;
+	top: 98px;
+	transform: rotate( -30deg );
+	transform-origin: -115px -35px 0;
+}
+
+.wiki-heroes .hexagon label,
+.wiki-illuvium .hexagon label {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon label > input,
+.wiki-illuvium .hexagon label > input {
+	display: none;
+}
+
+.wiki-heroes .hexagon label > span,
+.wiki-illuvium .hexagon label > span {
+	background-color: #aaaaaa;
+	border: 1px solid #aaaaaa;
+	border-radius: 5px;
+	margin: 5px;
+	padding: 5px;
+	transition: 0.5s;
+}
+
+.wiki-heroes .hexagon label > input:checked + span,
+.wiki-illuvium .hexagon label > input:checked + span {
+	background-color: #cccccc;
+	transition: 0.5s;
+}

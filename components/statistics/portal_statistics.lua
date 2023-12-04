@@ -15,7 +15,7 @@ local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Medal = require('Module:Medal')
 local Operator = require('Module:Operator')
 local Logic = require('Module:Logic')
@@ -444,7 +444,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
-	local rowLimit = Math._round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2, 0)
+	local rowLimit = Math.round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2)
 
 	local wrapper = mw.html.create('div')
 
@@ -829,8 +829,8 @@ function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 end
 
 
----@param args table?
----@param config table?
+---@param args table
+---@param config table
 ---@return table
 function StatisticsPortal._getOpponentEarningsData(args, config)
 	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
@@ -1020,7 +1020,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 	local function makeOpponentTable(item)
 		local opponentNames = {}
 		if args.opponentType == Opponent.solo then
-			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers, 'p') do
+			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers or {}, 'p') do
 				local name = string.gsub(playerName or '', ' ', '_')
 				table.insert(opponentNames, name)
 			end
@@ -1383,7 +1383,7 @@ end
 ---@param tablePlace number
 ---@param item table
 ---@param config table
----@return table
+---@return number
 function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 	local earnings
 	if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
@@ -1391,7 +1391,7 @@ function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 	else
 		earnings = item.prizemoney
 	end
-	return tablePlace + Math._round(earnings or 0, DEFAULT_ROUND_PRECISION)
+	return tablePlace + Math.round(earnings or 0, DEFAULT_ROUND_PRECISION)
 end
 
 

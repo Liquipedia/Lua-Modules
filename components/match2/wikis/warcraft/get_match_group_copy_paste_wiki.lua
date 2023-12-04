@@ -13,7 +13,8 @@ local Table = require('Module:Table')
 
 local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local INDENT = '\t'
 local MODE_CONVERSION = {
@@ -100,7 +101,7 @@ function WikiCopyPaste._mapDetails(opponents, mode)
 	local lines = {''}
 
 	Array.forEach(Array.range(1, opponents), function(opponentIndex)
-		Array.forEach(Array.range(1, Opponent.partySize(mode[1])), function(playerIndex)
+		Array.forEach(Array.range(1, Opponent.partySize(mode[1]) --[[@as integer]]), function(playerIndex)
 			local prefix = '|t' .. opponentIndex .. 'p' .. playerIndex
 			local player = mode.isTeamMatch and (prefix .. '=') or ''
 			table.insert(lines, INDENT .. INDENT .. player .. prefix .. 'heroes=')
@@ -125,7 +126,7 @@ function WikiCopyPaste._getOpponent(mode, score)
 	end
 
 	local players = ''
-	Array.forEach(Array.range(1, Opponent.partySize(mode[1])), function(playerIndex)
+	Array.forEach(Array.range(1, Opponent.partySize(mode[1]) --[[@as integer]]), function(playerIndex)
 		players = players .. '|p' .. playerIndex .. '=' .. '|p' .. playerIndex .. 'race='
 	end)
 

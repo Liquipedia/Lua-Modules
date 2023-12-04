@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local GameClock = require('Module:GameClock')
 local Hotkey = require('Module:Hotkey')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -31,7 +32,7 @@ local CustomInjector = Class.new(Injector)
 
 local SELL_FACTOR = 0.6
 local MISCELLANEOUS = 'Miscellaneous'
-local GOBLIN_MERCHANT = 'Goblin Merchant Items'
+local GOBLIN_MERCHANT = 'Goblin Merchant'
 local PURCHASABLE = 'Purchasable'
 local CLASSES = {
 	p = 'Permanent',
@@ -68,12 +69,25 @@ function CustomItem.run(frame)
 		Logic.readBool(_args.unique) and 'Unique' or nil
 	)
 	_args.caption = Table.isNotEmpty(caption) and table.concat(caption, '<br>') or nil
+	_args.soldFrom = CustomItem._soldFrom(_args.soldfrom)
 
 	customItem.createWidgetInjector = CustomItem.createWidgetInjector
 	customItem.getWikiCategories = CustomItem.getWikiCategories
 	customItem.setLpdbData = CustomItem.setLpdbData
 
 	return customItem:createInfobox()
+end
+
+---@param soldFromInput string?
+---@return {name: string, link: string}[]
+function CustomItem._soldFrom(soldFromInput)
+	local soldFromArgs = Json.parseIfTable(soldFromInput) or {}
+	local soldFrom = {}
+	for _, name, index in Table.iter.pairsByPrefix(soldFromArgs, 'name') do
+		table.insert(soldFrom, {name = name, link = (soldFromArgs['link' .. index] or name):gsub(' ', '_')})
+	end
+
+	return soldFrom
 end
 
 ---@param widgets Widget[]
@@ -100,7 +114,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'availability' then
 		return Array.append(widgets,
-			Cell{name = 'Sold From', content = {_args.soldfrom}},
+			Cell{name = 'Sold From', content = Array.map(_args.soldFrom, function(soldFrom)
+				return '[[' .. soldFrom.link .. '|' .. soldFrom.name .. ']]' end)},
 			Cell{name = 'Requirements', content = {_args.requires}},
 			Cell{name = 'Cost', content = {CostDisplay.run{gold = _args.gold, lumber = _args.lumber}}},
 			Cell{name = 'Sell value', content = {CostDisplay.run{
@@ -137,24 +152,30 @@ end
 
 ---@param args table
 function CustomItem:setLpdbData(args)
-	local class = (CLASSES[(_args.class or ''):lower()] or MISCELLANEOUS)
+	local class = (CLASSES[(args.class or ''):lower()] or MISCELLANEOUS)
+
+	local extradata = {
+		level = args.level,
+		gold = args.gold,
+		lumber = args.lumber,
+		cooldown = args.cooldown,
+		stock = args.stock,
+		stockstart = args.stockstart,
+		stockreplenish = args.stockreplenish,
+		requirement = args.requirement,
+		purchasedfromgoblinshop = tostring(class == PURCHASABLE and String.contains(args.soldfrom, GOBLIN_MERCHANT)),
+	}
+
+	Array.forEach(args.soldFrom, function(soldFrom, index)
+		extradata['soldfrom' .. index] = soldFrom.link
+	end)
 
 	local lpdbData = {
 		name = self.name,
 		type = 'item',
 		image = args.image,
 		information = class .. ' Items',
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			level = _args.level,
-			gold = _args.gold,
-			lumber = _args.lumber,
-			cooldown = _args.cooldown,
-			stock = _args.stock,
-			stockstart = _args.stockstart,
-			stockreplenish = _args.stockreplenish,
-			requirement = _args.requirement,
-			purchasedfromgoblinshop = tostring(class == PURCHASABLE and not String.contains(_args.soldfrom, GOBLIN_MERCHANT)),
-		}),
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
 	}
 
 	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. lpdbData.name, lpdbData)
@@ -163,12 +184,13 @@ end
 ---@param args table
 ---@return string[]
 function CustomItem:getWikiCategories(args)
-	local class = (CLASSES[(_args.class or ''):lower()] or MISCELLANEOUS) .. ' Items'
-	if not _args.level then
-		return {class}
-	end
+	local categories = Array.map(args.soldFrom, function(soldFrom) return soldFrom.link .. ' Items' end)
 
-	return {class, 'Level ' .. _args.level .. ' Items'}
+	local class = (CLASSES[(args.class or ''):lower()] or MISCELLANEOUS) .. ' Items'
+	table.insert(categories, class)
+	table.insert(categories, args.level and ('Level ' .. args.level .. ' Items') or nil)
+
+	return categories
 end
 
 return CustomItem

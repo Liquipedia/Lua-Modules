@@ -1,0 +1,167 @@
+/*******************************************************************************
+Template(s): Team Templates
+Author(s): FO-nTTaX
+*******************************************************************************/
+
+.team-template-image {
+	vertical-align: 2px;
+}
+
+.team-template-image-icon {
+	vertical-align: 2px;
+}
+
+.team-template-image-legacy {
+	vertical-align: 2px;
+}
+
+.team-template-team-part {
+	float: right;
+}
+
+.bind-highlighting {
+	display: none;
+}
+
+.team-template-image img {
+	width: 60px;
+	height: 25px;
+	image-rendering: -webkit-optimize-contrast;
+}
+
+.team-template-image-icon {
+	width: 60px;
+	height: 25px;
+	display: inline-block;
+	text-align: center;
+}
+
+.team-template-image-icon img {
+	max-width: 50px;
+	max-height: 25px;
+	width: auto;
+	height: auto;
+}
+
+.team-template-image-legacy img {
+	width: 60px;
+	height: 25px;
+}
+
+.tabs .team-template-image img {
+	width: 40px;
+	height: 17px;
+}
+
+.tabs .team-template-image-legacy img {
+	width: 40px;
+	height: 17px;
+}
+
+.tabs .team-template-image-icon img {
+	max-width: 40px;
+	max-height: 17px;
+	width: auto;
+	height: auto;
+	margin-right: 9px;
+}
+
+.tabs .team-template-image-icon {
+	width: auto;
+	height: 17px;
+}
+
+/* Improved match1 display by iMarbot */
+span.team-template-team-bracket {
+	white-space: nowrap;
+	display: inline-block;
+	height: var( --team-template-bracket-height, 21px );
+}
+
+.team-template-team-bracket .team-template-image-icon,
+.team-template-team-bracket .team-template-image-legacy {
+	vertical-align: 0;
+	height: var( --team-template-bracket-height, 21px );
+	width: calc( ~"var(--team-template-bracket-height, 21px) * 2.4" );
+}
+
+.team-template-team-bracket .team-template-image-icon img {
+	max-width: 90%;
+	max-height: 100%;
+}
+
+.team-template-team-bracket .team-template-image-legacy img {
+	max-width: 100%;
+	max-height: 100%;
+	width: auto;
+	height: auto;
+}
+
+.team-template-team-bracket > .team-template-text {
+	vertical-align: middle;
+}
+
+/* fix for timeline by FO-nTTaX */
+.timeline .team-template-team-standard {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: block;
+}
+
+.team-template-image-big img {
+	max-width: 300px;
+	max-height: 300px;
+	width: auto;
+	height: auto;
+}
+
+/*******************************************************************************
+Template(s): Dark Reader support
+Author(s): iMarbot, Darkrai
+*******************************************************************************/
+
+.team-template-image-icon.darkmode,
+.team-template-image-icon.team-template-darkmode,
+.team-template-image-legacy.team-template-darkmode {
+	display: none;
+}
+
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.team-template-image-icon.lightmode,
+	.team-template-image-icon.team-template-lightmode,
+	.team-template-image-legacy.team-template-lightmode {
+		display: none;
+	}
+
+	span.team-template-image-icon.darkmode,
+	span.team-template-image-icon.team-template-darkmode,
+	span.team-template-image-legacy.team-template-darkmode {
+		display: inline-block !important;
+	}
+}
+
+/*******************************************************************************
+Template(s): Group Table Hybrid
+Author(s): iMarbot
+*******************************************************************************/
+@media ( max-width: 399px ) {
+	.grouptableslot .team-template-text.mobile-hide {
+		display: none !important;
+	}
+
+	.grouptableslot .team-template-text.mobile-only {
+		display: unset !important;
+	}
+}
+
+@media ( min-width: 400px ) {
+	.grouptableslot .team-template-text.mobile-hide {
+		display: unset !important;
+	}
+
+	.grouptableslot .team-template-text.mobile-only {
+		display: none !important;
+	}
+}

@@ -1,0 +1,192 @@
+/*******************************************************************************
+Template(s): New match series templates
+Author(s): ???
+*******************************************************************************/
+table.matchseries-table-1,
+table.matchseries-table-2,
+table.matchseries-table-stats {
+	width: 695px;
+}
+
+table.matchseries-table-1 {
+	font-weight: bold;
+	margin-bottom: -1px !important;
+}
+
+.matchseries-table-1 .team1,
+.matchseries-table-1 .team2 {
+	background: #f2f2f2;
+	width: 45%;
+}
+
+.matchseries-table-1 .team1 {
+	padding-right: 50px;
+	text-align: right;
+}
+
+.matchseries-table-1 .team2 {
+	padding-left: 50px;
+	text-align: left;
+}
+
+.matchseries-table-1 .score {
+	text-align: center;
+	width: 5%;
+}
+
+table.matchseries-table-2 {
+	margin-top: 0 !important;
+}
+
+.matchseries-table-2 .date {
+	text-align: center;
+	padding-left: 40px;
+}
+
+.matchseries-table-2 .game {
+	font-weight: bold;
+	text-align: center;
+}
+
+.matchseries-table-2 .team1,
+.matchseries-table-2 .team2 {
+	width: 46%;
+}
+
+.matchseries-table-2 .team1.color-radiant-left,
+.matchseries-table-2 .team2.color-radiant-right {
+	background: #bcd985;
+}
+
+.matchseries-table-2 .team1.color-radiant-right,
+.matchseries-table-2 .team2.color-radiant-left {
+	background: #e79e7e;
+}
+
+.matchseries-table-2 .score1,
+.matchseries-table-2 .score2 {
+	width: 4%;
+	background: #f2f2f2;
+}
+
+.matchseries-table-2 .score1.winner-1,
+.matchseries-table-2 .score2.winner-2 {
+	background: #ccffcc;
+}
+
+.matchseries-table-2 .stats-table-container {
+	padding: 0;
+}
+
+table.matchseries-table-stats {
+	margin: -1px;
+}
+
+table.matchseries-table-stats > tr > td,
+table.matchseries-table-stats > * > tr > td {
+	padding: 1px !important;
+}
+
+.matchseries-table-stats .scoreboard-header,
+.matchseries-table-stats .faction,
+.matchseries-table-stats .scores-header {
+	font-size: 90%;
+}
+
+.matchseries-table-stats .picks,
+.matchseries-table-stats .bans {
+	background: #f2f2f2;
+	text-align: center;
+	letter-spacing: -3px;
+	white-space: nowrap;
+}
+
+.matchseries-table-stats .stats-header,
+.matchseries-table-stats .picks-bans-header {
+	font-size: 90%;
+}
+
+.matchseries-table-stats .stats-header th {
+	padding-left: 40px;
+}
+
+.matchseries-table-stats .picks-bans-header .match-id {
+	float: left;
+	width: 130px;
+	text-align: left;
+	padding-left: 3px;
+}
+
+.matchseries-table-stats .picks-bans-header .title {
+	float: left;
+	width: 412px;
+}
+
+.matchseries-table-stats .picks-bans-header .vod {
+	float: right;
+	width: 130px;
+	text-align: right;
+}
+
+.matchseries-table-stats .scores-header .hero,
+.matchseries-table-stats .scores-header .last-hits {
+	width: 38px;
+}
+
+.matchseries-table-stats .scores-header .lvl,
+.matchseries-table-stats .scores-header .kills,
+.matchseries-table-stats .scores-header .death,
+.matchseries-table-stats .scores-header .assists,
+.matchseries-table-stats .scores-header .denies {
+	width: 26px;
+}
+
+.matchseries-table-stats .scores-header .items {
+	width: 171px;
+}
+
+.matchseries-table-stats .scores-header .gpm,
+.matchseries-table-stats .scores-header .xpm {
+	width: 42px;
+}
+
+.matchseries-table-stats .faction.radiant th {
+	background: #bcd985;
+}
+
+.matchseries-table-stats .faction.dire th {
+	background: #e79e7e;
+}
+
+.matchseries-table-stats .player-row .hero {
+	padding: 0;
+}
+
+.matchseries-table-stats .player-row .player {
+	max-width: 156px;
+	overflow: hidden;
+	text-indent: 3px;
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.matchseries-table-stats .player-row .player .stand-in {
+	float: right;
+}
+
+.matchseries-table-stats .player-row .items {
+	letter-spacing: -3px;
+	padding: 2px;
+	width: 173px;
+	white-space: pre;
+}
+
+.matchseries-table-2 .wikitable,
+.matchseries-table-2 .wikitable {
+	margin: -1px;
+}
+
+.matchid-link {
+	float: right;
+}

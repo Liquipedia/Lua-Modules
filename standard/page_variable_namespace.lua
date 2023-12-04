@@ -16,19 +16,19 @@ local Namespace = Class.new(function(self, prefix)
 	self.prefix = prefix
 end)
 
----@param key string|number
+---@param key wikiVaribleKey
 ---@return string?
 function Namespace:get(key)
 	return StringUtils.nilIfEmpty(mw.ext.VariablesLua.var(self.prefix .. key))
 end
 
----@param key string|number
----@param value string|nil
+---@param key wikiVaribleKey
+---@param value wikiVariableValue
 function Namespace:set(key, value)
-	mw.ext.VariablesLua.vardefine(self.prefix .. key, StringUtils.nilIfEmpty(value))
+	mw.ext.VariablesLua.vardefine(self.prefix .. key, Logic.emptyOr(value))
 end
 
----@param key string|number
+---@param key wikiVaribleKey
 function Namespace:delete(key)
 	self:set(key, nil)
 end

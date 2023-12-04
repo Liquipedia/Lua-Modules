@@ -15,7 +15,15 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Deploy
+      - name: Resource Deploy
+        env:
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+        run: bash scripts/deploy_res.sh
+
+      - name: Lua Deploy
         env:
           WIKI_USER: ${{ secrets.LP_USER }}
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}

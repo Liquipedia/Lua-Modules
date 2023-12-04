@@ -15,7 +15,8 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'

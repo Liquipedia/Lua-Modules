@@ -13,7 +13,9 @@ local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MapsData = mw.loadData('Module:Maps/data')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local PageLink = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
@@ -73,6 +75,8 @@ local ESL_TIERS = {
 	['open cup'] = '[[File:ESL 2019 icon.png|20x20px|Open Cup]] Open Cup',
 }
 
+---@param frame Frame
+---@return Html|string
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_league = league
@@ -98,16 +102,23 @@ function CustomLeague.run(frame)
 	return league:createInfobox(frame)
 end
 
+---@return WidgetInjector
 function CustomLeague:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
-			Cell{name = 'Game version', content = {CustomLeague._displayGameVersion()}},
-			Cell{name = 'Server', content = {CustomLeague:_getServer()}}
+			Cell{name = 'Game Version', content = {
+				CustomLeague._displayGameVersion(),
+				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
+			}},
+			Cell{name = 'Server', content = CustomLeague._getServers(_args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
@@ -169,11 +180,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param number number|string
+---@return string
 function CustomLeague._displayParticipantNumber(number)
 	local numberOfReplacements
 	number, numberOfReplacements = string.gsub(number, '%+', '')
 
-	if numberOfReplacements > 0 then
+	if (tonumber(numberOfReplacements) or 0) > 0 then
 		return tostring(mw.html.create()
 			:node(mw.html.create('small'):wikitext('more than '))
 			:wikitext(number))
@@ -182,6 +195,7 @@ function CustomLeague._displayParticipantNumber(number)
 	return number
 end
 
+---@return string
 function CustomLeague._displayStartDateTime()
 	return Countdown._create{
 		date = Variables.varDefault('tournament_starttimeraw'),
@@ -189,11 +203,13 @@ function CustomLeague._displayStartDateTime()
 	}
 end
 
+---@param prefix string
+---@return string[]
 function CustomLeague._mapsDisplay(prefix)
 	local maps = CustomLeague._getMaps(prefix)
 
 	return {table.concat(
-		Array.map(maps, function(mapData)
+		Array.map(maps or {}, function(mapData)
 			return tostring(CustomLeague:_createNoWrappingSpan(
 				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
@@ -202,6 +218,7 @@ function CustomLeague._mapsDisplay(prefix)
 	)}
 end
 
+---@return string?
 function CustomLeague._displayGameVersion()
 	local patch = Variables.varDefault('tournament_patch')
 	local endPatch = Variables.varDefault('tournament_endpatch')
@@ -235,19 +252,20 @@ function CustomLeague._getGameVersion()
 	}
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
 end
 
-function CustomLeague:_getServer()
-	if String.isEmpty(_args.server) then
-		return nil
-	end
-
-	return '[[Server|' .. _args.server .. ']]'
+---@param args table
+---@return table
+function CustomLeague._getServers(args)
+	return Array.map(_league:getAllArgsForBase(args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	local name = self.name
@@ -320,6 +338,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	CustomLeague._getGameVersion()
 end
 
+---@return string?
 function CustomLeague._getFirstMatchTime()
 	local matchData = mw.ext.LiquipediaDB.lpdb('match', {
 		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
@@ -333,21 +352,33 @@ function CustomLeague._getFirstMatchTime()
 	end
 end
 
+---@param prefix string
+---@return {link: string, displayname: string}[]?
 function CustomLeague._getMaps(prefix)
 	if String.isEmpty(_args[prefix .. '1']) then
 		return
 	end
 	local mapArgs = _league:getAllArgsForBase(_args, prefix)
 
-	return Table.map(mapArgs, function(mapIndex, map)
-		map = mw.text.split(map, '|')
+	local maps = Table.map(mapArgs, function(mapIndex, map)
+		local splitMap = mw.text.split(map, '|')
+
+		splitMap[1] = (MapsData[splitMap[1]:lower()] or {}).name or splitMap[1]
+
 		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(splitMap[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or splitMap[#splitMap],
 		}
 	end)
+
+	Array.sortInPlaceBy(maps, Operator.property('link'))
+
+	return maps
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.game = GAMES[args.game]
@@ -369,16 +400,21 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.mode = CustomLeague._getMode()
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
+	lpdbData.extradata.server2 = args.server2
+	lpdbData.extradata.patch2 = args.patch2
+
 	return lpdbData
 end
 
+---@param content string|Html|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
+---@return string
 function CustomLeague._determineGame()
 	if _args.game and GAMES[_args.game:lower()] then
 		return _args.game:lower()
@@ -393,10 +429,14 @@ function CustomLeague._determineGame()
 	return GAME_FROZEN_THRONE
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:addParticipantTypeCategory(args)
 	return {(MODES[args.mode] or MODES.default).category .. ' Tournaments'}
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {'Tournaments'}
 
@@ -423,10 +463,13 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
+---@return string
 function CustomLeague._getMode()
 	return (MODES[_args.mode] or MODES.default).store
 end
 
+---@param args table
+---@return string?
 function CustomLeague:createLiquipediaTierDisplay(args)
 	local tierDisplay = Tier.display(args.liquipediatier, args.liquipediatiertype, {link = true, mode = args.mode})
 
@@ -437,6 +480,8 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
+---@param args table
+---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
 	local modeDisplay = (MODES[args.mode] or {}).tier
 	if not modeDisplay then

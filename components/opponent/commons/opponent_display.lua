@@ -40,7 +40,7 @@ OpponentDisplay.BracketOpponentEntry = Class.new(
 
 		if opponent.type == Opponent.team then
 			self:createTeam(opponent.template or 'tbd', options)
-		elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+		elseif Opponent.typeIsParty(opponent.type) then
 			self:createPlayers(opponent)
 		elseif opponent.type == Opponent.literal then
 			self:createLiteral(opponent.name or '')
@@ -115,9 +115,9 @@ end
 OpponentDisplay.propTypes.InlineOpponent = {
 	flip = 'boolean?',
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?', -- only affects Opponent.solo/Opponent.duo
-	showLink = 'boolean?', -- only affects Opponent.solo/Opponent.duo
-	dq = 'boolean?', -- only affects Opponent.solo/Opponent.duo
+	showFlag = 'boolean?', -- only affects parties
+	showLink = 'boolean?', -- only affects parties
+	dq = 'boolean?', -- only affects parties
 	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects Opponent.team
 }
 
@@ -144,7 +144,7 @@ function OpponentDisplay.InlineOpponent(props)
 		})
 	elseif opponent.type == Opponent.literal then
 		return opponent.name or ''
-	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
@@ -218,14 +218,26 @@ function OpponentDisplay.BlockOpponent(props)
 			name = opponent.name or '',
 			overflow = props.overflow,
 		})
-	elseif opponent.type == Opponent.solo or opponent.type == Opponent.duo then
+	elseif Opponent.typeIsParty(opponent.type) then
 		return OpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
 end
 
----@param props BlockOpponentProps
+---@class BlockPlayerProps
+---@field flip boolean?
+---@field opponent {players: standardPlayer[]?}
+---@field overflow OverflowModes?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field playerClass string?
+---@field dq boolean?
+---@field note string|number|nil
+
+---@param props BlockPlayerProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent

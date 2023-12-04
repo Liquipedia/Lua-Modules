@@ -278,6 +278,7 @@ function Team:_setLpdbData(args, links)
 		textlesslogo = args.teamcardimage,
 		textlesslogodark = args.teamcardimagedark,
 		earnings = earnings,
+		earningsbyyear = {},
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
@@ -292,6 +293,7 @@ function Team:_setLpdbData(args, links)
 
 	for year, earningsOfYear in pairs(self.earnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
@@ -302,6 +304,7 @@ function Team:_setLpdbData(args, links)
 	end
 
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear or {})
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
 end
 

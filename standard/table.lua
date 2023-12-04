@@ -27,11 +27,13 @@ end
 
 ---@param tbl table
 ---@param value any
+---@param isPattern boolean?
 ---@return boolean
-function Table.includes(tbl, value)
+function Table.includes(tbl, value, isPattern)
 	for _, entry in pairs(tbl) do
-		if entry == value then
-			return true
+		if isPattern and string.find(entry, value)
+			or not isPattern and entry == value then
+				return true
 		end
 	end
 	return false
@@ -96,9 +98,9 @@ function Table.isNotEmpty(tbl)
 end
 
 ---Shallow copies a table
----@generic K, V
----@param tbl {[K]: V}
----@return {[K]: V}
+---@generic T:table
+---@param tbl T
+---@return T
 function Table.copy(tbl)
 	local result = {}
 

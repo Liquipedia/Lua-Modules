@@ -1,0 +1,553 @@
+/*******************************************************************************
+Template(s): Prize pool tables
+Author(s): FO-nTTaX
+*******************************************************************************/
+
+table.prizepooltable:not( .collapsed ) .prizepooltableshow,
+table.prizepooltable.collapsed .prizepooltablehide {
+	display: none;
+}
+
+.prizepooltabletoggle {
+	cursor: pointer;
+}
+
+.prizepooltable-col-player,
+.prizepooltable-col-team {
+	min-width: 150px;
+}
+
+.prizepooltable-col-two-players {
+	min-width: 300px;
+}
+
+@media ( max-width: 600px ) {
+	.prizepooltable-col-team a:nth-child( 2 ) {
+		display: none;
+	}
+
+	.prizepooltable-col-team {
+		min-width: 65px;
+	}
+}
+
+html.client-js .prizepooltable.collapsed[ data-cutafter="0" ] tr:nth-child( n+3 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="1" ] tr:nth-child( n+4 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="2" ] tr:nth-child( n+5 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="3" ] tr:nth-child( n+6 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="4" ] tr:nth-child( n+7 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="5" ] tr:nth-child( n+8 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="6" ] tr:nth-child( n+9 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="7" ] tr:nth-child( n+10 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="8" ] tr:nth-child( n+11 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="9" ] tr:nth-child( n+12 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="10" ] tr:nth-child( n+13 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="11" ] tr:nth-child( n+14 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="12" ] tr:nth-child( n+15 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="13" ] tr:nth-child( n+16 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="14" ] tr:nth-child( n+17 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="15" ] tr:nth-child( n+18 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="16" ] tr:nth-child( n+19 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="17" ] tr:nth-child( n+20 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="18" ] tr:nth-child( n+21 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="19" ] tr:nth-child( n+22 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="20" ] tr:nth-child( n+23 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="21" ] tr:nth-child( n+24 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="22" ] tr:nth-child( n+25 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="23" ] tr:nth-child( n+26 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="24" ] tr:nth-child( n+27 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="25" ] tr:nth-child( n+28 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="26" ] tr:nth-child( n+29 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="27" ] tr:nth-child( n+30 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="28" ] tr:nth-child( n+31 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="29" ] tr:nth-child( n+32 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="30" ] tr:nth-child( n+33 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="31" ] tr:nth-child( n+34 ),
+html.client-js .prizepooltable.collapsed[ data-cutafter="32" ] tr:nth-child( n+35 ) {
+	display: none;
+}
+
+.prizepooltable-header {
+	background-color: var( --prize-pool-header-background-color, inherit );
+}
+
+body:not( .skin-bruinen ) .csstable-widget.prizepooltable {
+	border: 0.125rem solid var( --prize-pool-header-background-color );
+}
+
+body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-row,
+body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-cell {
+	border: 0;
+}
+
+body:not( .skin-bruinen ) .csstable-widget.prizepooltable .csstable-widget-row:nth-child( odd ):not( .prizepooltable-header ):not( .ppt-toggle-expand ) {
+	background-color: var( --prize-pool-alt-background-color );
+}
+
+/* Background colours */
+
+tr.bg-first,
+div.bg-first,
+tr.bg-p1,
+div.bg-p1,
+tr.background-color-first-place,
+div.background-color-first-place {
+	background-color: var( --prize-pool-background-color, #ffe982 );
+}
+
+body:not( .skin-bruinen ) tr.bg-first,
+body:not( .skin-bruinen ) div.bg-first,
+body:not( .skin-bruinen ) tr.bg-p1,
+body:not( .skin-bruinen ) div.bg-p1,
+body:not( .skin-bruinen ) tr.background-color-first-place,
+body:not( .skin-bruinen ) div.background-color-first-place,
+body:not( .skin-bruinen ) div.csstable-widget-row.background-color-first-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-gold, transparent );
+}
+
+body:not( .skin-bruinen ) tr.bg-first > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-first > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.bg-p1 > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-p1 > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.background-color-first-place > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.background-color-first-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-gold, inherit );
+	color: #ffffff;
+}
+
+tr.bg-second,
+div.bg-second,
+tr.bg-p2,
+div.bg-p2,
+tr.background-color-second-place,
+div.background-color-second-place {
+	background-color: var( --prize-pool-background-color, #eeeeee );
+}
+
+body:not( .skin-bruinen ) tr.bg-second,
+body:not( .skin-bruinen ) div.bg-second,
+body:not( .skin-bruinen ) tr.bg-p2,
+body:not( .skin-bruinen ) div.bg-p2,
+body:not( .skin-bruinen ) tr.background-color-second-place,
+body:not( .skin-bruinen ) div.background-color-second-place,
+body:not( .skin-bruinen ) div.csstable-widget-row.background-color-second-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-silver, transparent );
+}
+
+body:not( .skin-bruinen ) tr.bg-second > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-second > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.bg-p2 > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-p2 > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.background-color-second-place > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.background-color-second-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-silver, inherit );
+	color: #ffffff;
+}
+
+tr.bg-third,
+div.bg-third,
+tr.bg-p3,
+div.bg-p3,
+tr.background-color-third-place,
+div.background-color-third-place:not( :first-child ) {
+	background-color: var( --prize-pool-background-color, #f9e8c7 );
+}
+
+body:not( .skin-bruinen ) tr.bg-third,
+body:not( .skin-bruinen ) div.bg-third,
+body:not( .skin-bruinen ) tr.bg-p3,
+body:not( .skin-bruinen ) div.bg-p3,
+body:not( .skin-bruinen ) tr.background-color-third-place,
+body:not( .skin-bruinen ) div.background-color-third-place,
+body:not( .skin-bruinen ) div.csstable-widget-row.background-color-third-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-bronze, transparent );
+}
+
+body:not( .skin-bruinen ) tr.bg-third > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-third > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.bg-p3 > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-p3 > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.background-color-third-place > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.background-color-third-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-bronze, inherit );
+	color: #ffffff;
+}
+
+tr.bg-fourth,
+div.bg-fourth,
+tr.bg-p4,
+div.bg-p4,
+tr.background-color-fourth-place,
+div.background-color-fourth-place {
+	background-color: var( --prize-pool-background-color, #f9dec7 );
+}
+
+body:not( .skin-bruinen ) tr.bg-fourth,
+body:not( .skin-bruinen ) div.bg-fourth,
+body:not( .skin-bruinen ) tr.bg-p4,
+body:not( .skin-bruinen ) div.bg-p4,
+body:not( .skin-bruinen ) tr.background-color-fourth-place,
+body:not( .skin-bruinen ) div.background-color-fourth-place,
+body:not( .skin-bruinen ) div.csstable-widget-row.background-color-fourth-place > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --prize-pool-copper, transparent );
+}
+
+body:not( .skin-bruinen ) tr.bg-fourth > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-fourth > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.bg-p4 > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.bg-p4 > td.prizepooltable-place,
+body:not( .skin-bruinen ) tr.background-color-fourth-place > td.prizepooltable-place,
+body:not( .skin-bruinen ) div.background-color-fourth-place > *.prizepooltable-place {
+	background-color: var( --prize-pool-copper, inherit );
+	color: #ffffff;
+}
+
+tr.background-color-disqualified,
+div.background-color-disqualified {
+	background-color: #dee3ef;
+}
+
+tr.background-color-win,
+div.background-color-win {
+	background-color: #ddf4dd;
+}
+
+tr.background-color-lose,
+div.background-color-lose {
+	background-color: #fbdfdf;
+}
+
+tr.background-color-highlight,
+div.background-color-highlight {
+	background-color: #cce5ea;
+}
+
+.prizepooltable-background-variant {
+	background-color: var( --prize-pool-variant-background-color, #f2f2f2 );
+}
+
+/*******************************************************************************
+Template: Automated prize pool tables
+Author: warnull
+*******************************************************************************/
+
+.prize-pool-wrapper {
+	margin: -2px;
+	padding: 2px;
+}
+
+.prize-pool {
+	border-bottom: 1px solid #bbbbbb;
+	border-right: 1px solid #bbbbbb;
+	display: inline-grid;
+}
+
+@media ( max-width: 415px ) {
+	.prize-pool {
+		min-width: 100% !important;
+	}
+}
+
+.prize-pool-header {
+	display: contents;
+	background: #eaecf0;
+}
+
+.prize-pool-header > .prize-pool-cell {
+	font-weight: bold;
+}
+
+.prize-pool-cell {
+	align-items: center;
+	background-color: inherit;
+	border-left: 1px solid #bbbbbb;
+	border-top: 1px solid #bbbbbb;
+	display: flex;
+	min-width: 0;
+	padding: 5px;
+	text-align: center;
+}
+
+.prize-pool-cell-content {
+	flex: 1 1;
+	min-width: 0;
+}
+
+.prize-pool-toggle-expand {
+	display: contents;
+}
+
+.prize-pool-toggle-expand.prize-pool-toggle-expand.prize-pool-toggle-expand.prize-pool-toggle-expand > * {
+	color: unset;
+	grid-column: ~"1 / -1";
+	text-decoration: none;
+}
+
+.collapsed .prize-pool-toggle-expand > .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .prize-pool-toggle-expand > .general-collapsible-expand-button {
+	display: none;
+}
+
+.collapsed > .prize-pool-slot-area.prize-pool-hide-on-collapse {
+	display: none;
+}
+
+.prize-pool-slot-area {
+	display: contents;
+}
+
+.prize-pool-slot {
+	display: contents;
+	background-color: inherit;
+}
+
+.prize-pool-place {
+	font-weight: bold;
+	grid-column: place;
+	min-width: 80px;
+}
+
+@media ( max-width: 767px ) {
+	.prize-pool-place {
+		min-width: 60px;
+	}
+}
+
+.prize-pool-usd-prize {
+	grid-column: usd-prize;
+	min-width: 60px;
+}
+
+.prize-pool-local-prize {
+	grid-column: local-prize;
+	min-width: 60px;
+}
+
+.prize-pool-points {
+	grid-column: points;
+	max-width: 300px;
+	min-width: 40px;
+}
+
+.prize-pool-entry {
+	display: contents;
+	background-color: inherit;
+}
+
+.prize-pool-prime {
+	grid-column: prime;
+	min-width: 160px;
+}
+
+@media ( max-width: 767px ) {
+	.prize-pool-prime {
+		min-width: 80px;
+	}
+}
+
+.prize-pool-player {
+	text-align: left;
+	grid-column: prime;
+}
+
+.prize-pool-player-team {
+	grid-column: player-team;
+	min-width: 100px;
+}
+
+.prize-pool-entry > .prize-pool-player-team {
+	justify-content: left;
+	text-align: left;
+}
+
+.prize-pool-entry > .prize-pool-player:not( [ data-player-index="1" ] ),
+.prize-pool-entry > .prize-pool-player-team:not( [ data-player-index="1" ] ) {
+	border-top: 0;
+}
+
+.prize-pool-team {
+	grid-column: ~"prime / -1";
+	text-align: left;
+}
+
+.prize-pool-literal {
+	font-style: italic;
+	grid-column: ~"prime / -1";
+}
+
+.prize-pool-entry.brkts-opponent-hover::after {
+	content: none;
+}
+
+.brkts-opponent-hover > .prize-pool-cell {
+	position: relative;
+	transition: 0.5s;
+	transition-property: border-color;
+}
+
+.brkts-opponent-hover-active > .prize-pool-cell {
+	border-color: transparent;
+}
+
+.brkts-opponent-hover > .prize-pool-cell::after {
+	clip-path: inset( -5px 0 -5px -1px );
+	content: "";
+	height: 100%;
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	transition: 0.5s;
+	transition-property: box-shadow;
+	width: 100%;
+	z-index: 5;
+}
+
+.brkts-opponent-hover > .prize-pool-cell:first-child::after {
+	clip-path: inset( -5px 0 -5px -5px );
+}
+
+.brkts-opponent-hover > .prize-pool-cell:last-child::after {
+	clip-path: inset( -5px -5px -5px -1px );
+}
+
+.brkts-opponent-hover > .prize-pool-cell:only-child::after {
+	clip-path: inset( -5px );
+}
+
+.brkts-opponent-hover-active > .prize-pool-cell::after {
+	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
+}
+
+@supports not (display: contents) {
+	.prize-pool-header,
+	.prize-pool-slot-area,
+	.prize-pool-toggle-expand {
+		grid-column: ~"1 / -1";
+	}
+
+	.prize-pool-header {
+		display: grid;
+		grid-template-columns: repeat( 8, auto );
+	}
+
+	.prize-pool-slot-area {
+		display: grid;
+		grid-template-columns: 4fr 6fr;
+	}
+
+	.prize-pool-slot {
+		display: grid;
+		grid-template-columns: repeat( 6, auto );
+	}
+
+	.prize-pool-entry {
+		display: grid;
+		grid-column-start: 2;
+		grid-template-columns: ~"[prime] 1fr [player-team] 1fr";
+	}
+}
+
+/**
+ * Styles specific to starcraft/starcraft2
+ */
+
+.starcraft-prize-pool-special-prize {
+	grid-column: ~"prime / usd-prize";
+}
+
+.starcraft-prize-pool-archon-race {
+	grid-column: archon-race;
+	justify-content: center;
+}
+
+.starcraft-prize-external-archon {
+	background-color: inherit;
+	justify-content: center;
+	min-width: 40px;
+}
+
+.starcraft-prize-external-player {
+	align-items: center;
+	background-color: inherit;
+	display: flex;
+	justify-content: space-between;
+	min-width: 0;
+	min-width: 120px;
+	padding: 5px;
+	text-align: left;
+}
+
+/*******************************************************************************
+Template: (Standardized) prize pool tables
+Author: Rathoz
+*******************************************************************************/
+
+.collapsed > .ppt-hide-on-collapse {
+	display: none !important;
+}
+
+.collapsed .ppt-toggle-expand .general-collapsible-collapse-button,
+.general-collapsible:not( .collapsed ) .ppt-toggle-expand .general-collapsible-expand-button {
+	display: none !important;
+}
+
+.csstable-widget {
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	display: inline-grid;
+}
+
+.csstable-widget-row:not( .ppt-toggle-expand ) {
+	display: contents;
+}
+
+.csstable-widget-cell:not( .general-collapsible-collapse-button ):not( .general-collapsible-expand-button ) {
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	background: inherit;
+	padding: 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.ppt-toggle-expand {
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	padding: 4px;
+	text-align: center;
+}
+
+.ppt-toggle-expand.ppt-toggle-expand.ppt-toggle-expand.ppt-toggle-expand > * {
+	color: unset;
+	text-decoration: none;
+}
+
+.ppt-toggle-expand {
+	grid-column: ~"1 / -1";
+}
+
+/*******************************************************************************
+Template: (Standardized) prize pool section
+Author: iMarbot
+*******************************************************************************/
+
+.prizepool-section-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25em;
+}
+
+.prizepool-section-tables {
+	display: flex;
+	flex-flow: row wrap;
+	gap: 1em;
+}
+
+@media ( max-width: 600px ) {
+	.prizepool-section-tables > div {
+		min-width: 100%;
+	}
+}

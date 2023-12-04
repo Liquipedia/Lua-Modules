@@ -16,7 +16,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
-local MathUtils = require('Module:Math')
+local MathUtils = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -103,15 +103,15 @@ function CustomEarnings.calculate(conditions, queryYear, mode, perYear, aliases,
 	Lpdb.executeMassQuery('placement', queryParameters, sumUp)
 
 	if not perYear then
-		return MathUtils._round(totalEarnings)
+		return MathUtils.round(totalEarnings)
 	end
 
 	local totalEarningsByYear = {}
 	for year, earningsOfYear in pairs(sums) do
-		totalEarningsByYear[tonumber(year)] = MathUtils._round(earningsOfYear)
+		totalEarningsByYear[tonumber(year)] = MathUtils.round(earningsOfYear)
 	end
 
-	return MathUtils._round(totalEarnings), totalEarningsByYear
+	return MathUtils.round(totalEarnings), totalEarningsByYear
 end
 
 ---Determines the prize value earned from a placement

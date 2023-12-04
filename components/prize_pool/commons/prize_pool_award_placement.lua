@@ -12,7 +12,8 @@ local Table = require('Module:Table')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local _tbd_index = 0
 

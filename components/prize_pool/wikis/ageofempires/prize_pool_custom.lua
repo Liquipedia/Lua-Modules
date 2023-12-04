@@ -13,7 +13,8 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
 
@@ -24,6 +25,7 @@ local CustomPrizePool = {}
 
 local PRIZE_TYPE_QUALIFIES = 'QUALIFIES'
 local PRIZE_TYPE_POINTS = 'POINTS'
+local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
@@ -74,6 +76,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.qualified = Array.any(Array.filter(placement.parent.prizes, prizeIsQualifier), opponentHasPrize) and 1 or 0
+	if Variables.varDefault('tournament_liquipediatiertype') == QUALIFIER and lpdbData.qualified == 1 then
+		lpdbData.extradata.notabilitymod = '0'
+	end
 
 	-- Variable to communicate with TeamCards
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)

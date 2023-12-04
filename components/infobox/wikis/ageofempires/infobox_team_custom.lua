@@ -10,7 +10,8 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 local TeamTemplates = require('Module:Team')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
@@ -88,7 +89,7 @@ function CustomTeam._getGames()
 
 	local dateThreshold = os.date('!*t')
 	dateThreshold.year = dateThreshold.year - INACTIVITY_THRESHOLD_YEARS
-	dateThreshold = os.date('!%F', os.time(dateThreshold --[[@as osdate]]))
+	dateThreshold = os.date('!%F', os.time(dateThreshold --[[@as osdateparam]]))
 
 	local isActive = function(game)
 		local placement = CustomTeam._getLatestPlacement(game)

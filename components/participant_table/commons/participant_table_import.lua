@@ -11,7 +11,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
@@ -78,7 +79,7 @@ end
 ---@param opponentRecord table
 ---@return ParticipantTableEntry?
 function ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
-	local opponent = Opponent.fromMatch2Record(opponentRecord)
+	local opponent = Opponent.fromMatch2Record(opponentRecord) --[[@as standardOpponent]]
 	if  Opponent.isTbd(opponent) then
 		return
 	end

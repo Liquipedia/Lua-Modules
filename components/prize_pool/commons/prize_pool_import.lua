@@ -19,7 +19,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
 local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local AUTOMATION_START_DATE = '2023-01-01'
 local GROUPSCORE_DELIMITER = '/'
@@ -63,7 +64,7 @@ function Import._getConfig(args, placements)
 
 	return {
 		ignoreNonScoreEliminations = Logic.readBool(args.ignoreNonScoreEliminations),
-		importLimit = Import._importLimit(args.importLimit, placements),
+		importLimit = Import._importLimit(args.importLimit, placements, args.placementsExtendImportLimit),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
 		groupElimStatuses = Array.map(
@@ -104,10 +105,15 @@ function Import._enableImport(importInput)
 	)
 end
 
-function Import._importLimit(importLimitInput, placements)
+function Import._importLimit(importLimitInput, placements, placementsExtendImportLimit)
 	local importLimit = tonumber(importLimitInput)
+
 	if not importLimit then
 		return
+	end
+
+	if not Logic.readBool(placementsExtendImportLimit) then
+		return importLimit
 	end
 
 	-- if the number of entered entries is higher use that instead

@@ -154,6 +154,8 @@ function BaseResultsTable:create()
 	local splitData = Array.groupBy(data, function(placementData)
 		return placementData.date:sub(1,4)
 	end)
+	--we want to insert values for named keys hence table[][] would cause annotation warnings
+	---@cast splitData table[]
 
 	-- Set the header
 	Array.forEach(splitData, function(dataSet)
@@ -455,12 +457,12 @@ function BaseResultsTable:opponentDisplay(data, options)
 		}
 	elseif data.opponenttype ~= Opponent.team and (data.opponenttype ~= Opponent.solo or not options.teamForSolo) then
 		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data),
+			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 		}
 	elseif self.config.displayDefaultLogoAsIs then
 		return OpponentDisplay.BlockOpponent{
-			opponent = Opponent.fromLpdbStruct(data),
+			opponent = Opponent.fromLpdbStruct(data) --[[@as standardOpponent]],
 			flip = options.flip,
 			teamStyle = 'icon',
 		}
@@ -477,13 +479,13 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
+	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+
 	local teamDisplay = OpponentDisplay.BlockOpponent{
-		opponent = {template = teamTemplate, type = Opponent.team},
+		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},
 		flip = options.flip,
 		teamStyle = 'icon',
 	}
-
-	local rawTeamTemplate = Team.queryRaw(teamTemplate)
 
 	if self:shouldDisplayAdditionalText(rawTeamTemplate, not options.isLastVs) then
 		return BaseResultsTable.teamIconDisplayWithText(teamDisplay, rawTeamTemplate, options.flip)
