@@ -28,16 +28,17 @@ local _args
 local _team
 
 local STATISTICS = {
-	{name = 'races', name = 'Races'},
-	{name = 'wins', name = 'Wins'},
-	{name = 'podiums', name = 'Podiums'},
-	{name = 'poles', name = 'Pole positions'},
-	{name = 'fastestlaps', name = 'Fastest Laps'},
-	{name = 'points', name = 'Career Points'},
-	{name = 'firstentry', name = 'First entry'},
-	{name = 'firstwin', name = 'First win'},
-	{name = 'lastentry', name = 'Last entry'},
+	{key = 'races', name = 'Races'},
+	{key = 'wins', name = 'Wins'},
+	{key = 'podiums', name = 'Podiums'},
+	{key = 'poles', name = 'Pole positions'},
+	{key = 'fastestlaps', name = 'Fastest Laps'},
+	{key = 'points', name = 'Career Points'},
+	{key = 'firstentry', name = 'First entry'},
+	{key = 'firstwin', name = 'First win'},
+	{key = 'lastentry', name = 'Last entry'},
 }
+
 
 ---@param frame Frame
 function CustomTeam.run(frame)
@@ -105,7 +106,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.extradata = lpdbData.extradata or {}
 	lpdbData.extradata.previous = args.previous
 	lpdbData.extradata.previous2 = args.previous2
 	lpdbData.extradata.next = args.next
