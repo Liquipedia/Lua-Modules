@@ -42,10 +42,8 @@ return {
 	knownFactions = {'h', 'i', 'r'},
 	coreFactions = {'h', 'i'},
 	aliases = {
-		human = 'h',
 		hu = 'h',
 		vanguard = 'h',
-		infernal = 'i',
 		inf = 'i',
 		host = 'i',
 	},
