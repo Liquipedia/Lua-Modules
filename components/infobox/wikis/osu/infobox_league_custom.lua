@@ -95,11 +95,10 @@ end
 ---@return table
 function CustomLeague._getGameMode()
 	if String.isEmpty(_args.mode) then
-		return nil
+		return {}
 	end
 
-	local mode = MODES[string.lower(_args.mode or '')] or MODES['default']
-	return mode
+	return MODES[string.lower(_args.mode or '')] or MODES.default
 end
 
 ---@param args table
@@ -114,24 +113,10 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
 end
 
----@param content Html|string|number|nil
----@return Html
-function CustomLeague:_createNoWrappingSpan(content)
-	return mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-end
-
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if String.isNotEmpty(_args.mode) then
-		table.insert(categories, CustomLeague._getGameMode().category)
-	end
-
-	return categories
+	return {CustomLeague._getGameMode().category}
 end
 
 return CustomLeague
