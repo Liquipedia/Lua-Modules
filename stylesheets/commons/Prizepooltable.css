@@ -97,7 +97,7 @@ div.background-color-first-place {
 
 td.bg-first,
 td.bg-p1,
-td.background-color-first-place, {
+td.background-color-first-place {
 	background-color: var( --prize-pool-gold, #ffe982 );
 }
 
@@ -132,7 +132,7 @@ div.background-color-second-place {
 
 td.bg-second,
 td.bg-p2,
-td.background-color-second-place, {
+td.background-color-second-place {
 	background-color: var( --prize-pool-silver, #eeeeee );
 }
 
@@ -167,7 +167,7 @@ div.background-color-third-place:not( :first-child ) {
 
 td.bg-third,
 td.bg-p3,
-td.background-color-third-place, {
+td.background-color-third-place {
 	background-color: var( --prize-pool-bronze, #f9e8c7 );
 }
 
@@ -202,7 +202,7 @@ div.background-color-fourth-place {
 
 td.bg-fourth,
 td.bg-p4,
-td.background-color-fourth-place, {
+td.background-color-fourth-place {
 	background-color: var( --prize-pool-copper, #f9dec7 );
 }
 
