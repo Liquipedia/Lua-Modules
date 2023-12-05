@@ -4844,6 +4844,11 @@ Author(s): hjpalpha
 .theme--dark & {
 	img[ title="Human" ],
 	img[ title="Infernal" ],
+	img[ title="Orc" ],
+	img[ title="Undead" ],
+	img[ title="Night Elf" ],
+	img[ title="Nightelf" ],
+	img[ title="Multiple" ],
 	img[ title="Protoss" ],
 	img[ title="Zerg" ],
 	img[ title="Terran" ],
