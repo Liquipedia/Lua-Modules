@@ -164,6 +164,15 @@ function MatchMapsLegacy.handleLocation(args)
 	return args
 end
 
+-- invoked by Template:BracketMatchSummary
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.bracketMatchSummary(frame)
+	local args = Arguments.getArgs(frame)
+	args = MatchMapsLegacy.handleLocation(args)
+	return Json.stringify(args)
+end
+
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
 ---@return string|Html
@@ -176,7 +185,6 @@ function MatchMapsLegacy.convertMatch(frame)
 	args = MatchMapsLegacy.handleLiteralsForOpponents(args)
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy.copyDetailsToArgs(args, details)
-	args = MatchMapsLegacy.handleLocation(args)
 
 	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(args)
