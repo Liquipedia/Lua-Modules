@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2022,
+	startYear = 2023,
 	wikiName = 'stormgate',
 	name = 'Stormgate',
 	games = {
