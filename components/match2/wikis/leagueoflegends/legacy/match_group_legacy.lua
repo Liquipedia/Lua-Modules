@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=leagueoflegends
 -- page=Module:MatchGroup/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
