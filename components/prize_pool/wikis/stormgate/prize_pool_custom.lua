@@ -1,11 +1,11 @@
 ---
 -- @Liquipedia
 -- wiki=stormgate
--- page=Module:PrizePool/Award/Custom
+-- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Module:PrizePool/Award/Starcraft', {requireDevIfEnabled = true})
+return Lua.import('Module:PrizePool/Starcraft', {requireDevIfEnabled = true})
