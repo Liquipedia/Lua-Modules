@@ -11,14 +11,14 @@ local factionProps = {
 		bgClass = 'stormgate-human',
 		index = 1,
 		name = 'Human',
-		pageName = 'The Human Vanguard',
+		pageName = 'Human Vanguard',
 		faction = 'h',
 	},
 	i = {
 		bgClass = 'stormgate-ifernal',
 		index = 2,
 		name = 'Infernal',
-		pageName = 'The Infernal Host',
+		pageName = 'Infernal Host',
 		faction = 'i',
 	},
 	r = {
