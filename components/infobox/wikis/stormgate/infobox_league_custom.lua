@@ -39,6 +39,7 @@ local FALLBACK_DATE = '2999-99-99'
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
+mw.logObject('here')
 	local league = League(frame)
 	_league = league
 	_args = league.args
@@ -48,7 +49,7 @@ function CustomLeague.run(frame)
 	_args.raceBreakDown = RaceBreakdown.run(_args) or {}
 	_args.player_number = _args.raceBreakDown.total
 	_args.maps = CustomLeague._getMaps(_args)
-	_args.number = Logic.isNumeric(_args.number) and string.format('%05i', _args.number) or nil
+	_args.number = Logic.isNumeric(_args.number) and string.format('%05i', tonumber(_args.number)) or nil
 	--varDefault because it could have been set above the infobox via a template
 	_args.cancelled = CustomLeague._checkCancelled(_args)
 	_args.finished = CustomLeague._checkFinished(_args)
@@ -66,7 +67,6 @@ end
 function CustomLeague._checkCancelled(args)
 	return args.status == 'cancelled' or Logic.readBool(_args.cancelled or Variables.varDefault('cancelled tournament'))
 end
-
 
 ---@param args table
 ---@return boolean
@@ -250,3 +250,5 @@ end
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publishertier)
 end
+
+return CustomLeague
