@@ -39,7 +39,6 @@ local FALLBACK_DATE = '2999-99-99'
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
-mw.logObject('here')
 	local league = League(frame)
 	_league = league
 	_args = league.args
