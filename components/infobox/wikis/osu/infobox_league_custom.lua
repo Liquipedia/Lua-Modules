@@ -24,15 +24,15 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _MODES = {
-	standard = 'Standard[[Category:osu!standard Tournaments]]',
-	mania = 'Mania[[Category:osu!mania Tournaments]]',
-	['mania 4k'] = 'Mania (4 Keys)[[Category:osu!mania Tournaments]][[Category:osu!mania (4 Keys) Tournaments]]',
-	['mania 7k'] = 'Mania (7 Keys)[[Category:osu!mania Tournaments]][[Category:osu!mania (7 Keys) Tournaments]]',
-	taiko = 'Taiko[[Category:osu!taiko Tournaments]]',
-	catch = 'Catch[[Category:osu!catch Tournaments]]',
-	mixed  = 'Various Modes[[Category:Tournaments with Multiple game modes]]',
-	default = '[[Category:Unknown Mode Tournaments]]',
+local MODES = {
+	standard = {display = 'Standard', category = 'Osu!standard Tournaments'},
+	mania = {display = 'Mania', category = 'Osu!mania Tournaments'},
+	['mania 4k'] = {display = 'Mania (4 Keys)', category = 'Osu!mania (4 Keys) Tournaments'},
+	['mania 7k'] = {display = 'Mania (7 Keys)', category = 'Osu!mania (7 Keys) Tournaments'},
+	taiko = {display = 'Taiko', category = 'Osu!taiko Tournaments'},
+	catch = {display = 'Catch', category = 'Osu!catch Tournaments'},
+	mixed = {display = 'Various Modes', category = 'Tournaments with Multiple game modes'},
+	default = {display = 'Unknown', category = 'Unknown Mode Tournaments'},
 }
 
 ---@param frame Frame
@@ -45,6 +45,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -74,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{name = 'Game Mode', content = {
-					CustomLeague._getGameMode()
+					CustomLeague._getGameMode().display
 				}
 			},
 		}
@@ -97,7 +98,7 @@ function CustomLeague._getGameMode()
 		return nil
 	end
 
-	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
+	local mode = MODES[string.lower(_args.mode or '')] or MODES['default']
 	return mode
 end
 
@@ -119,6 +120,18 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
+end
+
+---@param args table
+---@return table
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
+	if String.isNotEmpty(_args.mode) then
+		table.insert(categories, CustomLeague._getGameMode().category)
+	end
+
+	return categories
 end
 
 return CustomLeague
