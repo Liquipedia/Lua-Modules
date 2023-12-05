@@ -96,7 +96,7 @@ function CustomTeam._statisticsCells(args)
 		return {}
 	end
 	local widgets = {Title{name = 'Team Statistics'}}
-	Array.forEach(STATISTICS, function(statsData) 
+	Array.forEach(STATISTICS, function(statsData)
 		table.insert(widgets, Cell{name = statsData.name, content = {args[statsData.key]}})
 	end)
 	return widgets
