@@ -4791,13 +4791,13 @@ Author(s): hjpalpha
 
 .Zerg,
 .warcraft-orc,
-.stormgate-ifernal,
+.stormgate-infernal,
 .Zerg th,
 .warcraft-orc th,
-.stormgate-ifernal th,
+.stormgate-infernal th,
 .Zerg td,
 .warcraft-orc td,
-.stormgate-ifernal td {
+.stormgate-infernal td {
 	background: var( --clr-cinnabar-90, #fad1d1 ) !important;
 }
 
@@ -4891,13 +4891,13 @@ Author(s): hjpalpha
 
 	.Zerg,
 	.warcraft-orc,
-	.stormgate-ifernal,
+	.stormgate-infernal,
 	.Zerg th,
 	.warcraft-orc th,
-	.stormgate-ifernal th,
+	.stormgate-infernal th,
 	.Zerg td,
 	.warcraft-orc td,
-	.stormgate-ifernal td {
+	.stormgate-infernal td {
 		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
 	}
 

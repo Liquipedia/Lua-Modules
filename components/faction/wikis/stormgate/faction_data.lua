@@ -15,7 +15,7 @@ local factionProps = {
 		faction = 'h',
 	},
 	i = {
-		bgClass = 'stormgate-ifernal',
+		bgClass = 'stormgate-infernal',
 		index = 2,
 		name = 'Infernal',
 		pageName = 'Infernal Host',
