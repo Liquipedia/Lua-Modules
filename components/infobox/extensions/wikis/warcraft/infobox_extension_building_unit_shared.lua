@@ -300,7 +300,7 @@ function CustomBuildingUnit.calculateMaxDamage(args, index)
 
 	local baseDamage = tonumber(args['dmgbase' .. index]) or 0
 	local diceDamage = tonumber(args['dmgdice' .. index]) or 1
-	local sidesDamage = tonumber(args.dmgsides) or 2
+	local sidesDamage = tonumber(args['dmgsides' .. index] or args.dmgsides) or 2
 
 	return baseDamage + diceDamage + sidesDamage
 end
