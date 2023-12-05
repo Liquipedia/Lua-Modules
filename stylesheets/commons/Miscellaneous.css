@@ -4791,19 +4791,25 @@ Author(s): hjpalpha
 
 .Zerg,
 .warcraft-orc,
+.stormgate-ifernal,
 .Zerg th,
 .warcraft-orc th,
+.stormgate-ifernal th,
 .Zerg td,
-.warcraft-orc td {
+.warcraft-orc td,
+.stormgate-ifernal td {
 	background: var( --clr-cinnabar-90, #fad1d1 ) !important;
 }
 
 .Terran,
 .warcraft-human,
+.stormgate-human,
 .Terran th,
 .warcraft-human th,
+.stormgate-human th,
 .Terran td,
-.warcraft-human td {
+.warcraft-human td,
+.stormgate-human td {
 	background: var( --clr-sapphire-90, #cce1ff ) !important;
 }
 
@@ -4836,6 +4842,8 @@ Author(s): hjpalpha
 
 [ data-darkreader-scheme="dark" ] &,
 .theme--dark & {
+	img[ title="Human" ],
+	img[ title="Infernal" ],
 	img[ title="Protoss" ],
 	img[ title="Zerg" ],
 	img[ title="Terran" ],
@@ -4866,19 +4874,25 @@ Author(s): hjpalpha
 
 	.Terran,
 	.warcraft-human,
+	.stormgate-human,
 	.Terran th,
 	.warcraft-human th,
+	.stormgate-human th,
 	.Terran td,
-	.warcraft-human td {
+	.warcraft-human td,
+	.stormgate-human td {
 		background: var( --clr-sapphire-20, #cce1ff ) !important;
 	}
 
 	.Zerg,
 	.warcraft-orc,
+	.stormgate-ifernal,
 	.Zerg th,
 	.warcraft-orc th,
+	.stormgate-ifernal th,
 	.Zerg td,
-	.warcraft-orc td {
+	.warcraft-orc td,
+	.stormgate-ifernal td {
 		background: var( --clr-cinnabar-20, #fad1d1 ) !important;
 	}
 
