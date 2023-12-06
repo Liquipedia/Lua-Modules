@@ -402,7 +402,6 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 
 	local pointsList = wrapper:tag('div')
 			:addClass('panel-content__container')
-			--:addClass('is--hidden')
 			:attr('data-js-battle-royale', 'collapsible-container')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
