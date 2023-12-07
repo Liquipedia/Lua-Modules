@@ -50,6 +50,11 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	-- If a custom override for LPDB exists, use it
 	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, lpdbPrefix) or lpdbData
 
+	-- Store aliases (page names) for opponenets for setting page vars
+	if Table.isNotEmpty(teamObject.aliases) then
+		lpdbData.extradata.opponentaliases = teamObject.aliases
+	end
+
 	-- Store into the standardized lpdb fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
 		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName} or Opponent.tbd(Opponent.team),
