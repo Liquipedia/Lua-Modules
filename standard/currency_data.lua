@@ -70,6 +70,15 @@ return {
 			text = 'лв.',
 		},
 	},
+	bhd = {
+		code = 'BHD',
+		name = 'Bahraini dinar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'د.ب',
+		},
+	},
 	bnd = {
 		code = 'BND',
 		name = 'Brunei Dollar',
