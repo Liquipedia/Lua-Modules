@@ -9,7 +9,7 @@
 local Legacy = {}
 
 local Arguments = require('Module:Arguments')
-local json = require('Module:Json')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchGroup = require('Module:MatchGroup')
@@ -101,7 +101,7 @@ function Legacy.getTemplate(frame)
 
 	local mapping = Legacy._getMapping(templateid)
 
-	local out = json.stringify(mapping, {pretty = true})
+	local out = Json.stringify(mapping, {pretty = true})
 		:gsub('"([^\n:"]-)":', '%1 = ')
 		:gsub('type =', '["type"] =')
 		:gsub(' = %[(.-)%]', ' = { %1 }')
@@ -128,7 +128,7 @@ function Legacy._convert(mapping)
 			for _, flattensource in ipairs(flatten) do
 				local toFlatten = _args[flattensource] or {}
 				if type(toFlatten) == 'string' then
-					toFlatten = json.parse(toFlatten)
+					toFlatten = Json.parse(toFlatten)
 				end
 				for key, val in pairs(toFlatten) do
 					flattened[key] = val
