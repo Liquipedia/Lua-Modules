@@ -156,7 +156,7 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	local participant = placement.opponentname
 	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
-		if Logic.isNotEmpty((placement.extradata or {}).opponentaliases) then
+		if Table.isNotEmpty((placement.extradata or {}).opponentaliases) then
 			Array.forEach(placement.extradata.opponentaliases, function(alias)
 				HiddenDataBox._setWikiVariableForParticipantKey(alias, participantResolved, key, value)
 			end)
