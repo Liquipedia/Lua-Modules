@@ -119,17 +119,17 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{
 			name = Abbreviation.make('Years active (caster)', 'Years active as a caster'),
-			content = {CustomPlayer._getActiveCasterYears()}
+			content = {_player:_getActiveCasterYears()}
 		},
 	}
 end
 
 ---@return string|nil
-function CustomPlayer._getActiveCasterYears()
+function CustomPlayer:_getActiveCasterYears()
 	if Namespace.isMain() then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			query = 'year::date',
-			conditions = '[[page::' .. _player.pagename .. ']] OR [[page::' .. _player.pagename:gsub(' ', '_') .. ']]',
+			conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
 			limit = 5000,
 		})
 
@@ -147,14 +147,14 @@ end
 ---@return Html?
 function CustomPlayer:createBottomContent()
 	if Namespace.isMain() then
-		return MatchTicker.participant({player = self.pagename}, _player.recentMatches)
+		return MatchTicker.participant({player = self.pagename})
 	end
 end
 
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	local args = _player.args
+	local args = self.args
 	for _, faction in pairs(self:readFactions(args.race)) do
 		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
