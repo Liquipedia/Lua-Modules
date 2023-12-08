@@ -18,6 +18,7 @@ local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local MatchTicker = Lua.import('Module:MatchTicker/Custom', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
@@ -25,22 +26,22 @@ local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local ROLES = {
-	analyst = {category = 'Analysts', variable = 'Analyst', personType = 'Talent'},
-	observer = {category = 'Observers', variable = 'Observer', personType = 'Talent'},
-	host = {category = 'Hosts', variable = 'Host', personType = 'Talent'},
-	journalist = {category = 'Journalists', variable = 'Journalist', personType = 'Talent'},
-	expert = {category = 'Experts', variable = 'Expert', personType = 'Talent'},
-	caster = {category = 'Casters', variable = 'Caster', personType = 'Talent'},
-	talent = {category = 'Talents', variable = 'Talent', personType = 'Talent'},
-	streamer = {category = 'Streamers', variable = 'Streamer', personType = 'Talent'},
-	interviewer = {category = 'Interviewers', variable = 'Interviewer', personType = 'Talent'},
-	photographer = {category = 'Photographers', variable = 'Photographer', personType = 'Talent'},
-	organizer = {category = 'Organizers', variable = 'Organizer', personType = 'Staff'},
-	coach = {category = 'Coaches', variable = 'Coach', personType = 'Staff'},
-	admin = {category = 'Admins', variable = 'Admin', personType = 'Staff'},
-	manager = {category = 'Managers', variable = 'Manager', personType = 'Staff'},
-	producer = {category = 'Producers', variable = 'Producer', personType = 'Staff'},
-	player = {category = 'Players', variable = 'Player', personType = 'Player'},
+	analyst = {category = 'Analyst', variable = 'Analyst', personType = 'Talent'},
+	observer = {category = 'Observer', variable = 'Observer', personType = 'Talent'},
+	host = {category = 'Host', variable = 'Host', personType = 'Talent'},
+	journalist = {category = 'Journalist', variable = 'Journalist', personType = 'Talent'},
+	expert = {category = 'Expert', variable = 'Expert', personType = 'Talent'},
+	caster = {category = 'Caster', variable = 'Caster', personType = 'Talent'},
+	talent = {category = 'Talent', variable = 'Talent', personType = 'Talent'},
+	streamer = {category = 'Streamer', variable = 'Streamer', personType = 'Talent'},
+	interviewer = {category = 'Interviewer', variable = 'Interviewer', personType = 'Talent'},
+	photographer = {category = 'Photographer', variable = 'Photographer', personType = 'Talent'},
+	organizer = {category = 'Organizer', variable = 'Organizer', personType = 'Staff'},
+	coach = {category = 'Coache', variable = 'Coach', personType = 'Staff'},
+	admin = {category = 'Admin', variable = 'Admin', personType = 'Staff'},
+	manager = {category = 'Manager', variable = 'Manager', personType = 'Staff'},
+	producer = {category = 'Producer', variable = 'Producer', personType = 'Staff'},
+	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
 ROLES.commentator = ROLES.caster
 ROLES['tournament organizer'] = ROLES.organizer
@@ -125,20 +126,16 @@ function CustomInjector:addCustomCells(widgets)
 end
 
 function CustomPlayer._getActiveCasterYears()
-	if _player.shouldQueryData then
+	if Namespace.isMain() then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			query = 'year::date',
 			conditions = '[[page::' .. _player.pagename .. ']] OR [[page::' .. _player.pagename:gsub(' ', '_') .. ']]',
 			limit = 5000,
 		})
 
-		local years = {}
-		for _, broadCastItem in pairs(queryData) do
-			local year = broadCastItem.year_date
-			years[tonumber(year)] = year
-		end
+		local years = Array.map(queryData, function(item) return tonumber(item.year_date) end)
 
-		return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
+		return Table.isNotEmpty(years) and YearsActive._displayYears(years) or nil
 	end
 end
 
@@ -147,43 +144,9 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if _player.shouldQueryData then
+	if Namespace.isMain() then
 		return MatchTicker.participant({player = self.pagename}, _player.recentMatches)
 	end
-end
-
-function CustomPlayer._getYearsActive(years)
-	local yearsActive = ''
-	local tempYear = nil
-	local firstYear = true
-
-	for i = 2010, CURRENT_YEAR do
-		if years[i] then
-			if (not tempYear) and (i ~= CURRENT_YEAR) then
-				if firstYear then
-					firstYear = false
-				else
-					yearsActive = yearsActive .. '<br/>'
-				end
-				yearsActive = yearsActive .. years[i]
-				tempYear = years[i]
-			end
-			if i == CURRENT_YEAR then
-				if tempYear then
-					yearsActive = yearsActive .. '&nbsp;-&nbsp;<b>Present</b>'
-				else
-					yearsActive = yearsActive .. '<br/><b>Present</b>'
-				end
-			elseif not years[i + 1] then
-				if tempYear ~= years[i] then
-					yearsActive = yearsActive .. '&nbsp;-&nbsp;' .. years[i]
-				end
-				tempYear = nil
-			end
-		end
-	end
-
-	return yearsActive
 end
 
 function CustomPlayer:getWikiCategories(categories)
