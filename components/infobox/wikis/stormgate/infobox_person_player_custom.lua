@@ -57,6 +57,8 @@ local CustomInjector = Class.new(Injector)
 
 local _player
 
+---@param frame Frame
+---@return string
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	_player = player
@@ -66,16 +68,12 @@ function CustomPlayer.run(frame)
 		addlpdbdata = Namespace.isMain(),
 	}
 
---[[
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getWikiCategories = CustomPlayer.getWikiCategories
-	player.nameDisplay = CustomPlayer.nameDisplay
-]]
-
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = _player.args
 	if id == 'status' then
@@ -107,6 +105,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	return {
 		Cell{
@@ -125,6 +125,7 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
+---@return string|nil
 function CustomPlayer._getActiveCasterYears()
 	if Namespace.isMain() then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
@@ -139,16 +140,20 @@ function CustomPlayer._getActiveCasterYears()
 	end
 end
 
+---@return CustomWidgetInjector
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomPlayer:createBottomContent(infobox)
+---@return Html?
+function CustomPlayer:createBottomContent()
 	if Namespace.isMain() then
 		return MatchTicker.participant({player = self.pagename}, _player.recentMatches)
 	end
 end
 
+---@param categories string[]
+---@return string[]
 function CustomPlayer:getWikiCategories(categories)
 	local args = _player.args
 	for _, faction in pairs(self:readFactions(args.race)) do
