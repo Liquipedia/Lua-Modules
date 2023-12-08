@@ -138,20 +138,18 @@ Author(s): ???
 	}
 }
 
-@media ( max-width: 1600px ) {
-	.teamcard-toggle-button {
-		height: 40px;
-	}
+.teamcard-toggle-button {
+	height: 40px;
 }
 
 .teamcard-toggle-button button {
-	margin: 0 0 10px 10px;
 	width: fit-content;
+	margin-left: 10px;
 	float: right;
 }
 
 .teamcard-toggle-button-left button {
-	margin: 0 10px 10px 0;
+	margin-right: 10px;
 	float: left;
 }
 
