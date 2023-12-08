@@ -138,8 +138,10 @@ Author(s): ???
 	}
 }
 
-.teamcard-toggle-button {
-	height: 40px;
+@media ( max-width: 1600px ) {
+	.teamcard-toggle-button {
+		height: 40px;
+	}
 }
 
 .teamcard-toggle-button button {
