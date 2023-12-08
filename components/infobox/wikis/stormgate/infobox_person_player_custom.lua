@@ -18,7 +18,6 @@ local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
 local MatchTicker = Lua.import('Module:MatchTicker/Custom', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
