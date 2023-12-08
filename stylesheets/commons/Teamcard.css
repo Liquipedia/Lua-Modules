@@ -139,17 +139,18 @@ Author(s): ???
 }
 
 .teamcard-toggle-button {
+	display: flow-root;
 	height: 40px;
 }
 
 .teamcard-toggle-button button {
+	margin: 0 0 10px 10px;
 	width: fit-content;
-	margin-left: 10px;
 	float: right;
 }
 
 .teamcard-toggle-button-left button {
-	margin-right: 10px;
+	margin: 0 10px 10px 0;
 	float: left;
 }
 
