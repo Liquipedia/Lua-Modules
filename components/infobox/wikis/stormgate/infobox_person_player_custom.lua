@@ -136,7 +136,7 @@ function CustomPlayer._getActiveCasterYears()
 
 		local years = Array.map(queryData, function(item) return tonumber(item.year_date) end)
 
-		return Table.isNotEmpty(years) and YearsActive._displayYears(years) or nil
+		return Table.isNotEmpty(years) and YearsActive.displayYears(years) or nil
 	end
 end
 
