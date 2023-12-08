@@ -114,13 +114,6 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
----@param role string?
----@return boolean
-function CustomPlayer._isNotPlayer(role)
-	local roleData = ROLES[(role or ''):lower()]
-	return roleData and (roleData.talent or roleData.staff)
-end
-
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
