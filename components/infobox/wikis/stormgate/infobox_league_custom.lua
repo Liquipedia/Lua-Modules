@@ -49,6 +49,7 @@ function CustomLeague.run(frame)
 	_args.maps = CustomLeague._getMaps(_args)
 	_args.number = Logic.isNumeric(_args.number) and string.format('%05i', tonumber(_args.number)) or nil
 	--varDefault because it could have been set above the infobox via a template
+	_args.status = _args.status or Variables.varDefault('tournament_status')
 	_args.cancelled = CustomLeague._checkCancelled(_args)
 	_args.finished = CustomLeague._checkFinished(_args)
 
@@ -182,8 +183,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.publishertier)))
 	Variables.varDefine('tournament_series_number', args.number)
 	Variables.varDefine('tournament_maps', args.maps and Json.stringify(args.maps) or '')
-
-	Variables.varDefine('tournament_series_number', tostring(args.cancelled))
 end
 
 ---@param args table
