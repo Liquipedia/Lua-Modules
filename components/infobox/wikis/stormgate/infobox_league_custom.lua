@@ -108,7 +108,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game version', content = {CustomLeague._getGameVersion(_args)}})
+		table.insert(widgets, Cell{name = 'Game Version', content = {CustomLeague._getGameVersion(_args)}})
 	elseif id == 'customcontent' then
 		if _args.player_number and _args.player_number > 0 then
 			Array.appendWith(widgets,
@@ -122,7 +122,7 @@ function CustomInjector:parse(id, widgets)
 		if (tonumber(_args.team_number) or 0) > 0 then
 			Array.appendWith(widgets,
 				Title{name = 'Teams'},
-				Cell{name = 'Number of teams', content = {_args.team_number}}
+				Cell{name = 'Number of Teams', content = {_args.team_number}}
 			)
 		end
 
@@ -226,10 +226,9 @@ end
 ---@param content string|Html|number|nil
 ---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
+	return mw.html.create('span')
+		:css('white-space', 'nowrap')
 		:node(content)
-	return span
 end
 
 ---@param item string?

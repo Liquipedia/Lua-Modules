@@ -113,12 +113,12 @@ function CustomInjector:addCustomCells(widgets)
 			content = {_player.earningsPerYear[CURRENT_YEAR]}
 		},
 		Cell{
-			name = Abbreviation.make('Years active', 'Years active as a player'),
+			name = Abbreviation.make('Years Active', 'Years active as a player'),
 			content = {YearsActive.display({player = _player.pagename})
 		}
 		},
 		Cell{
-			name = Abbreviation.make('Years active (caster)', 'Years active as a caster'),
+			name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
 			content = {_player:_getActiveCasterYears()}
 		},
 	}
