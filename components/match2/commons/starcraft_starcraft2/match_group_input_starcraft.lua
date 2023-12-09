@@ -39,10 +39,6 @@ local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
 	team = 'team',
 	literal = 'literal',
 }
-local TBD_STRINGS = {
-	'definitions',
-	'tbd'
-}
 
 local getStarcraftFfaInputModule = FnUtil.memoize(function()
 	return Lua.import('Module:MatchGroup/Input/Starcraft/Ffa', {requireDevIfEnabled = true})
