@@ -484,11 +484,20 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	local name = Variables.varDefault(varPrefix)
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
-		insertIntoPlayers{
-			pageName = name,
-			displayName = Variables.varDefault(varPrefix .. 'dn'),
-			flag = Variables.varDefault(varPrefix .. 'flag'),
-		}
+
+		local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
+		local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
+		local timestampLocal = (match.timestamp or DateExt.epochZero) - DateExt.getOffsetSeconds(match.timezoneOffset or '')
+
+		local wasPresentInMatch = not match.timestamp or not (joinDate or leaveDate) or
+			((not joinDate or (joinDate <= timestampLocal)) and (not leaveDate or (leaveDate > timestampLocal)))
+		if wasPresentInMatch then
+			insertIntoPlayers{
+				pageName = name,
+				displayName = Variables.varDefault(varPrefix .. 'dn'),
+				flag = Variables.varDefault(varPrefix .. 'flag'),
+			}
+		end
 		playerIndex = playerIndex + 1
 		varPrefix = teamName .. '_p' .. playerIndex
 		name = Variables.varDefault(varPrefix)
