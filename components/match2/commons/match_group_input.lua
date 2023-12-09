@@ -490,7 +490,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
 			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
 			if joinDate or leaveDate then
-				local timestampLocal = match.timestamp - DateExt.getOffsetSeconds(match.timezoneOffset or '')
+				local timestampLocal = match.timestamp + DateExt.getOffsetSeconds(match.timezoneOffset or '')
 				wasPresentInMatch = (not joinDate or (joinDate <= timestampLocal)) and
 					(not leaveDate or (leaveDate > timestampLocal))
 			end
