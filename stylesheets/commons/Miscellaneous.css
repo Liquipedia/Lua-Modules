@@ -4803,13 +4803,13 @@ Author(s): hjpalpha
 
 .Terran,
 .warcraft-human,
-.stormgate-human,
+.stormgate-vanguard,
 .Terran th,
 .warcraft-human th,
-.stormgate-human th,
+.stormgate-vanguard th,
 .Terran td,
 .warcraft-human td,
-.stormgate-human td {
+.stormgate-vanguard td {
 	background: var( --clr-sapphire-90, #cce1ff ) !important;
 }
 
@@ -4879,13 +4879,13 @@ Author(s): hjpalpha
 
 	.Terran,
 	.warcraft-human,
-	.stormgate-human,
+	.stormgate-vanguard,
 	.Terran th,
 	.warcraft-human th,
-	.stormgate-human th,
+	.stormgate-vanguard th,
 	.Terran td,
 	.warcraft-human td,
-	.stormgate-human td {
+	.stormgate-vanguard td {
 		background: var( --clr-sapphire-20, #cce1ff ) !important;
 	}
 

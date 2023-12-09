@@ -7,7 +7,7 @@
 --
 
 local byFaction = {
-	h = {
+	v = {
 		icon = 'File:Stormgate_Human_Vanguard_default_allmode.png',
 	},
 	i = {

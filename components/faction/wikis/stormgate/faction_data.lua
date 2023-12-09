@@ -7,12 +7,12 @@
 --
 
 local factionProps = {
-	h = {
-		bgClass = 'stormgate-human',
+	v = {
+		bgClass = 'stormgate-vanguard',
 		index = 1,
-		name = 'Human',
+		name = 'Vanguard',
 		pageName = 'Human Vanguard',
-		faction = 'h',
+		faction = 'v',
 	},
 	i = {
 		bgClass = 'stormgate-infernal',
@@ -38,13 +38,11 @@ local factionProps = {
 return {
 	factionProps = factionProps,
 	defaultFaction = 'u',
-	factions = {'h', 'i', 'r', 'u'},
-	knownFactions = {'h', 'i', 'r'},
-	coreFactions = {'h', 'i'},
+	factions = {'v', 'i', 'r', 'u'},
+	knownFactions = {'v', 'i', 'r'},
+	coreFactions = {'v', 'i'},
 	aliases = {
-		hu = 'h',
-		vanguard = 'h',
-		inf = 'i',
+		human = 'v',
 		host = 'i',
 	},
 }
