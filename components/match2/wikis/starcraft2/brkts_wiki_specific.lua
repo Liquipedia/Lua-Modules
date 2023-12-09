@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true})
+local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 
 ---@class Starcraft2BrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
@@ -27,12 +28,19 @@ end)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
-		return MatchList.MatchlistContainer
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
 
 	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
-	return Bracket.BracketContainer
+	return WikiSpecific.adjustMatchGroupContainerConfig(Bracket.BracketContainer)
+end
+
+function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
+	return function(props, matches)
+		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer})
+		return displayContainer(Table.merge(props, {config = config}), matches)
+	end
 end
 
 function WikiSpecific.getMatchContainer(displayMode)
