@@ -500,7 +500,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 				(not leaveDate or (leaveDate > timestampLocal))
 		end
 
-		if wasPresentInMatch then
+		if wasPresentInMatch() then
 			insertIntoPlayers{
 				pageName = name,
 				displayName = Variables.varDefault(varPrefix .. 'dn'),
