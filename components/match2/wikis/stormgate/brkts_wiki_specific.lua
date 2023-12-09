@@ -25,16 +25,30 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
+---@param matchGroupType string
+---@return function
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
-		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist/Starcraft', {requireDevIfEnabled = true})
-		return MatchList.MatchlistContainer
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
 
-	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Starcraft', {requireDevIfEnabled = true})
-	return Bracket.BracketContainer
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+	return WikiSpecific.adjustMatchGroupContainerConfig(Bracket.BracketContainer)
 end
 
+---@param displayContainer function
+---@return function
+function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
+	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
+	return function(props, matches)
+		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer})
+		return displayContainer(Table.merge(props, {config = config}), matches)
+	end
+end
+
+---@param displayMode string
+---@return function?
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
