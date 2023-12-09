@@ -25,6 +25,8 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 	return InputModule.processMatch
 end)
 
+---@param matchGroupType string
+---@return function
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	if matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
@@ -35,6 +37,8 @@ function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return WikiSpecific.adjustMatchGroupContainerConfig(Bracket.BracketContainer)
 end
 
+---@param displayContainer function
+---@return function
 function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
 	return function(props, matches)
@@ -43,6 +47,8 @@ function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	end
 end
 
+---@param displayMode string
+---@return function?
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
