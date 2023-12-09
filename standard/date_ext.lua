@@ -119,4 +119,11 @@ function DateExt.parseIsoDate(str)
 	return {year = year, month = month, day = day}
 end
 
+--- Converts a timezone offset (e.g. `+2:00`) to a UTC offset in seconds.
+---@param offsetString string
+---@return integer?
+function DateExt.getOffsetSeconds(offsetString)
+	return tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. offsetString))
+end
+
 return DateExt
