@@ -76,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return CustomWidgetInjector
+---@return WidgetInjector
 function CustomTeam:createWidgetInjector()
 	return CustomInjector()
 end

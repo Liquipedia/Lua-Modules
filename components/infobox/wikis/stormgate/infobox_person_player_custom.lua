@@ -139,7 +139,7 @@ function CustomPlayer:_getActiveCasterYears()
 	end
 end
 
----@return CustomWidgetInjector
+---@return WidgetInjector
 function CustomPlayer:createWidgetInjector()
 	return CustomInjector()
 end
