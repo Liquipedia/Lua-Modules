@@ -51,9 +51,6 @@ WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
 	return StarcraftMatchGroupUtil.matchHasDetails
 end)
 
---Default Logo for Teams without Team Template
-WikiSpecific.defaultIcon = 'StarCraft 2 Default logo.png'
-
 -- useless functions that should be present for some default checks
 -- would get called from Module:Match/Subobjects if we wouldn't circumvent that module completly
 WikiSpecific.processMap = FnUtil.identity

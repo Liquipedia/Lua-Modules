@@ -23,8 +23,6 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabl
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
 
-local defaultIcon
-
 local _MAX_NUM_MAPS = config.MAX_NUM_MAPS or 20
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local _CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
@@ -638,31 +636,12 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 end
 
 function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
-	local customTeam = Logic.readBool(opponent.default)
-		or Logic.readBool(opponent.defaulticon)
-		or Logic.readBool(opponent.custom)
-	local name
-	local icon
-	local iconDark
+	local name, icon, iconDark
 
-	if customTeam then
-		if not defaultIcon then
-			defaultIcon = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true}).defaultIcon
-		end
-		opponent.template = 'default'
-		icon = defaultIcon
-		name = Logic.emptyOr(opponent.link, opponent.name, opponent[1] or ''):gsub(' ', '_')
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.display = Logic.emptyOr(opponent.name, opponent[1], '')
-		opponent.extradata.short = Logic.emptyOr(opponent.short, opponent.name, opponent[1] or '')
-		opponent.extradata.bracket = Logic.emptyOr(opponent.bracket, opponent.name, opponent[1] or '')
-	else
-		opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], '')--[[@as string]])
-		if String.isEmpty(opponent.template) then
-			opponent.template = 'tbd'
-		end
-		name, icon, iconDark, opponent.template = StarcraftMatchGroupInput._processTeamTemplateInput(opponent.template, date)
-	end
+	opponent.template = string.lower(Logic.emptyOr(opponent.template, opponent[1], 'tbd')--[[@as string]])
+
+	name, icon, iconDark, opponent.template = StarcraftMatchGroupInput._processTeamTemplateInput(opponent.template, date)
+
 	name = TeamTemplate.resolveRedirect(name or '')
 	local players = StarcraftMatchGroupInput._getManuallyEnteredPlayers(opponent.players)
 	if Logic.isEmpty(players) then
