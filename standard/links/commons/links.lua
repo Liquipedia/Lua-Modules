@@ -120,6 +120,7 @@ local PREFIXES = {
 		team = 'https://old.letsplay.live/team/',
 		player = 'https://old.letsplay.live/profile/',
 	},
+	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},

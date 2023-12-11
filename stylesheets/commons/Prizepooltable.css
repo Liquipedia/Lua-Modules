@@ -95,6 +95,12 @@ div.background-color-first-place {
 	background-color: var( --prize-pool-background-color, #ffe982 );
 }
 
+td.bg-first,
+td.bg-p1,
+td.background-color-first-place {
+	background-color: var( --prize-pool-gold, #ffe982 );
+}
+
 body:not( .skin-bruinen ) tr.bg-first,
 body:not( .skin-bruinen ) div.bg-first,
 body:not( .skin-bruinen ) tr.bg-p1,
@@ -122,6 +128,12 @@ div.bg-p2,
 tr.background-color-second-place,
 div.background-color-second-place {
 	background-color: var( --prize-pool-background-color, #eeeeee );
+}
+
+td.bg-second,
+td.bg-p2,
+td.background-color-second-place {
+	background-color: var( --prize-pool-silver, #eeeeee );
 }
 
 body:not( .skin-bruinen ) tr.bg-second,
@@ -153,6 +165,12 @@ div.background-color-third-place:not( :first-child ) {
 	background-color: var( --prize-pool-background-color, #f9e8c7 );
 }
 
+td.bg-third,
+td.bg-p3,
+td.background-color-third-place {
+	background-color: var( --prize-pool-bronze, #f9e8c7 );
+}
+
 body:not( .skin-bruinen ) tr.bg-third,
 body:not( .skin-bruinen ) div.bg-third,
 body:not( .skin-bruinen ) tr.bg-p3,
@@ -180,6 +198,12 @@ div.bg-p4,
 tr.background-color-fourth-place,
 div.background-color-fourth-place {
 	background-color: var( --prize-pool-background-color, #f9dec7 );
+}
+
+td.bg-fourth,
+td.bg-p4,
+td.background-color-fourth-place {
+	background-color: var( --prize-pool-copper, #f9dec7 );
 }
 
 body:not( .skin-bruinen ) tr.bg-fourth,

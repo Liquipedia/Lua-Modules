@@ -61,6 +61,7 @@ return {
 		'discord',
 		'facebook',
 		'instagram',
+		'linkedin',
 		'privsteam',
 		'pubsteam',
 		'reddit',
