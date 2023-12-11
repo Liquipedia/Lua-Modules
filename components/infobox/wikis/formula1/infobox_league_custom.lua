@@ -48,7 +48,10 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Fastest Lap', content = {_args.fastestlap}},
 		Cell{name = 'Number of Races', content = {_args.numberofraces}},
 		Cell{name = 'Number of Drivers', content = {_args.driver_number}},
-		Cell{name = 'Number of Teams', content = {_args.team_number}}
+		Cell{name = 'Number of Teams', content = {_args.team_number}},
+		Cell{name = 'Engine', content = {_args.engine}},
+		Cell{name = 'Tyres', content = {_args.tyres}},
+		Cell{name = 'Chassis', content = {_args.chassis}}
 	)
 end
 
