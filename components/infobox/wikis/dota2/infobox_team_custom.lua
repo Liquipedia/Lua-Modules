@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
