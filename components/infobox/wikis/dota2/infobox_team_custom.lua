@@ -34,8 +34,7 @@ function CustomTeam.run(frame)
 
 	-- Automatic achievements
 	team.args.achievements = Achievements.team{
-		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS,
-		spacedIcons = true,
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
 
 	-- Automatic org people
