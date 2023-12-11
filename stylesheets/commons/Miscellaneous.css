@@ -4458,7 +4458,7 @@ Template // Module: Key/Key2 // Hotkey
 Author(s): hjpalpha
 *******************************************************************************/
 .hotkey-key {
-	background-color: #f0f0f0;
+	background-color: var( --clr-moon-background-color, #f0f0f0 );
 	width: 32px;
 	font-size: 9pt;
 	border-style: outset;
