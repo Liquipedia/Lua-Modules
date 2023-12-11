@@ -24,8 +24,8 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local LINK_DATA = {
 	cdl = {icon = 'File:Call of Duty League Logo Small.png', text = 'Call of Duty League matchpage'},
 	breakingpoint = {
-		icon = 'File:Breaking Point GG icon lightmode.png', 
-		iconDark = 'File:Breaking Point GG icon darkmode.png', 
+		icon = 'File:Breaking Point GG icon lightmode.png',
+		iconDark = 'File:Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
 	},
 	reddit = {icon = 'File:Reddit-icon.png', text = 'Reddit stats'},
