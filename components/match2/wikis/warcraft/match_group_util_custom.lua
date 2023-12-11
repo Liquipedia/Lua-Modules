@@ -70,7 +70,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
----@field headToHead boolean
 ---@field isFfa boolean
 ---@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
@@ -122,7 +121,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.casters = Table.extract(extradata, 'casters')
 
