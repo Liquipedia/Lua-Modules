@@ -51,9 +51,17 @@ local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'South Korea',
 	'Cambodia'
 }
-local STATUS_INACTIVE = 'inactive'
-local STATUS_BANNED = 'banned'
-local STATUS_RETIRED = 'retired'
+local STATUS_ACTIVE = 'Active'
+local STATUS_RETIRED = 'Retired'
+local STATUS_DECEASED = 'Deceased'
+local STATUS_INACTIVE = 'Inactive'
+local ALLOWED_STATUSES = {
+	STATUS_ACTIVE,
+	STATUS_INACTIVE,
+	STATUS_RETIRED,
+	STATUS_DECEASED,
+}
+local BANNED = 'banned'
 
 function Person.run(frame)
 	local person = Person(frame)
@@ -63,6 +71,12 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
+
+	if (args.status or ''):lower() == BANNED then
+		--can not use bool since string is expected in some customs
+		args.banned = args.banned or 'true'
+		args.status = nil
+	end
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
@@ -340,7 +354,19 @@ end
 
 --- Allows for overriding this functionality
 function Person:getStatusToStore(args)
-	return args.status
+	if args.status then
+		local status = mw.getContentLanguage():ucfirst(args.status)
+		assert(Table.includes(ALLOWED_STATUSES, status), 'Invalid status "' .. args.status .. '"')
+		return status
+	elseif args.death_date then
+		return 'Deceased'
+	elseif Logic.readBool(args.retired) or string.match(args.retired or '', '%d%d%d%d') then
+		return STATUS_RETIRED
+	elseif Logic.readBool(args.inactive) then
+		return STATUS_INACTIVE
+	end
+
+	return STATUS_ACTIVE
 end
 
 --- Allows for overriding this functionality
@@ -448,7 +474,10 @@ end
 function Person:getCategories(args, birthDisplay, personType, status)
 	if _shouldStoreData then
 		local team = args.teamlink or args.team
-		local categories = { personType .. 's' }
+		local categories = {
+			personType .. 's',
+			status .. ' ' .. personType .. 's',
+		}
 
 		if
 			not self.nonRepresenting and (args.country2 or args.nationality2)
@@ -457,24 +486,17 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		then
 			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
 		end
-		if args.death_date then
-			table.insert(categories, 'Deceased ' .. personType .. 's')
-		elseif
-			args.retired == 'yes' or args.retired == 'true'
-			or string.lower(status or '') == STATUS_RETIRED
-			or string.match(args.retired or '', '%d%d%d%d')--if retired has year set apply the retired category
-		then
-			table.insert(categories, 'Retired ' .. personType .. 's')
-		elseif string.lower(status or '') == STATUS_INACTIVE then
-			table.insert(categories, 'Inactive ' .. personType .. 's')
-		elseif string.lower(status or '') == STATUS_BANNED then
+
+		--account for banned possibly being a (stringified) bool
+		--or being a string that indicates what the player is banned from
+		if args.banned and Logic.readBoolOrNil(args.banned) ~= false then
 			table.insert(categories, 'Banned ' .. personType .. 's')
-		else
-			table.insert(categories, 'Active ' .. personType .. 's')
-			if String.isEmpty(team) then
-				table.insert(categories, 'Teamless ' .. personType .. 's')
-			end
 		end
+
+		if status == STATUS_ACTIVE and String.isEmpty(team) then
+			table.insert(categories, 'Teamless ' .. personType .. 's')
+		end
+
 		if not args.image then
 			table.insert(categories, personType .. 's with no profile picture')
 		end
