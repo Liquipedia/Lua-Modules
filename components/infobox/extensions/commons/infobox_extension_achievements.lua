@@ -133,7 +133,6 @@ end
 
 ---@class AchievementIconsOptions
 ---@field noTemplate boolean
----@field spacedIcons boolean
 ---@field onlyForFirstPrizePoolOfPage boolean
 ---@field adjustItem fun(item:table):table
 ---@field baseConditions string[]
@@ -146,7 +145,6 @@ function Achievements._readOptions(args)
 
 	return {
 		noTemplate = Logic.readBool(Logic.nilOr(args.noTemplate, CustomDefaultOptions.noTemplate)),
-		spacedIcons = Logic.readBool(args.spacedIcons),
 		onlyForFirstPrizePoolOfPage = Logic.readBool(Logic.nilOr(
 			args.onlyForFirstPrizePoolOfPage,
 			CustomDefaultOptions.onlyForFirstPrizePoolOfPage
