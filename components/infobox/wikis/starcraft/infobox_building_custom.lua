@@ -136,7 +136,7 @@ function CustomBuilding._contentWithBonus(key, bonusNumber)
 		or _args[key]}
 end
 
----@return CustomWidgetInjector
+---@return WidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end
