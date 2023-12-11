@@ -22,10 +22,9 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
----@class CustomBuildingInfobox: BuildingInfobox
+---@class Starcraft2CustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
 
----@class CustomWidgetInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
@@ -129,7 +128,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return CustomWidgetInjector
+---@return WidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end
