@@ -207,12 +207,9 @@ function Achievements.display(data, options)
 
 	Array.sortInPlaceBy(data, Operator.property('date'))
 
-	return String.nilIfEmpty(table.concat(Array.flatMap(data, function(item, index)
-		return {
-			Achievements._displayIcon(item, options),
-			options.spacedIcons and (index ~= #data) and NON_BREAKING_SPACE or nil,
-		}
-	end)))
+	return String.nilIfEmpty(table.concat(Array.map(data, function(item)
+		return Achievements._displayIcon(item, options)
+	end), NON_BREAKING_SPACE))
 end
 
 ---Build the icon for a single entry
