@@ -230,6 +230,7 @@ function CustomPlayer:getStatusToStore(args)
 	elseif args.retired then
 		return 'Retired'
 	end
+	return 'Active'
 end
 
 ---@param args table
