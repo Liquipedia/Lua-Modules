@@ -137,20 +137,18 @@ function Person:createInfobox()
 		Cell{name = 'Born', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
 		Customizable{id = 'region', children = {
-			Cell{name = 'Region', content = {
+				Cell{name = 'Region', content = {
 						self:_createRegion(args.region, args.country)
 					}
 				}
 			}
 		},
 		Customizable{id = 'status', children = {
-			Cell{name = 'Status', content = { args.status }
-				}
+				Cell{name = 'Status', content = {args.status or (Logic.readBool(args.banned) and 'Banned') or nil}}
 			}
 		},
 		Customizable{id = 'role', children = {
-			Cell{name = 'Role', content = { args.role }
-				}
+				Cell{name = 'Role', content = {args.role}}
 			}
 		},
 		Customizable{id = 'teams', children = {
