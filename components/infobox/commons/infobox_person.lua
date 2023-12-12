@@ -58,6 +58,7 @@ local Status = {
 	RETIRED = 'Retired',
 	DECEASED= 'Deceased',
 }
+Status['PASSED AWAY'] = Status.DECEASED
 local BANNED = 'banned'
 
 ---@param frame Frame
@@ -372,8 +373,8 @@ end
 ---@return PlayerStatus
 function Person:getStatusToStore(args)
 	if args.status then
-		local status = mw.getContentLanguage():ucfirst(args.status)
-		assert(Table.includes(Status, status), 'Invalid status "' .. args.status .. '"')
+		local status = Status(args.status:upper())
+		assert(status, 'Invalid status "' .. args.status .. '"')
 		return status
 	elseif args.death_date then
 		return Status.DECEASED
