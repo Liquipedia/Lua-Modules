@@ -147,7 +147,7 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
 
-	if String.isNotEmpty(_args.banned or '') then
+	if String.isNotEmpty(_args.banned) then
 		local banned = _BANNED[string.lower(_args.banned)]
 		if not banned then
 			banned = '[[Banned Players|Multiple Bans]]'
