@@ -373,7 +373,7 @@ end
 ---@return PlayerStatus
 function Person:getStatusToStore(args)
 	if args.status then
-		local status = Status(args.status:upper())
+		local status = Status[args.status:upper()]
 		assert(status, 'Invalid status "' .. args.status .. '"')
 		return status
 	elseif args.death_date then
