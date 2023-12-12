@@ -8,7 +8,7 @@ describe('Variables', function()
 
 	before_each(function()
 		-- Because of the complex nature of `formatDate`, a lot of the tests are just "check it has been called"
-		FormatDateSub = stub(mw.language, "formatDate")
+		FormatDateSub = stub(mw.language, 'formatDate')
 	end)
 
 	after_each(function()
