@@ -63,3 +63,16 @@ jobs:
         with:
           report_paths: 'busted.xml'
           check_name: 'Test Report'
+
+  lua-type-check:
+    name: Type Check Code Base
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Type Check Code Base
+        uses: mrcjkb/lua-typecheck-action@v0.2.0
+        with:
+          checklevel: Error
