@@ -101,9 +101,6 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, _, personType)
 	lpdbData.extradata.role = _args.role
 	lpdbData.extradata.role2 = _args.role2
-	lpdbData.extradata.activeplayer = _player:getStatusToStore() ~= STATUS_ACTIVE
-		and string.lower(_args.role or 'player') ~= 'player'
-		and Variables.varDefault('isActive') or ''
 
 	return lpdbData
 end
