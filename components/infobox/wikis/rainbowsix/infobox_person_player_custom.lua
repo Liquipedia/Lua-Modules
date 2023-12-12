@@ -68,6 +68,8 @@ function CustomPlayer.run(frame)
 
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
 
+	player.args.banned = tostring(player.args.banned or '')
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector

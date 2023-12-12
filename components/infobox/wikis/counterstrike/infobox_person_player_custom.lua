@@ -71,6 +71,8 @@ function CustomPlayer.run(frame)
 
 	player.args.informationType = player.args.informationType or 'Player'
 
+	player.args.banned = tostring(player.args.banned or '')
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.getPersonType = CustomPlayer.getPersonType
@@ -145,7 +147,7 @@ function CustomPlayer._getStatusContents()
 		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
 	end
 
-	if String.isNotEmpty(_args.banned) then
+	if String.isNotEmpty(_args.banned or '') then
 		local banned = _BANNED[string.lower(_args.banned)]
 		if not banned then
 			banned = '[[Banned Players|Multiple Bans]]'
