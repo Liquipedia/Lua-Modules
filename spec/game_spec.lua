@@ -3,19 +3,6 @@ describe('Game', function()
 	local Game = require('Module:Game')
 	local Info = require('Module:Info')
 
-	local orig = mw.html
-	before_each(function()
-		mw.title.new = spy.new(function(page)
-			if page == 'https://google.com' then
-				return nil
-			end
-			return {exists = page == 'Module:Page'}
-		end)
-	end)
-	after_each(function()
-		mw.title.new = orig
-	end)
-
 	local COMMONS_IDENTIFIER = 'commons'
 	local COMMONS_DATA = Info.games.commons
 	local COMMONS_ICON = '[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|25x25px]]'
