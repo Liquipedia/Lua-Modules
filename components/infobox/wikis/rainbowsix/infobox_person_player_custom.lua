@@ -26,7 +26,6 @@ local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requir
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Showmatch]]',
 	'[[liquipediatiertype::!Qualifier]]',
-	'[[liquipediatiertype::!Charity]]',
 	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
 	'[[placement::1]]',
 }
