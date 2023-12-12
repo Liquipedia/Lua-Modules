@@ -77,8 +77,7 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
-	
-			-- Automatic achievements
+	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
