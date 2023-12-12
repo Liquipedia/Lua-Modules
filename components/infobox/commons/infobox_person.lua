@@ -60,11 +60,14 @@ local Status = {
 }
 local BANNED = 'banned'
 
+---@param frame Frame
+---@return string
 function Person.run(frame)
 	local person = Person(frame)
 	return person:createInfobox()
 end
 
+---@return string
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -111,7 +114,7 @@ function Person:createInfobox()
 			shouldstore = _shouldStoreData
 		})
 	if not ageCalculationSuccess then
-		age = Person._createAgeCalculationErrorMessage(age)
+		age = Person._createAgeCalculationErrorMessage(age --[[@as string]])
 	end
 
 	local widgets = {
@@ -245,11 +248,16 @@ function Person:createInfobox()
 	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
 end
 
+---@param args table
 function Person:_definePageVariables(args)
 	Variables.varDefine('firstname', args.givenname or '')
 	Variables.varDefine('lastname', args.familyname or '')
 end
 
+---@param args table
+---@param links table
+---@param status PlayerStatus
+---@param personType string
 function Person:_setLpdbData(args, links, status, personType)
 	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
 
@@ -309,6 +317,8 @@ function Person:_setLpdbData(args, links, status, personType)
 end
 
 -- Allows this function to be used in /Custom
+---@param nationality string
+---@return string?
 function Person:getStandardNationalityValue(nationality)
 	if String.isEmpty(nationality) then
 		return nil
@@ -328,22 +338,33 @@ function Person:getStandardNationalityValue(nationality)
 end
 
 --- Allows for overriding this functionality
+---@param args table
 function Person:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@param personType string
+---@param status string
+---@return string
 function Person:getStorageType(args, personType, status)
 	return string.lower(personType)
 end
 
 --- Allows for overriding this functionality
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
 function Person:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return {store: string, category: string}
 function Person:getPersonType(args)
-	return { store = 'Player', category = 'Player'}
+	return {store = 'Player', category = 'Player'}
 end
 
 --- Allows for overriding this functionality
@@ -367,6 +388,8 @@ end
 
 --- Allows for overriding this functionality
 --- Decides if we store in LPDB and Vars or not
+---@param args table
+---@return boolean
 function Person:shouldStoreData(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
@@ -374,6 +397,8 @@ end
 
 --- Allows for overriding this functionality
 --- e.g. to add faction icons to the display for SC2, SC, WC
+---@param args table
+---@return string
 function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = mw.ext.TeamTemplate.teamexists(team)
@@ -395,18 +420,28 @@ function Person:nameDisplay(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string?
 function Person:subHeaderDisplay(args)
 	return args.localid
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return number
+---@return table<integer, number?>?
 function Person:calculateEarnings(args)
-	return Earnings.calculateForPlayer{
+	local totalEarnings, earningsPerYear =  Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
+
+	return totalEarnings, earningsPerYear
 end
 
+---@param region string?
+---@param country string?
+---@return string?
 function Person:_createRegion(region, country)
 	local regionData = Region.run({region = region, country = country})
 	_region = regionData.region
@@ -414,6 +449,9 @@ function Person:_createRegion(region, country)
 	return regionData.display
 end
 
+---@param args table
+---@param personType string
+---@return string[]
 function Person:_createLocations(args, personType)
 	local countryDisplayData = {}
 	local country = args.country or args.country1 or args.nationality or args.nationality1
@@ -434,6 +472,10 @@ function Person:_createLocations(args, personType)
 	return countryDisplayData
 end
 
+---@param country string?
+---@param location string?
+---@param personType string
+---@return string?
 function Person:_createLocation(country, location, personType)
 	if country == nil or country == '' then
 		return nil
@@ -452,6 +494,9 @@ function Person:_createLocation(country, location, personType)
 		(location ~= nil and (',&nbsp;' .. location) or '')
 end
 
+---@param team string?
+---@param link string?
+---@return string?
 function Person:_createTeam(team, link)
 	link = link or team
 	if link == nil or link == '' then
@@ -471,6 +516,7 @@ end
 ---@param birthDisplay string
 ---@param personType string
 ---@param status PlayerStatus
+---@return string[]
 function Person:getCategories(args, birthDisplay, personType, status)
 	if _shouldStoreData then
 		local team = args.teamlink or args.team
@@ -514,10 +560,14 @@ function Person:getCategories(args, birthDisplay, personType, status)
 end
 
 --- Allows for overriding this functionality
+---@param categories string[]
+---@return string[]
 function Person:getWikiCategories(categories)
 	return categories
 end
 
+---@param text string
+---@return {death: string?, birth: string?}
 function Person._createAgeCalculationErrorMessage(text)
 	-- Return formatted message text for an error.
 	local strongStart = '<strong class="error">Error: '
@@ -535,6 +585,8 @@ function Person._createAgeCalculationErrorMessage(text)
 	end
 end
 
+---@param args table
+---@return table
 function Person:_flipNameOrder(args)
 	if not Logic.readBool(args.nonameflip) and Table.includes(_COUNTRIES_EASTERN_NAME_ORDER, args.country) then
 		args.givenname, args.familyname = args.familyname, args.givenname
