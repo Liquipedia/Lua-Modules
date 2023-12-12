@@ -51,15 +51,12 @@ local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'South Korea',
 	'Cambodia'
 }
-local STATUS_ACTIVE = 'Active'
-local STATUS_RETIRED = 'Retired'
-local STATUS_DECEASED = 'Deceased'
-local STATUS_INACTIVE = 'Inactive'
-local ALLOWED_STATUSES = {
-	STATUS_ACTIVE,
-	STATUS_INACTIVE,
-	STATUS_RETIRED,
-	STATUS_DECEASED,
+---@enum PlayerStatus
+local Status = {
+	ACTIVE = 'Active',
+	INACTIVE = 'Inactive',
+	RETIRED = 'Retired',
+	DECREASED = 'Decreased',
 }
 local BANNED = 'banned'
 
@@ -73,8 +70,7 @@ function Person:createInfobox()
 	local args = self.args
 
 	if (args.status or ''):lower() == BANNED then
-		--can not use bool since string is expected in some customs
-		args.banned = args.banned or 'true'
+		args.banned = args.banned or true
 		args.status = nil
 	end
 
@@ -137,18 +133,18 @@ function Person:createInfobox()
 		Cell{name = 'Born', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
 		Customizable{id = 'region', children = {
-				Cell{name = 'Region', content = {
+			Cell{name = 'Region', content = {
 						self:_createRegion(args.region, args.country)
 					}
 				}
 			}
 		},
 		Customizable{id = 'status', children = {
-				Cell{name = 'Status', content = {args.status or (Logic.readBool(args.banned) and 'Banned') or nil}}
+			Cell{name = 'Status', content = {args.status or (Logic.readBool(args.banned) and 'Banned') or nil}}
 			}
 		},
 		Customizable{id = 'role', children = {
-				Cell{name = 'Role', content = {args.role}}
+			Cell{name = 'Role', content = {args.role}}
 			}
 		},
 		Customizable{id = 'teams', children = {
@@ -351,20 +347,22 @@ function Person:getPersonType(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return PlayerStatus
 function Person:getStatusToStore(args)
 	if args.status then
 		local status = mw.getContentLanguage():ucfirst(args.status)
-		assert(Table.includes(ALLOWED_STATUSES, status), 'Invalid status "' .. args.status .. '"')
+		assert(Table.includes(Status, status), 'Invalid status "' .. args.status .. '"')
 		return status
 	elseif args.death_date then
-		return 'Deceased'
+		return Status.DECEASED
 	elseif Logic.readBool(args.retired) or string.match(args.retired or '', '%d%d%d%d') then
-		return STATUS_RETIRED
+		return Status.RETIRED
 	elseif Logic.readBool(args.inactive) then
-		return STATUS_INACTIVE
+		return Status.INACTIVE
 	end
 
-	return STATUS_ACTIVE
+	return Status.ACTIVE
 end
 
 --- Allows for overriding this functionality
@@ -469,6 +467,10 @@ function Person:_createTeam(team, link)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@param birthDisplay string
+---@param personType string
+---@param status PlayerStatus
 function Person:getCategories(args, birthDisplay, personType, status)
 	if _shouldStoreData then
 		local team = args.teamlink or args.team
@@ -487,11 +489,11 @@ function Person:getCategories(args, birthDisplay, personType, status)
 
 		--account for banned possibly being a (stringified) bool
 		--or being a string that indicates what the player is banned from
-		if args.banned and Logic.readBoolOrNil(args.banned) ~= false then
+		if Logic.readBoolOrNil(args.banned) ~= false and Logic.isNotEmpty(args.banned) then
 			table.insert(categories, 'Banned ' .. personType .. 's')
 		end
 
-		if status == STATUS_ACTIVE and String.isEmpty(team) then
+		if status == Status.ACTIVE and String.isEmpty(team) then
 			table.insert(categories, 'Teamless ' .. personType .. 's')
 		end
 
