@@ -11,11 +11,9 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
-local Variables = require('Module:Variables')
 
 local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
-local STATUS_ACTIVE = 'Active'
 --role stuff tables
 local _ROLES = {
 	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
