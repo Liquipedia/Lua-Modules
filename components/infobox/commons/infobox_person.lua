@@ -56,7 +56,7 @@ local Status = {
 	ACTIVE = 'Active',
 	INACTIVE = 'Inactive',
 	RETIRED = 'Retired',
-	DECREASED = 'Decreased',
+	DECEASED= 'Deceased',
 }
 local BANNED = 'banned'
 
