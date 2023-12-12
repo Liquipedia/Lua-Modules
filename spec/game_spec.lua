@@ -30,9 +30,9 @@ describe('Game', function()
 	describe('icon', function()
 		it('verify', function()
 			assert.are_equal(COMMONS_ICON,
-				Game.icon({noSpan = true}))
+				Game.icon{noSpan = true})
 			assert.are_equal('<span class="span-class">' .. COMMONS_ICON .. '</span>',
-				tostring(Game.icon({spanClass = 'span-class'})))
+				tostring(Game.icon{spanClass = 'span-class'}))
 			assert.are_equal('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
 				tostring(Game.icon()))
 		end)
@@ -42,27 +42,27 @@ describe('Game', function()
 		it('verify',
 			function()
 				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text())
-				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text({}))
-				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text({game = ''}))
-				assert.are_equal(COMMONS_DATA.name, Game.text({noLink = true}))
-				assert.are_equal('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.name .. ']]', Game.text({link = 'ABC123'}))
+				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text{})
+				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.name .. ']]', Game.text{game = ''})
+				assert.are_equal(COMMONS_DATA.name, Game.text{noLink = true})
+				assert.are_equal('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.name .. ']]', Game.text{link = 'ABC123'})
 				assert.are_equal('[[' .. COMMONS_DATA.link .. '|' .. COMMONS_DATA.abbreviation .. ']]',
-					Game.text({useAbbreviation = true}))
-				assert.are_equal(COMMONS_DATA.abbreviation, Game.text({noLink = true, useAbbreviation = true}))
+					Game.text{useAbbreviation = true})
+				assert.are_equal(COMMONS_DATA.abbreviation, Game.text{noLink = true, useAbbreviation = true})
 				assert.are_equal('[[' .. 'ABC123' .. '|' .. COMMONS_DATA.abbreviation .. ']]',
-					Game.text({useAbbreviation = true, link = 'ABC123'}))
+					Game.text{useAbbreviation = true, link = 'ABC123'})
 				assert.are_equal('<abbr title="The specified game input is not recognized">Unknown Game</abbr>',
-					Game.text({useDefault = false}))
+					Game.text{useDefault = false})
 				assert.are_equal('<abbr title="The specified game input is not recognized">Unkwn.</abbr>',
-					Game.text({useDefault = false, useAbbreviation = true}))
+					Game.text{useDefault = false, useAbbreviation = true})
 			end)
 	end)
 
 	describe('list games', function()
 		it('verify', function()
 			assert.are_equal(COMMONS_IDENTIFIER, Game.listGames()[1])
-			assert.are_equal(COMMONS_IDENTIFIER, Game.listGames({ordered = true})[1])
-			assert.are_equal(COMMONS_IDENTIFIER, Game.listGames({ordered = false})[1])
+			assert.are_equal(COMMONS_IDENTIFIER, Game.listGames{ordered = true}[1])
+			assert.are_equal(COMMONS_IDENTIFIER, Game.listGames{ordered = false}[1])
 		end)
 	end)
 
