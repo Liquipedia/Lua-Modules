@@ -32,7 +32,6 @@ function CustomTeam.run(frame)
 	team.args.achievements = Achievements.team{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
-	
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
