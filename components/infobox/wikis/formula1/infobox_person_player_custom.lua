@@ -33,6 +33,7 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
 	_args.autoTeam = true
@@ -42,7 +43,7 @@ end
 
 ---@param id string
 ---@param widgets Widget[]
----@rreturn Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'history' then
 		return {
@@ -55,7 +56,10 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {Role.run({role = _args.role}).display, Role.run({role = _args.role2}).display}}
+			Cell{name = 'Role(s)', content = {
+				Role.run{role = _args.role, useDefault = true}.display,
+				Role.run{role = _args.role2}.display}
+			}
 		}
 	end
 	return widgets
@@ -100,9 +104,17 @@ end
 ---@param args table
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args)
-	lpdbData.extradata.role = Role.run{role = args.role}.role
+	lpdbData.extradata.role = Role.run{role = args.role, useDefault = true}.role
 	lpdbData.extradata.role2 = Role.run{role = args.role2}.role
 	return lpdbData
+end
+
+---@param args table
+---@return {store: string, category: string}
+function CustomPlayer:getPersonType(args)
+	local role = Role.run{role = args.role, useDefault = true}
+
+	return {store = role.personType, category = role.category}
 end
 
 return CustomPlayer

@@ -287,7 +287,13 @@ function mw.language:uc(str) end
 ---Converts the first character of the string to uppercase.
 ---@param str string
 ---@return string
-function mw.language:ucfirst(str) end
+function mw.language:ucfirst(str)
+	-- TODO: UTF8 support in fake
+	if str == 'übung' then
+		return 'Übung'
+	end
+	return (str:gsub("^%l", string.upper))
+end
 
 ---Converts the string to a representation appropriate for case-insensitive comparison. Note that the result may not make any sense when displayed.
 ---@param str string
