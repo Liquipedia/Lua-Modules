@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -195,7 +196,7 @@ function matchFunctions.getOpponents(args)
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
-				if firstTo <= tonumber(opponent.score) then
+				if firstTo < tonumber(opponent.score) then
 					args.finished = true
 				end
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -235,6 +236,10 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 
+	if not args.winner then
+		matchFunctions._checkDraw(opponents, firstTo, args)
+	end
+
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
@@ -248,24 +253,60 @@ function matchFunctions.getOpponents(args)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
-		local placement = 1
-		-- luacheck: push ignore
-		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-			if placement == 1 then
-				args.winner = opponentIndex
-			end
-			opponent.placement = placement
-			args['opponent' .. opponentIndex] = opponent
-			placement = placement + 1
+		matchFunctions._setPlacementsAndWinner(opponents, args)
+	end
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		args['opponent' .. opponentIndex] = opponent
+	end)
+
+	return args
+end
+
+---@param opponents table
+---@param match table
+function matchFunctions._setPlacementsAndWinner(opponents, match)
+	local counter = 0
+	local lastScore
+	local lastPlacement
+
+	match.winner = tonumber(match.winner)
+
+	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
+		if counter == 1 then
+			match.winner = opponentIndex
 		end
-	-- luacheck: pop
-	-- only apply arg changes otherwise
-	else
-		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
+		opponent.placement = counter
+		counter = counter + 1
+
+		local score = tonumber(opponent.score)
+		counter = counter + 1
+		if counter == 1 and not match.winner then
+			match.winner = opponentIndex
+		end
+		if lastScore == score then
+			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or lastPlacement
+		else
+			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or counter
+			lastPlacement = counter
+			lastScore = score or nil
 		end
 	end
-	return args
+end
+
+---@param opponents table
+---@param firstTo number
+---@param match table
+function matchFunctions._checkDraw(opponents, firstTo, match)
+	local isDraw = Array.all(opponents, function(opponent)
+		return opponent.score == firstTo
+	end)
+
+	if not isDraw then return end
+
+	match.winner = 0
+	match.finished = true
+	match.resulttype = 'draw'
 end
 
 --
