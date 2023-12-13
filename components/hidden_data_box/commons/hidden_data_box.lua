@@ -128,7 +128,7 @@ function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
 		limit = 1000,
-		query = 'opponentplayers, opponentname, opponenttype',
+		query = 'opponentplayers, opponentname, opponenttype, extradata',
 	})
 
 	return Array.filter(placements, function(placement)
@@ -156,7 +156,13 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	local participant = placement.opponentname
 	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
 	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
-		HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+		if Table.isNotEmpty((placement.extradata or {}).opponentaliases) then
+			Array.forEach(placement.extradata.opponentaliases, function(alias)
+				HiddenDataBox._setWikiVariableForParticipantKey(alias, participantResolved, key, value)
+			end)
+		else
+			HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+		end
 	end)
 end
 
