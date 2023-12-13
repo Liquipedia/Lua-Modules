@@ -289,8 +289,6 @@ function matchFunctions.getVodStuff(match)
 
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
 	local links = match.links
 	if match.preview then links.preview = match.preview end
