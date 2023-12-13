@@ -56,5 +56,5 @@ return {
 	defaultTeamLogoDark = 'Warcraft III logo.png', ---@deprecated
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
-	match2 = 1,
+	match2 = 2,
 }

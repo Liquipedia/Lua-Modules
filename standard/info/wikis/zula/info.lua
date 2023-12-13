@@ -29,5 +29,5 @@ return {
 
 	defaultTeamLogo = 'Zula Global default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Zula Global default allmode.png', ---@deprecated
-	match2 = 0,
+	match2 = 2,
 }
