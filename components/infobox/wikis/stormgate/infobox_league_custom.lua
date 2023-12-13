@@ -43,7 +43,6 @@ function CustomLeague.run(frame)
 	_args = league.args
 
 	_args.game = Game.name{game = _args.game}
-	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
 	_args.raceBreakDown = RaceBreakdown.run(_args) or {}
 	_args.player_number = _args.raceBreakDown.total
 	_args.maps = CustomLeague._getMaps(_args)
@@ -83,20 +82,18 @@ function CustomLeague._checkFinished(args)
 	end
 
 	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date) or FALLBACK_DATE
-	if os.date('%Y-%m-%d') >= queryDate then
-		local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-			query = 'date',
-			order = 'date asc',
-			limit = 1
-		})
-		if data and data[1] then
-			return true
-		end
+
+	if os.date('%Y-%m-%d') < queryDate then
+		return false
 	end
 
-	return false
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
+		query = 'date',
+		order = 'date asc',
+		limit = 1
+	})[1] ~= nil
 end
 
 ---@return WidgetInjector
@@ -120,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		--teams section
-		if (tonumber(_args.team_number) or 0) > 0 then
+		if Logic.isNumeric(_args.team_number) and tonumber(_args.team_number) > 0 then
 			Array.appendWith(widgets,
 				Title{name = 'Teams'},
 				Cell{name = 'Number of Teams', content = {_args.team_number}}
@@ -155,15 +152,13 @@ function CustomLeague._mapsDisplay(maps)
 end
 
 ---@param args table
----@return string
+---@return string?
 function CustomLeague._getGameVersion(args)
-	local game = '[[' .. args.game .. ']]'
-
 	if not args.patch then
-		return game
+		return
 	end
 
-	local gameVersion = game .. '<br/>[[' .. args.patch .. ']]'
+	local gameVersion = '[[' .. args.patch .. ']]'
 	if not args.epatch or args.epatch == args.patch then
 		return gameVersion
 	end
@@ -173,15 +168,11 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	--override var to standardize its entries
-	Variables.varDefine('tournament_game', args.game)
 
 	--wiki specific vars
 	Variables.varDefine('patch', args.patch)
 	Variables.varDefine('epatch', args.epatch)
-	Variables.varDefine('headtohead', tostring(Logic.nilOr(Logic.readBoolOrNil(args.headtohead), true)))
 	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.publishertier)))
-	Variables.varDefine('tournament_series_number', args.number)
 	Variables.varDefine('tournament_maps', args.maps and Json.stringify(args.maps) or '')
 end
 
@@ -206,16 +197,11 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = args.game
-	lpdbData.patch = args.patch
-	lpdbData.endpatch = args.epatch or args.patch
 	lpdbData.status = args.status
 		or args.cancelled and 'cancelled'
 		or args.finished and 'finished'
 		or nil
 	lpdbData.maps = args.maps and Json.stringify(args.maps) or nil
-	lpdbData.next = CustomLeague:_getPageNameFromChronology(args.next)
-	lpdbData.previous = CustomLeague:_getPageNameFromChronology(args.previous)
 
 	lpdbData.extradata.seriesnumber = _args.number
 
@@ -228,17 +214,6 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
-end
-
----@param item string?
----@return string?
-function CustomLeague:_getPageNameFromChronology(item)
-	if String.isEmpty(item) then
-		return
-	end
-	---@cast item -nil
-
-	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
 end
 
 ---@param args table

@@ -461,7 +461,7 @@ function League:_setLpdbData(args, links)
 		game = string.lower(args.game or ''),
 		mode = Variables.varDefault('tournament_mode', ''),
 		patch = args.patch,
-		endpatch = args.endpatch or args.epatch,
+		endpatch = args.endpatch or args.epatch or args.patch,
 		type = args.type,
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
 			Table.mapValues(
