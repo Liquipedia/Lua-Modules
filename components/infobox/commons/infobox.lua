@@ -59,11 +59,15 @@ function Infobox:widgetInjector(injector)
 	return self
 end
 
----Adds a custom components after the end the infobox
+---Adds custom components after the end the infobox
 ---@param wikitext string|number|Html|nil
 ---@return self
 function Infobox:bottom(wikitext)
-	self.bottomContent = (self.bottomContent or '') .. (wikitext or '')
+	if Logic.isEmpty(wikitext) then
+		return self
+	end
+
+	self.bottomContent = (self.bottomContent or mw.html.create()):node(wikitext)
 	return self
 end
 
@@ -91,9 +95,7 @@ function Infobox:build(widgets)
 		self.root:node(self.adbox)
 		Variables.varDefine('is_first_infobox', 'false')
 	end
-	if String.isNotEmpty(self.bottomContent) then
-		self.root:node(self.bottomContent)
-	end
+	self.root:node(self.bottomContent)
 
 	return self.root
 end
