@@ -75,7 +75,7 @@ function Person:createInfobox()
 
 	if (args.status or ''):lower() == BANNED then
 		args.banned = args.banned or true
-		args.status = nil
+		args.status = Status.INACTIVE
 	end
 
 	if String.isEmpty(args.id) then
