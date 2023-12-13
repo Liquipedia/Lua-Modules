@@ -14,7 +14,9 @@ local Table = require('Module:Table')
 
 local MAX_NUM_PLAYERS = 10
 
-function p.storeMatch(match2, options)
+---@param match2 table
+---@param options table
+function MatchLegacy.storeMatch(match2, options)
 	if options.storeMatch1 then
 		local match = p._convertParameters(match2)
 
