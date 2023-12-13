@@ -15,7 +15,8 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+---@class ArenaFPSMatchCopyPaste: MatchCopyPaste
+local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 --allowed opponent types on the wiki
 local MODES = {
