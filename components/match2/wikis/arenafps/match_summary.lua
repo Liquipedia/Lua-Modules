@@ -45,7 +45,7 @@ local VETO_TYPE_TO_TEXT = {
 local CustomMatchSummary = {}
 
 -- Map Veto Class
----@class WoTMapVeto: MatchSummaryRowInterface
+---@class AFPSMapVeto: MatchSummaryRowInterface
 ---@operator call: self
 ---@field root Html
 ---@field table Html
