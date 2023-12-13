@@ -251,7 +251,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local matchCountValue
 	local gameCountValue
 
-	if Logic.readBool(args.queryMatch2) then
+	if Info.match2 == 2 then
 		matchCountValue = Count.match2gamesData(parameters)
 		gameCountValue = Count.match2(parameters)
 	else
