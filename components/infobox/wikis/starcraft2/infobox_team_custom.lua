@@ -37,8 +37,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _doStore = true
-
 local CustomTeam = Class.new()
 
 local CustomInjector = Class.new(Injector)
@@ -176,7 +174,6 @@ function CustomTeam.calculateEarnings(args)
 		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
 		(not Namespace.isMain())
 	then
-		_doStore = false
 		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		CustomTeam.getEarningsAndMedalsData(_team.pagename)
