@@ -63,6 +63,10 @@ local function setupForTesting()
 			return require('components.opponent.commons.opponent_display')
 		end
 
+		if newName == 'player_display' then
+			return require('components.opponent.commons.player_display')
+		end
+
 		if newName == 'feature_flag_config' then
 			return {
 				award_table = {defaultValue = false},
