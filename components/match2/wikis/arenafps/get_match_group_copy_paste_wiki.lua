@@ -40,7 +40,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		args.score = true
 	end
 
-	local score = args.score == 'true' and '|score=' or nil
+	local score = Logic.readBool(args.score) and '|score=' or nil
 	local lines = Array.extend(
 		'{{Match',
 		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
