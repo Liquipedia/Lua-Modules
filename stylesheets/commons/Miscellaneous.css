@@ -5482,3 +5482,11 @@ Author(s): PhiLtheFisH, FO-nTTaX, salle
 	background-color: #cccccc;
 	transition: 0.5s;
 }
+
+.wiki-illuvium .hexagon-affinity-header {
+	text-align: left;
+}
+
+.wiki-illuvium .hexagon-class-header {
+	text-align: right;
+}
