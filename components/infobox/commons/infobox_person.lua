@@ -56,7 +56,7 @@ local Status = {
 	ACTIVE = 'Active',
 	INACTIVE = 'Inactive',
 	RETIRED = 'Retired',
-	DECEASED= 'Deceased',
+	DECEASED = 'Deceased',
 }
 Status['PASSED AWAY'] = Status.DECEASED
 local BANNED = 'banned'
