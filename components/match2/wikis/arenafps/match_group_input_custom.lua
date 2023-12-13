@@ -345,12 +345,9 @@ function matchFunctions.getOpponents(match)
 	-- see if match should actually be finished if bestof limit was reached
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.ceil(match.bestof/2)
-		for _, item in pairs(opponents) do
-			if (tonumber(item.score or 0) or 0) >= firstTo then
-				match.finished = true
-				break
-			end
-		end
+		match.finished = Array.any(opponents, function(opponent)
+			return (tonumber(item.score or 0) or 0) >= firstTo
+		end)
 	end
 
 	-- check if match should actually be finished due to a non score status
