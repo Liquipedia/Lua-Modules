@@ -7,7 +7,7 @@
 		"grunt-stylelint": "*",
 		"postcss-less": "*",
 		"stylelint-config-wikimedia": "*",
-		"stylelint-less": "*"
+		"stylelint-less": "2.x.x"
 	},
 	"scripts": {
 		"test": "grunt main",
