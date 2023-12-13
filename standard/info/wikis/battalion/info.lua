@@ -28,4 +28,5 @@ return {
 	defaultGame = 'battalion',
 	defaultTeamLogo = 'Battalion generic logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Battalion generic logo.png', ---@deprecated
+	match2 = 0,
 }

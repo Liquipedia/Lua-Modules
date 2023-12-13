@@ -31,4 +31,5 @@ return {
 		.. '(2021-06-01) Splitgate 2021 lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Splitgate allmode.png (2019) Change date '
 		.. '(2021-06-01) Splitgate 2021 darkmode.png', ---@deprecated
+	match2 = 0,
 }

@@ -1640,4 +1640,5 @@ return {
 	defaultGame = 'fighters',
 	defaultTeamLogo = 'Fighters default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Fighters default darkmode.png', ---@deprecated
+	match2 = 0,
 }

@@ -147,4 +147,5 @@ return {
 	defaultTeamLogoDark = 'Trackmania logo darkmode.png', ---@deprecated
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
+	match2 = 1,
 }

@@ -68,4 +68,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'World of Tanks default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'World of Tanks default darkmode.png', ---@deprecated
+	match2 = 0,
 }

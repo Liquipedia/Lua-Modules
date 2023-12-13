@@ -31,4 +31,5 @@ return {
 	defaultTeamLogoDark = 'Stormgate default darkmode.png', ---@deprecated
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
+	match2 = 0,
 }

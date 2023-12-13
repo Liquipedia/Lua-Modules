@@ -42,4 +42,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'osu! default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'osu! default allmode.png', ---@deprecated
+	match2 = 0,
 }

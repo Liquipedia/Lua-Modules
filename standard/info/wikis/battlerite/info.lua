@@ -28,4 +28,5 @@ return {
 	defaultGame = 'battlerite',
 	defaultTeamLogo = 'Battlerite default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Battlerite default allmode.png', ---@deprecated
+	match2 = 0,
 }
