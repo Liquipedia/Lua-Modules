@@ -23,7 +23,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
-local MATCH_BYE = {'bye', 'BYE'}
+local MATCH_BYE = 'bye'
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
