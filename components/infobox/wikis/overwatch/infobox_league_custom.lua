@@ -22,7 +22,6 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -73,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
-			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
+			for _, map in ipairs(League:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
 					PageLink.makeInternalLink({}, map, map .. game)
 				)))
@@ -96,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
