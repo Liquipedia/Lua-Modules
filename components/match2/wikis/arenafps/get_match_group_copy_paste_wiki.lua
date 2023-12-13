@@ -36,8 +36,8 @@ end
 function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '    '
 
-	if bestof == 0 and args.score ~= 'false' then
-		args.score = 'true'
+	if bestof == 0 and Logic.readBoolOrNil(args.score) ~= false then
+		args.score = true
 	end
 
 	local score = args.score == 'true' and '|score=' or nil
