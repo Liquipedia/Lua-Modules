@@ -8,11 +8,11 @@ liquipedia.sitenotice = {
 	init: function() {
 		if ( 'localStorage' in window ) {
 			document.querySelectorAll( '.networknotice' ).forEach( function( notice ) {
-				const key = notice.dataset.id;
+				var key = notice.dataset.id;
 				if ( liquipedia.sitenotice.isInStorage( key ) ) {
 					notice.style.display = 'none';
 				} else {
-					const closeButton = document.createElement( 'div' );
+					var closeButton = document.createElement( 'div' );
 					closeButton.setAttribute( 'style', 'cursor:pointer;font-size:12px;border:1px solid #333333;line-height:12px;padding:4px 5px;position:absolute;top:4px;right:4px;' );
 					closeButton.setAttribute( 'title', 'Close Notice' );
 					closeButton.innerHTML = '<i class="fa fa-times" aria-hidden="true"></i>';
@@ -26,7 +26,7 @@ liquipedia.sitenotice = {
 		}
 	},
 	putIntoStorage: function( key ) {
-		let items = localStorage.getItem( liquipedia.sitenotice.getLocalStorageKey() );
+		var items = localStorage.getItem( liquipedia.sitenotice.getLocalStorageKey() );
 		if ( items === null || items === '' ) {
 			items = [ ];
 		} else {
@@ -38,7 +38,7 @@ liquipedia.sitenotice = {
 		}
 	},
 	isInStorage: function( key ) {
-		let items = localStorage.getItem( liquipedia.sitenotice.getLocalStorageKey() );
+		var items = localStorage.getItem( liquipedia.sitenotice.getLocalStorageKey() );
 		if ( items === null || items === '' ) {
 			items = [ ];
 		} else {

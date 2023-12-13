@@ -24,6 +24,7 @@ local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
+local MAX_MUMBER_OF_PLAYERS = 5
 local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
@@ -109,24 +110,42 @@ end
 ---@param args table
 ---@param details table
 ---@return table, table
-function MatchMapsLegacy.convertMaps(args, details)
+function MatchMapsLegacy.handleDetails(args, details)
 	local getMapFromDetails = function (index)
-		if not details['match' .. index] then
+		local prefix = 'map' .. index
+		if not details[prefix] then
 			return nil
 		end
-		local match = Json.parseIfString(details['match' .. index])
-		if Logic.isEmpty(match.win) then
-			match.win = args['map' .. index .. 'win']
-		end
-		match.winner = match.win
-		match.win = nil
-
-		if match.length and match.length:lower() == DEFAULT then
-			match.walkover = match.winner
+		local map = {}
+		map.map = details[prefix]
+		map.winner = details[prefix .. 'winner']
+		--Try to get winner from "MatchMaps"
+		if Logic.isEmpty(map.winner) then
+			map.winner = args[prefix .. 'win']
 		end
 
-		match.map = DUMMY_MAP_NAME
-		return MatchSubobjects.luaGetMap(match)
+		if details[prefix .. 'length'] and details[prefix .. 'length']:lower() == DEFAULT then
+			map.walkover = map.winner
+		end
+		map.length = details[prefix .. 'length']
+
+		for oppIndex = 1, MAX_NUMBER_OF_OPPONENTS do
+			local side = 'team' .. oppIndex .. 'side'
+			map[side] = details[prefix .. side]
+			details[prefix .. side] = nil
+			for playerIndex = 1, MAX_MUMBER_OF_PLAYERS do
+				local pick = 't' .. oppIndex .. 'c' .. playerIndex
+				local ban = 't' .. oppIndex .. 'b' .. playerIndex
+				map[pick] = details[prefix .. pick]
+				map[ban] = details[prefix .. ban]
+				details[prefix .. pick] = nil
+				details[prefix .. ban] = nil
+			end
+		end
+		details[prefix] = nil
+		details[prefix .. 'winner'] = nil
+		details[prefix .. 'length'] = nil
+		return MatchSubobjects.luaGetMap(map)
 	end
 
 	local getMapOnlyWithWinner = function (index)
@@ -164,6 +183,33 @@ function MatchMapsLegacy.handleLocation(args)
 	return args
 end
 
+---@param args table
+---@return table
+function MatchMapsLegacy.convertMaps(args)
+	for matchKey, matchJson, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
+		local map = Json.parse(matchJson) or {}
+		map.winner = map.win
+		map.win = nil
+		local mapKey = 'map' .. matchIndex
+		for key, value in pairs(map) do
+			args[mapKey .. key] = value
+		end
+		args[mapKey] = DEFAULT
+		args[matchKey] = nil
+	end
+	return args
+end
+
+-- invoked by Template:BracketMatchSummary
+---@param frame Frame
+---@return string
+function MatchMapsLegacy.convertBracketMatchSummary(frame)
+	local args = Arguments.getArgs(frame)
+	args = MatchMapsLegacy.handleLocation(args)
+	args = MatchMapsLegacy.convertMaps(args)
+	return Json.stringify(args)
+end
+
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
 ---@return string|Html
@@ -171,12 +217,11 @@ function MatchMapsLegacy.convertMatch(frame)
 	local args = Arguments.getArgs(frame)
 	local details = Json.parseIfString(args.details or '{}')
 
-	args, details = MatchMapsLegacy.convertMaps(args, details)
+	args, details = MatchMapsLegacy.handleDetails(args, details)
 	args = MatchMapsLegacy.convertOpponents(args)
 	args = MatchMapsLegacy.handleLiteralsForOpponents(args)
 	args = MatchMapsLegacy.setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy.copyDetailsToArgs(args, details)
-	args = MatchMapsLegacy.handleLocation(args)
 
 	if Logic.readBool(matchlistVars:get('isOldMatchList')) then
 		return Json.stringify(args)

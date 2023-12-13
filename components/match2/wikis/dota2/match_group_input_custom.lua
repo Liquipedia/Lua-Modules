@@ -382,10 +382,11 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		featured = Logic.emptyOr(
+		featured = tostring(Logic.emptyOr(
 			match.featured,
-			matchFunctions.isFeatured(match)
-		),
+			matchFunctions.isFeatured(match),
+			''
+		)),
 		mvp = MatchGroupInput.readMvp(match),
 		headtohead = match.headtohead,
 	}

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
+-- wiki=stormgate
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +12,7 @@ local Table = require('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true})
 
----@class StarcraftBrktsWikiSpecific: BrktsWikiSpecific
+---@class StormgateBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
