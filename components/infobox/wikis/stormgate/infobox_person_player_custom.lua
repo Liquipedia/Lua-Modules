@@ -209,7 +209,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	extradata.role = CustomPlayer:_getRoleData(args.role).variable
 	extradata.role2 = args.role2 and CustomPlayer:_getRoleData(args.role2).variable or nil
 
-	if Variables.varDefault('racecount') then
+	if Variables.varDefault('factioncount') then
 		extradata.factionhistorical = true
 	end
 
