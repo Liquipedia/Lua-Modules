@@ -25,7 +25,7 @@ local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local MATCH_BYE = 'bye'
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
