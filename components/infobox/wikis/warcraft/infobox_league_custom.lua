@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -44,14 +45,7 @@ local ONLINE = 'online'
 
 local GAME_REFORGED = 'wc3r'
 local GAME_FROZEN_THRONE = 'tft'
-local GAME_REIGN = 'roc'
 local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
-
-local GAMES = {
-	[GAME_REFORGED] = 'Reforged',
-	[GAME_FROZEN_THRONE] = 'The Frozen Throne',
-	[GAME_REIGN] = 'Reign of Chaos',
-}
 
 local MODES = {
 	team = {tier = 'Team', store = 'team', category = 'Team'},
@@ -113,7 +107,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
+			Cell{name = 'Game', content = {Game.text{game = _args.game}}},
 			Cell{name = 'Game Version', content = {
 				CustomLeague._displayGameVersion(),
 				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
@@ -301,9 +295,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('firstmatch', CustomLeague._getFirstMatchTime())
 
-	--override var to standardize its entries
-	Variables.varDefine('tournament_game', GAMES[args.game])
-
 	--check if tournament is finished
 	local finished = Logic.readBoolOrNil(args.finished)
 	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
@@ -381,7 +372,6 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = GAMES[args.game]
 	lpdbData.patch = Variables.varDefault('tournament_patch')
 	lpdbData.endpatch = Variables.varDefault('tournament_endpatch', Variables.varDefault('tournament_patch'))
 	local status = args.status
@@ -416,8 +406,9 @@ end
 
 ---@return string
 function CustomLeague._determineGame()
-	if _args.game and GAMES[_args.game:lower()] then
-		return _args.game:lower()
+	local game = Game.toIdentifier{game = _args.game}
+	if game then
+		return game
 	end
 
 	local startDate = _league:_cleanDate(_args.sdate) or _league:_cleanDate(_args.date)
@@ -440,8 +431,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {'Tournaments'}
 
-	if GAMES[args.game] then
-		table.insert(categories, GAMES[args.game] .. ' Competitions')
+	if Game.name{game = _args.game} then
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
 	end
 
 	if String.isNotEmpty(args.eslprotier) then
