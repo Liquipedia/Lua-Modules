@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
