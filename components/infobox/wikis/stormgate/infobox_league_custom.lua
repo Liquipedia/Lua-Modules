@@ -30,6 +30,9 @@ local Title = Widgets.Title
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local CANCELLED = 'cancelled'
+local FINISHED = 'finished'
+
 local _args
 local _league
 
@@ -48,9 +51,7 @@ function CustomLeague.run(frame)
 	_args.maps = CustomLeague._getMaps(_args)
 	_args.number = Logic.isNumeric(_args.number) and string.format('%05i', tonumber(_args.number)) or nil
 	--varDefault because it could have been set above the infobox via a template
-	_args.status = _args.status or Variables.varDefault('tournament_status')
-	_args.cancelled = CustomLeague._checkCancelled(_args)
-	_args.finished = CustomLeague._checkFinished(_args)
+	_args.status = CustomLeague._getStatus(_args)
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -61,21 +62,26 @@ function CustomLeague.run(frame)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague._checkCancelled(args)
-	return args.status == 'cancelled' or Logic.readBool(_args.cancelled or Variables.varDefault('cancelled tournament'))
+---@return string?
+function CustomLeague._getStatus(args)
+	local status = args.status or Variables.varDefault('tournament_status')
+	if Logic.isNotEmpty(status) then
+		---@cast status -nil
+		return status:lower()
+	end
+
+	if Logic.readBool(_args.cancelled) then
+		return CANCELLED
+	end
+
+	if CustomLeague._isFinished(args) then
+		return FINISHED
+	end
 end
 
 ---@param args table
 ---@return boolean
-function CustomLeague._checkFinished(args)
-	if _args.cancelled then
-		return true
-	end
-	if args.status == 'finished' then
-		return true
-	end
-
+function CustomLeague._isFinished(args)
 	local finished = Logic.readBoolOrNil(args.finished)
 	if finished ~= nil then
 		return finished
@@ -198,9 +204,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.status = args.status
-		or args.cancelled and 'cancelled'
-		or args.finished and 'finished'
-		or nil
 	lpdbData.maps = args.maps and Json.stringify(args.maps) or nil
 
 	lpdbData.extradata.seriesnumber = _args.number
