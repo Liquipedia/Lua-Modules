@@ -113,7 +113,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 
 	match.links.lrthread = match.links.lrthread or match.lrthread
 
-	if not match.headToHead or #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
+	if #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
 	then
 		return footer:addLinks(LINKS_DATA, match.links)

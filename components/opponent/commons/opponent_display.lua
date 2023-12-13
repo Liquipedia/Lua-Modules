@@ -21,6 +21,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local zeroWidthSpace = '&#8203;'
 
+---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')

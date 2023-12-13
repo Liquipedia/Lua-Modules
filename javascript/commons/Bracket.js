@@ -74,8 +74,8 @@ liquipedia.bracket = {
 			} );
 		},
 		getImageSelector: function( url ) {
-			const urlparts = url.split( '/' );
-			let value = urlparts[ urlparts.length - 1 ];
+			var urlparts = url.split( '/' );
+			var value = urlparts[ urlparts.length - 1 ];
 			value.replace( '-icon', '_std' );
 			if ( value.indexOf( '-' ) !== -1 ) {
 				value = value.replace( '-logo', '' ).replace( '-std', '' );
@@ -85,12 +85,12 @@ liquipedia.bracket = {
 			return value;
 		},
 		getTextSelector: function( node ) {
-			const clonedNode = node.cloneNode( true );
-			const children = clonedNode.querySelectorAll( 'div.bracket-score, div.team-template-team-bracket' );
+			var clonedNode = node.cloneNode( true );
+			var children = clonedNode.querySelectorAll( 'div.bracket-score, div.team-template-team-bracket' );
 			children.forEach( function( child ) {
 				clonedNode.removeChild( child );
 			} );
-			let value = clonedNode.innerHTML;
+			var value = clonedNode.innerHTML;
 			value = value.replace( /<.*?>/g, '' );
 			value = value.replace( /&nbsp;/g, '' );
 			value = value.trim();
@@ -98,12 +98,12 @@ liquipedia.bracket = {
 		},
 		binds: { },
 		createBinds: function() {
-			const bindingtemplates = document.querySelectorAll( '.bind-highlighting' );
+			var bindingtemplates = document.querySelectorAll( '.bind-highlighting' );
 			bindingtemplates.forEach( function( element ) {
-				const from = element.querySelector( '.bind-highlighting-from' );
-				const to = element.querySelector( '.bind-highlighting-to' );
-				const fromteamicon = from.querySelector( '.team-template-image img' );
-				let fromselector;
+				var from = element.querySelector( '.bind-highlighting-from' );
+				var to = element.querySelector( '.bind-highlighting-to' );
+				var fromteamicon = from.querySelector( '.team-template-image img' );
+				var fromselector;
 				if ( fromteamicon === null ) {
 					// Player highlighting
 					fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
@@ -114,8 +114,8 @@ liquipedia.bracket = {
 						fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
 					}
 				}
-				const toteamicon = to.querySelector( '.team-template-image img' );
-				let toselector;
+				var toteamicon = to.querySelector( '.team-template-image img' );
+				var toselector;
 				if ( toteamicon === null ) {
 					// Player highlighting
 					toselector = liquipedia.bracket.highlighting.getTextSelector( to );
@@ -132,12 +132,12 @@ liquipedia.bracket = {
 		hoverCache: { },
 		createHoverCache: function() {
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
-				const teamicon = element.querySelector( '.team-template-image img' );
-				let selector;
+				var teamicon = element.querySelector( '.team-template-image img' );
+				var selector;
 				if ( teamicon === null ) {
 					// Player highlighting
 					selector = liquipedia.bracket.highlighting.getTextSelector( element );
-					const backgroundcolor = element.style.backgroundColor;
+					var backgroundcolor = element.style.backgroundColor;
 					switch ( backgroundcolor ) {
 						case 'rgb(242, 184, 184)':
 							// Zerg/Orc
@@ -192,12 +192,12 @@ liquipedia.bracket = {
 		popupBox: null,
 		createIcons: function() {
 			document.querySelectorAll( '.bracket-game' ).forEach( function( element ) {
-				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					const icon = document.createElement( 'div' );
+					var icon = document.createElement( 'div' );
 					icon.classList.add( 'icon' );
 					icon.style.top = ( parseInt( window.getComputedStyle( element.querySelector( ':first-child' ) ).height ) - 6 ) + 'px';
-					const score = element.querySelector( '.bracket-score' );
+					var score = element.querySelector( '.bracket-score' );
 					if ( score !== null ) {
 						icon.style.right = ( parseInt( window.getComputedStyle( score ).width ) - 5 ) + 'px';
 					} else {
@@ -211,15 +211,15 @@ liquipedia.bracket = {
 				}
 			} );
 			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
-				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					const icon = document.createElement( 'div' );
+					var icon = document.createElement( 'div' );
 					icon.style.position = 'relative';
-					const iconinner = document.createElement( 'div' );
+					var iconinner = document.createElement( 'div' );
 					iconinner.classList.add( 'match-row-icon' );
 					icon.appendChild( iconinner );
-					let iconHolder;
-					let i = 0;
+					var iconHolder;
+					var i = 0;
 					element.childNodes.forEach( function( node ) {
 						if ( typeof node.tagName !== 'undefined' && node.tagName.toLowerCase() === 'td' ) {
 							i++;
@@ -240,11 +240,11 @@ liquipedia.bracket = {
 				}
 			} );
 			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
-				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
+				var popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
-					const icon = document.createElement( 'div' );
+					var icon = document.createElement( 'div' );
 					icon.style.position = 'relative';
-					const iconinner = document.createElement( 'div' );
+					var iconinner = document.createElement( 'div' );
 					iconinner.classList.add( 'icon' );
 					icon.appendChild( iconinner );
 					element.appendChild( icon );
@@ -268,7 +268,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-inner, .bracket-game .icon' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					const newPopupWrapper = element.closest( '.bracket-game' );
+					var newPopupWrapper = element.closest( '.bracket-game' );
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -277,7 +277,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -290,7 +290,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					const newPopupWrapper = element;
+					var newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -299,7 +299,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -312,7 +312,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
 				element.addEventListener( 'click', function( event ) {
-					const newPopupWrapper = element;
+					var newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
 						liquipedia.tracker.track( 'Bracket popup closed' );
@@ -321,7 +321,7 @@ liquipedia.bracket = {
 							return;
 						}
 					}
-					const newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
+					var newPopup = newPopupWrapper.querySelector( '.bracket-popup-wrapper' );
 					if ( newPopup !== null ) {
 						newPopup.style.marginLeft = '';
 						newPopup.style.display = 'block';
@@ -334,29 +334,29 @@ liquipedia.bracket = {
 		},
 		positionBracketPopup: function() {
 			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.icon' ) !== null ) {
-				const popupBox = liquipedia.bracket.popup.popupBox;
-				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
-				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
+				var popupBox = liquipedia.bracket.popup.popupBox;
+				var popup = popupBox.querySelector( '.bracket-popup-wrapper' );
+				var windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
 				if ( !window.matchMedia( '(max-width: 767px)' ).matches ) {
 					popup.classList.remove( 'bracket-popup-mobile' );
-					// const detailsHeight = parseInt( window.getComputedStyle( popup ).height );
-					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
-					const popupBoxPosition = popupBox.getBoundingClientRect();
-					const spaceOnTheRight = windowWidth - ( popupBoxPosition.right + detailsWidth );
-					// const icon = popupBox.querySelector( '.icon' );
+					// var detailsHeight = parseInt( window.getComputedStyle( popup ).height );
+					var detailsWidth = parseInt( window.getComputedStyle( popup ).width );
+					var popupBoxPosition = popupBox.getBoundingClientRect();
+					var spaceOnTheRight = windowWidth - ( popupBoxPosition.right + detailsWidth );
+					// var icon = popupBox.querySelector( '.icon' );
 
-					const bracketWrapper = popup.closest( '.bracket-wrapper' );
-					const topPosition = ( popupBox.offsetHeight / 2 ) - ( popup.offsetHeight / 2 );
-					// const popupBoxY = document.documentElement.scrollTop + popupBoxPosition.top;
+					var bracketWrapper = popup.closest( '.bracket-wrapper' );
+					var topPosition = ( popupBox.offsetHeight / 2 ) - ( popup.offsetHeight / 2 );
+					// var popupBoxY = document.documentElement.scrollTop + popupBoxPosition.top;
 					popup.style.top = topPosition + 'px';
 					popup.style.bottom = '';
 
-					const wrapperTop = bracketWrapper.getBoundingClientRect().top;
-					const pBoxTop = popupBox.getBoundingClientRect().top;
-					const popupTop = popup.getBoundingClientRect().top;
-					const posDiff = pBoxTop - wrapperTop;
-					const hasXScrollbar = bracketWrapper.scrollWidth > bracketWrapper.clientWidth;
-					const scrollBarHeight = hasXScrollbar ?
+					var wrapperTop = bracketWrapper.getBoundingClientRect().top;
+					var pBoxTop = popupBox.getBoundingClientRect().top;
+					var popupTop = popup.getBoundingClientRect().top;
+					var posDiff = pBoxTop - wrapperTop;
+					var hasXScrollbar = bracketWrapper.scrollWidth > bracketWrapper.clientWidth;
+					var scrollBarHeight = hasXScrollbar ?
 						bracketWrapper.offsetHeight - bracketWrapper.clientHeight :
 						0;
 
@@ -371,11 +371,11 @@ liquipedia.bracket = {
 						// Positioned above the wrapper, move it down
 						popup.style.top = ( posDiff * -1 ) + 'px';
 					}
-					const contentHeight = ( popupTop - wrapperTop ) + popup.offsetHeight;
+					var contentHeight = ( popupTop - wrapperTop ) + popup.offsetHeight;
 					if ( contentHeight > ( bracketWrapper.offsetHeight - scrollBarHeight ) ) {
 						// Positioned too low, creating overflow, move it up
-						const overflow = contentHeight - bracketWrapper.offsetHeight + scrollBarHeight;
-						const newposition = topPosition - ( overflow ) - 1; // -1 for rounding errors
+						var overflow = contentHeight - bracketWrapper.offsetHeight + scrollBarHeight;
+						var newposition = topPosition - ( overflow ) - 1; // -1 for rounding errors
 						popup.style.top = newposition + 'px';
 					}
 
@@ -397,18 +397,18 @@ liquipedia.bracket = {
 		},
 		positionGroupTablePopup: function() {
 			if ( liquipedia.bracket.popup.popupBox !== null && liquipedia.bracket.popup.popupBox.querySelector( '.match-row-icon' ) !== null ) {
-				const popupBox = liquipedia.bracket.popup.popupBox;
-				const popup = popupBox.querySelector( '.bracket-popup-wrapper' );
-				const windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
-				const mainContentCol = document.querySelector( '.main-content-column' );
+				var popupBox = liquipedia.bracket.popup.popupBox;
+				var popup = popupBox.querySelector( '.bracket-popup-wrapper' );
+				var windowWidth = parseInt( window.getComputedStyle( document.querySelector( 'html' ) ).width );
+				var mainContentCol = document.querySelector( '.main-content-column' );
 				if ( windowWidth > 600 ) {
 					popup.classList.remove( 'bracket-popup-mobile' );
-					const detailsWidth = parseInt( window.getComputedStyle( popup ).width );
-					const popupBoxPosition = popupBox.getBoundingClientRect();
+					var detailsWidth = parseInt( window.getComputedStyle( popup ).width );
+					var popupBoxPosition = popupBox.getBoundingClientRect();
 					// popup.style.top = ( popupBoxPosition.top + popupBoxPosition.height ) + 'px';
 					popup.style.top = document.documentElement.scrollTop + ( popupBoxPosition.bottom - mainContentCol.offsetTop ) + 'px';
 					// var left = popupBoxPosition.left + popupBoxPosition.width / 2 - detailsWidth / 2;
-					let left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left + ( popupBoxPosition.width / 2 - detailsWidth / 2 );
+					var left = popupBoxPosition.left - mainContentCol.getBoundingClientRect().left + ( popupBoxPosition.width / 2 - detailsWidth / 2 );
 					if ( left < 10 ) {
 						left = 10;
 					}
@@ -423,7 +423,7 @@ liquipedia.bracket = {
 		createEventListeners: function() {
 			if ( document.querySelector( '.bracket .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
-				const bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				var bruinenBracketScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenBracketScroll !== null ) {
 					bruinenBracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				}
@@ -434,7 +434,7 @@ liquipedia.bracket = {
 			}
 			if ( document.querySelector( '.matchlist .bracket-popup-wrapper' ) !== null ) {
 				window.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
-				const bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
+				var bruinenGroupScroll = document.querySelector( 'body.logged-in .scroll-logged-in, body.logged-out .scroll-logged-out' );
 				if ( bruinenGroupScroll !== null ) {
 					bruinenGroupScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionGroupTablePopup );
 				}
