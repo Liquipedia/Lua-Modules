@@ -87,9 +87,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
+CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 --
 --
