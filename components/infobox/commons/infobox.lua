@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
@@ -58,11 +59,11 @@ function Infobox:widgetInjector(injector)
 	return self
 end
 
----Adds a custom widgets to the bottom of the infobox
+---Adds a custom components after the end the infobox
 ---@param wikitext string|number|Html|nil
 ---@return self
 function Infobox:bottom(wikitext)
-	self.bottomContent = wikitext
+	self.bottomContent = (self.bottomContent or '') .. (wikitext or '')
 	return self
 end
 
@@ -90,7 +91,7 @@ function Infobox:build(widgets)
 		self.root:node(self.adbox)
 		Variables.varDefine('is_first_infobox', 'false')
 	end
-	if self.bottomContent ~= nil then
+	if String.isNotEmpty(self.bottomContent) then
 		self.root:node(self.bottomContent)
 	end
 

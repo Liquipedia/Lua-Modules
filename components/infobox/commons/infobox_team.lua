@@ -9,9 +9,12 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local String = require('Module:StringUtils')
@@ -33,6 +36,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class InfoboxTeam : BasicInfobox
 local Team = Class.new(BasicInfobox)
 
 local _LINK_VARIANT = 'team'
@@ -196,6 +200,7 @@ function Team:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{content = {args.footnotes}},
 	}
+	infobox:bottom(self:_createUpcomingMatches())
 	infobox:bottom(self:createBottomContent())
 
 	-- Categories
@@ -243,6 +248,12 @@ function Team:_createLocation(location)
 	return Flags.Icon({flag = location, shouldLink = true}) ..
 			'&nbsp;' ..
 			(locationDisplay or '')
+end
+
+function Team:_createUpcomingMatches()
+	if self:shouldStore(self.args) and Info.match2 > 0 then
+		return MatchTicker.participant{team = self.pagename}
+	end
 end
 
 function Team:getStandardLocationValue(location)
@@ -303,9 +314,7 @@ function Team:_setLpdbData(args, links)
 			'have to set the LPDB earnings storage in the custom module')
 	end
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear or {})
-	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality

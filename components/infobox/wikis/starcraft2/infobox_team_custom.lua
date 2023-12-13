@@ -12,7 +12,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -58,7 +57,6 @@ function CustomTeam.run(frame)
 	_team = team
 	_args = team.args
 
-	team.createBottomContent = CustomTeam.createBottomContent
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
@@ -128,12 +126,6 @@ end
 
 function CustomTeam:createWidgetInjector()
 	return CustomInjector()
-end
-
-function CustomTeam:createBottomContent()
-	if _doStore then
-		return MatchTicker.participant{team = self.pagename}
-	end
 end
 
 function CustomTeam:addToLpdb(lpdbData)
