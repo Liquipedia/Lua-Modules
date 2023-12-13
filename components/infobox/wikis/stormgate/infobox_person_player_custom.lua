@@ -42,8 +42,6 @@ local ROLES = {
 	producer = {category = 'Producer', variable = 'Producer', personType = 'Staff'},
 	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
-ROLES.commentator = ROLES.caster
-ROLES['tournament organizer'] = ROLES.organizer
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
