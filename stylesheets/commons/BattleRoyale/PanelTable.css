@@ -16,7 +16,7 @@ Author(s): Elysienna
     }
 
     &__navigate {
-        position: sticky;
+        position: absolute;
         padding: 12px;
         height: 100%;
         background-color: #F5F5F5;
@@ -330,6 +330,8 @@ Author(s): Elysienna
             overflow-x: hidden;
             flex: 1;
             scroll-behavior: smooth;
+            border: 0;
+            align-items: unset;
         }
     }
 }
