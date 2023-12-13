@@ -45,7 +45,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		'{{Match',
 		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|twitch='} or {}
+		Logic.readBool(args.hasDate) and {indent .. '|date=', indent .. '|twitch='} or {}
 	)
 
 	for i = 1, opponents do
