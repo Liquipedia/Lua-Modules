@@ -173,7 +173,7 @@ function matchFunctions.getOpponents(args)
 	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
 	bestof = tonumber(bestof) or 5
 	Variables.varDefine('bestof', bestof)
-	local firstTo = math.ceil(bestof / 2)
+	local firstTo = bestof / 2
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
@@ -236,10 +236,6 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 
-	if not args.winner then
-		matchFunctions._checkDraw(opponents, firstTo, args)
-	end
-
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(args.finished) then
 		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
@@ -249,6 +245,10 @@ function matchFunctions.getOpponents(args)
 		if matchUnixTime + threshold < currentUnixTime then
 			args.finished = true
 		end
+	end
+
+	if not args.winner then
+		matchFunctions._checkDraw(opponents, firstTo, args)
 	end
 
 	-- apply placements and winner if finshed
@@ -273,15 +273,9 @@ function matchFunctions._setPlacementsAndWinner(opponents, match)
 	match.winner = tonumber(match.winner)
 
 	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-		if counter == 1 then
-			match.winner = opponentIndex
-		end
-		opponent.placement = counter
-		counter = counter + 1
-
 		local score = tonumber(opponent.score)
 		counter = counter + 1
-		if counter == 1 and not match.winner then
+		if not match.winner then
 			match.winner = opponentIndex
 		end
 		if lastScore == score then
@@ -298,8 +292,11 @@ end
 ---@param firstTo number
 ---@param match table
 function matchFunctions._checkDraw(opponents, firstTo, match)
+	local finished = Logic.readBool(match.finished)
+	local score1 = opponents[1].score
 	local isDraw = Array.all(opponents, function(opponent)
 		return opponent.score == firstTo
+			or finished and opponent.score == score1
 	end)
 
 	if not isDraw then return end
