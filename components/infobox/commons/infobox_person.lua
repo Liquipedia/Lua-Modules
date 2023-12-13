@@ -144,7 +144,7 @@ function Person:createInfobox()
 			}
 		},
 		Customizable{id = 'status', children = {
-			Cell{name = 'Status', content = {args.status or (Logic.readBool(args.banned) and 'Banned') or nil}}
+			Cell{name = 'Status', content = {(Logic.readBool(args.banned) and 'Banned') or args.status}}
 			}
 		},
 		Customizable{id = 'role', children = {
