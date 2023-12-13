@@ -49,10 +49,6 @@ function CustomTeam:createBottomContent()
 	if not _team.args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.name or _team.pagename}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
 			{team = _team.name or _team.pagename}
 		)

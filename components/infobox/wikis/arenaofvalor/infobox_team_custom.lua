@@ -37,9 +37,6 @@ function CustomTeam:createBottomContent()
 	if not _args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of'
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of'
 		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
 	end
