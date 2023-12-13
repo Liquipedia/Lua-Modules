@@ -417,6 +417,7 @@ end
 --in the team template extension
 function opponentFunctions.getLegacyTeamName(template)
 	local team = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	if not team then return end
 	team = team:gsub('%&', '')
 	team = String.split(team, 'link=')[2]
 	team = String.split(team, ']]')[1]
@@ -425,6 +426,7 @@ end
 
 function opponentFunctions.getLegacyTeamIcon(template)
 	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	if not iconTemplate then return end
 	iconTemplate = iconTemplate:gsub('%&', '')
 	local icon = String.split(iconTemplate, 'File:')[2]
 	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
