@@ -60,8 +60,6 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {soloAchievements}})
 		end
 
-		--need this ABOVE the history display and below the
-		--achievements display, hence moved it here
 		local raceBreakdown = RaceBreakdown.run(_args)
 		if raceBreakdown then
 			Array.appendWith(widgets,

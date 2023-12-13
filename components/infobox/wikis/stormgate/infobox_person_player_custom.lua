@@ -200,7 +200,7 @@ end
 ---@param personType string
 ---@return table<string, string|number|table|nil>
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	local extradata = lpdbData.extradata or {}
+	local extradata = lpdbData.extradata
 
 	local factions = self:readFactions(args.race)
 
@@ -212,8 +212,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	if Variables.varDefault('factioncount') then
 		extradata.factionhistorical = true
 	end
-
-	lpdbData.extradata = extradata
 
 	return lpdbData
 end
