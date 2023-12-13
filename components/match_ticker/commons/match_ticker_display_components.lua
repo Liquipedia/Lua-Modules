@@ -175,12 +175,13 @@ function ScoreBoard:create()
 		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponent standardOpponent
+---@param opponentData table
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponent, isWinner, flip)
-	opponent = Opponent.fromMatch2Record(opponent)
+function ScoreBoard:opponent(opponentData, isWinner, flip)
+	local opponent = Opponent.fromMatch2Record(opponentData)
+	---@cast opponent -nil
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
