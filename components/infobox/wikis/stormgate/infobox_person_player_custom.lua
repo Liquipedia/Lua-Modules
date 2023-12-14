@@ -215,20 +215,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	return lpdbData
 end
-
----@param args table
----@return string?
-function CustomPlayer:getStatusToStore(args)
-	if args.status then
-		return mw.getContentLanguage():ucfirst(args.status)
-	elseif args.death_date then
-		return 'Deceased'
-	elseif args.retired then
-		return 'Retired'
-	end
-	return 'Active'
-end
-
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
