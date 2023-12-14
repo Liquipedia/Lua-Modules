@@ -97,4 +97,4 @@ function p._convertParameters(match2)
 	return match
 end
 
-return p
+return MatchLegacy
