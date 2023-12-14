@@ -160,16 +160,10 @@ end
 ---@param args table
 ---@return string?
 function CustomLeague._getGameVersion(args)
-	if not args.patch then
-		return
-	end
-
-	local gameVersion = '[[' .. args.patch .. ']]'
-	if not args.epatch or args.epatch == args.patch then
-		return gameVersion
-	end
-
-	return gameVersion .. ' &ndash; [[' .. args.epatch .. ']]'
+	return table.concat({
+		Page.makeInternalLink(args.patch),
+		Page.makeInternalLink(args.epatch ~= args.patch and args.patch and args.epatch or nil)
+	}, ' &ndash; ')
 end
 
 ---@param args table
