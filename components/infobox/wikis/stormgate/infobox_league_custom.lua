@@ -47,7 +47,6 @@ function CustomLeague.run(frame)
 	_args.raceBreakDown = RaceBreakdown.run(_args) or {}
 	_args.player_number = _args.raceBreakDown.total
 	_args.maps = CustomLeague._getMaps(_args)
-	_args.number = Logic.isNumeric(_args.number) and string.format('%05i', tonumber(_args.number)) or nil
 	--varDefault because it could have been set above the infobox via a template
 	_args.status = CustomLeague._getStatus(_args)
 
@@ -85,7 +84,7 @@ function CustomLeague._isFinished(args)
 		return finished
 	end
 
-	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date) 
+	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date)
 
 	if not queryDate or os.date('%Y-%m-%d') < queryDate then
 		return false
@@ -140,11 +139,9 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param maps {link: string, displayname: string}[]?
----@return string?
+---@param maps {link: string, displayname: string}[]
+---@return string
 function CustomLeague._mapsDisplay(maps)
-	if not maps then return end
-
 	return table.concat(
 		Array.map(maps, function(mapData)
 			return tostring(CustomLeague:_createNoWrappingSpan(
@@ -169,15 +166,12 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--wiki specific vars
 	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.publishertier)))
-	Variables.varDefine('tournament_maps', args.maps and Json.stringify(args.maps) or '')
+	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 end
 
 ---@param args table
----@return {link: string, displayname: string}[]?
+---@return {link: string, displayname: string}[]
 function CustomLeague._getMaps(args)
-	if String.isEmpty(args.map1) then
-		return
-	end
 	local mapArgs = _league:getAllArgsForBase(args, 'map')
 
 	return Table.map(mapArgs, function(mapIndex, map)
@@ -194,7 +188,7 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.status = args.status
-	lpdbData.maps = args.maps and Json.stringify(args.maps) or nil
+	lpdbData.maps = Json.stringify(args.maps)
 
 	return lpdbData
 end
