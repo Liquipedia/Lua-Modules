@@ -36,8 +36,6 @@ local FINISHED = 'finished'
 local _args
 local _league
 
-local FALLBACK_DATE = '2999-99-99'
-
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
@@ -87,9 +85,9 @@ function CustomLeague._isFinished(args)
 		return finished
 	end
 
-	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date) or FALLBACK_DATE
+	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date) 
 
-	if os.date('%Y-%m-%d') < queryDate then
+	if not queryDate or os.date('%Y-%m-%d') < queryDate then
 		return false
 	end
 
@@ -170,8 +168,6 @@ end
 function CustomLeague:defineCustomPageVariables(args)
 
 	--wiki specific vars
-	Variables.varDefine('patch', args.patch)
-	Variables.varDefine('epatch', args.epatch)
 	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.publishertier)))
 	Variables.varDefine('tournament_maps', args.maps and Json.stringify(args.maps) or '')
 end
@@ -199,8 +195,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.status = args.status
 	lpdbData.maps = args.maps and Json.stringify(args.maps) or nil
-
-	lpdbData.extradata.seriesnumber = _args.number
 
 	return lpdbData
 end
