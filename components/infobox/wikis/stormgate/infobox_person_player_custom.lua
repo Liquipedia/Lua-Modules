@@ -153,7 +153,7 @@ end
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
 	local args = self.args
-	for _, faction in pairs(self:readFactions(args.race)) do
+	for _, faction in pairs(self:readFactions(args.faction)) do
 		table.insert(categories, Faction.toName(faction) .. ' Players')
 	end
 
