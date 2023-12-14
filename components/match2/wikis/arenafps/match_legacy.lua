@@ -29,7 +29,10 @@ function MatchLegacy.storeMatch(match2, options)
 	end
 end
 
-function p.storeGames(match, match2)
+---@param match table
+---@param match2 table
+---@return string
+function MatchLegacy.storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game = Table.deepCopy(game)
