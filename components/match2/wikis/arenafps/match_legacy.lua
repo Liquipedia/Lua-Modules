@@ -50,7 +50,9 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p._convertParameters(match2)
+---@param match2 table
+---@return table
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
