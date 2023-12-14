@@ -30,9 +30,11 @@ local CAMPS = {
 	{key = 'healthcamps', name = 'Health Camp'},
 	{key = 'siegecamps', name = 'Siege Camp'},
 }
+--currently the ingame icons are still temporary
+--use placeholders until ingame icons are final and we get them
 local RESOURCE_ICONS = {
-	liminite = 'L', --TODO: Add icon
-	therium = 'T', --TODO: Add icon
+	liminite = 'Lim',
+	therium = 'The',
 }
 local LADDER_HISTORY = {
 	{key = '1v1history', name = '1v1 Ladder'},
