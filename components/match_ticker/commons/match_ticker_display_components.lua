@@ -175,12 +175,13 @@ function ScoreBoard:create()
 		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponent standardOpponent
+---@param opponentData table
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponent, isWinner, flip)
-	opponent = Opponent.fromMatch2Record(opponent)
+function ScoreBoard:opponent(opponentData, isWinner, flip)
+	local opponent = Opponent.fromMatch2Record(opponentData)
+	---@cast opponent -nil
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
@@ -353,28 +354,40 @@ function Match:create()
 	return matchDisplay
 end
 
----@return Html
-function Match:brMatchRow()
-	local displayText = self.match.match2bracketdata.sectionheader or DEFAULT_BR_MATCH_TEXT
-
-	local inheritedHeader = self.match.match2bracketdata.inheritedheader
-	if inheritedHeader then
-		local headerArray = mw.text.split(inheritedHeader, '!')
-
-		local index = 1
-		if String.isEmpty(headerArray[1]) then
-			index = 2
-		end
-		displayText = Logic.emptyOr(
-			mw.message.new('brkts-header-' .. headerArray[index]):params(headerArray[index + 1] or ''):plain(),
-			inheritedHeader
-		)--[[@as string]]
+---@param inheritedHeader string?
+---@return string?
+function Match:_expandHeader(inheritedHeader)
+	if not inheritedHeader then
+		return
 	end
 
+	local headerArray = mw.text.split(inheritedHeader, '!')
+
+	local index = 1
+	if String.isEmpty(headerArray[1]) then
+		index = 2
+	end
+
+	local headerInput = 'brkts-header-' .. headerArray[index]
+	local expandedHeader = mw.message.new('brkts-header-' .. headerArray[index])
+			---@diagnostic disable-next-line: param-type-mismatch
+			:params(headerArray[index + 1] or ''):plain() --[[@as string]]
+	local failedExpandedHeader = '⧼' .. headerInput .. '⧽'
+	if Logic.isEmpty(expandedHeader) or failedExpandedHeader == expandedHeader then
+		return inheritedHeader
+	end
+
+	return expandedHeader
+end
+
+---@return Html
+function Match:brMatchRow()
+	local displayText = self:_expandHeader(self.match.match2bracketdata.inheritedheader)
+		or self.match.match2bracketdata.sectionheader or DEFAULT_BR_MATCH_TEXT
 
 	return mw.html.create('tr')
 		:addClass('versus')
-		:wikitext(displayText)
+		:tag('td'):wikitext(displayText):done()
 end
 
 ---@return Html
