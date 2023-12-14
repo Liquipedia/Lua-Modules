@@ -53,12 +53,7 @@ end
 ---@param match2 table
 ---@return table
 function MatchLegacy._convertParameters(match2)
-	local match = Table.deepCopy(match2)
-	for key, _ in pairs(match) do
-		if String.startsWith(key, 'match2') then
-			match[key] = nil
-		end
-	end
+	local match = Table.filterByKey(match2, function(key) return not String.startsWith(key, 'match2') end)
 
 	match.staticid = match2.match2id
 
