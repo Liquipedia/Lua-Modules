@@ -21,7 +21,6 @@ local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requir
 local MatchTicker = Lua.import('Module:MatchTicker/Custom', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
-local FACTION_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local ROLES = {
@@ -77,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Faction',
-				content = {_player:getFactionData(args.faction or 'unknown', FACTION_FIELD_AS_CATEGORY_LINK)}
+				content = {_player:getFactionData(args.faction or 'unknown')}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -175,17 +174,13 @@ function CustomPlayer:nameDisplay(args)
 end
 
 ---@param factionInput string?
----@param asCategory boolean?
 ---@return string
-function CustomPlayer:getFactionData(factionInput, asCategory)
+function CustomPlayer:getFactionData(factionInput)
 	local factions = self:readFactions(factionInput)
 
 	return table.concat(Array.map(factions, function(faction)
 		faction = Faction.toName(faction)
-		if asCategory then
-			return '[[:Category:' .. faction .. ' Players|' .. faction .. ']]'
-		end
-		return '[[' .. faction .. ']]'
+		return '[[:Category:' .. faction .. ' Players|' .. faction .. ']]'
 	end) or {}, ',&nbsp;')
 end
 
