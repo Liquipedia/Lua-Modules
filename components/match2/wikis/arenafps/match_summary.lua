@@ -105,27 +105,6 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(casterRow)
 	end
 
-	-- Add the Map Vetoes
-	if match.extradata.mapveto then
-		local vetoData = match.extradata.mapveto
-		if vetoData then
-			local mapVeto = MapVeto()
-
-			for _,vetoRound in ipairs(vetoData) do
-				if vetoRound.vetostart then
-					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
-				end
-				if vetoRound.type == 'decider' then
-					mapVeto:addDecider(vetoRound.decider)
-				else
-					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-				end
-			end
-
-			body:addRow(mapVeto)
-		end
-	end
-
 	return body
 end
 ---@param game MatchGroupUtilGame
