@@ -69,12 +69,11 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
-			for i = 1, MAX_NUM_PLAYERS do
-				local player = opponentmatch2players[i] or {}
+			Array.forEach(opponentmatch2players, function(player)
 				opponentplayers['p' .. i] = player.name or ''
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
-			end
+			end)
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
