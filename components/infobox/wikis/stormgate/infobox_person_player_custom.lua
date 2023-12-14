@@ -21,7 +21,7 @@ local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requir
 local MatchTicker = Lua.import('Module:MatchTicker/Custom', {requireDevIfEnabled = true})
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
-local RACE_FIELD_AS_CATEGORY_LINK = true
+local FACTION_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local ROLES = {
@@ -76,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'status' then
 		return {
 			Cell{
-				name = 'Race',
-				content = {_player:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				name = 'Faction',
+				content = {_player:getFactionData(args.faction or 'unknown', FACTION_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -163,22 +163,22 @@ end
 ---@param args table
 ---@return string
 function CustomPlayer:nameDisplay(args)
-	local factions = self:readFactions(args.race)
+	local factions = self:readFactions(args.faction)
 
-	local raceIcons = table.concat(Array.map(factions, function(faction)
+	local factionIcons = table.concat(Array.map(factions, function(faction)
 		return Faction.Icon{faction = faction, size = 'large'}
 	end))
 
 	local name = args.id or self.pagename
 
-	return raceIcons .. '&nbsp;' .. name
+	return factionIcons .. '&nbsp;' .. name
 end
 
----@param race string?
+---@param faction string?
 ---@param asCategory boolean?
 ---@return string
-function CustomPlayer:getRaceData(race, asCategory)
-	local factions = self:readFactions(race)
+function CustomPlayer:getFactionData(faction, asCategory)
+	local factions = self:readFactions(faction)
 
 	return table.concat(Array.map(factions, function(faction)
 		faction = Faction.toName(faction)
@@ -202,7 +202,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	local extradata = lpdbData.extradata
 
-	local factions = self:readFactions(args.race)
+	local factions = self:readFactions(args.faction)
 
 	extradata.faction = factions[1]
 	extradata.faction2 = factions[2]
