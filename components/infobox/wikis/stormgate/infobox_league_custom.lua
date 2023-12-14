@@ -12,7 +12,7 @@ local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -150,7 +150,7 @@ function CustomLeague._mapsDisplay(maps)
 	return table.concat(
 		Array.map(maps, function(mapData)
 			return tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
 		'&nbsp;• '

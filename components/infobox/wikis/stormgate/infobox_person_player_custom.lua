@@ -174,11 +174,11 @@ function CustomPlayer:nameDisplay(args)
 	return factionIcons .. '&nbsp;' .. name
 end
 
----@param faction string?
+---@param factionInput string?
 ---@param asCategory boolean?
 ---@return string
-function CustomPlayer:getFactionData(faction, asCategory)
-	local factions = self:readFactions(faction)
+function CustomPlayer:getFactionData(factionInput, asCategory)
+	local factions = self:readFactions(factionInput)
 
 	return table.concat(Array.map(factions, function(faction)
 		faction = Faction.toName(faction)
