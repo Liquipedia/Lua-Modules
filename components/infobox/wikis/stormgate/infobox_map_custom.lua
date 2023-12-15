@@ -129,16 +129,16 @@ function CustomInjector:addCustomCells(widgets)
 			Cell{name = 'Rush distance', content = {_args.rushDistance and (_args.rushDistance .. ' seconds') or nil}},
 			Cell{name = 'Available Resources', content = {CustomMap._resourcesDisplay(_args)}},
 		},
-		CustomMap._addCellsFromDatTable(_args, LADDER_HISTORY),
+		CustomMap._addCellsFromDataTable(_args, LADDER_HISTORY),
 		{hasCampData and Title{name = 'Camp Information'} or nil},
-		CustomMap._addCellsFromDatTable(_args, CAMPS)
+		CustomMap._addCellsFromDataTable(_args, CAMPS)
 	)
 end
 
 ---@param args table
 ---@param tbl {key: string, name: string}[]
 ---@return Widget[]
-function CustomMap._addCellsFromDatTable(args, tbl)
+function CustomMap._addCellsFromDataTable(args, tbl)
 	return Array.map(tbl, function(data)
 		return Cell{name = data.name, content = {args[data.key]}}
 	end)
