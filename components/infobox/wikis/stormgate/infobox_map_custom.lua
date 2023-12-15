@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
+-- wiki=stormgate
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -25,16 +26,16 @@ local CustomMap = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
-	{key = 'resourcecamps', name = 'Resource Camp'},
-	{key = 'speedcamps', name = 'Speed Camp'},
-	{key = 'healthcamps', name = 'Health Camp'},
-	{key = 'siegecamps', name = 'Siege Camp'},
+	{key = 'resourcecamps', name = 'Resource Camp(s)'},
+	{key = 'speedcamps', name = 'Speed Camp(s)'},
+	{key = 'healthcamps', name = 'Health Camp(s)'},
+	{key = 'siegecamps', name = 'Siege Camp(s)'},
 }
 --currently the ingame icons are still temporary
 --use placeholders until ingame icons are final and we get them
 local RESOURCE_ICONS = {
-	liminite = 'Lim',
-	therium = 'The',
+	luminite = Abbreviation.make('Lum', 'Luminite'),
+	therium = Abbreviation.make('The', 'Therium'),
 }
 local LADDER_HISTORY = {
 	{key = '1v1history', name = '1v1 Ladder'},
@@ -76,7 +77,7 @@ function CustomMap._parseArgs(args)
 			'rushDistance',
 			'height',
 			'width',
-			'liminite',
+			'luminite',
 			'therium',
 			'closedTherium',
 		},
@@ -158,7 +159,7 @@ function CustomMap._resourcesDisplay(args)
 	end
 	local therium = toValueWithIcon('therium')
 
-	return table.concat({toValueWithIcon('liminite'), therium and (therium .. theriumAppend)}, ' ')
+	return table.concat({toValueWithIcon('luminite'), therium and (therium .. theriumAppend)}, ' ')
 end
 
 ---@param types string[]
@@ -200,7 +201,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 		height = args.height or 0,
 		width = args.width or 0,
 		rush = args.rushDistance,
-		liminite = args.liminite or 0,
+		luminite = args.luminite or 0,
 		therium = args.therium or 0,
 		closedtherium = args.closedTherium or 0,
 	}
