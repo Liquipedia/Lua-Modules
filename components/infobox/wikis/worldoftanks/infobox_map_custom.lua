@@ -48,11 +48,11 @@ function CustomInjector:addCustomCells(widgets)
 		content = {_args.season}
 	})
 	table.insert(widgets, Cell{
-		name = 'Size', 
+		name = 'Size',
 		content = {(_args.width or '') .. 'x' .. (_args.height or '')}
 	})
 	table.insert(widgets, Cell{
-		name = 'Battle Tier', 
+		name = 'Battle Tier',
 		content = {(_args.btmin or '') .. '-' .. (_args.btmax or '')}
 	})
 	table.insert(widgets, Cell{
