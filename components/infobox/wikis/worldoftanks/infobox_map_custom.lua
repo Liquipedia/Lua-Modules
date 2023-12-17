@@ -97,7 +97,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 		season = args.season,
 		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
 	})
-	
+
 	return lpdbData
 end
 
