@@ -40,7 +40,6 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	local score = args.score == 'true' and '|score=' or nil
-	local bans = args.bans == 'true'
 	local veto = args.veto == 'true'
 	local vetoBanRounds = tonumber(args.vetoBanRounds) or 0
 	local lines = Array.extend(
@@ -57,7 +56,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if veto and bestof > 0 then
 		local preFilledVetoTypes = string.rep('ban,', vetoBanRounds)
 			.. string.rep('pick,', bestof - 1) .. 'pick'
-		
+
 		Array.appendWith(lines,
 			indent .. '|mapveto={{MapVeto',
 			indent .. indent .. '|vetostart=',
