@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
@@ -43,23 +44,12 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Map Season',
-		content = {_args.season}
-	})
-	table.insert(widgets, Cell{
-		name = 'Size',
-		content = {(_args.width or '') .. 'x' .. (_args.height or '')}
-	})
-	table.insert(widgets, Cell{
-		name = 'Battle Tier',
-		content = {(_args.btmin or '') .. '-' .. (_args.btmax or '')}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Modes',
-		content = CustomMap._getGameMode(),
-	})
-	return widgets
+	return Array.append(widgets,
+		Cell{name = 'Map Season', content = {_args.season}},
+		Cell{name = 'Size', content = {(_args.width or '') .. 'x' .. (_args.height or '')}},
+		Cell{name = 'Battle Tier', content = {(_args.btmin or '') .. '-' .. (_args.btmax or '')}},
+		Cell{name = 'Game Modes', content = CustomMap._getGameMode()}
+	)
 end
 
 ---@return string[]
@@ -71,14 +61,10 @@ function CustomMap._getGameMode()
 	local modes = Map:getAllArgsForBase(_args, 'mode')
 	local releasedate = _args.releasedate
 
-	local modeDisplayTable = {}
-	for _, mode in ipairs(modes) do
-		local modeIcon = MapModes.get({mode = mode, date = releasedate, size = 15})
-		local mapModeDisplay = modeIcon .. ' [[' .. mode .. ']]'
-		table.insert(modeDisplayTable, mapModeDisplay)
-	end
-
-	return modeDisplayTable
+	return Array.map(modes, function(mode)
+		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
+		return modeIcon .. ' [[' .. mode .. ']]'
+	end)
 end
 
 ---@param id string
@@ -100,21 +86,21 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.width = args.width
-	lpdbData.extradata.height = args.height
-	lpdbData.extradata.battletierminimum = args.btmin
-	lpdbData.extradata.battletiermaximum = args.btmax
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
+		args.width,
+		args.height
+	})
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
+		args.btmin,
+		args.btmax
+	})
 	lpdbData.extradata.season = args.season
 	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
-	mw.log(lpdbData)
 	return lpdbData
 end
 
----@param args table
----@return categories
 function CustomMap:getWikiCategories(args)
 	return {
-    --[TODO: Fix this method so it properly creates the categories
 		--[[CustomMap.season{season = args.season} .. ' Maps',
 		CustomMap.location{location = args.location} .. ' Maps',]]--
 	}
