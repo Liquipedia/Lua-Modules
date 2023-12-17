@@ -89,6 +89,7 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
+		location = args.location,
 		width = args.width,
 		height = args.height,
 		battletiermin = args.btmin,
@@ -96,15 +97,20 @@ function CustomMap:addToLpdb(lpdbData, args)
 		season = args.season,
 		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
 	})
-
+	
 	return lpdbData
 end
 
 function CustomMap:getWikiCategories(args)
-	return {
-		--[[CustomMap.season{season = args.season} .. ' Maps',
-		CustomMap.location{location = args.location} .. ' Maps',]]--
-	}
+	local categories = {}
+	if String.isNotEmpty(args.season) then
+		table.insert(categories, args.season .. ' Maps')
+	end
+	if String.isNotEmpty(args.location) then
+		table.insert(categories, 'Maps located in ' .. args.location)
+	end
+
+	return categories
 end
 
 return CustomMap
