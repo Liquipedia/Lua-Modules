@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
@@ -88,15 +89,14 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		args.width,
-		args.height
+		width = args.width,
+		height = args.height,
+		battletiermin = args.btmin,
+		battletiermax = args.btmax,
+		season = args.season,
+		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
 	})
-	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		args.btmin,
-		args.btmax
-	})
-	lpdbData.extradata.season = args.season
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
+
 	return lpdbData
 end
 
