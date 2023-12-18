@@ -28,4 +28,5 @@ return {
 	defaultGame = 'paladins',
 	defaultTeamLogo = 'Paladins allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Paladins allmode.png', ---@deprecated
+	match2 = 0,
 }

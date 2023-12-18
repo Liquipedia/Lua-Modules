@@ -341,4 +341,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Call of Duty Default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Call of Duty Default darkmode.png', ---@deprecated
+	match2 = 1,
 }

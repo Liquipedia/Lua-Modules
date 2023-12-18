@@ -405,4 +405,5 @@ return {
 	defaultGame = 'qc',
 	defaultTeamLogo = 'Quake logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Quake logo.png', ---@deprecated
+	match2 = 0,
 }
