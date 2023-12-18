@@ -20,6 +20,15 @@ local lpdb = {}
 ---@field parent string
 ---@field extradata table
 
+---@class LpdbDataPoint:LpdbBaseData
+---@field type string
+---@field name string
+---@field information string
+---@field image string
+---@field imagedark string
+---@field date string
+---@field extradata table
+
 ---@class LpdbPlacement:LpdbBaseData
 ---@field tournament string
 ---@field series string
