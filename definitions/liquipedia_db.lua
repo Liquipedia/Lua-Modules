@@ -7,6 +7,7 @@ local lpdb = {}
 ---@field pagename string
 ---@field namespace integer
 ---@field objectname string
+---@field [any] any
 
 ---@class broadcaster:LpdbBaseData
 ---@field id string
