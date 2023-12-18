@@ -42,8 +42,8 @@ local lpdb = {}
 ---@field weight number
 ---@field mode string
 ---@field type string
----@field liqupediatier string # to be converted to integer
----@field liqupediatiertype string
+---@field liquipediatier string # to be converted to integer
+---@field liquipediatiertype string
 ---@field publishertier string
 ---@field icon string
 ---@field icondark string
@@ -135,8 +135,8 @@ local lpdb = {}
 ---@field locations table
 ---@field prizepool number
 ---@field participantsnumber integer
----@field liqupediatier string # to be converted to integer
----@field liqupediatiertype string
+---@field liquipediatier string # to be converted to integer
+---@field liquipediatiertype string
 ---@field publishertier string
 ---@field status string
 ---@field maps string

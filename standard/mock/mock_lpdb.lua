@@ -132,7 +132,7 @@ dbStructure.squadplayer = {
 ---@generic T:LpdbBaseData
 ---@param dbTable `T`
 ---@param parameters table
----@return T
+---@return T[]
 function mockLpdb.lpdb(dbTable, parameters)
 	local lpdbData = mockLpdb._getMockData(dbTable)
 
