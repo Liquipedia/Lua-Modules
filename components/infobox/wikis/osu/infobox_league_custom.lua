@@ -91,7 +91,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
----@param args table
 ---@return table
 function CustomLeague._getGameMode()
 	if String.isEmpty(_args.mode) then
