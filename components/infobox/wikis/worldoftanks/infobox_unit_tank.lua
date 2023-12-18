@@ -8,18 +8,20 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local TankTypes = require('Module:TankTypes')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
 
+local Nation = Lua.import('Module:Infobox/Extension/Nation', {requireDevIfEnabled = true})
+
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+
+local _pagename = mw.title.getCurrentTitle().text
 
 local _args
 
@@ -46,7 +48,7 @@ function CustomInjector:addCustomCells(widgets)
 		Cell{name = 'Released', content = {_args.released}},
 		Cell{name = 'Technical Name', content = {_args.techname}},
 		Cell{name = 'Tank Tier', content = {_args.tier}},
-		Cell{name = 'Nation', content = {_args.nation}},
+		Cell{name = 'Nation', content = {Nation.run(_args.nation)}},
 		Cell{name = 'Role', content = {_args.role}}
 	)
 end
@@ -108,7 +110,7 @@ function CustomUnit:setLpdbData(args)
 			tankrole = args.role,
 		}
 	}
-	
+
 	mw.ext.LiquipediaDB.lpdb_datapoint('tank_' .. (args.name or _pagename), lpdbData)
 end
 
