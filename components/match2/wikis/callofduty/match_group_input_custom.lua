@@ -283,6 +283,7 @@ function matchFunctions.getVodStuff(match)
 	local links = match.links
 	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
+	if match.breakingpoint then links.breakingpoint = 'https://www.breakingpoint.gg/match/' .. match.breakingpoint end
 
 	return match
 end
