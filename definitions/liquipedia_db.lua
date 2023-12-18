@@ -58,6 +58,27 @@ local lpdb = {}
 ---@field qualifierurl string
 ---@field extradata table
 
+---@class LpdbPlayer:LpdbBaseData
+---@field id string
+---@field alternativeid string
+---@field name string
+---@field localizedname string
+---@field iamge string
+---@field type string
+---@field nationality string
+---@field nationality2 string
+---@field nationality3 string
+---@field region string
+---@field birthdate string
+---@field deathdate string
+---@field teampagename string
+---@field teamtemplate string
+---@field links table
+---@field status string
+---@field earnings integer
+---@field earningsbyyear table
+---@field extradata table
+
 ---@class LpdbSquadPlayer:LpdbBaseData
 ---@field id string
 ---@field link string
