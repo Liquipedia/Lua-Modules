@@ -45,6 +45,6 @@ function lpdb.lpdb_create_json(obj) end
 ---@param obj any[]
 ---@return string
 ---Encode an Array to a JSON array. Errors are raised if the passed value cannot be encoded in JSON.
-function lpdb.mw.ext.LiquipediaDB.lpdb_create_array(obj) end
+function lpdb.lpdb_create_array(obj) end
 
 return lpdb
