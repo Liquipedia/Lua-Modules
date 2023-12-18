@@ -123,7 +123,7 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>, extradata: table}[]
+---@return LpdbPlacement[]
 function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
@@ -142,7 +142,7 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
----@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>, extradata: table}
+---@param placement LpdbPlacement
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
