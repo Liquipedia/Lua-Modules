@@ -46,9 +46,9 @@ function HiddenDataBox.run(args)
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
-		})
+		})[1]
 
-		if not queryResult[1] and Namespace.isMain() then
+		if not queryResult and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
@@ -60,7 +60,7 @@ function HiddenDataBox.run(args)
 			end)
 		end
 
-		queryResult = queryResult[1] or {}
+		queryResult = queryResult or {}
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
@@ -123,7 +123,7 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}[]
+---@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>, extradata: table}[]
 function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
@@ -142,13 +142,12 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
----@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
+---@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>, extradata: table}
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
-		Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
-		return
+		return Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
 	end
 
 	-- TODO: An improvement would be called TeamCard module for this
