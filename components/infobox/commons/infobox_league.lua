@@ -420,7 +420,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', Game.toIdentifie({game = args.game})
+	Variables.varDefine('tournament_game', Game.toIdentifier{game = args.game})
 
 	-- If no parent is available, set pagename instead to ease querying
 	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
