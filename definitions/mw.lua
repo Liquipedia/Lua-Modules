@@ -829,17 +829,7 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 function mw.ustring.upper(s) return string.upper(s) end
 
 mw.ext = {}
-mw.ext.LiquipediaDB = {}
-
----@param obj table
----@return string
----Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
-function mw.ext.LiquipediaDB.lpdb_create_json(obj) end
-
----@param obj any[]
----@return string
----Encode an Array to a JSON array. Errors are raised if the passed value cannot be encoded in JSON.
-function mw.ext.LiquipediaDB.lpdb_create_array(obj) end
+mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVaribleKey string|number
