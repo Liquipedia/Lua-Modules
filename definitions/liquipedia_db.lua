@@ -49,6 +49,22 @@ local lpdb = {}
 ---@field qualifierurl string
 ---@field extradata table
 
+---@class LpdbSquadPlayer:LpdbBaseData
+---@field id string
+---@field link string
+---@field name string
+---@field nationality string
+---@field position string
+---@field role string
+---@field type 'player'|'staff'
+---@field newteam string
+---@field teamtemplate string
+---@field newteamtemplate string
+---@field joindate string
+---@field leavedate string
+---@field inactivedate string
+---@field extradata table
+
 ---@class LpdbTeam:LpdbBaseData
 ---@field name string
 ---@field locations table
