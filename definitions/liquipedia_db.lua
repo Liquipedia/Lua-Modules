@@ -8,7 +8,7 @@ local lpdb = {}
 ---@field namespace integer
 ---@field objectname string
 
----@class LpdbBroadcaster:LpdbBaseData
+---@class broadcaster:LpdbBaseData
 ---@field id string
 ---@field name string
 ---@field page string
@@ -20,7 +20,7 @@ local lpdb = {}
 ---@field parent string
 ---@field extradata table
 
----@class LpdbDataPoint:LpdbBaseData
+---@class datapoint:LpdbBaseData
 ---@field type string
 ---@field name string
 ---@field information string
@@ -29,7 +29,7 @@ local lpdb = {}
 ---@field date string
 ---@field extradata table
 
----@class LpdbPlacement:LpdbBaseData
+---@class placement:LpdbBaseData
 ---@field tournament string
 ---@field series string
 ---@field parent string
@@ -58,7 +58,7 @@ local lpdb = {}
 ---@field qualifierurl string
 ---@field extradata table
 
----@class LpdbPlayer:LpdbBaseData
+---@class player:LpdbBaseData
 ---@field id string
 ---@field alternativeid string
 ---@field name string
@@ -79,7 +79,7 @@ local lpdb = {}
 ---@field earningsbyyear table
 ---@field extradata table
 
----@class LpdbSquadPlayer:LpdbBaseData
+---@class squadplayer:LpdbBaseData
 ---@field id string
 ---@field link string
 ---@field name string
@@ -95,7 +95,7 @@ local lpdb = {}
 ---@field inactivedate string
 ---@field extradata table
 
----@class LpdbTeam:LpdbBaseData
+---@class team:LpdbBaseData
 ---@field name string
 ---@field locations table
 ---@field region string
@@ -110,7 +110,7 @@ local lpdb = {}
 ---@field links table
 ---@field extradata table
 
----@class LpdbTournament:LpdbBaseData
+---@class tournament:LpdbBaseData
 ---@field name string
 ---@field shortname string
 ---@field tickername string
