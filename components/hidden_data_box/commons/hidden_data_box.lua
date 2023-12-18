@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Game = require('Module:Game')
 local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -25,7 +26,8 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
-local Opponent = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true}).Opponent
+local OpponentLibraries = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true})
+local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
@@ -86,7 +88,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
-	HiddenDataBox.checkAndAssign('tournament_game', args.game, queryResult.game)
+	HiddenDataBox.checkAndAssign('tournament_game', Game.toIdentifier{game = args.game}, queryResult.game)
 	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
