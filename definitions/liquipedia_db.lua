@@ -8,6 +8,18 @@ local lpdb = {}
 ---@field namespace integer
 ---@field objectname string
 
+---@class LpdbBroadcaster:LpdbBaseData
+---@field id string
+---@field name string
+---@field page string
+---@field position string
+---@field language string
+---@field flag string
+---@field weight number
+---@field date string
+---@field parent string
+---@field extradata table
+
 ---@class LpdbPlacement:LpdbBaseData
 ---@field tournament string
 ---@field series string
