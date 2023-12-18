@@ -56,10 +56,6 @@ end
 
 ---@return string[]
 function CustomMap._getGameMode()
-	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
-		return {}
-	end
-
 	local modes = Map:getAllArgsForBase(_args, 'mode')
 	local releasedate = _args.releasedate
 
