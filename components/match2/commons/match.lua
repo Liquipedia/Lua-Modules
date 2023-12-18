@@ -71,8 +71,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 	}
-	local LegacyMatch = options.storeMatch1
-		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
