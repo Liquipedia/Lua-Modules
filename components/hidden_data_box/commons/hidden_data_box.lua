@@ -123,7 +123,7 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return LpdbPlacement[]
+---@return placement[]
 function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
@@ -142,12 +142,13 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
----@param placement LpdbPlacement
+---@param placement placement
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
-		return Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
+		Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
+		return
 	end
 
 	-- TODO: An improvement would be called TeamCard module for this
