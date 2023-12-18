@@ -420,7 +420,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', Game.toIdentifier({game = args.game}))
+	Variables.varDefine('tournament_game', Game.toIdentifie({game = args.game})
 
 	-- If no parent is available, set pagename instead to ease querying
 	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
@@ -461,7 +461,7 @@ function League:_setLpdbData(args, links)
 		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
 		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
 		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
-		game = Game.toIdentifier({game = args.game}),
+		game = Game.toIdentifier{game = args.game},
 		mode = Variables.varDefault('tournament_mode', ''),
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch,
