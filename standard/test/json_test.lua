@@ -61,4 +61,21 @@ function suite:testStringifySubTables()
 	self:assertDeepEquals({a = '{"d":1,"b":"c"}', e = 'f'}, Json.stringifySubTables{a = {b = 'c', d = 1}, e = 'f'})
 end
 
+function suite:testParseStringified()
+	self:assertDeepEquals({}, (Json.parseStringified(Json.stringify{})))
+	self:assertDeepEquals({abc = 'def'}, (Json.parseStringified(Json.stringify{abc = 'def'})))
+	self:assertDeepEquals({abc = {'b', 'c'}}, (Json.parseStringified(Json.stringify{abc = {'b', 'c'}})))
+	self:assertDeepEquals(mw.loadData('Module:Flags/MasterData'), (Json.parseStringified(Json.stringify(mw.loadData('Module:Flags/MasterData')))))
+	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify({1, 2, 3}, {asArray = true}))))
+	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify{1, 2, 3})))
+
+	self:assertDeepEquals({}, (Json.parseStringified('[]')))
+	self:assertDeepEquals(nil, (Json.parseStringified()))
+	self:assertDeepEquals('string', (Json.parseStringified('string')))
+	self:assertDeepEquals({abc = 'def'}, (Json.parseStringified('{"abc":"def"}')))
+	self:assertDeepEquals({abc = {'b', 'c'}}, (Json.parseStringified('{"abc":{"1":"b","2":"c"}}')))
+	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified('[1,2,3]')))
+	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified('{"1":1,"2":2,"3":3}')))
+end
+
 return suite
