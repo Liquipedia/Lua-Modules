@@ -13,6 +13,7 @@ Author(s): Elysienna
 
     &__sort {
         margin-left: auto;
+        color: var( --clr-wiki-on-primary );
     }
 
     &__navigate {
@@ -322,6 +323,13 @@ Author(s): Elysienna
         &--title {
             flex: 1 0 auto;
             justify-content: center;
+        }
+
+        &--game-container-nav-holder {
+            padding: 0;
+            position: relative;
+            flex: 1;
+            overflow: hidden;
         }
 
         &--game-container {

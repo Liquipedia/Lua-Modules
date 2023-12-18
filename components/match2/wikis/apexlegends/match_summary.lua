@@ -382,7 +382,10 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createPointsDistributionTable(match)
-	local wrapper = mw.html.create('div'):addClass('panel-content__collapsible'):attr('data-js-battle-royale', 'collapsible')
+	local wrapper = mw.html.create('div')
+			:addClass('panel-content__collapsible')
+			:addClass('is--collapsed')
+			:attr('data-js-battle-royale', 'collapsible')
 	local button = wrapper:tag('h5')
 			:addClass('panel-content__button')
 			:attr('data-js-battle-royale', 'collapsible-button')
@@ -537,13 +540,16 @@ function CustomMatchSummary._createMatchStandings(match)
 							groupedCell:tag('div')
 								:addClass('panel-table__sort')
 								:tag('i')
-									:addClass('fas fa-sort')
+									:addClass('far fa-arrows-alt-v')
 									:attr('data-js-battle-royale', 'sort-icon')
 						end
 	end)
 
+	local gameCollectionContainerNavHolder = header:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container-nav-holder')
+	local gameCollectionContainer  = gameCollectionContainerNavHolder:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container')
+
 	Array.forEach(match.games, function (game, idx)
-		local gameContainer = header:tag('div')
+		local gameContainer = gameCollectionContainer:tag('div')
 				:addClass('panel-table__cell')
 				:addClass('cell--game')
 
@@ -592,8 +598,10 @@ function CustomMatchSummary._createMatchStandings(match)
 					end
 		end)
 
+		local gameRowContainer = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container')
+
 		Array.forEach(opponentMatch.games, function(opponent)
-			local gameRow = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
+			local gameRow = gameRowContainer:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 
 			Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
 				gameRow:tag('div')
@@ -633,7 +641,7 @@ function CustomMatchSummary._createGameStandings(game)
 							groupedCell:tag('div')
 								:addClass('panel-table__sort')
 								:tag('i')
-									:addClass('fas fa-sort')
+									:addClass('far fa-arrows-alt-v')
 									:attr('data-js-battle-royale', 'sort-icon')
 						end
 	end)

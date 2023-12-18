@@ -2,6 +2,9 @@ liquipedia.battleRoyale = {
 
 	DIRECTION_LEFT: 'left',
 	DIRECTION_RIGHT: 'right',
+	ICON_SORT: 'fa-arrows-alt-v',
+	ICON_SORT_UP: 'fa-long-arrow-alt-up',
+	ICON_SORT_DOWN: 'fa-long-arrow-alt-down',
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
 	gameWidth: parseFloat(getComputedStyle(document.documentElement).fontSize) * 9.25,
@@ -216,16 +219,16 @@ liquipedia.battleRoyale = {
 
 	changeButtonStyle: function(button, order = 'default') {
 		const sortingOrder = {
-			'ascending': 'fa-sort-down',
-			'descending': 'fa-sort-up',
-			'default': 'fa-sort'
+			'ascending': this.ICON_SORT_DOWN,
+			'descending': this.ICON_SORT_UP,
+			'default': this.ICON_SORT
 		}
 
 		button.setAttribute('data-order', order);
 
 		let sortIcon = this.getSortingIcon(button);
 		sortIcon.removeAttribute('class');
-		sortIcon.classList.add('fas', sortingOrder[order]);
+		sortIcon.classList.add('far', sortingOrder[order]);
 	},
 
 	comparator: function (a, b, dir = 'ascending', sortType = 'team') {
