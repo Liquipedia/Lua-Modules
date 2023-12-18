@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
@@ -29,7 +30,9 @@ function Customizable:make()
 		return self.children
 	end
 	if self.id == 'custom' then
-		return self.context.injector:addCustomCells(self.children)
+		local widgets = Logic.emptyOr(self.context.injector:addCustomCells(self.children), self.children, {})
+		---@cast widgets -nil
+		self.children = widgets
 	end
 	return self.context.injector:parse(self.id, self.children)
 end
