@@ -34,4 +34,3 @@ function Injector:addCustomCells(widgets)
 end
 
 return Injector
-

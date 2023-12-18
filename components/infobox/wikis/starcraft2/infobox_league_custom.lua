@@ -32,9 +32,10 @@ local Center = Widgets.Center
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
-local CustomLeague = Class.new(League)
+local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
+local _league
 local _next
 local _previous
 
@@ -51,10 +52,18 @@ local PICON = '[[File:PIcon.png|text-bottom|Premier League]]'
 local CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
 
 function CustomLeague.run(frame)
-	local league = CustomLeague(frame)
+	local league = League(frame)
+	_league = league
 
 	league.args.game = league.args.game == GAME_MOD and GAME_MOD or Game.name{game = league.args.game}
 	league.args.liquipediatiertype = league.args.liquipediatiertype or league.args.tiertype
+
+	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.addToLpdb = CustomLeague.addToLpdb
+	league.shouldStore = CustomLeague.shouldStore
+	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -116,24 +125,24 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(args.map1) then
 			table.insert(widgets, Title{name = args['maptitle'] or 'Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('map')})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('map', args)})
 		end
 
 		if String.isNotEmpty(args['2map1']) then
 			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('2map')})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('2map', args)})
 		end
 
 		if String.isNotEmpty(args['3map1']) then
 			table.insert(widgets, Title{name = args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('3map')})
+			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('3map', args)})
 		end
 	end
 	return widgets
 end
 
-function CustomLeague:_mapsDisplay(prefix)
-	local maps = self:_getMaps(prefix)
+function CustomLeague._mapsDisplay(prefix, args)
+	local maps = CustomLeague._getMaps(prefix, args)
 	---@cast maps -nil
 
 	return {table.concat(
@@ -410,16 +419,15 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_finished', tostring(finished))
 
 	--maps
-	local maps = self:_getMaps('map')
+	local maps = CustomLeague._getMaps('map', args)
 	Variables.varDefine('tournament_maps', maps and Json.stringify(maps) or '')
 end
 
-function CustomLeague:_getMaps(prefix)
-	local args = self.args
+function CustomLeague._getMaps(prefix, args)
 	if String.isEmpty(args[prefix .. '1']) then
 		return
 	end
-	local mapArgs = self:getAllArgsForBase(args, prefix)
+	local mapArgs = _league:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')
@@ -440,8 +448,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
 	lpdbData.status = status
 	lpdbData.maps = Variables.varDefault('tournament_maps')
-	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(_next))
-	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(_previous))
+	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague._getPageNameFromChronology(_next))
+	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague._getPageNameFromChronology(_previous))
 
 	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
 
@@ -455,7 +463,7 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return span
 end
 
-function CustomLeague:_getPageNameFromChronology(item)
+function CustomLeague._getPageNameFromChronology(item)
 	if String.isEmpty(item) then
 		return ''
 	end
