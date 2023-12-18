@@ -10,12 +10,12 @@ local Class = require('Module:Class')
 
 ---@class WidgetInjector
 ---@operator call(table?): WidgetInjector
----@field parent table?
+---@field caller table?
 local Injector = Class.new(
 	---@param self self
-	---@param parent table?
-	function(self, parent)
-		self.parent = parent
+	---@param caller table?
+	function(self, caller)
+		self.caller = caller
 end)
 
 ---Parses the widgets

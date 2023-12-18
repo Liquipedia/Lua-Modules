@@ -64,7 +64,7 @@ function CustomLeague:createWidgetInjector()
 end
 
 function CustomInjector:parse(id, widgets)
-	local args = self.parent.args
+	local args = self.caller.args
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {
@@ -116,17 +116,17 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(args.map1) then
 			table.insert(widgets, Title{name = args['maptitle'] or 'Maps'})
-			table.insert(widgets, Center{content = self.parent:_mapsDisplay('map')})
+			table.insert(widgets, Center{content = self.caller:_mapsDisplay('map')})
 		end
 
 		if String.isNotEmpty(args['2map1']) then
 			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = self.parent:_mapsDisplay('2map')})
+			table.insert(widgets, Center{content = self.caller:_mapsDisplay('2map')})
 		end
 
 		if String.isNotEmpty(args['3map1']) then
 			table.insert(widgets, Title{name = args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = self.parent:_mapsDisplay('3map')})
+			table.insert(widgets, Center{content = self.caller:_mapsDisplay('3map')})
 		end
 	end
 	return widgets
