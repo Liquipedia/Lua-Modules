@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateClean = require('Module:DateTime')
-local Game = require('Module:Game')
 local GameLookup = require('Module:GameLookup')
 local GameModeLookup = require('Module:GameModeLookup')
 local Json = require('Module:Json')
@@ -133,10 +132,10 @@ function CustomLeague:createBottomContent()
 end
 
 function CustomLeague:getWikiCategories(args)
-	if not Game.name{game = args.game} then
+	if String.isEmpty(args.game) then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, Game.name{game = args.game} .. (args.beta and ' Beta' or '') .. ' Competitions')
+		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
 	end
 
 	return categories
@@ -165,6 +164,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('sdate', startdate)
 	Variables.varDefine('edate', enddate)
 
+	Variables.varDefine('game', GameLookup.getName({args.game}))
+	Variables.varDefine('tournament_game', GameLookup.getName({args.game}))
 	-- Currently, args.patch shall be used for official patches,
 	-- whereas voobly is used to denote non-official version played via voobly
 	Variables.varDefine('tournament_patch', args.patch or args.voobly)
@@ -206,6 +207,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = Variables.varDefault('tournament_maps')
 
+	lpdbData.game = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
 	-- whereas voobly is used to denote non-official version played via voobly
 	lpdbData.patch = args.patch or args.voobly
@@ -239,7 +241,7 @@ function CustomLeague:_getGameVersion(args)
 	local gameversion = {}
 
 	if not String.isEmpty(args.game) then
-		local gameName = Game.name{game = args.game}
+		local gameName = GameLookup.getName({args.game})
 		if String.isEmpty(gameName) then
 			error('Unknown or unsupported game: ' .. args.game)
 		end
@@ -375,7 +377,7 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 	local tierDisplay = Tier.display(
 		args.liquipediatier,
 		args.liquipediatiertype,
-		{link = true, game = Game.name{game = args.game}}
+		{link = true, game = GameLookup.getName{args.game}}
 	)
 
 	if String.isEmpty(tierDisplay) then
