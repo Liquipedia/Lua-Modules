@@ -49,6 +49,21 @@ local lpdb = {}
 ---@field qualifierurl string
 ---@field extradata table
 
+---@class LpdbTeam:LpdbBaseData
+---@field name string
+---@field locations table
+---@field region string
+---@field logo string
+---@field logodark string
+---@field status string
+---@field createdate string
+---@field disbanddate string
+---@field earnings integer
+---@field earnignsbyyear table
+---@field template string
+---@field links table
+---@field extradata table
+
 ---@class LpdbTournament:LpdbBaseData
 ---@field name string
 ---@field shortname string
