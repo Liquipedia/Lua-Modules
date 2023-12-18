@@ -829,7 +829,7 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 function mw.ustring.upper(s) return string.upper(s) end
 
 mw.ext = {}
-mw.ext.LiquipediaDB = require('definitions.lpdb')
+mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVaribleKey string|number
