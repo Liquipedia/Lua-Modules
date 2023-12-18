@@ -366,7 +366,6 @@ Match.matchFields = Table.map({
 	'links',
 	'liquipediatier',
 	'liquipediatiertype',
-	'lrthread',
 	'match2bracketdata',
 	'match2bracketid',
 	'match2id',

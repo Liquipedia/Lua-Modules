@@ -35,7 +35,6 @@ local LINKS_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	review = {icon = 'File:Reviews32.png', text = 'Review'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
 	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 }
 LINKS_DATA.preview2 = LINKS_DATA.preview

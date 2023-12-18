@@ -23,8 +23,6 @@ local ICONS = {
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 local CustomMatchSummary = {}

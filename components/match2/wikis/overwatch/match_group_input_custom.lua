@@ -290,11 +290,8 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
 	local links = match.links
-	if match.preview then links.preview = match.preview end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.owl then links.owl = 'https://overwatchleague.com/en-us/match/' .. match.owl end
 	if match.owc then links.owc = 'https://www.overwatchcontenders.com/match/details/' .. match.owc end
