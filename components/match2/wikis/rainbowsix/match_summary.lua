@@ -32,8 +32,6 @@ local ROUND_ICONS = {
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
 	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
 	esl = {

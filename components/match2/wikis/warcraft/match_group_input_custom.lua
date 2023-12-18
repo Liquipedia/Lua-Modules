@@ -30,7 +30,7 @@ local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap', 'lrthread'}
+local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap'}
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local NEUTRAL_HERO_FACTION = 'neutral'
