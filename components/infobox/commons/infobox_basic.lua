@@ -33,6 +33,13 @@ local BasicInfobox = Class.new(
 	end
 )
 
+---@param Injector WidgetInjector?
+---@return self
+function BasicInfobox:setWidgetInjector(Injector)
+	self.infobox:widgetInjector(Injector)
+	return self
+end
+
 ---Creates an empty WidgetInjector
 ---@return WidgetInjector?
 function BasicInfobox:createWidgetInjector()

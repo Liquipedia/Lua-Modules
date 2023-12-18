@@ -53,12 +53,12 @@ local CICON = '[[File:CIcon.png|text-bottom|Challenger League]]'
 
 function CustomLeague.run(frame)
 	local league = League(frame)
+	league:setWidgetInjector(CustomInjector(league))
 	_league = league
 
 	league.args.game = league.args.game == GAME_MOD and GAME_MOD or Game.name{game = league.args.game}
 	league.args.liquipediatiertype = league.args.liquipediatiertype or league.args.tiertype
 
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.shouldStore = CustomLeague.shouldStore
@@ -66,10 +66,6 @@ function CustomLeague.run(frame)
 	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
-end
-
-function CustomLeague:createWidgetInjector()
-	return CustomInjector(self)
 end
 
 function CustomInjector:parse(id, widgets)

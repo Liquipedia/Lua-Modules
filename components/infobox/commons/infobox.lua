@@ -54,7 +54,7 @@ end
 ---@param injector WidgetInjector?
 ---@return self
 function Infobox:widgetInjector(injector)
-	self.injector = injector
+	self.injector = injector or self.injector
 	return self
 end
 
