@@ -2,13 +2,13 @@
 -- luacheck: ignore
 local lpdb = {}
 
----@class LpdbTable
+---@class LpdbBaseData
 ---@field pageid integer
 ---@field pagename string
 ---@field namespace integer
 ---@field objectname string
 
----@class LpdbPlacement:LpdbTable
+---@class LpdbPlacement:LpdbBaseData
 ---@field tournament string
 ---@field series string
 ---@field parent string
@@ -35,6 +35,40 @@ local lpdb = {}
 ---@field qualifier string
 ---@field qualifierpage string
 ---@field qualifierurl string
+---@field extradata table
+
+---@class LpdbTournament:LpdbBaseData
+---@field name string
+---@field shortname string
+---@field tickername string
+---@field banner string
+---@field bannerdark string
+---@field icon string
+---@field icondark string
+---@field seriespage string
+---@field previous string
+---@field previous2 string
+---@field next string
+---@field next2 string
+---@field game string
+---@field mode string
+---@field patch string
+---@field endpatch string
+---@field type string
+---@field organizers table
+---@field startdate string
+---@field enddate string
+---@field sortdate string
+---@field locations table
+---@field prizepool number
+---@field participantsnumber integer
+---@field liqupediatier string # to be converted to integer
+---@field liqupediatiertype string
+---@field publishertier string
+---@field status string
+---@field maps string
+---@field format string
+---@field sponsors table
 ---@field extradata table
 
 ---@param obj table
