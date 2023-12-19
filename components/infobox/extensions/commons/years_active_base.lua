@@ -109,10 +109,10 @@ function ActiveYears._calculate(conditions)
 		return ActiveYears.noResultsText
 	end
 
-	return ActiveYears._displayYears(years)
+	return ActiveYears.displayYears(years)
 end
 
-function ActiveYears._displayYears(years)
+function ActiveYears.displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
 
