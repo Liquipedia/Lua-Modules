@@ -315,8 +315,6 @@ local lpdb = {}
 ---@field displayname string
 ---@field flag string
 
----@class company:LpdbBaseData
-
 ---@param obj table
 ---@return string
 ---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
