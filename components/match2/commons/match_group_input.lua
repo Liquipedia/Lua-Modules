@@ -529,7 +529,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		substitutions = {}
 	end
 
-	local handleSubstitution = function(substitution)
+	Array.forEach(substitutions, function(substitution)
 		if type(substitution) ~= 'table' or not substitution['in'] then return end
 		local substitute = getStandardPlayer(substitution['in'])
 
@@ -549,10 +549,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		})
 
 		insertIntoPlayers(substitute)
-	end
-
-	--handle `substitutes` input for opponenets
-	Array.forEach(substitutions, handleSubstitution)
+	end)
 
 	opponent.match2players = Array.extractValues(players)
 	Array.sortInPlaceBy(opponent.match2players, function (player)
