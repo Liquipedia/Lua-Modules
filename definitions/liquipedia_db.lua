@@ -223,7 +223,6 @@ local lpdb = {}
 ---@field type 'league'|'swiss'
 ---@field matches string[]
 ---@field config {hasdraw: string, hasovertime: string, haspoints: string}
----@field extradata table
 
 ---@class transfer:LpdbBaseData
 ---@field staticid string # not yet in use
@@ -244,7 +243,6 @@ local lpdb = {}
 ---@field display string
 ---@field audio table
 ---@field chair table
----@field extradata table
 
 ---@class match2:LpdbBaseData
 ---@field match2id string
@@ -277,7 +275,6 @@ local lpdb = {}
 ---@field match2bracketdata table
 ---@field match2opponents match2opponent[]
 ---@field match2games match2game[]
----@field extradata table
 
 ---@class match2opponent:LpdbBaseData
 ---@field match2id string
@@ -289,7 +286,6 @@ local lpdb = {}
 ---@field placement integer
 ---@field status string
 ---@field match2players match2player[]
----@field extradata table
 
 ---@class match2game:LpdbBaseData
 ---@field match2id string
@@ -310,7 +306,6 @@ local lpdb = {}
 ---@field map string
 ---@field length string
 ---@field parent string
----@field extradata table
 
 ---@class match2player:LpdbBaseData
 ---@field match2id string
@@ -319,7 +314,6 @@ local lpdb = {}
 ---@field name string
 ---@field displayname string
 ---@field flag string
----@field extradata string
 
 ---@class company:LpdbBaseData
 
