@@ -33,10 +33,10 @@ local BasicInfobox = Class.new(
 	end
 )
 
----@param Injector WidgetInjector?
+---@param injector WidgetInjector?
 ---@return self
-function BasicInfobox:setWidgetInjector(Injector)
-	self.infobox:widgetInjector(Injector)
+function BasicInfobox:setWidgetInjector(injector)
+	self.infobox:widgetInjector(injector)
 	return self
 end
 
