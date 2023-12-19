@@ -65,12 +65,21 @@ function suite:testParseStringified()
 	self:assertDeepEquals({}, (Json.parseStringified(Json.stringify{})))
 	self:assertDeepEquals({abc = 'def'}, (Json.parseStringified(Json.stringify{abc = 'def'})))
 	self:assertDeepEquals({abc = {'b', 'c'}}, (Json.parseStringified(Json.stringify{abc = {'b', 'c'}})))
-	self:assertDeepEquals(mw.loadData('Module:Flags/MasterData'), (Json.parseStringified(Json.stringify(mw.loadData('Module:Flags/MasterData')))))
+	self:assertDeepEquals(
+		mw.loadData('Module:Flags/MasterData'),
+		(Json.parseStringified(Json.stringify(mw.loadData('Module:Flags/MasterData'))))
+	)
 	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify({1, 2, 3}, {asArray = true}))))
 	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify{1, 2, 3})))
 
-	self:assertDeepEquals({abc = {'b', 'c'}, b = {'a', 'c'}}, (Json.parseStringified(Json.stringify{abc = {'b', 'c'}, b = Json.stringify{'a', 'c'}})))
-	self:assertDeepEquals({abc = {'b', 'c'}, b = {'a', 'c'}}, (Json.parseStringified('{"b":"{\\"1\\":\\"a\\",\\"2\\":\\"c\\"}","abc":{"1":"b","2":"c"}}')))
+	self:assertDeepEquals(
+		{abc = {'b', 'c'}, b = {'a', 'c'}},
+		(Json.parseStringified(Json.stringify{abc = {'b', 'c'}, b = Json.stringify{'a', 'c'}}))
+	)
+	self:assertDeepEquals(
+		{abc = {'b', 'c'}, b = {'a', 'c'}},
+		(Json.parseStringified('{"b":"{\\"1\\":\\"a\\",\\"2\\":\\"c\\"}","abc":{"1":"b","2":"c"}}'))
+	)
 
 	self:assertDeepEquals({}, (Json.parseStringified('[]')))
 	self:assertDeepEquals(nil, (Json.parseStringified()))
