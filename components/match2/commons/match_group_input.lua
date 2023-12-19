@@ -529,6 +529,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		substitutions = {}
 	end
 
+	--handle `substitutes` input for opponenets
 	Array.forEach(substitutions, function(substitution)
 		if type(substitution) ~= 'table' or not substitution['in'] then return end
 		local substitute = getStandardPlayer(substitution['in'])
