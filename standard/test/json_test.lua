@@ -69,6 +69,9 @@ function suite:testParseStringified()
 	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify({1, 2, 3}, {asArray = true}))))
 	self:assertDeepEquals({1, 2, 3}, (Json.parseStringified(Json.stringify{1, 2, 3})))
 
+	self:assertDeepEquals({abc = {'b', 'c'}, b = {'a', 'c'}}, (Json.parseStringified(Json.stringify{abc = {'b', 'c'}, b = Json.stringify{'a', 'c'}})))
+	self:assertDeepEquals({abc = {'b', 'c'}, b = {'a', 'c'}}, (Json.parseStringified('{"b":"{\\"1\\":\\"a\\",\\"2\\":\\"c\\"}","abc":{"1":"b","2":"c"}}')))
+
 	self:assertDeepEquals({}, (Json.parseStringified('[]')))
 	self:assertDeepEquals(nil, (Json.parseStringified()))
 	self:assertDeepEquals('string', (Json.parseStringified('string')))
