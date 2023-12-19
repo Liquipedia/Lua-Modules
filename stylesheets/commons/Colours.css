@@ -689,6 +689,11 @@ ul.nav-tabs li.game-wiiu,
 	border-color: var( --clr-cinnabar-80, #ee6767 );
 }
 
+/* MEDIAWIKI OVERRIDE */
+.toccolours {
+	background-color: var( --clr-surface-1, #f8f9fa );
+}
+
 /* ICON IN VISITED LINK COLOR FIX */
 .brkts-popup-body-element a:visited {
 	& .fad,
