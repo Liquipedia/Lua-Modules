@@ -53,7 +53,7 @@ local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 ---@field ['3'] number?
 ---@field ['3-4'] number?
 ---@field ['4'] number?
----@field total number?
+---@field total number
 
 ---@class SeriesMedalStats
 ---@operator call(table?): SeriesMedalStats
@@ -207,9 +207,8 @@ function MedalStats:processByIdentifier(getIdentifier, placement)
 end
 
 function MedalStats:sort()
-	self.data = Table.map(self.data, function(identifier, data)
+	Table.iter.forEachPair(self.data, function(identifier, data)
 		data.identifier = identifier
-		return identifier, data
 	end)
 	self.dataAsArray = Array.extractValues(self.data)
 	self.data = nil

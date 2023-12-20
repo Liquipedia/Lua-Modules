@@ -26,9 +26,6 @@ local MedalStats = Class.new(MedalStatsBase)
 function MedalStats.run(frame)
 	local args = Arguments.getArgs(frame)
 
-	--only query for solo opponents (only for them participantTeam stats make sense)
-	args.opponentTypes = Opponent.solo
-
 	return MedalStats(args):query():create()
 end
 
