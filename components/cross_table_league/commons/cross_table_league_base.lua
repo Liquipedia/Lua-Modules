@@ -242,6 +242,8 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		end
 	end
 
+	--can not use `Array.forEach` or `Table.iter.forEach` here
+	--would get git linter `unused recursive function 'processMatch'` else
 	for _, match in pairs(matches) do
 		processMatch(match)
 	end
