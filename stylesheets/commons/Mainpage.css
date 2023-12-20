@@ -332,7 +332,7 @@ table.infobox_matches_content {
 .infobox_matches_content .versus {
 	width: 4%;
 	text-align: center;
-	vertical-align: baseline;
+	padding: 0 5px;
 }
 
 .infobox_matches_content .versus-lower {
