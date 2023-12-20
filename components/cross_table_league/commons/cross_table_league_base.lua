@@ -216,9 +216,7 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 
 	local foundMatches = Array.map(self.opponents[1], function() return {} end)
 
-	-- helper table to be able to build local recursive function
-	local p = {}
-	p.processMatch = function(match, hasBeenProcessed)
+	local function processMatch(match, hasBeenProcessed)
 		local opponents = match.match2opponents
 		local leftIndex = self:_findEntryIndex(self.opponents[1], opponents[1].name)
 		local rightIndex = self:_findEntryIndex(self.opponents[2], opponents[2].name)
@@ -226,13 +224,13 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		if hasBeenProcessed and (not leftIndex or not rightIndex) then
 			return
 		elseif not leftIndex or not rightIndex then
-			return p.processMatch(CrossTableLeague._flipMatch(match), true)
+			return processMatch(CrossTableLeague._flipMatch(match), true)
 		end
 
 		if foundMatches[leftIndex][rightIndex] and hasBeenProcessed then
 			return
 		elseif foundMatches[leftIndex][rightIndex] then
-			return p.processMatch(CrossTableLeague._flipMatch(match), true)
+			return processMatch(CrossTableLeague._flipMatch(match), true)
 		end
 
 		foundMatches[leftIndex][rightIndex] = match
@@ -240,11 +238,13 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		if self.config.isSingle and self.opponents.isMirrored then
 			foundMatches[rightIndex][leftIndex] = CrossTableLeague._flipMatch(match)
 		elseif self.config.isSingle then
-			return p.processMatch(CrossTableLeague._flipMatch(match), true)
+			return processMatch(CrossTableLeague._flipMatch(match), true)
 		end
 	end
 
-	Array.forEach(matches, p.processMatch)
+	for _, match in pairs(matches) do
+		processMatch(match)
+	end
 
 	return foundMatches
 end
