@@ -202,6 +202,9 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
+--- Include the full functionality for faking
+mw.html = require('3rd.mw.html')
+
 ---@class Language
 mw.language = {}
 
