@@ -127,7 +127,7 @@ function MedalStats:_getConfig()
 		placements = placements,
 		additionalConditions = args.additionalConditions or '',
 		opponentTypes = splitAndTrimIfExist(args.opponentType),
-		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists)
+		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists),
 	}
 end
 
