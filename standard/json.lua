@@ -111,7 +111,7 @@ end
 ---Second return value boolean indicates a failed parse.
 ---@param any string
 ---@return table, boolean
----@overload fun(str: any): any, true
+---@overload fun(any: any): any, true
 function Json.parseStringified(any)
 	local tbl = Json.parseIfTable(any)
 	if not tbl then
