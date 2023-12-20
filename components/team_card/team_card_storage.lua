@@ -22,7 +22,7 @@ local Opponent = OpponentLibrary.Opponent
 local TeamCardStorage = {}
 
 ---@param args table
----@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?}
+---@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?, aliases: string[]?}
 ---@param players table
 ---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
