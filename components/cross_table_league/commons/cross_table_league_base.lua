@@ -228,7 +228,6 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		elseif not leftIndex or not rightIndex then
 			return p.processMatch(CrossTableLeague._flipMatch(match), true)
 		end
-		---@cast rightIndex -nil
 
 		if foundMatches[leftIndex][rightIndex] and hasBeenProcessed then
 			return
