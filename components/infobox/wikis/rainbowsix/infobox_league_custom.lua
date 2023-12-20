@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -38,11 +39,6 @@ local _PLATFORM_ALIAS = {
 	playstation = 'Playstation',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
-}
-
-local _GAMES = {
-	siege = 'Siege',
-	vegas2 = 'Vegas 2'
 }
 
 local _UBISOFT_TIERS = {
@@ -79,7 +75,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Game',
-		content = {CustomLeague:_createGameCell(args)}
+		content = {Game.name{game = _args.game}}
 	})
 	table.insert(widgets, Cell{
 		name = 'Platform',
@@ -180,10 +176,10 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if not CustomLeague:_gameLookup(args.game) then
+	if not Game.name{game = _args.game} then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, CustomLeague:_gameLookup(args.game) .. ' Competitions')
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
 	end
 
 	if CustomLeague:_platformLookup(args.platform) then
@@ -193,34 +189,12 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
-function CustomLeague:_gameLookup(game)
-	if String.isEmpty(game) then
-		return nil
-	end
-
-	return _GAMES[game:lower()]
-end
-
 function CustomLeague:_platformLookup(platform)
 	if String.isEmpty(platform) then
 		platform = _DEFAULT_PLATFORM
 	end
 
 	return _PLATFORM_ALIAS[platform:lower()]
-end
-
-function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) then
-		return nil
-	end
-
-	local game = CustomLeague:_gameLookup(args.game)
-
-	if String.isNotEmpty(game) then
-		return '[['.. game ..']]'
-	else
-		return nil
-	end
 end
 
 function CustomLeague:_createPlatformCell(args)

@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -21,15 +22,9 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
-
-local _GAMES = {
-	overwatch = 'Overwatch',
-	overwatch2 = 'Overwatch 2'
-}
 
 local _BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
@@ -38,8 +33,7 @@ local _BLIZZARD_TIERS = {
 
 function CustomLeague.run(frame)
 	local league = League(frame)
-	_league = league
-	_args = _league.args
+	_args = league.args
 
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
@@ -61,7 +55,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Game',
-		content = {CustomLeague:_createGameCell(args)}
+		content = {Game.text{game = _args.game}}
 	})
 	table.insert(widgets, Cell{
 		name = 'Players',
@@ -78,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
-			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
+			for _, map in ipairs(League:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
 					PageLink.makeInternalLink({}, map, map .. game)
 				)))
@@ -101,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
@@ -133,35 +127,13 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if not CustomLeague:_gameLookup(args.game) then
+	if not Game.name{game = _args.game} then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, CustomLeague:_gameLookup(args.game) .. ' Competitions')
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
 	end
 
 	return categories
-end
-
-function CustomLeague:_gameLookup(game)
-	if String.isEmpty(game) then
-		return nil
-	end
-
-	return _GAMES[game:lower()]
-end
-
-function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) then
-		return nil
-	end
-
-	local game = CustomLeague:_gameLookup(args.game)
-
-	if String.isNotEmpty(game) then
-		return '[['.. game ..']]'
-	else
-		return nil
-	end
 end
 
 function CustomLeague:_createNoWrappingSpan(content)

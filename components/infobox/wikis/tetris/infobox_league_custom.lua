@@ -78,7 +78,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = Game.name{game = args.game}
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.gamegroup = CustomLeague._determineGameGroup(lpdbData.game)
 
