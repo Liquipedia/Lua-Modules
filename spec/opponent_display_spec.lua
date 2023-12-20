@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('Opponent', function()
+describe('Opponent Display', function()
 	local OpponentDisplay = require('Module:OpponentDisplay')
 
 	describe('Inline Opponent', function()
