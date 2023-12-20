@@ -21,6 +21,12 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local TODAY = os.date('%Y-%m-%d') --[[@as string]]
+---@alias THIRD '3'
+local THIRD = '3'
+---@alias FOURTH '4'
+local FOURTH = '4'
+---@alias SEMIFINALIST '3-4'
+local SEMIFINALIST = '3-4'
 
 ---@class SeriesMedalStatsConfig
 ---@field series string[]
@@ -36,6 +42,7 @@ local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 ---@field limit integer? only valid if not noNumber
 ---@field additionalConditions string
 ---@field opponentTypes string[]
+---@field mergeIntoSemifinalists boolean
 
 ---@class SeriesMedalStatsPlacementObject
 ---@field opponentplayers table
@@ -50,9 +57,9 @@ local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 ---@field identifier string
 ---@field ['1'] number
 ---@field ['2'] number
----@field ['3'] number?
----@field ['3-4'] number?
----@field ['4'] number?
+---@field [THIRD] number?
+---@field [SEMIFINALIST] number?
+---@field [FOURTH] number?
 ---@field total number
 
 ---@class SeriesMedalStats
@@ -64,7 +71,6 @@ local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 ---@field dataAsArray SeriesMedalStatsDataSet[]?
 ---@field display Html?
 local MedalStats = Class.new(function(self, args) self:init(args) end)
-
 
 ---@param args table?
 ---@return self
@@ -81,13 +87,13 @@ function MedalStats:_getConfig()
 
 	local placements = {'1', '2'}
 	if Logic.readBool(args.bronze) then
-		table.insert(placements, '3')
+		table.insert(placements, THIRD)
 	end
 	if Logic.readBool(args.sf) then
-		table.insert(placements, '3-4')
+		table.insert(placements, SEMIFINALIST)
 	end
 	if Logic.readBool(args.copper) then
-		table.insert(placements, '4')
+		table.insert(placements, FOURTH)
 	end
 
 	---@param input string?
@@ -122,6 +128,7 @@ function MedalStats:_getConfig()
 		placements = placements,
 		additionalConditions = args.additionalConditions or '',
 		opponentTypes = splitAndTrimIfExist(args.opponentType),
+		mergeIntoSemifinalists = Logic.readBool(args.mergeIntoSemifinalists)
 	}
 end
 
@@ -201,8 +208,13 @@ function MedalStats:processByIdentifier(getIdentifier, placement)
 		return
 	end
 
+	local placementValue = placement.placement
+	if self.config.mergeIntoSemifinalists and placementValue == THIRD or placementValue == FOURTH then
+		placementValue = SEMIFINALIST
+	end
+
 	self.data[identifier] = self.data[identifier] or self:setUpPlacementData()
-	self.data[identifier][placement.placement] = self.data[identifier][placement.placement] + 1
+	self.data[identifier][placementValue] = self.data[identifier][placementValue] + 1
 	self.data[identifier].total = self.data[identifier].total + 1
 end
 
@@ -228,9 +240,9 @@ function MedalStats.compare(row1, row2)
 
 	if isNotEqual('1') then return compare('1') end
 	if isNotEqual('2') then return compare('2') end
-	if isNotEqual('3') then return compare('3') end
-	if isNotEqual('3-4') then return compare('3-4') end
-	if isNotEqual('4') then return compare('4') end
+	if isNotEqual(THIRD) then return compare(THIRD) end
+	if isNotEqual(SEMIFINALIST) then return compare(SEMIFINALIST) end
+	if isNotEqual(FOURTH) then return compare(FOURTH) end
 
 	return row1.identifier:lower() < row2.identifier:lower()
 end
