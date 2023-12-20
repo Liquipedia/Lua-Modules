@@ -68,7 +68,7 @@ function CrossTableLeague:readConfig()
 		endDate = DateExt.readTimestampOrNil(args.edate),
 		isSingle = Logic.readBool(args.single),
 		walkoverWin = tonumber(args.walkover_win) or 0,
-		cellwidth = (tonumber(args.cellwidth) or 60),
+		cellwidth = tonumber(args.cellwidth) or 60,
 		matchGroupSpecs = TournamentStructure.readMatchGroupsSpec(args) or TournamentStructure.currentPageSpec(),
 		buttonStyle = args.button,
 		queryOrder = Logic.readBool(args.backwards) and 'date desc' or 'date asc',
@@ -443,7 +443,7 @@ function CrossTableLeague:displayCell(rowIndex, columnIndex, toggleArea)
 end
 
 ---@param opponent standardOpponent
----@return string|number|nil
+---@return string|number
 function CrossTableLeague._getScore(opponent)
 	return opponent.status ~= SCORE_STATUS and opponent.status or
 		opponent.score ~= -1 and opponent.score or 0
