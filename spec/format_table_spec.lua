@@ -13,7 +13,7 @@ describe('table formatter', function()
 	10,
 	[10] = 100,
 	['a'] = 'a',
-	['a\'b'] = ']] .. 'te\\\'st' .. [[',
+	['a\'b'] = ']] .. mw.text.nowiki('te\\\'st') .. [[',
 	['b'] = {
 		['b'] = 'b',
 	},
@@ -43,8 +43,8 @@ describe('table formatter', function()
 		['b'] = 'b',
 	},
 	['c'] = 1,
-	['x'] = ']] .. '[[Module:Format/Table/testcases|aa]]' .. [[',
-	['z'] = ']] .. 'https://discord.com/invite/WaQRYSa' .. [[',
+	['x'] = ']] .. mw.text.nowiki('[[Module:Format/Table/testcases|aa]]') .. [[',
+	['z'] = ']] .. mw.text.nowiki('https://discord.com/invite/WaQRYSa') .. [[',
 }</pre>]],
 			tostring(TableFormatter.toLuaCode{
 				a = 'a', b = {b = 'b'}, c = 1, [10] = 100,
