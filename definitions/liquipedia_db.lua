@@ -7,6 +7,7 @@ local lpdb = {}
 ---@field pagename string
 ---@field namespace integer
 ---@field objectname string
+---@field extradata table
 ---@field [any] any
 
 ---@class broadcaster:LpdbBaseData
@@ -19,7 +20,6 @@ local lpdb = {}
 ---@field weight number
 ---@field date string
 ---@field parent string
----@field extradata table
 
 ---@class datapoint:LpdbBaseData
 ---@field type string
@@ -28,7 +28,6 @@ local lpdb = {}
 ---@field image string
 ---@field imagedark string
 ---@field date string
----@field extradata table
 
 ---@class placement:LpdbBaseData
 ---@field tournament string
@@ -52,12 +51,11 @@ local lpdb = {}
 ---@field lastvsdata table
 ---@field opponentname string
 ---@field opponenttemplate string
----@field opponenttype string
+---@field opponenttype OpponentType
 ---@field opponentplayers table
 ---@field qualifier string
 ---@field qualifierpage string
 ---@field qualifierurl string
----@field extradata table
 
 ---@class player:LpdbBaseData
 ---@field id string
@@ -78,7 +76,6 @@ local lpdb = {}
 ---@field status string
 ---@field earnings integer
 ---@field earningsbyyear table
----@field extradata table
 
 ---@class squadplayer:LpdbBaseData
 ---@field id string
@@ -94,7 +91,6 @@ local lpdb = {}
 ---@field joindate string
 ---@field leavedate string
 ---@field inactivedate string
----@field extradata table
 
 ---@class team:LpdbBaseData
 ---@field name string
@@ -109,7 +105,6 @@ local lpdb = {}
 ---@field earnignsbyyear table
 ---@field template string
 ---@field links table
----@field extradata table
 
 ---@class tournament:LpdbBaseData
 ---@field name string
@@ -143,7 +138,182 @@ local lpdb = {}
 ---@field maps string
 ---@field format string
 ---@field sponsors table
----@field extradata table
+
+---@class company:LpdbBaseData
+---@field name string
+---@field image string
+---@field imagedark string
+---@field locations table
+---@field parentcompany string
+---@field sistercompany string
+---@field industry string
+---@field foundeddate string
+---@field defunctdate string
+---@field defunctfate string
+---@field links table
+
+---@class externalmedialink:LpdbBaseData
+---@field title string
+---@field translatedtitle string
+---@field link string
+---@field date string
+---@field authors table
+---@field language string
+---@field publisher string
+---@field type string
+
+---@class series:LpdbBaseData
+---@field name string
+---@field abbreviation string
+---@field image string
+---@field imagedark string
+---@field icon string
+---@field icondark string
+---@field game string
+---@field type string
+---@field organizers table
+---@field locations table
+---@field prizepool number
+---@field liquipediatier string # to be converted to integer
+---@field liquipediatiertype string
+---@field publishertier string
+---@field launcheddate string
+---@field defunctdate string
+---@field defunctfate string
+---@field links table
+
+---@class settings:LpdbBaseData
+---@field name string
+---@field reference string
+---@field lastupdated string
+---@field keys table
+---@field gamesettings table
+---@field viewsettings table
+---@field type string
+
+---@class scoreBoard
+---@field match {w: number, d: number, l: number}
+---@field overtime {w: number, d: number, l: number}
+---@field game {w: number, d: number, l: number}
+---@field points number
+---@field diff number
+---@field buchholz number
+
+---@class standingsentry:LpdbBaseData
+---@field parent string
+---@field standingsindex integer
+---@field opponenttype OpponentType
+---@field opponentname string
+---@field opponenttemplate string
+---@field opponentplayers table
+---@field placement string
+---@field definitestatus string
+---@field currentstatus string
+---@field placementchange string
+---@field scoreboard scoreBoard
+---@field roundindex integer
+---@field slotindex integer
+
+---@class standingstable:LpdbBaseData
+---@field parent string
+---@field standingsindex integer
+---@field title string
+---@field tournament string
+---@field section string
+---@field type 'league'|'swiss'
+---@field matches string[]
+---@field config {hasdraw: string, hasovertime: string, haspoints: string}
+
+---@class transfer:LpdbBaseData
+---@field staticid string # not yet in use
+---@field player string
+---@field nationality string
+---@field fromteamtemplate string
+---@field toteamtemplate string
+---@field role1 string
+---@field role2 string
+---@field reference table
+---@field date string
+---@field wholeteam integer
+
+---@class gear:LpdbBaseData
+---@field date string
+---@field reference string
+---@field input table
+---@field display string
+---@field audio table
+---@field chair table
+
+---@class match2:LpdbBaseData
+---@field match2id string
+---@field match2bracketid string
+---@field winner integer
+---@field walkover WalkoverType
+---@field resulttype ResultType
+---@field finished integer
+---@field mode string
+---@field type string
+---@field section string
+---@field game string
+---@field patch string
+---@field date string
+---@field dateexact integer
+---@field stream table
+---@field links table
+---@field bestof integer
+---@field vod string
+---@field tournament string
+---@field parent string
+---@field tickername string
+---@field shortname string
+---@field series string
+---@field icon string
+---@field icondark string
+---@field liquipediatier string # to be converted to integer
+---@field liquipediatiertype string
+---@field publishertier string
+---@field match2bracketdata table
+---@field match2opponents match2opponent[]
+---@field match2games match2game[]
+
+---@class match2opponent:LpdbBaseData
+---@field match2id string
+---@field match2opponentid integer
+---@field type OpponentType
+---@field name string
+---@field template string
+---@field score number
+---@field placement integer
+---@field status string
+---@field match2players match2player[]
+
+---@class match2game:LpdbBaseData
+---@field match2id string
+---@field match2gameid integer
+---@field subgroup integer
+---@field scores number[]
+---@field participants table
+---@field winner integer
+---@field walkover WalkoverType
+---@field resulttype ResultType
+---@field mode string
+---@field type string
+---@field game string
+---@field patch string
+---@field tournament string
+---@field date string
+---@field vod string
+---@field map string
+---@field length string
+---@field parent string
+
+---@class match2player:LpdbBaseData
+---@field match2id string
+---@field match2opponentid integer
+---@field match2playerid integer
+---@field name string
+---@field displayname string
+---@field flag string
 
 ---@param obj table
 ---@return string
