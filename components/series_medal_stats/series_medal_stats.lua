@@ -208,7 +208,7 @@ function MedalStats:processByIdentifier(getIdentifier, placement)
 	end
 
 	local placementValue = placement.placement
-	if self.config.mergeIntoSemifinalists and placementValue == THIRD or placementValue == FOURTH then
+	if self.config.mergeIntoSemifinalists and (placementValue == THIRD or placementValue == FOURTH) then
 		placementValue = SEMIFINALIST
 	end
 
