@@ -19,7 +19,7 @@ local CustomMatchTicker = {}
 
 ---Entry point for display on tournament pages
 ---@param frame Frame
----@return Html|string
+---@return Html
 function CustomMatchTicker.tournament(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -38,15 +38,15 @@ function CustomMatchTicker.tournament(frame)
 end
 
 ---Entry point for display on the main page
----@param frame Frame
----@return Html|string
+---@param frame Frame?
+---@return Html
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchTicker(args):query():create()
 end
 
 ---Entry point for display on player pages
----@param frame Frame
+---@param frame Frame?
 ---@return Html
 function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
@@ -57,7 +57,7 @@ function CustomMatchTicker.player(frame)
 end
 
 ---Entry point for display on team pages
----@param frame Frame
+---@param frame Frame?
 ---@return Html
 function CustomMatchTicker.team(frame)
 	local args = Arguments.getArgs(frame)
@@ -76,6 +76,16 @@ function CustomMatchTicker.participant(args, matches)
 
 	--adjusting args
 	args.infoboxClass = Logic.nilOr(Logic.readBoolOrNil(args.infoboxClass), true)
+
+	if Logic.readBool(args.short) then
+		args.upcoming = true
+		args.ongoing = true
+		args.recent = false
+		args.limit = args.limit or 5
+		return MatchTicker(args):query():create(
+			MatchTicker.DisplayComponents.Header('Upcoming Matches')
+		)
+	end
 
 	return mw.html.create()
 		:node(MatchTicker(Table.merge(args, {

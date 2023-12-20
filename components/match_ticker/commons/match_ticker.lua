@@ -318,10 +318,10 @@ function MatchTicker.switchOpponents(match)
 end
 
 ---@param header MatchTickerHeader?
----@return Html|string
+---@return Html
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
-		return ''
+		return mw.html.create()
 	end
 
 	local wrapper = mw.html.create('div')

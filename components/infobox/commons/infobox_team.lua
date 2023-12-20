@@ -252,7 +252,7 @@ end
 
 function Team:_createUpcomingMatches()
 	if self:shouldStore(self.args) and Info.match2 > 0 then
-		return MatchTicker.participant{team = self.pagename}
+		return MatchTicker.team{short = true}
 	end
 end
 

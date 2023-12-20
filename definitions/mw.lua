@@ -60,7 +60,7 @@ function mw.log(...) end
 function mw.logObject(object, prefix) end
 
 ---@class Frame
----@field args table
+---@field args table?
 mw.frame = {}
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
