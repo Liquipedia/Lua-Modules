@@ -503,7 +503,10 @@ function mw.text.listToText(list, separator, conjunction) end
 ---Replaces various characters in the string with HTML entities to prevent their interpretation as wikitext.
 ---@param s string
 ---@return string
-function mw.text.nowiki(s) end
+function mw.text.nowiki(s)
+	-- TODO: Faking doesn't actually replace
+	return s
+end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
 ---@param s string

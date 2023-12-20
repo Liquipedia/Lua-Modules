@@ -7,19 +7,19 @@ describe('table formatter', function()
 			'<pre class="selectall">{}</pre>',
 			tostring(TableFormatter.toLuaCode{})
 		)
-		assert.are_equal(
+		assert.are_same(
 			[[<pre class="selectall">{
 	5,
 	10,
 	[10] = 100,
 	['a'] = 'a',
-	['a\'b'] = ']] .. mw.text.nowiki('te\\\'st') .. [[',
+	['a\'b'] = ']] .. 'te\\\'st' .. [[',
 	['b'] = {
 		['b'] = 'b',
 	},
 	['c'] = 1,
 	['trueBool'] = true,
-	['zFunction'] = function,
+	['zFunction'] = ]] .. tostring(tostring) .. [[,
 }</pre>]],
 			tostring(
 				TableFormatter.toLuaCode{
