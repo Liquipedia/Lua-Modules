@@ -37,9 +37,9 @@ local SEMIFINALIST = '3-4'
 ---@field endDate string?
 ---@field placements string[]
 ---@field external boolean
----@field noNumber boolean
----@field offset integer? only valid if not noNumber
----@field limit integer? only valid if not noNumber
+---@field hasNumber boolean
+---@field offset integer? only valid if hasNumber
+---@field limit integer? only valid if hasNumber
 ---@field additionalConditions string
 ---@field opponentTypes string[]
 ---@field mergeIntoSemifinalists boolean
@@ -121,8 +121,7 @@ function MedalStats:_getConfig()
 		offset = tonumber(args.offset),
 		limit = tonumber(args.limit),
 		cutAfter = tonumber(args.cutafter) or 7,
-		noNumber = Logic.readBool(args.noNumber) or
-			(args.edate or args.sdate) and tonumber(args.offset) and tonumber(args.limit),
+		hasNumber = Logic.isNumeric(args.offset) or Logic.isNumeric(args.limit) or not Logic.readBool(args.noNumber),
 		endDate = args.edate,
 		startDate = args.sdate,
 		placements = placements,
@@ -171,7 +170,7 @@ function MedalStats:_getConditions()
 		conditions:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1)}
 	end
 
-	if not config.noNumber then
+	if config.hasNumber then
 		conditions:add{ConditionNode(ColumnName('extradata_seriesnumber'), Comparator.eq, '!')}
 	end
 
