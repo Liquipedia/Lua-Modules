@@ -47,11 +47,15 @@ local function setupForTesting()
 		end
 
 		if newName == 'region' or newName == 'region_data' then
-			return require('region.commons.' .. newName)
+			return require_original('region.commons.' .. newName)
 		end
 
 		if newName == 'opponent' then
-			return require('components.opponent.commons.opponent')
+			return require_original('components.opponent.commons.opponent')
+		end
+
+		if newName == 'tier_utils' or newName == 'tier_data' then
+			return require_original('tier.commons.' .. newName)
 		end
 
 		if newName == 'feature_flag_config' then
