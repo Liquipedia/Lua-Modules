@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:SeriesMedalStats/Flags
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')

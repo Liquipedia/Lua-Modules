@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:SeriesMedalStats
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
