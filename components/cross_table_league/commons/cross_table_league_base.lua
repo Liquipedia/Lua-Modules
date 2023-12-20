@@ -245,9 +245,7 @@ function CrossTableLeague:_filterAndSortMatches(matches)
 		end
 	end
 
-	for _, match in pairs(matches) do
-		p.processMatch(match)
-	end
+	Array.forEach(matches, p.processMatch)
 
 	return foundMatches
 end
@@ -287,10 +285,10 @@ function CrossTableLeague:_readOpponentsFromMatches(matches)
 		end
 	end
 
-	for _, match in pairs(matches) do
+	Array.forEach(matches, function(match)
 		processOpponent(match.match2opponents[1])
 		processOpponent(match.match2opponents[2])
-	end
+	end)
 
 	Array.sortInPlaceBy(entries, function(entry) return entry.opponent.name end)
 
