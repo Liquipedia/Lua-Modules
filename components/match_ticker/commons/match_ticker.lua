@@ -310,9 +310,7 @@ function MatchTicker.switchOpponents(match)
 		or winner == 2 and 1
 		or match.winner
 
-	local tempOpponent = match.match2opponents[1]
-	match.match2opponents[1] = match.match2opponents[2]
-	match.match2opponents[2] = tempOpponent
+	match.match2opponents[1], match.match2opponents[2] = match.match2opponents[2], match.match2opponents[1]
 
 	return match
 end

@@ -61,7 +61,7 @@ end
 
 ---@return Html
 function Header:create()
-	return self.root
+	return mw.html.create('div'):node(self.root)
 end
 
 ---Display class for matches shown within a match ticker
