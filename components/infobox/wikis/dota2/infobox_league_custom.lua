@@ -38,6 +38,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	_args = league.args
 
@@ -143,6 +144,12 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
+end
+
+---@param args table
+---@return table
+function CustomLeague:getWikiCategories(args)
+	return {Game.name{game = args.game} .. " Competitions"}
 end
 
 function CustomLeague:_createPatchCell(args)

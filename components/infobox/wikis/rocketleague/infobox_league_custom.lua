@@ -47,6 +47,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -191,6 +192,13 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	return lpdbData
 end
+
+---@param args table
+---@return table
+function CustomLeague:getWikiCategories(args)
+	return {Game.name{game = args.game} .. " Competitions"}
+end
+
 
 function CustomLeague:_concatArgs(args, base)
 	local foundArgs = {args[base] or args[base .. '1']}
