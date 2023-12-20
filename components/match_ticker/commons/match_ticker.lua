@@ -290,7 +290,7 @@ function MatchTicker:adjustMatch(match)
 		return match
 	end
 
-	local opponentNames = Array.append({self.config.player}, self.config.teamPages)
+	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
 		Table.includes(opponentNames, (match.match2opponents[2].name:gsub(' ', '_')))
