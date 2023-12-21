@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 		return Array.append(widgets,
 			Cell{name = 'Released', content = {_args.released}},
 			Cell{name = 'Technical Name', content = {_args.techname}},
-			Cell{name = 'Tank Type', content = {CustomUnit._getTankType()}},
+			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(args)}},
 			Cell{name = 'Tank Tier', content = {_args.tier}},
 			Cell{name = 'Nation', content = {Nation.run(_args.nation)}},
 			Cell{name = 'Role', content = {_args.role}}
@@ -58,18 +58,17 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@args table
 ---@return string[]
-function CustomUnit._getTankType()
-	if String.isEmpty(_args.tanktype) then
+function CustomUnit._getTankType(args)
+	if String.isEmpty(args.tanktype) then
 		return {}
 	end
-
-	local releasedate = _args.releasedate
-	local typeIcon = TankTypes.get{type = _args.tanktype, date = releasedate, size = 15}
-	return typeIcon .. ' [[' .. _args.tanktype .. ']]'
+	local releasedate = args.releasedate
+	local typeIcon = TankTypes.get{type = args.tanktype, date = releasedate, size = 15}
+	return typeIcon .. ' [[' .. args.tanktype .. ']]'
 end
 
-	
 ---@return WidgetInjector
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
