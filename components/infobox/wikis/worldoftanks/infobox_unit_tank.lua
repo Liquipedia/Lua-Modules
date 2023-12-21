@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 		return Array.append(widgets,
 			Cell{name = 'Released', content = {_args.released}},
 			Cell{name = 'Technical Name', content = {_args.techname}},
-			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(args)}},
+			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(_args)}},
 			Cell{name = 'Tank Tier', content = {_args.tier}},
 			Cell{name = 'Nation', content = {Nation.run(_args.nation)}},
 			Cell{name = 'Role', content = {_args.role}}
