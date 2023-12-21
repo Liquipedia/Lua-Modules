@@ -92,6 +92,10 @@ function Game.listGames(options)
 		return Array.sortBy(gamesList, getGameOrder)
 	end
 
+	Array.filter(gamesList, function(game)
+		return not game.fake
+	end)
+
 	return gamesList
 end
 
