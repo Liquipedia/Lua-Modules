@@ -517,7 +517,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		playerData = type(playerData) == 'string' and {playerData} or playerData
 		local player = {
 			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
-			pageName = Logic.emptyOr(playerData.pageName or playerData.pagename or playerData.link),
+			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
 			flag = playerData.flag,
 		}
 		if Logic.isEmpty(player.displayName) then return end
