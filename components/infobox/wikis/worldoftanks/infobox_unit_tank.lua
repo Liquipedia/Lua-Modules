@@ -21,8 +21,6 @@ local Nation = Lua.import('Module:Infobox/Extension/Nation', {requireDevIfEnable
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _pagename = mw.title.getCurrentTitle().text
-
 local _args
 
 local CustomUnit = Class.new()
@@ -82,13 +80,13 @@ function CustomUnit:getWikiCategories(args)
 	if String.isEmpty(args.tanktype) then
 		return categories
 	end
-	return Array.append(categories, _args.tanktype .. ' Tanks')
+	return Array.append(categories, args.tanktype .. ' Tanks')
 end
 
 ---@param args table
 function CustomUnit:setLpdbData(args)
 	local lpdbData = {
-		name = args.name or _pagename,
+		name = args.name or self.pagename,
 		type = 'tank',
 		image = args.image,
 		date = args.released,
@@ -102,7 +100,7 @@ function CustomUnit:setLpdbData(args)
 		}
 	}
 
-	mw.ext.LiquipediaDB.lpdb_datapoint('tank_' .. (args.name or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('tank_' .. (args.name or self.pagename), lpdbData)
 end
 
 return CustomUnit
