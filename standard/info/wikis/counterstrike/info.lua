@@ -83,6 +83,7 @@ local infoData = {
 		},
 		csgocs2 = {
 			order = 6,
+			fake = true,
 			abbreviation = 'CS:GO/CS2',
 			name = 'CS:GO / CS2',
 			link = 'Counter-Strike 2',
