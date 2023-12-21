@@ -71,7 +71,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
 
-	lpdbData.game = Game.name{game = args.game}
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)
 
 	return lpdbData
@@ -81,7 +80,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end
-	Variables.varDefine('tournament_game', Game.name{game = args.game})
 	Variables.varDefine('tournament_publishertier', args['atvi-sponsored'])
 
 	--Legacy Vars:

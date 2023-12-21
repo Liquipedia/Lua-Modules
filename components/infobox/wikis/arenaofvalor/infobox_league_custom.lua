@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -23,9 +24,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
-
-local _GAME = mw.loadData('Module:GameVersion')
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -48,10 +46,8 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}},
-			}
+			Cell{name = 'Game version', content = {Game.name{game = _args.game}}},
+		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
@@ -72,23 +68,15 @@ function CustomLeague:liquipediaTierHighlighted()
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = _game or args.game
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_game', _game or args.game)
 	Variables.varDefine('tournament_publishertier', Logic.readBool(args.publisherpremier) and 'true' or nil)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-end
-
-function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
 end
 
 return CustomLeague

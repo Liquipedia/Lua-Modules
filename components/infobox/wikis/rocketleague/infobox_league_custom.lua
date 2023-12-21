@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -29,8 +30,6 @@ local CustomInjector = Class.new(Injector)
 
 local _SERIES_RLCS = 'Rocket League Championship Series'
 local _MODE_2v2 = '2v2'
-local _GAME_ROCKET_LEAGUE = 'rl'
-local _GAME_SARPBC = 'sarpbc'
 
 local _TIER_1 = 1
 local MISC_TIER = -1
@@ -48,6 +47,7 @@ function CustomLeague.run(frame)
 	league.addToLpdb = CustomLeague.addToLpdb
 	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -64,7 +64,7 @@ function CustomInjector:addCustomCells(widgets)
 	})
 	table.insert(widgets, Cell{
 		name = 'Game',
-		content = {CustomLeague:_createGameCell(args.game)}
+		content = {Game.text{game = args.game}}
 	})
 	table.insert(widgets, Cell{
 		name = 'Misc Mode',
@@ -102,13 +102,6 @@ function CustomInjector:parse(id, widgets)
 		end
 	end
 	return widgets
-end
-
-function CustomLeague:addCustomCells(infobox, args)
-	infobox:cell('Mode', args.mode)
-	infobox:cell('Game', CustomLeague:_createGameCell(args.game))
-	infobox:cell('Misc Mode:', args.miscmode)
-	return infobox
 end
 
 function CustomLeague:createLiquipediaTierDisplay(args)
@@ -188,7 +181,6 @@ function CustomLeague.parseShowHeadToHead(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = 'rocket league'
 	lpdbData.patch = args.patch
 
 	lpdbData.extradata.region = args.region
@@ -201,16 +193,12 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomLeague:_createGameCell(game)
-	if game == _GAME_ROCKET_LEAGUE then
-		return '[[Rocket League]][[Category:Rocket League Competitions]]'
-	elseif game == _GAME_SARPBC then
-		return '[[Supersonic Acrobatic Rocket-Powered Battle-Cars]]' ..
-			'[[Category:Supersonic Acrobatic Rocket-Powered Battle-Cars Competitions]]'
-	end
-
-	return nil
+---@param args table
+---@return table
+function CustomLeague:getWikiCategories(args)
+	return {Game.name{game = args.game} .. " Competitions"}
 end
+
 
 function CustomLeague:_concatArgs(args, base)
 	local foundArgs = {args[base] or args[base .. '1']}

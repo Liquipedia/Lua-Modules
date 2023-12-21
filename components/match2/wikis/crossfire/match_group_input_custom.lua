@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
+-- wiki=crossfire
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,24 +8,27 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Streams = require('Module:Links/Stream')
+local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
+local DateExt = require('Module:Date/Ext')
+local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
-local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
+local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
+local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
-local NO_SCORE = -99
-local SECONDS_UNTIL_FINISHED_EXACT = 30800
-local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local GAME = mw.loadData('Module:GameVersion')
+
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+local LANG = mw.getContentLanguage()
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -35,7 +38,7 @@ local opponentFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match, options)
+function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -67,11 +70,13 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date, {syncPlayer=true})
+	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -101,7 +106,10 @@ end
 
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
-	if Table.includes(FINISHED_INDICATORS, data.finished) or Table.includes(FINISHED_INDICATORS, data.winner) then
+	if
+	Table.includes(NP_STATUSES, data.finished) or
+	Table.includes(NP_STATUSES, data.winner)
+	then
 		data.resulttype = 'np'
 		data.finished = true
 	-- Map or Match is marked as finished.
@@ -139,7 +147,7 @@ end
 
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
+		for key in pairs(opponents) do
 			opponents[key].placement = 1
 		end
 	elseif specialType == 'default' then
@@ -151,13 +159,13 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			end
 		end
 	else
-		local lastScore = NO_SCORE
-		local lastPlacement = NO_SCORE
+		local lastScore = -99
+		local lastPlacement = -99
 		local counter = 0
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and (winner or '') == '' then
+			if counter == 1 and Logic.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
@@ -167,7 +175,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
 				lastPlacement = counter
-				lastScore = score or NO_SCORE
+				lastScore = score or -99
 			end
 		end
 	end
@@ -176,8 +184,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 end
 
 function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
-	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
+	local value1 = tonumber(table[key1].score) or -99
+	local value2 = tonumber(table[key2].score) or -99
 	return value1 > value2
 end
 
@@ -263,7 +271,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', EPOCH_TIME),
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
@@ -272,45 +280,26 @@ end
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	return MatchGroupInput.getCommonTournamentVars(match)
+
+	match = MatchGroupInput.getCommonTournamentVars(match)
+
+	match.game = GAME[match.game]
+
+	return match
 end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.links = {}
-	local links = match.links
-	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
-	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
-	if match.breakingpoint then links.breakingpoint = 'https://www.breakingpoint.gg/match/' .. match.breakingpoint end
-
 	return match
 end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match),
-		mvpteam = match.mvpteam or match.winner
+		mvp = MatchGroupInput.readMvp(match)
 	}
-
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players = players, points = mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -327,8 +316,9 @@ function matchFunctions.getOpponents(match)
 			if opponent.type == Opponent.team then
 				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
 			end
+
 			-- apply status
-			if Logic.isNumeric(opponent.score) then
+			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -336,29 +326,14 @@ function matchFunctions.getOpponents(match)
 				opponent.score = -1
 			end
 			opponents[opponentIndex] = opponent
-
-			-- get players from vars for teams
-			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
-			end
 		end
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
 	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.ceil(match.bestof / 2)
+		local firstTo = math.ceil(match.bestof/2)
 		for _, item in pairs(opponents) do
-			if (tonumber(item.score or 0) or 0) >= firstTo then
-				match.finished = true
-				break
-			end
-		end
-	end
-
-	-- check if match should actually be finished due to a non score status
-	if not Logic.readBool(match.finished) then
-		for _, opponent in pairs(opponents) do
-			if String.isNotEmpty(opponent.status) and opponent.status ~= 'S' then
+			if (tonumber(item.score) or 0) >= firstTo then
 				match.finished = true
 				break
 			end
@@ -367,18 +342,16 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
-			or SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < currentUnixTime then
+		local matchTime = tonumber(LANG:formatDate('U', match.date))
+		local autoFinishThreshold = match.dateexact and 30800 or 86400
+
+		if matchTime + autoFinishThreshold < NOW then
 			match.finished = true
 		end
 	end
 
 	-- apply placements and winner if finshed
-	if not Logic.isEmpty(match.winner) or Logic.readBool(match.finished) then
+	if not String.isEmpty(match.winner) or Logic.readBool(match.finished) then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -397,6 +370,7 @@ end
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
+		header = map.header,
 	}
 	return map
 end
@@ -410,7 +384,7 @@ function mapFunctions.getScoresAndWinner(map)
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
 		if not Logic.isEmpty(score) then
-			if Logic.isNumeric(score) then
+			if TypeUtil.isNumeric(score) then
 				obj.status = 'S'
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
@@ -431,7 +405,11 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
+
+	map = MatchGroupInput.getCommonTournamentVars(map)
+	map.game = GAME[map.game]
+
+	return map
 end
 
 --

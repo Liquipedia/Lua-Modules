@@ -81,14 +81,12 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
-	lpdbData.game = Game.name{game = args.game}
 	return lpdbData
 end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_publishertier', args.publisherpremier)
-	Variables.varDefine('tournament_game', Game.name{game = args.game})
 end
 
 ---@param args table

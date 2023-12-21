@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Game = require('Module:Game')
 local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -25,7 +26,8 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
-local Opponent = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true}).Opponent
+local OpponentLibraries = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true})
+local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
@@ -46,9 +48,9 @@ function HiddenDataBox.run(args)
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
-		})
+		})[1]
 
-		if not queryResult[1] and Namespace.isMain() then
+		if not queryResult and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
@@ -60,7 +62,7 @@ function HiddenDataBox.run(args)
 			end)
 		end
 
-		queryResult = queryResult[1] or {}
+		queryResult = queryResult or {}
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
@@ -86,7 +88,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
-	HiddenDataBox.checkAndAssign('tournament_game', args.game, queryResult.game)
+	HiddenDataBox.checkAndAssign('tournament_game', Game.toIdentifier{game = args.game}, queryResult.game)
 	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
@@ -123,7 +125,7 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}[]
+---@return placement[]
 function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
@@ -142,7 +144,7 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
----@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
+---@param placement placement
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then

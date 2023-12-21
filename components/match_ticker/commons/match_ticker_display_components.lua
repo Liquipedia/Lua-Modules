@@ -132,7 +132,7 @@ function Versus:scores()
 	end
 
 	Array.forEach(self.match.match2opponents, function(opponent, opponentIndex)
-		local score = opponent.status ~= SCORE_STATUS and opponent.status
+		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
 		table.insert(scores, setWinner(score ~= -1 and score or 0, opponentIndex))

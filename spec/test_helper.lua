@@ -27,6 +27,7 @@ local function setupForTesting()
 
 	package.path = '?.lua;' ..
 			'standard/?.lua;' .. -- Load std folder
+			'components/match2/commons/?.lua;' .. -- Load m2 folder
 			package.path
 
 	local require_original = require
@@ -47,11 +48,23 @@ local function setupForTesting()
 		end
 
 		if newName == 'region' or newName == 'region_data' then
-			return require('region.commons.' .. newName)
+			return require_original('region.commons.' .. newName)
 		end
 
 		if newName == 'opponent' then
-			return require('components.opponent.commons.opponent')
+			return require_original('components.opponent.commons.opponent')
+		end
+
+		if newName == 'tier_utils' or newName == 'tier_data' then
+			return require_original('tier.commons.' .. newName)
+		end
+
+		if newName == 'opponent_display' then
+			return require('components.opponent.commons.opponent_display')
+		end
+
+		if newName == 'player_display' then
+			return require('components.opponent.commons.player_display')
 		end
 
 		if newName == 'feature_flag_config' then
