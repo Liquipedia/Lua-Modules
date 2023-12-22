@@ -40,6 +40,7 @@ function CustomLeague.run(frame)
 	league.createWidgetInjector = CustomLeague.createWidgetInjector
 	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox()
 end
@@ -93,6 +94,20 @@ end
 ---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
+end
+
+---@param args table
+---@return table
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
+	if not Game.name{game = _args.game} then
+		table.insert(categories, 'Tournaments without game version')
+	else
+		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
+	end
+
+	return categories
 end
 
 ---@param content Html|string|number|nil
