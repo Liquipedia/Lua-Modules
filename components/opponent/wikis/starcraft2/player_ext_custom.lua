@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=starcraft2
 -- page=Module:Player/Ext/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
