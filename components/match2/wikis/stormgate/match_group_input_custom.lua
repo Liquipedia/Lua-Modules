@@ -341,7 +341,6 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 	local players = {}
 
 	local teamName = opponent.name
-	local playersData = Json.parseIfString(opponent.players) or {}
 
 	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name) then
