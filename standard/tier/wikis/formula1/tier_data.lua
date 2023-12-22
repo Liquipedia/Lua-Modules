@@ -104,6 +104,14 @@ return {
 			short = 'Showm.',
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
+		},	
+		misc = {
+			value = 'Awards',
+			sort = 'B3',
+			name = 'Awards',
+			short = 'Awards',
+			link = 'Awards Shows',
+			category = 'Awards Shows',
 		},
 	}
 }
