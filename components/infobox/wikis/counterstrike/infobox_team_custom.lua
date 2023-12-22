@@ -82,10 +82,6 @@ function CustomTeam:createBottomContent()
 
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.lpdbname or teamPage}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
 			{team = _team.lpdbname or teamPage}
 		)
