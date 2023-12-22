@@ -520,7 +520,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	if match.isTeamMatch then
 		map.subgroup = tonumber(map.subgroup)
 		if map.subgroup then
-			subGroupIndex = map.subgroup
+			subGroupIndex = map.subgroup --[[@as integer]]
 		else
 			subGroupIndex = subGroupIndex + 1
 			map.subgroup = subGroupIndex
