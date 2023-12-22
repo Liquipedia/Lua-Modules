@@ -346,7 +346,7 @@ function CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opp
 	end
 end
 
----Determines if any players in an opponent are not playing their main faction by comparing them to a reference opponent.
+---Determines if any players in an opponent aren't playing their main faction by comparing them to a reference opponent.
 ---Returns the factions played if at least one player chose an offfaction or nil if otherwise.
 ---@param gameOpponent StormgateMatchGroupUtilGameOpponent
 ---@param referenceOpponent StormgateStandardOpponent|StormgateMatchGroupUtilGameOpponent

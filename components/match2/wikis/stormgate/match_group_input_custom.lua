@@ -680,7 +680,11 @@ function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponent
 	map[prefix .. '1heroes'] = Logic.emptyOr(map[prefix .. '1heroes'], map['heroes' .. opponentIndex])
 
 	for playerIndex, player in pairs(players) do
-		local faction = Logic.emptyOr(map[prefix .. playerIndex .. 'faction'], player.extradata.faction, Faction.defaultFaction)
+		local faction = Logic.emptyOr(
+			map[prefix .. playerIndex .. 'faction'],
+			player.extradata.faction,
+			Faction.defaultFaction
+		)
 		faction = Faction.read(faction)
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
@@ -778,7 +782,8 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
 		assert(ignoreFactionHeroCheck or not isCoreFaction
 			or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
-			'Invalid hero input "' .. hero .. '" for faction "' .. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
+			'Invalid hero input "' .. hero .. '" for faction "'
+				.. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
 
 		return heroData.name
 	end)
