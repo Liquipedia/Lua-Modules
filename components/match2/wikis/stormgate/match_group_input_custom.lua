@@ -13,8 +13,6 @@ local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapsData = mw.loadData('Module:Maps/data')
-local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -30,7 +28,7 @@ local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap'}
+local LINKS_KEYS = {'preview', 'interview', 'review'}
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local NEUTRAL_HERO_FACTION = 'neutral'
@@ -48,7 +46,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match,
 		CustomMatchGroupInput._readDate(match)
 	)
-	match.patch = PatchAuto.retrieve{date = match.date}
+	match.patch = Variables.varDefault('tournament_patch')
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._updateFinished(match)
@@ -129,8 +127,9 @@ function CustomMatchGroupInput._getExtraData(match)
 	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
-		match.extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
+		match.extradata[prefix] = mapVeto and mw.ext.TeamLiquidIntegration.resolve_redirect(mapVeto) or nil
 		match.extradata[prefix .. 'by'] = match[prefix .. 'by']
+		match.extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 	end
 
 	Table.mergeInto(match.extradata, Table.filterByKey(match, function(key, value)
@@ -378,16 +377,6 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		insertIntoPlayers(Json.parseIfString(player))
 	end
 
-	--players from manual input in `opponent.players`
-	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
-		insertIntoPlayers({
-			name = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
-			faction = playersData[playerPrefix .. 'faction'],
-			flag = playersData[playerPrefix .. 'flag'],
-		})
-	end
-
 	opponent.match2players = Array.extractValues(players)
 	--set default faction for unset factions
 	Array.forEach(opponent.match2players, function(player)
@@ -498,12 +487,15 @@ end
 ---@return integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
-	map.map = (MapsData[(map.map or ''):lower()] or {}).name or map.map
+	if map.map ~= 'TBD' then
+		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
+	end
 
 	-- set initial extradata for maps
 	map.extradata = {
-		comment = map.comment or '',
-		header = map.header or '',
+		comment = map.comment,
+		header = map.header,
+		displayname = map.mapDisplayName,
 	}
 
 	-- inherit stuff from match data

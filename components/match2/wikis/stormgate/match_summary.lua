@@ -37,9 +37,6 @@ local LINKS_DATA = {
 	review = {icon = 'File:Reviews32.png', text = 'Review'},
 	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 }
-LINKS_DATA.preview2 = LINKS_DATA.preview
-LINKS_DATA.interview2 = LINKS_DATA.interview
-LINKS_DATA.recap = LINKS_DATA.review
 
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
@@ -118,6 +115,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		return footer:addLinks(LINKS_DATA, match.links)
 	end
 
+	--[[ disabled for now due to the form not being done yet
 	match.links.h2h = tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
 		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
 		.. match.opponents[1].players[1].pageName
@@ -125,6 +123,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		.. match.opponents[2].players[1].pageName
 		.. '&wpRunQuery=Run+query'
 	match.links.h2h = string.gsub(match.links.h2h, ' ', '_')
+	]]
 
 	return footer:addLinks(LINKS_DATA, match.links)
 end
