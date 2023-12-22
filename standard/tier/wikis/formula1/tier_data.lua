@@ -105,7 +105,7 @@ return {
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
 		},	
-		misc = {
+		award = {
 			value = 'Awards',
 			sort = 'B3',
 			name = 'Awards',
