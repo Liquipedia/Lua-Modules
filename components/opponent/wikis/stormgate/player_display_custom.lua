@@ -31,7 +31,7 @@ CustomPlayerDisplay.propTypes.BlockPlayer = {
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
 	showPlayerTeam = 'boolean?',
-	showFaction = 'boolean?',
+	hideFaction = 'boolean?',
 	abbreviateTbd = 'boolean?',
 	note = 'string?',
 }
@@ -63,7 +63,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	end
 
 	local factionNode
-	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
+	if not props.hideFaction and player.faction ~= Faction.defaultFaction then
 		factionNode = mw.html.create('span'):addClass('race')
 			:wikitext(CustomPlayerDisplay.Faction(player.faction))
 	end
@@ -92,7 +92,7 @@ CustomPlayerDisplay.propTypes.InlinePlayerContainer = {
 	savePageVar = 'boolean?',
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
-	showFaction = 'boolean?',
+	hideFaction = 'boolean?',
 }
 
 function CustomPlayerDisplay.InlinePlayerContainer(props)
@@ -111,7 +111,7 @@ CustomPlayerDisplay.propTypes.InlinePlayer = {
 	player = CustomMatchGroupUtil.types.Player,
 	showFlag = 'boolean?',
 	showLink = 'boolean?',
-	showFaction = 'boolean?',
+	hideFaction = 'boolean?',
 }
 function CustomPlayerDisplay.InlinePlayer(props)
 	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.InlinePlayer)
@@ -121,7 +121,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
+	local faction = not props.hideFaction and player.faction ~= Faction.defaultFaction
 		and CustomPlayerDisplay.Faction(player.faction)
 		or nil
 

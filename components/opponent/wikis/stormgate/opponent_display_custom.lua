@@ -24,7 +24,7 @@ local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, type
 
 CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.InlineOpponent, {
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFaction = 'boolean?',
+	hideFaction = 'boolean?',
 })
 
 ---Display component for an opponent entry appearing in a bracket match.
@@ -67,7 +67,7 @@ CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOp
 
 ---@class StormgateInlineOpponentProps: InlineOpponentProps
 ---@field opponent StormgateStandardOpponent
----@field showFaction boolean?
+---@field hideFaction boolean?
 
 ---@param props StormgateInlineOpponentProps
 ---@return Html|string|nil
@@ -84,13 +84,13 @@ end
 
 CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
 	opponent = MatchGroupUtil.types.GameOpponent,
-	showFaction = 'boolean?',
+	hideFaction = 'boolean?',
 	playerClass = 'string?',
 })
 
 ---@class StormgateBlockOpponentProps: BlockOpponentProps
 ---@field opponent StormgateStandardOpponent
----@field showFaction boolean?
+---@field hideFaction boolean?
 
 ---@param props StormgateBlockOpponentProps
 ---@return Html
@@ -114,11 +114,10 @@ end
 ---@param props StormgateInlineOpponentProps
 ---@return Html
 function CustomOpponentDisplay.InlinePlayers(props)
-	local showFaction = props.showFaction ~= false
 	local opponent = props.opponent
 
 	local playerTexts = Array.map(opponent.players, function(player)
-		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player, showFaction = showFaction})))
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player})))
 	end)
 
 	if props.flip then
@@ -133,7 +132,6 @@ end
 ---@return Html
 function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
-	local showFaction = props.showFaction ~= false
 
 	--only apply note to first player, hence extract it here
 	local note = Table.extract(props, 'note')
@@ -142,7 +140,6 @@ function CustomOpponentDisplay.BlockPlayers(props)
 		return PlayerDisplay.BlockPlayer(Table.merge(props, {
 			team = player.team,
 			player = player,
-			showFaction = showFaction,
 			note = playerIndex == 1 and note or nil,
 		})):addClass(props.playerClass)
 	end)
