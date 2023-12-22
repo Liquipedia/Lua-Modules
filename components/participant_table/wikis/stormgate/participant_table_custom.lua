@@ -293,7 +293,7 @@ function StormgateParticipantTable:_displaySoloFactionTableSection(section, fact
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
-				entry and self:displayEntry(entry, {showFaction = false}) or
+				entry and self:displayEntry(entry, {hideFaction = true}) or
 				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)
