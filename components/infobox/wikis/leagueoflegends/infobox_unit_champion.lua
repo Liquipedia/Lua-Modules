@@ -26,7 +26,7 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 
 ---@class LeagueOfLegendsUnitInfobox: UnitInfobox
-local CustomChampion = Class.new()
+local CustomChampion = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
@@ -36,13 +36,9 @@ local RIOT_POINTS_ICON = '[[File:RP Points.png|x20px|Riot Points|link=Riot Point
 ---@param frame Frame
 ---@return Html
 function CustomChampion.run(frame)
-	local unit = Unit(frame)
+	local unit = CustomChampion(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Champion'
-
-	unit.getWikiCategories = CustomChampion.getWikiCategories
-	unit.setLpdbData = CustomChampion.setLpdbData
-	unit.getCustomCells = CustomChampion.getCustomCells
 
 	return unit:createInfobox()
 end
