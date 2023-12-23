@@ -23,19 +23,16 @@ local Cell = Widgets.Cell
 
 local _args
 
-local CustomUnit = Class.new()
+local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Tank'
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
 	return unit:createInfobox()
 end
 
@@ -43,17 +40,17 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'custom' then
 		return Array.append(widgets,
-			Cell{name = 'Released', content = {_args.released}},
-			Cell{name = 'Technical Name', content = {_args.techname}},
-			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(_args)}},
-			Cell{name = 'Tank Tier', content = {_args.tier}},
-			Cell{name = 'Nation', content = {Nation.run(_args.nation)}},
-			Cell{name = 'Role', content = {_args.role}}
+			Cell{name = 'Released', content = {args.released}},
+			Cell{name = 'Technical Name', content = {args.techname}},
+			Cell{name = 'Tank Type', content = {CustomUnit._getTankType(args)}},
+			Cell{name = 'Tank Tier', content = {args.tier}},
+			Cell{name = 'Nation', content = {Nation.run(args.nation)}},
+			Cell{name = 'Role', content = {args.role}}
 		)
 	end
-	return widgets
 end
 
 ---@args table
