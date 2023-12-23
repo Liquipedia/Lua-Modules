@@ -290,7 +290,7 @@ function MatchTicker:adjustMatch(match)
 		return match
 	end
 
-	local opponentNames = Array.append({self.config.player}, self.config.teamPages)
+	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
 		Table.includes(opponentNames, (match.match2opponents[2].name:gsub(' ', '_')))
@@ -310,18 +310,16 @@ function MatchTicker.switchOpponents(match)
 		or winner == 2 and 1
 		or match.winner
 
-	local tempOpponent = match.match2opponents[1]
-	match.match2opponents[1] = match.match2opponents[2]
-	match.match2opponents[2] = tempOpponent
+	match.match2opponents[1], match.match2opponents[2] = match.match2opponents[2], match.match2opponents[1]
 
 	return match
 end
 
 ---@param header MatchTickerHeader?
----@return Html|string
+---@return Html
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
-		return ''
+		return mw.html.create()
 	end
 
 	local wrapper = mw.html.create('div')

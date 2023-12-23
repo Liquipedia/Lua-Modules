@@ -12,7 +12,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
@@ -38,8 +37,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _doStore = true
-
 local CustomTeam = Class.new()
 
 local CustomInjector = Class.new(Injector)
@@ -58,7 +55,6 @@ function CustomTeam.run(frame)
 	_team = team
 	_args = team.args
 
-	team.createBottomContent = CustomTeam.createBottomContent
 	team.getWikiCategories = CustomTeam.getWikiCategories
 	team.addToLpdb = CustomTeam.addToLpdb
 	team.createWidgetInjector = CustomTeam.createWidgetInjector
@@ -130,12 +126,6 @@ function CustomTeam:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomTeam:createBottomContent()
-	if _doStore then
-		return MatchTicker.participant{team = self.pagename}
-	end
-end
-
 function CustomTeam:addToLpdb(lpdbData)
 	lpdbData.region = nil
 	lpdbData.extradata.subteams = CustomTeam._listSubTeams()
@@ -184,7 +174,6 @@ function CustomTeam.calculateEarnings(args)
 		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
 		(not Namespace.isMain())
 	then
-		_doStore = false
 		Variables.varDefine('disable_LPDB_storage', 'true')
 	else
 		CustomTeam.getEarningsAndMedalsData(_team.pagename)
