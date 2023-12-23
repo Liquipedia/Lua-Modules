@@ -104,7 +104,7 @@ return {
 			short = 'Showm.',
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
-		},	
+		},
 		award = {
 			value = 'Awards',
 			sort = 'B3',
