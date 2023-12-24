@@ -21,8 +21,6 @@ local Nation = Lua.import('Module:Infobox/Extension/Nation', {requireDevIfEnable
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
 local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
