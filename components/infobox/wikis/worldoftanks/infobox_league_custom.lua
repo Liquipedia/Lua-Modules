@@ -102,7 +102,7 @@ function CustomLeague:getWikiCategories(args)
 	if not Game.name{game = args.game} then
 		return {'Tournaments without game version'}
 	end
-	return {Game.name{game = args.game} .. ' Competitions')}
+	return {Game.name{game = args.game} .. ' Competitions'}
 end
 
 ---@param content Html|string|number|nil
