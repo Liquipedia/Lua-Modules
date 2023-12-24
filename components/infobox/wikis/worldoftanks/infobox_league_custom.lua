@@ -99,15 +99,10 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if not Game.name{game = _args.game} then
-		table.insert(categories, 'Tournaments without game version')
-	else
-		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
+	if not Game.name{game = args.game} then
+		return {'Tournaments without game version'}
 	end
-
-	return categories
+	return {Game.name{game = args.game} .. ' Competitions')}
 end
 
 ---@param content Html|string|number|nil
