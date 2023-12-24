@@ -51,6 +51,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Role', content = {args.role}}
 		)
 	end
+	return widgets
 end
 
 ---@args table
