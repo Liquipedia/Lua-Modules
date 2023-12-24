@@ -63,11 +63,6 @@ function CustomUnit._getTankType(args)
 	return typeIcon .. ' [[' .. args.tanktype .. ']]'
 end
 
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param args table
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
