@@ -24,8 +24,6 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
 	return team:createInfobox()
 end
 
@@ -42,13 +40,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Analysts', content = {args.analysts}}
 		)
 	end
-
 	return widgets
 end
 
 function CustomTeam:createBottomContent(args)
-	mw.logObeject("args "  .. args)
-	mw.logObeject("team "  .. team)
 	if not team.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
