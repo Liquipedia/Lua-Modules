@@ -42,6 +42,7 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@param args table
 function CustomLeague:customParseArguments(args)
 	args.raceBreakDown = RaceBreakdown.run(args) or {}
 	args.player_number = args.raceBreakDown.total
