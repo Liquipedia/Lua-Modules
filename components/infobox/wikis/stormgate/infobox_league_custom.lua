@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -27,64 +27,55 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local CANCELLED = 'cancelled'
 local FINISHED = 'finished'
 
-local _args
-local _league
-
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = league.args
-
-	_args.game = Game.name{game = _args.game}
-	_args.raceBreakDown = RaceBreakdown.run(_args) or {}
-	_args.player_number = _args.raceBreakDown.total
-	_args.maps = CustomLeague._getMaps(_args)
-	--varDefault because it could have been set above the infobox via a template
-	_args.status = CustomLeague._getStatus(_args)
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
+function CustomLeague:customParseArguments(args)
+	args.raceBreakDown = RaceBreakdown.run(args) or {}
+	args.player_number = args.raceBreakDown.total
+	args.maps = self:_getMaps(args)
+	self.cleanedArgs.status = self:_getStatus(args)
+end
+
 ---@param args table
 ---@return string?
-function CustomLeague._getStatus(args)
+function CustomLeague:_getStatus(args)
 	local status = args.status or Variables.varDefault('tournament_status')
 	if Logic.isNotEmpty(status) then
 		---@cast status -nil
 		return status:lower()
 	end
 
-	if Logic.readBool(_args.cancelled) then
+	if Logic.readBool(args.cancelled) then
 		return CANCELLED
 	end
 
-	if CustomLeague._isFinished(args) then
+	if self:_isFinished(args) then
 		return FINISHED
 	end
 end
 
 ---@param args table
 ---@return boolean
-function CustomLeague._isFinished(args)
+function CustomLeague:_isFinished(args)
 	local finished = Logic.readBoolOrNil(args.finished)
 	if finished ~= nil then
 		return finished
 	end
 
-	local queryDate = _league:_cleanDate(args.edate) or _league:_cleanDate(args.date)
+	local queryDate = self.cleanedArgs.endDate or self.cleanedArgs.startDate
 
 	if not queryDate or os.date('%Y-%m-%d') < queryDate then
 		return false
@@ -99,39 +90,36 @@ function CustomLeague._isFinished(args)
 	})[1] ~= nil
 end
 
----@return WidgetInjector
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game Version', content = {CustomLeague._getGameVersion(_args)}})
+		table.insert(widgets, Cell{name = 'Game Version', content = {CustomLeague._getGameVersion(args)}})
 	elseif id == 'customcontent' then
-		if _args.player_number and _args.player_number > 0 then
+		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {_args.raceBreakDown.total}},
-				Breakdown{content = _args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
+				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
 
 		--teams section
-		if Logic.isNumeric(_args.team_number) and tonumber(_args.team_number) > 0 then
+		if Logic.isNumeric(args.team_number) and tonumber(args.team_number) > 0 then
 			Array.appendWith(widgets,
 				Title{name = 'Teams'},
-				Cell{name = 'Number of Teams', content = {_args.team_number}}
+				Cell{name = 'Number of Teams', content = {args.team_number}}
 			)
 		end
 
 		--maps
-		if String.isNotEmpty(_args.map1) then
+		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = {CustomLeague._mapsDisplay(_args.maps)}}
+				Center{content = {CustomLeague._mapsDisplay(args.maps)}}
 			)
 		end
 	end
@@ -171,8 +159,8 @@ end
 
 ---@param args table
 ---@return {link: string, displayname: string}[]
-function CustomLeague._getMaps(args)
-	local mapArgs = _league:getAllArgsForBase(args, 'map')
+function CustomLeague:_getMaps(args)
+	local mapArgs = self:getAllArgsForBase(args, 'map')
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		return mapIndex, {
@@ -187,7 +175,6 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.status = args.status
 	lpdbData.maps = Json.stringify(args.maps)
 
 	return lpdbData
