@@ -171,7 +171,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {self.caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {CustomLeague:_getServer(args)}}
+			Cell{name = 'Server', content = {self.caller:_getServer(args)}}
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
@@ -208,7 +208,7 @@ end
 function CustomLeague:_mapsDisplay(maps)
 	return {table.concat(
 		Array.map(maps, function(mapData)
-			return tostring(CustomLeague:_createNoWrappingSpan(
+			return tostring(self:_createNoWrappingSpan(
 				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
@@ -238,8 +238,8 @@ function CustomLeague:displayPrizePool(args)
 	end
 
 	local hasPlus
-	prizePoolUSD, hasPlus = CustomLeague:_removePlus(prizePoolUSD)
-	prizePool, hasPlus = CustomLeague:_removePlus(prizePool, hasPlus)
+	prizePoolUSD, hasPlus = self:_removePlus(prizePoolUSD)
+	prizePool, hasPlus = self:_removePlus(prizePool, hasPlus)
 
 	return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
 		prizepool = prizePool,
