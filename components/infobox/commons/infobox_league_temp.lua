@@ -498,7 +498,7 @@ function League:_setLpdbData(args, links)
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),
 		next2 = self:_getPageNameFromChronology(args.next2),
-		game = Game.toIdentifier{game = args.game},
+		game = self.cleanedArgs.game,
 		mode = self.cleanedArgs.mode,
 		patch = args.patch,
 		endpatch = args.endpatch or args.epatch or args.patch,
