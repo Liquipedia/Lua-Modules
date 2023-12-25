@@ -451,6 +451,7 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_liquipediatier', self.cleanedArgs.liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', self.cleanedArgs.liquipediatiertype)
+	Variables.varDefine('tournament_publishertier', self.cleanedArgs.publishertier)
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_mode', self.cleanedArgs.mode)

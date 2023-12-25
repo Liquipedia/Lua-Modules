@@ -47,6 +47,7 @@ function CustomLeague:customParseArguments(args)
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps(args)
 	self.cleanedArgs.status = self:_getStatus(args)
+	self.cleanedArgs.publishertier = tostring(Logic.readBool(args.publishertier))
 end
 
 ---@param args table
@@ -153,7 +154,6 @@ end
 function CustomLeague:defineCustomPageVariables(args)
 
 	--wiki specific vars
-	Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.publishertier)))
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 end
 
