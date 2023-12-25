@@ -279,6 +279,8 @@ function League:_parseArgs()
 		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
 		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
 		mode = args.mode,
+		patch = args.patch,
+		endPatch = args.endpatch or args.epatch or args.patch,
 	}
 
 	cleanedArgs.liquipediatier, cleanedArgs.liquipediatiertype =
@@ -472,6 +474,9 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_startdate', self.cleanedArgs.startDate)
 	Variables.varDefine('tournament_enddate', self.cleanedArgs.endDate)
 
+	Variables.varDefine('tournament_patch', self.cleanedArgs.patch)
+	Variables.varDefine('tournament_endpatch ', self.cleanedArgs.endPatch)
+
 	Variables.varDefine('tournament_currency', self.cleanedArgs.localCurrency or '')
 
 	Variables.varDefine('tournament_summary', self:seoText(args))
@@ -498,8 +503,8 @@ function League:_setLpdbData(args, links)
 		next2 = self:_getPageNameFromChronology(args.next2),
 		game = self.cleanedArgs.game,
 		mode = self.cleanedArgs.mode,
-		patch = args.patch,
-		endpatch = args.endpatch or args.epatch or args.patch,
+		patch = self.cleanedArgs.patch,
+		endpatch = self.cleanedArgs.endPatch,
 		type = args.type,
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
 			Table.mapValues(
