@@ -336,11 +336,8 @@ function BaseResultsTable._getOpponentTemplates(opponent)
 	end
 
 	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
-	if opponentTeamTemplates then
-		return Array.append(Array.extractValues(opponentTeamTemplates), opponentTemplate)
-	end
 
-	return {opponentTemplate}
+	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
 end
 
 ---Builds Lpdb conditions for players on a given team
