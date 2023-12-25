@@ -44,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomTeam:createBottomContent(args)
-	if not team.disbanded then
+	if not args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
