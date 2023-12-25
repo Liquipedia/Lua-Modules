@@ -609,8 +609,6 @@ function League:_createSeriesDisplay(seriesArgs, iconDisplay)
 	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
-	local series = seriesArgs.series
-	---@cast series -nil
 
 	iconDisplay = iconDisplay or self:_createSeriesIcon(seriesArgs)
 
