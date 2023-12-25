@@ -233,7 +233,7 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	local builtInfobox = self.infobox:build(widgets)
 
 	if self:shouldStore(args) then
 		self.infobox:categories(unpack(self:_getCategories(args)))
