@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Template = require('Module:Template')
@@ -17,40 +18,42 @@ local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
-local _team
-
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 	team.createBottomContent = CustomTeam.createBottomContent
 	team.addToLpdb = CustomTeam.addToLpdb
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'staff' then
-		table.insert(widgets, Cell{
-			name = 'In-Game Leader',
-			content = {_team.args.igl}
-		})
+		return {
+			Cell{name = 'In-Game Leader', content = {args.igl}}
+		}
 	end
+
+	if id == 'customcontent' then
+		return Array.append(widgets,
+			Cell{name = 'Analysts', content = {args.analysts}}
+		)
+	end
+
 	return widgets
 end
 
-function CustomTeam:createBottomContent()
-	if not _team.args.disbanded then
+function CustomTeam:createBottomContent(args)
+	mw.logObeject("args "  .. args)
+	mw.logObeject("team "  .. team)
+	if not team.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = _team.name or _team.pagename}
+			{team = args.name or self.pagename}
 		)
 	end
 end
