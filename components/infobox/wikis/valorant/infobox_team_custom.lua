@@ -36,19 +36,21 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	if id == 'customcontent' then
-		return Array.append(widgets,
-			Cell{name = 'Analysts', content = {args.analysts}}
-		)
+		table.insert(widgets, Cell{
+				name = 'Analysts',
+				content = {args.analyst}
+		})
 	end
 	return widgets
 end
 
-function CustomTeam:createBottomContent(args)
+function CustomTeam:createBottomContent()
+	args = self.args
 	if not args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = args.name or self.pagename}
+			{team = self.name or self.pagename}
 		)
 	end
 end
