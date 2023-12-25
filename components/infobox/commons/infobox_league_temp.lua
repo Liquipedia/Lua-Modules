@@ -486,18 +486,18 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = TextSanitizer.stripHTML(args.tickername),
-		shortname = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
+		tickername = self.cleanedArgs.tickerName,
+		shortname = self.cleanedArgs.shortName,
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
 		icon = self.cleanedArgs.icon,
 		icondark = self.cleanedArgs.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
-		previous = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous)),
-		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
-		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
-		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
+		previous = self:_getPageNameFromChronology(args.previous),
+		previous2 = self:_getPageNameFromChronology(args.previous2),
+		next = self:_getPageNameFromChronology(args.next),
+		next2 = self:_getPageNameFromChronology(args.next2),
 		game = Game.toIdentifier{game = args.game},
 		mode = self.cleanedArgs.mode,
 		patch = args.patch,
@@ -746,13 +746,11 @@ end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
 ---@param item string?
----@return string
+---@return string?
 function League:_getPageNameFromChronology(item)
-	if item == nil then
-		return ''
-	end
+	if item == nil then return end
 
-	return mw.text.split(item, '|')[1]
+	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually
