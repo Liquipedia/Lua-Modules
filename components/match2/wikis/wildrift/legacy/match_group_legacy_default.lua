@@ -187,30 +187,7 @@ function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
 	}
 	mapping = MatchGroupLegacyDefault.addMaps(mapping)
 
-	return MatchGroupLegacyDefault.addMaps{
-		['$flatten$'] = { data.details .. 'details' },
-		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
-		['opponent1'] = {
-			['type'] = 'type',
-			['$notEmpty$'] = data.opp1 .. (bracketType == 'team' and 'team' or ''),
-			template = data.opp1 .. 'team',
-			score = data.opp1 .. 'score',
-			name = bracketType ~= 'team' and data.opp1 or nil,
-			displayname = bracketType ~= 'team' and (data.opp1 .. 'display') or nil,
-			flag = bracketType ~= 'team' and data.opp1 or nil,
-			win = data.opp1 .. 'win',
-		},
-		['opponent2'] = {
-			['type'] = 'type',
-			['$notEmpty$'] = data.opp2 .. (bracketType == 'team' and 'team' or ''),
-			template = data.opp2 .. 'team',
-			score = data.opp2 .. 'score',
-			name = bracketType ~= 'team' and data.opp2 or nil,
-			displayname = bracketType ~= 'team' and (data.opp2 .. 'display') or nil,
-			flag = bracketType ~= 'team' and data.opp2 or nil,
-			win = data.opp2 .. 'win',
-		},
-	}
+	return mapping
 end
 
 --this is for custom mappings for Reset finals matches
