@@ -11,6 +11,7 @@ local MatchGroupLegacyDefault = {}
 local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 
+local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
 
 local roundData
@@ -68,6 +69,20 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 	return bracketData
 end
 
+function MatchGroupLegacyDefault._readOpponent(prefix, scoreKey, bracketType)
+	return {
+		['type'] = 'type',
+		prefix,
+		template = prefix .. 'team',
+		score = prefix .. scoreKey,
+		name = prefix,
+		displayname = prefix .. 'display',
+		flag = prefix .. 'flag',
+		win = prefix .. 'win',
+		['$notEmpty$'] = bracketType == 'team' and (prefix .. 'team') or prefix
+	}
+end
+
 --the following variable gets mutaded by each p._getMatchMapping
 --it is needed as a basis for the next call
 local _lastRound
@@ -101,107 +116,30 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 		lowerHeader[roundNum or ''] = round.G
 	end
 
-	-- opponents
-	local opponent1
-	local finished1
-	local finished2
-	if Logic.isEmpty(bd.toupper) and not reset then
-		-- RxDx
-		if bracketType == 'team' then
-			opponent1 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'D' .. round.D .. 'team',
-				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
-				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D .. 'team'
-			}
-		else
-			opponent1 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'D' .. round.D .. 'team',
-				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
-				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D,
-				name = 'R' .. round.R .. 'D' .. round.D,
-				displayname = 'R' .. round.R .. 'D' .. round.D .. 'display',
-				flag = 'R' .. round.R .. 'D' .. round.D .. 'flag'
-			}
-		end
-		finished1 = 'R' .. round.R .. 'D' .. round.D .. 'win'
-		round.D = round.D + 1
-	else
-		-- RxWx
-		if bracketType == 'team' then
-			opponent1 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'W' .. round.W .. 'team',
-				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
-				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W .. 'team'
-			}
-		else
-			opponent1 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'W' .. round.W .. 'team',
-				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
-				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W,
-				name = 'R' .. round.R .. 'W' .. round.W,
-				displayname = 'R' .. round.R .. 'W' .. round.W .. 'display',
-				flag = 'R' .. round.R .. 'W' .. round.W .. 'flag'
-			}
-		end
-		finished1 = 'R' .. round.R .. 'W' .. round.W .. 'win'
-		round.W = round.W + 1
-	end
+	local opponents = {}
+	local finished = {}
+	local scoreKey = (reset and 'score2' or 'score')
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		local prefix
+		if not reset and
+			(Logic.isEmpty(bd.toupper) and opponentIndex == 1 or
+			Logic.isEmpty(bd.tolower) and opponentIndex == 2) then
 
-	local opponent2
-	if Logic.isEmpty(bd.tolower) and not reset then
-		-- RxDx
-		if bracketType == 'team' then
-			opponent2 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'D' .. round.D .. 'team',
-				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
-				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D .. 'team'
-			}
+			prefix = 'R' .. round.R .. 'D' .. round.D
+			round.D = round.D + 1
 		else
-			opponent2 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'D' .. round.D .. 'team',
-				score = 'R' .. round.R .. 'D' .. round.D .. 'score',
-				['$notEmpty$'] = 'R' .. round.R .. 'D' .. round.D,
-				name = 'R' .. round.R .. 'D' .. round.D,
-				displayname = 'R' .. round.R .. 'D' .. round.D .. 'display',
-				flag = 'R' .. round.R .. 'D' .. round.D .. 'flag'
-			}
+			prefix = 'R' .. round.R .. 'W' .. round.W
+			round.W = round.W + 1
 		end
-		finished2 = 'R' .. round.R .. 'D' .. round.D .. 'win'
-		round.D = round.D + 1
-	else
-		-- RxWx
-		if bracketType == 'team' then
-			opponent2 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'W' .. round.W .. 'team',
-				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
-				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W .. 'team'
-			}
-		else
-			opponent2 = {
-				['type'] = 'type',
-				template = 'R' .. round.R .. 'W' .. round.W .. 'team',
-				score = 'R' .. round.R .. 'W' .. round.W .. 'score' .. (reset and '2' or ''),
-				['$notEmpty$'] = 'R' .. round.R .. 'W' .. round.W,
-				name = 'R' .. round.R .. 'W' .. round.W,
-				displayname = 'R' .. round.R .. 'W' .. round.W .. 'display',
-				flag = 'R' .. round.R .. 'W' .. round.W .. 'flag'
-			}
-		end
-		finished2 = 'R' .. round.R .. 'W' .. round.W .. 'win'
-		round.W = round.W + 1
+
+		opponents[opponentIndex] = MatchGroupLegacyDefault._readOpponent(prefix, scoreKey, bracketType)
+		finished[opponentIndex] = prefix .. 'win'
 	end
 
 	match = {
-		opponent1 = opponent1,
-		opponent2 = opponent2,
-		finished = finished1 .. '|' .. finished2,
+		opponent1 = opponents[1],
+		opponent2 = opponents[2],
+		finished = finished[1] .. '|' .. finished[2],
 		-- reference to variables that shall be flattened
 		['$flatten$'] = { 'R' .. round.R .. 'G' .. round.G .. 'details' }
 	}
@@ -240,6 +178,14 @@ function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
 	}
 	]]--
 	bracketType = bracketType or 'team'
+
+	local mapping = {
+		['$flatten$'] = {data.details .. 'details'},
+		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
+		opponent1 = MatchGroupLegacyDefault._readOpponent(data.opp1, 'score', bracketType),
+		opponent2 =  MatchGroupLegacyDefault._readOpponent(data.opp2, 'score', bracketType),
+	}
+	mapping = MatchGroupLegacyDefault.addMaps(mapping)
 
 	return MatchGroupLegacyDefault.addMaps{
 		['$flatten$'] = { data.details .. 'details' },
