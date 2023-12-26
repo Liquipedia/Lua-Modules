@@ -127,7 +127,7 @@ function MatchMapsLegacy.handleDetails(args, details)
 			map.walkover = map.winner
 		end
 		map.length = details[prefix .. 'length']
-		map.vod = details['vodgame' .. index]
+		map.vod = details[prefix .. 'vod']
 
 		for oppIndex = 1, MAX_NUMBER_OF_OPPONENTS do
 			local side = 'team' .. oppIndex .. 'side'
@@ -145,7 +145,7 @@ function MatchMapsLegacy.handleDetails(args, details)
 		details[prefix] = nil
 		details[prefix .. 'winner'] = nil
 		details[prefix .. 'length'] = nil
-		details['vodgame' .. index] = nil
+		details[prefix .. 'vod'] = nil
 		return MatchSubobjects.luaGetMap(map)
 	end
 
@@ -191,10 +191,12 @@ function MatchMapsLegacy.convertMaps(args)
 		local map = Json.parse(matchJson) or {}
 		map.winner = map.win
 		map.win = nil
+		map.vod = args['vodgame' .. matchIndex]
 		local mapKey = 'map' .. matchIndex
 		for key, value in pairs(map) do
 			args[mapKey .. key] = value
 		end
+		args['vodgame' .. matchIndex] = nil
 		args[mapKey] = DEFAULT
 		args[matchKey] = nil
 	end
