@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local PageLink = require('Module:Page')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -155,7 +155,7 @@ function CustomLeague:_computeChronology(args)
 
 	local fromAutomated = function(shiftedNumber)
 		local page = title.basePageTitle:subPageTitle(tostring(shiftedNumber)).fullText
-		return PageLink.exists(page) and page or nil
+		return Page.exists(page) and page or nil
 	end
 
 	args.previous = Logic.emptyOr(args.previous, fromAutomated(number - 1))
@@ -209,7 +209,7 @@ function CustomLeague:_mapsDisplay(maps)
 	return {table.concat(
 		Array.map(maps, function(mapData)
 			return tostring(self:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
 		'&nbsp;• '
@@ -274,14 +274,14 @@ function CustomLeague:_getGameVersion(args)
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 
 	local gameDisplay = self.cleanedArgs.game == GAME_MOD and (args.modname or 'Mod')
-		or PageLink.makeInternalLink(Game.name{game = self.cleanedArgs.game})
+		or Page.makeInternalLink(Game.name{game = self.cleanedArgs.game})
 
 	local patch = self.cleanedArgs.patch
 	local endPatch = self.cleanedArgs.endPatch
 
 	local patchDisplay = betaPrefix .. table.concat({
-		PageLink.makeInternalLink(patch),
-		PageLink.makeInternalLink(endPatch ~= patch and patch and endPatch or nil)
+		Page.makeInternalLink(patch),
+		Page.makeInternalLink(endPatch ~= patch and patch and endPatch or nil)
 	}, ' &ndash; ')
 
 	return table.concat({gameDisplay, patchDisplay}, '<br>')
