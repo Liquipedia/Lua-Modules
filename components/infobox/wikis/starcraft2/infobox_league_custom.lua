@@ -47,7 +47,7 @@ local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
+	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
 	league.args.game = league.args.game == GAME_MOD and GAME_MOD or Game.name{game = league.args.game}
