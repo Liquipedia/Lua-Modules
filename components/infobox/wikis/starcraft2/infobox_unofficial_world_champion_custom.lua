@@ -21,6 +21,7 @@ local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
+---@class Starcraft2UnofficialWorldChampionInfobox: UnofficialWorldChampionInfobox
 local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 
 local CustomInjector = Class.new(Injector)

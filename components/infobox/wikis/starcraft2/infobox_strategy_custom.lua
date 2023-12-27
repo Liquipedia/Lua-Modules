@@ -20,6 +20,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
+---@class Starcraft2StrategyInfobox: StrategyInfobox
 local CustomStrategy = Class.new(Strategy)
 
 local RACE_MATCHUPS = {

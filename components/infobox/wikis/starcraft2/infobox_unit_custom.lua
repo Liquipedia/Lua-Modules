@@ -24,6 +24,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
+---@class Starcraft2UnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)

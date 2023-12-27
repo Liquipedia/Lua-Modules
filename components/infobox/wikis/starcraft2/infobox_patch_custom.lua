@@ -17,6 +17,7 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class Starcraft2PatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 
 local CustomInjector = Class.new(Injector)

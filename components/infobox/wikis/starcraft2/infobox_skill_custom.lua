@@ -22,6 +22,7 @@ local Skill = Lua.import('Module:Infobox/Skill', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class Starcraft2SkillInfobox: SkillInfobox
 local CustomSkill = Class.new(Skill)
 
 local ENERGY = '[[File:EnergyIcon.gif|link=Energy]]'

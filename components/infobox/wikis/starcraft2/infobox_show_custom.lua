@@ -17,6 +17,7 @@ local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class Starcraft2ShowInfobox: ShowInfobox
 local CustomShow = Class.new(Show)
 
 local CustomInjector = Class.new(Injector)
