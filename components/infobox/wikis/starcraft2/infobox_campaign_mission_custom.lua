@@ -18,7 +18,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
----@class CustomMissionInfobox: CampaignMissionInfobox
+---@class Starcraft2CampaignMissionInfobox: CampaignMissionInfobox
 local CustomMission = Class.new(Mission)
 
 local CustomInjector = Class.new(Injector)
