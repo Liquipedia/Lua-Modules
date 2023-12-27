@@ -31,6 +31,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
+---@class Starcraft2LeagueInfobox: InfoboxLeagueTemp
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
