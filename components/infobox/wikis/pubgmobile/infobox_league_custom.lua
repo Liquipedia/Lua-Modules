@@ -49,15 +49,6 @@ local _PERSPECTIVES = {
 _PERSPECTIVES.first = _PERSPECTIVES.fpp
 _PERSPECTIVES.third = _PERSPECTIVES.tpp
 
-local _PLATFORMS = {
-	mobile = '[[Mobile]][[Category:Mobile Competitions]]',
-	newstate = '[[New State]][[Category:Mobile Competitions]]',
-	peace = '[[Peacekeeper Elite|Peace Elite]][[Category:Peacekeeper Elite Competitions]][[Category:Mobile Competitions]]',
-	bgmi = '[[Battlegrounds Mobile India|BGMI]]' ..
-		'[[Category:Battlegrounds Mobile India Competitions]][[Category:Mobile Competitions]]',
-	default = '[[Category:Unknown Platform Competitions]]',
-}
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
@@ -82,10 +73,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game version', content = {Game.name{game = _args.game}}},
 			Cell{name = 'Game mode', content = {
 					CustomLeague._getGameMode()
-				}
-			},
-			Cell{name = 'Platform', content = {
-					CustomLeague._getPlatform()
 				}
 			},
 		}
@@ -140,16 +127,6 @@ function CustomLeague._getGameMode()
 	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
 
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
-end
-
-function CustomLeague._getPlatform()
-	if String.isEmpty(_args.platform) then
-		return nil
-	end
-
-	local platform = string.lower(_args.platform or '')
-
-	return _PLATFORMS[platform] or _PLATFORMS['default']
 end
 
 return CustomLeague
