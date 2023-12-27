@@ -22,8 +22,8 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
----@class Starcraft2CustomBuildingInfobox: BuildingInfobox
-local CustomBuilding = Class.new()
+---@class Starcraft2BuildingInfobox: BuildingInfobox
+local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
@@ -32,116 +32,100 @@ local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomBuilding.run(frame)
-	local building = Building(frame)
-	_args = building.args
+	local building = CustomBuilding(frame)
+	building:setWidgetInjector(CustomInjector(building))
 
-	_args.game = Game.name{game = _args.game}
-
-	building.nameDisplay = CustomBuilding.nameDisplay
-	building.setLpdbData = CustomBuilding.setLpdbData
-	building.getWikiCategories = CustomBuilding.getWikiCategories
-	building.createWidgetInjector = CustomBuilding.createWidgetInjector
+	building.args.game = Game.name{game = building.args.game}
 
 	return building:createInfobox()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(
-		widgets,
-		Cell{name = 'Size', content = {_args.size}},
-		Cell{name = 'Sight', content = {_args.sight}},
-		Cell{name = 'Energy', content = {_args.energy}},
-		Cell{name = 'Detection/Attack Range', content = {_args.detection_range}}
-	)
-
-	if _args.game ~= GAME_LOTV then
-		table.insert(widgets, Center{content = {
-			'<small><b>Note:</b> ' ..
-			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' <i>See [[Game Speed]].</i></small>'
-		}})
-	end
-
-	return widgets
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Size', content = {args.size}},
+			Cell{name = 'Sight', content = {args.sight}},
+			Cell{name = 'Energy', content = {args.energy}},
+			Cell{name = 'Detection/Attack Range', content = {args.detection_range}}
+		)
+
+		if args.game ~= GAME_LOTV then
+			table.insert(widgets, Center{content = {
+				'<small><b>Note:</b> ' ..
+				'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
+				' <i>See [[Game Speed]].</i></small>'
+			}})
+		end
+	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _args.race,
-				minerals = _args.min,
-				mineralsTotal = _args.totalmin,
+				faction = args.race,
+				minerals = args.min,
+				mineralsTotal = args.totalmin,
 				mineralsForced = true,
-				gas = _args.gas,
-				gasTotal = _args.totalgas,
+				gas = args.gas,
+				gasTotal = args.totalgas,
 				gasForced = true,
-				buildTime = _args.buildtime,
-				buildTimeTotal = _args.totalbuildtime,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
 			}}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomBuilding:_getHotkeys()}}
+			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(_args.builds)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(_args.morphs)}},
-			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(_args.addons)}},
+			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphs)}},
+			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(_args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(_args.upgrades)}},
+			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {CustomBuilding:_defenseDisplay()}}
+			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}}
 		}
 	elseif id == 'attack' then
 		return {
-			Cell{name = 'Ground Attack', content = {_args.ground_attack}},
-			Cell{name = 'Ground [[Damage Per Second|DPS]]', content = {_args.ground_dps}},
-			Cell{name = 'Air Attack', content = {_args.air_attack}},
-			Cell{name = 'Air [[Damage Per Second|DPS]]', content = {_args.air_dps}},
-			Cell{name = 'Bonus', content = {_args.bonus}},
-			Cell{name = 'Bonus [[Damage Per Second|DPS]]', content = {_args.bonus_dps}},
-			Cell{name = 'Range', content = {_args.range}},
-			Cell{name = 'Cooldown', content = {_args.cooldown}},
+			Cell{name = 'Ground Attack', content = {args.ground_attack}},
+			Cell{name = 'Ground [[Damage Per Second|DPS]]', content = {args.ground_dps}},
+			Cell{name = 'Air Attack', content = {args.air_attack}},
+			Cell{name = 'Air [[Damage Per Second|DPS]]', content = {args.air_dps}},
+			Cell{name = 'Bonus', content = {args.bonus}},
+			Cell{name = 'Bonus [[Damage Per Second|DPS]]', content = {args.bonus_dps}},
+			Cell{name = 'Range', content = {args.range}},
+			Cell{name = 'Cooldown', content = {args.cooldown}},
 		}
 	end
 	return widgets
 end
 
----@return WidgetInjector
-function CustomBuilding:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@return string
 function CustomBuilding:_defenseDisplay()
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if _args.shield then
-		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if self.args.shield then
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. self.args.shield
 	end
-	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (self.args.armor or 1)
 
-	return display .. ' ' .. table.concat(CustomBuilding._getAttributes(_args, true), ', ')
+	return display .. ' ' .. table.concat(CustomBuilding._getAttributes(self.args, true), ', ')
 end
 
 ---@param args table
@@ -182,11 +166,11 @@ end
 ---@return string?
 function CustomBuilding:_getHotkeys()
 	local display
-	if not String.isEmpty(_args.hotkey) then
-		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'arrow')
+	if not String.isEmpty(self.args.hotkey) then
+		if not String.isEmpty(self.args.hotkey2) then
+			display = Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'arrow')
 		else
-			display = Hotkeys.hotkey(_args.hotkey)
+			display = Hotkeys.hotkey(self.args.hotkey)
 		end
 	end
 
