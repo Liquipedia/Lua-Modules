@@ -506,11 +506,9 @@ function League:_setLpdbData(args, links)
 		patch = self.cleanedArgs.patch,
 		endpatch = self.cleanedArgs.endPatch,
 		type = args.type,
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
-			Table.mapValues(
-				League:_getNamedTableofAllArgsForBase(args, 'organizer'),
-				mw.ext.TeamLiquidIntegration.resolve_redirect
-			)
+		organizers = Table.mapValues(
+			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
+			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
 		startdate = self.cleanedArgs.startDate or self.cleanedArgs.endDate or DEFAULT_DATE,
 		enddate = self.cleanedArgs.endDate or DEFAULT_DATE,
@@ -529,12 +527,8 @@ function League:_setLpdbData(args, links)
 			or -1,
 		status = self.cleanedArgs.status,
 		format = TextSanitizer.stripHTML(args.format),
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
-			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
-		),
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
-			Links.makeFullLinksForTableItems(links or {})
-		),
+		sponsors = League:_getNamedTableofAllArgsForBase(args, 'sponsor'),
+		links = Links.makeFullLinksForTableItems(links or {}),
 		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
