@@ -56,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Type', content = {args.type or 'Opening'}},
 			Cell{name = 'Popularized by', content = {args.popularized}, options = {makeLink = true}},
 			Cell{name = 'Converted Form', content = {args.convert}},
-			Cell{name = 'TL-Article', content = {self:_getTLarticle(args.tlarticle)}}
+			Cell{name = 'TL-Article', content = {self.caller:_getTLarticle(args.tlarticle)}}
 		)
 	end
 	return widgets
