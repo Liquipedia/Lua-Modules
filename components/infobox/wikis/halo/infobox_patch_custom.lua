@@ -15,8 +15,9 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _GAME = mw.loadData('Module:GameVersion')
+local GAME = mw.loadData('Module:GameVersion')
 
+--@Class HaloPatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
@@ -29,28 +30,16 @@ function CustomPatch.run(frame)
 	return patch:createInfobox()
 end
 
----@param widgets Widget[]
+---@param id String
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'customcontent' then
-		return{
-			Cell{name = 'Game Version', content = {CustomPatch._getGameVersion()}, options = {makeLink = true}},
+	local args = self.caller.args
+	if id == 'custom' then
+		return{ 
+			Cell{name = 'Game Version', content = {CustomPatch._getGameVersion(self.caller.args)}, options = {makeLink = true}},
 		}
 	end
 	return widgets
-end
-
----@param args table
-function CustomPatch:setLpdbData(args)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = self.name,
-		type = 'patch',
-		information = CustomPatch:_getGameVersion(),
-		date = args.release,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			version = args.version,
-		}
-	})
 end
 
 ---@param args table
@@ -67,9 +56,9 @@ function CustomPatch:getChronologyData(args)
 end
 
 ---@return string?
-function CustomPatch._getGameVersion(args)
+function CustomPatch._getGameVersion()
 	local game = string.lower(args.game or '')
-	return _GAME[game]
+	return GAME[game]
 end
 
 return CustomPatch
