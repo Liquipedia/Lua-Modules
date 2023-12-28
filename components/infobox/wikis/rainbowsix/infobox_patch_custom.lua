@@ -15,6 +15,7 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class R6PatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
@@ -23,7 +24,7 @@ local CustomInjector = Class.new(Injector)
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
-
+	
 	return patch:createInfobox()
 end
 
