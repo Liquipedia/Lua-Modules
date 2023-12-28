@@ -18,7 +18,7 @@ local CustomPatch = Class.new(Patch)
 ---@return Html
 function CustomPatch.run(frame)
 	local patch = Patch(frame)
-	
+
 	return patch:createInfobox()
 end
 
