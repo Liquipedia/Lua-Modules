@@ -18,7 +18,7 @@ local CustomPatch = Class.new(Patch)
 function CustomPatch.run(frame)
 	local patch = Patch(frame)
 	patch.getChronologyData = CustomPatch.getChronologyData
-	
+
 	return patch:createInfobox()
 end
 
