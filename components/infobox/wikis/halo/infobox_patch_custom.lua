@@ -25,7 +25,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
-	patch.setWidgetInjector(CustomInjector(patch))
+	patch:setWidgetInjector(CustomInjector(patch))
 
 	return patch:createInfobox()
 end
