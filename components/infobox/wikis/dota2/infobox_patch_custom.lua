@@ -11,13 +11,13 @@ local Lua = require('Module:Lua')
 
 local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 
+---@class Dota2PatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
-	patch.getChronologyData = CustomPatch.getChronologyData
 
 	return patch:createInfobox()
 end
