@@ -23,7 +23,7 @@ local CustomInjector = Class.new(Injector)
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
-	
+
 	return patch:createInfobox()
 end
 
