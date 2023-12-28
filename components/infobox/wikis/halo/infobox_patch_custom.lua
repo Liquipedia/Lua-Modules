@@ -33,9 +33,8 @@ end
 ---@param id String
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
 	if id == 'custom' then
-		return{ 
+		return{
 			Cell{name = 'Game Version', content = {CustomPatch._getGameVersion(self.caller.args)}, options = {makeLink = true}},
 		}
 	end
@@ -57,7 +56,7 @@ end
 
 ---@return string?
 function CustomPatch._getGameVersion()
-	local game = string.lower(args.game or '')
+	local game = string.lower(self.caller.args.game or '')
 	return GAME[game]
 end
 
