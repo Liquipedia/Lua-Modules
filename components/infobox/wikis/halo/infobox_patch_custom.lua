@@ -42,6 +42,15 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata.game = args.game
+
+	return lpdbData
+end
+
 ---@param args table
 ---@return {previous: string?, next: string?}
 function CustomPatch:getChronologyData(args)
