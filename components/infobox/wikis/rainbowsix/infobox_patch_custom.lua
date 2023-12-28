@@ -15,45 +15,28 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
-local CustomPatch = Class.new()
+local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-	return customPatch:createInfobox()
-end
-
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
+	
+	return patch:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{
-				name = 'Release Date',
-				content = {_args.release}
-			},
-			Cell{
-				name = 'PC Release Date',
-				content = {_args.pcrelease}
-			},
-			Cell{
-				name = 'Console Release Date',
-				content = {_args.consolerelease}
-			},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = 'PC Release Date', content = {args.pcrelease}},
+			Cell{name = 'Console Release Date', content = {args.consolerelease}},
 		}
 	end
 	return widgets
