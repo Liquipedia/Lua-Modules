@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Template = require('Module:Template')
@@ -36,17 +35,13 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	if id == 'customcontent' then
-		table.insert(widgets, Cell{
-				name = 'Analysts',
-				content = {args.analyst}
-		})
+		return {Cell{name = 'Analysts', content = {args.analyst}}}
 	end
 	return widgets
 end
 
 function CustomTeam:createBottomContent()
-	args = self.args
-	if not args.disbanded then
+	if not self.args.disbanded then
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
