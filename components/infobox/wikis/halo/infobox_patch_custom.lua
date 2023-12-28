@@ -15,37 +15,28 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
 local _GAME = mw.loadData('Module:GameVersion')
 
-local CustomPatch = Class.new()
+local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-	return customPatch:createInfobox()
-end
+	local patch = CustomPatch(frame)
+	patch.setWidgetInjector(CustomInjector(patch))
 
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	return patch:createInfobox()
 end
 
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Game Version',
-		content = {CustomPatch._getGameVersion()},
-		options = {makeLink = true}
-	})
+function CustomInjector:parse(id, widgets)
+	if id == 'customcontent' then
+		return{
+			Cell{name = 'Game Version', content = {CustomPatch._getGameVersion()}, options = {makeLink = true}},
+		}
+	end
 	return widgets
 end
 
@@ -76,8 +67,9 @@ function CustomPatch:getChronologyData(args)
 end
 
 ---@return string?
-function CustomPatch._getGameVersion()
-	local game = string.lower(_args.game or '')
+function CustomPatch._getGameVersion(args)
+	local game = string.lower(args.game or '')
 	return _GAME[game]
 end
+
 return CustomPatch
