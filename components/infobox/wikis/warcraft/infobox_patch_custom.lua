@@ -19,45 +19,35 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPatch = Class.new()
+---@class WarcraftPatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 
 local BALANCE_UPDATE = 'Balance Update'
 local IGNORE_NET_EASE_RELEASE_BEFORE = DateExt.readTimestamp('2011-03-23')
 local SKIP = 'skip'
 local SKIPPED = 'skipped'
 
-local _args
-
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
 
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-
-	return customPatch:createInfobox()
-end
-
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	return patch:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = '[[Public Test Realm|PTR]] Release Date', content = {_args.release_ptr}},
-			Cell{name = 'Release Date', content = {_args.release}},
-			Cell{name = '[[NetEase]] Release Date', content = {CustomPatch._netEaseRelease(_args)}},
+			Cell{name = '[[Public Test Realm|PTR]] Release Date', content = {args.release_ptr}},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = '[[NetEase]] Release Date', content = {CustomPatch._netEaseRelease(args)}},
 		}
 	end
 
