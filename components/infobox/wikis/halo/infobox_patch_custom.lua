@@ -31,6 +31,7 @@ function CustomPatch.run(frame)
 end
 
 ---@param id String
+---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
@@ -54,9 +55,10 @@ function CustomPatch:getChronologyData(args)
 	return data
 end
 
+---@param args table
 ---@return string?
-function CustomPatch._getGameVersion()
-	local game = string.lower(self.caller.args.game or '')
+function CustomPatch._getGameVersion(args)
+	local game = string.lower(args.game or '')
 	return GAME[game]
 end
 
