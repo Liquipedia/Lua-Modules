@@ -68,7 +68,7 @@ function Series:createInfobox()
 		args.venue = table.concat(splitVenue, ' ')
 	end
 
-	self.totalSeriesPrizepool = self.totalSeriesPrizepool or self:_getSeriesPrizepools()
+	self.totalSeriesPrizepool = self:getSeriesPrizepools()
 
 	local widgets = {
 		Header{
@@ -165,7 +165,7 @@ function Series:createInfobox()
 				end
 			end
 		},
-		Builder{
+		Customizable{id = 'totalprizepool', children = {Builder{
 			builder = function()
 				if self.totalSeriesPrizepool then
 					return {Cell{
@@ -174,7 +174,7 @@ function Series:createInfobox()
 					}}
 				end
 			end
-		},
+		}}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
@@ -428,7 +428,7 @@ function Series:_setCountryCategories(country)
 end
 
 ---@return number?
-function Series:_getSeriesPrizepools()
+function Series:getSeriesPrizepools()
 	local pagename = self.pagename:gsub('%s', '_')
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[series::' .. self.name .. ']] OR [[seriespage::' .. pagename .. ']]',
