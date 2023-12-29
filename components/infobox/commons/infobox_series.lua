@@ -20,6 +20,7 @@ local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
 local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
 local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
@@ -66,6 +67,8 @@ function Series:createInfobox()
 		table.remove(splitVenue, 1)
 		args.venue = table.concat(splitVenue, ' ')
 	end
+
+	self.totalSeriesPrizepool = self:_getSeriesPrizepools()
 
 	local widgets = {
 		Header{
@@ -162,6 +165,16 @@ function Series:createInfobox()
 				end
 			end
 		},
+		Builder{
+			builder = function()
+				if self.totalSeriesPrizepool then
+					return {Cell{
+						name = 'Total prize money',
+						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+					}}
+				end
+			end
+		},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
@@ -196,7 +209,7 @@ function Series:_setLpdbData(args, links)
 		previous2 = args.previous2,
 		next = args.next,
 		next2 = args.next2,
-		prizepool = args.prizepool,
+		prizepool = self.totalSeriesPrizepool or args.prizepool,
 		liquipediatier = tier,
 		liquipediatiertype = tierType,
 		publishertier = args.publishertier,
@@ -412,6 +425,22 @@ function Series:_setCountryCategories(country)
 	end
 
 	return countryAdjective .. ' Tournaments'
+end
+
+---@return number?
+function Series:_getSeriesPrizepools()
+	local pagename = self.pagename:gsub('%s', '_')
+	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[series::' .. self.name .. ']] OR [[seriespage::' .. pagename .. ']]',
+		query = 'sum::prizepool'
+	})
+
+	local prizemoney = tonumber(queryData[1]['sum_prizepool'])
+
+	if prizemoney == nil or prizemoney == 0 then
+		return nil
+	end
+	return prizemoney
 end
 
 return Series
