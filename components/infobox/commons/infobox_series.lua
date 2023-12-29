@@ -184,7 +184,7 @@ function Series:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
+		:node(infobox:widgetInjector():build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 

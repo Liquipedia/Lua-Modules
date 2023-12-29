@@ -32,7 +32,7 @@ local CustomSeries = Class.new(Series)
 ---@param frame Frame
 ---@return string
 function CustomSeries.run(frame)
-	local series = Series(frame)
+	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))
 
 	series.args.liquipediatiertype = series.args.liquipediatiertype or series.args.tiertype
@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Total prize money', content = {self.caller:_displaySeriesPrizepools()}},
 		}
 	elseif id == 'custom' then
-		Array.append(widgets,
+		Array.appendWith(widgets,
 			Cell{name = 'Patch', content = {self.caller:_getPatch()}},
 			Cell{name = 'Server', content = {args.server}},
 			Cell{name = 'Type', content = {args.type}},

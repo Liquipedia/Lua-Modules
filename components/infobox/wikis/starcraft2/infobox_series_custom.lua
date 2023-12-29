@@ -38,7 +38,7 @@ local CustomSeries = Class.new(Series)
 ---@param frame Frame
 ---@return string
 function CustomSeries.run(frame)
-	local series = Series(frame)
+	local series = CustomSeries(frame)
 	series:setWidgetInjector(CustomInjector(series))
 
 	local args = series.args
@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Total prize money', content = {self.caller:_displaySeriesPrizepools()}},
 		}
 	elseif id == 'custom' then
-		Array.append(widgets,
+		Array.appendWith(widgets,
 			Cell{name = 'Game version', content = {self.caller:_getGameVersion(args.game, args.patch)}},
 			Cell{name = 'Server', content = {args.server}},
 			Cell{name = 'Type', content = {args.type}},
@@ -108,7 +108,7 @@ function CustomSeries:_getGameVersion(game, patch)
 	if game == GAME_MOD then
 		gameVersion = modName or 'Mod'
 	else
-		gameVersion = '[[' .. game .. ']]' ..
+		gameVersion = '[[' .. Game.name{game = game} .. ']]' ..
 			'[[Category:' .. betaPrefix .. Game.abbreviation{game = game} .. ' Competitions]]'
 	end
 
