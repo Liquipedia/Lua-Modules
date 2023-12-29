@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
@@ -17,42 +18,29 @@ local Cell = Widgets.Cell
 
 local Language = mw.language.new('en')
 
-local CustomSeries = {}
+---@class FortniteSeriesInfobox: SeriesInfobox
+---@field totalSeriesPrizepool number?
+local CustomSeries = Class.new(Series)
 
 local CustomInjector = Class.new(Injector)
-
-local _series
-
-local _totalSeriesPrizepool = 0
 
 ---@param frame Frame
 ---@return string
 function CustomSeries.run(frame)
-	local series = Series(frame)
-	series.addToLpdb = CustomSeries.addToLpdb
-	series.createWidgetInjector = CustomSeries.createWidgetInjector
-	_series = series
+	local series = CustomSeries(frame)
+	series:setWidgetInjector(CustomInjector(series))
+
+	series.totalSeriesPrizepool = CustomSeries._getSeriesPrizepools(series.name)
 
 	return series:createInfobox()
 end
 
----@return WidgetInjector
-function CustomSeries:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param lpdbData table
----@return table
-function CustomSeries:addToLpdb(lpdbData)
-	lpdbData['prizepool'] = _totalSeriesPrizepool
-	return lpdbData
-end
-
----@param series string
----@return string?
-function CustomSeries._getSeriesPrizepools(series)
+---@param seriesName string
+---@return number?
+function CustomSeries._getSeriesPrizepools(seriesName)
+	local pagename = mw.title.getCurrentTitle().text:gsub('%s', '_')
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[series::' .. series .. ']]',
+		conditions = '[[series::' .. seriesName .. ']] OR [[seriespage::' .. pagename .. ']]',
 		query = 'sum::prizepool'
 	})
 
@@ -61,18 +49,28 @@ function CustomSeries._getSeriesPrizepools(series)
 	if prizemoney == nil or prizemoney == 0 then
 		return nil
 	end
-
-	_totalSeriesPrizepool = prizemoney
-	return '$' .. Language:formatNum(math.floor(prizemoney + 0.5))
+	return prizemoney
 end
 
+---@param lpdbData table
+---@return table
+function CustomSeries:addToLpdb(lpdbData)
+	lpdbData['prizepool'] = self.totalSeriesPrizepool
+	return lpdbData
+end
+
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell({
-		name = 'Total prize money',
-		content = {CustomSeries._getSeriesPrizepools(_series.name)}
-	}))
+function CustomInjector:parse(id, widgets)
+	if id == 'custom' then
+		local totalSeriesPrizepool = self.caller.totalSeriesPrizepool
+		table.insert(widgets, Cell({
+			name = 'Total prize money',
+			content = {totalSeriesPrizepool and InfoboxPrizePool.display{prizepoolusd = totalSeriesPrizepool} or nil}
+		}))
+	end
+
 	return widgets
 end
 
