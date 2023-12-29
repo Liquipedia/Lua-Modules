@@ -39,7 +39,7 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
 
 	return team:createInfobox()
