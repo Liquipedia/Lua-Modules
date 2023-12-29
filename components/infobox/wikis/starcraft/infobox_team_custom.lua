@@ -53,7 +53,7 @@ local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on 
 ---@param frame Frame
 ---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 
 	team.args.achievements = Achievements.team()
 
