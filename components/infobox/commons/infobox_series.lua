@@ -145,6 +145,16 @@ function Series:createInfobox()
 			id = 'custom',
 			children = {}
 		},
+		Customizable{id = 'totalprizepool', children = {Builder{
+			builder = function()
+				if self.totalSeriesPrizepool then
+					return {Cell{
+						name = 'Total prize money',
+						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
+					}}
+				end
+			end
+		}}},
 		Customizable{
 			id = 'liquipediatier',
 			children = {
@@ -165,16 +175,6 @@ function Series:createInfobox()
 				end
 			end
 		},
-		Customizable{id = 'totalprizepool', children = {Builder{
-			builder = function()
-				if self.totalSeriesPrizepool then
-					return {Cell{
-						name = 'Total prize money',
-						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
-					}}
-				end
-			end
-		}}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
