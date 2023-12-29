@@ -47,7 +47,7 @@ function Series.run(frame)
 	return series:createInfobox()
 end
 
----@return string
+---@return Html
 function Series:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -166,69 +166,73 @@ function Series:createInfobox()
 	}
 
 	if self:shouldStore(args) then
+		self:_setLpdbData(args, links)
 		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return mw.html.create()
+		:node(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
+		:node(WarningBox.displayAll(self.warnings))
+end
 
-	if self:shouldStore(args) then
-		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
+---@param args table
+---@param links table
+function Series:_setLpdbData(args, links)
+	local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 
-		local lpdbData = {
-			name = self.name,
-			image = args.image,
-			imagedark = args.imagedark or args.imagedarkmode,
-			abbreviation = args.abbreviation or args.acronym,
-			icon = args.icon,
-			icondark = args.icondark or args.icondarkmode,
-			game = args.game,
-			type = args.type,
-			location = Locale.formatLocation({city = args.city, country = args.country}),
-			location2 = Locale.formatLocation({city = args.city2, country = args.country2}),
-			locations = Locale.formatLocations(args),
-			previous = args.previous,
-			previous2 = args.previous2,
-			next = args.next,
-			next2 = args.next2,
-			prizepool = args.prizepool,
-			liquipediatier = tier,
-			liquipediatiertype = tierType,
-			publishertier = args.publishertier,
-			launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
-			defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
-			defunctfate = ReferenceCleaner.clean(args.defunctfate),
-			organizers = mw.ext.LiquipediaDB.lpdb_create_json({
-				organizer1 = args.organizer or args.organizer1,
-				organizer2 = args.organizer2,
-				organizer3 = args.organizer3,
-				organizer4 = args.organizer4,
-				organizer5 = args.organizer5,
-			}),
-			sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
-				sponsor1 = args.sponsor1,
-				sponsor2 = args.sponsor2,
-				sponsor3 = args.sponsor3,
-				sponsor4 = args.sponsor4,
-				sponsor5 = args.sponsor5,
-			}),
-			links = mw.ext.LiquipediaDB.lpdb_create_json(
-				Links.makeFullLinksForTableItems(links or {})
-			),
-		}
-		lpdbData = self:_getIconFromLeagueIconSmall(lpdbData)
+	local lpdbData = {
+		name = self.name,
+		image = args.image,
+		imagedark = args.imagedark or args.imagedarkmode,
+		abbreviation = args.abbreviation or args.acronym,
+		icon = args.icon,
+		icondark = args.icondark or args.icondarkmode,
+		game = args.game,
+		type = args.type,
+		location = Locale.formatLocation({city = args.city, country = args.country}),
+		location2 = Locale.formatLocation({city = args.city2, country = args.country2}),
+		locations = Locale.formatLocations(args),
+		previous = args.previous,
+		previous2 = args.previous2,
+		next = args.next,
+		next2 = args.next2,
+		prizepool = args.prizepool,
+		liquipediatier = tier,
+		liquipediatiertype = tierType,
+		publishertier = args.publishertier,
+		launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
+		defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
+		defunctfate = ReferenceCleaner.clean(args.defunctfate),
+		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
+			organizer1 = args.organizer or args.organizer1,
+			organizer2 = args.organizer2,
+			organizer3 = args.organizer3,
+			organizer4 = args.organizer4,
+			organizer5 = args.organizer5,
+		}),
+		sponsors = mw.ext.LiquipediaDB.lpdb_create_json({
+			sponsor1 = args.sponsor1,
+			sponsor2 = args.sponsor2,
+			sponsor3 = args.sponsor3,
+			sponsor4 = args.sponsor4,
+			sponsor5 = args.sponsor5,
+		}),
+		links = mw.ext.LiquipediaDB.lpdb_create_json(
+			Links.makeFullLinksForTableItems(links or {})
+		),
+	}
+	lpdbData = self:_getIconFromLeagueIconSmall(lpdbData)
 
-		lpdbData = self:addToLpdb(lpdbData)
-		mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
-	end
+	lpdbData = self:addToLpdb(lpdbData, args)
 
-	return tostring(builtInfobox)
-		.. WarningBox.displayAll(Series.warnings)
+	mw.ext.LiquipediaDB.lpdb_series('series_' .. self.name, lpdbData)
 end
 
 --- Allows for overriding this functionality
 ---@param lpdbData table
+---@param args table
 ---@return table
-function Series:addToLpdb(lpdbData)
+function Series:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
