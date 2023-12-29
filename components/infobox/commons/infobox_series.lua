@@ -68,7 +68,7 @@ function Series:createInfobox()
 		args.venue = table.concat(splitVenue, ' ')
 	end
 
-	self.totalSeriesPrizepool = self:_getSeriesPrizepools()
+	self.totalSeriesPrizepool = self.totalSeriesPrizepool or self:_getSeriesPrizepools()
 
 	local widgets = {
 		Header{
