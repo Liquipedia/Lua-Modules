@@ -49,7 +49,7 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.earnings = self.earnings
+	lpdbData.earnings = self.totalEarnings
 
 	return lpdbData
 end
@@ -60,12 +60,12 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local earningsWhileOnTeam
-		self.caller.earnings, earningsWhileOnTeam = self:calculateEarnings()
+		self.caller.totalEarnings, earningsWhileOnTeam = self.caller:calculateEarnings()
 		local earningsDisplay
-		if self.caller.earnings == 0 then
+		if self.caller.totalEarnings == 0 then
 			earningsDisplay = nil
 		else
-			earningsDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.earnings)
+			earningsDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarnings)
 		end
 		local earningsFromPlayersDisplay
 		if earningsWhileOnTeam > 0 then
