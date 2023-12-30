@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string[]
+---@return string
 function CustomWeapon:_getOperators()
 	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator, _)
 		return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
