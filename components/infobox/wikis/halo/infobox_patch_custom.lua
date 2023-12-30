@@ -9,13 +9,12 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-
-local GAME = mw.loadData('Module:GameVersion')
 
 --@Class HaloPatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
@@ -27,7 +26,7 @@ function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
 
-	patch.args.game = Game.toIdentifie{game = patch.args.game}
+	patch.args.game = Game.toIdentifier{game = patch.args.game}
 
 	return patch:createInfobox()
 end
@@ -64,13 +63,6 @@ function CustomPatch:getChronologyData(args)
 		data.next = args.next .. ' Patch|' .. args.next_link
 	end
 	return data
-end
-
----@param args table
----@return string?
-function CustomPatch._getGameVersion(args)
-	local game = string.lower(args.game or '')
-	return GAME[game]
 end
 
 return CustomPatch
