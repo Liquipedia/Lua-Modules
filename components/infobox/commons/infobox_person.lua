@@ -56,9 +56,9 @@ local Status = {
 	ACTIVE = 'Active',
 	INACTIVE = 'Inactive',
 	RETIRED = 'Retired',
-	DECEASED = 'Deceased',
+	['PASSED AWAY'] = 'Passed Away',
 }
-Status['PASSED AWAY'] = Status.DECEASED
+local DECEASED = 'DECEASED'
 local BANNED = 'banned'
 
 ---@param frame Frame
@@ -73,9 +73,12 @@ function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
+	--catch legay inputs
 	if (args.status or ''):lower() == BANNED then
 		args.banned = args.banned or true
 		args.status = Status.INACTIVE
+	elseif (args.status or ''):upper() == DECEASED then
+		args.status = Status['PASSED AWAY']
 	end
 
 	if String.isEmpty(args.id) then
@@ -377,7 +380,7 @@ function Person:getStatusToStore(args)
 		assert(status, 'Invalid status "' .. args.status .. '"')
 		return status
 	elseif args.death_date then
-		return Status.DECEASED
+		return Status['PASSED AWAY']
 	elseif Logic.readBool(args.retired) or string.match(args.retired or '', '%d%d%d%d') then
 		return Status.RETIRED
 	elseif Logic.readBool(args.inactive) then
