@@ -27,6 +27,8 @@ function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
 
+	patch.args.game = Game.toIdentifie{game = patch.args.game}
+
 	return patch:createInfobox()
 end
 
