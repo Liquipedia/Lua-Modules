@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,66 +19,61 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
-local CustomUser = Class.new()
+---@class Starcraft2InfoboxUser: Person
+local CustomUser = Class.new(CustomPerson)
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _user
-
+---@param frame Frame
+---@return Html
 function CustomUser.run(frame)
-	local user = CustomPerson(frame)
-	user.args.informationType = user.args.informationType or 'User'
-	_user = user
-	_args = user.args
+	local user = CustomUser(frame)
+	user:setWidgetInjector(CustomInjector(user))
 
-	user.shouldStoreData = CustomUser.shouldStoreData
-	user.getStatusToStore = CustomUser.getStatusToStore
-	user.getPersonType = CustomUser.getPersonType
-	user.createWidgetInjector = CustomUser.createWidgetInjector
-	user._getArgsfromBaseDefault = CustomUser._getArgsfromBaseDefault
-	user._getFavouriteTeams = CustomUser._getFavouriteTeams
+	user.args.informationType = user.args.informationType or 'User'
 
 	return user:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Languages', content = {args.languages}},
+			Cell{name = 'Favorite players', content = self.caller:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+			Cell{name = 'Favorite casters', content = self.caller:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+			Cell{name = 'Favorite teams', content = {args['fav-teams']}}
+		)
+	if not String.isEmpty(args['fav-team-1']) then
+		table.insert(widgets, Title{name = 'Favorite teams'})
+		table.insert(widgets, Center{content = {self.caller:_getFavouriteTeams()}})
+	end
+	elseif id == 'status' then
 		return {
-			Cell{name = 'Race', content = {_user:getRaceData(_args.race or 'unknown')}}
+			Cell{name = 'Race', content = {self.caller:getRaceData(args.race or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
 	elseif id == 'achievements' then return {}
 	elseif
 		id == 'history' and
-		string.match(_args.retired or '', '%d%d%d%d')
+		string.match(args.retired or '', '%d%d%d%d')
 	then
 		table.insert(widgets, Cell{
 				name = 'Retired',
-				content = {_args.retired}
+				content = {args.retired}
 			})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {
-		Cell{name = 'Languages', content = {_args.languages}},
-		Cell{name = 'Favorite players', content = _user:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = _user:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
-	}
-	if not String.isEmpty(_args['fav-team-1']) then
-		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {_user:_getFavouriteTeams()}})
-	end
-
-	return widgets
-end
-
+---@return string
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = self:getAllArgsForBase(_args, 'fav-team-')
+	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do
@@ -88,26 +84,36 @@ function CustomUser:_getFavouriteTeams()
 	return display
 end
 
+---@param base any
+---@param default any
+---@return string[]
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = self:getAllArgsForBase(_args, base)
-	table.insert(foundArgs, _args[default])
+	local foundArgs = self:getAllArgsForBase(self.args, base)
+	table.insert(foundArgs, self.args[default])
 	return foundArgs
 end
 
-function CustomUser:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomUser:shouldStoreData()
+---@param args table
+---@return boolean
+function CustomUser:shouldStoreData(args)
 	Variables.varDefine('disable_LPDB_storage', 'true')
 	return false
 end
 
-function CustomUser:getStatusToStore() return '' end
+---@param args table
+---@return string
+function CustomUser:getStatusToStore(args) return '' end
 
-function CustomUser:getCategories() return {} end
+---@param args table
+---@param birthDisplay string
+---@param personType string
+---@param status PlayerStatus
+---@return string[]
+function CustomUser:getCategories(args, birthDisplay, personType, status) return {} end
 
-function CustomUser:getPersonType()
+---@param args table
+---@return {store: string, category: string}
+function CustomUser:getPersonType(args)
 	return {store = 'User', category = 'User'}
 end
 
