@@ -7,9 +7,11 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
 
@@ -81,7 +83,7 @@ function Patch:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain() then
+	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		infobox:categories(self:getInformationType(args))
 		self:setLpdbData(args)
 	end
