@@ -27,6 +27,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
