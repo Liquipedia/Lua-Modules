@@ -112,7 +112,7 @@ function Patch:setLpdbData(args)
 			highlights = self:getAllArgsForBase(args, 'highlight')
 		},
 	}
-	
+
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, lpdbData)
