@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Class')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -19,77 +20,85 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local CustomUser = Class.new()
+---@class OverwatchInfoboxUser: Person
+local CustomUser = Class.new(User)
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomUser.run(frame)
-	local user = User(frame)
+	local user = CustomUser(frame)
+	user:setWidgetInjector(CustomInjector(user))
+
 	user.args.informationType = user.args.informationType or 'User'
-	_args = user.args
-
-	user.shouldStoreData = CustomUser.shouldStoreData
-	user.getStatusToStore = CustomUser.getStatusToStore
-	user.getPersonType = CustomUser.getPersonType
-
-	user.createWidgetInjector = CustomUser.createWidgetInjector
 
 	return user:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if
+	local args = self.caller.args
+
+	if id == 'custom' then
+		self.caller:addCustomCells(widgets)
+	elseif
 		id == 'history' and
-		not (String.isEmpty(_args.team_history) and String.isEmpty(_args.clan_history))
+		not (String.isEmpty(args.team_history) and String.isEmpty(args.clan_history))
 	then
 		return {
 			Title{ name = 'History' },
-			Center{content = {_args.team_history}},
-			Center{content = {_args.clan_history}},
+			Center{content = {args.team_history}},
+			Center{content = {args.clan_history}},
 		}
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {
-		Cell{name = 'Gender', content = {_args.gender}},
-		Cell{name = 'Languages', content = {_args.languages}},
-		Cell{name = 'BattleTag', content = {_args.battletag}},
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
+	local args = self.args
+
+	Array.appendWith(widgets,
+		Cell{name = 'Gender', content = {args.gender}},
+		Cell{name = 'Languages', content = {args.languages}},
+		Cell{name = 'BattleTag', content = {args.battletag}},
 		Cell{name = 'Main Hero', content = CustomUser:_getHeroes()},
 		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
-		Cell{name = 'Favorite teams', content = {_args['fav-teams']}}
-	}
+		Cell{name = 'Favorite teams', content = {args['fav-teams']}}
+)
 
-	if not String.isEmpty(_args['fav-team-1']) then
+	if not String.isEmpty(args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
 		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
 	end
 
-	if not String.isEmpty(_args.s1high) then
+	if not String.isEmpty(args.s1high) then
 		table.insert(widgets, Title{name = '[[Leaderboards|Skill Ratings]]'})
 	end
 
 	local index = 1
-	while not String.isEmpty(_args['s' .. index .. 'high']) do
-		local display = _args['s' .. index .. 'high']
-		if not String.isEmpty(_args['s' .. index .. 'final']) then
-			display = display .. '&nbsp;<small>(Final: ' .. _args['s' .. index .. 'final'] .. ')</small>'
+	while not String.isEmpty(args['s' .. index .. 'high']) do
+		local display = args['s' .. index .. 'high']
+		if not String.isEmpty(args['s' .. index .. 'final']) then
+			display = display .. '&nbsp;<small>(Final: ' .. args['s' .. index .. 'final'] .. ')</small>'
 		end
 		table.insert(widgets, Cell{name = 'Season ' .. index, content = {display}})
 		index = index + 1
 	end
 
-	table.insert(widgets, Cell{name = 'National teams', content = {_args['nationalteams']}})
+	table.insert(widgets, Cell{name = 'National teams', content = {args['nationalteams']}})
 
 	return widgets
 end
 
+---@return string[]
 function CustomUser:_getHeroes()
-	local foundArgs = User:getAllArgsForBase(_args, 'hero')
+	local foundArgs = self:getAllArgsForBase(self.args, 'hero')
 
 	local heroes = {}
 	for _, item in ipairs(foundArgs) do
@@ -101,8 +110,9 @@ function CustomUser:_getHeroes()
 	return heroes
 end
 
+---@return string
 function CustomUser:_getFavouriteTeams()
-	local foundArgs = User:getAllArgsForBase(_args, 'fav-team-')
+	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
 
 	local display = ''
 	for _, item in ipairs(foundArgs) do
@@ -113,24 +123,34 @@ function CustomUser:_getFavouriteTeams()
 	return display
 end
 
+---@param base any
+---@param default any
+---@return string[]
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = User:getAllArgsForBase(_args, base)
-	table.insert(foundArgs, _args[default])
+	local foundArgs = User:getAllArgsForBase(self.args, base)
+	table.insert(foundArgs, self.args[default])
 	return foundArgs
 end
 
-function CustomUser:createWidgetInjector()
-	return CustomInjector()
-end
+---@param args table
+---@return boolean
+function CustomUser:shouldStoreData(args) return false end
 
-function CustomUser:shouldStoreData() return false end
+---@param args table
+---@return string
+function CustomUser:getStatusToStore(args) return '' end
 
-function CustomUser:getStatusToStore() return '' end
+---@param args table
+---@param birthDisplay string
+---@param personType string
+---@param status PlayerStatus
+---@return string[]
+function CustomUser:getCategories(args, birthDisplay, personType, status) return {} end
 
-function CustomUser:getCategories() return {} end
-
-function CustomUser:getPersonType()
-	return { store = 'User', category = 'User' }
+---@param args table
+---@return {store: string, category: string}
+function CustomUser:getPersonType(args)
+	return {store = 'User', category = 'User'}
 end
 
 return CustomUser
