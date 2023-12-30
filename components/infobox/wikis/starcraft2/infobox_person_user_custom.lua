@@ -19,7 +19,7 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
----@class Starcraft2InfoboxUser: Person
+---@class Starcraft2InfoboxUser: SC2CustomPerson
 local CustomUser = Class.new(CustomPerson)
 
 local CustomInjector = Class.new(Injector)
