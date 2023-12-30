@@ -36,7 +36,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return{
-			Cell{name = 'Game Version', content = {CustomPatch._getGameVersion(self.caller.args)}, options = {makeLink = true}},
+			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args}}, options = {makeLink = true}},
 		}
 	end
 	return widgets
