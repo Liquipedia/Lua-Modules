@@ -47,18 +47,17 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomPatch:setLpdbData(args)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		local date = args.narelease or args.eurelease
-		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-		mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-			name = args.name,
-			type = 'patch',
-			information = monthAndDay,
-			date = date,
-		})
-	end
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	local date = args.narelease or args.eurelease
+	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
+
+	lpdbData.information = monthAndDay
+	lpdbData.date = date
+
+	return lpdbData
 end
 
 ---@param args table
