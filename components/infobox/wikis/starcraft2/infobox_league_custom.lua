@@ -63,10 +63,10 @@ function CustomLeague:customParseArguments(args)
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps('map', args)
 	args.number = tonumber(args.number)
-	self.cleanedArgs.mode = args.mode or DEFAULT_MODE
-	self.cleanedArgs.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.cleanedArgs.game
-	self.cleanedArgs.publishertier = tostring(Logic.readBool(args.featured))
-	self.cleanedArgs.status = self:_getStatus(args)
+	self.data.mode = args.mode or DEFAULT_MODE
+	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
+	self.data.publishertier = tostring(Logic.readBool(args.featured))
+	self.data.status = self:_getStatus(args)
 
 	self:_computeChronology(args)
 	self:_computePatch(args)
@@ -81,15 +81,15 @@ function CustomLeague:_computePatch(args)
 
 	local shouldFetchPatch = Logic.nilOr(Logic.readBoolOrNil(args.autopatch), true)
 	local fetchPatch = function(date)
-		if not shouldFetchPatch or self.cleanedArgs.game ~= GAME_LOTV then return end
+		if not shouldFetchPatch or self.data.game ~= GAME_LOTV then return end
 		return Autopatch._main{date}
 	end
 
-	local patch = args.patch or fetchPatch(self.cleanedArgs.startDate or TODAY)
-	local endPatch = args.epatch or fetchPatch(self.cleanedArgs.endDate or TODAY) or patch
+	local patch = args.patch or fetchPatch(self.data.startDate or TODAY)
+	local endPatch = args.epatch or fetchPatch(self.data.endDate or TODAY) or patch
 
-	self.cleanedArgs.patch = prefixPatch(patch)
-	self.cleanedArgs.endPatch = prefixPatch(endPatch)
+	self.data.patch = prefixPatch(patch)
+	self.data.endPatch = prefixPatch(endPatch)
 end
 
 ---@param args table
@@ -118,7 +118,7 @@ function CustomLeague:_isFinished(args)
 		return finished
 	end
 
-	local queryDate = self.cleanedArgs.endDate or self.cleanedArgs.startDate
+	local queryDate = self.data.endDate or self.data.startDate
 
 	if not queryDate or os.date('%Y-%m-%d') < queryDate then
 		return false
@@ -247,7 +247,7 @@ function CustomLeague:displayPrizePool(args)
 		prizepoolusd = prizePoolUSD,
 		currency = localCurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.cleanedArgs.endDate),
+		date = Logic.emptyOr(args.currency_date, self.data.endDate),
 		displayRoundPrecision = PRIZE_POOL_ROUND_PRECISION,
 	}
 end
@@ -274,11 +274,11 @@ end
 function CustomLeague:_getGameVersion(args)
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 
-	local gameDisplay = self.cleanedArgs.game == GAME_MOD and (args.modname or 'Mod')
-		or Page.makeInternalLink(Game.name{game = self.cleanedArgs.game})
+	local gameDisplay = self.data.game == GAME_MOD and (args.modname or 'Mod')
+		or Page.makeInternalLink(Game.name{game = self.data.game})
 
-	local patch = self.cleanedArgs.patch
-	local endPatch = self.cleanedArgs.endPatch
+	local patch = self.data.patch
+	local endPatch = self.data.endPatch
 
 	local patchDisplay = betaPrefix .. table.concat({
 		Page.makeInternalLink(patch),
@@ -364,12 +364,12 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	if self.cleanedArgs.game == GAME_MOD then
+	if self.data.game == GAME_MOD then
 		return {}
 	end
 
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
-	return {betaPrefix .. Game.abbreviation{game = self.cleanedArgs.game} .. ' Competitions'}
+	return {betaPrefix .. Game.abbreviation{game = self.data.game} .. ' Competitions'}
 end
 
 ---@param args table
