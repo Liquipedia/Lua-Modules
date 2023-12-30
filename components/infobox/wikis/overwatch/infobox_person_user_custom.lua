@@ -59,22 +59,22 @@ end
 
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
+function CustomUser:addCustomCells(widgets)
 	local args = self.args
 
 	Array.appendWith(widgets,
 		Cell{name = 'Gender', content = {args.gender}},
 		Cell{name = 'Languages', content = {args.languages}},
 		Cell{name = 'BattleTag', content = {args.battletag}},
-		Cell{name = 'Main Hero', content = CustomUser:_getHeroes()},
-		Cell{name = 'Favorite players', content = CustomUser:_getArgsfromBaseDefault('fav-player', 'fav-players')},
-		Cell{name = 'Favorite casters', content = CustomUser:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
+		Cell{name = 'Main Hero', content = self:_getHeroes()},
+		Cell{name = 'Favorite players', content = self:_getArgsfromBaseDefault('fav-player', 'fav-players')},
+		Cell{name = 'Favorite casters', content = self:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {args['fav-teams']}}
 )
 
 	if not String.isEmpty(args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {CustomUser:_getFavouriteTeams()}})
+		table.insert(widgets, Center{content = {self:_getFavouriteTeams()}})
 	end
 
 	if not String.isEmpty(args.s1high) then
@@ -127,7 +127,7 @@ end
 ---@param default any
 ---@return string[]
 function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = User:getAllArgsForBase(self.args, base)
+	local foundArgs = self:getAllArgsForBase(self.args, base)
 	table.insert(foundArgs, self.args[default])
 	return foundArgs
 end
