@@ -12,6 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
@@ -67,9 +68,6 @@ end
 ---@param args table
 function CustomPatch:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
-		name = self.name,
-		type = 'patch',
-		date = args.release,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			beta = tostring(Logic.readBool(args.beta)),
 			version = self.name,
@@ -81,6 +79,24 @@ function CustomPatch:setLpdbData(args)
 			next = args.next and ('Patch args.previous') or nil,
 		})
 	})
+end
+
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
+		beta = tostring(Logic.readBool(args.beta)),
+		version = self.name,
+		release = args.release,
+		neteaserelease = args.release_netease ~= SKIP and args.release_netease or nil,
+		ptrdate = args.release_ptr,
+		balanceupdates = tostring(CustomPatch._hasBalanceUpdate(args)),
+		previous = args.previous and ('Patch args.previous') or nil,
+		next = args.next and ('Patch args.previous') or nil,
+	})
+
+	return lpdbData
 end
 
 ---@param args table
