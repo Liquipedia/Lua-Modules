@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Weapon = require('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 
+---@class RainbowsixWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
@@ -30,12 +31,13 @@ function CustomWeapon.run(frame)
 	return weapon:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Operators', content = self:_getOperators()},
+			Cell{name = 'Operators', content = self.caller:_getOperators()},
 		}
 	end
 	return widgets
@@ -45,14 +47,11 @@ end
 function CustomWeapon:_getOperators()
 	local foundArgs = self:getAllArgsForBase(self.args, 'operator')
 
-	local operators = {}
-	for _, item in ipairs(foundArgs) do
-		local operator = Template.safeExpand(mw.getCurrentFrame(), 'Operator/' .. item, nil, '')
-		if not String.isEmpty(operator) then
-			table.insert(operators, operator)
-		end
-	end
-	return operators
+	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator, _)
+		return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
+	end)
+
+	return table.concat(operatorIcons, '&nbsp;')
 end
 
 ---@param lpdbData table
@@ -67,9 +66,9 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		ammocap = args.ammocap,
 		reloadspeed = args.reloadspeed,
 		rateoffire = args.rateoffire,
-		firemode = table.concat(self.weapon:getAllArgsForBase(args, 'firemode'), ';'),
-		operators = table.concat(self.weapon:getAllArgsForBase(args, 'operator'), ';'),
-		games = table.concat(self.weapon:getAllArgsForBase(args, 'game'), ';'),
+		firemode = table.concat(self:getAllArgsForBase(args, 'firemode'), ';'),
+		operators = table.concat(self:getAllArgsForBase(args, 'operator'), ';'),
+		games = table.concat(self:getAllArgsForBase(args, 'game'), ';'),
 	})
 	return lpdbData
 end
