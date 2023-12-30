@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 
 local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
