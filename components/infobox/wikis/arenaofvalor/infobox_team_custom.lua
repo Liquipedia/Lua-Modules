@@ -21,7 +21,7 @@ local CustomTeam = Class.new(Team)
 ---@param frame Frame
 ---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
