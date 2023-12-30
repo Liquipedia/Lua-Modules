@@ -90,21 +90,32 @@ function Patch:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---Adjust Lpdb data
+---@param lpdbData table
+---@param args table
+---@return table
+function Patch:addToLpdb(lpdbData, args)
+	return lpdbData
+end
+
+--- Allows for overriding this functionality
 ---@param args table
 function Patch:setLpdbData(args)
-	local date = args.release
-	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	local informationType = self:getInformationType(args):lower()
-	mw.ext.LiquipediaDB.lpdb_datapoint(informationType .. '_' .. self.name, {
-		name = args.name,
-		type = informationType,
-		information = monthAndDay,
+	local lpdbData = {
+		name = self.name,
+		type = self:getInformationType(args):lower(),
 		image = args.image,
-		date = date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			highlights = self:getAllArgsForBase(args, 'highlight')
+		imagedark = args.imagedark,
+		date = args.release,
+		information = mw.getContentLanguage():formatDate('m-d', date),
+		extradata = { 
+			highlights = self:getAllArgsForBase(args, 'highlight') 
 		},
-	})
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, lpdbData)
 end
 
 --- Allows for overriding this functionality
