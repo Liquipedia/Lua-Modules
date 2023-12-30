@@ -20,12 +20,10 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local CustomTeam = Class.new()
+---@class Formula1InfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 local Chronology = Widgets.Chronology
-
-local _args
-local _team
 
 local STATISTICS = {
 	{key = 'races', name = 'Races'},
@@ -39,51 +37,46 @@ local STATISTICS = {
 	{key = 'lastentry', name = 'Last entry'},
 }
 
-
 ---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	_args = _team.args
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox()
 end
 
----@return WidgetInjector
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.extendWith(widgets, CustomTeam._statisticsCells(_args))
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-	if _args.academy then
-		local academyTeams = Array.map(_team:getAllArgsForBase(_args, 'academy'), function(team)
-			return TeamTemplates.team(nil, team)
-		end)
-		Array.extendWith(widgets,
-			{Title{name = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
-			Array.map(academyTeams, function(academyTeam) return Center{content = {academyTeam}} end)
-		)
-	end
+	if id == 'content' then
+		Array.extendWith(widgets, CustomTeam._statisticsCells(args))
 
-	if _args.previous or _args.next then
-		Array.appendWith(
-			widgets,
-			Title{name = 'Chronology'},
-			Chronology{content = {
-				previous = _args.previous,
-				previous2 = _args.previous2,
-				next = _args.next,
-				next2 = _args.next2,
-			}}
-		)
+		if args.academy then
+			local academyTeams = Array.map(self.caller:getAllArgsForBase(args, 'academy'), function(team)
+				return TeamTemplates.team(nil, team)
+			end)
+			Array.extendWith(widgets,
+				{Title{name = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
+				Array.map(academyTeams, function(academyTeam) return Center{content = {academyTeam}} end)
+			)
+		end
+
+		if args.previous or args.next then
+			Array.appendWith(
+				widgets,
+				Title{name = 'Chronology'},
+				Chronology{content = {
+					previous = args.previous,
+					previous2 = args.previous2,
+					next = args.next,
+					next2 = args.next2,
+				}}
+			)
+		end
 	end
 
 	return widgets
