@@ -107,12 +107,12 @@ function Patch:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		date = args.release,
-		information = mw.getContentLanguage():formatDate('m-d', date),
-		extradata = { 
-			highlights = self:getAllArgsForBase(args, 'highlight') 
+		information = mw.getContentLanguage():formatDate('m-d', args.release),
+		extradata = {
+			highlights = self:getAllArgsForBase(args, 'highlight')
 		},
 	}
-
+	
 	lpdbData = self:addToLpdb(lpdbData, args)
 	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, lpdbData)
