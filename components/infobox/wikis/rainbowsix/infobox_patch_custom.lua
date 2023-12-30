@@ -24,7 +24,7 @@ local CustomInjector = Class.new(Injector)
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
 	patch:setWidgetInjector(CustomInjector(patch))
-
+	
 	return patch:createInfobox()
 end
 
@@ -43,18 +43,14 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomPatch:setLpdbData(args)
-	local date = args.release or args.pcrelease or args.consolerelease
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = args.name,
-		type = 'patch',
-		information = args.game,
-		date = date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			version = args.version,
-		}
-	})
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata.version = args.version
+	lpdbData.extradata.game = args.game
+
+	return lpdbData
 end
 
 ---@param args table
