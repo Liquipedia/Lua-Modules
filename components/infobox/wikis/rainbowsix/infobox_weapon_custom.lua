@@ -26,8 +26,8 @@ local _SIZE_OPERATOR = '25x25px'
 ---@return Html
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
+	weapon:setWidgetInjector(CustomInjector(weapon))
 
-	weapon:setWidgetInjector(CustomInjector(patch))
 	return weapon:createInfobox()
 end
 
@@ -45,8 +45,6 @@ end
 
 ---@return string[]
 function CustomWeapon:_getOperators()
-	local foundArgs = self:getAllArgsForBase(self.args, 'operator')
-
 	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator, _)
 		return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
 	end)
