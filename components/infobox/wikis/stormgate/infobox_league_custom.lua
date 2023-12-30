@@ -47,8 +47,8 @@ function CustomLeague:customParseArguments(args)
 	args.raceBreakDown = RaceBreakdown.run(args) or {}
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps(args)
-	self.cleanedArgs.status = self:_getStatus(args)
-	self.cleanedArgs.publishertier = tostring(Logic.readBool(args.publishertier))
+	self.data.status = self:_getStatus(args)
+	self.data.publishertier = tostring(Logic.readBool(args.publishertier))
 end
 
 ---@param args table
@@ -77,7 +77,7 @@ function CustomLeague:_isFinished(args)
 		return finished
 	end
 
-	local queryDate = self.cleanedArgs.endDate or self.cleanedArgs.startDate
+	local queryDate = self.data.endDate or self.data.startDate
 
 	if not queryDate or os.date('%Y-%m-%d') < queryDate then
 		return false

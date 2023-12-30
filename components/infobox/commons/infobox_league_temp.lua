@@ -266,7 +266,7 @@ function League:_parseArgs()
 		args.venue = table.concat(splitVenue, ' ')
 	end
 
-	local cleanedArgs = {
+	local data = {
 		name = TextSanitizer.stripHTML(args.name),
 		shortName = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
 		tickerName = TextSanitizer.stripHTML(args.tickername),
@@ -283,14 +283,14 @@ function League:_parseArgs()
 		endPatch = args.endpatch or args.epatch or args.patch,
 	}
 
-	cleanedArgs.liquipediatier, cleanedArgs.liquipediatiertype =
+	data.liquipediatier, data.liquipediatiertype =
 		Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 
-	self.cleanedArgs = cleanedArgs
+	self.data = data
 
 	self:_parsePrizePool(args)
 
-	cleanedArgs.icon, cleanedArgs.iconDark, self.iconDisplay = self:_getIcons{
+	data.icon, data.iconDark, self.iconDisplay = self:_getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 		series = args.series,
 		abbreviation = args.abbreviation,
@@ -314,8 +314,8 @@ function League:_parsePrizePool(args)
 	local display = self:displayPrizePool(args)
 
 	self.prizepoolDisplay = display
-	self.cleanedArgs.prizepoolUsd = tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0
-	self.cleanedArgs.localCurrency = Variables.varDefault('tournament_currency', args.localcurrency)
+	self.data.prizepoolUsd = tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0
+	self.data.localCurrency = Variables.varDefault('tournament_currency', args.localcurrency)
 end
 
 ---@param args table
@@ -326,7 +326,7 @@ function League:displayPrizePool(args)
 		prizepoolusd = args.prizepoolusd,
 		currency = args.localcurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.cleanedArgs.endDate),
+		date = Logic.emptyOr(args.currency_date, self.data.endDate),
 		displayRoundPrecision = args.currencyDispPrecision,
 		varRoundPrecision = args.currencyVarPrecision
 	}
@@ -443,21 +443,21 @@ end
 
 ---@param args table
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', self.cleanedArgs.name)
-	Variables.varDefine('tournament_shortname', self.cleanedArgs.shortName)
-	Variables.varDefine('tournament_tickername', self.cleanedArgs.tickerName)
-	Variables.varDefine('tournament_series', self.cleanedArgs.series)
+	Variables.varDefine('tournament_name', self.data.name)
+	Variables.varDefine('tournament_shortname', self.data.shortName)
+	Variables.varDefine('tournament_tickername', self.data.tickerName)
+	Variables.varDefine('tournament_series', self.data.series)
 
-	Variables.varDefine('tournament_icon', self.cleanedArgs.icon)
-	Variables.varDefine('tournament_icondark', self.cleanedArgs.iconDark)
+	Variables.varDefine('tournament_icon', self.data.icon)
+	Variables.varDefine('tournament_icondark', self.data.iconDark)
 
-	Variables.varDefine('tournament_liquipediatier', self.cleanedArgs.liquipediatier)
-	Variables.varDefine('tournament_liquipediatiertype', self.cleanedArgs.liquipediatiertype)
-	Variables.varDefine('tournament_publishertier', self.cleanedArgs.publishertier)
+	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
+	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
+	Variables.varDefine('tournament_publishertier', self.data.publishertier)
 
 	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_mode', self.cleanedArgs.mode)
-	Variables.varDefine('tournament_status', self.cleanedArgs.status)
+	Variables.varDefine('tournament_mode', self.data.mode)
+	Variables.varDefine('tournament_status', self.data.status)
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -465,19 +465,19 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', self.cleanedArgs.game)
+	Variables.varDefine('tournament_game', self.data.game)
 
-	Variables.varDefine('tournament_parent', self.cleanedArgs.parent)
+	Variables.varDefine('tournament_parent', self.data.parent)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
-	Variables.varDefine('tournament_startdate', self.cleanedArgs.startDate)
-	Variables.varDefine('tournament_enddate', self.cleanedArgs.endDate)
+	Variables.varDefine('tournament_startdate', self.data.startDate)
+	Variables.varDefine('tournament_enddate', self.data.endDate)
 
-	Variables.varDefine('tournament_patch', self.cleanedArgs.patch)
-	Variables.varDefine('tournament_endpatch ', self.cleanedArgs.endPatch)
+	Variables.varDefine('tournament_patch', self.data.patch)
+	Variables.varDefine('tournament_endpatch ', self.data.endPatch)
 
-	Variables.varDefine('tournament_currency', self.cleanedArgs.localCurrency or '')
+	Variables.varDefine('tournament_currency', self.data.localCurrency or '')
 
 	Variables.varDefine('tournament_summary', self:seoText(args))
 
@@ -489,43 +489,43 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = self.cleanedArgs.tickerName,
-		shortname = self.cleanedArgs.shortName,
+		tickername = self.data.tickerName,
+		shortname = self.data.shortName,
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
-		icon = self.cleanedArgs.icon,
-		icondark = self.cleanedArgs.iconDark,
+		icon = self.data.icon,
+		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
 		previous = self:_getPageNameFromChronology(args.previous),
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),
 		next2 = self:_getPageNameFromChronology(args.next2),
-		game = self.cleanedArgs.game,
-		mode = self.cleanedArgs.mode,
-		patch = self.cleanedArgs.patch,
-		endpatch = self.cleanedArgs.endPatch,
+		game = self.data.game,
+		mode = self.data.mode,
+		patch = self.data.patch,
+		endpatch = self.data.endPatch,
 		type = args.type,
 		organizers = Table.mapValues(
 			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = self.cleanedArgs.startDate or self.cleanedArgs.endDate or DEFAULT_DATE,
-		enddate = self.cleanedArgs.endDate or DEFAULT_DATE,
-		sortdate = self.cleanedArgs.endDate or DEFAULT_DATE,
+		startdate = self.data.startDate or self.data.endDate or DEFAULT_DATE,
+		enddate = self.data.endDate or DEFAULT_DATE,
+		sortdate = self.data.endDate or DEFAULT_DATE,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
 		locations = Locale.formatLocations(args),
-		prizepool = self.cleanedArgs.prizepoolUsd,
-		liquipediatier = self.cleanedArgs.liquipediatier,
-		liquipediatiertype = self.cleanedArgs.liquipediatiertype,
-		publishertier = self.cleanedArgs.publishertier,
+		prizepool = self.data.prizepoolUsd,
+		liquipediatier = self.data.liquipediatier,
+		liquipediatiertype = self.data.liquipediatiertype,
+		publishertier = self.data.publishertier,
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)
 			or -1,
-		status = self.cleanedArgs.status,
+		status = self.data.status,
 		format = TextSanitizer.stripHTML(args.format),
 		sponsors = League:_getNamedTableofAllArgsForBase(args, 'sponsor'),
 		links = Links.makeFullLinksForTableItems(links or {}),
@@ -657,7 +657,7 @@ function League:_createSeriesIcon(iconArgs)
 		iconDark = iconArgs.displayManualIcons and iconArgs.iconDark or nil,
 		series = series,
 		abbreviation = iconArgs.abbreviation,
-		date = self.cleanedArgs.endDate,
+		date = self.data.endDate,
 		options = {noLink = not Page.exists(series)}
 	}
 
