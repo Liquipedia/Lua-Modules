@@ -20,7 +20,7 @@ local Weapon = require('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
-local _SIZE_OPERATOR = '25x25px'
+local SIZE_OPERATOR = '25x25px'
 
 ---@param frame Frame
 ---@return Html
@@ -37,7 +37,7 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
-			Cell{name = 'Operators', content = self.caller:_getOperators()},
+			Cell{name = 'Operators', content = {self.caller:_getOperators()}},
 		}
 	end
 	return widgets
@@ -46,7 +46,7 @@ end
 ---@return string
 function CustomWeapon:_getOperators()
 	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator, _)
-		return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
+		return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
 	end)
 
 	return table.concat(operatorIcons, '&nbsp;')
