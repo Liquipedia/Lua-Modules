@@ -52,14 +52,11 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	if id == 'earnings' then
-		local earningsDisplay = function(value)
-			return value ~= 0 and ('$' .. mw.language.new('en'):formatNum(value)) or nil
-		end
-
-		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay(caller.totalEarnings)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {earningsDisplay(caller.totalPlayerEarnings)}},
-		}
+		local playerEarnings = self.caller.totalPlayerEarnings
+		table.insert(widgets, Cell{
+			name = PLAYER_EARNINGS_ABBREVIATION,
+			content = {playerEarnings ~= 0 and ('$' .. mw.language.new('en'):formatNum(playerEarnings)) or nil}
+		})
 	end
 
 	return widgets
