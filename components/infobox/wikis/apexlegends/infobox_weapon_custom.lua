@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			end)
 
 			if String.isNotEmpty(args[key1 .. 'note']) then
-				table.insert(baseDamages, self.caller:_createContextualNote(args[key1 .. 'note']))
+				table.insert(baseDamage, self.caller:_createContextualNote(args[key1 .. 'note']))
 			end
 
 			return values
