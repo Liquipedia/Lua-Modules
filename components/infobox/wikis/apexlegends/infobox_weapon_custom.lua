@@ -19,6 +19,7 @@ local Center = Widgets.Center
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 
+---@class ApexlegendsWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
@@ -44,6 +45,8 @@ local DAMAGE_INFO = {
 }
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@param frame Frame
+---@return Html
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
 	weapon:setWidgetInjector(CustomInjector(weapon))
