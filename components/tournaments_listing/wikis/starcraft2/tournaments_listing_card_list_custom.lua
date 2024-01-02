@@ -31,9 +31,7 @@ function CustomTournamentsListing.run(args)
 		return CustomTournamentsListing.byYear(args)
 	end
 
-	args.game = args.game
-		and Game.name{game = args.game, useDefault = false}
-		or nil
+	args.game = Game.toIdentifier{game = args.game, useDefault = false}
 	args.noLis = true
 	args.allowedPlacements = ALLOWED_PLACES
 	args.tiertype = args.tiertype or NON_QUALIFIER
