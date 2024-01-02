@@ -9,17 +9,14 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PageLink = require('Module:Page')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
+---@class PubgWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
