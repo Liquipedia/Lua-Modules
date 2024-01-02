@@ -50,8 +50,8 @@ function LegacyMatchMaps.solo(frame)
 		width = args.width,
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
-		store = not store,
-		noDuplicateCheck = store,
+		store = store,
+		noDuplicateCheck = not store,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
