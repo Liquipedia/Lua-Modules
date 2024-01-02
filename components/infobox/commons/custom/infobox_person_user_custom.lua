@@ -12,14 +12,14 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local User = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local User = Lua.import('Module:Infobox/Person/User', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class CustomInfoboxUser: Person
+---@class CustomInfoboxUser: InfoboxUser
 local CustomUser = Class.new(User)
 
 local CustomInjector = Class.new(Injector)
@@ -67,49 +67,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@return string
-function CustomUser:_getFavouriteTeams()
-	local foundArgs = self:getAllArgsForBase(self.args, 'fav-team-')
-
-	local display = ''
-	for _, item in ipairs(foundArgs) do
-		local team = item:lower():gsub('_', ' ')
-		display = display .. mw.ext.TeamTemplate.teamicon(team)
-	end
-
-	return display
-end
-
----@param base any
----@param default any
----@return string[]
-function CustomUser:_getArgsfromBaseDefault(base, default)
-	local foundArgs = self:getAllArgsForBase(self.args, base)
-	table.insert(foundArgs, self.args[default])
-	return foundArgs
-end
-
----@param args table
----@return boolean
-function CustomUser:shouldStoreData(args) return false end
-
----@param args table
----@return string
-function CustomUser:getStatusToStore(args) return '' end
-
----@param args table
----@param birthDisplay string
----@param personType string
----@param status PlayerStatus
----@return string[]
-function CustomUser:getCategories(args, birthDisplay, personType, status) return {} end
-
----@param args table
----@return {store: string, category: string}
-function CustomUser:getPersonType(args)
-	return {store = 'User', category = 'User'}
 end
 
 return CustomUser
