@@ -8,8 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -59,75 +59,76 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
-		local baseDamages = {}
-		for index, baseDamage in ipairs(self.caller:getAllArgsForBase(args, 'basedamage')) do
-			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
-		end
-		if String.isNotEmpty(args.basedamagenote) then
-			table.insert(baseDamages, CustomWeapon:_createContextualNote(args.basedamagenote))
-		end
-		table.insert(widgets, Cell{name = 'Damage', content = baseDamages})
-	end
-
-	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
-		local rofTimes = {}
-		for index, rofTime in ipairs(self.caller:getAllArgsForBase(args, 'ratesoffire')) do
-			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
-		end
-		if String.isNotEmpty(args.ratesoffirenote) then
-			table.insert(rofTimes, CustomWeapon:_createContextualNote(args.ratesoffirenote))
-		end
-		table.insert(widgets, Cell{name = 'Rates of Fire', content = rofTimes})
-	end
-
-	if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
-		local ammoSizes = {}
-		for index, ammoSize in ipairs(self.caller:getAllArgsForBase(args, 'ammocapacity')) do
-			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
-		end
-		if String.isNotEmpty(args.ammocapacitynote) then
-			table.insert(ammoSizes, CustomWeapon:_createContextualNote(args.ammocapacitynote))
-		end
-		table.insert(widgets, Cell{name = 'Ammo Capacity', content = ammoSizes})
-	end
-
-	if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
-		local reloadTimes = {}
-		for index, reloadTime in ipairs(self.caller:getAllArgsForBase(args, 'reloadtime')) do
-			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
-		end
-		if String.isNotEmpty(args.reloadtimenote) then
-			table.insert(reloadTimes, CustomWeapon:_createContextualNote(args.reloadtimenote))
-		end
-		table.insert(widgets, Cell{name = 'Reload Speed', content = reloadTimes})
-	end
-
-	if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
-		table.insert(widgets, Cell{name = 'Ammo Type', content = {args.ammotypeicon .. ' ' .. args.ammotype}})
-	end
-
-	if String.isNotEmpty(args.attachment) then
-		local attachments = {}
-		for index, attachment in ipairs(self.caller:getAllArgsForBase(args, 'attachment')) do
-			table.insert(attachments, CustomWeapon:_createContextualNoWrappingSpan(attachment, index))
-		end
-		table.insert(widgets, Title{name = 'Attachment Slots'})
-		table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
-	end
-
-	if String.isNotEmpty(args.hopup) then
-		local hopups = {}
-		args.hopupdesc1 = args.hopupdesc1 or args.hopupdesc
-		for index, hopup in ipairs(self.caller:getAllArgsForBase(args, 'hopup')) do
-			table.insert(hopups, CustomWeapon:_createContextualNoWrappingSpan(hopup, index))
-			table.insert(hopups, args['hopupdesc' .. index])
-		end
-		table.insert(widgets, Title{name = 'Hop-Ups'})
-		table.insert(widgets, Center{content = {table.concat(hopups, '<br>')}})
-	end
 
 	if id == 'custom' then
+		if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
+			local baseDamages = {}
+			for index, baseDamage in ipairs(self.caller:getAllArgsForBase(args, 'basedamage')) do
+				table.insert(baseDamages, self.caller:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
+			end
+			if String.isNotEmpty(args.basedamagenote) then
+				table.insert(baseDamages, self.caller:_createContextualNote(args.basedamagenote))
+			end
+			table.insert(widgets, Cell{name = 'Damage', content = baseDamages})
+		end
+
+		if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
+			local rofTimes = {}
+			for index, rofTime in ipairs(self.caller:getAllArgsForBase(args, 'ratesoffire')) do
+				table.insert(rofTimes, self.caller:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
+			end
+			if String.isNotEmpty(args.ratesoffirenote) then
+				table.insert(rofTimes, self.caller:_createContextualNote(args.ratesoffirenote))
+			end
+			table.insert(widgets, Cell{name = 'Rates of Fire', content = rofTimes})
+		end
+
+		if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
+			local ammoSizes = {}
+			for index, ammoSize in ipairs(self.caller:getAllArgsForBase(args, 'ammocapacity')) do
+				table.insert(ammoSizes, self.caller:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
+			end
+			if String.isNotEmpty(args.ammocapacitynote) then
+				table.insert(ammoSizes, self.caller:_createContextualNote(args.ammocapacitynote))
+			end
+			table.insert(widgets, Cell{name = 'Ammo Capacity', content = ammoSizes})
+		end
+
+		if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
+			local reloadTimes = {}
+			for index, reloadTime in ipairs(self.caller:getAllArgsForBase(args, 'reloadtime')) do
+				table.insert(reloadTimes, self.caller:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
+			end
+			if String.isNotEmpty(args.reloadtimenote) then
+				table.insert(reloadTimes, self.caller:_createContextualNote(args.reloadtimenote))
+			end
+			table.insert(widgets, Cell{name = 'Reload Speed', content = reloadTimes})
+		end
+
+		if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
+			table.insert(widgets, Cell{name = 'Ammo Type', content = {args.ammotypeicon .. ' ' .. args.ammotype}})
+		end
+
+		if String.isNotEmpty(args.attachment) then
+			local attachments = {}
+			for index, attachment in ipairs(self.caller:getAllArgsForBase(args, 'attachment')) do
+				table.insert(attachments, self.caller:_createContextualNoWrappingSpan(attachment, index))
+			end
+			table.insert(widgets, Title{name = 'Attachment Slots'})
+			table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
+		end
+
+		if String.isNotEmpty(args.hopup) then
+			local hopups = {}
+			args.hopupdesc1 = args.hopupdesc1 or args.hopupdesc
+			for index, hopup in ipairs(self.caller:getAllArgsForBase(args, 'hopup')) do
+				table.insert(hopups, self.caller:_createContextualNoWrappingSpan(hopup, index))
+				table.insert(hopups, args['hopupdesc' .. index])
+			end
+			table.insert(widgets, Title{name = 'Hop-Ups'})
+			table.insert(widgets, Center{content = {table.concat(hopups, '<br>')}})
+		end
+
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Rate of fire (Single)', content = {args.rateoffiresingle}},
@@ -143,8 +144,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param content Html|string|number|nil
+---@param index integer
+---@param lookUpTable table[]
+---@return string?
 function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTable)
-
 	if not lookUpTable then
 		local page = 'link=Portal:Attachments'
 		local icon = '[[File:Apex ATTM_' .. content .. '_lightmode.png|60px|'.. page ..'|class=show-when-light-mode]]'
@@ -173,13 +177,15 @@ function CustomWeapon:_createContextualNoWrappingSpan(content, index, lookUpTabl
 			:wikitext(info.text)
 
 		span
-			:wikitext(infoIndex ~=1 and ' ' or '')
+			:wikitext(infoIndex ~= 1 and ' ' or '')
 			:node(sup)
 	end
 
 	return tostring(span)
 end
 
+---@param noteText string|number
+---@return string
 function CustomWeapon:_createContextualNote(noteText)
 	return '<span style="font-size:80%">' .. noteText .. '</span>'
 end
