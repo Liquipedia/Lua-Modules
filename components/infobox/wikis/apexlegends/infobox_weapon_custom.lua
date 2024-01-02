@@ -61,49 +61,29 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
-			local baseDamages = {}
-			for index, baseDamage in ipairs(self.caller:getAllArgsForBase(args, 'basedamage')) do
-				table.insert(baseDamages, self.caller:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
+		local fetchCustomValues = function(key1, key2, lookUpTable)
+			if String.isEmpty(args[key1]) or String.isNotEmpty(args[key2]) then
+				return {}
 			end
-			if String.isNotEmpty(args.basedamagenote) then
-				table.insert(baseDamages, self.caller:_createContextualNote(args.basedamagenote))
+
+			local values = Array.map(self.caller:getAllArgsForBase(args, key1), function(item, index)
+				return self.caller:_createContextualNoWrappingSpan(item, index, lookUpTable)
+			end)
+
+			if String.isNotEmpty(args[key1 .. 'note']) then
+				table.insert(baseDamages, self.caller:_createContextualNote(args[key1 .. 'note']))
 			end
-			table.insert(widgets, Cell{name = 'Damage', content = baseDamages})
+
+			return values
 		end
 
-		if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
-			local rofTimes = {}
-			for index, rofTime in ipairs(self.caller:getAllArgsForBase(args, 'ratesoffire')) do
-				table.insert(rofTimes, self.caller:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
-			end
-			if String.isNotEmpty(args.ratesoffirenote) then
-				table.insert(rofTimes, self.caller:_createContextualNote(args.ratesoffirenote))
-			end
-			table.insert(widgets, Cell{name = 'Rates of Fire', content = rofTimes})
-		end
-
-		if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
-			local ammoSizes = {}
-			for index, ammoSize in ipairs(self.caller:getAllArgsForBase(args, 'ammocapacity')) do
-				table.insert(ammoSizes, self.caller:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
-			end
-			if String.isNotEmpty(args.ammocapacitynote) then
-				table.insert(ammoSizes, self.caller:_createContextualNote(args.ammocapacitynote))
-			end
-			table.insert(widgets, Cell{name = 'Ammo Capacity', content = ammoSizes})
-		end
-
-		if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
-			local reloadTimes = {}
-			for index, reloadTime in ipairs(self.caller:getAllArgsForBase(args, 'reloadtime')) do
-				table.insert(reloadTimes, self.caller:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
-			end
-			if String.isNotEmpty(args.reloadtimenote) then
-				table.insert(reloadTimes, self.caller:_createContextualNote(args.reloadtimenote))
-			end
-			table.insert(widgets, Cell{name = 'Reload Speed', content = reloadTimes})
-		end
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Damage', content = fetchCustomValues('basedamage', 'damage', DAMAGE_INFO)},
+			Cell{name = 'Rates of Fire', content = fetchCustomValues('ratesoffire', 'rateoffireauto', BOLT_INFO)},
+			Cell{name = 'Ammo Capacity', content = fetchCustomValues('ammocapacity', 'ammocap', MAGAZINE_INFO)},
+			Cell{name = 'Reload Speed', content = fetchCustomValues('reloadtime', 'reloadspeed', MAGAZINE_INFO)}
+		)
 
 		if String.isNotEmpty(args.ammotype) and String.isNotEmpty(args.ammotypeicon) then
 			table.insert(widgets, Cell{name = 'Ammo Type', content = {args.ammotypeicon .. ' ' .. args.ammotype}})
