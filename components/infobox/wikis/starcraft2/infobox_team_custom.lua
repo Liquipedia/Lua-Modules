@@ -220,14 +220,14 @@ function CustomTeam:getEarningsAndMedalsData()
 	}
 
 	local earnings = {total = {total = 0}, team = {total = 0}, other = {total = 0}}
-	local medals = {solo = {}, team = {}}
+	self.medals = {solo = {}, team = {}}
 	local processPlacement = function(placement)
 		self:_addPlacementToEarnings(placement, earnings)
 
 		--handle medals
 		local mode = placement.opponenttype
 		if mode == Opponent.solo or (mode == Opponent.team and self:_isCorrectTeam(placement.opponentname)) then
-			CustomTeam:_addPlacementToMedals(medals[mode], placement)
+			CustomTeam:_addPlacementToMedals(self.medals[mode], placement)
 		end
 	end
 
@@ -241,10 +241,6 @@ function CustomTeam:getEarningsAndMedalsData()
 	local totalEarnings = Table.mapValues(earnings.total, Math.round)
 	self.teamEarnings = Table.mapValues(earnings.team, Math.round)
 	self.playerEarnings = Table.mapValues(earnings.other, Math.round)
-
-	Variables.varDefine('playerEarnings', Json.stringify(self.playerEarnings))
-	Variables.varDefine('teamEarnings', Json.stringify(self.teamEarnings))
-	Variables.varDefine('medals', Json.stringify(medals))
 
 	local totalEarningsTotal = Table.extract(totalEarnings, 'total')
 	--due to the table extract now totalEarnings is of format `table<integer, number>`
@@ -328,7 +324,12 @@ end
 function CustomTeam:defineCustomPageVariables(args)
 	if not self:shouldStore(args) then
 		Variables.varDefine('disable_SMW_storage', 'true')
+		return
 	end
+
+	Variables.varDefine('playerEarnings', Json.stringify(self.playerEarnings))
+	Variables.varDefine('teamEarnings', Json.stringify(self.teamEarnings))
+	Variables.varDefine('medals', Json.stringify(self.medals))
 end
 
 return CustomTeam
