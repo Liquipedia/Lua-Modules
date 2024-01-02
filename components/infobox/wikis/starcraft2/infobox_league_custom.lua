@@ -170,7 +170,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {self.caller:_getGameVersion(args)}},
+			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}},
 			Cell{name = 'Server', content = {self.caller:_getServer(args)}}
 		}
 	elseif id == 'customcontent' then
@@ -178,7 +178,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Title{name = 'Participants'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Cell{name = 'Number of teams', content = {args.team_number}},
+				Cell{name = 'Number of Teams', content = {args.team_number}},
 				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
