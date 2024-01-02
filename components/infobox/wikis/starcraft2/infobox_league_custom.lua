@@ -51,7 +51,6 @@ function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
-	league.args.game = league.args.game == GAME_MOD and GAME_MOD or Game.name{game = league.args.game}
 	league.args.liquipediatiertype = league.args.liquipediatiertype or league.args.tiertype
 
 	return league:createInfobox()
