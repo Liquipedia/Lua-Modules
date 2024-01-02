@@ -39,8 +39,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local doStore = true
-
 ---@class StarcraftInfoboxTeam: InfoboxTeam
 ---@field totalEarningsWhileOnTeam number
 ---@field earningsWhileOnTeam table<integer, number>
