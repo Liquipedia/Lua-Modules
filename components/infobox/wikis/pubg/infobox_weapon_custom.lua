@@ -47,19 +47,18 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Maps', content = {args.maps}}
 		)
 
-		if String.isNotEmpty(args.map1) then
-		local maps = {}
-
-		for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-			table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
-						PageLink.makeInternalLink({}, map)
-					)))
-
+		if String.isEmpty(args.map1) then
+			return widgets
 		end
+
+		local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
+			return tostring(CustomWeapon:_createNoWrappingSpan(PageLink.makeInternalLink({}, map)))
+		end)
+
 		table.insert(widgets, Title{name = 'Maps'})
 		table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 	end
-	end
+
 	return widgets
 end
 
@@ -71,4 +70,5 @@ function CustomWeapon:_createNoWrappingSpan(content)
 		:node(content)
 	return span
 end
+
 return CustomWeapon
