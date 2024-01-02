@@ -181,9 +181,6 @@ end
 ---@return number
 ---@return table<integer, number>
 function CustomTeam:getEarningsAndMedalsData()
-	local query = 'liquipediatier, liquipediatiertype, placement, date, opponentname'
-		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
-
 	self.cleanPageName = self.pagename:gsub(' ', '_')
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any):add{
@@ -236,7 +233,8 @@ function CustomTeam:getEarningsAndMedalsData()
 
 	Lpdb.executeMassQuery('placement', {
 		conditions = conditions:toString(),
-		query = query,
+		query = 'liquipediatier, liquipediatiertype, placement, date, opponentname, '
+			.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype',
 		order = 'weight desc, liquipediatier asc, placement asc',
 	}, processPlacement)
 
