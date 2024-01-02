@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -31,9 +32,7 @@ end
 ---@param default any
 ---@return string[]
 function User:_getArgsfromBaseDefault(base, default)
-	local foundArgs = self:getAllArgsForBase(self.args, base)
-	table.insert(foundArgs, self.args[default])
-	return foundArgs
+	return Array.appendWith(self:getAllArgsForBase(self.args, base), self.args[default])
 end
 
 ---@param args table
