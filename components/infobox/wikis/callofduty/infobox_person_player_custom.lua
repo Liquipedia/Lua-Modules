@@ -48,6 +48,7 @@ function CustomInjector:parse(id, widgets)
 		local manualHistory = _args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
+			addlpdbdata = 'true',
 			player = _pagename
 		}
 
