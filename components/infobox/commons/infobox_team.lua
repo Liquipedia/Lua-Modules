@@ -333,6 +333,8 @@ function Team:calculateEarnings(args)
 		team = self.pagename or self.name,
 		perYear = true,
 		queryHistorical = true,
+		queryHistorical = args.queryEarningsHistorical,
+		doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
 	}
 end
 
