@@ -52,7 +52,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'content' then
+	if id == 'custom' then
 		Array.extendWith(widgets, CustomTeam._statisticsCells(args))
 
 		if args.academy then
