@@ -46,7 +46,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}},
 			Cell{name = 'Maps', content = {args.maps}}
 		)
-		
+
 		if String.isNotEmpty(args.map1) then
 		local maps = {}
 
