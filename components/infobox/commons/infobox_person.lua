@@ -51,15 +51,25 @@ local _COUNTRIES_EASTERN_NAME_ORDER = {
 	'South Korea',
 	'Cambodia'
 }
+
 ---@enum PlayerStatus
 local Status = {
 	ACTIVE = 'Active',
 	INACTIVE = 'Inactive',
 	RETIRED = 'Retired',
-	['PASSED AWAY'] = 'Passed Away',
+	DECEASED = 'Passed Away',
 }
-local DECEASED = 'DECEASED'
-local BANNED = 'banned'
+
+local STATUS_TRANSLATE = {
+	active = Status.ACTIVE,
+	inactive = Status.INACTIVE,
+	retired = Status.RETIRED,
+	['passed away'] = Status.DECEASED,
+	deceased = Status.DECEASED, -- Temporary until conversion
+	banned = Status.INACTIVE, -- Temporary until conversion
+}
+
+local BANNED = 'banned' -- Temporary until conversion
 
 ---@param frame Frame
 ---@return string
@@ -73,13 +83,12 @@ function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	--catch legay inputs
+	-- Temporary until conversion
 	if (args.status or ''):lower() == BANNED then
 		args.banned = args.banned or true
-		args.status = Status.INACTIVE
-	elseif (args.status or ''):upper() == DECEASED then
-		args.status = Status['PASSED AWAY']
 	end
+
+	args.status = STATUS_TRANSLATE[args.status]
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
@@ -376,11 +385,10 @@ end
 ---@return PlayerStatus
 function Person:getStatusToStore(args)
 	if args.status then
-		local status = Status[args.status:upper()]
-		assert(status, 'Invalid status "' .. args.status .. '"')
-		return status
+		assert(args.status, 'Invalid status "' .. args.status .. '"')
+		return args.status
 	elseif args.death_date then
-		return Status['PASSED AWAY']
+		return Status.DECEASED
 	elseif Logic.readBool(args.retired) or string.match(args.retired or '', '%d%d%d%d') then
 		return Status.RETIRED
 	elseif Logic.readBool(args.inactive) then
