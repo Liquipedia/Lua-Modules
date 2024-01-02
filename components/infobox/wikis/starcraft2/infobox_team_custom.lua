@@ -323,7 +323,7 @@ end
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	if not self:shouldStore(args) then
-		Variables.varDefine('disable_SMW_storage', 'true')
+		Variables.varDefine('disable_LPDB_storage', 'true')
 		return
 	end
 
