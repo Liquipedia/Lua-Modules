@@ -81,6 +81,8 @@ function CustomPlayer.run(frame)
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
 
+	player.args.banned = tostring(player.args.banned or '')
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector

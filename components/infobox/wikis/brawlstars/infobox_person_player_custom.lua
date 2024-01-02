@@ -50,7 +50,6 @@ function CustomPlayer.run(frame)
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
-	player.getStatusToStore = CustomPlayer.getStatusToStore
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
@@ -204,12 +203,6 @@ function CustomPlayer:getPersonType(args)
 	end
 
 	return {store = 'Player', category = 'Player'}
-end
-
-function CustomPlayer:getStatusToStore(args)
-	if String.isNotEmpty(args.status) then
-		return mw.getContentLanguage():ucfirst(args.status)
-	end
 end
 
 function CustomPlayer._getRole(roleInput)

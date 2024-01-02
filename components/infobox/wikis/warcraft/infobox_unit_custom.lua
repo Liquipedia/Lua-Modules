@@ -26,7 +26,8 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomUnit = Class.new()
+---@class WarcraftUnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
@@ -41,99 +42,92 @@ local ADDITIONAL_UNIT_RACES = {
 	c = 'Creeps',
 }
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
-
-	unit.nameDisplay = CustomUnit.nameDisplay
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 
 	return unit:createInfobox()
 end
 
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local mana = Shared.manaValues(_args)
-	local acquisitionRange = tonumber(_args.acq_range) or 0
-	local level = tonumber(_args.level) or 0
-	local race = Faction.toName(Faction.read(_args.race)) or ADDITIONAL_UNIT_RACES[string.lower(_args.race or '')]
+function CustomUnit:addCustomCells(widgets)
+	local args = self.args
+
+	local mana = Shared.manaValues(args)
+	local acquisitionRange = tonumber(args.acq_range) or 0
+	local level = tonumber(args.level) or 0
+	local race = Faction.toName(Faction.read(args.race)) or ADDITIONAL_UNIT_RACES[string.lower(args.race or '')]
 
 	Array.appendWith(widgets,
-		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or _args.race}},
+		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or args.race}},
 		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
-			_args.class and String.convertWikiListToHtmlList(_args.class) or nil}},
-		Cell{name = 'Bounty Awarded', content = {CustomUnit._bounty(_args)}},
-		Cell{name = 'Sleeps', content = {_args.sleeps}},
-		Cell{name = 'Cargo Capacity', content = {_args.cargo_capacity}},
-		Cell{name = 'Morphs into', content = {_args.morphs}},
-		Cell{name = 'Duration', content = {_args.duration}},
-		Cell{name = 'Formation Rank', content = {_args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {_args.daysight .. ' / ' .. _args.nightsight}},
+			args.class and String.convertWikiListToHtmlList(args.class) or nil}},
+		Cell{name = 'Bounty Awarded', content = {CustomUnit._bounty(args)}},
+		Cell{name = 'Sleeps', content = {args.sleeps}},
+		Cell{name = 'Cargo Capacity', content = {args.cargo_capacity}},
+		Cell{name = 'Morphs into', content = {args.morphs}},
+		Cell{name = 'Duration', content = {args.duration}},
+		Cell{name = 'Formation Rank', content = {args.formationrank}},
+		Cell{name = '[[Sight_Range|Sight]]', content = {args.daysight .. ' / ' .. args.nightsight}},
 		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
 		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
-			level > 0 and ('[[Experience|'.._args.level..']]') or nil}},
+			level > 0 and ('[[Experience|'..args.level..']]') or nil}},
 		Cell{name = '[[Mana]]', content = {mana.manaDisplay}},
 		Cell{name = '[[Mana|Initial Mana]]', content = {mana.initialManaDisplay}},
 		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', content = {mana.manaRegenDisplay}},
-		Cell{name = 'Selection Priorty', content = {_args.priority}}
+		Cell{name = 'Selection Priorty', content = {args.priority}}
 	)
 
-	local movement = Shared.movement(_args, 'Movement')
+	local movement = Shared.movement(args, 'Movement')
 	if movement then
 		Array.appendWith(widgets, unpack(movement))
 	end
 
-	local mercenaryStats = Shared.mercenaryStats(_args)
+	local mercenaryStats = Shared.mercenaryStats(args)
 	if mercenaryStats then
 		Array.appendWith(widgets, unpack(mercenaryStats))
 	end
 
-	if _args.icon then
+	if args.icon then
 		Array.appendWith(widgets,
 			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. _args.icon .. '.png]]'}}
+			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 
-	return Array.append(widgets, unpack(Shared.attackDisplay(_args)))
+	return Array.append(widgets, unpack(Shared.attackDisplay(args)))
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _args.race,
-				gold = _args.gold,
-				lumber = _args.lumber,
-				buildTime = _args.build_time,
-				food = _args.food,
+				faction = args.race,
+				gold = args.gold,
+				lumber = args.lumber,
+				buildTime = args.build_time,
+				food = args.food,
 			}}},
 		}
 	elseif id == 'requirements' then
-		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}}}
+		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'defense' then
 		return {
-			Cell{name = '[[Hit Points|Hit Points]]', content = {CustomUnit:_defenseDisplay()}},
+			Cell{name = '[[Hit Points|Hit Points]]', content = {self.caller:_defenseDisplay()}},
 			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', content = {
-				Shared.hitPointsRegeneration(_args, {display = true})}},
-			Cell{name = '[[Armor|Armor]]', content = {CustomUnit:_armorDisplay()}}
+				Shared.hitPointsRegeneration(args, {display = true})}},
+			Cell{name = '[[Armor|Armor]]', content = {self.caller:_armorDisplay()}}
 		}
 	elseif id == 'attack' then return {}
+	elseif id == 'custom' then
+		return self.caller:addCustomCells(widgets)
 	end
 
 	return widgets
@@ -150,18 +144,18 @@ end
 
 ---@return string
 function CustomUnit:_defenseDisplay()
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if tonumber(_args.hitpoint_bonus) > 0 then
-		return display .. ' (' .. _args.hp + _args.hitpoint_bonus .. ')'
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if tonumber(self.args.hitpoint_bonus) > 0 then
+		return display .. ' (' .. self.args.hp + self.args.hitpoint_bonus .. ')'
 	end
 	return display
 end
 
 ---@return string
 function CustomUnit:_armorDisplay()
-	local display = ArmorIcon.run(_args.armortype) .. ' ' .. (_args.armor or 0)
-	if _args.armor_upgrades then
-		display = display.. ' (' .. (_args.armor + _args.armor_upgrades) .. ')'
+	local display = ArmorIcon.run(self.args.armortype) .. ' ' .. (self.args.armor or 0)
+	if self.args.armor_upgrades then
+		display = display.. ' (' .. (self.args.armor + self.args.armor_upgrades) .. ')'
 	end
 	return display
 end
@@ -177,11 +171,11 @@ end
 
 ---@return string?
 function CustomUnit:_getHotkeys()
-	if not String.isEmpty(_args.shortcut) then
-		if not String.isEmpty(_args.shortcut2) then
-			return Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'arrow')
+	if not String.isEmpty(self.args.shortcut) then
+		if not String.isEmpty(self.args.shortcut2) then
+			return Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
 		else
-			return Hotkeys.hotkey(_args.shortcut)
+			return Hotkeys.hotkey(self.args.shortcut)
 		end
 	end
 end

@@ -27,7 +27,7 @@ local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Team Principals, Race Engi
 local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'cinnabar-bg',
-	deceased = 'gray-bg',
+	['passed away'] = 'gray-bg',
 }
 
 local CustomPortalPlayers = {}
@@ -129,7 +129,7 @@ function CustomPortalPlayers._getAge(player)
 	})
 
 	if not ageCalculationSuccess then
-		return age
+		return age --[[@as string]]
 	end
 
 	if age.death then

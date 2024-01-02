@@ -17,38 +17,35 @@ local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomShow = Class.new()
-
-local _show
-local _args
+---@class Starcraft2ShowInfobox: ShowInfobox
+local CustomShow = Class.new(Show)
 
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomShow.run(frame)
-	local customShow = Show(frame)
-	_show = customShow
-	_args = customShow.args
-	customShow.createWidgetInjector = CustomShow.createWidgetInjector
-	return customShow:createInfobox()
+	local show = CustomShow(frame)
+	show:setWidgetInjector(CustomInjector(show))
+
+	if Namespace.isMain() and show.args.edate == nil then
+		show.infobox:categories('Active Shows')
+	end
+
+	return show:createInfobox()
 end
 
-function CustomShow:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(
-		widgets,
-		Cell{name = 'No. of episodes', content = {_args['num_episodes']}},
-		Cell{name = 'Original Release', content = {CustomShow:_getReleasePeriod(_args.sdate, _args.edate)}}
-	)
-
-	if Namespace.isMain() and _args.edate == nil then
-		_show.infobox:categories('Active Shows')
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'No. of episodes', content = {args['num_episodes']}},
+			Cell{name = 'Original Release', content = {self.caller:_getReleasePeriod(args.sdate, args.edate)}}
+		)
 	end
 
 	return widgets
