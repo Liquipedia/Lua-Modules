@@ -12,10 +12,12 @@ local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -32,7 +34,6 @@ local CustomTeam = Class.new(Team)
 
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
-local EARNINGS_MODES = {team = 'team'}
 
 local CustomInjector = Class.new(Injector)
 
@@ -45,49 +46,32 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.earnings = self.totalEarnings
-
-	return lpdbData
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
-		local earningsWhileOnTeam
-		self.caller.totalEarnings, earningsWhileOnTeam = self.caller:calculateEarnings()
-		local earningsDisplay
-		if self.caller.totalEarnings == 0 then
-			earningsDisplay = nil
-		else
-			earningsDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarnings)
-		end
-		local earningsFromPlayersDisplay
-		if earningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. mw.language.new('en'):formatNum(earningsWhileOnTeam)
-		end
-		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
-		}
+		local playerEarnings = self.caller.totalPlayerEarnings
+		table.insert(widgets, Cell{
+			name = PLAYER_EARNINGS_ABBREVIATION,
+			content = {playerEarnings ~= 0 and ('$' .. mw.language.new('en'):formatNum(Math.round(playerEarnings))) or nil}
+		})
 	end
+
 	return widgets
 end
 
 ---@return number
----@return number
+---@return table<integer, number>
 function CustomTeam:calculateEarnings()
+	self.totalPlayerEarnings = 0
+
 	if not Namespace.isMain() then
-		return 0, 0
+		return 0, {}
 	end
 
 	local team = self.pagename
-	local query = 'individualprizemoney, prizemoney, players, date, mode'
+	local query = 'individualprizemoney, prizemoney, opponentplayers, opponenttype, date, mode'
 
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
@@ -113,56 +97,40 @@ function CustomTeam:calculateEarnings()
 		query = query,
 	}
 
-	local earnings = {total = {}}
-	local playerEarnings = 0
+	local earnings = {total = 0}
 
 	local processPlacement = function(placement)
-		earnings, playerEarnings = self:_addPlacementToEarnings(earnings, playerEarnings, placement)
+		self:_addPlacementToEarnings(earnings, placement)
 	end
 
 	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
-
-	if earnings.team == nil then
-		earnings.team = {}
-	end
 
 	if Namespace.isMain() then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
 				name = self.pagename,
-				information = playerEarnings,
+				information = self.totalPlayerEarnings,
 		})
 	end
 
-	Variables.varDefine('earnings', earnings.team.total or 0)
+	local totalEarnings = Math.round(Table.extract(earnings, 'total'))
 
-	return Math.round(earnings.team.total or 0), Math.round(playerEarnings or 0)
+	return totalEarnings, earnings
 end
 
 ---@param earnings table
----@param playerEarnings number
 ---@param data placement
----@return table
----@return number
-function CustomTeam:_addPlacementToEarnings(earnings, playerEarnings, data)
+function CustomTeam:_addPlacementToEarnings(earnings, data)
 	local prizeMoney = data.prizemoney
-	data.players = data.players or {}
-	local mode = data.players.type or data.mode or ''
-	mode = EARNINGS_MODES[mode]
-	if not mode then
-		prizeMoney = data.individualprizemoney * self:_amountOfTeamPlayersInPlacement(data.players)
-		playerEarnings = playerEarnings + prizeMoney
-		mode = 'other'
-	end
-	if not earnings[mode] then
-		earnings[mode] = {}
-	end
-	local date = string.sub(data.date, 1, 4)
-	earnings[mode][date] = (earnings[mode][date] or 0) + prizeMoney
-	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + prizeMoney
-	earnings['total'][date] = (earnings['total'][date] or 0) + prizeMoney
 
-	return earnings, playerEarnings
+	if data.opponenttype ~= Opponent.team then
+		prizeMoney = data.individualprizemoney * self:_amountOfTeamPlayersInPlacement(data.opponentplayers)
+		self.totalPlayerEarnings = self.totalPlayerEarnings + prizeMoney
+	end
+
+	local date = tonumber(string.sub(data.date, 1, 4)) --[[@as integer]]
+	earnings[date] = (earnings[date] or 0) + prizeMoney
+	earnings.total = earnings.total + prizeMoney
 end
 
 ---@param players table

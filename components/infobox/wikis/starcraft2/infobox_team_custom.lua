@@ -20,9 +20,11 @@ local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -42,11 +44,12 @@ local CustomTeam = Class.new(Team)
 
 local CustomInjector = Class.new(Injector)
 
-local EARNINGS_MODES = {team = Opponent.team}
 local ALLOWED_PLACES = {'1', '2', '3', '4', '3-4'}
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 20
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
@@ -60,21 +63,14 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
-	elseif id == 'earnings' then
-		self.caller:calculateEarnings(args)
-		local earningsDisplay
-		if self.caller.totalEarnings > 0 then
-			earningsDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarnings)
+	if id == 'earnings' then
+		local displayEarnings = function(value)
+			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
 		end
-		local earningsFromPlayersDisplay
-		if self.caller.totalEarningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarningsWhileOnTeam)
-		end
+
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
+			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings.total)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings.total)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
@@ -96,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
+				Breakdown{content = raceBreakdown.display, classes = {'infobox-center'}}
 			)
 		end
 
@@ -121,9 +117,13 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = nil
 	lpdbData.extradata.subteams = self:_listSubTeams()
 
-	lpdbData.extradata.playerearnings = self.totalEarningsWhileOnTeam
-	for year, playerEarningsOfYear in pairs(self.earningsWhileOnTeam or {}) do
+	lpdbData.extradata.playerearnings = Table.extract(self.playerEarnings, 'total')
+	lpdbData.extradata.teamearnings = Table.extract(self.teamEarnings, 'total')
+	for year, playerEarningsOfYear in pairs(self.playerEarnings or {}) do
 		lpdbData.extradata['playerearningsin' .. year] = playerEarningsOfYear
+	end
+	for year, teamEarningsOfYear in pairs(self.teamEarnings or {}) do
+		lpdbData.extradata['teamearningsin' .. year] = teamEarningsOfYear
 	end
 
 	return lpdbData
@@ -156,179 +156,155 @@ function CustomTeam:_listSubTeams()
 end
 
 ---@param args table
-function CustomTeam:calculateEarnings(args)
-	-- set default values for the non query case
-	self.earnings = {}
-	self.totalEarnings = 0
-	self.earningsWhileOnTeam = {}
-	self.totalEarningsWhileOnTeam = 0
-
-	if
-		Logic.readBool(args.disable_lpdb) or
-		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
-		(not Namespace.isMain())
-	then
-		Variables.varDefine('disable_LPDB_storage', 'true')
-	else
-		self:getEarningsAndMedalsData(self.pagename)
-		Variables.varDefine('earnings', self.totalEarnings)
-	end
+---@return boolean
+function CustomTeam:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(args.disable_lpdb) and
+		not Logic.readBool(args.disable_storage) and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
----@param team string
-function CustomTeam:getEarningsAndMedalsData(team)
-	local query = 'liquipediatier, liquipediatiertype, placement, date, '
-		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
+---@param args table
+---@return number
+---@return table<integer, number>
+function CustomTeam:calculateEarnings(args)
+	self.teamEarnings = {total = 0}
+	self.playerEarnings = {total = 0}
 
-	local playerTeamConditions = ConditionTree(BooleanOperator.any)
+	if not self:shouldStore(args) then
+		return 0, {}
+	end
+
+	return self:getEarningsAndMedalsData()
+end
+
+---@return number
+---@return table<integer, number>
+function CustomTeam:getEarningsAndMedalsData()
+	self.cleanPageName = self.pagename:gsub(' ', '_')
+
+	local playerTeamConditions = ConditionTree(BooleanOperator.any):add{
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.pagename),
+		ConditionNode(ColumnName('opponentname'), Comparator.eq, self.cleanPageName),
+	}
+
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerTeamConditions:add{
-			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, team),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.pagename),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, self.cleanPageName),
 		}
 	end
 
 	local placementConditions = ConditionTree(BooleanOperator.any)
 	for _, item in pairs(ALLOWED_PLACES) do
-		placementConditions:add{
+		placementConditions:add({
 			ConditionNode(ColumnName('placement'), Comparator.eq, item),
-		}
+		})
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
-				ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
 				placementConditions,
+				ConditionTree(BooleanOperator.any):add{
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.team),
+					ConditionNode(ColumnName('opponenttype'), Comparator.eq, Opponent.solo),
+				},
 			},
 		},
-		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
-			ConditionTree(BooleanOperator.all):add{
-				ConditionNode(ColumnName('opponenttype'), Comparator.neq, Opponent.team),
-				playerTeamConditions
-			},
-		},
+		playerTeamConditions,
 	}
 
-	local queryParameters = {
-		conditions = conditions:toString(),
-		query = query,
-		order = 'weight desc, liquipediatier asc, placement asc',
-	}
-
-	local earnings = {}
-	local medals = {}
-	local teamMedals = {}
-	local playerEarnings = 0
-	earnings['total'] = {}
-	medals['total'] = {}
-	teamMedals['total'] = {}
-
+	local earnings = {total = {total = 0}, team = {total = 0}, other = {total = 0}}
+	self.medals = {solo = {}, team = {}}
 	local processPlacement = function(placement)
-		--handle earnings
-		earnings, playerEarnings = self:_addPlacementToEarnings(earnings, playerEarnings, placement)
+		self:_addPlacementToEarnings(placement, earnings)
 
 		--handle medals
 		local mode = placement.opponenttype
-		if mode == Opponent.solo then
-			medals = CustomTeam._addPlacementToMedals(medals, placement)
-		elseif mode == Opponent.team then
-			teamMedals = CustomTeam._addPlacementToMedals(teamMedals, placement)
+		if mode == Opponent.solo or (mode == Opponent.team and self:_isCorrectTeam(placement.opponentname)) then
+			CustomTeam:_addPlacementToMedals(self.medals[mode], placement)
 		end
 	end
 
-	Lpdb.executeMassQuery('placement', queryParameters, processPlacement)
+	Lpdb.executeMassQuery('placement', {
+		conditions = conditions:toString(),
+		query = 'liquipediatier, liquipediatiertype, placement, date, opponentname, '
+			.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype',
+		order = 'weight desc, liquipediatier asc, placement asc',
+	}, processPlacement)
 
-	CustomTeam._setVarsFromTable(earnings)
-	CustomTeam._setVarsFromTable(medals)
-	CustomTeam._setVarsFromTable(teamMedals, 'team_')
+	local totalEarnings = Table.mapValues(earnings.total, Math.round)
+	self.teamEarnings = Table.mapValues(earnings.team, Math.round)
+	self.playerEarnings = Table.mapValues(earnings.other, Math.round)
 
-	if earnings.team == nil then
-		earnings.team = {}
-	end
-
-	for _, earningsTable in pairs(earnings) do
-		for key, value in pairs(earningsTable) do
-			earningsTable[key] = Math.round(value)
-		end
-	end
-
-	self.totalEarnings = Table.extract(earnings.team or {}, 'total') or 0
-	self.earnings = earnings.team or {}
-	self.totalEarningsWhileOnTeam = Table.extract(earnings.other or {}, 'total') or 0
-	self.earningsWhileOnTeam = earnings.other or {}
+	local totalEarningsTotal = Table.extract(totalEarnings, 'total')
+	--due to the table extract now totalEarnings is of format `table<integer, number>`
+	return totalEarningsTotal, totalEarnings --[[@as table<integer, number>]]
 end
 
----@param earnings table
----@param playerEarnings number
----@param data placement
----@return table
----@return number
-function CustomTeam:_addPlacementToEarnings(earnings, playerEarnings, data)
-	local prizeMoney = data.prizemoney
-	data.opponentplayers = data.opponentplayers or {}
-	local mode = data.opponenttype --[[@as string]]
-	mode = EARNINGS_MODES[mode]
-	if not mode then
-		prizeMoney = data.individualprizemoney * self:_amountOfTeamPlayersInPlacement(data.opponentplayers)
-		playerEarnings = playerEarnings + prizeMoney
-		mode = 'other'
-	end
-	if not earnings[mode] then
-		earnings[mode] = {}
-	end
-	local date = string.sub(data.date, 1, 4)
-	earnings[mode][date] = (earnings[mode][date] or 0) + prizeMoney
-	earnings[mode]['total'] = (earnings[mode]['total'] or 0) + prizeMoney
-	earnings['total'][date] = (earnings['total'][date] or 0) + prizeMoney
+---@param team string
+---@return boolean
+function CustomTeam:_isCorrectTeam(team)
+	return team == self.pagename or team == self.cleanPageName
+end
 
-	return earnings, playerEarnings
+---@param tbl table
+---@param value number
+---@param year integer
+function CustomTeam:_addToEarningsTable(tbl, value, year)
+	tbl[year] = (tbl[year] or 0) + value
+	tbl.total = tbl.total + value
+end
+
+---@param data placement
+---@param earnings table
+function CustomTeam:_addPlacementToEarnings(data, earnings)
+	local prize = tonumber(data.prizemoney) or 0
+	if prize == 0 then return end
+
+	data.opponentplayers = data.opponentplayers or {}
+
+	local mode = self:_isCorrectTeam(data.opponentname) and 'team' or 'other'
+
+	if mode == 'other' then
+		prize = (tonumber(data.individualprizemoney) or 0) * self:_amountOfTeamPlayersInPlacement(data.opponentplayers)
+	end
+
+	local year = tonumber(string.sub(data.date, 1, 4)) --[[@as number]]
+
+	self:_addToEarningsTable(earnings[mode], prize, year)
+	self:_addToEarningsTable(earnings.total, prize, year)
 end
 
 ---@param medals table
 ---@param data placement
+function CustomTeam:_addPlacementToMedals(medals, data)
+	if data.liquipediatiertype == 'Qualifier' or not Table.includes(ALLOWED_PLACES, data.placement or '') then
+		return
+	end
+
+	local place = data.placement
+	local tier = data.liquipediatier or 'undefined'
+
+	medals[tier] = medals[tier] or self:_emptyMedalsTable()
+	medals.total = medals.total or self:_emptyMedalsTable()
+
+	medals[tier].total = medals[tier].total + 1
+	medals[tier][place] = medals[tier][place] + 1
+	medals.total[place] = medals.total[place] + 1
+	medals.total.total = medals.total.total + 1
+end
+
 ---@return table
-function CustomTeam._addPlacementToMedals(medals, data)
-	local place = CustomTeam._placements(data.placement)
-	if place then
-		if data.liquipediatiertype ~= 'Qualifier' then
-			local tier = data.liquipediatier or 'undefined'
-			if not medals[place] then
-				medals[place] = {}
-			end
-			medals[place][tier] = (medals[place][tier] or 0) + 1
-			medals[place]['total'] = (medals[place]['total'] or 0) + 1
-			medals['total'][tier] = (medals['total'][tier] or 0) + 1
-		end
-	end
+function CustomTeam:_emptyMedalsTable()
+	local dataSet = Table.map(ALLOWED_PLACES, function(_, placement) return placement, 0 end)
 
-	return medals
-end
-
----@param tbl table
----@param prefix string?
-function CustomTeam._setVarsFromTable(tbl, prefix)
-	for key1, item1 in pairs(tbl) do
-		for key2, item2 in pairs(item1) do
-			Variables.varDefine((prefix or '') .. key1 .. '_' .. key2, item2)
-		end
-	end
-end
-
----@param value string?
----@return string?
-function CustomTeam._placements(value)
-	value = mw.text.split(value or '', '-')[1]
-	if value == '1' or value == '2' then
-		return value
-	elseif value == '3' then
-		return 'sf'
-	end
+	return Table.merge(dataSet, {total = 0})
 end
 
 ---@param players table
@@ -342,6 +318,18 @@ function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	end
 
 	return amount
+end
+
+---@param args table
+function CustomTeam:defineCustomPageVariables(args)
+	if not self:shouldStore(args) then
+		Variables.varDefine('disable_LPDB_storage', 'true')
+		return
+	end
+
+	Variables.varDefine('playerEarnings', Json.stringify(self.playerEarnings))
+	Variables.varDefine('teamEarnings', Json.stringify(self.teamEarnings))
+	Variables.varDefine('medals', Json.stringify(self.medals))
 end
 
 return CustomTeam

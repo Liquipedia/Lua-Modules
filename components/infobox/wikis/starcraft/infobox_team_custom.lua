@@ -21,9 +21,11 @@ local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -36,8 +38,6 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
-
-local doStore = true
 
 ---@class StarcraftInfoboxTeam: InfoboxTeam
 ---@field totalEarningsWhileOnTeam number
@@ -71,18 +71,13 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
 	elseif id == 'earnings' then
-		self.caller:calculateEarnings(args)
-		local earningsDisplay
-		if self.caller.totalEarnings > 0 then
-			earningsDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarnings)
+		local displayEarnings = function(value)
+			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
 		end
-		local earningsFromPlayersDisplay
-		if self.caller.totalEarningsWhileOnTeam > 0 then
-			earningsFromPlayersDisplay = '$' .. mw.language.new('en'):formatNum(self.caller.totalEarningsWhileOnTeam)
-		end
+
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {earningsDisplay}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {earningsFromPlayersDisplay}},
+			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.totalEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.totalEarningsWhileOnTeam)}},
 		}
 	elseif id == 'achievements' then
 		table.insert(widgets, Cell{name = 'Solo Achievements', content = {args['solo achievements']}})
@@ -124,9 +119,11 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
-function CustomTeam:getWikiCategories()
+---@param args table
+---@return string[]
+function CustomTeam:getWikiCategories(args)
 	local categories = {}
-	if String.isNotEmpty(self.args.disbanded) then
+	if String.isNotEmpty(args.disbanded) then
 		table.insert(categories, 'Disbanded Teams')
 	end
 	return categories
@@ -135,6 +132,7 @@ end
 -- gets a list of sub/accademy teams of the team
 -- this data can be used in results queries to include
 -- results of accademy teams of the current team
+---@return string?
 function CustomTeam:_listSubTeams()
 	if String.isEmpty(self.args.subteam) and String.isEmpty(self.args.subteam1) then
 		return nil
@@ -147,29 +145,36 @@ function CustomTeam:_listSubTeams()
 	return Json.stringify(subTeamsToStore)
 end
 
-function CustomTeam:calculateEarnings(args)
-	-- set default values for the non query case
-	self.earnings = {}
-	self.totalEarnings = 0
-	self.earningsWhileOnTeam = {}
-	self.totalEarningsWhileOnTeam = 0
+---@param args table
+---@return boolean
+function CustomTeam:shouldStore(args)
+	return Namespace.isMain() and
+		not Logic.readBool(args.disable_lpdb) and
+		not Logic.readBool(args.disable_storage) and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+end
 
-	if
-		Logic.readBool(args.disable_smw) or
-		Logic.readBool(args.disable_lpdb) or
-		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
-		(not Namespace.isMain())
-	then
-		doStore = false
-		Variables.varDefine('disable_LPDB_storage', 'true')
-	else
-		self:getEarningsAndMedalsData(self.pagename)
-		Variables.varDefine('earnings', self.totalEarnings)
+---@param args table
+---@return number
+---@return table<integer, number>
+function CustomTeam:calculateEarnings(args)
+	if not self:shouldStore(args) then
+		self.totalEarningsWhileOnTeam = 0
+		self.earningsWhileOnTeam = {}
+		return 0, {}
 	end
+
+	local total, yearly, playerTotal, playerYearly = self:getEarningsAndMedalsData(self.pagename)
+	self.totalEarningsWhileOnTeam = playerTotal or 0
+	self.earningsWhileOnTeam = playerYearly or {}
+	return total or 0, yearly or {}
 end
 
 ---@param team string
+---@return number
+---@return table<integer, number>
+---@return number
+---@return table<integer, number>
 function CustomTeam:getEarningsAndMedalsData(team)
 	local query = 'liquipediatier, liquipediatiertype, placement, date, '
 		.. 'individualprizemoney, prizemoney, opponentplayers, opponenttype'
@@ -247,7 +252,7 @@ function CustomTeam:getEarningsAndMedalsData(team)
 	end
 
 	-- to be removed after a purge run + consumer updates
-	if doStore then
+	if self:shouldStore(self.args) then
 		mw.ext.LiquipediaDB.lpdb_datapoint('total_earnings_players_while_on_team_' .. team, {
 				type = 'total_earnings_players_while_on_team',
 				name = self.pagename,
@@ -261,10 +266,8 @@ function CustomTeam:getEarningsAndMedalsData(team)
 		end
 	end
 
-	self.totalEarnings = Table.extract(earnings.team or {}, 'total') or 0
-	self.earnings = earnings.team or {}
-	self.totalEarningsWhileOnTeam = Table.extract(earnings.other or {}, 'total') or 0
-	self.earningsWhileOnTeam = earnings.other or {}
+	return Table.extract(earnings.team or {}, 'total'), earnings.team or {},
+		Table.extract(earnings.other or {}, 'total'), earnings.other or {}
 end
 
 ---@param earnings table
@@ -345,6 +348,13 @@ function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	end
 
 	return amount
+end
+
+---@param args table
+function CustomTeam:defineCustomPageVariables(args)
+	if not self:shouldStore(args) then
+		Variables.varDefine('disable_LPDB_storage', 'true')
+	end
 end
 
 return CustomTeam
