@@ -10,9 +10,11 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
@@ -56,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if String.isNotEmpty(args.basedamage) and String.isEmpty(args.damage) then
 		local baseDamages = {}
-		for index, baseDamage in ipairs(Weapon:getAllArgsForBase(args, 'basedamage')) do
+		for index, baseDamage in ipairs(self.caller:getAllArgsForBase(args, 'basedamage')) do
 			table.insert(baseDamages, CustomWeapon:_createContextualNoWrappingSpan(baseDamage, index, DAMAGE_INFO))
 		end
 		if String.isNotEmpty(args.basedamagenote) then
@@ -67,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 
 	if String.isNotEmpty(args.ratesoffire) and String.isEmpty(args.rateoffireauto) then
 		local rofTimes = {}
-		for index, rofTime in ipairs(Weapon:getAllArgsForBase(args, 'ratesoffire')) do
+		for index, rofTime in ipairs(self.caller:getAllArgsForBase(args, 'ratesoffire')) do
 			table.insert(rofTimes, CustomWeapon:_createContextualNoWrappingSpan(rofTime, index, BOLT_INFO))
 		end
 		if String.isNotEmpty(args.ratesoffirenote) then
@@ -78,7 +80,7 @@ function CustomInjector:parse(id, widgets)
 
 	if String.isNotEmpty(args.ammocapacity) and String.isEmpty(args.ammocap) then
 		local ammoSizes = {}
-		for index, ammoSize in ipairs(Weapon:getAllArgsForBase(args, 'ammocapacity')) do
+		for index, ammoSize in ipairs(self.caller:getAllArgsForBase(args, 'ammocapacity')) do
 			table.insert(ammoSizes, CustomWeapon:_createContextualNoWrappingSpan(ammoSize, index, MAGAZINE_INFO))
 		end
 		if String.isNotEmpty(args.ammocapacitynote) then
@@ -89,7 +91,7 @@ function CustomInjector:parse(id, widgets)
 
 	if String.isNotEmpty(args.reloadtime) and String.isEmpty(args.reloadspeed) then
 		local reloadTimes = {}
-		for index, reloadTime in ipairs(Weapon:getAllArgsForBase(args, 'reloadtime')) do
+		for index, reloadTime in ipairs(self.caller:getAllArgsForBase(args, 'reloadtime')) do
 			table.insert(reloadTimes, CustomWeapon:_createContextualNoWrappingSpan(reloadTime, index, MAGAZINE_INFO))
 		end
 		if String.isNotEmpty(args.reloadtimenote) then
@@ -104,7 +106,7 @@ function CustomInjector:parse(id, widgets)
 
 	if String.isNotEmpty(args.attachment) then
 		local attachments = {}
-		for index, attachment in ipairs(Weapon:getAllArgsForBase(args, 'attachment')) do
+		for index, attachment in ipairs(self.caller:getAllArgsForBase(args, 'attachment')) do
 			table.insert(attachments, CustomWeapon:_createContextualNoWrappingSpan(attachment, index))
 		end
 		table.insert(widgets, Title{name = 'Attachment Slots'})
@@ -114,7 +116,7 @@ function CustomInjector:parse(id, widgets)
 	if String.isNotEmpty(args.hopup) then
 		local hopups = {}
 		args.hopupdesc1 = args.hopupdesc1 or args.hopupdesc
-		for index, hopup in ipairs(Weapon:getAllArgsForBase(args, 'hopup')) do
+		for index, hopup in ipairs(self.caller:getAllArgsForBase(args, 'hopup')) do
 			table.insert(hopups, CustomWeapon:_createContextualNoWrappingSpan(hopup, index))
 			table.insert(hopups, args['hopupdesc' .. index])
 		end
