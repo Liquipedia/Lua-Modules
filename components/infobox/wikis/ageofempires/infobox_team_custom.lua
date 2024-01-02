@@ -52,7 +52,7 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'earningscell' then
+	if id == 'earnings' then
 		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
 	elseif id == 'custom' then
