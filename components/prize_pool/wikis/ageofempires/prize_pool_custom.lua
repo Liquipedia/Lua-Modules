@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
@@ -82,6 +83,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	-- Variable to communicate with TeamCards
 	Variables.varDefine('enddate_' .. lpdbData.participant, lpdbData.date)
+	Variables.varDefine(lpdbData.objectName .. '_extradata', Json.stringify(lpdbData.extradata))
 
 	return lpdbData
 end
