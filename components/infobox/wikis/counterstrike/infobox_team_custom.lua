@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 			widgets[1], -- Coaches
 			Cell{name = 'Analysts', content = {args.analysts}},
 		}
-	elseif id == 'earningscell' then
+	elseif id == 'earnings' then
 		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
 	elseif id == 'custom' then
