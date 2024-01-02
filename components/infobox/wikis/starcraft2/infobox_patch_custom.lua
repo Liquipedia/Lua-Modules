@@ -7,9 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
 local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
@@ -17,55 +15,47 @@ local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPatch = Class.new()
-
-local _args
+---@class Starcraft2PatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-	return customPatch:createInfobox()
-end
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
 
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	return patch:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = 'SEA Release Date', content = {_args.searelease}},
-			Cell{name = 'NA Release Date', content = {_args.narelease}},
-			Cell{name = 'EU Release Date', content = {_args.eurelease}},
-			Cell{name = 'KR Release Date', content = {_args.korrelease}},
+			Cell{name = 'SEA Release Date', content = {args.searelease}},
+			Cell{name = 'NA Release Date', content = {args.narelease}},
+			Cell{name = 'EU Release Date', content = {args.eurelease}},
+			Cell{name = 'KR Release Date', content = {args.korrelease}},
 		}
 	end
 	return widgets
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomPatch:setLpdbData(args)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		local date = args.narelease or args.eurelease
-		local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-		mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-			name = args.name,
-			type = 'patch',
-			information = monthAndDay,
-			date = date,
-		})
-	end
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	local date = args.narelease or args.eurelease
+	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
+
+	lpdbData.information = monthAndDay
+	lpdbData.date = date
+
+	return lpdbData
 end
 
 ---@param args table

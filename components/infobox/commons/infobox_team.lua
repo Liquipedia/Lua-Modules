@@ -39,10 +39,9 @@ local Builder = Widgets.Builder
 ---@class InfoboxTeam : BasicInfobox
 local Team = Class.new(BasicInfobox)
 
-local _LINK_VARIANT = 'team'
+local LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
-local _defaultEarningsFunctionUsed = false
 
 ---@enum statuses
 local Status = {
@@ -50,13 +49,16 @@ local Status = {
 	DISBANDED = 'disbanded',
 }
 
-local _warnings = {}
+Team.warnings = {}
 
+---@param frame Frame
+---@return Html
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
+---@return Html
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -64,6 +66,9 @@ function Team:createInfobox()
 	--- Transform data
 	-- Links
 	local links = Links.transform(args)
+
+	-- Earnings
+	self.totalEarnings, self.yearlyEarnings = self:calculateEarnings(args)
 
 	-- Team Information
 	local team = args.teamtemplate or self.pagename
@@ -74,7 +79,7 @@ function Team:createInfobox()
 	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
 	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
 
-	-- Display
+	--- Display
 	local widgets = {
 		Header{
 			name = args.name,
@@ -118,32 +123,11 @@ function Team:createInfobox()
 		Customizable{
 			id = 'earnings',
 			children = {
-				Builder{
-					builder = function()
-						_defaultEarningsFunctionUsed = true
-						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
-							team = self.pagename or self.name,
-							perYear = true,
-							queryHistorical = args.queryEarningsHistorical,
-							doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
-						}
-						local totalEarningsDisplay
-						if self.totalEarnings > 0 then
-							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
-						end
-						return {
-							Customizable{id = 'earningscell',
-								children = {
-									Cell{name = Abbreviation.make(
-										'Approx. Total Winnings',
-										'Includes individual player earnings won&#10;while representing this team'
-									),
-									content = {totalEarningsDisplay}}
-								}
-							}
-						}
-					end
-				}
+				Cell{name = Abbreviation.make(
+					'Approx. Total Winnings',
+					'Includes individual player earnings won&#10;while representing this team'
+				),
+				content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -152,7 +136,7 @@ function Team:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = _LINK_VARIANT}
+						Widgets.Links{content = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -217,9 +201,14 @@ function Team:createInfobox()
 		self:defineCustomPageVariables(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(WarningBox.displayAll(self.warnings))
 end
 
+--to be reworked in another PR
+---@param region string?
+---@return string?
 function Team:_createRegion(region)
 	if String.isEmpty(region) then
 		return
@@ -228,6 +217,8 @@ function Team:_createRegion(region)
 	return Template.safeExpand(self.infobox.frame, 'Region', {region})
 end
 
+---@param location string?
+---@return string?
 function Team:_createLocation(location)
 	if String.isEmpty(location)then
 		return
@@ -250,12 +241,15 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
+---@return Html?
 function Team:_createUpcomingMatches()
 	if self:shouldStore(self.args) and Info.match2 > 0 then
 		return MatchTicker.team{short = true}
 	end
 end
 
+---@param location string?
+---@return string?
 function Team:getStandardLocationValue(location)
 	if String.isEmpty(location) then
 		return
@@ -265,7 +259,7 @@ function Team:getStandardLocationValue(location)
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
-			_warnings,
+			self.warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
 		return
@@ -274,9 +268,10 @@ function Team:getStandardLocationValue(location)
 	return locationToStore
 end
 
+---@param args table
+---@param links table
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = self.totalEarnings
 
 	local lpdbData = {
 		name = name,
@@ -288,8 +283,8 @@ function Team:_setLpdbData(args, links)
 		logodark = args.imagedark,
 		textlesslogo = args.teamcardimage,
 		textlesslogodark = args.teamcardimagedark,
-		earnings = earnings,
-		earningsbyyear = {},
+		earnings = self.totalEarnings,
+		earningsbyyear = self.yearlyEarnings or {},
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
@@ -302,32 +297,43 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(self.earnings or {}) do
+	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-
-	if String.isEmpty(lpdbData.earnings) and not _defaultEarningsFunctionUsed then
-		error('Since your wiki uses a customized earnings function you ' ..
-			'have to set the LPDB earnings storage in the custom module')
-	end
 
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality
+---@param args table
 function Team:defineCustomPageVariables(args)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function Team:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return boolean
 function Team:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+end
+
+---@param args table
+---@return number
+---@return table<integer, number?>?
+function Team:calculateEarnings(args)
+	return Earnings.calculateForTeam{
+		team = self.pagename or self.name,
+		perYear = true,
+		queryHistorical = true,
+	}
 end
 
 return Team
