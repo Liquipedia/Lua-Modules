@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
@@ -54,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 		local playerEarnings = self.caller.totalPlayerEarnings
 		table.insert(widgets, Cell{
 			name = PLAYER_EARNINGS_ABBREVIATION,
-			content = {playerEarnings ~= 0 and ('$' .. mw.language.new('en'):formatNum(Math.round(playerEarnings))) or nil}
+			content = {playerEarnings ~= 0 and ('$' .. Currency.formatMoney(playerEarnings)) or nil}
 		})
 	end
 

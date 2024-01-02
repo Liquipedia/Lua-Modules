@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -40,8 +41,6 @@ local Builder = Widgets.Builder
 local Team = Class.new(BasicInfobox)
 
 local LINK_VARIANT = 'team'
-
-local Language = mw.language.new('en')
 
 ---@enum statuses
 local Status = {
@@ -127,7 +126,7 @@ function Team:createInfobox()
 					'Approx. Total Winnings',
 					'Includes individual player earnings won&#10;while representing this team'
 				),
-				content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
+				content = {self.totalEarnings > 0 and ('$' .. Currency.formatMoney(self.totalEarnings)) or nil}}
 			}
 		},
 		Customizable{id = 'custom', children = {}},

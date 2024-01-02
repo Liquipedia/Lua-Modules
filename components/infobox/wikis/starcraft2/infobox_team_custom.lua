@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Currency = require('Module:Currency')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
@@ -65,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'earnings' then
 		local displayEarnings = function(value)
-			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
+			return value > 0 and ('$' .. Currency.formatMoney(value)) or nil
 		end
 
 		return {
