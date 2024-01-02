@@ -83,12 +83,12 @@ function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
-	-- Temporary until conversion
-	if (args.status or ''):lower() == BANNED then
+	local lowerStatus = (args.status or ''):lower()
+	if lowerStatus == BANNED then
+		-- Temporary until conversion
 		args.banned = args.banned or true
 	end
-
-	args.status = STATUS_TRANSLATE[args.status]
+	args.status = STATUS_TRANSLATE[lowerStatus]
 
 	if String.isEmpty(args.id) then
 		error('You need to specify an "id"')
@@ -385,7 +385,6 @@ end
 ---@return PlayerStatus
 function Person:getStatusToStore(args)
 	if args.status then
-		assert(args.status, 'Invalid status "' .. args.status .. '"')
 		return args.status
 	elseif args.death_date then
 		return Status.DECEASED
