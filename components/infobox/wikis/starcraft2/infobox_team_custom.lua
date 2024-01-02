@@ -60,9 +60,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
-	elseif id == 'earnings' then
+	if id == 'earnings' then
 		self.caller:calculateEarnings(args)
 		local earningsDisplay
 		if self.caller.totalEarnings > 0 then
