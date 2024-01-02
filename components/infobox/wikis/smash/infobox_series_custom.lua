@@ -17,25 +17,22 @@ local Cell = Widgets.Cell
 
 local CustomInjector = Class.new(Injector)
 
-local CustomSeries = {}
-
-local _series
+---@class SmashSeriesInfobox: SeriesInfobox
+local CustomSeries = Class.new(Series)
 
 ---@param frame Frame
 ---@return string
 function CustomSeries.run(frame)
-	_series = Series(frame)
+	local series = CustomSeries(frame)
+	series:setWidgetInjector(CustomInjector(series))
 
-	_series.createWidgetInjector = CustomSeries.createWidgetInjector
-	_series.addToLpdb = CustomSeries.addToLpdb
-	_series.createLiquipediaTierDisplay = function() return nil end
-
-	return _series:createInfobox()
+	return series:createInfobox()
 end
 
----@return WidgetInjector
-function CustomSeries:createWidgetInjector()
-	return CustomInjector()
+---@param args table
+---@return string
+function CustomSeries:createLiquipediaTierDisplay(args)
+	return ''
 end
 
 ---@param id string
@@ -46,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Type',
-				content = { mw.language.getContentLanguage():ucfirst(_series.args.type or '') }
+				content = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
 		}}
 	end
 
@@ -54,13 +51,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param lpdbData table
+---@param args table
 ---@return table
-function CustomSeries:addToLpdb(lpdbData)
-	lpdbData.game = _series.args.game or 'none'
-	lpdbData.launcheddate = _series.args.sdate
-	lpdbData.defunctdate = _series.args.edate
+function CustomSeries:addToLpdb(lpdbData, args)
+	lpdbData.game = args.game or 'none'
+	lpdbData.launcheddate = args.sdate
+	lpdbData.defunctdate = args.edate
 	lpdbData.extradata = {
-		leagueiconsmall = _series.args.leagueiconsmall
+		leagueiconsmall = args.leagueiconsmall
 	}
 
 	return lpdbData
