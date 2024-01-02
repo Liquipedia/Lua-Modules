@@ -158,16 +158,10 @@ end
 ---@param args table
 ---@return boolean
 function CustomTeam:shouldStore(args)
-	local shouldNotStore = Logic.readBool(args.disable_lpdb) or
-		Logic.readBool(args.disable_storage) or
-		Logic.readBool(Variables.varDefault('disable_LPDB_storage')) or
-		Namespace.isMain()
-
-	if shouldNotStore then
-		Variables.varDefine('disable_LPDB_storage', 'true')
-	end
-
-	return not shouldNotStore
+	return Namespace.isMain() and
+		not Logic.readBool(args.disable_lpdb) and
+		not Logic.readBool(args.disable_storage) and
+		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
 ---@param args table
@@ -330,6 +324,13 @@ function CustomTeam:_amountOfTeamPlayersInPlacement(players)
 	end
 
 	return amount
+end
+
+---@param args table
+function CustomTeam:defineCustomPageVariables(args)
+	if not self:shouldStore(args) then
+		Variables.varDefine('disable_SMW_storage', 'true')
+	end
 end
 
 return CustomTeam
