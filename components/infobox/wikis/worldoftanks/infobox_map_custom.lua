@@ -21,43 +21,27 @@ local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class WorldoftanksMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-	_args = customMap.args
-	return customMap:createInfobox()
-end
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return Array.append(widgets,
-		Cell{name = 'Map Season', content = {_args.season}},
-		Cell{name = 'Size', content = {(_args.width or '') .. 'x' .. (_args.height or '')}},
-		Cell{name = 'Battle Tier', content = {(_args.btmin or '') .. '-' .. (_args.btmax or '')}},
-		Cell{name = 'Game Modes', content = CustomMap._getGameMode()}
-	)
+	return map:createInfobox()
 end
 
 ---@return string[]
-function CustomMap._getGameMode()
-	local modes = Map:getAllArgsForBase(_args, 'mode')
-	local releasedate = _args.releasedate
+function CustomMap._getGameMode(args)
+	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
+		return {}
+	end
+
+	local modes = Map:getAllArgsForBase(args, 'mode')
+	local releasedate = args.releasedate
 
 	return Array.map(modes, function(mode)
 		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
@@ -69,13 +53,23 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'location' then
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = _args.location, shouldLink = false} .. '&nbsp;' .. _args.location}
+				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
 			},
 		}
+	end
+
+	if id == 'custom' then
+		return Array.append(widgets,
+			Cell{name = 'Map Season', content = {args.season}},
+			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', content = {(args.btmin or '') .. '-' .. (args.btmax or '')}},
+			Cell{name = 'Game Modes', content = CustomMap._getGameMode(args)}
+		)
 	end
 	return widgets
 end
