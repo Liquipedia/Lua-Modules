@@ -34,7 +34,6 @@ local CustomTeam = Class.new(Team)
 
 local PLAYER_EARNINGS_ABBREVIATION = '<abbr title="Earnings of players while on the team">Player earnings</abbr>'
 local MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS = 10
-local EARNINGS_MODES = {team = 'team'}
 
 local CustomInjector = Class.new(Injector)
 
