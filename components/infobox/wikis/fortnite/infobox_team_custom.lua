@@ -50,7 +50,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local caller = self.caller
 	if id == 'earnings' then
 		local playerEarnings = self.caller.totalPlayerEarnings
 		table.insert(widgets, Cell{
