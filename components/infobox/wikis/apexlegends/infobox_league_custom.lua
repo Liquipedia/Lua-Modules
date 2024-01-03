@@ -78,10 +78,10 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(args.map1) then
 			table.insert(widgets, Title{name = args.maptitle or 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
+			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('map')})
 		elseif String.isNotEmpty(args['2map1']) then
 			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
+			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('2map')})
 		end
 	end
 	return widgets
@@ -110,7 +110,7 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	while String.isNotEmpty(self.args[base .. index]) do
 		local currentArg = self.args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(CustomLeague:_createNoWrappingSpan(
+			tostring(self:_createNoWrappingSpan(
 				Page.makeInternalLink({}, currentArg)
 			))
 		)
