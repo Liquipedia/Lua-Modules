@@ -13,41 +13,43 @@ local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local _league
-
-local CustomLeague = Class.new()
+---@class HeroesLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		local server = _league.args.server
+	local args = self.caller.args
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Teams', content = {(args.team_number)}})
+	elseif id == 'gamesettings' then
+		local server = args.server
 		if server then
 			return {Cell{name = 'Server', content = {
 				Flags.Icon(server) .. '&nbsp;' .. Flags.CountryName(server)
 			}}}
 		end
 	elseif id == 'customcontent' then
-		local maps = Array.map(_league:getAllArgsForBase(_league.args, 'bg'), function(map)
+		local maps = Array.map(self.caller:getAllArgsForBase(args, 'bg'), function(map)
 			return tostring(CustomLeague:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 		end)
 
@@ -60,14 +62,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {(_league.args.team_number)}
-	})
-	return widgets
-end
-
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')
