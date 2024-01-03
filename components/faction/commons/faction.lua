@@ -130,12 +130,20 @@ function Faction.toName(faction, game)
 	return factionProps and factionProps.name or nil
 end
 
+---@class FactionIconProps
+---@field faction string
+---@field showLink boolean?
+---@field showTitle boolean?
+---@field size string|number|nil
+---@field title string?
+---@field game string?
 Faction.propTypes.Icon = TypeUtil.struct{
 	faction = 'string',
 	showLink = 'boolean?',
 	showTitle = 'boolean?',
 	size = TypeUtil.union('string', 'number', 'nil'),
 	title = 'string?',
+	game = 'string?',
 }
 
 local namedSizes = {
@@ -146,7 +154,7 @@ local namedSizes = {
 }
 
 --- Returns the icon of an entered faction identifier
----@param props {faction: string?, game: string?, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+---@param props FactionIconProps
 ---@return string?
 function Faction.Icon(props)
 	local faction = Faction.read(props.faction, {game=props.game})
