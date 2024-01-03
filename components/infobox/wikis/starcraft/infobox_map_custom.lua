@@ -31,20 +31,23 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
----@param id string
+---@param widgetId string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:parse(id, widgets)
+function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
+	local id = args.id
 
-	Array.appendWith(widgets,
-		Cell{name = 'Tileset', content = {args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
-		Cell{name = 'Size', content = {CustomMap:_getSize(id, args)}},
-		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id, args)}},
-		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-		Cell{name = 'Competition Span', content = {args.span}},
-		Cell{name = 'Leagues Featured', content = {args.leagues}}
-	)
+	if widgetId == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Tileset', content = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
+			Cell{name = 'Size', content = {self.caller:_getSize(id, args)}},
+			Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id, args)}},
+			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Competition Span', content = {args.span}},
+			Cell{name = 'Leagues Featured', content = {args.leagues}}
+		)
+	end
 
 	return widgets
 end
@@ -53,7 +56,7 @@ end
 ---@return string?
 function CustomMap:getNameDisplay(args)
 	if String.isEmpty(args.name) then
-		return CustomMap:_tlpdMap(args.id, 'name')
+		return self:_tlpdMap(args.id, 'name')
 	end
 
 	return args.name
@@ -63,7 +66,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.name = CustomMap:getNameDisplay(args)
+	lpdbData.name = self:getNameDisplay(args)
 	lpdbData.extradata = {
 		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
@@ -77,9 +80,9 @@ end
 ---@return string
 function CustomMap:_getSize(id, args)
 	local width = args.width
-		or CustomMap:_tlpdMap(id, 'width') or ''
+		or self:_tlpdMap(id, 'width') or ''
 	local height = args.height
-		or CustomMap:_tlpdMap(id, 'height') or ''
+		or self:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
@@ -87,9 +90,9 @@ end
 ---@return string
 function CustomMap:_getSpawn(id, args)
 	local players = args.players
-		or CustomMap:_tlpdMap(id, 'players') or ''
+		or self:_tlpdMap(id, 'players') or ''
 	local positions = args.positions
-		or CustomMap:_tlpdMap(id, 'positions') or ''
+		or self:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
@@ -106,7 +109,7 @@ end
 function CustomMap:getWikiCategories(args)
 	local players = args.players
 	if String.isEmpty(players) then
-		players = CustomMap:_tlpdMap(args.id, 'players')
+		players = self:_tlpdMap(args.id, 'players')
 	end
 
 	if String.isEmpty(players) then
