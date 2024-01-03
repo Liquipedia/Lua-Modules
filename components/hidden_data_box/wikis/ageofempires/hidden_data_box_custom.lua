@@ -43,6 +43,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('sdate', Variables.varDefault('tournament_startdate', ''))
 
+	Variables.varDefine('tournament_game', args.game or queryResult.game)
+
 	--headtohead option
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 	Variables.varDefine('headtohead', args.headtohead)
