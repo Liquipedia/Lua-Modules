@@ -30,7 +30,7 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
+	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
