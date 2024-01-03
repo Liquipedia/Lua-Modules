@@ -24,6 +24,7 @@ Faction.factions = Data.factions
 Faction.knownFactions = Data.knownFactions
 Faction.coreFactions = Data.coreFactions
 Faction.aliases = Data.aliases
+Faction.byGame = Data.byGame
 
 Faction.types.Faction = TypeUtil.literalUnion(unpack(Faction.factions))
 
@@ -35,28 +36,44 @@ Faction.types.FactionProps = TypeUtil.struct{
 	faction = Faction.types.Faction,
 }
 
-local byName = Table.map(Data.factionProps, function(faction, props) return props.name, faction end)
-local byLowerName = Table.map(byName, function(name, faction) return name:lower(), faction end)
+---@generic U, T
+---@param func fun(key?: string, value?: table): U, T
+---@return fun(key?: string, value?: table): U, T
+local transformWrapper = function(func)
+	if Faction.byGame then
+		return function (game, factionProps)
+			return game, Table.map(factionProps, func)
+		end
+	end
+	return func
+end
+
+local byName = Table.map(Data.factionProps, transformWrapper(function(faction, props) return props.name, faction end))
+local byLowerName = Table.map(byName, transformWrapper(function(name, faction) return name:lower(), faction end))
 
 --- Checks if a entered faction is valid
 ---@param faction string?
+---@param game string?
 ---@return boolean
-function Faction.isValid(faction)
-	return Data.factionProps[faction] ~= nil
+function Faction.isValid(faction, game)
+	return String.isNotEmpty(game) and Data.factionProps[game] ~= nil and Data.factionProps[game][faction] ~= nil
+		or Data.factionProps[faction] ~= nil
 end
 
 --- Fetches the properties of an entered faction
 ---@param faction string?
+---@param game string?
 ---@return table?
-function Faction.getProps(faction)
-	return Data.factionProps[faction]
+function Faction.getProps(faction, game)
+	return String.isNotEmpty(game) and Data.factionProps[game][faction]
+		or Data.factionProps[faction]
 end
 
 --- Parses a faction from input. Returns the factions short handle/identifier.
 -- Returns nil if not a valid faction.
 -- If `options.alias` is set to false the function will not look in the aliases provided via the data module.
 ---@param faction string?
----@param options {alias: boolean?}?
+---@param options {game: string?, alias: boolean?}?
 ---@return string?
 function Faction.read(faction, options)
 	if type(faction) ~= 'string' then
@@ -66,9 +83,9 @@ function Faction.read(faction, options)
 	options = options or {}
 
 	faction = faction:lower()
-	return Faction.isValid(faction) and faction
-		or byLowerName[faction]
-		or (options.alias ~= false and Faction.aliases[faction])
+	return Faction.isValid(faction, options.game) and faction
+		or (String.isNotEmpty(options.game) and byLowerName[options.game][faction] or byLowerName[faction])
+		or (options.alias ~= false and (String.isNotEmpty(options.game) and Faction.aliases[options.game][faction] or Faction.aliases[faction]))
 		or nil
 end
 
@@ -76,7 +93,7 @@ end
 -- Returns an array of faction identifiers.
 -- Returns an empty array for nil input. Throws upon invalid inputs.
 ---@param input string?
----@param options {sep: string?, alias: boolean?}?
+---@param options {game: string?, sep: string?, alias: boolean?}?
 ---@return table
 function Faction.readMultiFaction(input, options)
 	if String.isEmpty(input) then
@@ -103,9 +120,10 @@ end
 
 --- Returns the name of an entered faction identifier
 ---@param faction string?
+---@param game string?
 ---@return string?
-function Faction.toName(faction)
-	local factionProps = Faction.getProps(faction)
+function Faction.toName(faction, game)
+	local factionProps = Faction.getProps(faction, game)
 	return factionProps and factionProps.name or nil
 end
 
@@ -125,13 +143,13 @@ local namedSizes = {
 }
 
 --- Returns the icon of an entered faction identifier
----@param props {faction: string?, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
+---@param props {faction: string?, game: string?, size: string|number|nil, showLink: boolean?, showTitle: boolean?, title: string?}
 ---@return string?
 function Faction.Icon(props)
-	local faction = Faction.read(props.faction)
+	local faction = Faction.read(props.faction, {game=props.game})
 	if not faction then return end
 
-	local factionProps = Faction.getProps(faction)
+	local factionProps = Faction.getProps(faction, props.game)
 	assert(factionProps, 'Faction.Icon: Invalid faction=' .. tostring(props.faction))
 
 	local size = namedSizes[props.size or 'small'] or props.size
@@ -139,7 +157,7 @@ function Faction.Icon(props)
 		size = size .. 'px'
 	end
 
-	local iconData = IconData.byFaction[faction] or {}
+	local iconData = String.isNotEmpty(props.game) and IconData.byFaction[props.game][faction] or IconData.byFaction[faction] or {}
 	local iconName = iconData.icon
 	if not iconName then return end
 
@@ -154,9 +172,10 @@ end
 
 --- Returns the background color class of a given faction
 ---@param faction string?
+---@param game string?
 ---@return string?
-function Faction.bgClass(faction)
-	local factionProps = Faction.getProps(faction)
+function Faction.bgClass(faction, game)
+	local factionProps = Faction.getProps(faction, game)
 	return factionProps and factionProps.bgClass or nil
 end
 
