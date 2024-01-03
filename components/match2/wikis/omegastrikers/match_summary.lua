@@ -142,22 +142,6 @@ function CustomMatchSummary.createBody(match)
 		end
 	end
 
-	-- Add Match MVP(s)
-	local mvpInput = match.extradata.mvp
-	if mvpInput then
-		local mvpData = mw.text.split(mvpInput or '', ',')
-		if String.isNotEmpty(mvpData[1]) then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData) do
-				if String.isNotEmpty(player) then
-					mvp:addPlayer(player)
-				end
-			end
-
-			body:addRow(mvp)
-		end
-	end
-
 	-- Pre-Process Striker picks
 	local showGamePicks = {}
 	for gameIndex, game in ipairs(match.games) do
