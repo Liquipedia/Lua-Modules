@@ -88,7 +88,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 		season = args.season,
 		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
 	})
-	
+
 	return lpdbData
 end
 
@@ -102,7 +102,7 @@ function CustomMap:getWikiCategories(args)
 	if String.isNotEmpty(args.location) then
 		table.insert(categories, 'Maps located in ' .. args.location)
 	end
-	
+
 	return categories
 end
 
