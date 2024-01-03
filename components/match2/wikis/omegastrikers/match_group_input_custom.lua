@@ -25,7 +25,6 @@ local STATUS_TO_WALKOVER = {FF = 'ff', DQ = 'dq', L = 'l'}
 local NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
-local MAX_NUM_VODGAMES = 20
 
 -- containers for process helper functions
 local matchFunctions = {}
