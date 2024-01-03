@@ -80,6 +80,7 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.riotpremier)
 end
 
+---@return string?
 function CustomLeague:_getPatchVersion()
 	if String.isEmpty(self.args.patch) then return nil end
 	local content = Page.makeInternalLink(self.args.patch, 'Patch ' .. self.args.patch)
