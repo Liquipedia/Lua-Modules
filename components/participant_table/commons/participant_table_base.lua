@@ -80,6 +80,7 @@ end
 ---@return ParticipantTableConfig
 function ParticipantTable.readConfig(args, parentConfig)
 	parentConfig = parentConfig or {}
+
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
 		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
@@ -171,6 +172,7 @@ function ParticipantTable:readSection(args)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
 		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+		self:setCustomPageVariables(entry, config)
 		return entry
 	end)
 
@@ -179,6 +181,11 @@ function ParticipantTable:readSection(args)
 	end)
 
 	table.insert(self.sections, section)
+end
+
+---@param entry ParticipantTableEntry
+---@param config ParticipantTableConfig
+function ParticipantTable:setCustomPageVariables(entry, config)
 end
 
 ---@class ParticipantTableEntry
@@ -191,7 +198,7 @@ end
 ---@param sectionArgs table
 ---@param key string|number
 ---@param index number
----@param config any
+---@param config ParticipantTableConfig
 ---@return ParticipantTableEntry
 function ParticipantTable:readEntry(sectionArgs, key, index, config)
 	local prefix = 'p' .. index
@@ -263,7 +270,7 @@ function ParticipantTable:store()
 
 		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
 
-		ParticipantTable:adjustLpdbData(lpdbData, entry, section.config)
+		self:adjustLpdbData(lpdbData, entry, section.config)
 
 		mw.ext.LiquipediaDB.lpdb_placement(self:objectName(lpdbData), Json.stringifySubTables(lpdbData))
 	end) end)
