@@ -18,45 +18,34 @@ local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class StarcraftMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-
-	_args = customMap.args
-	return customMap:createInfobox()
+	return map:createInfobox()
 end
 
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local id = _args.id
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
 	Array.appendWith(widgets,
-		Cell{name = 'Tileset', content = {_args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
-		Cell{name = 'Size', content = {CustomMap:_getSize(id)}},
-		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id)}},
-		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(_args.versions)}},
-		Cell{name = 'Competition Span', content = {_args.span}},
-		Cell{name = 'Leagues Featured', content = {_args.leagues}}
+		Cell{name = 'Tileset', content = {args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
+		Cell{name = 'Size', content = {CustomMap:_getSize(id, args)}},
+		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id, args)}},
+		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
+		Cell{name = 'Competition Span', content = {args.span}},
+		Cell{name = 'Leagues Featured', content = {args.leagues}}
 	)
 
 	return widgets
-end
-
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@param args table
@@ -85,20 +74,20 @@ end
 
 ---@param id string?
 ---@return string
-function CustomMap:_getSize(id)
-	local width = _args.width
+function CustomMap:_getSize(id, args)
+	local width = args.width
 		or CustomMap:_tlpdMap(id, 'width') or ''
-	local height = _args.height
+	local height = args.height
 		or CustomMap:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
 ---@param id string?
 ---@return string
-function CustomMap:_getSpawn(id)
-	local players = _args.players
+function CustomMap:_getSpawn(id, args)
+	local players = args.players
 		or CustomMap:_tlpdMap(id, 'players') or ''
-	local positions = _args.positions
+	local positions = args.positions
 		or CustomMap:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
