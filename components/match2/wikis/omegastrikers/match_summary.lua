@@ -14,7 +14,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local StrikerIcon = require('Module:StrikerIcon')
 local Table = require('Module:Table')
 
@@ -204,8 +203,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex]
-	return mw.html.create('div'):wikitext(score)
+	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
 end
 
 function CustomMatchSummary._createMapRow(game)
