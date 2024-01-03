@@ -98,33 +98,15 @@ function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
 	local op2 = table[key2]
 	local op1norm = op1.status == 'S'
 	local op2norm = op2.status == 'S'
-	if op1norm then
-		if op2norm then
-			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
-			local op2setwins = CustomMatchGroupInput._getSetWins(op2)
-			if op1setwins + op2setwins > 0 then
-				return op1setwins > op2setwins
-			else
-				return tonumber(op1.score) > tonumber(op2.score)
-			end
-		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == 'W' then return true
-		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
-		elseif op2.status == 'DQ' then return true
-		else return true end
+	if op1norm and op2norm then return tonumber(op1.score) > tonumber(op2.score)
+	elseif not op2norm then return true
+	elseif not op1norm then return false
+	elseif op1.status == 'W' then return true
+	elseif op1.status == 'DQ' then return false
+	elseif op2.status == 'W' then return false
+	elseif op2.status == 'DQ' then return true
+	else return true
 	end
-end
-
-function CustomMatchGroupInput._getSetWins(opp)
-	local extradata = opp.extradata or {}
-	local set1win = extradata.set1win and 1 or 0
-	local set2win = extradata.set2win and 1 or 0
-	local set3win = extradata.set3win and 1 or 0
-	local sum = set1win + set2win + set3win
-	return sum
 end
 
 --
@@ -294,17 +276,7 @@ end
 -- map related functions
 --
 function mapFunctions.getExtraData(map)
-	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
-	bestof = tonumber(bestof) or 5
-	Variables.varDefine('map_bestof', bestof)
-	map.extradata = {
-		bestof = bestof,
-		comment = map.comment,
-		header = map.header,
-	}
-
 	local bans = {}
-
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
@@ -313,8 +285,10 @@ function mapFunctions.getExtraData(map)
 		end
 	end
 
-	map.extradata.bans = Json.stringify(bans)
-	map.bestof = bestof
+	map.extradata = {
+		comment = map.comment,
+		bans = Json.stringify(bans)
+	}
 
 	return map
 end
