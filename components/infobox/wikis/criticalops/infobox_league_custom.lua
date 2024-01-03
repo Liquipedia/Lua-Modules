@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -13,54 +14,42 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class CriticalopsLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
-
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {_args.team_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'customcontent' then
-		if String.isNotEmpty(_args.map1) then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Teams', content = {args.team_number}},
+			Cell{name = 'Players', content = {args.player_number}}
+		)
+	elseif id == 'customcontent' then
+		if String.isNotEmpty(args.map1) then
 			local maps = {}
 
-			for _, map in ipairs(_league:getAllArgsForBase(_args, 'map')) do
+			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
 				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
 					Page.makeInternalLink(map)
 				)))
@@ -73,18 +62,22 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	-- Wiki Custom
-	Variables.varDefine('tournament_mode', (args.individual or args. player_number) and '1v1' or 'team')
-	Variables.varDefine('patch', args.patch or '')
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.mode = (args.individual or args. player_number) and '1v1' or 'team'
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
