@@ -145,7 +145,7 @@ function CustomMatchSummary.createBody(match)
 	local showGamePicks = {}
 	for gameIndex, game in ipairs(match.games) do
 		local pickData = {{}, {}}
-		local numberOfPicks = game.extradata.maximumpickindex
+		local numberOfPicks = game.extradata.maximumpickindex or 0
 		local participants = game.participants
 		for index = 1, numberOfPicks do
 			if not Table.isEmpty(participants['1_' .. index]) then
