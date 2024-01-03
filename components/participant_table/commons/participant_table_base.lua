@@ -31,6 +31,36 @@ local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDev
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 
+---@class ParticipantTableConfig
+---@field lpdbPrefix string?
+---@field noStorage boolean
+---@field matchGroupSpec table?
+---@field syncPlayers boolean
+---@field showCountBySection boolean
+---@field onlyNotable boolean
+---@field count number?
+---@field colSpan number
+---@field resolveDate string
+---@field sortPlayers boolean sort players within an opponent
+---@field sortOpponents boolean
+---@field showTeams boolean
+---@field title string?
+---@field importOnlyQualified boolean?
+---@field display boolean
+---@field width string
+---@field columnWidth string
+
+---@class ParticipantTableSection
+---@field config ParticipantTableConfig
+---@field entries ParticipantTableEntry
+
+---@class ParticipantTableEntry
+---@field opponent standardOpponent
+---@field name string
+---@field note string?
+---@field dq boolean
+---@field inputIndex integer?
+
 ---@class ParticipantTable
 ---@operator call(Frame): ParticipantTable
 ---@field args table
@@ -55,25 +85,6 @@ function ParticipantTable:read()
 
 	return self
 end
-
----@class ParticipantTableConfig
----@field lpdbPrefix string?
----@field noStorage boolean
----@field matchGroupSpec table?
----@field syncPlayers boolean
----@field showCountBySection boolean
----@field onlyNotable boolean
----@field count number?
----@field colSpan number
----@field resolveDate string
----@field sortPlayers boolean sort players within an opponent
----@field sortOpponents boolean
----@field showTeams boolean
----@field title string?
----@field importOnlyQualified boolean?
----@field display boolean
----@field width string
----@field columnWidth string
 
 ---@param args table
 ---@param parentConfig ParticipantTableConfig?
@@ -147,11 +158,6 @@ function ParticipantTable._stashArgs(potentialSection)
 	return potentialSection
 end
 
-
----@class ParticipantTableSection
----@field config ParticipantTableConfig
----@field entries ParticipantTableEntry
-
 ---@param args table
 function ParticipantTable:readSection(args)
 	local config = self.readConfig(args, self.config)
@@ -187,13 +193,6 @@ end
 ---@param config ParticipantTableConfig
 function ParticipantTable:setCustomPageVariables(entry, config)
 end
-
----@class ParticipantTableEntry
----@field opponent standardOpponent
----@field name string
----@field note string?
----@field dq boolean
----@field inputIndex integer?
 
 ---@param sectionArgs table
 ---@param key string|number
