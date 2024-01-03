@@ -348,10 +348,9 @@ end
 ---@param variant string?
 ---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
-	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
-	end
-	return links
+	return Table.map(links, function(key, item)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
+	end)
 end
 
 --remove appended number
