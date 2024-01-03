@@ -83,9 +83,9 @@ function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
 			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
-			Cell{name = 'Game mode', content = {CustomLeague:_getGameMode(args)}},
+			Cell{name = 'Game mode', content = {self.caller:_getGameMode(args)}},
 			Cell{name = 'Patch', content = {CustomLeague._getPatchVersion(args)}},
-			Cell{name = 'Platform', content = {CustomLeague:_getPlatform(args)}},
+			Cell{name = 'Platform', content = {self.caller:_getPlatform(args)}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number then

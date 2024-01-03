@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
 					Page.makeInternalLink({}, map, map .. game)
 				)))
 			end
@@ -77,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{
 			name = 'Patch',
-			content = {CustomLeague:_createPatchCell(args)}
+			content = {self.caller:_createPatchCell(args)}
 		})
 	end
 

@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 			local maps = {}
 
 			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
 					PageLink.makeInternalLink(map)
 				)))
 			end

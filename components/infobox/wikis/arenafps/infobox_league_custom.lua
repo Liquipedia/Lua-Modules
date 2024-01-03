@@ -52,7 +52,7 @@ function CustomLeague.run(frame)
 
 	league.args.player_number = league.args.participants_number
 	league.args.game = Game.name{game = league.args.game}
-	league.args.mode = CustomLeague:_modeLookup(league.args.mode)
+	league.args.mode = league:_modeLookup(league.args.mode)
 
 	return league:createInfobox()
 end

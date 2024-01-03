@@ -50,7 +50,7 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'customcontent' then
 		local maps = Array.map(self.caller:getAllArgsForBase(args, 'bg'), function(map)
-			return tostring(CustomLeague:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
+			return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 		end)
 
 		if #maps > 0 then

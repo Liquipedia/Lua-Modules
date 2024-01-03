@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
-				return tostring(CustomLeague:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
+				return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 			end)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
