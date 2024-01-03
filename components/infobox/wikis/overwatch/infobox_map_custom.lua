@@ -37,7 +37,6 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	local gameModes = CustomMap._getGameMode(args)
 
 	if id == 'location' then
 		return {
@@ -49,6 +48,7 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	if id == 'custom' then
+		local gameModes = self.caller:_getGameMode(args)
 		Array.appendWith(
 			widgets,
 			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', content = gameModes},
@@ -59,13 +59,14 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 ---@return string[]
-function CustomMap._getGameMode(args)
+function CustomMap:_getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
 		return {}
 	end
 
-	local modes = Map:getAllArgsForBase(args, 'mode')
+	local modes = self:getAllArgsForBase(args, 'mode')
 	local releaseDate = args.releasedate
 
 	local modeDisplayTable = {}
