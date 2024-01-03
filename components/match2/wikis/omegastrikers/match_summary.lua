@@ -6,38 +6,29 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
-local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local StrikerIcon = require('Module:StrikerIcon')
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local StrikerIcon = require('Module:StrikerIcon')
+local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local htmlCreate = mw.html.create
-
-local _GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local _ICONS = {
-	check = _GREEN_CHECK,
+local ICONS = {
+	check = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	empty = '[[File:NoCheck.png|link=]]'
 }
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
-}
-
 
 local CustomMatchSummary = {}
-
 
 -- Striker Pick/Ban Class
 local Striker = Class.new(
@@ -130,15 +121,13 @@ end
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(MatchLinks, match.links)
+	return MatchSummary.addVodsToFooter(match, footer)
 end
 
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -192,7 +181,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Striker picks
 	if not Table.isEmpty(showGamePicks) then
-		local striker = Striker({isBan = false})
+		local striker = Striker{isBan = false}
 
 		for gameIndex, pickData in ipairs(showGamePicks) do
 			striker:row(pickData, gameIndex, pickData.numberOfPicks, match.date)
@@ -218,7 +207,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Striker bans
 	if not Table.isEmpty(showGameBans) then
-		local striker = Striker({isBan = true})
+		local striker = Striker{isBan = true}
 
 		for gameIndex, banData in ipairs(showGameBans) do
 			striker:row(banData, gameIndex, banData.numberOfBans, match.date)
@@ -231,8 +220,8 @@ function CustomMatchSummary.createBody(match)
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
-	return htmlCreate('div'):wikitext(score)
+	local score = game.scores[opponentIndex]
+	return mw.html.create('div'):wikitext(score)
 end
 
 function CustomMatchSummary._createMapRow(game)
@@ -240,7 +229,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Header
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = htmlCreate('div')
+		local mapHeader = mw.html.create('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
@@ -249,21 +238,21 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local centerNode = htmlCreate('div')
+	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:wikitext(CustomMatchSummary._getMapDisplay(game))
+		:wikitext(Page.makeInternalLink(game))
 		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
 		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
-	local leftNode = htmlCreate('div')
+	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
-	local rightNode = htmlCreate('div')
+	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
@@ -278,7 +267,7 @@ function CustomMatchSummary._createMapRow(game)
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
-		local comment = htmlCreate('div')
+		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
 		row:addElement(comment)
@@ -287,22 +276,14 @@ function CustomMatchSummary._createMapRow(game)
 	return row
 end
 
-function CustomMatchSummary._getMapDisplay(game)
-	local mapDisplay = '[[' .. game.map .. ']]'
-	return mapDisplay
-end
-
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = htmlCreate('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
+	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then
-		container:node(_ICONS[iconType])
-	else
-		container:node(_NO_CHECK)
+		return container:node(ICONS[iconType])
 	end
 
-	return container
+	return container:node(ICONS.empty)
 end
 
 return CustomMatchSummary

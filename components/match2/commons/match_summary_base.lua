@@ -196,7 +196,7 @@ local Mvp = Class.new(
 	end
 )
 
----@param player table
+---@param player table|string
 ---@return MatchSummaryMvp
 function Mvp:addPlayer(player)
 	local playerDisplay
