@@ -34,13 +34,14 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param args table
 ---@return string[]
-function CustomMap._getGameMode(args)
+function CustomMap:_getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
 		return {}
 	end
 
-	local modes = Map:getAllArgsForBase(args, 'mode')
+	local modes = self:getAllArgsForBase(args, 'mode')
 	local releasedate = args.releasedate
 
 	return Array.map(modes, function(mode)
@@ -68,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Map Season', content = {args.season}},
 			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
 			Cell{name = 'Battle Tier', content = {(args.btmin or '') .. '-' .. (args.btmax or '')}},
-			Cell{name = 'Game Modes', content = CustomMap._getGameMode(args)}
+			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end
 	return widgets
@@ -87,10 +88,12 @@ function CustomMap:addToLpdb(lpdbData, args)
 		season = args.season,
 		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
 	})
-
+	
 	return lpdbData
 end
 
+---@param args table
+---@return table
 function CustomMap:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.season) then
@@ -99,7 +102,7 @@ function CustomMap:getWikiCategories(args)
 	if String.isNotEmpty(args.location) then
 		table.insert(categories, 'Maps located in ' .. args.location)
 	end
-
+	
 	return categories
 end
 
