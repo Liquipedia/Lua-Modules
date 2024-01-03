@@ -178,6 +178,28 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param maps {link: string, displayname: string}[]
+---@return string[]
+function CustomLeague:_mapsDisplay(maps)
+	return {table.concat(
+		Array.map(maps, function(mapData)
+			return tostring(self:_createNoWrappingSpan(
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
+			))
+		end),
+		'&nbsp;• '
+	)}
+end
+
+---@param content string|Html|number|nil
+---@return Html
+function CustomLeague:_createNoWrappingSpan(content)
+	local span = mw.html.create('span')
+	span:css('white-space', 'nowrap')
+		:node(content)
+	return span
+end
+
 ---@param args table
 ---@return string
 function CustomLeague._getPatch(args)
@@ -218,7 +240,7 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.maps = CustomLeague:_concatArgs('map')
+	lpdbData.maps = self:_concatArgs('map')
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
@@ -239,7 +261,7 @@ end
 ---@return string
 function CustomLeague:_concatArgs(base)
 	return table.concat(
-		Array.map(League:getAllArgsForBase(self.args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
+		Array.map(self:getAllArgsForBase(self.args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
 		';'
 	)
 end
