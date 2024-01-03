@@ -31,6 +31,7 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
