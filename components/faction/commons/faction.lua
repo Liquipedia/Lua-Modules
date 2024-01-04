@@ -24,7 +24,6 @@ Faction.factions = Data.factions
 Faction.knownFactions = Data.knownFactions
 Faction.coreFactions = Data.coreFactions
 Faction.aliases = Data.aliases
-Faction.byGame = Data.byGame
 
 Faction.types.Faction = TypeUtil.literalUnion(unpack(Faction.factions))
 

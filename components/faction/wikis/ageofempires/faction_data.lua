@@ -263,7 +263,6 @@ local factionPropsAoE2 = {
 }
 
 return {
-    byGame = true,
     factionProps = {
         aoe2 = factionPropsAoE2,
     },
