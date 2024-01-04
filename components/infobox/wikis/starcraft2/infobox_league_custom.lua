@@ -58,8 +58,8 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	args. = .run(args) or {}
-	args.player_number = args..total
+	args.raceBreakDown = RaceBreakdown.run(args) or {}
+	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps('map', args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
