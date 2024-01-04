@@ -58,8 +58,8 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	args.raceBreakDown = RaceBreakdown.run(args) or {}
-	args.player_number = args.raceBreakDown.total
+	args. = .run(args) or {}
+	args.player_number = args..total
 	args.maps = self:_getMaps('map', args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
@@ -179,7 +179,7 @@ function CustomInjector:parse(id, widgets)
 				Title{name = 'Participants'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{content = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
