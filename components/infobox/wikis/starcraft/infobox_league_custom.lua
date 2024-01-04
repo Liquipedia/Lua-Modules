@@ -155,7 +155,7 @@ function CustomInjector:parse(id, widgets)
 				Title{name = 'Participants'},
 				Cell{name = 'Number of Players', content = {self.data.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = self.data.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{content = self.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
