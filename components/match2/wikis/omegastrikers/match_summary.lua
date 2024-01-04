@@ -222,7 +222,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:wikitext(Page.makeInternalLink(game))
+		:wikitext(Page.makeInternalLink(game.map))
 		:css('text-align', 'center')
 
 	if game.resultType == 'np' then
