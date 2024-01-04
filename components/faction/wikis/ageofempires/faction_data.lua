@@ -8,12 +8,7 @@
 
 local Array = require('Module:Array')
 
-local AOE1_SUFFIX = '/Age of Empires I'
 local AOE2_SUFFIX = '/Age of Empires II'
-local AOE3_SUFFIX = '/Age of Empires III'
-local AOE4_SUFFIX = '/Age of Empires IV'
-local AOM_SUFFIX = '/Age of Mythology'
-local AOEO_SUFFIX = '/Age of Empires Online'
 
 local factionPropsAoE2 = {
     armenians = {
