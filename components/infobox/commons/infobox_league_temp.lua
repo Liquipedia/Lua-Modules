@@ -613,8 +613,9 @@ function League:_createSeriesDisplay(seriesArgs, iconDisplay)
 		iconDisplay = iconDisplay .. ' '
 	end
 
-	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, seriesArgs.abbreviation, seriesArgs.series)
-		or Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
+	local abbreviation = Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
+	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, abbreviation, seriesArgs.series)
+		or abbreviation
 
 	return iconDisplay .. pageDisplay
 end
