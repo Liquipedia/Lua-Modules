@@ -290,7 +290,7 @@ function League:_parseArgs()
 
 	self:_parsePrizePool(args)
 
-	data.icon, data.iconDark, self.iconDisplay = self:_getIcons{
+	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 		series = args.series,
 		abbreviation = args.abbreviation,
@@ -623,7 +623,7 @@ end
 ---@return string?
 ---@return string?
 ---@return string?
-function League:_getIcons(iconArgs)
+function League:getIcons(iconArgs)
 	local display = self:_createSeriesIcon(iconArgs)
 
 	if not display then
