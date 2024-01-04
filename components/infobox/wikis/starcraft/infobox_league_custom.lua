@@ -44,12 +44,13 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	args.raceBreakDown = RaceBreakdown.run(args) or {}
-	args.player_number = args.raceBreakDown.total
-	args.maps = self:_getMaps('map', args)
-	args.number = tonumber(args.number)
+	self.data.raceBreakDown = RaceBreakdown.run(args) or {}
+	self.data.maps = self:_getMaps('map', args)
+	self.data.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.status = self:_getStatus(args)
+
+	args.player_number = self.data.raceBreakDown.total
 
 	self:_computeChronology(args)
 end
@@ -122,7 +123,7 @@ function CustomLeague:_computeChronology(args)
 	local number = tonumber(title.subpageText)
 	local automateChronology = String.isNotEmpty(args.series)
 		and number
-		and args.number == number
+		and self.data.number == number
 		and title.subpageText ~= title.text
 		and Logic.readBool(args.auto_chronology or true)
 		and (String.isEmpty(args.next) or String.isEmpty(args.previous))
@@ -152,9 +153,9 @@ function CustomInjector:parse(id, widgets)
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{name = 'Participants'},
-				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
+				Cell{name = 'Number of Players', content = {self.data.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{content = self.data.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -170,7 +171,7 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		displayMaps('map', 'Maps', args.maps)
+		displayMaps('map', 'Maps', self.data.maps)
 		displayMaps('2map', '2v2 Maps')
 		displayMaps('3map', '3v3 Maps')
 	end
@@ -228,7 +229,7 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--SC specific vars
 	Variables.varDefine('headtohead', args.headtohead or 'true')
-	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
