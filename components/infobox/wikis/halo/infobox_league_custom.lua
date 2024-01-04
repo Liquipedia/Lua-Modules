@@ -88,7 +88,10 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		index = index + 1
 	end
 
-	lpdbData.maps = self:_concatArgs('map')
+	lpdbData.maps = table.concat(Array.map(
+		self:getAllArgsForBase(args, 'map'),
+		mw.ext.TeamLiquidIntegration.resolve_redirect
+	), ';')
 
 	lpdbData.extradata.maps = Json.stringify(maps)
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)
@@ -108,25 +111,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_edate', self.data.endDate)
 	Variables.varDefine('tournament_tier', args.liquipediatier)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
-end
-
----@param base string
----@return string?
-function CustomLeague:_concatArgs(base)
-	local firstArg = self.args[base] or self.args[base .. '1']
-	if String.isEmpty(firstArg) then
-		return nil
-	end
-	local foundArgs = {mw.ext.TeamLiquidIntegration.resolve_redirect(firstArg)}
-	local index = 2
-	while not String.isEmpty(self.args[base .. index]) do
-		table.insert(foundArgs,
-			mw.ext.TeamLiquidIntegration.resolve_redirect(self.args[base .. index])
-		)
-		index = index + 1
-	end
-
-	return table.concat(foundArgs, ';')
 end
 
 ---@param args table
