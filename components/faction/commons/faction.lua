@@ -36,28 +36,25 @@ Faction.types.FactionProps = TypeUtil.struct{
 	faction = Faction.types.Faction,
 }
 
----@generic U, T
----@param func fun(key?: string, value?: table): U, T
----@return fun(key?: string, value?: table): U, T
-local transformWrapper = function(func)
-	if Faction.byGame then
-		return function (game, factionProps)
-			return game, Table.map(factionProps, func)
-		end
-	end
-	return func
-end
 
-local byName = Table.map(Data.factionProps, transformWrapper(function(faction, props) return props.name, faction end))
-local byLowerName = Table.map(byName, transformWrapper(function(name, faction) return name:lower(), faction end))
+local byName = Table.mapValues(Data.factionProps,
+	function(factionProps)
+		return Table.map(factionProps, function(faction, props) return props.name, faction end)
+	end
+)
+local byLowerName = Table.mapValues(byName,
+	function(byGame)
+		return Table.map(byGame, function(name, faction) return name:lower(), faction end)
+	end
+)
 
 --- Checks if a entered faction is valid
 ---@param faction string?
 ---@param game string?
 ---@return boolean
 function Faction.isValid(faction, game)
+	game = game or Data.defaultGame
 	return game and (Data.factionProps[game] or {})[faction] ~= nil
-		or Data.factionProps[faction] ~= nil
 end
 
 --- Fetches the properties of an entered faction
@@ -65,8 +62,8 @@ end
 ---@param game string?
 ---@return table?
 function Faction.getProps(faction, game)
+	game = game or Data.defaultGame
 	return game and (Data.factionProps[game] or {})[faction]
-		or Data.factionProps[faction]
 end
 
 --- Parses a faction from input. Returns the factions short handle/identifier.
@@ -81,16 +78,14 @@ function Faction.read(faction, options)
 	end
 
 	options = options or {}
+	options.game = options.game or Data.defaultGame
 
 	faction = faction:lower()
 	return Faction.isValid(faction, options.game) and faction
-		or (options.game and (byLowerName[options.game] or {})[faction] or byLowerName[faction])
+		or (options.game and (byLowerName[options.game] or {})[faction])
 		or (
 			options.alias ~= false
-			and (
-				options.game and (Faction.aliases[options.game] or {})[faction]
-				or Faction.aliases[faction]
-			)
+			and options.game and (Faction.aliases[options.game] or {})[faction]
 		) or nil
 end
 
@@ -170,8 +165,8 @@ function Faction.Icon(props)
 		size = size .. 'px'
 	end
 
+	props.game = props.game or Data.defaultGame
 	local iconData = props.game and (IconData.byFaction[props.game] or {})[faction]
-		or IconData.byFaction[faction]
 		or {}
 	local iconName = iconData.icon
 	if not iconName then return end

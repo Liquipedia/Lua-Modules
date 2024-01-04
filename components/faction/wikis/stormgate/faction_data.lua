@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = require('Module:Info')
+
 local factionProps = {
 	v = {
 		bgClass = 'stormgate-vanguard',
@@ -36,13 +38,24 @@ local factionProps = {
 }
 
 return {
-	factionProps = factionProps,
-	defaultFaction = 'u',
-	factions = {'v', 'i', 'r', 'u'},
-	knownFactions = {'v', 'i', 'r'},
-	coreFactions = {'v', 'i'},
-	aliases = {
-		human = 'v',
-		host = 'i',
+	defaultGame = Info.defaultGame,
+	factionProps = {
+		[Info.defaultGame] = factionProps,
 	},
+	defaultFaction = 'u',
+	factions = {
+		[Info.defaultGame] = {'v', 'i', 'r', 'u'},
+	},
+	knownFactions = {
+		[Info.defaultGame] = {'v', 'i', 'r'},
+	},
+	coreFactions = {
+		[Info.defaultGame] = {'v', 'i'},
+	},
+	aliases = {
+		[Info.defaultGame] = {
+			human = 'v',
+			host = 'i',
+		},
+	}
 }
