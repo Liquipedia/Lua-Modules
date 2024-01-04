@@ -95,8 +95,30 @@ function CustomLeague:customParseArguments(args)
 	self.data.raceBreakDown = RaceBreakdown.run(args) or {}
 	self.data.maps = self:_getMaps('map', args)
 	self.data.number = tonumber(args.number)
+	self.data.playerNumberDisplay = args.player_number or self.data.raceBreakDown.total
 
-	args.player_number = self.data.raceBreakDown.total
+	args.player_number = string.gsub(self.data.playerNumberDisplay or 0, '%+', '')
+
+	--this sets the below used wiki vars
+	PatchAuto.infobox{
+		patch = args.patch,
+		epatch = args.epatch,
+		patchFeature = (args.patch_feature or ''):lower(),
+		sDate = self.data.startDate,
+		eDate = self.data.endDate,
+		server = args.server,
+	}
+	self.data.patch = Variables.varDefault('tournament_patch')
+	self.data.endPatch = Variables.varDefault('tournament_endpatch', self.data.patch)
+	self.data.patchFeature = Variables.varDefault('tournament_patchfeature')
+
+	self.data.startTime = args.starttime and {
+		raw = (self.data.startDate or '') .. args.starttime,
+		startTime = (self.data.startDate or '') .. ' ' .. args.starttime:gsub('<.*', ''),
+		timeZone = args.starttime:match('data%-tz="(.-)"'),
+	} or {}
+
+	self.data.firstMatch = CustomLeague._getFirstMatchTime()
 end
 
 ---@param args table
@@ -108,9 +130,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_icon_filename', self.data.icon)
 	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
 
-	here
-	Variables.varDefine('usd prize', Variables.varDefault('tournament_prizepoolusd'))
-	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
+	Variables.varDefine('usd prize', self.data.prizepoolUsd)
+	Variables.varDefine('localcurrency', self.data.localCurrency)
 	Variables.varDefine('local prize', Variables.varDefault('tournament_prizepoollocal'))
 
 	Variables.varDefine('sdate', self.data.startDate)
@@ -120,26 +141,14 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Warcraft specific stuff
 	Variables.varDefine('environment', (args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
 
-	here
-	if args.starttime then
-		Variables.varDefine('tournament_starttimeraw', (self.data.startDate or '') .. args.starttime)
+	Variables.varDefine('tournament_starttimeraw', self.data.startTime.raw)
+	Variables.varDefine('tournament_starttime', self.data.startTime.startTime)
+	Variables.varDefine('start_time', self.data.startTime.startTime)
+	Variables.varDefine('tournament_timezone', self.data.startTime.timeZone)
 
-		local startTime = (self.data.startDate or '') .. ' '
-			.. args.starttime:gsub('<.*', '')
-
-		Variables.varDefine('tournament_starttime', startTime)
-		Variables.varDefine('start_time', startTime)
-		local timeZone = args.starttime:match('data%-tz="(.-)"')
-		if timeZone then
-			Variables.varDefine('tournament_timezone', timeZone)
-		end
-	end
-
-	here
-	Variables.varDefine('firstmatch', CustomLeague._getFirstMatchTime())
-
+	Variables.varDefine('firstmatch', self.data.firstMatch)
 	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
-	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
+	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
 	Variables.varDefine('tournament_series_number', self.data.number)
 end
 
@@ -252,20 +261,16 @@ function CustomInjector:parse(id, widgets)
 			return dateCells
 		end
 	elseif id == 'customcontent' then
-		local raceBreakdown = RaceBreakdown.run(args, BREAKDOWN_RACES) or {}
-		args.player_number = args.player_number or raceBreakdown.total
-
-		if args.player_number or args.team_number then
+		local playerNumber = self.caller.data.playerNumberDisplay
+		if playerNumber or args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
 
-		if args.player_number then
+		if playerNumber then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of Players', content = {args.player_number or raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display or {}, classes = { 'infobox-center' }}
+				Cell{name = 'Number of Players', content = {playerNumber}},
+				Breakdown{content = self.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
-
-			args.player_number = string.gsub(args.player_number, '%+', '')
 		end
 
 		if args.team_number then
@@ -313,7 +318,7 @@ end
 ---@return string
 function CustomLeague:_displayStartDateTime()
 	return Countdown._create{
-		date = Variables.varDefault('tournament_starttimeraw'),
+		date = self.data.startTime.raw,
 		finished = self.data.isFinished,
 	}
 end
@@ -335,7 +340,7 @@ end
 function CustomLeague:_displayGameVersion()
 	local patch = self.data.patch
 	local endPatch = self.data.endPatch
-	local patchFeature = Variables.varDefault('tournament_patchfeature')
+	local patchFeature = self.data.patchFeature
 
 	if not patch then return end
 
@@ -351,19 +356,6 @@ function CustomLeague:_displayGameVersion()
 
 	return gameVersion .. NON_BREAKING_SPACE .. DASH .. NON_BREAKING_SPACE
 		.. '[[' .. endPatch .. '|' .. endPatch .. ']]'
-end
-
-function CustomLeague:_getGameVersion()
-	local args = self.args
-	-- calculates patch data and sets several variables
-	PatchAuto.infobox{
-		patch = args.patch,
-		epatch = args.epatch,
-		patchFeature = (args.patch_feature or ''):lower(),
-		sDate = self.data.startDate,
-		eDate = self.data.endDate,
-		server = args.server,
-	}
 end
 
 ---@param args table
@@ -393,17 +385,17 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.patch = self.data.patch
 	lpdbData.endpatch = self.data.endPatch
-	lpdbData.maps = Variables.varDefault('tournament_maps')
+	lpdbData.maps = Json.stringify(self.data.maps)
 	local participantsNumber = tonumber(args.team_number) or 0
 	if participantsNumber == 0 then
 		participantsNumber = tonumber(args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
-	lpdbData.sortdate = Variables.varDefault('tournament_starttime')
-		and (Variables.varDefault('tournament_starttime') .. (Variables.varDefault('tournament_timezone') or ''))
-		or Variables.varDefault('firstmatch', self.data.startDate)
+	lpdbData.sortdate = self.data.startTime.startTime
+		and (self.data.startTime.startTime .. (self.data.startTime.timeZone or ''))
+		or self.data.firstMatch or  self.data.startDate
 	lpdbData.mode = self:_getMode()
-	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
+	lpdbData.extradata.seriesnumber = self.data.number
 
 	lpdbData.extradata.server2 = args.server2
 	lpdbData.extradata.patch2 = args.patch2
