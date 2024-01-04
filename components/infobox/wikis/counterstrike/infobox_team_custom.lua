@@ -22,6 +22,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeInfoboxTeam: InfoboxTeam
+---@field gamesList string[]
 local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
@@ -29,7 +30,7 @@ function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
 
-	team.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	team.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return team.args[gameIdentifier]
 		end)
 
@@ -59,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		return {Cell {
 			name = 'Games',
-			content = Array.map(args.gamesList, function (gameIdentifier)
+			content = Array.map(self.caller.gamesList, function (gameIdentifier)
 					return Game.text{game = gameIdentifier}
 				end)
 		}}
@@ -96,12 +97,12 @@ end
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	Array.forEach(self.args.gamesList, function (gameIdentifier)
+	Array.forEach(self.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' Teams')
 		end)
 
-	if Table.isEmpty(self.args.gamesList) then
+	if Table.isEmpty(self.gamesList) then
 		table.insert(categories, 'Gameless Teams')
 	end
 
