@@ -101,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = self.caller:_displayMaps(self.data.maps)}
+				Center{content = self.caller:_displayMaps(self.caller.data.maps)}
 			)
 		end
 	elseif id == 'sponsors' then
