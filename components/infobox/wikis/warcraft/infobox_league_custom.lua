@@ -237,7 +237,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.text{game = self.data.game}}},
+			Cell{name = 'Game', content = {Game.text{game = self.caller.data.game}}},
 			Cell{name = 'Game Version', content = {
 				self.caller:_displayGameVersion(),
 				args.patch2 and ('[[' .. args.patch2 .. ']]') or nil
@@ -269,7 +269,7 @@ function CustomInjector:parse(id, widgets)
 		if playerNumber then
 			Array.appendWith(widgets,
 				Cell{name = 'Number of Players', content = {playerNumber}},
-				Breakdown{content = self.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{content = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -293,7 +293,7 @@ function CustomInjector:parse(id, widgets)
 			)
 		end
 
-		displayMaps('map', 'Maps', self.data.maps)
+		displayMaps('map', 'Maps', self.caller.data.maps)
 		displayMaps('2map', '2v2 Maps')
 		displayMaps('3map', '3v3 Maps')
 	end
