@@ -91,6 +91,7 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param args table
+---@return number|string?
 function CustomLeague:displayPrizePool(args)
 	local localCurrency = args.localcurrency
 	local prizePoolUSD = args.prizepoolusd
@@ -121,6 +122,8 @@ function CustomLeague:displayPrizePool(args)
 	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 	Variables.varDefine('local prize', prizePool)
+	Variables.varDefine('tournament_currency',
+		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
 	if args.prizepoolassumed then
 		display = Abbreviation.make(
@@ -129,9 +132,7 @@ function CustomLeague:displayPrizePool(args)
 		)
 	end
 
-	self.prizepoolDisplay = display
-	self.data.prizepoolUsd = tonumber(prizePoolUSD or prizePool) or 0
-	self.data.localCurrency = string.upper(Variables.varDefault('tournament_currency', localCurrency) or '')
+	return display
 end
 
 ---@param id string
