@@ -56,7 +56,7 @@ local byLowerName = Table.map(byName, transformWrapper(function(name, faction) r
 ---@param game string?
 ---@return boolean
 function Faction.isValid(faction, game)
-	return String.isNotEmpty(game) and (Data.factionProps[game] or {})[faction] ~= nil
+	return game and (Data.factionProps[game] or {})[faction] ~= nil
 		or Data.factionProps[faction] ~= nil
 end
 
@@ -65,7 +65,7 @@ end
 ---@param game string?
 ---@return table?
 function Faction.getProps(faction, game)
-	return String.isNotEmpty(game) and (Data.factionProps[game] or {})[faction]
+	return game and (Data.factionProps[game] or {})[faction]
 		or Data.factionProps[faction]
 end
 
@@ -84,11 +84,13 @@ function Faction.read(faction, options)
 
 	faction = faction:lower()
 	return Faction.isValid(faction, options.game) and faction
-		or (String.isNotEmpty(options.game) and (byLowerName[options.game] or {})[faction] or byLowerName[faction])
+		or (options.game and (byLowerName[options.game] or {})[faction] or byLowerName[faction])
 		or (
 			options.alias ~= false
-			and (String.isNotEmpty(options.game) and (Faction.aliases[options.game] or {})[faction]
-			or Faction.aliases[faction])
+			and (
+				options.game and (Faction.aliases[options.game] or {})[faction]
+				or Faction.aliases[faction]
+			)
 		) or nil
 end
 
@@ -168,8 +170,7 @@ function Faction.Icon(props)
 		size = size .. 'px'
 	end
 
-	local iconData = String.isNotEmpty(props.game)
-		and (IconData.byFaction[props.game] or {})[faction]
+	local iconData = props.game and (IconData.byFaction[props.game] or {})[faction]
 		or IconData.byFaction[faction]
 		or {}
 	local iconName = iconData.icon
