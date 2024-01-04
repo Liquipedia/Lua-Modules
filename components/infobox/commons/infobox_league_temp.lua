@@ -75,14 +75,14 @@ function League:createInfobox()
 		Cell{
 			name = 'Series',
 			content = {
-				self:_createSeriesDisplay({
+				self:createSeriesDisplay({
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
 					abbreviation = args.abbreviation,
 					icon = args.icon,
 					iconDark = args.icondark or args.icondarkmode,
 				}, self.iconDisplay),
-				self:_createSeriesDisplay{
+				self:createSeriesDisplay{
 					series = args.series2,
 					abbreviation = args.abbreviation2,
 				},
@@ -602,7 +602,7 @@ end
 ---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@param iconDisplay string?
 ---@return string?
-function League:_createSeriesDisplay(seriesArgs, iconDisplay)
+function League:createSeriesDisplay(seriesArgs, iconDisplay)
 	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
@@ -613,8 +613,9 @@ function League:_createSeriesDisplay(seriesArgs, iconDisplay)
 		iconDisplay = iconDisplay .. ' '
 	end
 
-	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, seriesArgs.abbreviation, seriesArgs.series)
-		or Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
+	local abbreviation = Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
+	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, abbreviation, seriesArgs.series)
+		or abbreviation
 
 	return iconDisplay .. pageDisplay
 end
