@@ -51,7 +51,7 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class StormgateMatchGroupUtilGame: MatchGroupUtilGame
 ---@field opponents  StormgateMatchGroupUtilGameOpponent[]
----@field offfactions table<integer, string[]>?
+---@field offFactions table<integer, string[]>?
 
 ---@class StormgateMatchGroupUtilVeto
 ---@field by number?
@@ -347,19 +347,19 @@ function CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opp
 end
 
 ---Determines if any players in an opponent aren't playing their main faction by comparing them to a reference opponent.
----Returns the factions played if at least one player chose an offfaction or nil if otherwise.
+---Returns the factions played if at least one player chose an offFaction or nil if otherwise.
 ---@param gameOpponent StormgateMatchGroupUtilGameOpponent
 ---@param referenceOpponent StormgateStandardOpponent|StormgateMatchGroupUtilGameOpponent
 ---@return string[]?
-function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent)
+function CustomMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent)
 	local gameFactions = {}
-	local hasOfffaction = false
+	local hasOffFaction = false
 	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do
 		local referencePlayer = referenceOpponent.players[playerIndex]
 		table.insert(gameFactions, gamePlayer.faction)
-		hasOfffaction = hasOfffaction or gamePlayer.faction ~= referencePlayer.faction
+		hasOffFaction = hasOffFaction or gamePlayer.faction ~= referencePlayer.faction
 	end
-	return hasOfffaction and gameFactions or nil
+	return hasOffFaction and gameFactions or nil
 end
 
 ---@param record table
