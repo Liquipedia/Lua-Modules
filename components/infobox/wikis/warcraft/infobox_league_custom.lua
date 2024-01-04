@@ -16,7 +16,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapsData = mw.loadData('Module:Maps/data')
 local Operator = require('Module:Operator')
-local PageLink = require('Module:Page')
+local Page = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -92,7 +92,11 @@ function CustomLeague:customParseArguments(args)
 	self.data.game = self:_determineGame(args.game)
 	self.data.status = self:_getStatus(args)
 	self.data.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
+	self.data.raceBreakDown = RaceBreakdown.run(args) or {}
+	self.data.maps = self:_getMaps('map', args)
+	self.data.number = tonumber(args.number)
 
+	args.player_number = self.data.raceBreakDown.total
 end
 
 ---@param args table
@@ -104,6 +108,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_icon_filename', self.data.icon)
 	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
 
+	here
 	Variables.varDefine('usd prize', Variables.varDefault('tournament_prizepoolusd'))
 	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
 	Variables.varDefine('local prize', Variables.varDefault('tournament_prizepoollocal'))
@@ -115,6 +120,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Warcraft specific stuff
 	Variables.varDefine('environment', (args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
 
+	here
 	if args.starttime then
 		Variables.varDefine('tournament_starttimeraw', (self.data.startDate or '') .. args.starttime)
 
@@ -129,24 +135,33 @@ function CustomLeague:defineCustomPageVariables(args)
 		end
 	end
 
+	here
 	Variables.varDefine('firstmatch', CustomLeague._getFirstMatchTime())
 
 	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
-
-	--maps
-	local maps = self:_getMaps('map')
-	Variables.varDefine('tournament_maps', maps and Json.stringify(maps) or '')
-
-	local seriesNumber = args.number
-	if Logic.isNumeric(seriesNumber) then
-		Variables.varDefine('tournament_series_number', seriesNumber)
-	end
-
-	self:_getGameVersion()
+	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
+	Variables.varDefine('tournament_series_number', self.data.number)
 end
 
+---@param prefix string
+---@param args table
+---@return {link: string, displayname: string}[]
+function CustomLeague:_getMaps(prefix, args)
+	local maps = Table.map(self:getAllArgsForBase(args, 'map'), function(mapIndex, map)
+		local mapArray = mw.text.split(map, '|')
 
+		mapArray[1] = (MapsData[mapArray[1]:lower()] or {}).name or mapArray[1]
 
+		return mapIndex, {
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
+		}
+	end)
+
+	Array.sortInPlaceBy(maps, Operator.property('link'))
+
+	return maps
+end
 
 ---@param game string?
 ---@return string?
@@ -262,20 +277,20 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		--maps
-		if String.isNotEmpty(args.map1) then
-			table.insert(widgets, Title{name = args['maptitle'] or 'Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('map')})
+		---@param prefix string
+		---@param defaultTitle string
+		---@param maps {link: string, displayname: string}[]?
+		local displayMaps = function(prefix, defaultTitle, maps)
+			if String.isEmpty(args[prefix .. 1]) then return end
+			Array.appendWith(widgets,
+				Title{name = args[prefix .. 'title'] or defaultTitle},
+				Center{content = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
+			)
 		end
 
-		if String.isNotEmpty(args['2map1']) then
-			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('2map')})
-		end
-
-		if String.isNotEmpty(args['3map1']) then
-			table.insert(widgets, Title{name = args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = self.caller:_mapsDisplay('3map')})
-		end
+		displayMaps('map', 'Maps', self.data.maps)
+		displayMaps('2map', '2v2 Maps')
+		displayMaps('3map', '3v3 Maps')
 	end
 	return widgets
 end
@@ -303,15 +318,13 @@ function CustomLeague:_displayStartDateTime()
 	}
 end
 
----@param prefix string
+---@param maps {link: string, displayname: string}[]
 ---@return string[]
-function CustomLeague:_mapsDisplay(prefix)
-	local maps = self:_getMaps(prefix)
-
+function CustomLeague:_mapsDisplay(maps)
 	return {table.concat(
-		Array.map(maps or {}, function(mapData)
+		Array.map(maps, function(mapData)
 			return tostring(self:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
 		'&nbsp;• '
@@ -371,31 +384,6 @@ function CustomLeague._getFirstMatchTime()
 	if matchData and type(matchData[1]) == 'table' then
 		return matchData[1].date
 	end
-end
-
----@param prefix string
----@return {link: string, displayname: string}[]?
-function CustomLeague:_getMaps(prefix)
-	local args = self.args
-	if String.isEmpty(args[prefix .. '1']) then
-		return
-	end
-	local mapArgs = self:getAllArgsForBase(self.args, prefix)
-
-	local maps = Table.map(mapArgs, function(mapIndex, map)
-		local splitMap = mw.text.split(map, '|')
-
-		splitMap[1] = (MapsData[splitMap[1]:lower()] or {}).name or splitMap[1]
-
-		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(splitMap[1]),
-			displayname = args[prefix .. mapIndex .. 'display'] or splitMap[#splitMap],
-		}
-	end)
-
-	Array.sortInPlaceBy(maps, Operator.property('link'))
-
-	return maps
 end
 
 ---@param lpdbData table
