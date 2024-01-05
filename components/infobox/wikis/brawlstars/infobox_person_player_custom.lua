@@ -46,6 +46,9 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
+	player.roleData = CustomPlayer._getRole(player.args.role)
+	player.roleData2 = CustomPlayer._getRole(player.args.role2)
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -63,9 +66,9 @@ function CustomPlayer.run(frame)
 			name = Logic.emptyOr(_args.romanized_name, _args.name),
 			romanizedname = _args.romanized_name,
 			status = _args.status,
-			type = Variables.varDefault('type'),
-			role = Variables.varDefault('role'),
-			role2 = Variables.varDefault('role2'),
+			type = player.roleData.personType,
+			role = player.roleData.variable,
+			role2 = player.roleData2.variable,
 			id = _args.id,
 			idIPA = _args.idIPA,
 			idAudio = _args.idAudio,
@@ -128,10 +131,10 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role = self.roleData.variable
+	lpdbData.extradata.role2 = self.roleData2.variable
 
-	lpdbData.type = Variables.varDefault('type', 'player')
+	lpdbData.type = Logic.emptyOr(self.roleData.variable, 'player')
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
@@ -174,24 +177,21 @@ function CustomPlayer._createRole(role)
 end
 
 function CustomPlayer:defineCustomPageVariables(args)
-	local roleData = CustomPlayer._getRole(args.role)
-
-	if roleData then
-		Variables.varDefine('role', roleData.variable)
-		Variables.varDefine('type', roleData.personType)
+	if self.roleData then
+		Variables.varDefine('role', self.roleData.variable)
+		Variables.varDefine('type', self.roleData.personType)
 	end
 
 	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
+	if self.roleData and self.roleData.isplayer == false then
 		Variables.varDefine('isplayer', 'false')
 	else
 		Variables.varDefine('isplayer', 'true')
 	end
 
-	local role2Data = CustomPlayer._getRole(args.role2)
-	if role2Data then
-		Variables.varDefine('role2', role2Data.variable)
-		Variables.varDefine('type2', role2Data.personType)
+	if self.roleData2 then
+		Variables.varDefine('role2', self.roleData2.variable)
+		Variables.varDefine('type2', self.roleData2.personType)
 	end
 end
 
