@@ -231,6 +231,10 @@ function Person:createInfobox()
 				statusToStore
 			)))
 
+	--move remove this after all customs have been cleaned up
+	--only here so we do not break role storage on 16 wikis ...
+	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+
 	if self:shouldStoreData(args) then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
@@ -242,7 +246,9 @@ function Person:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
+		:node(builtInfobox)
+		--kick above line and un-comment below line after customs have been cleaned up
+		--:node(infobox:build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 
