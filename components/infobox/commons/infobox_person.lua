@@ -109,10 +109,6 @@ function Person:createInfobox()
 
 	args = self:_flipNameOrder(args)
 
-	-- set custom variables here already so they are available
-	-- in functions we call from here on
-	self:defineCustomPageVariables(args)
-
 	--set those already here as they are needed in several functions below
 	local links = Links.transform(args)
 	local personType = self:getPersonType(args)
@@ -256,6 +252,7 @@ end
 function Person:_definePageVariables(args)
 	Variables.varDefine('firstname', args.givenname or '')
 	Variables.varDefine('lastname', args.familyname or '')
+	self:defineCustomPageVariables(args)
 end
 
 ---@param args table
@@ -431,12 +428,10 @@ end
 ---@return number
 ---@return table<integer, number?>?
 function Person:calculateEarnings(args)
-	local totalEarnings, earningsPerYear =  Earnings.calculateForPlayer{
+	return Earnings.calculateForPlayer{
 		player = args.earnings or self.pagename,
 		perYear = true
 	}
-
-	return totalEarnings, earningsPerYear
 end
 
 ---@param args table
@@ -473,14 +468,12 @@ function Person:_createLocation(country, location, personType)
 	local countryDisplay = Flags.CountryName(country)
 	local demonym = Flags.getLocalisation(countryDisplay) or ''
 
-	local category = ''
 	if Namespace.isMain() then
 		self.infobox:categories(demonym .. ' ' .. personType .. 's')
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
-		category ..
 		(location ~= nil and (',&nbsp;' .. location) or '')
 end
 
@@ -489,7 +482,7 @@ end
 ---@return string?
 function Person:_createTeam(team, link)
 	link = link or team
-	if link == nil or link == '' then
+	if String.isEmpty(link) then
 		return nil
 	end
 
@@ -508,45 +501,47 @@ end
 ---@param status PlayerStatus
 ---@return string[]
 function Person:getCategories(args, birthDisplay, personType, status)
-	if self:shouldStoreData(args) then
-		local team = args.teamlink or args.team
-		local categories = Array.append(self.age.categories,
-			personType .. 's',
-			status .. ' ' .. personType .. 's'
-		)
-
-		if
-			not self.nonRepresenting and (args.country2 or args.nationality2)
-			or args.country3
-			or args.nationality3
-		then
-			table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
-		end
-
-		--account for banned possibly being a (stringified) bool
-		--or being a string that indicates what the player is banned from
-		if Logic.readBoolOrNil(args.banned) ~= false and Logic.isNotEmpty(args.banned) then
-			table.insert(categories, 'Banned ' .. personType .. 's')
-		end
-
-		if status == Status.ACTIVE and String.isEmpty(team) then
-			table.insert(categories, 'Teamless ' .. personType .. 's')
-		end
-
-		if not args.image then
-			table.insert(categories, personType .. 's with no profile picture')
-		end
-		if String.isEmpty(birthDisplay) then
-			table.insert(categories, personType .. 's with unknown birth date')
-		end
-
-		if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
-			table.insert(categories, 'Players with invalid team')
-		end
-
-		return self:getWikiCategories(categories)
+	if not self:shouldStoreData(args) then
+		return {}
 	end
-	return {}
+
+	local team = args.teamlink or args.team
+	local categories = Array.append(self.age.categories,
+		personType .. 's',
+		status .. ' ' .. personType .. 's'
+	)
+
+	if
+		not self.nonRepresenting and (args.country2 or args.nationality2)
+		or args.country3
+		or args.nationality3
+	then
+		table.insert(categories, 'Dual Citizenship ' .. personType .. 's')
+	end
+
+	--account for banned possibly being a (stringified) bool
+	--or being a string that indicates what the player is banned from
+	if Logic.readBoolOrNil(args.banned) ~= false and Logic.isNotEmpty(args.banned) then
+		table.insert(categories, 'Banned ' .. personType .. 's')
+	end
+
+	if status == Status.ACTIVE and String.isEmpty(team) then
+		table.insert(categories, 'Teamless ' .. personType .. 's')
+	end
+
+	if not args.image then
+		table.insert(categories, personType .. 's with no profile picture')
+	end
+
+	if String.isEmpty(birthDisplay) then
+		table.insert(categories, personType .. 's with unknown birth date')
+	end
+
+	if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
+		table.insert(categories, 'Players with invalid team')
+	end
+
+	return self:getWikiCategories(categories)
 end
 
 --- Allows for overriding this functionality
@@ -555,6 +550,8 @@ end
 function Person:getWikiCategories(categories)
 	return categories
 end
+
+--below annotation needs the isos as optional strings to match the annotation of what `AgeCalculation.run` returns
 
 ---@param text string
 ---@return {death: string?, birth: string?, birthDateIso: string?, deathDateIso: string?, categories: string[]}
