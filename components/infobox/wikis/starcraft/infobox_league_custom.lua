@@ -134,11 +134,11 @@ function CustomLeague:_computeChronology(args)
 
 	local fromAutomated = function(shiftedNumber)
 		local page = title.basePageTitle:subPageTitle(tostring(shiftedNumber)).fullText
-		return Page.exists(page) and page or nil
+		return Page.exists(page) and (page .. '|#' .. shiftedNumber) or nil
 	end
 
 	args.previous = Logic.emptyOr(args.previous, fromAutomated(number - 1))
-	args.next = Logic.emptyOr(args.previous, fromAutomated(number + 1))
+	args.next = Logic.emptyOr(args.next, fromAutomated(number + 1))
 end
 
 ---@param id string
