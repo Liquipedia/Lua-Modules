@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 
 local AgeCalculation = {}
 
@@ -196,7 +196,6 @@ function Age:_secondsToAge(seconds)
 end
 
 function AgeCalculation.run(args)
-	local shouldStore = args.shouldstore
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
 	local deathDate = DeathDate(args.deathdate)
@@ -205,25 +204,18 @@ function AgeCalculation.run(args)
 
 	local age = Age(birthDate, deathDate):makeDisplay()
 
-	if shouldStore then
-		if age.birth and not birthDate.isExact then
-			age.birth = age.birth .. '[[Category:Incomplete birth dates]]'
-		end
-
-		if birthDate.year then
-			age.birth = age.birth .. '[[Category:' .. birthDate.year .. ' births]]'
-		end
-
-		if age.death and not deathDate.isExact then
-			age.death = age.death .. '[[Category:Incomplete death dates]]'
-		end
-	end
+	local categories = Array.append({},
+		age.birth and not birthDate.isExact and 'Incomplete birth dates' or nil,
+		birthDate.year and (birthDate.year .. ' births') or nil,
+		age.death and not deathDate.isExact and 'Incomplete death dates' or nil
+	)
 
 	return {
 		birthDateIso = birthDate:makeIso(),
 		deathDateIso = deathDate:makeIso(),
 		birth = age.birth,
-		death = age.death
+		death = age.death,
+		categories = categories,
 	}
 end
 
