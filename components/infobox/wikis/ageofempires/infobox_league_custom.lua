@@ -283,15 +283,11 @@ function CustomLeague:_makePatchLink(args)
 end
 
 ---@param args table
----@param makeLink boolean?
 ---@return string[]
-function CustomLeague:_getGameModes(args, makeLink)
+function CustomLeague:_getGameModes(args)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
 		table.insert(self.categories, default .. ' Tournaments')
-		if makeLink then
-			default = Page.makeInternalLink(default)
-		end
 		return {default}
 	end
 
@@ -304,10 +300,6 @@ function CustomLeague:_getGameModes(args, makeLink)
 				and gameModes[index] .. ' Tournaments'
 				or 'Pages with unknown game mode'
 			)
-
-			if makeLink then
-				gameModes[index] = Page.makeInternalLink(gameModes[index])
-			end
 		end
 	)
 
