@@ -40,10 +40,8 @@ local Person = Class.new(BasicInfobox)
 Person.warnings = {}
 
 local Language = mw.language.new('en')
-local _LINK_VARIANT = 'player'
-local _shouldStoreData
-local _region
-local _COUNTRIES_EASTERN_NAME_ORDER = {
+local LINK_VARIANT = 'player'
+local COUNTRIES_EASTERN_NAME_ORDER = {
 	'China',
 	'Taiwan',
 	'Hong Kong',
@@ -72,13 +70,13 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 
 ---@param frame Frame
----@return string
+---@return Html
 function Person.run(frame)
 	local person = Person(frame)
 	return person:createInfobox()
 end
 
----@return string
+---@return Html
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -107,9 +105,10 @@ function Person:createInfobox()
 		self.nonRepresenting = true
 	end
 
+	self.region = Region.run({region = args.region, country = args.country})
+
 	args = self:_flipNameOrder(args)
 
-	_shouldStoreData = Person:shouldStoreData(args)
 	-- set custom variables here already so they are available
 	-- in functions we call from here on
 	self:defineCustomPageVariables(args)
@@ -124,7 +123,7 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
-			shouldstore = _shouldStoreData
+			shouldstore = self:shouldStoreData(args)
 		})
 	if not ageCalculationSuccess then
 		age = Person._createAgeCalculationErrorMessage(age --[[@as string]])
@@ -149,10 +148,7 @@ function Person:createInfobox()
 		Cell{name = 'Born', content = {age.birth}},
 		Cell{name = 'Died', content = {age.death}},
 		Customizable{id = 'region', children = {
-			Cell{name = 'Region', content = {
-						self:_createRegion(args.region, args.country)
-					}
-				}
+				Cell{name = 'Region', content = {self.region.display}}
 			}
 		},
 		Customizable{id = 'status', children = {
@@ -201,7 +197,7 @@ function Person:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = _LINK_VARIANT}
+						Widgets.Links{content = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -248,7 +244,7 @@ function Person:createInfobox()
 
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
-	if _shouldStoreData then
+	if self:shouldStoreData(args) then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
@@ -258,7 +254,9 @@ function Person:createInfobox()
 		)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(self.warnings)
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(WarningBox.displayAll(self.warnings))
 end
 
 ---@param args table
@@ -272,7 +270,7 @@ end
 ---@param status PlayerStatus
 ---@param personType string
 function Person:_setLpdbData(args, links, status, personType)
-	links = Links.makeFullLinksForTableItems(links, _LINK_VARIANT)
+	links = Links.makeFullLinksForTableItems(links, LINK_VARIANT)
 
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
@@ -294,7 +292,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		birthdate = Variables.varDefault('player_birthdate'),
 		deathdate = Variables.varDefault('player_deathdate'),
 		image = args.image,
-		region = _region,
+		region = self.region.region,
 		team = teamLink or team,
 		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
@@ -450,16 +448,6 @@ function Person:calculateEarnings(args)
 	return totalEarnings, earningsPerYear
 end
 
----@param region string?
----@param country string?
----@return string?
-function Person:_createRegion(region, country)
-	local regionData = Region.run({region = region, country = country})
-	_region = regionData.region
-
-	return regionData.display
-end
-
 ---@param args table
 ---@param personType string
 ---@return string[]
@@ -529,7 +517,7 @@ end
 ---@param status PlayerStatus
 ---@return string[]
 function Person:getCategories(args, birthDisplay, personType, status)
-	if _shouldStoreData then
+	if self:shouldStoreData(args) then
 		local team = args.teamlink or args.team
 		local categories = {
 			personType .. 's',
@@ -599,7 +587,7 @@ end
 ---@param args table
 ---@return table
 function Person:_flipNameOrder(args)
-	if not Logic.readBool(args.nonameflip) and Table.includes(_COUNTRIES_EASTERN_NAME_ORDER, args.country) then
+	if not Logic.readBool(args.nonameflip) and Table.includes(COUNTRIES_EASTERN_NAME_ORDER, args.country) then
 		args.givenname, args.familyname = args.familyname, args.givenname
 	end
 	return args
