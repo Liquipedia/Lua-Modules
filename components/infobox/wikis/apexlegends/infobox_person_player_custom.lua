@@ -144,7 +144,7 @@ function CustomPlayer:createBottomContent(infobox)
 end
 
 function CustomPlayer._getStatusContents()
-	local status = Logic.readBool(_args.banned) and 'Banned' or _args.status
+	local status = Logic.readBool(_args.banned) and 'Banned' or Logic.emptyOr(_args.banned, _args.status)
 	return {Page.makeInternalLink({onlyIfExists = true}, status) or status}
 end
 
