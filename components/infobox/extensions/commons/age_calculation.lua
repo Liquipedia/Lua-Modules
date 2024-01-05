@@ -221,7 +221,7 @@ function Age:_secondsToAge(seconds)
 end
 
 ---@param args table
----@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string}
+---@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string?}
 function AgeCalculation.run(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
