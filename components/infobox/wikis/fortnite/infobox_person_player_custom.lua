@@ -41,6 +41,8 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	_player = player
 	_args.autoTeam = true
+	_role = Role.run({role = _args.role})
+	_role2 = Role.run({role = _args.role2})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -66,8 +68,6 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
 			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
 		}
