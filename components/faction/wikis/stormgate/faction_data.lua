@@ -46,12 +46,8 @@ return {
 	factions = {
 		[Info.defaultGame] = {'v', 'i', 'r', 'u'},
 	},
-	knownFactions = {
-		[Info.defaultGame] = {'v', 'i', 'r'},
-	},
-	coreFactions = {
-		[Info.defaultGame] = {'v', 'i'},
-	},
+	knownFactions = {'v', 'i', 'r'},
+	coreFactions = {'v', 'i'},
 	aliases = {
 		[Info.defaultGame] = {
 			human = 'v',
