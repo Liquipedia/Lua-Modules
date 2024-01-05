@@ -42,6 +42,7 @@ liquipedia.filterButtons = {
 	buttons: {},
 	items: {},
 	activeFilters: {},
+	activeAlwaysFilters: {},
 	localStorageKey: null,
 	localStorageValue: {},
 
@@ -67,6 +68,13 @@ liquipedia.filterButtons = {
 			this.buttons[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelectorAll( ':scope > [data-filter-on]:not([data-filter-on=all])' );
 			// Get only 'all' button
 			this.buttonFilterAll[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelector( '[data-filter-on=all]' );
+			// Get always active filters
+			this.activeAlwaysFilters[ filterGroup ] = [];
+			var activeAlwaysFilters = this.buttonContainerElements[ filterGroup ].getAttribute( 'data-filter-always-active' )
+			if ( typeof activeAlwaysFilters === 'string' )
+				activeAlwaysFilters.split( ',' ).forEach( function(alwaysActiveFilter) {
+					this.activeAlwaysFilters[ filterGroup ].push( alwaysActiveFilter );
+				} )
 
 			var itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
 			if ( filterGroup === this.bcFilterGroup ) {
@@ -201,15 +209,18 @@ liquipedia.filterButtons = {
 	},
 
 	hideAllItems: function( filterGroup ) {
-		this.activeFilters[ filterGroup ] = [];
+		this.activeFilters[ filterGroup ] = this.activeAlwaysFilters[ filterGroup ];
 
 		this.buttons[ filterGroup ].forEach( function( button ) {
-			button.classList.remove( this.activeButtonClass );
+			if ( ! this.activeAlwaysFilters[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) )
+				button.classList.remove( this.activeButtonClass );
 		}.bind( this ) );
 
 		this.items[ filterGroup ].forEach( function( item ) {
-			item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-			item.classList.add( this.hiddenCategoryClass );
+			if ( ! this.activeAlwaysFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
+				item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.add( this.hiddenCategoryClass );
+			}
 		}.bind( this ) );
 
 		this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
