@@ -124,8 +124,7 @@ end
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', args.tickername or name)
+	Variables.varDefine('tournament_ticker_name', args.tickername or self.name)
 	Variables.varDefine('tournament_tier', self.data.liquipediatier)
 	Variables.varDefine('tournament_icon_filename', self.data.icon)
 	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
@@ -233,16 +232,17 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {Game.text{game = self.caller.data.game}}},
+			Cell{name = 'Game', content = {Game.text{game = caller.data.game}}},
 			Cell{name = 'Game Version', content = {
-				self.caller:_displayGameVersion(),
+				caller:_displayGameVersion(),
 				args.patch2 and ('[[' .. args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = self.caller:_getServers(args)}
+			Cell{name = 'Server', content = caller:_getServers(args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
@@ -253,15 +253,15 @@ function CustomInjector:parse(id, widgets)
 		if args.starttime then
 			local dateCells = {}
 			if args.sdate then
-				table.insert(dateCells, Cell{name = 'Start Date', content = {self.caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Start Date', content = {caller:_displayStartDateTime()}})
 			elseif args.date then
-				table.insert(dateCells, Cell{name = 'Date', content = {self.caller:_displayStartDateTime()}})
+				table.insert(dateCells, Cell{name = 'Date', content = {caller:_displayStartDateTime()}})
 			end
 			table.insert(dateCells, Cell{name = 'End Date', content = {args.edate}})
 			return dateCells
 		end
 	elseif id == 'customcontent' then
-		local playerNumber = self.caller.data.playerNumberDisplay
+		local playerNumber = caller.data.playerNumberDisplay
 		if playerNumber or args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
@@ -269,7 +269,7 @@ function CustomInjector:parse(id, widgets)
 		if playerNumber then
 			Array.appendWith(widgets,
 				Cell{name = 'Number of Players', content = {playerNumber}},
-				Breakdown{content = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{content = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -289,11 +289,11 @@ function CustomInjector:parse(id, widgets)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
 				Title{name = args[prefix .. 'title'] or defaultTitle},
-				Center{content = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
+				Center{content = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
 			)
 		end
 
-		displayMaps('map', 'Maps', self.caller.data.maps)
+		displayMaps('map', 'Maps', caller.data.maps)
 		displayMaps('2map', '2v2 Maps')
 		displayMaps('3map', '3v3 Maps')
 	end
@@ -385,7 +385,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
 	lpdbData.patch = self.data.patch
 	lpdbData.endpatch = self.data.endPatch
-	lpdbData.maps = Json.stringify(self.data.maps)
+	lpdbData.maps = self.data.maps
 	local participantsNumber = tonumber(args.team_number) or 0
 	if participantsNumber == 0 then
 		participantsNumber = tonumber(args.player_number) or 0
