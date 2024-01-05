@@ -21,7 +21,6 @@ local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
