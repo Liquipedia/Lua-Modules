@@ -74,7 +74,7 @@ liquipedia.filterButtons = {
 			if ( typeof activeAlwaysFilters === 'string' )
 				activeAlwaysFilters.split( ',' ).forEach( function(alwaysActiveFilter) {
 					this.activeAlwaysFilters[ filterGroup ].push( alwaysActiveFilter );
-				} )
+				}, this )
 
 			var itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
 			if ( filterGroup === this.bcFilterGroup ) {
