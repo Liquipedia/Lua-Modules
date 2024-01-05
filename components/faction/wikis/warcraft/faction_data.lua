@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = require('Module:Info')
+
 local factionProps = {
 	h = {
 		bgClass = 'warcraft-human',
@@ -57,10 +59,17 @@ local factionProps = {
 }
 
 return {
-	factionProps = factionProps,
+	defaultGame = Info.defaultGame,
+	factionProps = {
+		[Info.defaultGame] = factionProps
+	},
 	defaultFaction = 'a',
-	factions = {'h', 'o', 'u', 'n', 'r', 'm', 'a'},
+	factions = {
+		[Info.defaultGame] = {'h', 'o', 'u', 'n', 'r', 'm', 'a'},
+	},
 	knownFactions = {'h', 'o', 'u', 'n', 'r'},
 	coreFactions = {'h', 'o', 'u', 'n'},
-	aliases = {['nightelf'] = 'n'},
+	aliases = {
+		[Info.defaultGame] = {['nightelf'] = 'n'},
+	},
 }

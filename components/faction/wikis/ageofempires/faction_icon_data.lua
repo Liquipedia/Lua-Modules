@@ -153,7 +153,6 @@ local byFactionAoe2 = {
 
 
 return {
-	byGame = true,
 	byFaction = {
 		aoe2 = byFactionAoe2,
 	},
