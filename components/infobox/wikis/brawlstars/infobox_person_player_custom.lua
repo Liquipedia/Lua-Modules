@@ -69,8 +69,8 @@ function CustomPlayer.run(frame)
 			id = _args.id,
 			idIPA = _args.idIPA,
 			idAudio = _args.idAudio,
-			birthdate = Variables.varDefault('player_birthdate'),
-			deathdate = Variables.varDefault('player_deathdate'),
+			birthdate = player.age.birthDateIso,
+			deathdate = player.age.deathDateIso,
 			nationality = _args.country,
 			nationality2 = _args.country2,
 			nationality3 = _args.country3,
@@ -81,7 +81,9 @@ function CustomPlayer.run(frame)
 		autoPlayerIntro = _args.freetext
 	end
 
-	return builtInfobox .. autoPlayerIntro
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(autoPlayerIntro)
 end
 
 function CustomInjector:parse(id, widgets)
