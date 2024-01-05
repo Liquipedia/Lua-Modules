@@ -46,8 +46,8 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	player.roleData = CustomPlayer._getRole(player.args.role)
-	player.roleData2 = CustomPlayer._getRole(player.args.role2)
+	player.roleData = CustomPlayer._getRole(player.args.role) or {}
+	player.roleData2 = CustomPlayer._getRole(player.args.role2) or {}
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
