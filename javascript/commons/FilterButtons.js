@@ -202,8 +202,10 @@ liquipedia.filterButtons = {
 		}.bind( this ) );
 
 		this.items[ filterGroup ].forEach( function( item ) {
-			item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-			item.classList.remove( this.hiddenCategoryClass );
+			if ( this.activeFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
+				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.remove( this.hiddenCategoryClass );
+			}
 		}.bind( this ) );
 
 		this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
