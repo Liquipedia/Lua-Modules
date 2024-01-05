@@ -88,9 +88,7 @@ function Person:createInfobox()
 	end
 	args.status = STATUS_TRANSLATE[lowerStatus]
 
-	if String.isEmpty(args.id) then
-		error('You need to specify an "id"')
-	end
+	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')
 
 	if Logic.readBool(args.autoTeam) then
 		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
@@ -106,6 +104,8 @@ function Person:createInfobox()
 	end
 
 	self.region = Region.run({region = args.region, country = args.country})
+
+	args.ids = args.ids or args.alternateids
 
 	args = self:_flipNameOrder(args)
 
@@ -123,11 +123,12 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
-			shouldstore = self:shouldStoreData(args)
 		})
 	if not ageCalculationSuccess then
-		age = Person._createAgeCalculationErrorMessage(age --[[@as string]])
+		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
 	end
+
+	self.age = age
 
 	local widgets = {
 		Header{
@@ -161,13 +162,10 @@ function Person:createInfobox()
 		},
 		Customizable{id = 'teams', children = {
 			Builder{builder = function()
-				local teams = {
-					self:_createTeam(args.team, args.teamlink),
-					self:_createTeam(args.team2, args.team2link),
-					self:_createTeam(args.team3, args.team3link),
-					self:_createTeam(args.team4, args.team4link),
-					self:_createTeam(args.team5, args.team5link)
-				}
+				local teams = Array.mapIndexes(function (integerIndex)
+					local index = integerIndex == 1 and '' or integerIndex
+					return self:_createTeam(args['team' .. index], args['team' .. index .. 'link'])
+				end)
 				return {Cell{
 					name = #teams > 1 and 'Teams' or 'Team',
 					content = teams
@@ -175,10 +173,7 @@ function Person:createInfobox()
 			end}
 		}},
 		Cell{name = 'Alternate IDs', content = {
-				table.concat(
-					Array.map(mw.text.split(args.ids or args.alternateids or '', ',', true), String.trim),
-					', '
-				)
+				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
 			}
 		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
@@ -194,7 +189,7 @@ function Person:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				if not Table.isEmpty(links) then
+				if Table.isNotEmpty(links) then
 					return {
 						Title{name = 'Links'},
 						Widgets.Links{content = links, variant = LINK_VARIANT}
@@ -203,31 +198,29 @@ function Person:createInfobox()
 			end
 		},
 		Customizable{id = 'achievements', children = {
-				Builder{
-					builder = function()
-						if not String.isEmpty(args.achievements) then
-							return {
-								Title{name = 'Achievements'},
-								Center{content = {args.achievements}}
-							}
-						end
+			Builder{
+				builder = function()
+					if String.isNotEmpty(args.achievements) then
+						return {
+							Title{name = 'Achievements'},
+							Center{content = {args.achievements}}
+						}
 					end
-				},
-			}
-		},
+				end
+			},
+		}},
 		Customizable{id = 'history', children = {
-				Builder{
-					builder = function()
-						if not String.isEmpty(args.history) then
-							return {
-								Title{name = 'History'},
-								Center{content = {args.history}}
-							}
-						end
+			Builder{
+				builder = function()
+					if String.isNotEmpty(args.history) then
+						return {
+							Title{name = 'History'},
+							Center{content = {args.history}}
+						}
 					end
-				},
-			}
-		},
+				end
+			},
+		}},
 		Center{content = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
@@ -270,8 +263,6 @@ end
 ---@param status PlayerStatus
 ---@param personType string
 function Person:_setLpdbData(args, links, status, personType)
-	links = Links.makeFullLinksForTableItems(links, LINK_VARIANT)
-
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
 	if team and mw.ext.TeamTemplate.teamexists(team) then
@@ -281,7 +272,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	local lpdbData = {
-		id = args.id or mw.title.getCurrentTitle().prefixedText,
+		id = args.id,
 		alternateid = args.ids,
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
@@ -289,8 +280,8 @@ function Person:_setLpdbData(args, links, status, personType)
 		nationality = args.country, -- already standardized above
 		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
-		birthdate = Variables.varDefault('player_birthdate'),
-		deathdate = Variables.varDefault('player_deathdate'),
+		birthdate = self.age.birthDateIso,
+		deathdate = self.age.deathDateIso,
 		image = args.image,
 		region = self.region.region,
 		team = teamLink or team,
@@ -300,7 +291,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		type = personType,
 		earnings = self.totalEarnings,
 		earningsbyyear = {},
-		links = links,
+		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
 		extradata = {
 			firstname = args.givenname,
 			lastname = args.familyname,
@@ -324,7 +315,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	lpdbData = Json.stringifySubTables(lpdbData)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. (args.id or self.name), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, lpdbData)
 end
 
 -- Allows this function to be used in /Custom
@@ -484,7 +475,7 @@ function Person:_createLocation(country, location, personType)
 
 	local category = ''
 	if Namespace.isMain() then
-		category = '[[Category:' .. demonym .. ' ' .. personType .. 's]]'
+		self.infobox:categories(demonym .. ' ' .. personType .. 's')
 	end
 
 	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
@@ -566,21 +557,18 @@ function Person:getWikiCategories(categories)
 end
 
 ---@param text string
----@return {death: string?, birth: string?}
-function Person._createAgeCalculationErrorMessage(text)
+---@return {death: string?, birth: string?, birthDateIso: string?, deathDateIso: string?, categories: string[]}
+function Person:_createAgeCalculationErrorMessage(text)
 	-- Return formatted message text for an error.
 	local strongStart = '<strong class="error">Error: '
 	local strongEnd = '</strong>'
-	text = string.gsub(text or '', 'Module:AgeCalculation/test:%d+: ', '')
-	if mw.title.getCurrentTitle():inNamespaces(0) then
-		strongEnd = strongEnd .. '[[Category:Age error]]'
-	end
+	text = string.gsub(text or '', 'Module:AgeCalculation:%d+: ', '')
 	text = strongStart .. mw.text.nowiki(text) .. strongEnd
 
 	if string.match(text, '[Dd]eath') then
-		return {death = text}
+		return {death = text, categories = {'Age error'}}
 	else
-		return {birth = text}
+		return {birth = text, categories = {'Age error'}}
 	end
 end
 
