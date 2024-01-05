@@ -8,12 +8,12 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Data = mw.loadData('Module:Faction/Data')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
+local Data = Lua.requireIfExists('Module:Faction/Data', {requireDevIfEnabled = true, loadData = true})
 local IconData = Lua.requireIfExists('Module:Faction/IconData', {requireDevIfEnabled = true, loadData = true})
 	or {byFaction = {}}
 
