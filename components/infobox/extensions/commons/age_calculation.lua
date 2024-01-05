@@ -205,9 +205,6 @@ function AgeCalculation.run(args)
 
 	local age = Age(birthDate, deathDate):makeDisplay()
 
-	Variables.varDefine('player_birthdate', birthDate:makeIso())
-	Variables.varDefine('player_deathdate', deathDate:makeIso())
-
 	if shouldStore then
 		if age.birth and not birthDate.isExact then
 			age.birth = age.birth .. '[[Category:Incomplete birth dates]]'
@@ -223,6 +220,8 @@ function AgeCalculation.run(args)
 	end
 
 	return {
+		birthDateIso = birthDate:makeIso(),
+		deathDateIso = deathDate:makeIso(),
 		birth = age.birth,
 		death = age.death
 	}
