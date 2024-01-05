@@ -19,10 +19,15 @@ local IconData = Lua.requireIfExists('Module:Faction/IconData', {requireDevIfEna
 
 local Faction = {propTypes = {}, types = {}}
 
+---@type string
 Faction.defaultFaction = Data.defaultFaction
+---@type table<string, table<string, string>>
 Faction.factions = Data.factions
+---@type table<string, string>?
 Faction.knownFactions = Data.knownFactions
+---@type table<string, string>?
 Faction.coreFactions = Data.coreFactions
+---@type table<string, table<string, string>>?
 Faction.aliases = Data.aliases
 
 Faction.types.Faction = TypeUtil.literalUnion(unpack(Faction.factions))
@@ -46,6 +51,22 @@ local byLowerName = Table.mapValues(byName,
 		return Table.map(byGame, function(name, faction) return name:lower(), faction end)
 	end
 )
+
+---Returns a list of valid factions
+---@param game string?
+---@return string[]
+function Faction.getFactions(game)
+	game = game or Data.defaultGame
+	return game and Data.factions[game] or {}
+end
+
+---Returns a list of valid faction aliases
+---@param game string?
+---@return string[]
+function Faction.getAliases(game)
+	game = game or Data.defaultGame
+	return game and Data.aliases[game] or {}
+end
 
 --- Checks if a entered faction is valid
 ---@param faction string?
