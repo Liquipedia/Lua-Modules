@@ -159,7 +159,7 @@ function CustomLeague:_computeChronology(args)
 	end
 
 	args.previous = Logic.emptyOr(args.previous, fromAutomated(number - 1))
-	args.next = Logic.emptyOr(args.previous, fromAutomated(number + 1))
+	args.next = Logic.emptyOr(args.next, fromAutomated(number + 1))
 end
 
 ---@param id string
