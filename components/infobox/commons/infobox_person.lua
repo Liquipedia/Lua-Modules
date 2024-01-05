@@ -510,10 +510,10 @@ end
 function Person:getCategories(args, birthDisplay, personType, status)
 	if self:shouldStoreData(args) then
 		local team = args.teamlink or args.team
-		local categories = {
+		local categories = Array.append(self.age.categories,
 			personType .. 's',
-			status .. ' ' .. personType .. 's',
-		}
+			status .. ' ' .. personType .. 's'
+		)
 
 		if
 			not self.nonRepresenting and (args.country2 or args.nationality2)
