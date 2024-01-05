@@ -98,8 +98,8 @@ function Person:createInfobox()
 
 	-- check if non-representing is used and set an according value in self
 	-- so it can be accessed in the /Custom modules
-	args.country = Person:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == Person:getStandardNationalityValue('non-representing') then
+	args.country = self:getStandardNationalityValue(args.country or args.nationality)
+	if args.country == self:getStandardNationalityValue('non-representing') then
 		self.nonRepresenting = true
 	end
 
@@ -273,8 +273,8 @@ function Person:_setLpdbData(args, links, status, personType)
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
 		nationality = args.country, -- already standardized above
-		nationality2 = Person:getStandardNationalityValue(args.country2 or args.nationality2),
-		nationality3 = Person:getStandardNationalityValue(args.country3 or args.nationality3),
+		nationality2 = self:getStandardNationalityValue(args.country2 or args.nationality2),
+		nationality3 = self:getStandardNationalityValue(args.country3 or args.nationality3),
 		birthdate = self.age.birthDateIso,
 		deathdate = self.age.deathDateIso,
 		image = args.image,
@@ -442,12 +442,12 @@ function Person:_createLocations(args, personType)
 		return countryDisplayData
 	end
 
-	countryDisplayData[1] = Person:_createLocation(country, args.location, personType)
+	countryDisplayData[1] = self:_createLocation(country, args.location, personType)
 
 	local index = 2
 	country = args['country2'] or args['nationality2']
 	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = Person:_createLocation(country, args['location' .. index], personType)
+		countryDisplayData[index] = self:_createLocation(country, args['location' .. index], personType)
 		index = index + 1
 		country = args['country' .. index] or args['nationality' .. index]
 	end
