@@ -19,18 +19,25 @@ local IconData = Lua.requireIfExists('Module:Faction/IconData', {requireDevIfEna
 
 local Faction = {propTypes = {}, types = {}}
 
+--[[
+Generic data
+]]--
 ---@type string
 Faction.defaultFaction = Data.defaultFaction
 ---@type table<string, table<string, string>>
 Faction.factions = Data.factions
+---@type table<string, table<string, string>>?
+Faction.aliases = Data.aliases
+
+--[[
+Wiki-specific data
+]]--
 ---@type table<string, string>?
 Faction.knownFactions = Data.knownFactions
 ---@type table<string, string>?
 Faction.coreFactions = Data.coreFactions
----@type table<string, table<string, string>>?
-Faction.aliases = Data.aliases
 
-Faction.types.Faction = TypeUtil.literalUnion(unpack(Faction.factions))
+Faction.types.Faction = TypeUtil.literalUnion(unpack(Array.flatten(Array.extractValuesFaction.factions)))
 
 Faction.types.FactionProps = TypeUtil.struct{
 	bgClass = 'string?',
