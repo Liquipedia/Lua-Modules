@@ -209,7 +209,7 @@ liquipedia.filterButtons = {
 	},
 
 	hideAllItems: function( filterGroup ) {
-		this.activeFilters[ filterGroup ] = this.activeAlwaysFilters[ filterGroup ];
+		this.activeFilters[ filterGroup ] = this.activeAlwaysFilters[ filterGroup ].slice( 0 );
 
 		this.buttons[ filterGroup ].forEach( function( button ) {
 			if ( ! this.activeAlwaysFilters[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) )
