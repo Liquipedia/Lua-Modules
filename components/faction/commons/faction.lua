@@ -37,7 +37,7 @@ Faction.knownFactions = Data.knownFactions
 ---@type table<string, string>?
 Faction.coreFactions = Data.coreFactions
 
-Faction.types.Faction = TypeUtil.literalUnion(unpack(Array.flatten(Array.extractValuesFaction.factions)))
+Faction.types.Faction = TypeUtil.literalUnion(unpack(Array.flatten(Array.extractValues(Faction.factions))))
 
 Faction.types.FactionProps = TypeUtil.struct{
 	bgClass = 'string?',
