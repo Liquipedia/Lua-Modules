@@ -231,8 +231,6 @@ function Person:createInfobox()
 				statusToStore
 			)))
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if self:shouldStoreData(args) then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
@@ -244,7 +242,7 @@ function Person:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(infobox:widgetInjector(self:createWidgetInjector()):build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 
