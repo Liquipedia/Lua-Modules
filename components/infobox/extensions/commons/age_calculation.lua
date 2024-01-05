@@ -29,13 +29,26 @@ local NON_BREAKING_SPACE = '&nbsp;'
 -- `isExact`: Whether this is a complete date, consisting of YYYY-MM-DD
 -- `isEmpty`: Whether there is a date here at all.
 -- `time`: Time in seconds
+---@class AgeDate
+---@operator call(...): AgeDate
+---@field year integer?
+---@field month integer?
+---@field day integer?
+---@field isExact boolean
+---@field isEmpty boolean
+---@field location string?
+---@field time integer?
 local Date = Class.new(
+	---@param self self
+	---@param dateString string?
+	---@param location string?
 	function(self, dateString, location)
 		if String.isEmpty(dateString) then
 			self.isExact = false
 			self.isEmpty = true
 			return
 		end
+		---@cast dateString -nil
 
 		self.location = location
 		self.isEmpty = false
@@ -59,6 +72,7 @@ local Date = Class.new(
 	end
 )
 
+---@return string?
 function Date:makeDisplay()
 	if self.isEmpty then
 		return nil
@@ -68,7 +82,7 @@ function Date:makeDisplay()
 	local timestamp = self:getEarliestPossible()
 
 	if formatString then
-		local formatted = os.date(formatString, timestamp)
+		local formatted = os.date(formatString, timestamp) --[[@as string]]
 		if not String.isEmpty(self.location) then
 			formatted = formatted .. '<br>' .. self.location
 		end
@@ -79,18 +93,16 @@ function Date:makeDisplay()
 	return nil
 end
 
+---@return string?
 function Date:makeIso()
 	if self.isEmpty or not self.isExact then
-		return ''
+		return
 	end
 
-	local year = self.year
-	local month = self.month
-	local day = self.day
-
-	return year .. '-' .. month .. '-' .. day
+	return self.year .. '-' .. self.month .. '-' .. self.day
 end
 
+---@return string?
 function Date:_getFormatString()
 	if self.year then
 		if self.month and self.day then
@@ -107,6 +119,7 @@ function Date:_getFormatString()
 	end
 end
 
+---@return integer
 function Date:getEarliestPossible()
 	return os.time({
 		year = self.year or _EPOCH_DATE.year,
@@ -115,6 +128,7 @@ function Date:getEarliestPossible()
 	})
 end
 
+---@return integer
 function Date:getLatestPossible()
 	return os.time({
 		year = self.year or _CURRENT_YEAR,
@@ -123,9 +137,15 @@ function Date:getLatestPossible()
 	})
 end
 
+---@class BirthDate: AgeDate
 local BirthDate = Class.new(Date)
+---@class DeathDate: AgeDate
 local DeathDate = Class.new(Date)
 
+---@class Age
+---@operator call(...): Age
+---@field birthDate BirthDate
+---@field deathDate DeathDate
 local Age = Class.new(
 	function(self, birthDate, deathDate)
 		self.birthDate = birthDate
@@ -133,6 +153,7 @@ local Age = Class.new(
 	end
 )
 
+---@return string|number?
 function Age:calculate()
 	local endDate
 	if self.deathDate.isEmpty then
@@ -141,7 +162,8 @@ function Age:calculate()
 		endDate = self.deathDate.time
 	end
 
-	if self.birthDate.isExact and (self.deathDate.exact or self.deathDate.isEmpty) then
+	if self.birthDate.isExact and (self.deathDate.isExact or self.deathDate.isEmpty) then
+		---@cast endDate -nil
 		return self:_secondsToAge(os.difftime(endDate, self.birthDate.time))
 	elseif self.birthDate.year and (self.deathDate.year or self.deathDate.isEmpty) then
 		local minEndDate
@@ -169,6 +191,7 @@ function Age:calculate()
 	return nil
 end
 
+---@return {death: string?, birth: string?}
 function Age:makeDisplay()
 	local age = self:calculate()
 	local result = {
@@ -191,10 +214,14 @@ function Age:makeDisplay()
 	return result
 end
 
+---@param seconds integer
+---@return integer
 function Age:_secondsToAge(seconds)
 	return math.floor(seconds / 60 / 60 / 24 / 365.2425)
 end
 
+---@param args table
+---@return {birthDateIso: string?, deathDateIso: string?, categories: string[], birth: string?, death: string}
 function AgeCalculation.run(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
@@ -219,6 +246,8 @@ function AgeCalculation.run(args)
 	}
 end
 
+---@param birthDate BirthDate
+---@param deathDate DeathDate
 function AgeCalculation._assertValidDates(birthDate, deathDate)
 	local earliestPossibleBirthDate = birthDate:getEarliestPossible()
 	if deathDate.isExact then
@@ -239,6 +268,8 @@ function AgeCalculation._assertValidDates(birthDate, deathDate)
 	AgeCalculation._showErrorForDateIfNeeded(deathDate, 'Death')
 end
 
+---@param date AgeDate
+---@param dateType string
 function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	if date.month then
 		if date.month > 12 or date.month == 0 then
