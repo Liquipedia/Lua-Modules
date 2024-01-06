@@ -231,7 +231,7 @@ function Person:createInfobox()
 				statusToStore
 			)))
 
-	--move remove this after all customs have been cleaned up
+	--remove this after all customs have been cleaned up
 	--only here so we do not break role storage on 16 wikis ...
 	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
