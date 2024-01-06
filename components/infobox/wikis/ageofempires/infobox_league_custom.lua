@@ -199,7 +199,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.sponsors = args.sponsors
 
-	lpdbData.maps = Json.stringify(self.data.maps)
+	lpdbData.maps = self.data.maps
 
 	lpdbData.game = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
