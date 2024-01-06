@@ -182,9 +182,9 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- map links, to be used by brackets and mappool templates
 	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
-	for _, map in ipairs(self.data.maps) do
+	Array.forEach(self.data.maps, function(map)
 		Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
-	end
+	end)
 end
 
 ---@param lpdbData table
