@@ -64,12 +64,13 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'gamesettings' then
 		Array.appendWith(widgets,
-			Cell{name = 'Game & Version', content = self.caller:_getGameVersion(args)},
-			Cell{name = 'Game Mode', content = Array.map(self.caller.data.gameModes, function(gameMode)
+			Cell{name = 'Game & Version', content = caller:_getGameVersion(args)},
+			Cell{name = 'Game Mode', content = Array.map(caller.data.gameModes, function(gameMode)
 				return Page.makeInternalLink(gameMode)
 			end)}
 		)
@@ -88,7 +89,7 @@ function CustomInjector:parse(id, widgets)
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
-					tostring(self.caller:_createNoWrappingSpan(
+					tostring(caller:_createNoWrappingSpan(
 						Page.makeInternalLink(args['team' .. index])
 					))
 				)
@@ -101,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		if not String.isEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = self.caller:_displayMaps(self.caller.data.maps)}
+				Center{content = caller:_displayMaps(caller.data.maps)}
 			)
 		end
 	elseif id == 'sponsors' then
