@@ -48,16 +48,9 @@ Faction.types.FactionProps = TypeUtil.struct{
 }
 
 
-local byName = Table.mapValues(Data.factionProps,
-	function(factionProps)
-		return Table.map(factionProps, function(faction, props) return props.name, faction end)
-	end
-)
-local byLowerName = Table.mapValues(byName,
-	function(byGame)
-		return Table.map(byGame, function(name, faction) return name:lower(), faction end)
-	end
-)
+local factionsByName = Table.mapValues(Data.factionProps, function(factionProps)
+	return Table.map(factionProps, function(faction, props) return props.name:lower(), faction end)
+end)
 
 ---Returns a list of valid factions
 ---@param options {game: string?}?
