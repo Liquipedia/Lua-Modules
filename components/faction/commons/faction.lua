@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -48,8 +49,10 @@ Faction.types.FactionProps = TypeUtil.struct{
 }
 
 
-local factionsByName = Table.mapValues(Data.factionProps, function(factionProps)
-	return Table.map(factionProps, function(faction, props) return props.name:lower(), faction end)
+local factionsByName = FnUtil.memoize(function ()
+	return Table.mapValues(Data.factionProps, function(factionProps)
+		return Table.map(factionProps, function(faction, props) return props.name:lower(), faction end)
+	end)
 end)
 
 ---Returns a list of valid factions
@@ -116,7 +119,7 @@ function Faction.read(faction, options)
 
 	faction = faction:lower()
 	return Faction.isValid(faction, options) and faction
-		or (options.game and (byLowerName[options.game] or {})[faction])
+		or (options.game and (factionsByName()[options.game] or {})[faction])
 		or (
 			options.alias ~= false
 			and options.game and (Faction.aliases[options.game] or {})[faction]
