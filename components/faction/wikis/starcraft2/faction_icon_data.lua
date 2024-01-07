@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Info = require('Module:Info')
+local Info = mw.loadData('Module:Info')
 
 local byFaction = {
 	p = {
