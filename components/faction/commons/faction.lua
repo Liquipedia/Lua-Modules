@@ -55,14 +55,24 @@ local factionsByName = FnUtil.memoize(function ()
 	end)
 end)
 
+---Parses the option table, eventually adding defaults
+---@param options table?
+---@return table
+function Faction._parseOptions(options)
+	if type(options) ~= 'table' then
+		options = {}
+	end
+
+	options.game = options.game or Data.defaultGame
+	return options
+end
+
 ---Returns a list of valid factions
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getFactions(options)
-	if type(options) ~= 'table' then
-		options = {}
-	end
-	local game = options.game or Data.defaultGame
+	options = Faction._parseOptions(options)
+	local game = options.game
 	return game and Data.factions[game] or {}
 end
 
@@ -70,10 +80,8 @@ end
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getAliases(options)
-	if type(options) ~= 'table' then
-		options = {}
-	end
-	local game = options.game or Data.defaultGame
+	options = Faction._parseOptions(options)
+	local game = options.game
 	return game and Data.aliases[game] or {}
 end
 
@@ -82,10 +90,8 @@ end
 ---@param options {game: string?}?
 ---@return boolean
 function Faction.isValid(faction, options)
-	if type(options) ~= 'table' then
-		options = {}
-	end
-	local game = options.game or Data.defaultGame
+	options = Faction._parseOptions(options)
+	local game = options.game
 	return game and (Data.factionProps[game] or {})[faction] ~= nil
 end
 
@@ -94,10 +100,8 @@ end
 ---@param options {game: string?}?
 ---@return table?
 function Faction.getProps(faction, options)
-	if type(options) ~= 'table' then
-		options = {}
-	end
-	local game = options.game or Data.defaultGame
+	options = Faction._parseOptions(options)
+	local game = options.game
 	return game and (Data.factionProps[game] or {})[faction]
 end
 
@@ -112,10 +116,8 @@ function Faction.read(faction, options)
 		return nil
 	end
 
-	if type(options) ~= 'table' then
-		options = {}
-	end
-	options.game = options.game or Data.defaultGame
+	options = Faction._parseOptions(options)
+	local game = options.game
 
 	faction = faction:lower()
 	return Faction.isValid(faction, options) and faction
@@ -138,9 +140,7 @@ function Faction.readMultiFaction(input, options)
 	end
 	---@cast input -nil
 
-	if type(options) ~= 'table' then
-		options = {}
-	end
+	options = Faction._parseOptions(options)
 
 	local singleFaction = Faction.read(input, options)
 	if singleFaction then return {singleFaction} end
