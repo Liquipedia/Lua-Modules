@@ -71,8 +71,7 @@ end
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getFactions(options)
-	options = Faction._parseOptions(options)
-	local game = options.game
+	local game = Faction._parseOptions(options).game
 	return game and Data.factions[game] or {}
 end
 
@@ -80,8 +79,7 @@ end
 ---@param options {game: string?}?
 ---@return string[]
 function Faction.getAliases(options)
-	options = Faction._parseOptions(options)
-	local game = options.game
+	local game = Faction._parseOptions(options).game
 	return game and Data.aliases[game] or {}
 end
 
@@ -90,8 +88,7 @@ end
 ---@param options {game: string?}?
 ---@return boolean
 function Faction.isValid(faction, options)
-	options = Faction._parseOptions(options)
-	local game = options.game
+	local game = Faction._parseOptions(options).game
 	return game and (Data.factionProps[game] or {})[faction] ~= nil
 end
 
@@ -100,8 +97,7 @@ end
 ---@param options {game: string?}?
 ---@return table?
 function Faction.getProps(faction, options)
-	options = Faction._parseOptions(options)
-	local game = options.game
+	local game = Faction._parseOptions(options).game
 	return game and (Data.factionProps[game] or {})[faction]
 end
 
