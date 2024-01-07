@@ -117,7 +117,6 @@ function Faction.read(faction, options)
 	end
 
 	options = Faction._parseOptions(options)
-	local game = options.game
 
 	faction = faction:lower()
 	return Faction.isValid(faction, options) and faction
