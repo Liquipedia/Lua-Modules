@@ -28,7 +28,6 @@ local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local LINKS_KEYS = {'preview', 'interview', 'review'}
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local DEFAULT_HERO_FACTION = HeroData.default.faction
@@ -51,7 +50,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._updateFinished(match)
 	match.stream = Streams.processStreams(match)
-	CustomMatchGroupInput._getLinks(match)
 	CustomMatchGroupInput._getExtraData(match)
 
 	return match
@@ -109,14 +107,6 @@ function CustomMatchGroupInput._getTournamentVars(match)
 	Variables.varDefine('match_bestof', match.bestof)
 
 	MatchGroupInput.getCommonTournamentVars(match)
-end
-
----@param match table
-function CustomMatchGroupInput._getLinks(match)
-	match.links = {}
-	for _, linkKey in pairs(LINKS_KEYS) do
-		match.links[linkKey] = match[linkKey]
-	end
 end
 
 ---@param match table
