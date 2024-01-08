@@ -72,8 +72,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	lpdbData.extradata.teamid = args.teamid
 	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
 	lpdbData.manager = Variables.varDefault('managerid') or args.manager
