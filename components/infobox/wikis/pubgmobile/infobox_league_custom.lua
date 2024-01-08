@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -25,9 +26,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
-
-local _GAME = mw.loadData('Module:GameVersion')
 
 local _MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
@@ -51,15 +49,6 @@ local _PERSPECTIVES = {
 _PERSPECTIVES.first = _PERSPECTIVES.fpp
 _PERSPECTIVES.third = _PERSPECTIVES.tpp
 
-local _PLATFORMS = {
-	mobile = '[[Mobile]][[Category:Mobile Competitions]]',
-	newstate = '[[New State]][[Category:Mobile Competitions]]',
-	peace = '[[Peacekeeper Elite|Peace Elite]][[Category:Peacekeeper Elite Competitions]][[Category:Mobile Competitions]]',
-	bgmi = '[[Battlegrounds Mobile India|BGMI]]' ..
-		'[[Category:Battlegrounds Mobile India Competitions]][[Category:Mobile Competitions]]',
-	default = '[[Category:Unknown Platform Competitions]]',
-}
-
 function CustomLeague.run(frame)
 	local league = League(frame)
 	_args = league.args
@@ -81,16 +70,9 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}
-			},
+			Cell{name = 'Game version', content = {Game.name{game = _args.game}}},
 			Cell{name = 'Game mode', content = {
 					CustomLeague._getGameMode()
-				}
-			},
-			Cell{name = 'Platform', content = {
-					CustomLeague._getPlatform()
 				}
 			},
 		}
@@ -110,23 +92,15 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = args.platform
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_game', _game or args.game)
 	Variables.varDefine('tournament_publishertier', args.pubgpremier)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-end
-
-function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
 end
 
 function CustomLeague:liquipediaTierHighlighted()
@@ -153,16 +127,6 @@ function CustomLeague._getGameMode()
 	local mode = _MODES[string.lower(_args.mode or '')] or _MODES['default']
 
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
-end
-
-function CustomLeague._getPlatform()
-	if String.isEmpty(_args.platform) then
-		return nil
-	end
-
-	local platform = string.lower(_args.platform or '')
-
-	return _PLATFORMS[platform] or _PLATFORMS['default']
 end
 
 return CustomLeague

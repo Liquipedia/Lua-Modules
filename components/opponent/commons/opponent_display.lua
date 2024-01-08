@@ -21,6 +21,7 @@ local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled =
 
 local zeroWidthSpace = '&#8203;'
 
+---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')
@@ -225,7 +226,19 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
----@param props BlockOpponentProps
+---@class BlockPlayerProps
+---@field flip boolean?
+---@field opponent {players: standardPlayer[]?}
+---@field overflow OverflowModes?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field playerClass string?
+---@field dq boolean?
+---@field note string|number|nil
+
+---@param props BlockPlayerProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent

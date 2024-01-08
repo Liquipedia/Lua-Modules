@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -24,7 +25,6 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
-local _GAME = mw.loadData('Module:GameVersion')
 local _MODES = mw.loadData('Module:GameModes')
 local _FORMATS = mw.loadData('Module:GameFormats')
 
@@ -48,14 +48,8 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}
-			},
-			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
-				}
-			},
+			Cell{name = 'Game version', content = {Game.name{game = _args.game}}},
+			Cell{name = 'Game mode', content = {CustomLeague:_getGameMode()}},
 		}
 	elseif id == 'customcontent' then
 		if _args.player_number then
@@ -70,7 +64,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.mode = CustomLeague:_getGameMode()
 
@@ -78,17 +71,12 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
 	Variables.varDefine('tournament_publishertier', args.pokemonpremier)
 	Variables.varDefine('tournament_mode', CustomLeague:_getGameMode())
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-end
-
-function CustomLeague._getGameVersion()
-	return _GAME[string.lower(_args.game or '')]
 end
 
 function CustomLeague:liquipediaTierHighlighted()

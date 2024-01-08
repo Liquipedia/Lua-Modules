@@ -8,6 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -41,6 +43,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
+---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
 
 League.warnings = {}
@@ -417,7 +420,7 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', string.lower(args.game or ''))
+	Variables.varDefine('tournament_game', Game.toIdentifier{game = args.game})
 
 	-- If no parent is available, set pagename instead to ease querying
 	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
@@ -458,10 +461,10 @@ function League:_setLpdbData(args, links)
 		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
 		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
 		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
-		game = string.lower(args.game or ''),
+		game = Game.toIdentifier{game = args.game},
 		mode = Variables.varDefault('tournament_mode', ''),
 		patch = args.patch,
-		endpatch = args.endpatch or args.epatch,
+		endpatch = args.endpatch or args.epatch or args.patch,
 		type = args.type,
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
 			Table.mapValues(
@@ -499,8 +502,7 @@ function League:_setLpdbData(args, links)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param args table

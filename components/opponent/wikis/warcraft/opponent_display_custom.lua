@@ -55,7 +55,6 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 				overflow = 'ellipsis',
 				playerClass = 'starcraft-bracket-block-player',
 				showLink = false,
-				showRace = not showRaceBackground,
 			}))
 		end
 

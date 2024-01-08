@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -50,14 +49,6 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
@@ -65,6 +56,7 @@ function CustomPlayer.run(frame)
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end

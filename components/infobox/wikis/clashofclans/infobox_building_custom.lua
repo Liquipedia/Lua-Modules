@@ -24,10 +24,9 @@ local MODE_AVAILABILITY = {
 	clan 	= {order = 3, name = 'Clan Capital'},
 }
 
----@class CustomBuildingInfobox: BuildingInfobox
+---@class ClashOfClansCustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
 
----@class CustomWidgetInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 local _args

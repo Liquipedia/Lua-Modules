@@ -50,8 +50,8 @@ function LegacyMatchMaps.solo(frame)
 		width = args.width,
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
-		store = not store,
-		noDuplicateCheck = store,
+		store = store,
+		noDuplicateCheck = not store,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
@@ -188,7 +188,10 @@ function LegacyMatchMaps._readTeamOpponents(args)
 	Array.forEach(Array.range(1, NUMBER_OF_OPPONENTS), function(opponentIndex)
 		local template = args['team' .. opponentIndex]
 		args['team' .. opponentIndex] = nil
-		if template:upper() == BYE then
+		if not template then
+			args['opponent' .. opponentIndex] = Opponent.blank(Opponent.literal)
+			return
+		elseif template:upper() == BYE then
 			args['opponent' .. opponentIndex] = {type = Opponent.literal, name = BYE}
 			return
 		end

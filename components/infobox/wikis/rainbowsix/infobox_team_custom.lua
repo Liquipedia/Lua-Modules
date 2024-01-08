@@ -8,38 +8,43 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 
-local CustomTeam = Class.new()
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	'[[liquipediatiertype::!Showmatch]]',
+	'[[liquipediatiertype::!Qualifier]]',
+	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+	'[[placement::1]]',
+}
 
-local _team
+---@class RainbowsixInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
+	local team = CustomTeam(frame)
+	-- Automatic achievements
+	team.args.achievements = Achievements.team{
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
+
 	return team:createInfobox()
 end
 
-function CustomTeam:createBottomContent()
-	return Template.expandTemplate(
-		mw.getCurrentFrame(),
-		'Upcoming and ongoing matches of',
-		{team = _team.name or _team.pagename}
-	)
-end
-
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 
 	return lpdbData
 end
 
+---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)
 end

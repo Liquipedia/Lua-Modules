@@ -199,7 +199,7 @@ local Mvp = Class.new(
 	end
 )
 
----@param player table
+---@param player table|string
 ---@return MatchSummaryMvp
 function Mvp:addPlayer(player)
 	local playerDisplay
@@ -625,6 +625,8 @@ function MatchSummary.createSubstitutesComment(match)
 			table.insert(comment, table.concat(subString, ' ') .. '.')
 		end)
 	end)
+
+	if Logic.isEmpty(comment) then return end
 
 	return table.concat(comment, tostring(Break():create()))
 end

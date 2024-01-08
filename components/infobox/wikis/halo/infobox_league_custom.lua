@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -27,9 +28,6 @@ local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
 
 local _args
-local _game
-
-local _GAME = mw.loadData('Module:GameVersion')
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -59,10 +57,8 @@ end
 function CustomInjector:parse(id, widgets)
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}},
-			}
+			Cell{name = 'Game version', content = {Game.name{game = _args.game}}},
+		}
 	elseif id == 'customcontent' then
 		--maps
 		if not String.isEmpty(_args.map1) then
@@ -97,8 +93,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = CustomLeague:_concatArgs('map')
 
-	lpdbData.game = _game or args.game
-
 	lpdbData.extradata.maps = Json.stringify(maps)
 	lpdbData.extradata.individual = not String.isEmpty(args.player_number)
 
@@ -109,7 +103,6 @@ function CustomLeague:defineCustomPageVariables()
 	if _args.player_number then
 		Variables.varDefine('tournament_mode', 'solo')
 	end
-	Variables.varDefine('tournament_game', _game or _args.game)
 
 	Variables.varDefine('tournament_publishertier', _args['hcs-sponsored'])
 
@@ -138,12 +131,6 @@ end
 
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(_args['hcs-sponsored'])
-end
-
-function CustomLeague._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
 end
 
 function CustomLeague:_makeMapList()

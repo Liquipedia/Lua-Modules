@@ -60,6 +60,7 @@ function StarcraftParticipantTable.run(frame)
 	participantTable._displaySoloRaceTableSection = StarcraftParticipantTable._displaySoloRaceTableSection
 	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
+	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
 
 	participantTable:read():store()
 
@@ -122,12 +123,17 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	--unset wiki var for random events to not read players as random if prize pool already sets them as random
+	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
+		Variables.varDefine(opponentArgs.name .. '_race', '')
+	end
+
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
@@ -145,6 +151,10 @@ end
 ---@param entry StarcraftParticipantTableEntry
 ---@param config StarcraftParticipantTableConfig
 function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
+	if config.isRandomEvent then
+		lpdbData.opponentplayers.p1faction = Faction.read('r')
+	end
+
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
@@ -299,6 +309,14 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 		end)
 		self.display:node(sectionNode)
 	end)
+end
+
+---@param entry StarcraftParticipantTableEntry
+---@param config StarcraftParticipantTableConfig
+function StarcraftParticipantTable:setCustomPageVariables(entry, config)
+	if config.isRandomEvent then
+		Variables.varDefine(entry.opponent.players[1].displayName .. '_race', Faction.read('r'))
+	end
 end
 
 return StarcraftParticipantTable

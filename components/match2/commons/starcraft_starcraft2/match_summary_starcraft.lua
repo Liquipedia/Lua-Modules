@@ -232,6 +232,8 @@ end
 ---@param options {noLink: boolean}?
 ---@return (Html|string)[]
 function StarcraftMatchSummary.Game(game, options)
+	options = options or {}
+	options.noLink = options.noLink or (game.map or ''):upper() == TBD
 	local getWinnerIcon = function(opponentIndex)
 		return StarcraftMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
 			or game.winner == opponentIndex and 'greenCheck')
@@ -318,7 +320,7 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 		local opponent = submatch.opponents[opponentIndex]
 		local node = opponent
 			and OpponentDisplay.BlockOpponent({
-				opponent = opponent,
+				opponent = opponent --[[@as standardOpponent]],
 				flip = opponentIndex == 1,
 			})
 			or mw.html.create('div'):wikitext('&nbsp;')

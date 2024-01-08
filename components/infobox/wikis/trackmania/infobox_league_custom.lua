@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Game = require('Module:Game')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,8 +22,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
-
-local Games = mw.loadData('Module:Games')
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
@@ -63,9 +62,9 @@ function CustomInjector:parse(id, widgets)
 			name = 'Game' .. (#games > 1 and 's' or ''),
 			content = Array.map(games,
 					function(game)
-						local info = Games[game:lower()]
+						local info = Game.raw{game = game}
 						if not info then
-							return 'Unknown game, check Module:Games.'
+							return 'Unknown game, check Module:Info.'
 						end
 						table.insert(_categories, info.link .. ' Competitions')
 						return Page.makeInternalLink(info.name, info.link)
@@ -134,8 +133,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	end
 
 	lpdbData.maps = table.concat(_league:getAllArgsForBase(_args, 'map'), ';')
-
-	lpdbData.game = (Games[args.game] or {}).link
 
 	-- Legacy, can be superseeded by lpdbData.mode
 	lpdbData.extradata.individual = Variables.varDefault('tournament_mode', 'solo') == 'solo'

@@ -31,6 +31,36 @@ local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDev
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 
+---@class ParticipantTableConfig
+---@field lpdbPrefix string?
+---@field noStorage boolean
+---@field matchGroupSpec table?
+---@field syncPlayers boolean
+---@field showCountBySection boolean
+---@field onlyNotable boolean
+---@field count number?
+---@field colSpan number
+---@field resolveDate string
+---@field sortPlayers boolean sort players within an opponent
+---@field sortOpponents boolean
+---@field showTeams boolean
+---@field title string?
+---@field importOnlyQualified boolean?
+---@field display boolean
+---@field width string
+---@field columnWidth string
+
+---@class ParticipantTableSection
+---@field config ParticipantTableConfig
+---@field entries ParticipantTableEntry
+
+---@class ParticipantTableEntry
+---@field opponent standardOpponent
+---@field name string
+---@field note string?
+---@field dq boolean
+---@field inputIndex integer?
+
 ---@class ParticipantTable
 ---@operator call(Frame): ParticipantTable
 ---@field args table
@@ -56,30 +86,12 @@ function ParticipantTable:read()
 	return self
 end
 
----@class ParticipantTableConfig
----@field lpdbPrefix string?
----@field noStorage boolean
----@field matchGroupSpec table?
----@field syncPlayers boolean
----@field showCountBySection boolean
----@field onlyNotable boolean
----@field count number?
----@field colSpan number
----@field resolveDate string
----@field sortPlayers boolean sort players within an opponent
----@field sortOpponents boolean
----@field showTeams boolean
----@field title string?
----@field importOnlyQualified boolean?
----@field display boolean
----@field width string
----@field columnWidth string
-
 ---@param args table
 ---@param parentConfig ParticipantTableConfig?
 ---@return ParticipantTableConfig
 function ParticipantTable.readConfig(args, parentConfig)
 	parentConfig = parentConfig or {}
+
 	local config = {
 		lpdbPrefix = args.lpdbPrefix or parentConfig.lpdbPrefix or Variables.varDefault('lpdbPrefix'),
 		noStorage = Logic.readBool(args.noStorage or parentConfig.noStorage or
@@ -146,11 +158,6 @@ function ParticipantTable._stashArgs(potentialSection)
 	return potentialSection
 end
 
-
----@class ParticipantTableSection
----@field config ParticipantTableConfig
----@field entries ParticipantTableEntry
-
 ---@param args table
 function ParticipantTable:readSection(args)
 	local config = self.readConfig(args, self.config)
@@ -171,6 +178,7 @@ function ParticipantTable:readSection(args)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
 		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+		self:setCustomPageVariables(entry, config)
 		return entry
 	end)
 
@@ -181,17 +189,15 @@ function ParticipantTable:readSection(args)
 	table.insert(self.sections, section)
 end
 
----@class ParticipantTableEntry
----@field opponent standardOpponent
----@field name string
----@field note string?
----@field dq boolean
----@field inputIndex integer?
+---@param entry ParticipantTableEntry
+---@param config ParticipantTableConfig
+function ParticipantTable:setCustomPageVariables(entry, config)
+end
 
 ---@param sectionArgs table
 ---@param key string|number
 ---@param index number
----@param config any
+---@param config ParticipantTableConfig
 ---@return ParticipantTableEntry
 function ParticipantTable:readEntry(sectionArgs, key, index, config)
 	local prefix = 'p' .. index
@@ -213,12 +219,12 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
@@ -263,7 +269,7 @@ function ParticipantTable:store()
 
 		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
 
-		ParticipantTable:adjustLpdbData(lpdbData, entry, section.config)
+		self:adjustLpdbData(lpdbData, entry, section.config)
 
 		mw.ext.LiquipediaDB.lpdb_placement(self:objectName(lpdbData), Json.stringifySubTables(lpdbData))
 	end) end)

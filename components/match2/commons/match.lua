@@ -71,8 +71,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 	}
-	local LegacyMatch = options.storeMatch1
-		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
@@ -202,7 +202,7 @@ end
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
-		table.insert(list, item)
+		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list
@@ -366,7 +366,6 @@ Match.matchFields = Table.map({
 	'links',
 	'liquipediatier',
 	'liquipediatiertype',
-	'lrthread',
 	'match2bracketdata',
 	'match2bracketid',
 	'match2id',

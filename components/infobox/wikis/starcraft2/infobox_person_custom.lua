@@ -21,6 +21,7 @@ local Variables = require('Module:Variables')
 
 local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
+local STATUS_ACTIVE = 'Active'
 local RACE_ALL = 'All'
 local RACE_ALL_SHORT = 'a'
 local RACE_ALL_ICON = '[[File:RaceIcon All.png|30px|link=]]'
@@ -135,7 +136,7 @@ function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	extradata.role = args.role
 	extradata.role2 = args.role2
 	extradata.militaryservice = self:military(args.military).storeValue
-	extradata.activeplayer = not CustomPerson:getStatusToStore(args)
+	extradata.activeplayer = CustomPerson:getStatusToStore(args) == STATUS_ACTIVE
 		and CustomPerson._isPlayer(args)
 		and Variables.varDefault('isActive', '') or ''
 
@@ -168,16 +169,6 @@ function CustomPerson:military(military)
 	end
 
 	return {}
-end
-
----@param args table
----@return string?
-function CustomPerson:getStatusToStore(args)
-	if args.death_date then
-		return 'Deceased'
-	elseif args.retired then
-		return 'Retired'
-	end
 end
 
 ---@param args table

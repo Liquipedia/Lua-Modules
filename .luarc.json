@@ -7,11 +7,15 @@
 		"trailing-space": "Error"
 	},
 	"diagnostics.neededFileStatus": {
-        "codestyle-check": "None",
-        "name-style-check": "None"
-    },
-    "workspace.library": [
-        "${3rd}/busted/library",
-        "${3rd}/luassert/library"
-    ]
+		"codestyle-check": "None",
+		"name-style-check": "None"
+	},
+	"workspace.library": [
+		"${3rd}/busted/library",
+		"${3rd}/luassert/library"
+	],
+	"workspace.ignoreDir": [
+		".vscode",
+		"3rd"
+	]
 }

@@ -37,6 +37,8 @@ describe('flags', function()
 
 			Flags.Icon{shouldLink = false, flag = 'dummy'}
 			assert.stub(TemplateMock).was.called_with(nil, 'FlagNoLink/dummy')
+
+			TemplateMock:revert()
 		end)
 	end)
 

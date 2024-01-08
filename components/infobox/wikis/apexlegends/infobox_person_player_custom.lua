@@ -9,9 +9,9 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local LegendIcon = require('Module:LegendIcon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local UpcomingMatches = require('Module:Matches Player')
@@ -56,19 +56,12 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -151,10 +144,8 @@ function CustomPlayer:createBottomContent(infobox)
 end
 
 function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
-		return {}
-	end
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+	local status = Logic.readBool(_args.banned) and 'Banned' or Logic.emptyOr(_args.banned, _args.status)
+	return {Page.makeInternalLink({onlyIfExists = true}, status) or status}
 end
 
 function CustomPlayer._createRole(key, role)

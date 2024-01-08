@@ -1,0 +1,60 @@
+/*******************************************************************************
+Template(s): Statistics table
+Author(s): Clubfan
+*******************************************************************************/
+.statstable {
+	text-align: center;
+}
+
+.statstable .stats-map-row .stats-map-name {
+	text-align: left;
+}
+
+.statstable .stats-tvz-4,
+.statstable .stats-zvp-4,
+.statstable .stats-pvt-4 {
+	text-align: right;
+	padding-right: 5px;
+}
+
+/*******************************************************************************
+Template(s): Champion statistics table
+Author(s): Inflicted
+*******************************************************************************/
+
+tr.dota-stat-row > td {
+	vertical-align: top !important;
+	width: 30px;
+}
+
+.dota-stat-popup {
+	border: 1px solid #a9a9a9;
+	width: calc( ~"100% - 5px" );
+	min-width: 1150px;
+	background: var( --clr-background, #f8f9fa );
+	position: absolute;
+	left: 5px;
+	margin-top: 12px;
+	box-shadow: 5px 5px 20px rgba( 0, 0, 0, 0.3 );
+}
+
+.dota-stat-popup-header {
+	font-size: 20px;
+	font-weight: bold;
+	margin-top: 10px;
+}
+
+.dota-stat-popup-info > div {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.dota-stat-popup-button {
+	background: #d3d3d3;
+	background-color: #d3d3d3 !important;
+	border: 0 !important;
+	box-shadow: 2px 2px 2px rgba( 0, 0, 0, 0.1 );
+	font-size: 10px;
+	overflow: hidden;
+	height: 15px !important;
+}

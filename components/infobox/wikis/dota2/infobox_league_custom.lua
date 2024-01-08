@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -20,16 +21,9 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local _args
-local _league
 
 local CustomLeague = Class.new()
 local CustomInjector = Class.new(Injector)
-
-local _GAMES = {
-	dota2 = {name = 'Dota 2', category = 'Dota 2 Competitions'},
-	dota = {name = 'DotA', category = 'DotA Competitions'},
-	hon = {name = 'Heroes of Newerth', category = 'Heroes of Newerth Competitions'},
-}
 
 function CustomLeague.run(frame)
 	local league = League(frame)
@@ -45,8 +39,7 @@ function CustomLeague.run(frame)
 	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
 	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
 
-	_league = league
-	_args = _league.args
+	_args = league.args
 
 	return league:createInfobox()
 end
@@ -59,7 +52,7 @@ function CustomInjector:addCustomCells(widgets)
 	local args = _args
 	table.insert(widgets, Cell{
 		name = 'Game',
-		content = {CustomLeague:_createGameCell(args)}
+		content = {Game.text{game = _args.game}}
 	})
 	table.insert(widgets, Cell{
 		name = 'Version',
@@ -117,8 +110,6 @@ function CustomLeague:liquipediaTierHighlighted(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = string.lower(args.game or 'dota2')
-
 	lpdbData.extradata.valvepremier = String.isNotEmpty(args.valvepremier) and '1' or '0'
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
@@ -135,7 +126,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_publisher_major', args.valvepremier)
 	Variables.varDefine('tournament_pro_circuit_tier', args.pctier)
 	Variables.varDefine('tournament_publishertier', args.pctier)
-	Variables.varDefine('tournament_game', string.lower(args.game or 'dota2'))
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
@@ -153,28 +143,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', edate)
 	Variables.varDefine('sdate', sdate)
 	Variables.varDefine('edate', edate)
-end
-
-function CustomLeague:_gameLookup(game)
-	if String.isEmpty(game) then
-		return nil
-	end
-
-	return _GAMES[game:lower()]
-end
-
-function CustomLeague:_createGameCell(args)
-	if String.isEmpty(args.game) then
-		return nil
-	end
-
-	local game = CustomLeague:_gameLookup(args.game)
-
-	if game then
-		return '[['.. game.name ..']]' .. '[[Category:'.. game.category ..']]'
-	else
-		return nil
-	end
 end
 
 function CustomLeague:_createPatchCell(args)

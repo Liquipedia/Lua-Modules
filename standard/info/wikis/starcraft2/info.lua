@@ -57,4 +57,5 @@ return {
 
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
+	match2 = 2,
 }

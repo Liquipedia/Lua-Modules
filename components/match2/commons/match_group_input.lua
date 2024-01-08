@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -528,13 +528,15 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		}
 	end
 
+	---@param playerData table|string|nil
 	---@return standardPlayer?
-	local getStandardPlayer = function(standardPlayerInput)
-		local playerJson = Json.parseIfTable(standardPlayerInput) or {}
+	local getStandardPlayer = function(playerData)
+		if not playerData then return end
+		playerData = type(playerData) == 'string' and {playerData} or playerData
 		local player = {
-			displayName = Logic.emptyOr(playerJson.displayName, playerJson.displayName, playerJson[1] or playerJson.name),
-			pageName = Logic.emptyOr(playerJson.pageName or playerJson.pageName or playerJson.link),
-			flag = playerJson.flag,
+			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
+			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
+			flag = playerData.flag,
 		}
 		if Logic.isEmpty(player.displayName) then return end
 		player = PlayerExt.populatePlayer(player)
@@ -542,16 +544,19 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		return player
 	end
 
-	local substitutes = Json.parseIfTable(opponent.substitutes) or {}
+	local substitutions, parseFailure = Json.parseStringified(opponent.substitutes)
+	if parseFailure then
+		substitutions = {}
+	end
 
-	local readSubstitute = function(prefix, substituteInput)
-		local index = prefix:sub(4)
-		local substitute = getStandardPlayer(substituteInput)
-		if not substitute then return end
+	--handle `substitutes` input for opponenets
+	Array.forEach(substitutions, function(substitution)
+		if type(substitution) ~= 'table' or not substitution['in'] then return end
+		local substitute = getStandardPlayer(substitution['in'])
 
-		local subbedGames = substitutes['games' .. index]
+		local subbedGames = substitution['games']
 
-		local player = getStandardPlayer(substitutes['player' .. index])
+		local player = getStandardPlayer(substitution['out'])
 		if player then
 			players[player.pageName] = subbedGames and players[player.pageName] or nil
 		end
@@ -561,16 +566,11 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 			substitute = substitute,
 			player = player,
 			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
-			reason = substitutes['reason' .. index],
+			reason = substitution['reason'],
 		})
 
 		insertIntoPlayers(substitute)
-	end
-
-	--handle substitutes input for opponenets
-	for prefix, substituteOpponent in Table.iter.pairsByPrefix(substitutes, 'sub', {requireIndex = false}) do
-		readSubstitute(prefix, substituteOpponent)
-	end
+	end)
 
 	opponent.match2players = Array.extractValues(players)
 	Array.sortInPlaceBy(opponent.match2players, function (player)

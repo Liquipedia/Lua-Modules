@@ -27,17 +27,12 @@ local LEFT_SIDE = 1
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|First pick]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|First pick]]'
 
-local htmlCreate = mw.html.create
-
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local ICONS = {
 	check = GREEN_CHECK,
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
-}
+local LINK_DATA = {}
 
 local CustomMatchSummary = {}
 
@@ -273,7 +268,7 @@ end
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex] or ''
-	return htmlCreate('div'):wikitext(score)
+	return mw.html.create('div'):wikitext(score)
 end
 
 ---@param game MatchGroupUtilGame
@@ -283,7 +278,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Header
 	if Logic.isNotEmpty(game.header) then
-		local mapHeader = htmlCreate('div')
+		local mapHeader = mw.html.create('div')
 			:wikitext(game.header)
 			:css('font-weight','bold')
 			:css('font-size','85%')
@@ -292,7 +287,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local centerNode = htmlCreate('div')
+	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:wikitext(CustomMatchSummary._getMapDisplay(game))
 		:css('text-align', 'center')
@@ -301,12 +296,12 @@ function CustomMatchSummary._createMapRow(game)
 		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
-	local leftNode = htmlCreate('div')
+	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
-	local rightNode = htmlCreate('div')
+	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
@@ -321,7 +316,7 @@ function CustomMatchSummary._createMapRow(game)
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
-		local comment = htmlCreate('div')
+		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
 		row:addElement(comment)
@@ -344,7 +339,7 @@ end
 ---@param iconType string
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = htmlCreate('div')
+	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
 
 	if showIcon then

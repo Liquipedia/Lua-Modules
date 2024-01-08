@@ -22,7 +22,7 @@ local Opponent = OpponentLibrary.Opponent
 local TeamCardStorage = {}
 
 ---@param args table
----@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?}
+---@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?, aliases: string[]?}
 ---@param players table
 ---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
@@ -49,6 +49,11 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 
 	-- If a custom override for LPDB exists, use it
 	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, lpdbPrefix) or lpdbData
+
+	-- Store aliases (page names) for opponenets for setting page vars
+	if Table.isNotEmpty(teamObject.aliases) then
+		lpdbData.extradata.opponentaliases = teamObject.aliases
+	end
 
 	-- Store into the standardized lpdb fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(

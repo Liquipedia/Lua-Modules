@@ -9,6 +9,7 @@
 local Json = {}
 
 local Arguments = require('Module:Arguments')
+local Table = require('Module:Table')
 
 ---Json-stringifies all arguments from a supplied frame.
 ---@param frame Frame
@@ -103,6 +104,20 @@ function Json.parseIfTable(any)
 		end
 	end
 	return nil
+end
+
+---Parses a given JSON input from a template call to `Json.stringify()`.
+---If the parse fails it returns the original input.
+---Second return value boolean indicates a failed parse.
+---@param any string
+---@return table, boolean
+---@overload fun(any: any): any, true
+function Json.parseStringified(any)
+	local tbl = Json.parseIfTable(any)
+	if not tbl then
+		return any, true
+	end
+	return Table.mapValues(tbl, Json.parseStringified), false
 end
 
 return Json

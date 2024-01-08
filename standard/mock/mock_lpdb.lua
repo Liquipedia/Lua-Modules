@@ -129,9 +129,10 @@ dbStructure.squadplayer = {
 ---- query with `::`
 ---- order
 ---- groupby
----@param dbTable string
+---@generic T:LpdbBaseData
+---@param dbTable `T`
 ---@param parameters table
----@return table
+---@return T[]
 function mockLpdb.lpdb(dbTable, parameters)
 	local lpdbData = mockLpdb._getMockData(dbTable)
 

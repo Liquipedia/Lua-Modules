@@ -70,8 +70,6 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = args.platform
-
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number)
 
 	return lpdbData

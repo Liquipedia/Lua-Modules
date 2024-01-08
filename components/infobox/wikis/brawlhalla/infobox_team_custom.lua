@@ -12,15 +12,20 @@ local Variables = require('Module:Variables')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
-local CustomTeam = Class.new()
+---@class BrawlhallaInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	team.addToLpdb = CustomTeam.addToLpdb
+	local team = CustomTeam(frame)
 
 	return team:createInfobox()
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 

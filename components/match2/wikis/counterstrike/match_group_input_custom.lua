@@ -342,7 +342,6 @@ end
 function matchFunctions.getLinks(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
 
 	match.links = {}
 

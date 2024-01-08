@@ -1,0 +1,76 @@
+/*******************************************************************************
+Template(s): Automatic points tables
+Author(s): XtratoS
+*******************************************************************************/
+.automatic-points-table .fixed-size-table-container {
+	border-style: solid;
+	border-width: 1px 0 0 1px;
+	overflow: hidden;
+	margin-bottom: 20px;
+}
+
+.automatic-points-table .divTable.border-bottom {
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+}
+
+.automatic-points-table .diagonal-header-div-cell {
+	min-width: 50px;
+	max-width: 50px;
+	transform: translate( 63.5px, 74px ) rotate( -45deg );
+}
+
+.automatic-points-table .diagonal-header-div-cell.ranking {
+	min-width: 35px;
+	max-width: 35px;
+	transform: translate( 50.5px, 79px ) rotate( -45deg );
+}
+
+.automatic-points-table .diagonal-header-div-cell.team {
+	min-width: 225px;
+	max-width: 225px;
+	transform: translate( 212px, 12.5px ) rotate( -45deg );
+}
+
+.automatic-points-table .diagonal-header-div-cell .content {
+	border-bottom-style: solid;
+	border-bottom-width: 1px;
+	width: 201px;
+	height: 35.3px;
+	white-space: nowrap;
+	margin-left: -5px;
+	padding-top: 6px;
+	background-color: #f5f5f5;
+}
+
+.automatic-points-table .divCell.border-top-right {
+	border-style: solid;
+	border-width: 1px 1px 0 0;
+}
+
+.automatic-points-table .divHeaderRow.diagonal {
+	height: 140px;
+}
+
+.automatic-points-table .divCell > .deduction-box {
+	padding: 0 3px;
+	margin: auto;
+	font-size: 0.8rem;
+	box-shadow: 1px 1px 2px;
+}
+
+.automatic-points-table .divCell.name-cell {
+	max-width: 225px;
+	text-align: left;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.automatic-points-table .divCell.va-middle {
+	vertical-align: middle;
+}
+
+.automatic-points-table .divCell.centered-cell:not( .name-cell ) {
+	text-align: center;
+}

@@ -294,7 +294,7 @@ function PortalPlayers.toOpponent(player)
 		link = player.pagename,
 		name = player.id,
 		flag = player.nationality,
-	}))
+	}))--[[@as standardOpponent]]
 end
 
 return PortalPlayers

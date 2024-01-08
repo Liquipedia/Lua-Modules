@@ -1,0 +1,23 @@
+/*******************************************************************************
+Template(s): Select all for pre elements
+Author(s): Chapatiyaq
+*******************************************************************************/
+div.selectall-relative {
+	position: relative;
+}
+
+textarea.selectall-duplicate {
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	background: #ffffff;
+	border: 1px solid transparent;
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	white-space: pre;
+	-moz-tab-size: 13;
+	tab-size: 13;
+}

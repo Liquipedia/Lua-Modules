@@ -29,4 +29,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Freefire Default Logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Freefire Default Logo.png', ---@deprecated
+	match2 = 0,
 }

@@ -1,0 +1,51 @@
+/*******************************************************************************
+Template(s): TeamCard Columns
+Author(s): FO-nTTaX
+*******************************************************************************/
+.cols-2 {
+	max-width: 420px;
+}
+
+@media ( min-width: 840px ) {
+	.cols-2 {
+		max-width: 840px;
+	}
+}
+
+@media ( min-width: 1260px ) {
+	.cols-2 {
+		max-width: 1260px;
+	}
+}
+
+@media ( min-width: 1680px ) {
+	.cols-2 {
+		max-width: 1680px;
+	}
+}
+
+.cols-3 {
+	max-width: 630px;
+}
+
+@media ( min-width: 1260px ) {
+	.cols-3 {
+		max-width: 1260px;
+	}
+}
+
+@media ( min-width: 1890px ) {
+	.cols-3 {
+		max-width: 1890px;
+	}
+}
+
+.cols-4 {
+	max-width: 840px;
+}
+
+@media ( min-width: 1680px ) {
+	.cols-4 {
+		max-width: 1680px;
+	}
+}
