@@ -28,5 +28,5 @@ return {
 	defaultGame = 'wildrift',
 	defaultTeamLogo = 'Wild Rift Teamcard.png', ---@deprecated
 	defaultTeamLogoDark = 'Wild Rift Teamcard.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }
