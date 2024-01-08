@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -38,7 +39,6 @@ local LINKS_DATA = {
 	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 }
 
-local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
 
 ---Custom Class for displaying game details in submatches
@@ -147,7 +147,7 @@ function CustomMatchSummary.createBody(match)
 		CustomMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 	end
 
-	if match.opponentMode == UNIFORM_MATCH then
+	if match.isUniformMode then
 		Array.forEach(match.games, function(game)
 			body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game')
 				:addElements(CustomMatchSummary.Game(game, hasHeroes))) end)
@@ -159,10 +159,8 @@ function CustomMatchSummary.createBody(match)
 	if Table.isNotEmpty(match.vetoes) then
 		-- add Veto Header
 		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-header brkts-popup-sc-veto-center'):addElement('Vetoes'))
+		Array.forEach(Array.map(match.vetoes, CustomMatchSummary.Veto), FnUtil.curry(body.addRow, body))
 	end
-	Array.forEach(match.vetoes, function(veto)
-		body:addRow(CustomMatchSummary.Veto(veto))
-	end)
 
 	if match.casters then
 		local casters = Json.parseIfString(match.casters)
@@ -179,7 +177,7 @@ end
 
 ---@param match table
 function CustomMatchSummary.computeOffFactions(match)
-	if match.opponentMode == UNIFORM_MATCH then
+	if match.isUniformMode then
 		CustomMatchSummary.computeMatchOffFactions(match)
 	else
 		for _, submatch in pairs(match.submatches) do
@@ -343,9 +341,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 
 	local details = SubmatchCollapsible()
 	for _, game in ipairs(submatch.games) do
-		if game.map ~= 'Submatch Score Fix' then
-			details:game(CustomMatchSummary.Game(game, true))
-		end
+		details:game(CustomMatchSummary.Game(game, true))
 	end
 
 	return submatchDisplay:addElement(details:create()):css('margin-bottom', '8px')

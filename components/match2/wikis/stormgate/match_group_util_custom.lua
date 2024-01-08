@@ -19,8 +19,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
 local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
 
-local TEAM_DISPLAY_MODE = 'team'
-local UNIFORM_DISPLAY_MODE = 'uniform'
 local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
@@ -72,11 +70,11 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 ---@field games StormgateMatchGroupUtilGame[]
 ---@field isFfa boolean
 ---@field noScore boolean?
----@field opponentMode 'uniform'|'team'
 ---@field opponents StormgateStandardOpponent[]
 ---@field vetoes StormgateMatchGroupUtilVeto[]
 ---@field submatches StormgateMatchGroupUtilSubmatch[]?
 ---@field casters string?
+---@field isUniformMode boolean
 
 ---@param record table
 ---@return StormgateMatchGroupUtilMatch
@@ -91,13 +89,11 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 		game.opponents = CustomMatchGroupUtil.computeGameOpponents(game, match.opponents)
 	end
 
-	-- Determine whether the match is a team match with different players each game
-	match.opponentMode = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
-		and TEAM_DISPLAY_MODE or UNIFORM_DISPLAY_MODE
+	match.isUniformMode = Array.all(match.opponents, function(opponent) return opponent.type  ~= Opponent.team end)
 
 	local extradata = match.extradata
 	---@cast extradata table
-	if match.opponentMode == TEAM_DISPLAY_MODE then
+	if not match.isUniformMode then
 		-- Compute submatches
 		match.submatches = Array.map(
 			CustomMatchGroupUtil.groupBySubmatch(match.games),
@@ -190,11 +186,9 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		table.insert(opponentPlayers[opponentIndex], player)
 	end
 
-	local modeParts = mw.text.split(game.mode or '', 'v')
-
 	-- Create game opponents
 	local opponents = {}
-	for opponentIndex = 1, #modeParts do
+	for opponentIndex = 1, 2 do
 		local opponent = {
 			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIndex)),
 			players = opponentPlayers[opponentIndex] or {},
