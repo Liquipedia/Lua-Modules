@@ -110,6 +110,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	return {}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
