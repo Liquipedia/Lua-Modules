@@ -244,7 +244,8 @@ end
 ---@return Html?
 function Team:_createUpcomingMatches()
 	if self:shouldStore(self.args) and Info.match2 > 0 then
-		return MatchTicker.team{short = true}
+		local frame = {short = true} ---@type Frame
+		return MatchTicker.team(frame)
 	end
 end
 
