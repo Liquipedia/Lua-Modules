@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
