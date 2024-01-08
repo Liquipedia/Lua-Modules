@@ -18,6 +18,7 @@ local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class HaloMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
@@ -37,7 +38,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		Array.appendWith(widgets,
+		Array.appendWith(widgets, 
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Max Players', content = {args.players}},
 			Cell{name = 'Game Version', content = {self.caller:getGameVersion(args)}, options = {makeLink = true}},
@@ -47,6 +48,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+--@return string[]
 function CustomMap:getGameVersion(args)
 	local game = string.lower(args.game or '')
 	game = GAME[game]
@@ -82,8 +84,8 @@ function CustomMap:addToLpdb(lpdbData, args)
 	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
-	lpdbData.extradata.game = game
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
+	lpdbData.extradata.game = args.game
+	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 
