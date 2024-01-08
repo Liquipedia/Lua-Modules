@@ -60,7 +60,7 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate') or Variables.varDefault('Match_date')
+	local suggestedDate = Variables.varDefault('matchDate')
 
 	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
 
@@ -103,10 +103,10 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
-	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
+	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('tournament_cancelled', 'false'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	match.bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
-	Variables.varDefine('bestof', match.bestof)
+	match.bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('match_bestof')))
+	Variables.varDefine('match_bestof', match.bestof)
 
 	MatchGroupInput.getCommonTournamentVars(match)
 end
