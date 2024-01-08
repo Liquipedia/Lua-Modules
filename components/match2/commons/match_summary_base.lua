@@ -626,6 +626,8 @@ function MatchSummary.createSubstitutesComment(match)
 		end)
 	end)
 
+	if Logic.isEmpty(comment) then return end
+
 	return table.concat(comment, tostring(Break():create()))
 end
 
