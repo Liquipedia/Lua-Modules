@@ -104,7 +104,7 @@ function CustomOpponentDisplay.BlockOpponent(props)
 
 	if opponent.type == Opponent.literal and opponent.extradata.hasFactionOrFlag then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
-	elseif Opponent.typeIsParty((opponent or {}).type) then
+	elseif Opponent.typeIsParty(opponent.type) then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	end
 

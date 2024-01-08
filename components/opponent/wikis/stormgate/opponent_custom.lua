@@ -46,11 +46,10 @@ CustomOpponent.types.Opponent = TypeUtil.union(
 ---@return StormgateStandardOpponent?
 function CustomOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args) --[[@as StormgateStandardOpponent?]]
-	local partySize = Opponent.partySize((opponent or {}).type)
 
-	if not opponent then
-		return nil
-	end
+	if not opponent then return nil end
+
+	local partySize = Opponent.partySize(opponent.type)
 
 	if partySize == 1 then
 		opponent.players[1].faction = Faction.read(args.faction)
@@ -120,9 +119,7 @@ end
 ---@return StormgateStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
-	if opponent.type == Opponent.team then
-		return Opponent.resolve(opponent --[[@as standardOpponent]], date, options) --[[@as StormgateStandardOpponent]]
-	elseif Opponent.typeIsParty(opponent.type) then
+	if Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local hasFaction = String.isNotEmpty(player.faction)
@@ -138,8 +135,11 @@ function CustomOpponent.resolve(opponent, date, options)
 				player.team = TeamTemplate.resolve(player.team, date)
 			end
 		end
+
+		return opponent
 	end
-	return opponent
+
+	return Opponent.resolve(opponent, date, options) --[[@as StormgateStandardOpponent]]
 end
 
 return CustomOpponent
