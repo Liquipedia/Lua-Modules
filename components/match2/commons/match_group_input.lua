@@ -484,11 +484,29 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 	local name = Variables.varDefault(varPrefix)
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
-		insertIntoPlayers{
-			pageName = name,
-			displayName = Variables.varDefault(varPrefix .. 'dn'),
-			flag = Variables.varDefault(varPrefix .. 'flag'),
-		}
+
+		local wasPresentInMatch = function()
+			if not match.timestamp then return true end
+
+			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
+			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
+
+			if (not joinDate) and (not leaveDate) then return true end
+
+			-- need to offset match time to correct timezone as transfers do not have a time associated with them
+			local timestampLocal = match.timestamp + DateExt.getOffsetSeconds(match.timezoneOffset or '')
+
+			return (not joinDate or (joinDate <= timestampLocal)) and
+				(not leaveDate or (leaveDate > timestampLocal))
+		end
+
+		if wasPresentInMatch() then
+			insertIntoPlayers{
+				pageName = name,
+				displayName = Variables.varDefault(varPrefix .. 'dn'),
+				flag = Variables.varDefault(varPrefix .. 'flag'),
+			}
+		end
 		playerIndex = playerIndex + 1
 		varPrefix = teamName .. '_p' .. playerIndex
 		name = Variables.varDefault(varPrefix)
