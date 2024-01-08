@@ -12,21 +12,28 @@ local String = require('Module:StringUtils')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
-local CustomTeam = Class.new()
+---@class CallofdutyInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
+	local team = CustomTeam(frame)
+
 	return team:createInfobox()
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.competesin = (args.league or ''):upper()
 
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 

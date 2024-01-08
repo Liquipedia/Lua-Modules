@@ -155,11 +155,11 @@ function CustomLeague:_computeChronology(args)
 
 	local fromAutomated = function(shiftedNumber)
 		local page = title.basePageTitle:subPageTitle(tostring(shiftedNumber)).fullText
-		return Page.exists(page) and page or nil
+		return Page.exists(page) and (page .. '|#' .. shiftedNumber) or nil
 	end
 
 	args.previous = Logic.emptyOr(args.previous, fromAutomated(number - 1))
-	args.next = Logic.emptyOr(args.previous, fromAutomated(number + 1))
+	args.next = Logic.emptyOr(args.next, fromAutomated(number + 1))
 end
 
 ---@param id string
@@ -179,7 +179,7 @@ function CustomInjector:parse(id, widgets)
 				Title{name = 'Participants'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{content = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -328,7 +328,7 @@ end
 ---@param args table
 ---@return {link: string, displayname: string}[]
 function CustomLeague:_getMaps(prefix, args)
-	local mapArgs = self:getAllArgsForBase(args, 'map')
+	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')

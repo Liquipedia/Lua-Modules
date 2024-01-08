@@ -120,7 +120,8 @@ function MatchTicker:init(args)
 		not (config.upcoming or config.ongoing)),
 		'Invalid recent, upcoming, ongoing combination')
 
-	local teamPages = args.team and Team.queryHistoricalNames(args.team) or nil
+	local teamPages = args.team and Team.queryHistoricalNames(args.team)
+		or args.team and {args.team} or nil
 	if teamPages then
 		Array.extendWith(teamPages,
 		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),

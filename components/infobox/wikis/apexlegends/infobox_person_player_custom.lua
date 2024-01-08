@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local LegendIcon = require('Module:LegendIcon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -143,10 +144,8 @@ function CustomPlayer:createBottomContent(infobox)
 end
 
 function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
-		return {}
-	end
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+	local status = Logic.readBool(_args.banned) and 'Banned' or Logic.emptyOr(_args.banned, _args.status)
+	return {Page.makeInternalLink({onlyIfExists = true}, status) or status}
 end
 
 function CustomPlayer._createRole(key, role)
