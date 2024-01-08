@@ -522,13 +522,7 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	end
 
 	if hasManualScores then
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
-			if not tonumber(map.winner) then
-				map.winner = scoreIndex
-			else
-				break
-			end
-		end
+		map.winner = tonumber(map.winner) or CustomMatchGroupInput._getWinner(indexedScores)
 
 		return map
 	end
@@ -727,27 +721,30 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 	end)
 end
 
--- function to sort out winner/placements
----@param tbl table
----@param key1 string
----@param key2 string
+---@param indexedScores table
+---@return integer?
+function CustomMatchGroupInput._getWinner(indexedScores)
+	table.sort(indexedScores, CustomMatchGroupInput._mapWinnerSortFunction)
+
+	return indexedScores[1].index
+end
+
+---@param opponent1 table
+---@param opponent2 table
 ---@return boolean
-function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
-	local opponent1 = tbl[key1]
-	local opponent2 = tbl[key2]
-	local opponent1Norm = opponent1.status == 'S'
-	local opponent2Norm = opponent2.status == 'S'
-	if opponent1Norm then
-		if opponent2Norm then
-			return tonumber(opponent1.score) > tonumber(opponent2.score)
-		else return true end
-	else
-		if opponent2Norm then return false
-		elseif opponent1.status == 'W' then return true
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent1.status) then return false
-		elseif opponent2.status == 'W' then return false
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
-		else return true end
+function CustomMatchGroupInput._mapWinnerSortFunction(opponent1, opponent2)
+	local opponent1Norm = opponent1.status == SCORE_STATUS
+	local opponent2Norm = opponent2.status == SCORE_STATUS
+
+	if opponent1Norm and opponent2Norm then
+		return tonumber(opponent1.score) > tonumber(opponent2.score)
+	elseif opponent1Norm then return true
+	elseif opponent2Norm then return false
+	elseif opponent1.status == DEFAULT_WIN_STATUS then return true
+	elseif Table.includes(ALLOWED_STATUSES, opponent1.status) then return false
+	elseif opponent2.status == DEFAULT_WIN_STATUS then return false
+	elseif Table.includes(ALLOWED_STATUSES, opponent2.status) then return true
+	else return true
 	end
 end
 
