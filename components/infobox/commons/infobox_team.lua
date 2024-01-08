@@ -15,8 +15,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Table = require('Module:Table')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
@@ -206,7 +206,7 @@ end
 function Team:createRegion(region)
 	if Logic.isEmpty(region) then return {} end
 
-	return Region.run{region = region} or {}
+	return Region.run{region = region, linkToCategory = true} or {}
 end
 
 ---@param location string?
