@@ -190,8 +190,6 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
@@ -199,7 +197,7 @@ function Team:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(infobox:build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 
