@@ -328,7 +328,7 @@ end
 ---@param args table
 ---@return {link: string, displayname: string}[]
 function CustomLeague:_getMaps(prefix, args)
-	local mapArgs = self:getAllArgsForBase(args, 'map')
+	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')
