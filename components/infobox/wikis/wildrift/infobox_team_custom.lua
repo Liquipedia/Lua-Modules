@@ -60,13 +60,4 @@ function CustomInjector:addCustomCells(id, widgets)
 	return widgets
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
-end
-
 return CustomTeam
