@@ -52,13 +52,4 @@ function CustomTeam:createBottomContent()
 	)
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
-end
-
 return CustomTeam
