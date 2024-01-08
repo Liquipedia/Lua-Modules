@@ -19,6 +19,7 @@ local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class AgeofEmpiresMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
