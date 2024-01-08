@@ -257,31 +257,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----CreateMatch cs specific overwrite due to altered styles for match comment
----@param matchData table?
----@return MatchSummaryMatch?
-function CustomMatchSummary.createMatch(matchData)
-	if not matchData then
-		return
-	end
-
-	local match = MatchSummary.Match()
-
-	match
-		:header(MatchSummary.createDefaultHeader(matchData))
-		:body(CustomMatchSummary.createBody(matchData))
-
-	if matchData.comment then
-		local comment = MatchSummary.Comment():content(matchData.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
-		match:comment(comment)
-	end
-
-	match:footer(CustomMatchSummary.addToFooter(matchData, MatchSummary.Footer()))
-
-	return match
-end
-
 ---@param match MatchGroupUtilMatch
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter

@@ -6,10 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
+local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
@@ -281,6 +284,7 @@ local Comment = Class.new(
 ---@param content Html|string|number
 ---@return MatchSummaryComment
 function Comment:content(content)
+	if Logic.isEmpty(content) then return self end
 	self.root:node(content):node(Break():create())
 	return self
 end
@@ -575,6 +579,58 @@ function MatchSummary.addVodsToFooter(match, footer)
 	return footer
 end
 
+---Creates a match footer with vods if vods are set
+---@param match table
+---@return string
+function MatchSummary.createSubstitutesComment(match)
+	local comment = {}
+	Array.forEach(match.opponents, function(opponent)
+		local substitutions = (opponent.extradata or {}).substitutions
+		if Logic.isEmpty(substitutions) then
+			return
+		end
+
+		Array.forEach(substitutions, function(substitution)
+			if Logic.isEmpty(substitution.substitute) then
+				return
+			end
+
+			local subString = {}
+			table.insert(subString, string.format('%s stands in',
+				tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
+			))
+
+			if Logic.isNotEmpty(substitution.player) then
+				table.insert(subString, string.format('for %s',
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
+				))
+			end
+
+			if opponent.type == Opponent.team then
+				local team = require('Module:Team').queryRaw(opponent.template)
+				if team then
+					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
+				end
+			end
+
+			if Table.isNotEmpty(substitution.games) then
+				local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
+				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
+			end
+
+			if String.isNotEmpty(substitution.reason) then
+				table.insert(subString, string.format('due to %s', substitution.reason))
+			end
+
+			table.insert(comment, table.concat(subString, ' ') .. '.')
+		end)
+	end)
+
+	if Logic.isEmpty(comment) then return end
+
+	return table.concat(comment, tostring(Break():create()))
+end
+
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
@@ -592,8 +648,10 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	match:body(CustomMatchSummary.createBody(matchData))
 
-	if matchData.comment then
-		local comment = MatchSummary.Comment():content(matchData.comment)
+	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
+
+	if matchData.comment or substituteComment then
+		local comment = MatchSummary.Comment():content(matchData.comment):content(substituteComment)
 		match:comment(comment)
 	end
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.addVodsToFooter
