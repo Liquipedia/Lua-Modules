@@ -151,6 +151,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 		local opponent = match['opponent' .. opponentIndex]
 
 		if Logic.isEmpty(opponent) then return end
+
 		numberofOpponents = numberofOpponents + 1
 
 		if Table.includes(ALLOWED_STATUSES, string.upper(opponent.score or '')) then
@@ -180,6 +181,9 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = opponent.score or -1
 			end
 		end
+
+		-- to not break the loop
+		return true
 	end)
 
 	CustomMatchGroupInput._determineWinnerIfMissing(match)
