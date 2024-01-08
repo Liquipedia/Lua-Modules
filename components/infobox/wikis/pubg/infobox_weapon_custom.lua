@@ -43,8 +43,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{name = 'Ammo Type', content = {args.ammotype}},
 			Cell{name = 'Throw Speed', content = {args.throwspeed}},
-			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}},
-			Cell{name = 'Maps', content = {args.maps}}
+			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}}
 		)
 
 		if String.isEmpty(args.map1) then
