@@ -16,12 +16,12 @@ return {
 			name = 'Team Fortress 2',
 			link = 'Team Fortress 2',
 			logo = {
-				darkMode = 'Team Fortress logo.png',
-				lightMode = 'Team Fortress logo.png',
+				darkMode = 'Team Fortress default allmode.png',
+				lightMode = 'Team Fortress default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Team Fortress logo.png',
-				lightMode = 'Team Fortress logo.png',
+				darkMode = 'Team Fortress default allmode.png',
+				lightMode = 'Team Fortress default allmode.png',
 			},
 		},
 	},
