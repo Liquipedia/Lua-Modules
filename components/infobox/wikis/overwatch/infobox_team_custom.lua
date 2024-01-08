@@ -38,8 +38,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	lpdbData.extradata.competesin = string.upper(args.league or '')
 
 	return lpdbData
