@@ -120,7 +120,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = nil
 	lpdbData.extradata.subteams = self:_listSubTeams()
 
 	lpdbData.extradata.playerearnings = Table.extract(self.playerEarnings, 'total')
