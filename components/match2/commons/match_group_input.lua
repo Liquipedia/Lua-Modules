@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
 
 local OpponentLibraries = require('Module:OpponentLibraries')
