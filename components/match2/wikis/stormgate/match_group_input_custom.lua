@@ -31,7 +31,7 @@ local DEFAULT_BEST_OF = 99
 local LINKS_KEYS = {'preview', 'interview', 'review'}
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
-local NEUTRAL_HERO_FACTION = 'neutral'
+local DEFAULT_HERO_FACTION = HeroData.default.faction
 
 local CustomMatchGroupInput = {}
 
@@ -179,7 +179,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 						opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
 					end
 				elseif Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
-					if tonumber(match.winner or 0) == opponentIndex then
+					if (tonumber(match.winner) or 0) == opponentIndex then
 						opponent.status = 'W'
 					else
 						opponent.status = CONVERT_STATUS_INPUT[string.upper(walkover)] or 'L'
@@ -486,9 +486,7 @@ end
 ---@return integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
-	if map.map ~= 'TBD' then
-		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
-	end
+	map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
 
 	-- set initial extradata for maps
 	map.extradata = {
@@ -667,8 +665,6 @@ end
 ---@return table<string, table>
 function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponentIndex, participants)
 	local prefix = 't' .. opponentIndex .. 'p'
-	map[prefix .. '1faction'] = Logic.emptyOr(map[prefix .. '1faction'], map['faction' .. opponentIndex])
-	map[prefix .. '1heroes'] = Logic.emptyOr(map[prefix .. '1heroes'], map['heroes' .. opponentIndex])
 
 	for playerIndex, player in pairs(players) do
 		local faction = Logic.emptyOr(
@@ -772,7 +768,7 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
 		assert(ignoreFactionHeroCheck or not isCoreFaction
-			or faction == heroData.faction or heroData.faction == NEUTRAL_HERO_FACTION,
+			or faction == heroData.faction or heroData.faction == DEFAULT_HERO_FACTION,
 			'Invalid hero input "' .. hero .. '" for faction "'
 				.. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
 
