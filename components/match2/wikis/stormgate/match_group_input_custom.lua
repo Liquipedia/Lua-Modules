@@ -45,7 +45,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match,
 		CustomMatchGroupInput._readDate(match)
 	)
-	match.patch = Variables.varDefault('tournament_patch')
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._updateFinished(match)
@@ -488,7 +487,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	-- inherit stuff from match data
 	map = MatchGroupInput.getCommonTournamentVars(map, match)
 	map.date = map.date or match.date
-	map.patch = match.patch
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
