@@ -123,6 +123,11 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
+	--unsed wiki var for random events to not read players as random if prize pool already sets them as random
+	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
+		Variables.varDefine(opponentArgs.name .. '_race', '')
+	end
+
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
