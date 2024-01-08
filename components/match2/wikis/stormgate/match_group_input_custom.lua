@@ -105,8 +105,8 @@ end
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('tournament_cancelled', 'false'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	match.bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
-	Variables.varDefine('bestof', match.bestof)
+	match.bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('match_bestof')))
+	Variables.varDefine('match_bestof', match.bestof)
 
 	MatchGroupInput.getCommonTournamentVars(match)
 end
