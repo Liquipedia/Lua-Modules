@@ -85,7 +85,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
 	lpdbData.extradata.ismixteam = tostring(String.isNotEmpty(args.mixteam))
 	lpdbData.extradata.isnationalteam = tostring(String.isNotEmpty(args.nationalteam))
 
