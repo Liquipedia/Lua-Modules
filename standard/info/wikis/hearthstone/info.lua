@@ -16,17 +16,17 @@ return {
 			name = 'Hearthstone',
 			link = 'Hearthstone',
 			logo = {
-				darkMode = 'Hearthstone logo.png',
-				lightMode = 'Hearthstone logo.png',
+				darkMode = 'Hearthstone default allmode.png',
+				lightMode = 'Hearthstone default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Hearthstone logo.png',
-				lightMode = 'Hearthstone logo.png',
+				darkMode = 'Hearthstone default allmode.png',
+				lightMode = 'Hearthstone default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'hs',
-	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
+	defaultTeamLogo = 'Hearthstone default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Hearthstone default allmode.png', ---@deprecated
 	match2 = 0,
 }
