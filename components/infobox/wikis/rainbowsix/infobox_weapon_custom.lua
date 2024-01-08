@@ -45,7 +45,7 @@ end
 
 ---@return string
 function CustomWeapon:_getOperators()
-	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator, _)
+	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator)
 		return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
 	end)
 
