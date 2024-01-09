@@ -50,7 +50,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'custom' then 
+	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Span', content = {args.span}},
 			Cell{name = 'Theme', content = {args.theme}},
