@@ -75,14 +75,14 @@ function League:createInfobox()
 		Cell{
 			name = 'Series',
 			content = {
-				self:_createSeriesDisplay({
+				self:createSeriesDisplay({
 					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 					series = args.series,
 					abbreviation = args.abbreviation,
 					icon = args.icon,
 					iconDark = args.icondark or args.icondarkmode,
 				}, self.iconDisplay),
-				self:_createSeriesDisplay{
+				self:createSeriesDisplay{
 					series = args.series2,
 					abbreviation = args.abbreviation2,
 				},
@@ -290,7 +290,7 @@ function League:_parseArgs()
 
 	self:_parsePrizePool(args)
 
-	data.icon, data.iconDark, self.iconDisplay = self:_getIcons{
+	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
 		series = args.series,
 		abbreviation = args.abbreviation,
@@ -602,7 +602,7 @@ end
 ---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
 ---@param iconDisplay string?
 ---@return string?
-function League:_createSeriesDisplay(seriesArgs, iconDisplay)
+function League:createSeriesDisplay(seriesArgs, iconDisplay)
 	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
@@ -624,7 +624,7 @@ end
 ---@return string?
 ---@return string?
 ---@return string?
-function League:_getIcons(iconArgs)
+function League:getIcons(iconArgs)
 	local display = self:_createSeriesIcon(iconArgs)
 
 	if not display then
