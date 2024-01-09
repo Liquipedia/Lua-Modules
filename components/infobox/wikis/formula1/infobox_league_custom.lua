@@ -11,48 +11,46 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomLeague = Class.new()
+---@class Formula1LeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
----@return WidgetInjector
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return Array.appendWith(widgets,
-		Cell{name = 'Race Number', content = {_args.race}},
-		Cell{name = 'Total Laps', content = {_args.laps}},
-		Cell{name = 'Pole Position', content = {_args.pole}},
-		Cell{name = 'Fastest Lap', content = {_args.fastestlap}},
-		Cell{name = 'Number of Races', content = {_args.numberofraces}},
-		Cell{name = 'Number of Drivers', content = {_args.driver_number}},
-		Cell{name = 'Number of Teams', content = {_args.team_number}},
-		Cell{name = 'Engine', content = {_args.engine}},
-		Cell{name = 'Tyres', content = {_args.tyres}},
-		Cell{name = 'Chassis', content = {_args.chassis}}
-	)
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		return Array.appendWith(widgets,
+			Cell{name = 'Race Number', content = {args.race}},
+			Cell{name = 'Total Laps', content = {args.laps}},
+			Cell{name = 'Pole Position', content = {args.pole}},
+			Cell{name = 'Fastest Lap', content = {args.fastestlap}},
+			Cell{name = 'Number of Races', content = {args.numberofraces}},
+			Cell{name = 'Number of Drivers', content = {args.driver_number}},
+			Cell{name = 'Number of Teams', content = {args.team_number}},
+			Cell{name = 'Engine', content = {args.engine}},
+			Cell{name = 'Tyres', content = {args.tyres}},
+			Cell{name = 'Chassis', content = {args.chassis}}
+		)
+	end
+
+	return widgets
 end
 
 ---@param lpdbData table

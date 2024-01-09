@@ -121,7 +121,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = {CustomLeague._mapsDisplay(args.maps)}}
+				Center{content = {self.caller:_mapsDisplay(args.maps)}}
 			)
 		end
 	end
@@ -131,10 +131,10 @@ end
 
 ---@param maps {link: string, displayname: string}[]
 ---@return string
-function CustomLeague._mapsDisplay(maps)
+function CustomLeague:_mapsDisplay(maps)
 	return table.concat(
 		Array.map(maps, function(mapData)
-			return tostring(CustomLeague:_createNoWrappingSpan(
+			return tostring(self:_createNoWrappingSpan(
 				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
