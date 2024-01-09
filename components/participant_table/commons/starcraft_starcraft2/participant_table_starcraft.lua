@@ -243,7 +243,7 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	end)
 
 	local factionNumbers = {}
-	for _, faction in pairs(Faction.factions) do
+	for _, faction in pairs(Faction.getFactions()) do
 		factionNumbers[faction] = calculatedNumbers[faction] or 0
 		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
 			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))

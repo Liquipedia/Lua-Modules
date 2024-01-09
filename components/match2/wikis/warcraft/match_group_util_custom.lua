@@ -25,7 +25,7 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
+CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',

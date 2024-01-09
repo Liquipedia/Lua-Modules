@@ -24,7 +24,7 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 StarcraftMatchGroupUtil.types = {}
 
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
+StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,

@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = mw.loadData('Module:Info')
+
 local byFaction = {
 	v = {
 		icon = 'File:Stormgate_Human_Vanguard_default_allmode.png',
@@ -21,4 +23,4 @@ local byFaction = {
 	},
 }
 
-return {byFaction = byFaction, randomIcons = {}}
+return {byFaction = {[Info.defaultGame] = byFaction}, randomIcons = {}}
