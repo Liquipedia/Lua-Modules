@@ -15,6 +15,8 @@ std = {
 		"package",
 		"pairs",
 		"pcall",
+		"rawget",
+		"rawset",
 		"require",
 		"select",
 		"setmetatable",
