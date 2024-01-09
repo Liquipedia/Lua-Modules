@@ -169,7 +169,6 @@ function ScoreBoard:create()
 	local winner = tonumber(match.winner)
 
 	return self.root
-		:addClass(WINNER_TO_BG_CLASS[winner])
 		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
 		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
@@ -346,7 +345,9 @@ function Match:create()
 	if isBrMatch then
 		matchDisplay:node(self:brMatchRow())
 	else
-		matchDisplay:node(self:standardMatchRow())
+		matchDisplay
+			:addClass(WINNER_TO_BG_CLASS[tonumber(self.match.winner)])
+			:node(self:standardMatchRow())
 	end
 
 	matchDisplay:node(self:detailsRow(isBrMatch))
