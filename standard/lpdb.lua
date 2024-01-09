@@ -79,19 +79,7 @@ end
 
 --- LPDB Object-Relational Mapping
 
----@enum FieldTypes
-local FieldTypes = {
-	integer = 0,
-	string = 1,
-	page = 1,
-	boolean = 3,
-	date = 4,
-	datetime = 5,
-	array = 6,
-	table = 7,
-}
-
----@alias ModelColumnData {name: string, fieldType: FieldTypes, default: any}
+---@alias ModelColumnData {name: string, fieldType: string|any, default: any}
 
 ---@class Model
 ---@field tableName string
