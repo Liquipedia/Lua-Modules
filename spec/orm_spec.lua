@@ -15,20 +15,17 @@ describe('LPDB Object-Relational Mapping', function()
 		end)
 
 		it('set()', function()
-			local match2 = Lpdb.Match2:new()
-			match2:set('bestof', 5)
+			local match2 = Lpdb.Match2:new():set('bestof', 5)
 			assert.are_same({bestof = 5}, rawget(match2, 'fields'))
 		end)
 
 		it('setMany()', function()
-			local match2 = Lpdb.Match2:new()
-			match2:setMany{bestof = 3, game = 'r6s'}
+			local match2 = Lpdb.Match2:new():setMany{bestof = 3, game = 'r6s'}
 			assert.are_same({bestof = 3, game = 'r6s'}, rawget(match2, 'fields'))
 		end)
 
 		it('strip html tags', function()
-			local match2 = Lpdb.Match2:new()
-			match2:set('match2bracketdata', {header = '<abbr title="Best of 5">Bo5</abbr>'})
+			local match2 = Lpdb.Match2:new():set('match2bracketdata', {header = '<abbr title="Best of 5">Bo5</abbr>'})
 			assert.are_same({match2bracketdata = {header = 'Bo5'}}, rawget(match2, 'fields'))
 		end)
 	end)
@@ -36,8 +33,7 @@ describe('LPDB Object-Relational Mapping', function()
 	describe('saving data', function()
 		it('saving', function()
 			local stub = stub(mw.ext.LiquipediaDB, 'lpdb_match2')
-			local match2 = Lpdb.Match2:new({match2id = 'Foo', match2bracketid = 'Bar', bestof = 3, game = 'r6s'})
-			match2:save()
+			Lpdb.Match2:new({match2id = 'Foo', match2bracketid = 'Bar', bestof = 3, game = 'r6s'}):save()
 			assert.stub(stub).called_with('Foo', {
 				bestof = 3,
 				date = 0,

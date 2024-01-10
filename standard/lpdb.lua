@@ -139,6 +139,7 @@ function ModelRow:save()
 	Array.forEach(self.tableColumns, FnUtil.curry(ModelRow._prepareFieldForStorage, self))
 	local objectName = Table.extract(self.fields, 'objectname')
 	mw.ext.LiquipediaDB['lpdb_' .. self.tableName](objectName, self.fields)
+	return self
 end
 
 function ModelRow:__newindex(key, value)
@@ -157,14 +158,17 @@ function ModelRow:__newindex(key, value)
 	end
 
 	self.fields[key] = value
+	return self
 end
 
 function ModelRow:set(key, value)
 	self:__newindex(key, value)
+	return self
 end
 
 function ModelRow:setMany(tbl)
 	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.__newindex, self))
+	return self
 end
 
 ---@class Match2Model:Model
