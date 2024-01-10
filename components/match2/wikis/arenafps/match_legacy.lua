@@ -22,7 +22,7 @@ function MatchLegacy.storeMatch(match2, options)
 
 		match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
+		mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id,
 			match
 		)
