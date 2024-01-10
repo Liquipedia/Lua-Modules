@@ -32,16 +32,11 @@ local Icon = {
 }
 
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport.png', text = 'Live Report Thread'},
-	quakehistory = {icon = 'File:Quake history icon', text = 'Quake History matchpage'},
 	dbstats = {icon = 'File:Diabotical icon.png', text = 'QuakeLife matchpage'},
 	qrindr = {icon = 'File:Quake Champions icon.png', text = 'Qrindr matchpage'},
 	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
 	esl = {icon = 'File:ESL icon.png', text = 'Match page and stats on ESL'},
 	interview = {icon = 'File:Int_Icon.png', text = 'Interview'},
-	review = {icon = 'File::Writers_Icon.png', text = 'Review'},
-	recap = {icon = 'File::Writers_Icon.png', text = 'Recap'},
 }
 
 local VETO_TYPE_TO_TEXT = {
