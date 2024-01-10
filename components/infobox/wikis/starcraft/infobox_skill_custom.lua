@@ -48,14 +48,14 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Area of Effect', content = {args.area}},
 			Cell{name = 'Move Speed', content = {args.movespeed}},
-			Cell{name = 'Researched from', content = {CustomSkill:getResearchFrom()}},
-			Cell{name = 'Research Cost', content = {CustomSkill:getResearchCost()}},
-			Cell{name = 'Research Hotkey', content = {CustomSkill:getResearchHotkey()}},
+			Cell{name = 'Researched from', content = {self.caller:getResearchFrom()}},
+			Cell{name = 'Research Cost', content = {self.caller:getResearchCost()}},
+			Cell{name = 'Research Hotkey', content = {self.caller:getResearchHotkey()}},
 		}
 	elseif id == 'cost' then
-		return {Cell{name = 'Cost', content = {CustomSkill:getCostDisplay()}}}
+		return {Cell{name = 'Cost', content = {self.caller:getCostDisplay()}}}
 	elseif id == 'hotkey' then
-		return {Cell{name = '[[Shortcuts|Hotkey]]', content = {CustomSkill:getHotkeys()}}}
+		return {Cell{name = '[[Shortcuts|Hotkey]]', content = {self.caller:getHotkeys()}}}
 	elseif id == 'cooldown' then
 		return {Cell{name = '[[Cooldown]]', content = {args.cooldown}}}
 	elseif id == 'duration' then
@@ -63,11 +63,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@return WidgetInjector
-function CustomSkill:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@return string?
