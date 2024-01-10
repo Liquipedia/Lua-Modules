@@ -70,6 +70,7 @@ function HorizontallistDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.BracketContainer)
 	return HorizontallistDisplay.Bracket({
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracketId = props.bracketId,
 		config = props.config,
 	})
 end
@@ -123,7 +124,7 @@ function HorizontallistDisplay.Bracket(props)
 		matchNode:node(HorizontallistDisplay.Match(matchProps))
 	end
 
-	return mw.html.create('div'):addClass('brkts-br-wrapper battle-royale'):attr('data-js-battle-royale-id', 'abc12345'):node(bracketNode):node(matchNode)
+	return mw.html.create('div'):addClass('brkts-br-wrapper battle-royale'):attr('data-js-battle-royale-id', props.bracketId):node(bracketNode):node(matchNode)
 end
 
 ---@param bracket MatchGroupUtilMatchGroup
