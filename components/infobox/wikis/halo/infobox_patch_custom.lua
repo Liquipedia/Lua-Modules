@@ -31,7 +31,7 @@ function CustomPatch.run(frame)
 	return patch:createInfobox()
 end
 
----@param id String
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
