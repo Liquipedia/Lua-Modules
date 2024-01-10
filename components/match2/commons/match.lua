@@ -292,7 +292,7 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 
 	matchRecord.match2games = table.concat(gameIndexes)
 	matchRecord.match2opponents = table.concat(opponentIndexes)
-	Lpdb.Match2:new(matchRecord)
+	Lpdb.Match2:new(matchRecord):save()
 end
 
 --[[
