@@ -281,7 +281,7 @@ local Comment = Class.new(
 	end
 )
 
----@param content Html|string|number
+---@param content Html|string|number|nil
 ---@return MatchSummaryComment
 function Comment:content(content)
 	if Logic.isEmpty(content) then return self end
@@ -581,7 +581,7 @@ end
 
 ---Creates a match footer with vods if vods are set
 ---@param match table
----@return string
+---@return string?
 function MatchSummary.createSubstitutesComment(match)
 	local comment = {}
 	Array.forEach(match.opponents, function(opponent)
