@@ -19,9 +19,6 @@ local String = require('Module:StringUtils')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
 
-local MAP_VETO_START = '<b>Start Map Veto</b>'
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
 
