@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -291,7 +292,7 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 
 	matchRecord.match2games = table.concat(gameIndexes)
 	matchRecord.match2opponents = table.concat(opponentIndexes)
-	mw.ext.LiquipediaDB.lpdb_match2(matchRecord.match2id, matchRecord)
+	Lpdb.Match2:new(matchRecord)
 end
 
 --[[
