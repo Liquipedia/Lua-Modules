@@ -7,7 +7,6 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -18,9 +17,6 @@ local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
 local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-
-local NONE = '-'
-local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
 
 ---@enum AFPSMatchIcons
 local Icon = {
