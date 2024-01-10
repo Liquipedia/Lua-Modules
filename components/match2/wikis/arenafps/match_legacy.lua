@@ -8,11 +8,10 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-
-local MAX_NUM_PLAYERS = 10
 
 ---@param match2 table
 ---@param options table
