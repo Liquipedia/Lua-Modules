@@ -93,7 +93,7 @@ function Game.listGames(options)
 	end
 
 	Array.filter(gamesList, function(game)
-		return not game.fake
+		return not game.unlisted
 	end)
 
 	return gamesList
