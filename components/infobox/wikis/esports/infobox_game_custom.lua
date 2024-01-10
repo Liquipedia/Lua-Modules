@@ -17,10 +17,9 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabl
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomGame = Class.new()
+---@class EsportsGameInfobox: GameInfobox
+local CustomGame = Class.new(Game)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
