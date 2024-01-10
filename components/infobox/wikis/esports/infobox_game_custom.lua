@@ -31,11 +31,6 @@ function CustomGame.run(frame)
 	return game:createInfobox()
 end
 
----@return WidgetInjector
-function CustomGame:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
