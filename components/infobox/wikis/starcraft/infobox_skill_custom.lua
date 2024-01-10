@@ -29,7 +29,7 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomSkill.run(frame)
-	local skill = Skill(frame)
+	local skill = CustomSkill(frame)
 
 	assert(skill.args.informationType, 'Missing "informationType"')
 
