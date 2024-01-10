@@ -36,13 +36,6 @@ local LINK_DATA = {
 	interview = {icon = 'File:Int_Icon.png', text = 'Interview'},
 }
 
-local VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-
-}
 local CustomMatchSummary = {}
 
 ---@param args table
