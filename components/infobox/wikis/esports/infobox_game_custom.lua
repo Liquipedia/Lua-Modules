@@ -24,12 +24,9 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomGame.run(frame)
-	local game = Game(frame)
+	local game = CustomGame(frame)
+	game:setWidgetInjector(CustomInjector(game))
 
-	game.createWidgetInjector = CustomGame.createWidgetInjector
-	game.addToLpdb = CustomGame.addToLpdb
-
-	_args = game.args
 	return game:createInfobox()
 end
 
