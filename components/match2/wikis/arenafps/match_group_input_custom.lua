@@ -291,16 +291,12 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 	if match.preview then links.preview = match.preview end
+	if match.quakehistory then links.quakehistory = 'http://www.quakehistory.com/en/matches/' .. match.quakehistory end
+	if match.dbstats then links.dbstats = 'https://quakelife.ru/diabotical/stats/matches/?matches=' .. match.dbstats end
+	if match.qrindr then links.qrindr = 'https://qrindr.com/match/' .. match.qrindr end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.stats then links.stats = match.stats end
 
-	return match
-end
-
-function matchFunctions.getExtraData(match)
-	match.extradata = {
-		casters = MatchGroupInput.readCasters(match),
-	}
 	return match
 end
 
@@ -378,22 +374,6 @@ function matchFunctions.getOpponents(match)
 end
 
 -- Get Playerdata for non-team opponents
-function matchFunctions.getPlayers(match, opponentType, opponentIndex)
-	local players = {}
-	for playerIndex = 1, Opponent.partySize(opponentType) do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or 'TBD'
-		player.flag = player.flag
-		player.displayname = player.displayname or player.name
-		if Table.isNotEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-
-	return players
-end
-
 function CustomMatchGroupInput._playerIsBye(player)
 	return (player.name or ''):lower() == MATCH_BYE or (player.displayname or ''):lower() == MATCH_BYE
 end
