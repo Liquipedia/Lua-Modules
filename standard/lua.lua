@@ -65,7 +65,7 @@ end
 function Lua.import(name, options)
 	options = options or {}
 	local importFunction = options.loadData and mw.loadData or require
-	if options.requireDevIfEnabled == false then
+	if options.requireDevIfEnabled ~= false then
 		if StringUtils.endsWith(name, '/dev') then
 			error('Lua.import: Module name should not end in \'/dev\'')
 		end
