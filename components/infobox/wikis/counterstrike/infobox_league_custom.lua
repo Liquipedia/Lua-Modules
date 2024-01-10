@@ -21,7 +21,7 @@ local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
 local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
 local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
 local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
 
