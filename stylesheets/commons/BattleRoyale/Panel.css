@@ -180,4 +180,37 @@ Author(s): Elysienna
             padding-left: 0.5rem;
         }
     }
+
+    &__bottom-navigation {
+        height: 3.125rem;
+        border: 0.0625rem solid rgba( 0,0,0,0.08 );
+        border-top: 0;
+        display: flex;
+        align-items: center;
+
+        &__link {
+            color: var( --clr-on-background, #212529 );
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            font-weight: 700;
+
+            &.navigate--left {
+                flex-direction: row-reverse;
+            }
+
+            &.navigate--right {
+                margin-left: auto;
+            }
+        }
+
+        &__icon {
+            color: var( --clr-wiki-on-primary );
+            width: 1.5rem;
+            display: flex;
+            justify-content: center;
+            margin: 0 0.5rem;
+        }
+    }
 }

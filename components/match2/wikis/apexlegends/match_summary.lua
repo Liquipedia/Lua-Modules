@@ -517,6 +517,7 @@ end
 function CustomMatchSummary._createMatchStandings(match)
 	local wrapper = mw.html.create('div')
 			:addClass('panel-table')
+			:attr('data-js-battle-royale', 'table')
 
 	local header = wrapper:tag('div')
 			:addClass('panel-table__row')
@@ -545,8 +546,14 @@ function CustomMatchSummary._createMatchStandings(match)
 						end
 	end)
 
-	local gameCollectionContainerNavHolder = header:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container-nav-holder')
-	local gameCollectionContainer  = gameCollectionContainerNavHolder:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container')
+	local gameCollectionContainerNavHolder = header:tag('div')
+			:addClass('panel-table__cell')
+			:addClass('cell--game-container-nav-holder')
+			:attr('data-js-battle-royale', 'game-nav-holder')
+	local gameCollectionContainer = gameCollectionContainerNavHolder:tag('div')
+			:addClass('panel-table__cell')
+			:addClass('cell--game-container')
+			:attr('data-js-battle-royale', 'game-container')
 
 	Array.forEach(match.games, function (game, idx)
 		local gameContainer = gameCollectionContainer:tag('div')
@@ -598,7 +605,10 @@ function CustomMatchSummary._createMatchStandings(match)
 					end
 		end)
 
-		local gameRowContainer = row:tag('div'):addClass('panel-table__cell'):addClass('cell--game-container')
+		local gameRowContainer = row:tag('div')
+				:addClass('panel-table__cell')
+				:addClass('cell--game-container')
+				:attr('data-js-battle-royale', 'game-container')
 
 		Array.forEach(opponentMatch.games, function(opponent)
 			local gameRow = gameRowContainer:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
@@ -618,7 +628,9 @@ end
 ---@param game table
 ---@return Html
 function CustomMatchSummary._createGameStandings(game)
-	local wrapper = mw.html.create('div'):addClass('panel-table')
+	local wrapper = mw.html.create('div')
+			:addClass('panel-table')
+			:attr('data-js-battle-royale', 'table')
 	local header = wrapper:tag('div')
 			:addClass('panel-table__row')
 			:addClass('row--header')
