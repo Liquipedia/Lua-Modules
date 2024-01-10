@@ -60,10 +60,7 @@ function UnofficialWorldChampion:createInfobox()
 					end
 					return {
 						Title{name = 'Title Gained'},
-						Cell{
-							name = args['gained date'],
-							content = { contentCell },
-						},
+						Cell{name = args['gained date'], content = { contentCell }},
 					}
 				end
 			end
@@ -103,7 +100,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 return UnofficialWorldChampion

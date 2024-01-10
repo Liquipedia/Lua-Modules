@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
 
+---@class CustomUnofficialWorldChampionInfobox: UnofficialWorldChampionInfobox
 local CustomUnofficialWorldChampion = Class.new()
 
 ---@param frame Frame
