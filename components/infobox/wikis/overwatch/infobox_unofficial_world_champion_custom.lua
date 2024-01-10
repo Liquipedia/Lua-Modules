@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, String.isNotEmpty(args.region1) and Title{name = 'Regional distribution'} or nil)
 
 		for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
-			Array.append(widgets,
+			Array.appendWith(widgets,
 				Cell{name = (args[regionKey .. ' no'] or '') .. ' champions', content = {region}},
 				Breakdown{content = {args[regionKey .. ' champions']}}
 			)
