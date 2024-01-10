@@ -35,21 +35,18 @@ function CustomGame:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Engine',
-		content = {_args.engine}
-	})
-	table.insert(widgets, Cell{
-		name = 'Genre(s)',
-		content = {_args.genre}
-	})
-	table.insert(widgets, Cell{
-		name = 'Mode(s)',
-		content = {_args.mode}
-	})
+function CustomInjector:addCustomCells(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.append(widgets,
+			Cell{name = 'Engine', content = {args.engine}},
+			Cell{name = 'Genre(s)', content = {args.genre}},
+			Cell{name = 'Mode(s)', content = {args.mode}}
+		)
+	end
 
 	return widgets
 end
