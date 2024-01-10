@@ -135,6 +135,7 @@ function ModelRow:_prepareFieldForStorage(columnData)
 	self:_validateField(columnData)
 end
 
+---@return self
 function ModelRow:save()
 	Array.forEach(self.tableColumns, FnUtil.curry(ModelRow._prepareFieldForStorage, self))
 	local objectName = Table.extract(self.fields, 'objectname')
@@ -142,30 +143,41 @@ function ModelRow:save()
 	return self
 end
 
+---@param key string
+---@param value any
+---@return self
 function ModelRow:__newindex(key, value)
-	-- Strip HTML from strings
-	local function stripHtml(str)
-		if type(str) == 'string' then
-			return TextSanitizer.stripHTML(str)
+	if key ~= 'extradata' then
+		-- Strip HTML from strings
+		-- We allow HTML in extradata though
+		local function stripHtml(str)
+			if type(str) == 'string' then
+				return TextSanitizer.stripHTML(str)
+			end
+			return str
 		end
-		return str
-	end
 
-	if type(value) == 'table' then
-		value = Table.mapValues(value, stripHtml)
-	else
-		value = stripHtml(value)
+		if type(value) == 'table' then
+			value = Table.mapValues(value, stripHtml)
+		else
+			value = stripHtml(value)
+		end
 	end
 
 	self.fields[key] = value
 	return self
 end
 
+---@param key string
+---@param value any
+---@return self
 function ModelRow:set(key, value)
 	self:__newindex(key, value)
 	return self
 end
 
+---@param tbl table<string, any>
+---@return self
 function ModelRow:setMany(tbl)
 	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.__newindex, self))
 	return self
