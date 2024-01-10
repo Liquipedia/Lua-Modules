@@ -11,16 +11,16 @@ liquipedia.battleRoyale = {
 
 	implementOnWindowResize: function(instanceId) {
 		window.addEventListener('resize', () => {
-			this.battleRoyaleInstances[instanceId].querySelectorAll('.cell--game-container-nav-holder').forEach(tableEl => {
+			this.battleRoyaleInstances[instanceId].querySelectorAll('[data-js-battle-royale="game-nav-holder"]').forEach(tableEl => {
 				this.recheckSideScrollButtonStates(tableEl);
 			});
 		});
 	},
 
 	implementScrollendEvent: function(instanceId) {
-		if(!('onscrollend' in window) || typeof window.onscrollend === 'undefined') {
-			this.battleRoyaleInstances[instanceId].querySelectorAll('.cell--game-container-nav-holder').forEach(tableEl => {
-				const scrollingEl = tableEl.querySelector('.cell--game-container');
+		if (!('onscrollend' in window) || typeof window.onscrollend === 'undefined') {
+			this.battleRoyaleInstances[instanceId].querySelectorAll('[data-js-battle-royale="game-nav-holder"]').forEach(tableEl => {
+				const scrollingEl = tableEl.querySelector('[data-js-battle-royale="game-container"]');
 				const options = {
 					passive: true
 				}
@@ -50,7 +50,7 @@ liquipedia.battleRoyale = {
 			const isNav = i.parentNode.classList.contains('cell--game-container-nav-holder');
 			if (direction === this.DIRECTION_RIGHT) {
 				i.scrollLeft += this.gameWidth;
-				if(isNav) {
+				if (isNav) {
 					this.onScrollEndSideScrollButtonStates(tableElement);
 				}
 			} else {
@@ -71,13 +71,13 @@ liquipedia.battleRoyale = {
 	},
 
 	recheckSideScrollButtonStates: function(tableElement) {
-		const navLeft = tableElement.querySelector('.cell--game-container-nav-holder > .navigate--left');
-		const navRight = tableElement.querySelector('.cell--game-container-nav-holder > .navigate--right');
-		const el = tableElement.querySelector('.cell--game-container-nav-holder > .cell--game-container');
+		const navLeft = tableElement.querySelector('[data-js-battle-royale="navigate-left"]');
+		const navRight = tableElement.querySelector('[data-js-battle-royale="navigate-right"]');
+		const el = tableElement.querySelector('[data-js-battle-royale="game-nav-holder"] > [data-js-battle-royale="game-container"]');
 
 		const isScrollable = el.scrollWidth > el.offsetWidth;
 		// Check LEFT
-		if(isScrollable && el.scrollLeft > 0) {
+		if (isScrollable && el.scrollLeft > 0) {
 			navLeft.classList.remove('d-none');
 		} else {
 			navLeft.classList.add('d-none');
@@ -113,8 +113,8 @@ liquipedia.battleRoyale = {
 
 	handlePanelTabChange: function(instanceId, contentId, panelTab) {
 		const tabs = this.battleRoyaleMap[instanceId].navigationContentPanelTabs[contentId];
-		tabs.forEach(item => {
-			if(item === panelTab) {
+		tabs.forEach((item, index) => {
+			if (item === panelTab) {
 				// activate content tab
 				item.classList.add('is--active');
 			} else {
@@ -124,14 +124,14 @@ liquipedia.battleRoyale = {
 		});
 		const contents = this.battleRoyaleMap[instanceId].navigationContentPanelTabContents[contentId];
 		Object.keys(contents).forEach(panelId => {
-			if(panelId === panelTab.dataset.jsBattleRoyaleContentTargetId) {
+			if (panelId === panelTab.dataset.jsBattleRoyaleContentTargetId) {
 				// activate content tab panel
 				contents[panelId].classList.remove('is--hidden');
 			} else {
 				// deactivate content tab panel
 				contents[panelId].classList.add('is--hidden');
 			}
-		})
+		});
 	},
 
 	buildBattleRoyaleMap: function(id) {
@@ -144,7 +144,6 @@ liquipedia.battleRoyale = {
 		};
 
 		this.battleRoyaleMap[id].navigationContents.forEach(content => {
-			// content.classList.add('is--hidden');
 			const brContentId = content.dataset.jsBattleRoyaleContentId;
 			this.battleRoyaleMap[id].navigationContentPanelTabs[brContentId] =
 				Array.from(content.querySelectorAll('[data-js-battle-royale="panel-tab"]'));
@@ -169,14 +168,14 @@ liquipedia.battleRoyale = {
 	attachHandlers: function(id) {
 		this.battleRoyaleMap[id].navigationTabs.forEach(tab => {
 			tab.addEventListener('click', () => {
-				this.handleNavigationTabChange(id, tab)
+				this.handleNavigationTabChange(id, tab);
 			});
 		});
 
 		Object.keys(this.battleRoyaleMap[id].navigationContentPanelTabs).forEach(contentId => {
 			this.battleRoyaleMap[id].navigationContentPanelTabs[contentId].forEach(panelTab => {
 				panelTab.addEventListener('click', () => {
-					this.handlePanelTabChange(id, contentId, panelTab)
+					this.handlePanelTabChange(id, contentId, panelTab);
 				});
 			});
 		});
@@ -193,15 +192,23 @@ liquipedia.battleRoyale = {
 		});
 	},
 
+	createNavigationElement: function(dir) {
+		const element = document.createElement('div');
+		element.classList.add('panel-table__navigate', 'navigate--' + dir);
+		element.setAttribute('data-js-battle-royale', 'navigate-' + dir);
+
+		const icon = document.createElement('i');
+		icon.classList.add('fas', `fa-chevron-${dir}`)
+		element.append(icon);
+		return element;
+	},
+
 	makeSideScrollElements: function(id) {
-		this.battleRoyaleInstances[id].querySelectorAll('.panel-table').forEach(table => {
+		this.battleRoyaleInstances[id].querySelectorAll('[data-js-battle-royale="table"]').forEach(table => {
 			const navHolder = table.querySelector('.row--header > .cell--game-container-nav-holder');
-			if(navHolder) {
+			if (navHolder) {
 				for (let dir of [this.DIRECTION_LEFT, this.DIRECTION_RIGHT]) {
-					const element = document.createElement('div');
-					element.classList.add('panel-table__navigate', 'navigate--' + dir);
-					element.setAttribute('data-js-battle-royale', 'navigate-' + dir);
-					element.innerText = dir === this.DIRECTION_RIGHT ? '>' : '<';
+					const element = this.createNavigationElement(dir);
 					element.addEventListener('click', () => {
 						this.handleTableSideScroll(table, dir);
 					});
@@ -234,7 +241,7 @@ liquipedia.battleRoyale = {
 	comparator: function (a, b, dir = 'ascending', sortType = 'team') {
 		let valA = a.querySelector(`[data-sort-type='${sortType}']`).dataset.sortVal;
 		let valB = b.querySelector(`[data-sort-type='${sortType}']`).dataset.sortVal;
-		if(dir === 'ascending') {
+		if (dir === 'ascending') {
 			return valB > valA ? -1 : (valA > valB ? 1 : 0);
 		} else {
 			return valB < valA ? -1 : (valA < valB ? 1 : 0);
@@ -248,7 +255,7 @@ liquipedia.battleRoyale = {
 			button.addEventListener( 'click', () => {
 
 				const sortType = button.dataset.sortType;
-				const table = button.closest('.panel-table');
+				const table = button.closest('[data-js-battle-royale="table"]');
 				const sortableRows = Array.from(table.querySelectorAll('[data-js-battle-royale="row"]'));
 
 				/**
@@ -274,6 +281,45 @@ liquipedia.battleRoyale = {
 		})
 	},
 
+	createBottomNav(instanceId, navigationTab, currentPanelIndex) {
+		const contentPanel = Object.values(this.battleRoyaleMap[instanceId].navigationContentPanelTabContents[navigationTab])[currentPanelIndex];
+		const navPanels = this.battleRoyaleMap[instanceId].navigationContentPanelTabs[navigationTab];
+		if(navPanels.length <= 1) return;
+
+		const element = document.createElement('div');
+		element.classList.add('panel-content__bottom-navigation');
+		element.setAttribute('data-js-battle-royale', 'bottom-nav');
+		if(currentPanelIndex !== 0) {
+			element.append(this.createBottomNavLink(instanceId, navigationTab, navPanels[currentPanelIndex - 1], this.DIRECTION_LEFT));
+		}
+		if(currentPanelIndex < navPanels.length - 1) {
+			element.append(this.createBottomNavLink(instanceId, navigationTab, navPanels[currentPanelIndex + 1], this.DIRECTION_RIGHT));
+		}
+		contentPanel.append(element);
+	},
+
+	createBottomNavLink: function(instanceId, navigationTab, destinationPanel, direction = this.DIRECTION_LEFT) {
+		const element = document.createElement('div');
+		element.classList.add('panel-content__bottom-navigation__link', `navigate--${direction}`);
+		element.setAttribute('data-js-battle-royale', `bottom-nav-${direction}`);
+		element.setAttribute('tabindex', '0');
+
+		const textElement = document.createElement('span');
+		textElement.setAttribute('data-js-battle-royale', `bottom-nav-${direction}-text`);
+		textElement.innerText = destinationPanel.innerText;
+
+		const icon = document.createElement('i');
+		icon.classList.add('fas', `fa-arrow-${direction}`, 'panel-content__bottom-navigation__icon');
+		icon.setAttribute('data-js-battle-royale', `bottom-nav-${direction}-icon`);
+		element.append(textElement, icon);
+
+		element.addEventListener('click', () => {
+			this.handlePanelTabChange(instanceId, navigationTab, destinationPanel);
+		});
+
+		return element;
+	},
+
 	init: function() {
 		Array.from(document.querySelectorAll('[data-js-battle-royale-id]')).forEach(instance => {
 			this.battleRoyaleInstances[instance.dataset.jsBattleRoyaleId] = instance;
@@ -282,7 +328,6 @@ liquipedia.battleRoyale = {
 		});
 
 		Object.keys(this.battleRoyaleInstances).forEach( function(instanceId) {
-
 			// create object based on id
 			this.buildBattleRoyaleMap(instanceId);
 
@@ -295,9 +340,16 @@ liquipedia.battleRoyale = {
 			this.battleRoyaleMap[instanceId].navigationTabs.forEach(navTab => {
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[instanceId].navigationContentPanelTabs[target];
+
 				if(target && Array.isArray(panels) && panels.length) {
+					// Set on first panel on init
 					this.handlePanelTabChange(instanceId, target, panels[0]);
 				}
+
+				panels.forEach((panel, index) => {
+					this.createBottomNav(instanceId, target, index);
+				})
+
 			});
 
 			this.implementScrollendEvent(instanceId);
