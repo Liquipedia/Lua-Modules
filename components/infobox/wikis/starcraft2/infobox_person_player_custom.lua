@@ -254,7 +254,7 @@ function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
 
 	local addScores = function(statsTable)
 		statsTable[vsRace] = statsTable[vsRace] or self.emptyStatsCell()
-		statsTable.total = statsTable[vsRace] or self.emptyStatsCell()
+		statsTable.total = statsTable.total or self.emptyStatsCell()
 
 		statsTable[vsRace].w = statsTable[vsRace].w + playerScore
 		statsTable[vsRace].l = statsTable[vsRace].l + vsScore
