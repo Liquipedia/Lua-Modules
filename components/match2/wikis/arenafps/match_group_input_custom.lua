@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Json = require('Module:Json')
+local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -75,11 +75,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	if teamTemplateDate == EPOCH_TIME_EXTENDED then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			EPOCH_TIME_EXTENDED
 		)
 	end
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -272,7 +272,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
 		}
 	end
