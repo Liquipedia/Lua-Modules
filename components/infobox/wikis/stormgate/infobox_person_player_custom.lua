@@ -11,7 +11,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
@@ -73,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local currentYearEarnings = Math.round(caller.earningsPerYear[CURRENT_YEAR] or 0)
+		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR] or 0
 
 		return {
 			Cell{

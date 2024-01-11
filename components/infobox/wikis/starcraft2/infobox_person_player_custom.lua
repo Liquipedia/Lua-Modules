@@ -20,6 +20,7 @@ local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local YearsActive = require('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
@@ -54,43 +55,45 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
+---@class Starcraft2InfoboxPlayer: SC2CustomPerson
 local CustomPlayer = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _player
-
 function CustomPlayer.run(frame)
 	local player = CustomPerson(frame)
-	_args = player.args
-	_player = player
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.recentMatches = {}
-	player.infoboxAchievements = {}
-	player.awardAchievements = {}
-	player.achievements = {}
-	player.achievementsFallBack = {}
-	player.earningsGlobal = {}
-	player.shouldQueryData = player:shouldStoreData(_args)
+	player.shouldQueryData = player:shouldStoreData(player.args)
+
+	player:_processMatches()
+
 	if player.shouldQueryData then
 		player.yearsActive = CustomPlayer._getMatchupData(player.pagename)
 	end
 
-	player.calculateEarnings = CustomPlayer.calculateEarnings
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getWikiCategories = CustomPlayer.getWikiCategories
-
 	return player:createInfobox()
 end
 
+function CustomPlayer:_processMatches()
+
+
+end
+
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+
+	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Race',
-				content = {_player:getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -98,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'achievements' then
 		local achievementCells = {}
 		if _player.shouldQueryData then
-			local achievements = Achievements.display(_player.infoboxAchievements)
+			local achievements = Achievements.display(caller.infoboxAchievements)
 			if not String.isEmpty(achievements) then
 				table.insert(achievementCells, Center{content = {achievements}})
 			end
@@ -116,15 +119,10 @@ function CustomInjector:parse(id, widgets)
 			end
 		end
 		return achievementCells
-	elseif
-		id == 'history' and
-		string.match(_args.retired or '', '%d%d%d%d')
-	then
-		table.insert(widgets, Cell{
-				name = 'Retired',
-				content = {_args.retired}
-			})
+	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
+
 	return widgets
 end
 
@@ -134,13 +132,13 @@ function CustomInjector:addCustomCells(widgets)
 		rank1, rank2 = CustomPlayer._getRank(_player.pagename)
 	end
 
-	local currentYearEarnings = _player.earningsGlobal[tostring(CURRENT_YEAR)]
+	local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
-	local yearsActiveCaster = CustomPlayer._getActiveCasterYears()
+	local yearsActiveCaster = self.caller:_getActiveCasterYears()
 
 	return {
 		Cell{
@@ -161,21 +159,22 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
-function CustomPlayer._getActiveCasterYears()
-	if _player.shouldQueryData then
+---@return string|nil
+function CustomPlayer:_getActiveCasterYears()
+	if self:shouldStoreData(self.args) then
 		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			query = 'year::date',
-			conditions = '[[page::' .. _player.pagename .. ']] OR [[page::' .. _player.pagename:gsub(' ', '_') .. ']]',
+			conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
 			limit = 5000,
 		})
 
-		local years = {}
-		for _, broadCastItem in pairs(queryData) do
-			local year = broadCastItem.year_date
-			years[tonumber(year)] = year
-		end
+		local years = Array.map(queryData,
+			---@param item broadcaster
+			---@return number?
+			function(item) return tonumber(item.year_date) end
+		)
 
-		return Table.isNotEmpty(years) and CustomPlayer._getYearsActive(years) or nil
+		return Table.isNotEmpty(years) and YearsActive.displayYears(years) or nil
 	end
 end
 
