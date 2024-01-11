@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local Array = require('Module:FnUtil')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -337,7 +337,7 @@ function matchFunctions.getOpponents(match)
 	if isScoreSet and not Logic.readBool(match.finished) then
 		local firstTo = math.ceil(match.bestof/2)
 		match.finished = Array.any(opponents, function(opponent)
-			return (tonumber(item.score or 0) or 0) >= firstTo
+			return (tonumber(opponent.score) or 0) >= firstTo
 		end)
 	end
 
