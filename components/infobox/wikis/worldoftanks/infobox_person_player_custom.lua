@@ -68,8 +68,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				caller:_displayRole('role', caller.role),
-				caller:_displayRole('role2', caller.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2)
 			}},
 		}
 	elseif id == 'history' then
