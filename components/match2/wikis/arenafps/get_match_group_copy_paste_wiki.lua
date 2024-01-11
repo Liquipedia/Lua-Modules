@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 --[[
@@ -49,7 +50,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score))
 	end
 
 	if bestof ~= 0 then
