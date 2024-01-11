@@ -82,4 +82,4 @@ function WikiCopyPaste._getOpponent(mode, score)
 	return out
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
