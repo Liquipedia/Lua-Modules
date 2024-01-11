@@ -279,7 +279,7 @@ function matchFunctions.readDate(matchArgs)
 end
 
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'Duel'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
