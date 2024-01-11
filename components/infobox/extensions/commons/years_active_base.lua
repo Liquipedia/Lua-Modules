@@ -23,8 +23,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _CURRENT_YEAR = tonumber(os.date('%Y'))
+local DEFAULT_DATE = '1970-01-01 00:00:00'
+local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
@@ -86,7 +86,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
-		ConditionNode(ColumnName('date'), Comparator.neq, _DEFAULT_DATE),
+		ConditionNode(ColumnName('date'), Comparator.neq, DEFAULT_DATE),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
 			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
@@ -155,7 +155,10 @@ function ActiveYears._groupYears(sortedYears)
 		end
 		endYear = year
 	end
-	if endYear >= _CURRENT_YEAR then
+
+	if Logic.isEmpty(yearRanges) then return yearRanges end
+
+	if endYear >= CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. '<b>Present</b>')
 	else
 		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)
