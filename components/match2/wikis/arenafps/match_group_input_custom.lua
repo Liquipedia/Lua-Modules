@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Array = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
