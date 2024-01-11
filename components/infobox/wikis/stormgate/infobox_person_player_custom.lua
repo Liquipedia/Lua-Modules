@@ -19,7 +19,7 @@ local YearsActive = require('Module:YearsActive')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
 local MatchTicker = Lua.import('Module:MatchTicker/Custom', {requireDevIfEnabled = true})
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
@@ -47,21 +47,19 @@ local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
 
-local CustomPlayer = Class.new(Person)
-
+---@class StormgateInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _player
-
 ---@param frame Frame
----@return string
+---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
-	_player = player
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto.results{
 		player = player.pagename,
-		addlpdbdata = Namespace.isMain(),
+		addlpdbdata = player:shouldStoreData(player.args),
 	}
 
 	return player:createInfobox()
@@ -71,12 +69,30 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _player.args
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{
+				name = 'Approx. Winnings ' .. CURRENT_YEAR,
+				content = {caller.earningsPerYear[CURRENT_YEAR]}
+			},
+			Cell{
+				name = Abbreviation.make('Years Active', 'Years active as a player'),
+				content = {YearsActive.display({player = caller.pagename})
+			}
+			},
+			Cell{
+				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
+				content = {caller:_getActiveCasterYears()}
+			},
+		}
+	elseif id == 'status' then
 		return {
 			Cell{
 				name = 'Faction',
-				content = {_player:getFactionData(args.faction or 'unknown')}
+				content = {caller:getFactionData(args.faction or 'unknown')}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -85,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 		local achievements = Achievements.player{
 			noTemplate = true,
 			onlyForFirstPrizePoolOfPage = true,
-			player = _player.pagename,
+			player = caller.pagename,
 			onlySolo = true,
 		}
 		if not achievements then return {} end
@@ -101,49 +117,28 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{
-			name = 'Approx. Winnings ' .. CURRENT_YEAR,
-			content = {_player.earningsPerYear[CURRENT_YEAR]}
-		},
-		Cell{
-			name = Abbreviation.make('Years Active', 'Years active as a player'),
-			content = {YearsActive.display({player = _player.pagename})
-		}
-		},
-		Cell{
-			name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
-			content = {_player:_getActiveCasterYears()}
-		},
-	}
-end
-
 ---@return string|nil
 function CustomPlayer:_getActiveCasterYears()
-	if Namespace.isMain() then
-		local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			query = 'year::date',
-			conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
-			limit = 5000,
-		})
+	if not self:shouldStoreData(self.args) then return end
 
-		local years = Array.map(queryData, function(item) return tonumber(item.year_date) end)
+	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+		query = 'year::date',
+		conditions = '[[page::' .. self.pagename .. ']] OR [[page::' .. self.pagename:gsub(' ', '_') .. ']]',
+		limit = 5000,
+	})
 
-		return Table.isNotEmpty(years) and YearsActive.displayYears(years) or nil
-	end
-end
+	local years = Array.map(queryData,
+		---@param item broadcaster
+		---@return number?
+		function(item) return tonumber(item.year_date) end
+	)
 
----@return WidgetInjector
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
+	return Table.isNotEmpty(years) and YearsActive.displayYears(years) or nil
 end
 
 ---@return Html?
 function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
+	if self:shouldStoreData(self.args) then
 		return MatchTicker.participant({player = self.pagename})
 	end
 end
