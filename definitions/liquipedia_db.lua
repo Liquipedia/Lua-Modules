@@ -20,6 +20,7 @@ local lpdb = {}
 ---@field weight number
 ---@field date string
 ---@field parent string
+---@field year_date string
 
 ---@class datapoint:LpdbBaseData
 ---@field type string
