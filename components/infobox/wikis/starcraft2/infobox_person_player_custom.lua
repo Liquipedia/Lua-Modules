@@ -378,7 +378,7 @@ end
 ---@param placement placement
 ---@param fallBackAchievements placement[]
 function CustomPlayer:_addToMedals(placement, fallBackAchievements)
-	if placement.liquipediatiertype ~= 'Qualifier' then return end
+	if placement.liquipediatiertype == 'Qualifier' then return end
 
 	self:_setAchievements(placement, fallBackAchievements)
 
