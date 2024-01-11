@@ -284,7 +284,7 @@ function MatchMapsLegacy.convertMatch(frame)
 	return mw.html.create('div'):css('display', 'none')
 end
 
--- invoked by Template:Showmatch
+-- invoked by Template:LegacySingleMatch
 ---@param frame Frame
 ---@return Html
 function MatchMapsLegacy.showmatch(frame)
@@ -315,7 +315,7 @@ function MatchMapsLegacy.showmatch(frame)
 	})
 end
 
--- invoked by Template:MatchListStart
+-- invoked by Template:LegacyMatchListStart
 ---@param frame Frame
 function MatchMapsLegacy.matchListStart(frame)
 	local args = Arguments.getArgs(frame)
