@@ -22,75 +22,72 @@ local Cell = Widgets.Cell
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 local NON_BREAKING_SPACE = '&nbsp;'
 
-local CustomPlayer = Class.new()
-
+---@class WarcraftInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _player
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	_player = Player(frame)
-	_args = _player.args
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
+
+	local args = player.args
 
 	-- Automatic achievements
-	_args.achievements = Achievements.player{noTemplate = true}
+	args.achievements = Achievements.player{noTemplate = true}
 
 	-- Profiles to links
-	_args.esl = _args.esl or _args.eslprofile
-	_args.nwc3l = _args.nwc3l or _args.nwc3lprofile
+	args.esl = args.esl or args.eslprofile
+	args.nwc3l = args.nwc3l or args.nwc3lprofile
 
 	-- Uppercase first letter in status
-	if _args.status then
-		_args.status = mw.getContentLanguage():ucfirst(_args.status)
+	if args.status then
+		args.status = mw.getContentLanguage():ucfirst(args.status)
 	end
 
-	_player.adjustLPDB = CustomPlayer.adjustLPDB
-	_player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	_player.nameDisplay = CustomPlayer.nameDisplay
-
-	return _player:createInfobox()
+	return player:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	--Earnings this Year
-	local currentYearEarnings = _player.earningsPerYear[CURRENT_YEAR]
-	if currentYearEarnings then
-		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
-	end
-
-	table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarnings}})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'role' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		local currentYearEarnings = self.caller.earningsPerYear[CURRENT_YEAR] or 0
+		if currentYearEarnings == 0 then return widgets end
+		local currentYearEarningsDisplay = '$' .. mw.getContentLanguage():formatNum(Math.round(currentYearEarnings))
+
+		table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarningsDisplay}})
+
+	elseif id == 'role' then
 		-- WC doesn't show any roles, but rather shows the Race/Faction instead
 		return {
-			Cell{name = 'Race', content = {Faction.toName(_args.race)}}
+			Cell{name = 'Race', content = {Faction.toName(args.race)}}
 		}
 	end
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.faction = Faction.toName(_args.race)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args)
+	lpdbData.extradata.faction = Faction.toName(args.race)
 	lpdbData.extradata.factionhistorical = Variables.varDefault('racecount') and 'true' or 'false'
 
 	return lpdbData
 end
 
-function CustomPlayer.nameDisplay()
-	local factionIcon = Faction.Icon{faction = Faction.read(_args.race)}
+---@param args table
+---@return string
+function CustomPlayer:nameDisplay(args)
+	local factionIcon = Faction.Icon{faction = args.race}
 
 	return (factionIcon and (factionIcon .. NON_BREAKING_SPACE) or '')
-		.. (_args.id or _player.pagename)
+		.. (args.id or self.pagename)
 end
 
 return CustomPlayer
