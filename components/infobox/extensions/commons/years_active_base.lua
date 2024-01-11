@@ -141,6 +141,8 @@ function ActiveYears._getYears(conditions)
 end
 
 function ActiveYears._groupYears(sortedYears)
+	if Logic.isEmpty(sortedYears) then return {} end
+
 	local startYear
 	local endYear
 	local yearRanges = {}
@@ -155,8 +157,6 @@ function ActiveYears._groupYears(sortedYears)
 		end
 		endYear = year
 	end
-
-	if Logic.isEmpty(yearRanges) then return yearRanges end
 
 	if endYear >= CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. '<b>Present</b>')
