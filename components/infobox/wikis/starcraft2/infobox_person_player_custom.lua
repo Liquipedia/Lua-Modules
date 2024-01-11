@@ -410,8 +410,9 @@ end
 function CustomPlayer:_setAchievements(placement, fallBackAchievements)
 	local tier = tonumber(placement.liquipediatier)
 	local place = tonumber(mw.text.split(placement.placement, '-')[1])
+	local hasNoTierType = String.isEmpty(placement.liquipediatiertype)
 
-	if tier == 1 and place == 1 and placement.opponenttype == Opponent.solo and String.isEmpty(placement.liquipediatiertype) then
+	if tier == 1 and place == 1 and placement.opponenttype == Opponent.solo and hasNoTierType then
 		table.insert(self.infoboxAchievements, placement)
 	end
 
