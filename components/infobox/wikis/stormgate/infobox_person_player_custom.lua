@@ -11,7 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
@@ -73,10 +73,12 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
+		local currentYearEarnings = Math.round(caller.earningsPerYear[CURRENT_YEAR] or 0)
+
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {caller.earningsPerYear[CURRENT_YEAR]}
+				content = {currentYearEarnings > 0 and ('$' .. mw.language.new('en'):formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
 				name = Abbreviation.make('Years Active', 'Years active as a player'),
@@ -90,10 +92,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'status' then
 		return {
-			Cell{
-				name = 'Faction',
-				content = {caller:getFactionData(args.faction or 'unknown')}
-			}
+			Cell{name = 'Faction', content = {caller:getFactionData(args.faction or 'unknown')}}
 		}
 	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
