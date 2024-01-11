@@ -11,7 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+local Set = require('Module:Set')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
@@ -125,13 +125,14 @@ function CustomPlayer:_getActiveCasterYears()
 		limit = 5000,
 	})
 
-	local years = Array.map(queryData,
+	local years = Set{}
+	Array.forEach(queryData,
 		---@param item broadcaster
 		---@return number?
-		function(item) return tonumber(item.year_date) end
+		function(item) years:add(tonumber(item.year_date)) end
 	)
 
-	return Table.isNotEmpty(years) and YearsActive.displayYears(years) or nil
+	return YearsActive.displayYears(years:toArray())
 end
 
 ---@return Html?
