@@ -474,7 +474,7 @@ function CustomPlayer:_getRank()
 	---@param dataSet datapoint
 	---@return {name:string?, rank: string?}
 	local getRankDisplay = function(dataSet)
-		local extradata = dataSet.extradata or {}
+		local extradata = (dataSet or {}).extradata or {}
 		if not extradata.rank then return {} end
 
 		return {
