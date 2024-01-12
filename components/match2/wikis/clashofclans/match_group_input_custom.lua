@@ -17,7 +17,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
