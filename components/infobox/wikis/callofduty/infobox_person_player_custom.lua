@@ -76,8 +76,9 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args)
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
 	lpdbData.extradata.role = self.role.role
 	lpdbData.extradata.role2 = self.role2.role
