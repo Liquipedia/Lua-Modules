@@ -47,7 +47,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 }
 local NONE = 'none'
-local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox'
+local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
