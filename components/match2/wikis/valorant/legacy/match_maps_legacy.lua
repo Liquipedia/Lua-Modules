@@ -81,9 +81,9 @@ function MatchMapsLegacy._handleMaps(args)
 		local score1
 		local score2
 		if Logic.isNotEmpty(score) then
-			local score = mw.text.split(score, '-')
-			score1 = score[1]
-			score2 = score[2]
+			local splitedScore = mw.text.split(score, '-')
+			score1 = splitedScore[1]
+			score2 = splitedScore[2]
 		end
 		if not score1 and not score2 and winner ~= SKIP then
 			local winnerInt = tonumber(winner)
