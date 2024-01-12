@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
