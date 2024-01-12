@@ -9,8 +9,8 @@
 local LuaBasic = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local FeatureFlag = LuaBasic.import('Module:FeatureFlag', {requireDevIfEnabled = true})
-local Lua = LuaBasic.import('Module:Lua', {requireDevIfEnabled = true})
+local FeatureFlag = LuaBasic.import('Module:FeatureFlag')
+local Lua = LuaBasic.import('Module:Lua')
 
 local suite = ScribuntoUnit:new()
 
@@ -25,9 +25,9 @@ function suite:testIfExists()
 	self:assertEquals(nil, Lua.requireIfExists('Module:ThisLinkIsDead'))
 	self:assertEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua'))
 	FeatureFlag.set('dev', false)
-	self:assertEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua'), Lua.requireIfExists('Module:Lua'))
 	FeatureFlag.set('dev', true)
-	self:assertEquals(require('Module:Lua/dev'), Lua.requireIfExists('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua/dev'), Lua.requireIfExists('Module:Lua'))
 	FeatureFlag.set('dev', devFlag)
 end
 
@@ -35,9 +35,9 @@ function suite:testImport()
 	local devFlag = FeatureFlag.get('dev')
 	self:assertEquals(require('Module:Lua'), Lua.import('Module:Lua'))
 	FeatureFlag.set('dev', false)
-	self:assertEquals(require('Module:Lua'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua'), Lua.import('Module:Lua'))
 	FeatureFlag.set('dev', true)
-	self:assertEquals(require('Module:Lua/dev'), Lua.import('Module:Lua', {requireDevIfEnabled = true}))
+	self:assertEquals(require('Module:Lua/dev'), Lua.import('Module:Lua'))
 	FeatureFlag.set('dev', devFlag)
 end
 

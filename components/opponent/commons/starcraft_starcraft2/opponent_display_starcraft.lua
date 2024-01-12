@@ -12,10 +12,10 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Faction = Lua.import('Module:Faction', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
+local Faction = Lua.import('Module:Faction')
+local Opponent = Lua.import('Module:Opponent')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
+local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
 
 --Display components for opponents used by the starcraft and starcraft 2 wikis
 ---@class StarcraftOpponentDisplay: OpponentDisplay

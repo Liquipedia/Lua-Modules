@@ -11,9 +11,9 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 

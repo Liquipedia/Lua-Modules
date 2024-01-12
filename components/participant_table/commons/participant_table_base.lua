@@ -25,9 +25,9 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Import = Lua.import('Module:ParticipantTable/Import', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
-local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
+local Import = Lua.import('Module:ParticipantTable/Import')
+local PlayerExt = Lua.import('Module:Player/Ext')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
 
