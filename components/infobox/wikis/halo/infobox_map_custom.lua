@@ -42,15 +42,15 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {self.caller:getGameVersion(args)}, options = {makeLink = true}},
-			Cell{name = 'Game Modes', content = self.caller:getGameMode(args)}
+			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}, options = {makeLink = true}},
+			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end
 	return widgets
 end
 
 --@return string[]
-function CustomMap:getGameVersion(args)
+function CustomMap:_getGameVersion(args)
 	local game = string.lower(args.game or '')
 	game = GAME[game]
 	return game
@@ -58,7 +58,7 @@ end
 
 ---@param args table
 ---@return string[]
-function CustomMap:getGameMode(args)
+function CustomMap:_getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
 		return {}
 	end
