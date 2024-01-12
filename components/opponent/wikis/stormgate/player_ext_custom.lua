@@ -16,7 +16,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext')
 
 local CustomPlayerExt = Table.deepCopy(PlayerExt)
 

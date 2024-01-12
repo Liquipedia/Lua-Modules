@@ -13,10 +13,10 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local TypeUtil = require('Module:TypeUtil')
 
-local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
+local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local Opponent = Lua.import('Module:Opponent')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 local ZERO_WIDTH_SPACE = '&#8203;'

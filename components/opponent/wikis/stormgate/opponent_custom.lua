@@ -13,8 +13,8 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
