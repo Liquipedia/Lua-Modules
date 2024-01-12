@@ -30,7 +30,7 @@ local CustomInjector = Class.new(Injector)
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 
-	map:setWidgetInjector(CustomInjector(map)) 
+	map:setWidgetInjector(CustomInjector(map))
 	return map:createInfobox()
 end
 
