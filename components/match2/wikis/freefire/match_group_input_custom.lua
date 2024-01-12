@@ -16,7 +16,7 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 8
