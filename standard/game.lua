@@ -16,7 +16,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
 
 local GamesData = Info.games
 
