@@ -193,8 +193,11 @@ function MatchMapsLegacy._handleOpponents(args)
 		local score
 		local winner = tonumber(args.winner)
 		if args.walkover then
-			if tonumber(args.walkover) ~= 0 then
-				score = tonumber(args.walkover) == index and DEFAULT_WIN or FORFEIT
+			local walkover = tonumber(args.walkover)
+			if walkover and walkover ~= 0 then
+				score = walkover == index and DEFAULT_WIN or FORFEIT
+			else
+				score = args['score' .. index]
 			end
 		elseif args['score' .. index] then
 			score = tonumber(args['score' .. index])
