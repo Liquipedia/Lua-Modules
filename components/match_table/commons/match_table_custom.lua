@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local MatchTable = Lua.import('Module:MatchTable', {requireDevIfEnabled = true})
+local MatchTable = Lua.import('Module:MatchTable')
 
 local CustomMatchTable = {}
 
