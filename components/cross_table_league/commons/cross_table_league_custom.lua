@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local CrossTableLeague = Lua.import('Module:CrossTableLeague/Base', {requireDevIfEnabled = true})
+local CrossTableLeague = Lua.import('Module:CrossTableLeague/Base')
 
 local CustomCrossTableLeague = {}
 
