@@ -546,7 +546,15 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 		return nil
 	end
 
-	local isCurrentTense = String.isNotEmpty(playerInfo.team) and not isDeceased
+	local isCurrentTense = not isDeceased
+		and (
+			String.isNotEmpty(playerInfo.team) or (
+				String.isNotEmpty(transferInfo.team) and (
+					transferInfo.type == TRANSFER_STATUS_CURRENT
+					or transferInfo.type == TRANSFER_STATUS_LOAN
+				)
+			)
+		)
 
 	local shouldDisplayTeam2 = isCurrentTense
 		and transferInfo.type == TRANSFER_STATUS_LOAN
