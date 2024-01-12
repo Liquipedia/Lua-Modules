@@ -17,8 +17,8 @@ local Table = require('Module:Table')
 local CardNames = mw.loadData('Module:CardNames')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Streams = Lua.import('Module:Links/Stream')
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
