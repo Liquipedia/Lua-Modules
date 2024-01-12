@@ -19,8 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchGroupBase = Lua.import('Module:MatchGroup/Base', { requireDevIfEnabled = true })
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', { requireDevIfEnabled = true })
+local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
