@@ -31,10 +31,10 @@ local CLEAN_OTHER_ROLES = {
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = require('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
 
----@class SrawlhallaInfoboxPlayer: Person
+---@class BrawlhallaInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -69,14 +69,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Main Legends', content = {PlayersSignatureLegends.get{player = caller.pagename}}},
 		}
 	elseif id == 'role' then return {}
-	elseif
-		id == 'history' and
-		string.match(args.retired or '', '%d%d%d%d')
-	then
-		table.insert(widgets, Cell{
-				name = 'Retired',
-				content = {args.retired}
-			})
+	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
 	return widgets
 end

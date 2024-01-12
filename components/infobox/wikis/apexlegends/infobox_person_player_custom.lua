@@ -115,6 +115,18 @@ function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	if not self:shouldStoreData(self.args) then
+		return roleData.variable
+	end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+end
+
 ---@param args table
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role', (self.role or {}).variable)
