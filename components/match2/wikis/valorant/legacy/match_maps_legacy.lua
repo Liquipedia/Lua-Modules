@@ -198,7 +198,7 @@ function MatchMapsLegacy._handleOpponents(args)
 				score = args['score' .. index]
 			end
 		elseif args['score' .. index] then
-			score = tonumber(args['score' .. index])
+			score = args['score' .. index]
 		elseif not args.mapWinnersSet and winner then
 			score = winner == index and DEFAULT_WIN or DEFAULT_LOSS
 		end
