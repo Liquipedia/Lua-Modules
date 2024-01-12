@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
 
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person')
 
 --role stuff tables
 local _ROLES = {
