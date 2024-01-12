@@ -82,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 				name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
 				content = {table.concat(legendIcons, '&nbsp;')}
 			},
-			Cell{name = 'Input', content = {CustomPlayer:formatInput()}}
+			Cell{name = 'Input', content = {caller:formatInput()}}
 		)
 	elseif id == 'region' then
 		return {}
@@ -138,7 +138,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
 
-	lpdbData.extradata.input = CustomPlayer:formatInput()
+	lpdbData.extradata.input = self:formatInput()
 	lpdbData.extradata.retired = args.retired
 
 	for _, legend, legendIndex in Table.iter.pairsByPrefix(args, 'legends', {requireIndex = false}) do
@@ -155,7 +155,7 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	if Player:shouldStoreData(self.args) then
+	if self:shouldStoreData(self.args) then
 		return UpcomingMatches.get(self.args)
 	end
 end
