@@ -10,143 +10,143 @@ local byFactionAoe2 = {
 	armenians = {
 		icon = 'File:Armenians AoE2 icon.png'
 	},
-    aztecs = {
+	aztecs = {
 		icon = 'File:Aztecs AoE2 icon.png'
 	},
-    berbers = {
+	berbers = {
 		icon = 'File:Berbers AoE2 icon.png'
 	},
-    bengalis = {
+	bengalis = {
 		icon = 'File:Bengalis AoE2 icon.png'
 	},
-    bohemians = {
+	bohemians = {
 		icon = 'File:Bohemians AoE2 icon.png'
 	},
-    britons = {
+	britons = {
 		icon = 'File:Britons AoE2 icon.png'
 	},
-    bulgarians = {
+	bulgarians = {
 		icon = 'File:Bulgarians AoE2 icon.png'
 	},
-    burgundians = {
+	burgundians = {
 		icon = 'File:Burgundians AoE2 icon.png'
 	},
-    burmese = {
+	burmese = {
 		icon = 'File:Burmese AoE2 icon.png'
 	},
-    byzantines = {
+	byzantines = {
 		icon = 'File:Byzantines AoE2 icon.png'
 	},
-    celts = {
+	celts = {
 		icon = 'File:Celts AoE2 icon.png'
 	},
-    chinese = {
+	chinese = {
 		icon = 'File:Chinese AoE2 icon.png'
 	},
-    cumans = {
+	cumans = {
 		icon = 'File:Cumans AoE2 icon.png'
 	},
-    dravidians = {
+	dravidians = {
 		icon = 'File:Dravidians AoE2 icon.png'
 	},
-    ethiopians = {
+	ethiopians = {
 		icon = 'File:Ethiopians AoE2 icon.png'
 	},
-    franks = {
+	franks = {
 		icon = 'File:Franks AoE2 icon.png'
 	},
-    georgians = {
+	georgians = {
 		icon = 'File:Georgians AoE2 icon.png'
 	},
-    goths = {
+	goths = {
 		icon = 'File:Goths AoE2 icon.png'
 	},
-    gurjaras = {
+	gurjaras = {
 		icon = 'File:Gurjaras AoE2 icon.png'
 	},
-    hindustanis = {
+	hindustanis = {
 		icon = 'File:Hindustanis AoE2 icon.png'
 	},
-    huns = {
+	huns = {
 		icon = 'File:Huns AoE2 icon.png'
 	},
-    incas = {
+	incas = {
 		icon = 'File:Incas AoE2 icon.png'
 	},
-    indians = {
+	indians = {
 		icon = 'File:Indians AoE2 icon.png'
 	},
-    italians = {
+	italians = {
 		icon = 'File:Italians AoE2 icon.png'
 	},
-    japanese = {
+	japanese = {
 		icon = 'File:Japanese AoE2 icon.png'
 	},
-    khmer = {
+	khmer = {
 		icon = 'File:Khmer AoE2 icon.png'
 	},
-    koreans = {
+	koreans = {
 		icon = 'File:Koreans AoE2 icon.png'
 	},
-    lithuanians = {
+	lithuanians = {
 		icon = 'File:Lithuanians AoE2 icon.png'
 	},
-    magyars = {
+	magyars = {
 		icon = 'File:Magyars AoE2 icon.png'
 	},
-    malay = {
+	malay = {
 		icon = 'File:Malay AoE2 icon.png'
 	},
-    malians = {
+	malians = {
 		icon = 'File:Malians AoE2 icon.png'
 	},
-    mayans = {
+	mayans = {
 		icon = 'File:Mayans AoE2 icon.png'
 	},
-    mongols = {
+	mongols = {
 		icon = 'File:Mongols AoE2 icon.png'
 	},
-    persians = {
+	persians = {
 		icon = 'File:Persians AoE2 icon.png'
 	},
-    poles = {
+	poles = {
 		icon = 'File:Poles AoE2 icon.png'
 	},
-    portuguese = {
+	portuguese = {
 		icon = 'File:Portuguese AoE2 icon.png'
 	},
-    romans = {
+	romans = {
 		icon = 'File:Romans AoE2 icon.png'
 	},
-    saracens = {
+	saracens = {
 		icon = 'File:Saracens AoE2 icon.png'
 	},
-    sicilians = {
+	sicilians = {
 		icon = 'File:Sicilians AoE2 icon.png'
 	},
-    slavs = {
+	slavs = {
 		icon = 'File:Slavs AoE2 icon.png'
 	},
-    spanish = {
+	spanish = {
 		icon = 'File:Spanish AoE2 icon.png'
 	},
-    tatars = {
+	tatars = {
 		icon = 'File:Tatars AoE2 icon.png'
 	},
-    teutons = {
+	teutons = {
 		icon = 'File:Teutons AoE2 icon.png'
 	},
-    turks = {
+	turks = {
 		icon = 'File:Turks AoE2 icon.png'
 	},
-    vietnamese = {
+	vietnamese = {
 		icon = 'File:Vietnamese AoE2 icon.png'
 	},
-    vikings = {
+	vikings = {
 		icon = 'File:Vikings AoE2 icon.png'
 	},
 
-    unknown = {
+	unknown = {
 		icon = 'File:Char head filler.png'
 	},
 }
