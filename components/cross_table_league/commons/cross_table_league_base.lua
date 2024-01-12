@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
