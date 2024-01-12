@@ -140,7 +140,7 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 		['$flatten$'] = { 'R' .. round.R .. 'G' .. round.G .. 'details' }
 	}
 
-	bracketData[id] = MatchGroupLegacyDefault.addMaps(match)
+	bracketData[id] = MatchGroupLegacyDefault.addCustomMapping(match)
 	_lastRound = round
 	roundData[round.R] = round
 
@@ -154,13 +154,14 @@ parameter format of the old bracket
 ]]--
 
 --this can be used for custom mappings too
-function MatchGroupLegacyDefault.addMaps(match)
+function MatchGroupLegacyDefault.addCustomMapping(match)
 	for mapIndex = 1, MAX_NUMBER_OF_MAPS do
 		match['map' .. mapIndex] = {
 			['$ref$'] = 'map',
 			['$1$'] = mapIndex
 		}
 	end
+	match['mapveto'] = 'mapveto'
 	return match
 end
 
@@ -181,7 +182,7 @@ function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
 		opponent1 = MatchGroupLegacyDefault._readOpponent(data.opp1, 'score', bracketType),
 		opponent2 =  MatchGroupLegacyDefault._readOpponent(data.opp2, 'score', bracketType),
 	}
-	mapping = MatchGroupLegacyDefault.addMaps(mapping)
+	mapping = MatchGroupLegacyDefault.addCustomMapping(mapping)
 
 	return mapping
 end
