@@ -12,7 +12,7 @@ local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local TournamentsListing = Lua.import('Module:TournamentsListing/CardList', {requireDevIfEnabled = true})
+local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
 local CustomTournamentsListing = Class.new()
 
