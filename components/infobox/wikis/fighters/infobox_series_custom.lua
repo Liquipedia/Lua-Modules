@@ -23,6 +23,17 @@ function CustomSeries.run(frame)
 	return series:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'totalprizepool' then return {} end
+
+	return widgets
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
