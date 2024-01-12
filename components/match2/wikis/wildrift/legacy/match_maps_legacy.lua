@@ -18,7 +18,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', { requireDevIfEnabled = true })
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
