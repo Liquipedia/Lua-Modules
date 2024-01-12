@@ -73,8 +73,9 @@ end
 
 ---@param lpdbData table
 ---@param args table
+---@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args)
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.faction = Faction.toName(args.race)
 	lpdbData.extradata.factionhistorical = Variables.varDefault('racecount') and 'true' or 'false'
 
