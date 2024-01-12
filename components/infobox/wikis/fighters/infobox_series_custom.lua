@@ -9,8 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Series = Lua.import('Module:Infobox/Series')
 
 ---@class FightersSeriesInfobox: SeriesInfobox
 local CustomSeries = Class.new(Series)
