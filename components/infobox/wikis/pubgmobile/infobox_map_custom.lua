@@ -56,8 +56,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Span', content = {args.span}},
 			Cell{name = 'Theme', content = {args.theme}},
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Game Version', content = {self.caller:getGameVersion(args)}},
-			Cell{name = 'Game Mode(s)',content = {self.caller:getGameMode(args)}}
+			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}},
+			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
 		)
 	end
 	return widgets
@@ -65,13 +65,13 @@ end
 
 ---@param args table
 ---@return string?
-function CustomMap:getGameVersion(args)
+function CustomMap:_getGameVersion(args)
 	return GAME[string.lower(args.game or '')]
 end
 
 ---@param args table
 ---@return string?
-function CustomMap:getGameMode(args)
+function CustomMap:_getGameMode(args)
 	return MODES[string.lower(args.mode or '')]
 end
 
