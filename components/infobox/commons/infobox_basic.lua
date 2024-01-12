@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
-local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
+local Infobox = Lua.import('Module:Infobox')
 
 ---@class BasicInfobox
 ---@operator call(Frame): BasicInfobox

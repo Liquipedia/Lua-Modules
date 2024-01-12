@@ -21,7 +21,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree

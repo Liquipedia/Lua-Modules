@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Tier = require('Module:Tier/Custom')
 
-local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series')
 
 ---@class AoeSeriesInfobox: SeriesInfobox
 local CustomSeries = Class.new(Series)

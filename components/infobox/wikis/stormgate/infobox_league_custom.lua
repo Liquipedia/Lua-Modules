@@ -16,9 +16,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
-local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -121,7 +121,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = {CustomLeague._mapsDisplay(args.maps)}}
+				Center{content = {self.caller:_mapsDisplay(args.maps)}}
 			)
 		end
 	end
@@ -131,10 +131,10 @@ end
 
 ---@param maps {link: string, displayname: string}[]
 ---@return string
-function CustomLeague._mapsDisplay(maps)
+function CustomLeague:_mapsDisplay(maps)
 	return table.concat(
 		Array.map(maps, function(mapData)
-			return tostring(CustomLeague:_createNoWrappingSpan(
+			return tostring(self:_createNoWrappingSpan(
 				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),

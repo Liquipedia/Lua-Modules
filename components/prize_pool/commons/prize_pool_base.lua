@@ -17,9 +17,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Currency = Lua.import('Module:Currency')
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
+local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent

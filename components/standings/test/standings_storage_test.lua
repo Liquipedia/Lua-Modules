@@ -9,10 +9,10 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
-local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
-local Table = Lua.import('Module:Table', {requireDevIfEnabled = true})
-local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
+local LpdbMock = Lua.import('Module:Mock/Lpdb')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
+local Table = Lua.import('Module:Table')
+local TournamentMock = Lua.import('Module:Infobox/Mock/League')
 
 local suite = ScribuntoUnit:new()
 

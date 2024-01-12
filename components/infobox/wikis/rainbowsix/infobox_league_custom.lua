@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
@@ -13,23 +14,21 @@ local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class RainbowsixLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local DEFAULT_TIERTYPE = 'General'
-local _DEFAULT_PLATFORM = 'PC'
-local _PLATFORM_ALIAS = {
+local DEFAULT_PLATFORM = 'PC'
+local PLATFORM_ALIAS = {
 	console = 'Console',
 	pc = 'PC',
 	xbox = 'Xbox',
@@ -41,7 +40,7 @@ local _PLATFORM_ALIAS = {
 	ps4 = 'Playstation',
 }
 
-local _UBISOFT_TIERS = {
+local UBISOFT_TIERS = {
 	si = 'Six Invitational',
 	pl = 'Pro League',
 	cl = 'Challenger League',
@@ -50,54 +49,35 @@ local _UBISOFT_TIERS = {
 	minor = 'Minor',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {Game.name{game = _args.game}}
-	})
-	table.insert(widgets, Cell{
-		name = 'Platform',
-		content = {CustomLeague:_createPlatformCell(args)}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {args.player_number}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _args
-	if id == 'customcontent' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
+		Cell{name = 'Game', content = {Game.name{game = args.game}}},
+		Cell{name = 'Platform', content = {self.caller:_createPlatformCell(args)}},
+		Cell{name = 'Players', content = {args.player_number}}
+	)
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
-			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
 					PageLink.makeInternalLink({}, map, map .. game)
 				)))
 			end
@@ -105,11 +85,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		if CustomLeague:_validPublisherTier(args.ubisofttier) then
+		if self.caller:_validPublisherTier(args.ubisofttier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft Tier',
-					content = {'[['.._UBISOFT_TIERS[args.ubisofttier:lower()]..']]'},
+					content = {'[['..UBISOFT_TIERS[args.ubisofttier:lower()]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -118,20 +98,27 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-	lpdbData.extradata.startdatetext = CustomLeague:_standardiseRawDate(args.sdate or args.date)
-	lpdbData.extradata.enddatetext = CustomLeague:_standardiseRawDate(args.edate or args.date)
+	lpdbData.extradata.startdatetext = self:_standardiseRawDate(args.sdate or args.date)
+	lpdbData.extradata.enddatetext = self:_standardiseRawDate(args.edate or args.date)
 
 	return lpdbData
 end
 
+---@param publishertier string?
+---@return string?
 function CustomLeague:_validPublisherTier(publishertier)
-	return String.isNotEmpty(publishertier) and _UBISOFT_TIERS[publishertier:lower()]
+	return UBISOFT_TIERS[string.lower(publishertier or '')]
 end
 
+---@param dateString string
+---@return string
 function CustomLeague:_standardiseRawDate(dateString)
 	-- Length 7 = YYYY-MM
 	-- Length 10 = YYYY-MM-??
@@ -146,59 +133,57 @@ function CustomLeague:_standardiseRawDate(dateString)
 	return dateString
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.liquipediatiertype = self.data.liquipediatiertype or DEFAULT_TIERTYPE
+	self.data.publishertier = self:_validPublisherTier(args.ubisofttier) and args.ubisofttier:lower()
+		or self.data.publishertier
+end
+
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	-- Variables with different handling compared to commons
-	Variables.varDefine('tournament_liquipediatiertype',
-		Variables.varDefault('tournament_liquipediatiertype', DEFAULT_TIERTYPE))
-
-	if CustomLeague:_validPublisherTier(args.ubisofttier) then
-		Variables.varDefine('tournament_publishertier', args.ubisofttier:lower())
-	end
-
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
 	Variables.varDefine('tournament_tier', args.liquipediatier or '')
-	Variables.varDefine('tournament_tier_type', Variables.varDefault('tournament_liquipediatiertype'))
+	Variables.varDefine('tournament_tier_type', self.data.liquipediatiertype)
 	Variables.varDefine('tournament_prizepool', args.prizepool or '')
-	Variables.varDefine('tournament_mode', args.mode or '')
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
+	local game = Game.name{game = args.game}
+	local platform = self:_platformLookup(args.platform)
 
-	if not Game.name{game = _args.game} then
-		table.insert(categories, 'Tournaments without game version')
-	else
-		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
-	end
-
-	if CustomLeague:_platformLookup(args.platform) then
-		table.insert(categories, CustomLeague:_platformLookup(args.platform) .. ' Tournaments')
-	end
-
-	return categories
+	return {
+		game and (game .. 'Competitions') or 'Tournaments without game version',
+		platform and (platform .. ' Tournaments') or nil,
+	}
 end
 
+---@param platform string?
+---@return string?
 function CustomLeague:_platformLookup(platform)
 	if String.isEmpty(platform) then
-		platform = _DEFAULT_PLATFORM
+		platform = DEFAULT_PLATFORM
 	end
+	---@cast platform -nil
 
-	return _PLATFORM_ALIAS[platform:lower()]
+	return PLATFORM_ALIAS[platform:lower()]
 end
 
+---@param args table
+---@return string?
 function CustomLeague:_createPlatformCell(args)
-	local platform = CustomLeague:_platformLookup(args.platform)
+	local platform = self:_platformLookup(args.platform)
 
 	if String.isNotEmpty(platform) then
 		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
@@ -207,6 +192,8 @@ function CustomLeague:_createPlatformCell(args)
 	end
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')

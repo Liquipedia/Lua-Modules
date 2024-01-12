@@ -14,8 +14,8 @@ local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local BreakDown = Widgets.Breakdown
@@ -99,9 +99,9 @@ function CustomInjector:parse(id, widgets)
 			Title{name = 'Level Changes'},
 			BreakDown{content = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
 			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, self.caller:_hitPointsRegenTitle())),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateHitPointsRegen(gainFactor) end, '[[Hit Points]]:')),
+				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, '[[Hit Points]]:')),
+			BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
+				return self.caller:_calculateHitPointsRegen(gainFactor) end, self.caller:_hitPointsRegenTitle())),
 			BreakDown(CustomCharacter._toLevelChangesRow(
 				function(gainFactor) return self.caller:_calculateMana(gainFactor) end, '[[Mana]]:')),
 			BreakDown(CustomCharacter._toLevelChangesRow(

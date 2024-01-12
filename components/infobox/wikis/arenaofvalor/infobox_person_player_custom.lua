@@ -14,8 +14,8 @@ local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -37,6 +37,8 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	_args.autoTeam = true
 
+	_role = Role.run({role = _args.role})
+	_role2 = Role.run({role = _args.role2})
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 
@@ -45,8 +47,6 @@ end
 
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
 			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
 		}

@@ -6,91 +6,83 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class SquadronsLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {_args.team_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _args
-	if id == 'customcontent' then
-		if String.isNotEmpty(args.map1) then
-			local maps = {}
+	local args = self.caller.args
 
-			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
-					PageLink.makeInternalLink(map)
-				)))
-			end
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Teams', content = {args.team_number}},
+			Cell{name = 'Players', content = {args.player_number}}
+		)
+	elseif id == 'customcontent' and String.isNotEmpty(args.map1) then
+		local maps = {}
+
+		for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
+			table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
+				PageLink.makeInternalLink(map)
+			)))
 		end
+
+		Array.appendWith(widgets,
+			Title{name = 'Maps'},
+			Center{content = {table.concat(maps, '&nbsp;• ')}}
+		)
 	end
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.maps = table.concat(_league:getAllArgsForBase(args, 'map'), ';')
+	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables()
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')

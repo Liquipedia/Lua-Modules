@@ -12,7 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class Infobox
 ---@field frame Frame?

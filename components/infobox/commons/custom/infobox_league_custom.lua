@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League')
 
 local CustomLeague = {}
 

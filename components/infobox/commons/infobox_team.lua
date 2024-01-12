@@ -21,12 +21,12 @@ local String = require('Module:StringUtils')
 local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Earnings = Lua.import('Module:Earnings')
+local Flags = Lua.import('Module:Flags')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -332,7 +332,8 @@ function Team:calculateEarnings(args)
 	return Earnings.calculateForTeam{
 		team = self.pagename or self.name,
 		perYear = true,
-		queryHistorical = true,
+		queryHistorical = args.queryEarningsHistorical,
+		doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
 	}
 end
 

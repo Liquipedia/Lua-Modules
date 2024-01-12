@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local MatchTicker = Lua.import('Module:MatchTicker', {requireDevIfEnabled = true})
+local MatchTicker = Lua.import('Module:MatchTicker')
 
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 

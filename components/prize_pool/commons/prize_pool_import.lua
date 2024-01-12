@@ -14,10 +14,10 @@ local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
-local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Placement = Lua.import('Module:PrizePool/Placement')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

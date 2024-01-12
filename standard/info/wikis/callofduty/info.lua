@@ -13,7 +13,7 @@ return {
 	games = {
 		aw = {
 			abbreviation = 'AW',
-			name = 'Call of Duty: Advanced Warfare',
+			name = 'Advanced Warfare',
 			link = 'Call of Duty: Advanced Warfare',
 			logo = {
 				darkMode = 'COD AW TeamCardImage.png',
@@ -26,7 +26,7 @@ return {
 		},
 		bo = {
 			abbreviation = 'BO',
-			name = 'Call of Duty: Black Ops',
+			name = 'Black Ops',
 			link = 'Call of Duty: Black Ops',
 			logo = {
 				darkMode = 'Call of Duty Black Ops darkmode.png',
@@ -39,7 +39,7 @@ return {
 		},
 		bo2 = {
 			abbreviation = 'BO2',
-			name = 'Call of Duty: Black Ops II',
+			name = 'Black Ops II',
 			link = 'Call of Duty: Black Ops II',
 			logo = {
 				darkMode = 'COD BO2 TeamCardImage.png',
@@ -52,7 +52,7 @@ return {
 		},
 		bo3 = {
 			abbreviation = 'BO3',
-			name = 'Call of Duty: Black Ops III',
+			name = 'Black Ops III',
 			link = 'Call of Duty: Black Ops III',
 			logo = {
 				darkMode = 'COD BO3 TeamCardImage.png',
@@ -65,7 +65,7 @@ return {
 		},
 		bo4 = {
 			abbreviation = 'BO4',
-			name = 'Call of Duty: Black Ops 4',
+			name = 'Black Ops 4',
 			link = 'Call of Duty: Black Ops 4',
 			logo = {
 				darkMode = 'Black Ops 4 TeamCardImage.png',
@@ -78,8 +78,8 @@ return {
 		},
 		bocw = {
 			abbreviation = 'BOCW',
-			name = 'Call of Duty: Black Ops Cold War',
-			link = 'Black Ops Cold War',
+			name = 'Black Ops Cold War',
+			link = 'Call of Duty: Black Ops Cold War',
 			logo = {
 				darkMode = 'Call of Duty Black Ops Cold War darkmode.png',
 				lightMode = 'Call of Duty Black Ops Cold War lightmode.png',
@@ -130,7 +130,7 @@ return {
 		},
 		cod4 = {
 			abbreviation = 'COD4',
-			name = 'Call of Duty 4: Modern Warfare',
+			name = 'Call of Duty 4',
 			link = 'Call of Duty 4: Modern Warfare',
 			logo = {
 				darkMode = 'COD4 Teamcard.png',
@@ -156,7 +156,7 @@ return {
 		},
 		ghosts = {
 			abbreviation = 'GHOSTS',
-			name = 'Call of Duty: Ghosts',
+			name = 'Ghosts',
 			link = 'Call of Duty: Ghosts',
 			logo = {
 				darkMode = 'Call of Duty Ghosts darkmode.png',
@@ -169,7 +169,7 @@ return {
 		},
 		iw = {
 			abbreviation = 'IW',
-			name = 'Call of Duty: Infinite Warfare',
+			name = 'Infinite Warfare',
 			link = 'Call of Duty: Infinite Warfare',
 			logo = {
 				darkMode = 'COD IW TeamCardImage.png',
@@ -182,7 +182,7 @@ return {
 		},
 		mw2 = {
 			abbreviation = 'MW2',
-			name = 'Call of Duty: Modern Warfare 2',
+			name = 'Modern Warfare 2',
 			link = 'Call of Duty: Modern Warfare 2',
 			logo = {
 				darkMode = 'COD MW2 teamcard.png',
@@ -195,8 +195,8 @@ return {
 		},
 		mw2019 = {
 			abbreviation = 'MW2019',
-			name = 'Call of Duty: Modern Warfare',
-			link = 'Modern Warfare (2019)',
+			name = 'Modern Warfare (2019)',
+			link = 'Call of Duty: Modern Warfare (2019)',
 			logo = {
 				darkMode = 'Modern warfare TeamCardImage.png',
 				lightMode = 'Modern warfare TeamCardImage.png',
@@ -208,7 +208,7 @@ return {
 		},
 		mw3 = {
 			abbreviation = 'MW3',
-			name = 'Call of Duty: Modern Warfare 3',
+			name = 'Modern Warfare 3',
 			link = 'Call of Duty: Modern Warfare 3',
 			logo = {
 				darkMode = 'COD MW3 TeamCardImage.png',
@@ -221,7 +221,7 @@ return {
 		},
 		mwii = {
 			abbreviation = 'MWII',
-			name = 'Call of Duty: Modern Warfare II',
+			name = 'Modern Warfare II',
 			link = 'Call of Duty: Modern Warfare II',
 			logo = {
 				darkMode = 'COD Modern Warfare II Teamcard.png',
@@ -234,7 +234,7 @@ return {
 		},
 		mwiii = {
 			abbreviation = 'MWIII',
-			name = 'Call of Duty: Modern Warfare III',
+			name = 'Modern Warfare III',
 			link = 'Call of Duty: Modern Warfare III',
 			logo = {
 				darkMode = 'COD MWIII default allmode.png',
@@ -247,7 +247,7 @@ return {
 		},
 		vg = {
 			abbreviation = 'VG',
-			name = 'Call of Duty: Vanguard',
+			name = 'Vanguard',
 			link = 'Call of Duty: Vanguard',
 			logo = {
 				darkMode = 'COD Vanguard Teamcard.png',
@@ -260,7 +260,7 @@ return {
 		},
 		waw = {
 			abbreviation = 'WaW',
-			name = 'Call of Duty: World at War',
+			name = 'World at War',
 			link = 'Call of Duty: World at War',
 			logo = {
 				darkMode = 'COD World at War darkmode.png',
@@ -273,7 +273,7 @@ return {
 		},
 		wwii = {
 			abbreviation = 'WWII',
-			name = 'Call of Duty: WWII',
+			name = 'WWII',
 			link = 'Call of Duty: WWII',
 			logo = {
 				darkMode = 'COD WW2 TeamCardImage.png',
@@ -286,7 +286,7 @@ return {
 		},
 		wz = {
 			abbreviation = 'WZ',
-			name = 'Call of Duty: Warzone',
+			name = 'Warzone 1.0',
 			link = 'Call of Duty: Warzone',
 			logo = {
 				darkMode = 'COD Warzone 1.0 default darkmode.png',
@@ -299,7 +299,7 @@ return {
 		},
 		wz2 = {
 			abbreviation = 'WZ2',
-			name = 'Call of Duty: Warzone 2.0',
+			name = 'Warzone 2.0',
 			link = 'Call of Duty: Warzone 2.0',
 			logo = {
 				darkMode = 'COD Warzone 2.0 default allmode.png',
@@ -312,7 +312,7 @@ return {
 		},
 		wzm = {
 			abbreviation = 'WZM',
-			name = 'Call of Duty: Warzone Mobile',
+			name = 'Warzone Mobile',
 			link = 'Call of Duty: Warzone Mobile',
 			logo = {
 				darkMode = 'COD Warzone Mobile default darkmode.png',

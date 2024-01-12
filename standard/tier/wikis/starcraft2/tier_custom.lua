@@ -12,7 +12,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 

@@ -12,6 +12,7 @@ local DateClean = require('Module:DateTime')
 local GameLookup = require('Module:GameLookup')
 local GameModeLookup = require('Module:GameModeLookup')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local MatchTicker = require('Module:Matches Tournament')
@@ -21,70 +22,66 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local CustomLeague = Class.new()
+---@class AgeofempiresLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local SECONDS_PER_DAY = 86400
 
-local _league
-local categories = {}
-
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
-	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.createBottomContent = CustomLeague.createBottomContent
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.mode = Logic.emptyOr(
+		args.mode,
+		String.isNotEmpty(args.team_number) and 'team' or '1v1'
+	)
+
+	self.categories = {}
+	self.data.maps = self:_getMaps()
+	self.data.gameModes = self:_getGameModes(args)
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _league.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{
-			name = 'Game & Version',
-			content = CustomLeague:_getGameVersion(args)
-		})
-
-		table.insert(widgets, Cell{
-			name = 'Game Mode',
-			content = CustomLeague:_getGameModes(args, true)
-		})
+		Array.appendWith(widgets,
+			Cell{name = 'Game & Version', content = caller:_getGameVersion(args)},
+			Cell{name = 'Game Mode', content = Array.map(caller.data.gameModes, function(gameMode)
+				return Page.makeInternalLink(gameMode)
+			end)}
+		)
 	elseif id == 'customcontent' then
 		local playertitle = (not String.isEmpty(args.team_number)) and 'Teams' or 'Players'
 
-		table.insert(widgets, Title{name = playertitle})
-
-		table.insert(widgets, Cell{
-			name = 'Number of Teams',
-			content = {args.team_number}
-		})
-
-		table.insert(widgets, Cell{
-			name = 'Number of Players',
-			content = {args.player_number}
-		})
+		Array.appendWith(widgets,
+			Title{name = playertitle},
+			Cell{name = 'Number of Teams', content = {args.team_number}},
+			Cell{name = 'Number of Players', content = {args.player_number}}
+		)
 
 		if not String.isEmpty(args.team1) then
 			local teams = {Page.makeInternalLink(args.team1)}
@@ -92,7 +89,7 @@ function CustomInjector:parse(id, widgets)
 
 			while not String.isEmpty(args['team' .. index]) do
 				table.insert(teams, '&nbsp;• ' ..
-					tostring(CustomLeague:_createNoWrappingSpan(
+					tostring(caller:_createNoWrappingSpan(
 						Page.makeInternalLink(args['team' .. index])
 					))
 				)
@@ -103,8 +100,10 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		if not String.isEmpty(args.map1) then
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_displayMaps(CustomLeague:_getMaps())})
+			Array.appendWith(widgets,
+				Title{name = 'Maps'},
+				Center{content = caller:_displayMaps(caller.data.maps)}
+			)
 		end
 	elseif id == 'sponsors' then
 		if not String.isEmpty(args.sponsors) then
@@ -119,32 +118,33 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return string?
 function CustomLeague:createBottomContent()
 	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
 
-	if yesterday <= Variables.varDefault('tournament_enddate', '1970-01-01') then
+	if self.data.endDate and yesterday <= self.data.endDate then
 		return MatchTicker.get{args={
-			parent = _league.pagename,
-			limit = tonumber(_league.args.matchtickerlimit) or 7,
+			parent = self.pagename,
+			limit = tonumber(self.args.matchtickerlimit) or 7,
 			noInfoboxWrapper = true
 		}}
 	end
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	if String.isEmpty(args.game) then
-		table.insert(categories, 'Tournaments without game version')
-	else
-		table.insert(categories, GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
-	end
-
-	return categories
+	return Array.append(self.categories,
+		String.isEmpty(args.game) and 'Tournaments without game version'
+			or (GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
+	)
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername)
-	Variables.varDefine('tournament_organizer', CustomLeague:_concatArgs(args, 'organizer'))
+	Variables.varDefine('tournament_organizer', self:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', args.sponsors)
 
 
@@ -171,11 +171,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_patch', args.patch or args.voobly)
 	Variables.varDefine('patch', args.patch or args.voobly)
 	Variables.varDefine('tournament_gameversion', args.version)
-	Variables.varDefine('tournament_mode',
-		(not String.isEmpty(args.mode)) and args.mode or
-		(not String.isEmpty(args.team_number)) and 'team' or
-		'1v1'
-	)
 	Variables.varDefine('tournament_headtohead', args.headtohead)
 
 	-- Legacy notability vars
@@ -184,20 +179,20 @@ function CustomLeague:defineCustomPageVariables(args)
 	-- Variables for extradata to be added again in
 	-- Module:Prize pool, Module:Prize pool team, Module:TeamCard and Module:TeamCard2
 	Variables.varDefine('tournament_deadline', DateClean._clean(args.deadline or ''))
-	Variables.varDefine('tournament_gamemode', table.concat(CustomLeague:_getGameModes(args, false), ','))
+	Variables.varDefine('tournament_gamemode', table.concat(self.data.gameModes, ','))
 
 	-- map links, to be used by brackets and mappool templates
-	local maps = CustomLeague:_getMaps()
-	Variables.varDefine('tournament_maps', Json.stringify(maps))
-	for _, map in ipairs(maps) do
+	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
+	Array.forEach(self.data.maps, function(map)
 		Variables.varDefine('tournament_map_'.. (map.name or map.link), map.link)
-	end
+	end)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	if String.isEmpty(args.tickername) then
-		lpdbData.tickername = args.name
-	end
+	lpdbData.tickername = Logic.emptyOr(lpdbData.tickername, args.name)
 
 	-- Prevent resolving redirects for series
 	-- lpdbData.seriespage will still contain the resolved page
@@ -205,7 +200,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.sponsors = args.sponsors
 
-	lpdbData.maps = Variables.varDefault('tournament_maps')
+	lpdbData.maps = self.data.maps
 
 	lpdbData.game = GameLookup.getName({args.game})
 	-- Currently, args.patch shall be used for official patches,
@@ -214,12 +209,15 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.deadline = DateClean._clean(args.deadline or '')
-	lpdbData.extradata.gamemode = table.concat(CustomLeague:_getGameModes(args, false), ',')
+	lpdbData.extradata.gamemode = table.concat(self.data.gameModes, ',')
 	lpdbData.extradata.gameversion = args.version
 
 	return lpdbData
 end
 
+---@param args table
+---@param base string
+---@return string
 function CustomLeague:_concatArgs(args, base)
 	local foundArgs = {args[base] or args[base .. '1']}
 	local index = 2
@@ -231,12 +229,16 @@ function CustomLeague:_concatArgs(args, base)
 	return table.concat(foundArgs, ';')
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:_getGameVersion(args)
 	local gameversion = {}
 
@@ -256,9 +258,7 @@ function CustomLeague:_getGameVersion(args)
 		end
 
 		if not String.isEmpty(args.patch) then
-			table.insert(gameversion,
-				CustomLeague:_makePatchLink(args)
-			)
+			table.insert(gameversion, self:_makePatchLink(args))
 		end
 
 		if not String.isEmpty(args.voobly) then
@@ -269,7 +269,8 @@ function CustomLeague:_getGameVersion(args)
 	return gameversion
 end
 
-
+---@param args table
+---@return string
 function CustomLeague:_makePatchLink(args)
 	local content = GameLookup.makePatchLink({game = args.game, version = args.version, patch = args.patch})
 
@@ -282,13 +283,12 @@ function CustomLeague:_makePatchLink(args)
 	return content
 end
 
-function CustomLeague:_getGameModes(args, makeLink)
+---@param args table
+---@return string[]
+function CustomLeague:_getGameModes(args)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
-		table.insert(categories, default .. ' Tournaments')
-		if makeLink then
-			default = Page.makeInternalLink(default)
-		end
+		table.insert(self.categories, default .. ' Tournaments')
 		return {default}
 	end
 
@@ -297,26 +297,20 @@ function CustomLeague:_getGameModes(args, makeLink)
 		function(mode, index)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
-			table.insert(categories, not String.isEmpty(gameModes[index])
+			table.insert(self.categories, not String.isEmpty(gameModes[index])
 				and gameModes[index] .. ' Tournaments'
 				or 'Pages with unknown game mode'
 			)
-
-			if makeLink then
-				gameModes[index] = Page.makeInternalLink(gameModes[index])
-			end
 		end
 	)
 
 	return gameModes
 end
 
+---@return {link: string, name: string?, mode: string?, image: string?}[]
 function CustomLeague:_getMaps()
-	if _league.maps then
-		return _league.maps
-	end
+	local args = self.args
 
-	local args = _league.args
 	local maps = {}
 	for prefix, mapInput in Table.iter.pairsByPrefix(args, 'map', {strict = true}) do
 		local mode = String.isNotEmpty(args[prefix .. 'mode']) and MapMode.get({args[prefix .. 'mode']}) or nil
@@ -336,16 +330,17 @@ function CustomLeague:_getMaps()
 			display = nil
 		end
 
-		CustomLeague:_checkMapInformation(display or link, link, Variables.varDefault('tournament_game'))
+		self:_checkMapInformation(display or link, link, self.data.game)
 
 		table.insert(maps, {link = link, name = display, mode = mode, image = args[prefix .. 'image']})
 	end
 
-	_league.maps = maps
-
 	return maps
 end
 
+---@param name any
+---@param link any
+---@param game any
 function CustomLeague:_checkMapInformation(name, link, game)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',
@@ -355,15 +350,17 @@ function CustomLeague:_checkMapInformation(name, link, game)
 		local extradata = data[1].extradata or {}
 		if extradata.game ~= game then
 			mw.logObject('Map ' .. name .. ' is linking to ' .. link .. ', an ' .. extradata.game .. ' page.')
-			table.insert(categories, 'Tournaments linking to maps for a different game')
+			table.insert(self.categories, 'Tournaments linking to maps for a different game')
 		end
 	end
 end
 
+---@param maps {link: string, name: string?, mode: string?, image: string?}[]
+---@return table
 function CustomLeague:_displayMaps(maps)
 	local mapDisplay = function(map)
-		return tostring(CustomLeague:_createNoWrappingSpan(
-			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode and map.mode or ''), map.link)
+		return tostring(self:_createNoWrappingSpan(
+			Page.makeInternalLink({}, (map.name or map.link) .. (map.mode or ''), map.link)
 		))
 	end
 
@@ -373,6 +370,8 @@ function CustomLeague:_displayMaps(maps)
 	)}
 end
 
+---@param args table
+---@return string?
 function CustomLeague:createLiquipediaTierDisplay(args)
 	local tierDisplay = Tier.display(
 		args.liquipediatier,

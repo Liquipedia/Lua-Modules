@@ -12,10 +12,11 @@ local RoleOf = require('Module:RoleOf')
 
 local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
 
-local CustomTeam = Class.new()
+---@class TeamfortressInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}

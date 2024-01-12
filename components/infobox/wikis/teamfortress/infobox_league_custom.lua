@@ -20,10 +20,8 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class TeamfortressLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local MODES = {
@@ -33,41 +31,31 @@ local MODES = {
 	highlander = 'Highlander',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.mode = MODES[(_args.mode or '6v6'):lower()]
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.args.mode = MODES[(league.args.mode or '6v6'):lower()]
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Mode',
-		content = {_args.mode}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _args
-	if id == 'customcontent' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Mode', content = {args.mode}})
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = {}
 
-			for _, map in ipairs(_league:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
 					PageLink.makeInternalLink(map)
 				)))
 			end
@@ -78,6 +66,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
@@ -85,16 +74,16 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_prizepool', args.prizepoolusd)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
@@ -105,6 +94,8 @@ function CustomLeague:getWikiCategories(args)
 	return categories
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')

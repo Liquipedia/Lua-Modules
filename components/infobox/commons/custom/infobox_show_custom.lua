@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
+local Show = Lua.import('Module:Infobox/Show')
 
 local CustomShow = Class.new()
 
