@@ -43,31 +43,31 @@ local MAX_NUMBER_OF_PLAYERS = 5
 ---@param args table
 ---@return table
 function MatchMapsLegacy._handlePlayersStats(prefix, args)
-	for oppIndex = 1, MAX_NUMBER_OF_OPPONENTS do
-		local teamKey = prefix .. 't' .. oppIndex
-		for playerIndex = 1, MAX_NUMBER_OF_PLAYERS do
+	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function(opponentIndex)
+		local teamKey = prefix .. 't' .. opponentIndex
+		Array.forEach(Array.range(1, MAX_NUMBER_OF_PLAYERS), function(playerIndex)
 			local player = args[teamKey .. 'p' .. playerIndex]
-			if Logic.isNotEmpty(player) then
-				local agent = args[teamKey .. 'a' .. playerIndex]
-				local kda = args[teamKey .. 'kda' .. playerIndex] or ''
-				local acs = args[teamKey .. 'acs' .. playerIndex]
-				local kills, deaths, assists = kda:match("(%d+)%/(%d+)%/(%d+)")
+			if Logic.isEmpty(player) then return end
 
-				args[teamKey .. 'p' .. playerIndex] = Json.stringify({
-					player = player,
-					agent = agent,
-					kills = kills,
-					deaths = deaths,
-					assists = assists,
-					acs = acs
-				})
+			local agent = args[teamKey .. 'a' .. playerIndex]
+			local kda = args[teamKey .. 'kda' .. playerIndex] or ''
+			local acs = args[teamKey .. 'acs' .. playerIndex]
+			local kills, deaths, assists = kda:match("(%d+)%/(%d+)%/(%d+)")
 
-				args[teamKey .. 'a' .. playerIndex] = nil
-				args[teamKey .. 'kda' .. playerIndex] = nil
-				args[teamKey .. 'acs' .. playerIndex] = nil
-			end
-		end
-	end
+			args[teamKey .. 'p' .. playerIndex] = Json.stringify({
+				player = player,
+				agent = agent,
+				kills = kills,
+				deaths = deaths,
+				assists = assists,
+				acs = acs
+			})
+
+			args[teamKey .. 'a' .. playerIndex] = nil
+			args[teamKey .. 'kda' .. playerIndex] = nil
+			args[teamKey .. 'acs' .. playerIndex] = nil
+		end)
+	end)
 
 	return args
 end
