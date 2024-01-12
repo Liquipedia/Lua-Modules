@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -20,70 +21,61 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomMap = Class.new()
+---@class ApexMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
-local _map
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local map = Map(frame)
-	_map = map
-	_args = map.args
-	map.addToLpdb = CustomMap.addToLpdb
-	map.createWidgetInjector = CustomMap.createWidgetInjector
+	local map = CustomMap(frame)
+
+	map:setWidgetInjector(CustomInjector(map)) 
 	return map:createInfobox()
 end
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Game Mode(s)',
-		content = {_args.gamemode}
-	})
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-	local spanText = ''
-	if String.isNotEmpty(_args.spanstart) then
-		spanText = spanText .. ' - '
-	else
-		--If it never started being played competitively, it can't have an end date
-		_args.spanend = nil
-	end
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game Mode(s)', content = {args.gamemode}},
+			Cell{name = 'Played in ALGS', content = {self.caller:createSpan(args)}}
+		)
 
-	table.insert(widgets, Cell{
-		name = 'Played in ALGS',
-		content = {(_args.spanstart or '<i><b>Not </b></i>') .. spanText .. (_args.spanend or '<i><b>Currently</b></i>')}
-	})
+		if String.isEmpty(args.ring) then return widgets end
 
-	if String.isNotEmpty(_args.ring) then
 		local ringTable = WidgetTable{
 			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
-			css = {['text-align'] = 'center',
+			css = {
+				['text-align'] = 'center',
 				display = 'inline-grid !important',
 				['padding-top'] = '0px',
 				['padding-bottom'] = '0px',
-				['border-top-style'] = 'none'},
-			}
-		ringTable:addRow(CustomMap:_createRingTableHeader())
-		for _, ringData in ipairs(_map:getAllArgsForBase(_args, 'ring')) do
-			ringTable:addRow(CustomMap:_createRingTableRow(ringData))
-		end
-		table.insert(widgets, Title{name = 'Ring Information'})
-		table.insert(widgets, ringTable)
+				['border-top-style'] = 'none',
+			},
+		}
+
+		ringTable:addRow(self.caller:createRingTableHeader())
+
+		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
+			ringTable:addRow(self.caller:createRingTableRow(ringData))
+		end)
+
+		Array.appendWith(widgets,
+			Title{name = 'Ring Information'},
+			ringTable
+		)
 	end
+
 	return widgets
 end
 
 ---@return WidgetTableRow
-function CustomMap:_createRingTableHeader()
+function CustomMap:createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
 		:addCell(TableCell{content = {'Ring'}})
@@ -95,12 +87,26 @@ end
 
 ---@param ringData string
 ---@return WidgetTableRow
-function CustomMap:_createRingTableRow(ringData)
+function CustomMap:createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
 		row:addCell(TableCell{content = {item}})
 	end
 	return row
+end
+
+---@param args table
+---@return table
+function CustomMap:createSpan(args)
+	local spanText = ''
+	if String.isNotEmpty(args.spanstart) then
+		spanText = spanText .. ' - '
+	else
+		--If it never started being played competitively, it can't have an end date
+		args.spanend = nil
+	end
+
+	return (args.spanstart or '<i><b>Not </b></i>') .. spanText .. (args.spanend or '<i><b>Currently</b></i>')
 end
 
 ---@param lpdbData table
