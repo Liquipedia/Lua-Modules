@@ -99,9 +99,9 @@ function CustomInjector:parse(id, widgets)
 			Title{name = 'Level Changes'},
 			BreakDown{content = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
 			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, self.caller:_hitPointsRegenTitle())),
-			BreakDown(CustomCharacter._toLevelChangesRow(
-				function(gainFactor) return self.caller:_calculateHitPointsRegen(gainFactor) end, '[[Hit Points]]:')),
+				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, '[[Hit Points]]:')),
+			BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
+				return self.caller:_calculateHitPointsRegen(gainFactor) end, self.caller:_hitPointsRegenTitle())),
 			BreakDown(CustomCharacter._toLevelChangesRow(
 				function(gainFactor) return self.caller:_calculateMana(gainFactor) end, '[[Mana]]:')),
 			BreakDown(CustomCharacter._toLevelChangesRow(
