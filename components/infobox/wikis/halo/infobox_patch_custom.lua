@@ -9,9 +9,9 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Patch = Lua.import('Module:Infobox/Patch')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
