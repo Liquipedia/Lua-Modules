@@ -19,8 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchGroupBase = Lua.import('Module:MatchGroup/Base', { requireDevIfEnabled = true })
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', { requireDevIfEnabled = true })
+local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -47,8 +47,6 @@ function MatchMapsLegacy._handlePlayersStats(prefix, args)
 		local teamKey = prefix .. 't' .. opponentIndex
 		Array.forEach(Array.range(1, MAX_NUMBER_OF_PLAYERS), function(playerIndex)
 			local player = args[teamKey .. 'p' .. playerIndex]
-			if Logic.isEmpty(player) then return end
-
 			local kda = Table.extract(args, teamKey .. 'kda' .. playerIndex) or ''
 			local kills, deaths, assists = kda:match("(%d+)%/(%d+)%/(%d+)")
 
@@ -193,11 +191,14 @@ function MatchMapsLegacy._handleOpponents(args)
 		local score
 		local winner = tonumber(args.winner)
 		if args.walkover then
-			if tonumber(args.walkover) ~= 0 then
-				score = tonumber(args.walkover) == index and DEFAULT_WIN or FORFEIT
+			local walkover = tonumber(args.walkover)
+			if walkover and walkover ~= 0 then
+				score = walkover == index and DEFAULT_WIN or FORFEIT
+			else
+				score = args['score' .. index]
 			end
 		elseif args['score' .. index] then
-			score = tonumber(args['score' .. index])
+			score = args['score' .. index]
 		elseif not args.mapWinnersSet and winner then
 			score = winner == index and DEFAULT_WIN or DEFAULT_LOSS
 		end
