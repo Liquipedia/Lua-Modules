@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Person = Lua.import('Module:Infobox/Person')
 
 local STATUS_ACTIVE = 'Active'
 local RACE_ALL = 'All'
