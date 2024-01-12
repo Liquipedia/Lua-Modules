@@ -72,20 +72,21 @@ function MatchMapsLegacy._handleMaps(args)
 	Array.mapIndexes(function(index)
 		local prefix = 'map' .. index
 		local map = args[prefix]
-		local winner = args[prefix .. 'win']
+		local winner = Table.extract(args, prefix .. 'win')
+		local score = Table.extract(args, prefix .. 'score')
 		if Logic.isEmpty(map) and Logic.isEmpty(winner) then
 			return false
 		end
 
 		local score1
 		local score2
-		if Logic.isNotEmpty(args[prefix .. 'score']) then
-			local score = mw.text.split(args[prefix .. 'score'], '-')
+		if Logic.isNotEmpty(score) then
+			local score = mw.text.split(score, '-')
 			score1 = score[1]
 			score2 = score[2]
 		end
 		if not score1 and not score2 and winner ~= SKIP then
-			local winnerInt = tonumber(args[prefix .. 'win'])
+			local winnerInt = tonumber(winner)
 			score1 = winnerInt == 1 and DEFAULT_WIN or DEFAULT_LOSS
 			score2 = winnerInt == 2 and DEFAULT_WIN or DEFAULT_LOSS
 		end
@@ -95,27 +96,17 @@ function MatchMapsLegacy._handleMaps(args)
 		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
 			(not Logic.isEmpty(winner) and 'true') or 'false'
 
-		args[prefix .. 't1firstsideot'] = args[prefix .. 'o1t1firstside']
-		args[prefix .. 't1otatk'] = args[prefix .. 'o1t1atk']
-		args[prefix .. 't1otdef'] = args[prefix .. 'o1t1def']
-		args[prefix .. 't2otatk'] = args[prefix .. 'o1t2atk']
-		args[prefix .. 't2otdef'] = args[prefix .. 'o1t2def']
+		args[prefix .. 't1firstsideot'] = Table.extract(args, prefix .. 'o1t1firstside')
+		args[prefix .. 't1otatk'] = Table.extract(args, prefix .. 'o1t1atk')
+		args[prefix .. 't1otdef'] = Table.extract(args, prefix .. 'o1t1def')
+		args[prefix .. 't2otatk'] = Table.extract(args, prefix .. 'o1t2atk')
+		args[prefix .. 't2otdef'] = Table.extract(args, prefix .. 'o1t2def')
 
-		local vod = args['vodgame' .. index]
+		local vod = Table.extract(args, 'vodgame' .. index)
 		if Logic.isEmpty(vod) then
-			vod = args['vod' .. index]
+			vod = Table.extract(args, 'vod' .. index)
 		end
 		args[prefix .. 'vod'] = vod
-
-		args[prefix .. 'o1t1firstside'] = nil
-		args[prefix .. 'o1t1atk'] = nil
-		args[prefix .. 'o1t1def'] = nil
-		args[prefix .. 'o1t2atk'] = nil
-		args[prefix .. 'o1t2def'] = nil
-		args[prefix .. 'win'] = nil
-		args[prefix .. 'score'] = nil
-		args['vodgame' .. index] = nil
-		args['vod' .. index] = nil
 
 		args = MatchMapsLegacy._handlePlayersStats(prefix, args)
 		return true
@@ -129,8 +120,7 @@ end
 ---@return string
 function MatchMapsLegacy.convertBracketMatchSummary(frame)
 	local args = Arguments.getArgs(frame)
-	args.mapveto = args.mapbans
-	args.mapbans = nil
+	args.mapveto = Table.extract(args, 'mapbans')
 	args = MatchMapsLegacy._handleMaps(args)
 
 	return Json.stringify(args)
@@ -141,8 +131,7 @@ end
 ---@return string
 function MatchMapsLegacy.convertMapVeto(frame)
 	local args = Arguments.getArgs(frame)
-	args.firstpick = args.firstban
-	args.firstban = nil
+	args.firstpick = Table.extract(args, 'firstban')
 	local vetoTypes = {}
 	for vetoKey, vetoType, vetoIndex in Table.iter.pairsByPrefix(args, 'r') do
 		table.insert(vetoTypes, vetoType)
@@ -194,7 +183,7 @@ function MatchMapsLegacy._handleOpponents(args)
 	args.winner = args.winner or args.win
 	for index = 1, MAX_NUMBER_OF_OPPONENTS do
 		args['score' .. index] = args['score' .. index] or args['games' .. index]
-		local template = args['team' .. index]
+		local template = Table.extract(args, 'team' .. index)
 		if (not template) or template == '&nbsp;' then
 			template = TBD
 		else
@@ -229,7 +218,6 @@ function MatchMapsLegacy._handleOpponents(args)
 			}
 		end
 		args['opponent' .. index] = opponent
-		args['team' .. index] = nil
 		args['score' .. index] = nil
 		args['games' .. index] = nil
 	end
@@ -367,9 +355,8 @@ function MatchMapsLegacy.matchListEnd()
 
 	Array.forEach(matches, function(match, matchIndex)
 		if Logic.isEmpty(gsl) then
-			args['M' .. matchIndex .. 'header'] = match.header
+			args['M' .. matchIndex .. 'header'] = Table.extract(match, 'header')
 		end
-		match.header = nil
 		args['M' .. matchIndex] = Json.stringify(match)
 	end)
 
