@@ -118,13 +118,13 @@ function CustomInjector:parse(id, widgets)
 		return Array.extend(
 			widgets,
 			{
-				Cell{name = typeName, content = self.caller:displayTypes(args.types)},
+				Cell{name = typeName, content = self.caller:_displayTypes(args.types)},
 				Cell{name = 'Tileset', content = {args.tileset}},
-				Cell{name = 'Size', content = {self.caller:getSizeDisplay(args)}},
-				Cell{name = 'Spawn Positions', content = {self.caller:getSpawnDisplay(args)}},
+				Cell{name = 'Size', content = {self.caller:_getSizeDisplay(args)}},
+				Cell{name = 'Spawn Positions', content = {self.caller:_getSpawnDisplay(args)}},
 				Cell{name = 'Versions', content = {args.versions}},
 				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
-				Cell{name = 'Available Resources', content = {self.caller:resourcesDisplay(args)}},
+				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
 			},
 			self.caller:addCellsFromDataTable(args, LADDER_HISTORY),
 			{hasCampData and Title{name = 'Camp Information'} or nil},
@@ -136,7 +136,7 @@ end
 ---@param args table
 ---@param tbl {key: string, name: string}[]
 ---@return Widget[]
-function CustomMap:addCellsFromDataTable(args, tbl)
+function CustomMap:_addCellsFromDataTable(args, tbl)
 	return Array.map(tbl, function(data)
 		return Cell{name = data.name, content = {args[data.key]}}
 	end)
@@ -144,7 +144,7 @@ end
 
 ---@param args table
 ---@return string
-function CustomMap:resourcesDisplay(args)
+function CustomMap:_resourcesDisplay(args)
 	local toValueWithIcon = function(key)
 		return args[key] and (RESOURCE_ICONS[key] .. ' ' .. args[key]) or nil
 	end
@@ -161,7 +161,7 @@ end
 
 ---@param types string[]
 ---@return string[]
-function CustomMap:displayTypes(types)
+function CustomMap:_displayTypes(types)
 	return Array.map(types, function(mapType)
 		return MapTypes[mapType]
 	end)
@@ -169,14 +169,14 @@ end
 
 ---@param args table
 ---@return string?
-function CustomMap:getSizeDisplay(args)
+function CustomMap:_getSizeDisplay(args)
 	if not args.width or not args.height then return end
 	return args.width .. 'x' .. args.height
 end
 
 ---@param args table
 ---@return string?
-function CustomMap:getSpawnDisplay(args)
+function CustomMap:_getSpawnDisplay(args)
 	return table.concat({args.players, args.positions}, ' at ')
 end
 
