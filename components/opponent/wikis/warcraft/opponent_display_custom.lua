@@ -15,10 +15,10 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local Opponent = Lua.import('Module:Opponent/Custom', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent/Custom')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, types={}})
 
