@@ -15,8 +15,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Abbreviation = require('Module:Abbreviation')
 
 local Opponent = OpponentLibraries.Opponent
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
-local CivIcon = Lua.import('Module:CivIcon', {requireDevIfEnabled = true})
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local CivIcon = Lua.import('Module:CivIcon')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 local ZERO_WIDTH_SPACE = '&#8203;'
