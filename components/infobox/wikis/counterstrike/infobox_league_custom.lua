@@ -80,7 +80,7 @@ local VALVE_TIERS = {
 	['major'] = {meta = 'Major Championship', name = 'Major Championship', link = 'Majors'},
 	['major qualifier'] = {meta = 'Major Championship main qualifier', name = 'Major Qualifier', link = 'Majors'},
 	['minor'] = {meta = 'Regional Minor Championship', name = 'Minor Championship', link = 'Minors'},
-	['rmr event'] = {meta = 'Regional Major Rankings evnt', name = 'RMR Event', link = 'Regional Major Rankings'},
+	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
 }
 
 local RESTRICTIONS = {
@@ -113,19 +113,21 @@ function CustomLeague.run(frame)
 	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
 	league.args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 	league.gameData = Game.raw{game = league.args.game, useDefault = false}
+	league.valveTier = VALVE_TIERS[(league.args.valvetier or ''):lower()]
 
 	return league:createInfobox()
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
+	self.data.publishertier = (self.valveTier or {}).name
 	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
 		local currency = string.upper(args.localcurrency)
 		local prize = InfoboxPrizePool._cleanValue(args.prizepool)
 		self.data.localPrizePool = Currency.display(currency, prize, {
-					formatValue = true,
-					formatPrecision = PRIZE_POOL_ROUND_PRECISION
-				})
+				formatValue = true,
+				formatPrecision = PRIZE_POOL_ROUND_PRECISION
+			})
 	end
 end
 
@@ -167,7 +169,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell(args.valvetier)},
+				content = {self.caller:_createValveTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -214,7 +216,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if String.isNotEmpty(args.valvetier) then
+	if self.valveTier then
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 
@@ -237,9 +239,8 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	local tierData = VALVE_TIERS[(args.valvetier or ''):lower()]
-	if tierData then
-		Variables.varDefine('metadesc-valve', tierData.meta)
+	if self.valveTier then
+		Variables.varDefine('metadesc-valve', self.valveTier.meta)
 	end
 
 	-- Legacy vars
@@ -268,7 +269,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tier', tierName) -- Stores as X-tier, not the integer
 
 	-- Wiki specific vars
-	local valveTier = mw.getContentLanguage():ucfirst((args.valvetier or ''):lower())
+	local valveTier = (self.valveTier or {}).name
 	Variables.varDefine('tournament_valve_tier', valveTier)
 	Variables.varDefine('tournament_publishertier', valveTier)
 	Variables.varDefine('tournament_cstrike_major', args.cstrikemajor)
@@ -366,10 +367,9 @@ end
 
 ---@param valveTier string?
 ---@return string?
-function CustomLeague:_createValveTierCell(valveTier)
-	local tierData = VALVE_TIERS[(valveTier or ''):lower()]
-	if tierData then
-		return '[[' .. tierData.link .. '|' .. tierData.name .. ']]'
+function CustomLeague:_createValveTierCell()
+	if self.valveTier then
+		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
 	end
 end
 
