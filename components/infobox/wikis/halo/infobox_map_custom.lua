@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -33,6 +33,7 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
@@ -55,6 +56,7 @@ function CustomMap:getGameVersion(args)
 	return game
 end
 
+---@param args table
 ---@return string[]
 function CustomMap:getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
