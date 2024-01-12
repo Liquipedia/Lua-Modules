@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Game Mode(s)', content = {args.gamemode}},
-			Cell{name = 'Played in ALGS', content = {self.caller:createSpan(args)}}
+			Cell{name = 'Played in ALGS', content = {self.caller:_createSpan(args)}}
 		)
 
 		if String.isEmpty(args.ring) then return widgets end
@@ -59,10 +59,10 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 
-		ringTable:addRow(self.caller:createRingTableHeader())
+		ringTable:addRow(self.caller:_createRingTableHeader())
 
 		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
-			ringTable:addRow(self.caller:createRingTableRow(ringData))
+			ringTable:addRow(self.caller:_createRingTableRow(ringData))
 		end)
 
 		Array.appendWith(widgets,
@@ -75,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@return WidgetTableRow
-function CustomMap:createRingTableHeader()
+function CustomMap:_createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
 		:addCell(TableCell{content = {'Ring'}})
@@ -87,7 +87,7 @@ end
 
 ---@param ringData string
 ---@return WidgetTableRow
-function CustomMap:createRingTableRow(ringData)
+function CustomMap:_createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
 		row:addCell(TableCell{content = {item}})
@@ -97,7 +97,7 @@ end
 
 ---@param args table
 ---@return table
-function CustomMap:createSpan(args)
+function CustomMap:_createSpan(args)
 	local spanText = ''
 	if String.isNotEmpty(args.spanstart) then
 		spanText = spanText .. ' - '
