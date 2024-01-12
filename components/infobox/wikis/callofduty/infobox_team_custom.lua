@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class CallofdutyInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
