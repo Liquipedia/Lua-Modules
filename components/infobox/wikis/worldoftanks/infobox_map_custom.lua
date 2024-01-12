@@ -34,22 +34,6 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
----@param args table
----@return string[]
-function CustomMap:_getGameMode(args)
-	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
-		return {}
-	end
-
-	local modes = self:getAllArgsForBase(args, 'mode')
-	local releasedate = args.releasedate
-
-	return Array.map(modes, function(mode)
-		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
-		return modeIcon .. ' [[' .. mode .. ']]'
-	end)
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -73,6 +57,22 @@ function CustomInjector:parse(id, widgets)
 		)
 	end
 	return widgets
+end
+
+---@param args table
+---@return string[]
+function CustomMap:_getGameMode(args)
+	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
+		return {}
+	end
+
+	local modes = self:getAllArgsForBase(args, 'mode')
+	local releasedate = args.releasedate
+
+	return Array.map(modes, function(mode)
+		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
+		return modeIcon .. ' [[' .. mode .. ']]'
+	end)
 end
 
 ---@param lpdbData table
