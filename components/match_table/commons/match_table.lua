@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
