@@ -47,8 +47,6 @@ function MatchMapsLegacy._handlePlayersStats(prefix, args)
 		local teamKey = prefix .. 't' .. opponentIndex
 		Array.forEach(Array.range(1, MAX_NUMBER_OF_PLAYERS), function(playerIndex)
 			local player = args[teamKey .. 'p' .. playerIndex]
-			if Logic.isEmpty(player) then return end
-
 			local kda = Table.extract(args, teamKey .. 'kda' .. playerIndex) or ''
 			local kills, deaths, assists = kda:match("(%d+)%/(%d+)%/(%d+)")
 
