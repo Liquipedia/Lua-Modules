@@ -49,23 +49,17 @@ function MatchMapsLegacy._handlePlayersStats(prefix, args)
 			local player = args[teamKey .. 'p' .. playerIndex]
 			if Logic.isEmpty(player) then return end
 
-			local agent = args[teamKey .. 'a' .. playerIndex]
-			local kda = args[teamKey .. 'kda' .. playerIndex] or ''
-			local acs = args[teamKey .. 'acs' .. playerIndex]
+			local kda = Table.extract(args, teamKey .. 'kda' .. playerIndex) or ''
 			local kills, deaths, assists = kda:match("(%d+)%/(%d+)%/(%d+)")
 
 			args[teamKey .. 'p' .. playerIndex] = Json.stringify({
 				player = player,
-				agent = agent,
+				agent = Table.extract(args, teamKey .. 'a' .. playerIndex),
 				kills = kills,
 				deaths = deaths,
 				assists = assists,
-				acs = acs
+				acs = Table.extract(args, teamKey .. 'acs' .. playerIndex)
 			})
-
-			args[teamKey .. 'a' .. playerIndex] = nil
-			args[teamKey .. 'kda' .. playerIndex] = nil
-			args[teamKey .. 'acs' .. playerIndex] = nil
 		end)
 	end)
 
