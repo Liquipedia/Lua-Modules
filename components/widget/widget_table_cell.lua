@@ -8,7 +8,9 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
 
 ---@class WidgetCellInput
 ---@field content (string|number|table|Html)[]?
