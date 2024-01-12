@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Manufacturer = Lua.import('Module:Infobox/Manufacturer', {requireDevIfEnabled = true})
+local Manufacturer = Lua.import('Module:Infobox/Manufacturer')
 
 local CustomManufacturer = Class.new()
 

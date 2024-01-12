@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
+local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 
 local CustomLegacyPrizePool = {}
 

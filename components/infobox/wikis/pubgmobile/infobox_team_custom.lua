@@ -12,7 +12,7 @@ local PlacementStats = require('Module:InfoboxPlacementStats')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class PubgmobileInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)

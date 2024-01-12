@@ -9,7 +9,7 @@
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExt = Lua.import('Module:Player/Ext')
 
 --- Asks LPDB for the team a player belonged to on a page. For specific uses only.
 ---@param resolvedPageName string

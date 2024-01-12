@@ -84,7 +84,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
-MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
+MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 
 ---@param args table?
 ---@return table

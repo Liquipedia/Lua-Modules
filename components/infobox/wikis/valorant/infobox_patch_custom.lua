@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Patch = Lua.import('Module:Infobox/Patch')
 
 ---@class ValorantPatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)

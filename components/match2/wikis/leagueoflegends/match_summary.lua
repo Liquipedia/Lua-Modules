@@ -18,10 +18,10 @@ local MatchLinks = mw.loadData('Module:MatchLinks')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BigMatch = Lua.import('Module:BigMatch', {requireDevIfEnabled = true})
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local BigMatch = Lua.import('Module:BigMatch')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local Opponent = Lua.import('Module:Opponent')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5

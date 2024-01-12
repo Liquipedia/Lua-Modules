@@ -17,7 +17,7 @@ local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
+local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

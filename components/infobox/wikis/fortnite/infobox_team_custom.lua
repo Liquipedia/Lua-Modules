@@ -13,8 +13,8 @@ local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent

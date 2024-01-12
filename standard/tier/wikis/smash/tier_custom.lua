@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Utils')
 
 ---@class SmashTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)

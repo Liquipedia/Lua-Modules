@@ -16,8 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }

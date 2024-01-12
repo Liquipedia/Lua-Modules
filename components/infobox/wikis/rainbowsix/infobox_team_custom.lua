@@ -10,8 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Showmatch]]',

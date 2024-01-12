@@ -11,8 +11,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled = true})
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local AwardPrizePool = Lua.import('Module:PrizePool/Award')
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 

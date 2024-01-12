@@ -26,7 +26,7 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true})
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 ---Entry point

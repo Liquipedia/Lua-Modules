@@ -16,8 +16,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local EarningsOf = require('Module:Earnings of')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}

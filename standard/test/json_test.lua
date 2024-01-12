@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local Json = Lua.import('Module:Json', {requireDevIfEnabled = true})
+local Json = Lua.import('Module:Json')
 
 local suite = ScribuntoUnit:new()
 

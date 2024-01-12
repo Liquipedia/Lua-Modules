@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local Company = Lua.import('Module:Infobox/Company', {requireDevIfEnabled = true})
+local Company = Lua.import('Module:Infobox/Company')
 
 local CustomCompany = {}
 

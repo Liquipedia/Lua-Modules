@@ -13,10 +13,10 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local TankTypes = require('Module:TankTypes')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
-local Nation = Lua.import('Module:Infobox/Extension/Nation', {requireDevIfEnabled = true})
+local Nation = Lua.import('Module:Infobox/Extension/Nation')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

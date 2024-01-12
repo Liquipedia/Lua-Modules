@@ -21,9 +21,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
+local Opponent = Lua.import('Module:Opponent/Starcraft')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -48,7 +48,7 @@ local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')

@@ -17,7 +17,7 @@ local Tier = require('Module:Tier/Utils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
+local Currency = Lua.import('Module:Currency')
 
 local MetadataGenerator = {}
 
