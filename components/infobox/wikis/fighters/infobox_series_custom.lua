@@ -11,21 +11,24 @@ local Lua = require('Module:Lua')
 
 local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
 
-local CustomSeries = {}
+---@class FightersSeriesInfobox: SeriesInfobox
+local CustomSeries = Class.new(Series)
 
-local _series
-
+---@param frame Frame
+---@return Html
 function CustomSeries.run(frame)
-	_series = Series(frame)
+	local series = CustomSeries(frame)
+	series:setWidgetInjector(CustomInjector(series))
 
-	_series.addToLpdb = CustomSeries.addToLpdb
-
-	return _series:createInfobox()
+	return series:createInfobox()
 end
 
-function CustomSeries:addToLpdb(lpdbData)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomSeries:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
-		parentseries = _series.args.parentseries
+		parentseries = args.parentseries
 	}
 
 	return lpdbData
