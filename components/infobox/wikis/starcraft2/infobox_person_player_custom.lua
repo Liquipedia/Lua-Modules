@@ -23,9 +23,9 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local CustomPerson = Lua.import('Module:Infobox/Person/Custom', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
+local Opponent = Lua.import('Module:Opponent/Starcraft')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -243,7 +243,7 @@ function CustomPlayer:_addToStats(match, player, playerWithoutUnderscore)
 	if playerScore < 0 or vsScore < 0 or (vsScore + playerScore == 0) then return end
 
 	local getFaction = function(opponent)
-		local faction = Faction.read(playerOpponent.match2players[1].extradata.faction)
+		local faction = Faction.read(opponent.match2players[1].extradata.faction)
 		-- treat default faction as random
 		return faction ~= Faction.defaultFaction and faction or Faction.read('r')
 	end
@@ -521,10 +521,12 @@ end
 
 ---@param args table
 function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('MatchUpStats', Json.stringify(self.stats or {}))
+	Variables.varDefine('matchUpStats', Json.stringify(self.stats or {}))
 	Variables.varDefine('isActive', tostring(self:_isActive()))
 	Variables.varDefine('achievements', Json.stringify(self.achievements or {}))
 	Variables.varDefine('awardAchievements', Json.stringify(self.awardAchievements or {}))
+	Variables.varDefine('earningsStats', Json.stringify(self.earnings or {}))
+	Variables.varDefine('medals', Json.stringify(self.medals or {}))
 end
 
 return CustomPlayer
