@@ -38,7 +38,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	local modes = self.caller:getModes(args)
+	local modes = self.caller:_getModes(args)
 
 	Array.appendWith(widgets,
 		Cell{name = 'Environment', content = {args.environment}},
@@ -51,7 +51,7 @@ end
 
 ---@param args table
 ---@return string[]?
-function CustomMap:getModes(args)
+function CustomMap:_getModes(args)
 	local modes = self:getAllArgsForBase(args, 'mode')
 
 	if Table.isEmpty(modes) then return end
