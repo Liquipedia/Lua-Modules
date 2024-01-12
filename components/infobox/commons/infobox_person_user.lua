@@ -10,7 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Person = Lua.import('Module:Infobox/Person')
 
 ---@class InfoboxUser: Person
 local User = Class.new(Person)

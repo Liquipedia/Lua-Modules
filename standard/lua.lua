@@ -137,7 +137,7 @@ function Lua.invoke(frame)
 
 	local flags = {dev = devEnabled(frame)}
 	return require('Module:FeatureFlag').with(flags, function()
-		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
+		local module = Lua.import('Module:' .. moduleName)
 		return module[fnName](frame)
 	end)
 end
@@ -178,7 +178,7 @@ function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
 
 		local flags = {dev = Logic.readBoolOrNil(dev)}
 		return require('Module:FeatureFlag').with(flags, function()
-			local variantModule = Lua.import(baseModuleName, {requireDevIfEnabled = true})
+			local variantModule = Lua.import(baseModuleName)
 			local fn = module == variantModule and moduleFn or variantModule[fnName]
 			return fn(frame)
 		end)

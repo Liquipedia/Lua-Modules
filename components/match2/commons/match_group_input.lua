@@ -18,9 +18,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -128,7 +128,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		end
 
 		matchArgs = Json.parseIfString(matchArgs)
-			or Json.parse(Lua.import('Module:Match', {requireDevIfEnabled = true}).toEncodedJson({}))
+			or Json.parse(Lua.import('Module:Match').toEncodedJson({}))
 
 		local context = MatchGroupInput.readContext(matchArgs, args)
 		MatchGroupInput.persistContextChanges(context)

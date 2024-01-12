@@ -9,11 +9,11 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local HDB = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
-local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
-local String = Lua.import('Module:StringUtils', {requireDevIfEnabled = true})
-local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
-local WarningBox = Lua.import('Module:WarningBox', {requireDevIfEnabled = true})
+local HDB = Lua.import('Module:HiddenDataBox')
+local LpdbMock = Lua.import('Module:Mock/Lpdb')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
+local WarningBox = Lua.import('Module:WarningBox')
 
 local suite = ScribuntoUnit:new()
 

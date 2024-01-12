@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local Template = Lua.import('Module:Template', {requireDevIfEnabled = true})
+local Template = Lua.import('Module:Template')
 
 local suite = ScribuntoUnit:new()
 

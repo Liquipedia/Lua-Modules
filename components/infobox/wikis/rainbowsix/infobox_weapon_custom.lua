@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Weapon = Lua.import('Module:Infobox/Weapon')
 
 ---@class RainbowsixWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)

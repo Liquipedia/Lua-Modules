@@ -13,9 +13,9 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 local HAS_NUMBER = false

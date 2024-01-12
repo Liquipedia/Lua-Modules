@@ -34,7 +34,7 @@ local Variables = require('Module:Variables')
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

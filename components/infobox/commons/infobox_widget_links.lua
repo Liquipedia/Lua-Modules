@@ -10,8 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local UtilLinks = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local UtilLinks = Lua.import('Module:Links')
+local Widget = Lua.import('Module:Infobox/Widget')
 
 ---@class LinksWidget: Widget
 ---@operator call({content: table<string, string>, variant: string?}): LinksWidget
@@ -25,7 +25,7 @@ local Links = Class.new(
 	end
 )
 
-local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {requireDevIfEnabled = true, loadData = true})
+local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
 ---@return {[1]: Html}
 function Links:make()

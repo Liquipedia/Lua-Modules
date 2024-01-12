@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
+local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.defaultIcon = 'Sideswipe allmode.png'
 

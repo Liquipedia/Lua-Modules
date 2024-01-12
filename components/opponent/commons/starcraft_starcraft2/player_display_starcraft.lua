@@ -14,11 +14,11 @@ local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 local Abbreviation = require('Module:Abbreviation')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
-local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local PlayerExt = Lua.import('Module:Player/Ext')
+local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
