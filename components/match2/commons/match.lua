@@ -18,7 +18,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {requireDevIfEnabled = true, loadData = true})
+local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 
 -- These last_headings are considered sub headings
 -- and matchsection should be used instead if available
@@ -72,7 +72,7 @@ function Match.storeMatchGroup(matchRecords, options)
 		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 	}
-	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy')
 	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)

@@ -12,7 +12,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local MatchSubobjects = {}
 
@@ -62,7 +62,7 @@ end
 local _ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
 
 if FeatureFlag.get('perf') then
-	local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
+	local Match = Lua.import('Module:Match')
 	MatchSubobjects.perfConfig = Match.perfConfig
 	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, _ENTRY_POINT_NAMES)
 end

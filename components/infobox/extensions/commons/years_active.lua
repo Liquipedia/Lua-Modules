@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEnabled = true})
+local CustomActiveYears = Lua.import('Module:YearsActive/Base')
 
 -- wiki specific settings
 CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10

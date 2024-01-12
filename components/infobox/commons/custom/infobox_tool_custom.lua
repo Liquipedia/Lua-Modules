@@ -8,4 +8,4 @@
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Module:Infobox/Tool', {requireDevIfEnabled = true})
+return Lua.import('Module:Infobox/Tool')

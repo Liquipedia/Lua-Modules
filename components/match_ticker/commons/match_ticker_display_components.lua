@@ -21,7 +21,7 @@ local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
-local HighlightConditions = Lua.import('Module:HighlightConditions', {requireDevIfEnabled = true})
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
