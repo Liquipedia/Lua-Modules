@@ -55,10 +55,7 @@ end
 
 ---@param args table
 function CustomUnit:setLpdbData(args)
-	local game = args.game or 'rl'
-	if game == 'rl' then
-		game = 'rocketleague'
-	end
+	local game = args.game or 'rocketleague'
 
 	local lpdbData = {
 		name = args.name or self.pagename,
