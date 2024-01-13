@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -19,62 +20,53 @@ local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
-local _args
-
-local CustomUnit = Class.new()
-
+---@class Formula1UnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
 	unit.args.informationType = 'Car'
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
+	unit:setWidgetInjector(CustomInjector(unit))
 	return unit:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Season(s)', content = {_args.season}},
-		Cell{name = 'Power', content = {_args.power}},
-		Cell{name = 'Weight', content = {_args.weight}},
-		Cell{name = 'Engine', content = {_args.engine}},
-		Cell{name = 'Fuel', content = {_args.fuel}},
-		Cell{name = 'Lubricant(s)', content = {_args.lubricant}},
-		Cell{name = 'Tyre Supplier', content = {_args.tyres}},
-		Cell{name = 'First Entry', content = {_args.firstentry}},
-		Cell{name = 'Last Entry', content = {_args.lastentry}},
-	}
-end
-
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param id string
----@widgets Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(widgets, 
+			Cell{name = 'Team', content = {args.team}},
+			Cell{name = 'Designer', content = {args.designer}},
+			Cell{name = 'Season(s)', content = {args.season}},
+			Cell{name = 'Power', content = {args.power}},
+			Cell{name = 'Weight', content = {args.weight}},
+			Cell{name = 'Engine', content = {args.engine}},
+			Cell{name = 'Fuel', content = {args.fuel}},
+			Cell{name = 'Lubricant(s)', content = {args.lubricant}},
+			Cell{name = 'Tyre Supplier', content = {args.tyres}},
+			Cell{name = 'First Entry', content = {args.firstentry}},
+			Cell{name = 'Last Entry', content = {args.lastentry}}
+		)
+	end
+
 	if id == 'customcontent' then
-		if String.isNotEmpty(_args.previous) or String.isNotEmpty(_args.next) then
+		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 				return {
 					Title{name = 'Chronology'},
 					Chronology{
 						content = {
-							previous = _args.previous,
-							next = _args.next,
+							previous = args.previous,
+							next = args.next,
 						}
 					}
 				}
 		end
 	end
-
 	return widgets
 end
 
