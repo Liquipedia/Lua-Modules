@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -19,67 +20,57 @@ local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
-local _args
-
-local CustomUnit = Class.new()
-
+---@class Formula1UnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Engine'
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
 	return unit:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Manufacturer', content = {_args.manufacturer}},
-		Cell{name = 'Production', content = {_args.production}},
-		Cell{name = 'Weight', content = {_args.weight}},
-		Title{name = 'Engine Output'},
-		Cell{name = 'Power', content = {_args.power}},
-		Cell{name = 'Torque', content = {_args.torque}},
-		Cell{name = 'Idle RPM', content = {_args.idlerpm}},
-		Cell{name = 'Peak RPM', content = {_args.peakrpm}},
-		Title{name = 'Engine Layout'},
-		Cell{name = 'Configuration', content = {_args.configuration}},
-		Cell{name = 'Displacement', content = {_args.displacement}},
-		Cell{name = 'Compression', content = {_args.compression}},
-		Cell{name = 'Cylinder Bore', content = {_args.bore}},
-		Cell{name = 'Piston Stroke', content = {_args.stroke}},
-	}
-end
-
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param id string
----@widgets Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Manufacturer', content = {args.manufacturer}},
+			Cell{name = 'Production', content = {args.production}},
+			Cell{name = 'Weight', content = {args.weight}},
+			Title{name = 'Engine Output'},
+			Cell{name = 'Power', content = {args.power}},
+			Cell{name = 'Torque', content = {args.torque}},
+			Cell{name = 'Idle RPM', content = {args.idlerpm}},
+			Cell{name = 'Peak RPM', content = {args.peakrpm}},
+			Title{name = 'Engine Layout'},
+			Cell{name = 'Configuration', content = {args.configuration}},
+			Cell{name = 'Displacement', content = {args.displacement}},
+			Cell{name = 'Compression', content = {args.compression}},
+			Cell{name = 'Cylinder Bore', content = {args.bore}},
+			Cell{name = 'Piston Stroke', content = {args.stroke}}
+		)
+	end
+
 	if id == 'customcontent' then
-		if String.isNotEmpty(_args.previous) or String.isNotEmpty(_args.next) then
+		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 			return {
 				Title{name = 'Chronology'},
 				Chronology{
 					content = {
-						previous = _args.previous,
-						next = _args.next,
+						previous = args.previous,
+						next = args.next,
 					}
 				}
 			}
 		end
 	end
-
 	return widgets
 end
 
