@@ -16,46 +16,41 @@ local Unit = Lua.import('Module:Infobox/Unit')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
-local CustomUnit = Class.new()
-
+---@class RocketLeagueUnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Car'
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
 	return unit:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Released', content = {_args.released}},
-	}
-end
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		return {
+			Cell{name = 'Released', content = {args.released}},
+		}
+	end
 
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
+	return widgets
 end
 
 ---@param args table
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
-	local categories = {}
 	if Namespace.isMain() then
-		categories = {'Cars'}
+		return {'Cars'}
 	end
 
-	return categories
+	return {}
 end
 
 ---@param args table
@@ -64,21 +59,19 @@ function CustomUnit:setLpdbData(args)
 	if game == 'rl' then
 		game = 'rocketleague'
 	end
+
 	local lpdbData = {
-		name = args.name,
+		name = args.name or self.pagename,
 		type = 'car',
 		image = args.image,
 		date = args.released,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			game = game,
-		}),
+		-- extradata gets set via a template further down on the page
 	}
 
 	-- Wikicode was: car_{{#explode:{{PAGENAME}}|/|1}}
-	local objectName = mw.title.getCurrentTitle().text
-	objectName = string.gsub(objectName, '.-/^', '')
-	objectName = string.gsub(objectName, '/.*$', '')
-	objectName = 'car_' .. objectName
+	local splitPagename = mw.text.split(self.pagename, '/')
+	-- wiki code explode is 0 index, lua is 1 indexed, hence use 2 if present
+	local objectName = 'car_' .. (splitPagename[2] or splitPagename[1])
 
 	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
 end
