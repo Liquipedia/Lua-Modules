@@ -8,14 +8,15 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Map = Lua.import('Module:Infobox/Map')
-local TableCell = Lua.import('Module:Widget/Table/Cell')
-local TableRow = Lua.import('Module:Widget/Table/Row')
-local WidgetTable = Lua.import('Module:Widget/Table')
+local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local TableCell = Lua.import('Module:Widget/Table/Cell', {requireDevIfEnabled = true})
+local TableRow = Lua.import('Module:Widget/Table/Row', {requireDevIfEnabled = true})
+local WidgetTable = Lua.import('Module:Widget/Table', {requireDevIfEnabled = true})
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -30,7 +31,7 @@ local CustomInjector = Class.new(Injector)
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 
-	map:setWidgetInjector(CustomInjector(map))
+	map:setWidgetInjector(CustomInjector(map)) 
 	return map:createInfobox()
 end
 
@@ -96,17 +97,19 @@ function CustomMap:_createRingTableRow(ringData)
 end
 
 ---@param args table
----@return table
+---@return string
 function CustomMap:_createSpan(args)
-	local spanText = ''
-	if String.isNotEmpty(args.spanstart) then
-		spanText = spanText .. ' - '
-	else
-		--If it never started being played competitively, it can't have an end date
-		args.spanend = nil
+	local sep = ' - '
+	local spanEnd = args.spanend
+	if String.isEmpty(args.spanstart) then
+		sep = ''
+		spanEnd = nil
 	end
 
-	return (args.spanstart or '<i><b>Not </b></i>') .. spanText .. (args.spanend or '<i><b>Currently</b></i>')
+	return table.concat({
+			Logic.emptyOr(args.spanstart, '<i><b>Not </b></i>'),
+			Logic.emptyOr(args.spanend, '<i><b>Currently</b></i>')
+	}, sep)
 end
 
 ---@param lpdbData table
