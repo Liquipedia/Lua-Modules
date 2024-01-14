@@ -15,7 +15,6 @@ local Logic = require('Module:Logic')
 local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
