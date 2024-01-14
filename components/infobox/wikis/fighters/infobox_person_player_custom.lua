@@ -53,7 +53,7 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories, Array.map(self.games, function(game)
+	return Array.extendWith(categories, Array.map(self.games, function(game)
 		return game .. ' Players'
 	end))
 end
