@@ -16,64 +16,63 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class TetrisInfoboxPlayer: Person
+---@field role table
+---@field role2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _role
-local _role2
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-	_role = Role.run({role = _args.role})
-	_role2 = Role.run({role = _args.role2})
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getPersonType = CustomPlayer.getPersonType
+	player.role = Role.run{role = player.args.role}
+	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox(frame)
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _role),
-				CustomPlayer._createRole('role2', _role2)
+				CustomPlayer:_createRole(self.caller.role),
+				CustomPlayer:_createRole( self.caller.role2)
 			}},
 		}
 	end
+
 	return widgets
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
-
-	lpdbData.extradata.role = _role.variable
-	lpdbData.extradata.role2 = _role2.variable
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = self.role.variable
+	lpdbData.extradata.role2 = self.role2.variable
 	return lpdbData
 end
 
-function CustomPlayer._createRole(key, role)
-	local roleData = role
+---@param roleData any
+---@return string?
+function CustomPlayer:_createRole(roleData)
 	if not roleData then
 		return nil
 	end
-	if Player:shouldStoreData(_args) then
-		return roleData.category
-	else
-		return roleData.variable
-	end
+	return self:shouldStoreData(self.args) and roleData.category or roleData.variable
 end
 
+---@param args table
+---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
-	local roleData = _role
+	local roleData = self.role
 	if roleData then
 		if roleData.staff then
 			return {store = 'Staff', category = 'Staff'}
