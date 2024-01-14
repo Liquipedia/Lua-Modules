@@ -22,8 +22,11 @@ local Cell = Widgets.Cell
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.role = Role.run({role = player.args.role})
 	player.role2 = Role.run({role = player.args.role2})
