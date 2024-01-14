@@ -108,7 +108,7 @@ function CustomMap:_createSpan(args)
 
 	return table.concat({
 			Logic.emptyOr(args.spanstart, '<i><b>Not </b></i>'),
-			Logic.emptyOr(spanend, '<i><b>Currently</b></i>')
+			Logic.emptyOr(spanEnd, '<i><b>Currently</b></i>')
 	}, sep)
 end
 
