@@ -31,7 +31,7 @@ local CustomInjector = Class.new(Injector)
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 
-	map:setWidgetInjector(CustomInjector(map)) 
+	map:setWidgetInjector(CustomInjector(map))
 	return map:createInfobox()
 end
 
@@ -100,7 +100,6 @@ end
 ---@return string
 function CustomMap:_createSpan(args)
 	local sep = ' - '
-	local spanEnd = args.spanend
 	if String.isEmpty(args.spanstart) then
 		sep = ''
 		spanEnd = nil
