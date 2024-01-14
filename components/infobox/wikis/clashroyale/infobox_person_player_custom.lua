@@ -16,42 +16,43 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class ClashroyaleInfoboxPlayer: Person
+---@field role table
+---@field role2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
-
-local _role
-local _role2
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
-	_role = Role.run({role = player.args.role})
-	_role2 = Role.run({role = player.args.role2})
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.role = Role.run({role = player.args.role})
+	player.role2 = Role.run({role = player.args.role2})
 
 	return player:createInfobox(frame)
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local caller = self.caller
 	if id == 'role' then
 		return {
-			Cell{name = _role2.display and 'Roles' or 'Role', content = {_role.display, _role2.display}}
+			Cell{name = caller.role2.display and 'Roles' or 'Role', content = {caller.role.display, caller.role2.display}}
 		}
 	end
 
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
+	lpdbData.extradata.role = self.role.role
+	lpdbData.extradata.role2 = self.role2.role
 	return lpdbData
 end
 
