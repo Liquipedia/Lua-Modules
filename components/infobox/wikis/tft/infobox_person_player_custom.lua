@@ -89,10 +89,10 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@param key string
----@return {}
-function CustomPlayer:_getRoleData(key)
-	return ROLES[(self.args[key] or ''):lower()] or {}
+---@param role string
+---@return {category: string?, value: string?, type: string?}
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()] or {}
 end
 
 ---@param args table
