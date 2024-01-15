@@ -10,30 +10,30 @@ liquipedia.battleRoyale = {
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
 	implementOnWindowResize: function( instanceId ) {
-		window.addEventListener( 'resize', function () {
+		window.addEventListener( 'resize', function() {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
-				.forEach( ( tableEl ) => {
+				.forEach( function( tableEl ) {
 					this.recheckSideScrollButtonStates( tableEl );
-				} );
+				}.bind( this ) );
 		}.bind(this) );
 	},
 
 	implementScrollendEvent: function( instanceId ) {
 		if ( !( 'onscrollend' in window ) || typeof window.onscrollend === 'undefined' ) {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
-				.forEach( ( tableEl ) => {
+				.forEach( function( tableEl ) {
 					const scrollingEl = tableEl.querySelector( '[data-js-battle-royale="game-container"]' );
 					const options = {
 						passive: true
 					};
-					const scrollEnd = this.debounce( ( e ) => {
+					const scrollEnd = this.debounce( function( e ) {
 						e.target.dispatchEvent( new CustomEvent( 'scrollend', {
 							bubbles: true
 						} ) );
 					}, 100 );
 
 					scrollingEl.addEventListener( 'scroll', scrollEnd, options );
-				} );
+				}.bind( this ) );
 		}
 	},
 
@@ -41,14 +41,14 @@ liquipedia.battleRoyale = {
 		let timeout;
 		return function( e ) {
 			clearTimeout( timeout );
-			timeout = setTimeout( () => {
+			timeout = setTimeout( function() {
 				callback( e );
 			}, wait );
 		};
 	},
 
 	handleTableSideScroll: function( tableElement, direction ) {
-		tableElement.querySelectorAll( '.cell--game-container' ).forEach( ( i ) => {
+		tableElement.querySelectorAll( '.cell--game-container' ).forEach( function( i ) {
 			const isNav = i.parentNode.classList.contains( 'cell--game-container-nav-holder' );
 			if ( direction === this.DIRECTION_RIGHT ) {
 				i.scrollLeft += this.gameWidth;
@@ -61,13 +61,13 @@ liquipedia.battleRoyale = {
 					this.onScrollEndSideScrollButtonStates( tableElement );
 				}
 			}
-		} );
+		}.bind( this ) );
 	},
 
 	onScrollEndSideScrollButtonStates: function( tableElement ) {
-		tableElement.querySelector( '.cell--game-container' ).addEventListener( 'scrollend', () => {
+		tableElement.querySelector( '.cell--game-container' ).addEventListener( 'scrollend', function() {
 			this.recheckSideScrollButtonStates( tableElement );
-		}, {
+		}.bind( this ), {
 			once: true
 		} );
 	},
@@ -95,7 +95,7 @@ liquipedia.battleRoyale = {
 	},
 
 	handleNavigationTabChange: function( instanceId, tab ) {
-		this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( item ) => {
+		this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( function( item ) {
 			if ( item === tab ) {
 				// activate nav tab
 				item.classList.add( 'tab--active' );
@@ -104,7 +104,7 @@ liquipedia.battleRoyale = {
 				item.classList.remove( 'tab--active' );
 			}
 		} );
-		this.battleRoyaleMap[ instanceId ].navigationContents.forEach( ( content ) => {
+		this.battleRoyaleMap[ instanceId ].navigationContents.forEach( function( content ) {
 			if ( content.dataset.jsBattleRoyaleContentId === tab.dataset.targetId ) {
 				// activate nav tab content
 				content.classList.remove( 'is--hidden' );
@@ -117,7 +117,7 @@ liquipedia.battleRoyale = {
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
 		const tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
-		tabs.forEach( ( item ) => {
+		tabs.forEach( function( item ) {
 			if ( item === panelTab ) {
 				// activate content tab
 				item.classList.add( 'is--active' );
@@ -127,7 +127,7 @@ liquipedia.battleRoyale = {
 			}
 		} );
 		const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
-		Object.keys( contents ).forEach( ( panelId ) => {
+		Object.keys( contents ).forEach( function( panelId ) {
 			if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId ) {
 				// activate content tab panel
 				contents[ panelId ].classList.remove( 'is--hidden' );
@@ -149,12 +149,12 @@ liquipedia.battleRoyale = {
 			collapsibles: []
 		};
 
-		this.battleRoyaleMap[ id ].navigationContents.forEach( ( content ) => {
+		this.battleRoyaleMap[ id ].navigationContents.forEach( function( content ) {
 			const brContentId = content.dataset.jsBattleRoyaleContentId;
 			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ] =
 				Array.from( content.querySelectorAll( '[data-js-battle-royale="panel-tab"]' ) );
 
-			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ].forEach( ( node ) => {
+			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ].forEach( function( node ) {
 				// Create object keys
 				if ( !( brContentId in this.battleRoyaleMap[ id ].navigationContentPanelTabContents ) ) {
 					this.battleRoyaleMap[ id ].navigationContentPanelTabContents[ brContentId ] = {};
@@ -169,31 +169,31 @@ liquipedia.battleRoyale = {
 					.querySelectorAll( '[data-js-battle-royale="collapsible"]' );
 
 				this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
-			} );
-		} );
+			}.bind( this ) );
+		}.bind( this ) );
 	},
 
 	attachHandlers: function( id ) {
-		this.battleRoyaleMap[ id ].navigationTabs.forEach( ( tab ) => {
-			tab.addEventListener( 'click', () => {
+		this.battleRoyaleMap[ id ].navigationTabs.forEach( function( tab ) {
+			tab.addEventListener( 'click', function() {
 				this.handleNavigationTabChange( id, tab );
-			} );
-		} );
+			}.bind( this ) );
+		}.bind( this ) );
 
-		Object.keys( this.battleRoyaleMap[ id ].navigationContentPanelTabs ).forEach( ( contentId ) => {
-			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ contentId ].forEach( ( panelTab ) => {
-				panelTab.addEventListener( 'click', () => {
+		Object.keys( this.battleRoyaleMap[ id ].navigationContentPanelTabs ).forEach( function( contentId ) {
+			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ contentId ].forEach( function( panelTab ) {
+				panelTab.addEventListener( 'click', function() {
 					this.handlePanelTabChange( id, contentId, panelTab );
-				} );
-			} );
-		} );
+				}.bind( this ) );
+			}.bind( this ) );
+		}.bind( this ) );
 	},
 
 	makeCollapsibles: function ( id ) {
-		this.battleRoyaleMap[ id ].collapsibles.forEach( ( element ) => {
+		this.battleRoyaleMap[ id ].collapsibles.forEach( function( element ) {
 			const button = element.querySelector( '[data-js-battle-royale="collapsible-button"]' );
 			if ( button && element ) {
-				button.addEventListener( 'click', () => {
+				button.addEventListener( 'click', function() {
 					element.classList.toggle( 'is--collapsed' );
 				} );
 			}
@@ -212,19 +212,19 @@ liquipedia.battleRoyale = {
 	},
 
 	makeSideScrollElements: function( id ) {
-		this.battleRoyaleInstances[ id ].querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
+		this.battleRoyaleInstances[ id ].querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( function( table ) {
 			const navHolder = table.querySelector( '.row--header > .cell--game-container-nav-holder' );
 			if ( navHolder ) {
 				for ( const dir of [ this.DIRECTION_LEFT, this.DIRECTION_RIGHT ] ) {
 					const element = this.createNavigationElement( dir );
-					element.addEventListener( 'click', () => {
+					element.addEventListener( 'click', function() {
 						this.handleTableSideScroll( table, dir );
-					} );
+					}.bind( this ) );
 					navHolder.appendChild( element );
 				}
 				this.recheckSideScrollButtonStates( navHolder );
 			}
-		} );
+		}.bind( this ) );
 
 	},
 
@@ -259,8 +259,8 @@ liquipedia.battleRoyale = {
 	makeSortableTable: function( instance ) {
 		const sortButtons = instance.querySelectorAll( '[data-js-battle-royale="header-row"] > [data-sort-type]' );
 
-		sortButtons.forEach( ( button ) => {
-			button.addEventListener( 'click', () => {
+		sortButtons.forEach( function( button ) {
+			button.addEventListener( 'click', function() {
 
 				const sortType = button.dataset.sortType;
 				const table = button.closest( '[data-js-battle-royale="table"]' );
@@ -279,7 +279,7 @@ liquipedia.battleRoyale = {
 					return this.comparator( a, b, newOrder, sortType );
 				}.bind( this ) );
 
-				sorted.forEach( ( element, index ) => {
+				sorted.forEach( function( element, index ) {
 					if ( element.style.order ) {
 						element.style.removeProperty( 'order' );
 					}
@@ -334,19 +334,19 @@ liquipedia.battleRoyale = {
 		icon.setAttribute( 'data-js-battle-royale', `bottom-nav-${ direction }-icon` );
 		element.append( textElement, icon );
 
-		element.addEventListener( 'click', () => {
+		element.addEventListener( 'click', function() {
 			this.handlePanelTabChange( instanceId, navigationTab, destinationPanel );
-		} );
+		}.bind( this ) );
 
 		return element;
 	},
 
 	init: function() {
-		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( ( instance ) => {
+		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( function( instance ) {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
 
 			this.makeSortableTable( instance );
-		} );
+		}.bind( this ) );
 
 		Object.keys( this.battleRoyaleInstances ).forEach( function( instanceId ) {
 			// create object based on id
@@ -358,7 +358,7 @@ liquipedia.battleRoyale = {
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
-			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
+			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( function( navTab ) {
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
 
@@ -367,11 +367,11 @@ liquipedia.battleRoyale = {
 					this.handlePanelTabChange( instanceId, target, panels[ 0 ] );
 				}
 
-				panels.forEach( ( panel, index ) => {
+				panels.forEach( function ( panel, index ) {
 					this.createBottomNav( instanceId, target, index );
-				} );
+				}.bind( this ) );
 
-			} );
+			}.bind( this ) );
 
 			this.implementScrollendEvent( instanceId );
 			this.implementOnWindowResize( instanceId );
