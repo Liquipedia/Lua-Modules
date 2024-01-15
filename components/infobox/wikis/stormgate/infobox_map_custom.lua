@@ -107,14 +107,14 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
-
-	local typeName = Table.size(args.types) == 1 and 'Type' or 'Types'
-	local hasCampData = Array.any(CAMPS, function(campData)
-		return args[campData.key]
-	end)
+	local args = self.caller.args-
 
 	if id == 'custom' then
+		local typeName = Table.size(args.types) == 1 and 'Type' or 'Types'
+		local hasCampData = Array.any(CAMPS, function(campData)
+			return args[campData.key]
+		end)
+
 		return Array.extend(
 			widgets,
 			{
@@ -131,6 +131,8 @@ function CustomInjector:parse(id, widgets)
 			self.caller:addCellsFromDataTable(args, CAMPS)
 		)
 	end
+
+	return widgets
 end
 
 ---@param args table
