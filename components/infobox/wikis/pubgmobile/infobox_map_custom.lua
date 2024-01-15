@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
@@ -20,13 +19,6 @@ local Cell = Widgets.Cell
 ---@class PubgMobileMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local GAME = {
-	mobile = '[[Mobile]]',
-	newstate = '[[New State]]',
-	peace = '[[Peacekeeper Elite|Peace Elite]]',
-	bgmi = '[[Battlegrounds Mobile India|BGMI]]',
-}
 
 local MODES = {
 	['battle royale'] = 'Battle Royale',
