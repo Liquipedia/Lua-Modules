@@ -34,6 +34,7 @@ local STATISTICS = {
 	{key = 'points', name = 'Career Points'},
 	{key = 'firstentry', name = 'First entry'},
 	{key = 'firstwin', name = 'First win'},
+	{key = 'lastwin', name = 'Last win'},
 	{key = 'lastentry', name = 'Last entry'},
 }
 
