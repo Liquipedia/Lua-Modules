@@ -21,6 +21,13 @@ local Cell = Widgets.Cell
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
+local GAME = {
+	mobile = '[[Mobile]]',
+	newstate = '[[New State]]',
+	peace = '[[Peacekeeper Elite|Peace Elite]]',
+	bgmi = '[[Battlegrounds Mobile India|BGMI]]',
+}
+
 local MODES = {
 	['battle royale'] = 'Battle Royale',
 	arena = 'Arena',
@@ -49,7 +56,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Span', content = {args.span}},
 			Cell{name = 'Theme', content = {args.theme}},
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}},
 			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
 		)
 	end
@@ -69,7 +75,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.span = args.span
 	lpdbData.extradata.mode = string.lower(args.mode or '')
 	lpdbData.extradata.perpective = string.lower(args.perspective or '')
-	lpdbData.extradata.game = string.lower(args.game or '')
 	return lpdbData
 end
 
