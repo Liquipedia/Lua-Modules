@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
----@class Formula1UnitInfobox: UnitInfobox
+---@class Formula1EngineInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
@@ -56,18 +56,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Cylinder Bore', content = {args.bore}},
 			Cell{name = 'Piston Stroke', content = {args.stroke}}
 		)
-	end
-
-	if id == 'customcontent' then
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 			return {
 				Title{name = 'Chronology'},
-				Chronology{
-					content = {
-						previous = args.previous,
-						next = args.next,
-					}
-				}
+				Chronology{content = {previous = args.previous, next = args.next,}}
 			}
 		end
 	end
