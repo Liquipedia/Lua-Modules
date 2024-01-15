@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
----@class Formula1UnitInfobox: UnitInfobox
+---@class Formula1CarInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
@@ -39,7 +39,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		Array.appendWith(widgets,
+		Array.appendWith(widgets, 
 			Cell{name = 'Team', content = {args.team}},
 			Cell{name = 'Designer', content = {args.designer}},
 			Cell{name = 'Season(s)', content = {args.season}},
@@ -52,18 +52,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'First Entry', content = {args.firstentry}},
 			Cell{name = 'Last Entry', content = {args.lastentry}}
 		)
-	end
-
-	if id == 'customcontent' then
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 				return {
 					Title{name = 'Chronology'},
-					Chronology{
-						content = {
-							previous = args.previous,
-							next = args.next,
-						}
-					}
+					Chronology{content = {previous = args.previous, next = args.next,}}
 				}
 		end
 	end
