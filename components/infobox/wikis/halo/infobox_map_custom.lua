@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 
+local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
@@ -22,8 +23,6 @@ local Cell = Widgets.Cell
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
-local GAME = mw.loadData('Module:GameVersion')
-
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
@@ -33,30 +32,22 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
----@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
+	mw.logObject(args)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}, options = {makeLink = true}},
+			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end
 	return widgets
 end
 
---@return string[]
-function CustomMap:_getGameVersion(args)
-	local game = string.lower(args.game or '')
-	game = GAME[game]
-	return game
-end
-
----@param args table
 ---@return string[]
 function CustomMap:_getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
