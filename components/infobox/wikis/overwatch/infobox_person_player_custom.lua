@@ -13,7 +13,6 @@ local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 

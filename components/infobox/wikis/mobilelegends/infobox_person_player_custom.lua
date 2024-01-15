@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
