@@ -1,9 +1,9 @@
 {
 	"extends": [
-		"wikimedia/client-es6",
 		"wikimedia/client",
 		"wikimedia/jquery",
-		"wikimedia/mediawiki"
+		"wikimedia/mediawiki",
+		"wikimedia/client-es6"
 	],
 	"globals": {
 		"liquipedia": "readonly",
