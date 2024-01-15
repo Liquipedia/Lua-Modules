@@ -96,6 +96,7 @@ function CustomMatchSummary.createBody(match)
 
 	return body
 end
+
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return Html
