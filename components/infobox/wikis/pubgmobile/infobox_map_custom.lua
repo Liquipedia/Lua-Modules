@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
@@ -46,7 +47,6 @@ function CustomMap.run(frame)
 end
 
 --@param id string
----@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
@@ -56,27 +56,19 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Span', content = {args.span}},
 			Cell{name = 'Theme', content = {args.theme}},
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}},
+			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}},
 			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
 		)
 	end
 	return widgets
 end
 
----@param args table
----@return string?
-function CustomMap:_getGameVersion(args)
-	return GAME[string.lower(args.game or '')]
-end
-
----@param args table
 ---@return string?
 function CustomMap:_getGameMode(args)
 	return MODES[string.lower(args.mode or '')]
 end
 
 ---@param lpdbData table
----@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.theme = args.theme
