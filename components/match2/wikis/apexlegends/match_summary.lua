@@ -131,7 +131,11 @@ local MATCH_STANDING_COLUMNS = {
 				value = function (opponent)
 					local icon, color = CustomMatchSummary._getIcon(opponent.placement)
 					return mw.html.create()
-							:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
+							:tag('i')
+								:addClass('panel-table__cell-icon')
+								:addClass(icon)
+								:addClass(color)
+								:done()
 							:tag('span'):addClass('panel-table__cell-game__text')
 									:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
 				end,
