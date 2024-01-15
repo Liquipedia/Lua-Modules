@@ -164,7 +164,7 @@ function CustomLeague:getWikiCategories(args)
 	local platform = self:_platformLookup(args.platform)
 
 	return {
-		game and (game .. 'Competitions') or 'Tournaments without game version',
+		game and (game .. ' Competitions') or 'Tournaments without game version',
 		platform and (platform .. ' Tournaments') or nil,
 	}
 end
