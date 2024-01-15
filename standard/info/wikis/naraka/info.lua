@@ -28,4 +28,5 @@ return {
 	defaultGame = 'naraka',
 	defaultTeamLogo = 'NARAKA lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'NARAKA darkmode.png', ---@deprecated
+	match2 = 0,
 }

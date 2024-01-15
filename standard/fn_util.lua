@@ -84,4 +84,16 @@ end
 ---@return T
 function FnUtil.identity(x) return x end
 
+---Currying is a way to re-write a function with multiple arguments in such a way as it can be
+---called as a chain of functions each with a single argument
+---@generic T, V, R
+---@param func fun(x: T, ...: V):R
+---@param x T
+---@return fun(...:V):R
+function FnUtil.curry(func, x)
+	return function(...)
+		return func(x, ...)
+	end
+end
+
 return FnUtil

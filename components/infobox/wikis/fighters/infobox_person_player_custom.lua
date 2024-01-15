@@ -12,8 +12,8 @@ local GamesPlayed = require('Module:GamesPlayed')
 local Lua = require('Module:Lua')
 local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

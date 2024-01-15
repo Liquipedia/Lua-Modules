@@ -15,8 +15,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local LEAGUE_TYPE = 'league'
 local TYPE_FROM_NUMBER = Table.map(Opponent.partySizes, function(key, code) return code, key end)
@@ -129,7 +129,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	end
 	opponentArgs[prefix] = name
 	opponentArgs[prefix .. 'link'] = link
-	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
 	-- get the race
 	-- first remove the flag so that only 1 image is left

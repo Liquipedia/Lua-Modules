@@ -13,8 +13,8 @@ local Template = require('Module:Template')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local CustomPlayer = Class.new()
 local CustomInjector = Class.new(Injector)

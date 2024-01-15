@@ -10,13 +10,14 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Json = require('Module:Json')
 local Namespace = require('Module:Namespace')
 local Variables = require('Module:Variables')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
+local Opponent = Lua.import('Module:Opponent')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
@@ -42,23 +43,19 @@ function CustomPrizePool.run(frame)
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
 	if args['smw mute'] or not Namespace.isMain() or Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		prizePool:setConfig('storeSmw', false)
 		prizePool:setConfig('storeLpdb', false)
 	end
 
-	HEADER_DATA.tournamentName = args['tournament name']
-	HEADER_DATA.resultName = args['custom-name']
+	HEADER_DATA.tournamentName = args['tournamentName']
+	HEADER_DATA.resultName = args['resultName']
 
 	Variables.varDefine('prizepool_resultName', HEADER_DATA.resultName)
 
 	if Logic.readBool(args.qualifier) then
+		local extradata = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
+		extradata.qualifier = '1' -- This is the new field, rest are just what Infobox League sets
 		mw.ext.LiquipediaDB.lpdb_tournament('tournament_'.. Variables.varDefault('tournament_name', ''), {
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-				prizepoollocal = Variables.varDefault('prizepoollocal', ''),
-				startdate_raw = Variables.varDefault('raw_sdate', ''),
-				enddate_raw = Variables.varDefault('raw_edate', ''),
-				qualifier = '1', -- This is the new field, rest are just what Infobox League sets
-			}
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 		})
 	end
 

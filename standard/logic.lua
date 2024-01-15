@@ -50,7 +50,8 @@ end
 ---@overload fun(val: any):false
 function Logic.isEmpty(val)
 	if type(val) == 'table' then
-		return require('Module:Table').isEmpty(val)
+		local Table = require('Module:Table')
+		return Table.isEmpty(val)
 	else
 		return val == '' or val == nil
 	end
@@ -62,10 +63,30 @@ end
 ---@overload fun(val: any):true
 function Logic.isNotEmpty(val)
 	if type(val) == 'table' then
-		return require('Module:Table').isNotEmpty(val)
+		local Table = require('Module:Table')
+		return Table.isNotEmpty(val)
 	else
 		return val ~= nil and val ~= ''
 	end
+end
+
+---Checks if a given object (table|string|nil) is deep empty
+---i.e. is empty itself or only contains objects that are deep empty
+---@param val table|string|nil
+---@return boolean
+---@overload fun(val: any):false
+function Logic.isDeepEmpty(val)
+	local Table = require('Module:Table')
+	return Logic.isEmpty(val) or type(val) == 'table' and
+		Table.all(val, function(key, item) return Logic.isDeepEmpty(item) end)
+end
+
+---Inverse of `Logic.isDeepEmpty`
+---@param val table|string|nil
+---@return boolean
+---@overload fun(val: any):true
+function Logic.isNotDeepEmpty(val)
+	return not Logic.isDeepEmpty(val)
 end
 
 ---Check if the input is a representation of a boolean
@@ -119,6 +140,46 @@ function Logic.try(f)
 	return require('Module:ResultOrError').try(f)
 end
 
+---Returns the result of a function if successful. Otherwise it returns the result of the second function.
+---If the first function fails, its error is logged to the console and stashed away for display.
+---@param f fun(): any
+---@param other? fun(error: error): any
+---@param makeError? fun(error: error): error function that allows customizing Error instance being logged and stashed.
+---@return any?
+function Logic.tryOrElseLog(f, other, makeError)
+	return Logic.try(f)
+		:catch(function(error)
+			if type(error) == 'string' then
+				error = require('Module:Error')(error)
+			end
+
+			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
+			if makeError then
+				error = makeError(error)
+			end
+
+			require('Module:Error/Ext').logAndStash(error)
+
+			if other then
+				return other(error)
+			end
+		end)
+		:get()
+end
+
+---Returns the result of a function if successful. Otherwise it returns nil.
+---If the first function fails, its error is logged to the console and stashed away for display.
+---@param f fun(): any
+---@param makeError? fun(error: error): error function that allows customizing Error instance being logged and stashed.
+---@return function
+function Logic.wrapTryOrLog(f, makeError)
+	return function(...)
+		--Need to pack the vararg, so it can be passed to the inner function
+		local args = require('Module:Table').pack(...)
+		return Logic.tryOrElseLog(function() return f(unpack(args)) end, nil, makeError)
+	end
+end
+
 ---Checks if a provided value is numeric
 ---@param val number|string|nil
 ---@return boolean
@@ -134,7 +195,8 @@ function Logic.deepEquals(x, y)
 	if x == y then
 		return true
 	elseif type(x) == 'table' and type(y) == 'table' then
-		return require('Module:Table').deepEquals(x, y)
+		local Table = require('Module:Table')
+		return Table.deepEquals(x, y)
 	else
 		return false
 	end

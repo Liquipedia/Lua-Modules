@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Lua = require('Module:Lua')
 
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local CustomPortalPlayers = {}
 

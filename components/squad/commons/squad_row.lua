@@ -59,10 +59,8 @@ function SquadRow:id(args)
 	cell:addClass('ID')
 
 	local opponent = Opponent.resolve(
-		Opponent.readOpponentArgs(
-			Table.merge(args, {type = Opponent.solo}),
-			nil, {syncPlayer = true}
-		)
+		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo})),
+		nil, {syncPlayer = true}
 	)
 	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
 
@@ -82,7 +80,8 @@ function SquadRow:id(args)
 
 	local teamNode = mw.html.create('td')
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
-		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team))
+		local date = String.nilIfEmpty(ReferenceCleaner.clean(args.date))
+		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team, date))
 		if args.teamrole then
 			teamNode:css('text-align', 'center')
 			teamNode:tag('div'):css('font-size', '85%'):tag('i'):wikitext(args.teamrole)
@@ -132,14 +131,8 @@ function SquadRow:role(args)
 
 	if role == 'sub' then
 		self.content:addClass('sub')
-	elseif role == 'coach' then
-		self.content:addClass('coach')
-		self.content:addClass('roster-coach')
-	elseif role == 'coach/manager' then
-		self.content:addClass('coach/manager')
-		self.content:addClass('roster-coach')
-	elseif role == 'coach/substitute' then
-		self.content:addClass('coach/substitute')
+	elseif role:find('coach', 1, true) then
+		self.content:addClass(role)
 		self.content:addClass('roster-coach')
 	end
 

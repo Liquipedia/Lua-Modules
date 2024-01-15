@@ -9,7 +9,7 @@
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
+local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 
 local CustomLegacyPrizePool = {}
 
@@ -20,8 +20,9 @@ end
 
 function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	newArgs.qualifier = header.qualifier
-	newArgs['custom-name'] = header['custom-name']
-	newArgs.points1link = header['points-link']
+	newArgs['tournamentName'] = header['tournament name']
+	newArgs['points1link'] = header['points-link']
+	newArgs['resultName'] = header['custom-name']
 
 	return newArgs
 end

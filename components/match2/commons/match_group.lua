@@ -9,17 +9,19 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
-local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
-local MatchGroupBase = Lua.import('Module:MatchGroup/Base', {requireDevIfEnabled = true})
-local MatchGroupConfig = Lua.loadDataIfExists('Module:MatchGroup/Config')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local Match = Lua.import('Module:Match')
+local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
+local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 -- The core module behind every type of MatchGroup. A MatchGroup is a collection of matches, such as a bracket or
 -- a matchlist.
@@ -34,7 +36,7 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
-		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
 		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
@@ -57,7 +59,7 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
-		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
@@ -93,13 +95,25 @@ function MatchGroup.MatchGroupById(args)
 
 	local matchGroupType = matches[1].bracketData.type
 
+	if Logic.readBool(args.forceMatchList) then
+		matchGroupType = 'matchlist'
+		Array.forEach(matches, function(match)
+			match.bracketData.header = match.bracketData.header
+				and DisplayHelper.expandHeader(match.bracketData.header)[1] or nil
+		end)
+	end
+
 	local config
 	if matchGroupType == 'matchlist' then
-		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true})
+		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
 		config = MatchlistDisplay.configFromArgs(args)
 	else
-		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
+		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 		config = BracketDisplay.configFromArgs(args)
+	end
+
+	if Logic.readBool(args.suppressDetails) then
+		config.matchHasDetails = function() return false end
 	end
 
 	MatchGroupInput.applyOverrideArgs(matches, args)
@@ -126,7 +140,7 @@ function MatchGroup.MatchByMatchId(args)
 
 	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
 
-	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
+	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch')
 	local config = SingleMatchDisplay.configFromArgs(args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')

@@ -14,8 +14,8 @@ local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -23,8 +23,6 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local _pagename = mw.title.getCurrentTitle().prefixedText
-local _role
-local _role2
 
 local CustomPlayer = Class.new()
 
@@ -34,7 +32,11 @@ local _args
 
 function CustomPlayer.run(frame)
 	local player = Player(frame)
+	player:setWidgetInjector(CustomInjector(player))
 	_args = player.args
+
+	player.roleData = Role.run({role = _args.role})
+	player.roleData2 = Role.run({role = _args.role2})
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -59,10 +61,8 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = 'Role(s)', content = {self.caller.roleData.display, self.caller.roleData2.display}}
 		}
 	end
 	return widgets
@@ -77,14 +77,10 @@ function CustomInjector:addCustomCells(widgets)
 	}
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
+	lpdbData.extradata.isplayer = self.roleData.isPlayer or 'true'
+	lpdbData.extradata.role = self.roleData.role
+	lpdbData.extradata.role2 = self.roleData2.role
 
 	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
 

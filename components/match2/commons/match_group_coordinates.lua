@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local IteratorUtil = require('Module:IteratorUtil')
+local Iterator = require('Module:Iterator')
 local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -25,7 +25,7 @@ function MatchGroupCoordinates.dfsFrom(bracketDatasById, start)
 end
 
 function MatchGroupCoordinates.dfs(bracket)
-	return IteratorUtil.flatMap(function(_, rootMatchId)
+	return Iterator.flatMap(function(_, rootMatchId)
 		return MatchGroupCoordinates.dfsFrom(bracket.bracketDatasById, rootMatchId)
 	end, ipairs(bracket.rootMatchIds))
 end
@@ -319,11 +319,6 @@ opponents leave the tournament directly from the upper bracket.
 The third place match is not counted.
 ]]
 function MatchGroupCoordinates.computeRawCounts(bracket)
-	if #bracket.sections > 2 then
-		-- Triple elimination brackets are not supported
-		return {}
-	end
-
 	local reverseRounds = Array.reverse(bracket.rounds)
 
 	local countsBySection = Array.map(Array.range(1, #bracket.sections), function(sectionIx) return 0 end)

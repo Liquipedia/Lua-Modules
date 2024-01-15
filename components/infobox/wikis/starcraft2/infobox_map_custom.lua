@@ -6,89 +6,63 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
+---@class Starcraft2MapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	_args = customMap.args
-	return customMap:createInfobox()
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+
+	return map:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local id = _args.id
+---@param widgetId string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(widgetId, widgets)
+	local args = self.caller.args
 
-	table.insert(widgets, Cell{
-		name = 'Tileset',
-		content = {
-			_args.tileset or CustomMap:_tlpdMap(id, 'tileset')
-		}
-	})
-	table.insert(widgets, Cell{
-		name = 'Size',
-		content = {CustomMap:_getSize(id)}
-	})
-	table.insert(widgets, Cell{
-		name = 'Spawn Positions',
-		content = {CustomMap:_getSpawn(id)}
-	})
-	table.insert(widgets, Cell{
-		name = 'Versions',
-		content = {_args.versions}
-	})
-	table.insert(widgets, Cell{
-		name = 'Competition Span',
-		content = {_args.span}
-	})
-	table.insert(widgets, Cell{
-		name = 'Leagues Featured',
-		content = {_args.leagues}
-	})
-	table.insert(widgets, Cell{
-		name = '[[Rush distance]]',
-		content = {CustomMap:_getRushDistance()}
-	})
-	table.insert(widgets, Cell{
-		name = '1v1 Ladder',
-		content = {_args['1v1history']}
-	})
-	table.insert(widgets, Cell{
-		name = '2v2 Ladder',
-		content = {_args['2v2history']}
-	})
-	table.insert(widgets, Cell{
-		name = '3v3 Ladder',
-		content = {_args['3v3history']}
-	})
-	table.insert(widgets, Cell{
-		name = '4v4 Ladder',
-		content = {_args['4v4history']}
-	})
+	if widgetId == 'custom' then
+		local id = args.id
+
+	return Array.append(
+		widgets,
+		Cell{name = 'Tileset', content = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
+		Cell{name = 'Size', content = {self.caller:_getSize(id)}},
+		Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id)}},
+		Cell{name = 'Versions', content = {args.versions}},
+		Cell{name = 'Competition Span', content = {args.span}},
+		Cell{name = 'Leagues Featured', content = {args.leagues}},
+		Cell{name = '[[Rush distance]]', content = {self.caller:_getRushDistance()}},
+		Cell{name = '1v1 Ladder', content = {args['1v1history']}},
+		Cell{name = '2v2 Ladder', content = {args['2v2history']}},
+		Cell{name = '3v3 Ladder', content = {args['3v3history']}},
+		Cell{name = '4v4 Ladder', content = {args['4v4history']}}
+	)
+	end
 
 	return widgets
 end
 
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param args table
+---@return string?
 function CustomMap:getNameDisplay(args)
 	if String.isEmpty(args.name) then
 		return CustomMap:_tlpdMap(args.id, 'name')
@@ -97,40 +71,48 @@ function CustomMap:getNameDisplay(args)
 	return args.name
 end
 
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.name = CustomMap:getNameDisplay(_args)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.name = self:getNameDisplay(args)
 	lpdbData.extradata = {
-		creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator),
-		creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2),
-		spawns = _args.players,
-		height = _args.height,
-		width = _args.width,
+		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
+		creator2 = args.creator2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2) or nil,
+		spawns = args.players,
+		height = args.height,
+		width = args.width,
 		rush = Variables.varDefault('rush_distance'),
 	}
 	return lpdbData
 end
 
+---@param id string?
+---@return string
 function CustomMap:_getSize(id)
-	local width = _args.width
-		or CustomMap:_tlpdMap(id, 'width') or ''
-	local height = _args.height
-		or CustomMap:_tlpdMap(id, 'height') or ''
+	local width = self.args.width
+		or self:_tlpdMap(id, 'width') or ''
+	local height = self.args.height
+		or self:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
+---@param id string?
+---@return string
 function CustomMap:_getSpawn(id)
-	local players = _args.players
-		or CustomMap:_tlpdMap(id, 'players') or ''
-	local positions = _args.positions
-		or CustomMap:_tlpdMap(id, 'positions') or ''
+	local players = self.args.players
+		or self:_tlpdMap(id, 'players') or ''
+	local positions = self.args.positions
+		or self:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
+---@return string?
 function CustomMap:_getRushDistance()
-	if String.isEmpty(_args['rush_distance']) then
+	if String.isEmpty(self.args['rush_distance']) then
 		return nil
 	end
-	local rushDistance = _args['rush_distance']
+	local rushDistance = self.args['rush_distance']
 	rushDistance = string.gsub(rushDistance, 's', '')
 	rushDistance = string.gsub(rushDistance, 'seconds', '')
 	rushDistance = string.gsub(rushDistance, ' ', '')
@@ -138,15 +120,20 @@ function CustomMap:_getRushDistance()
 	return rushDistance .. ' seconds'
 end
 
+---@param id string?
+---@param query string
+---@return string?
 function CustomMap:_tlpdMap(id, query)
 	if not id then return nil end
-	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', { id, query })
+	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', {id, query})
 end
 
+---@param args table
+---@return string[]
 function CustomMap:getWikiCategories(args)
 	local players = args.players
 	if String.isEmpty(players) then
-		players = CustomMap:_tlpdMap(args.id, 'players')
+		players = self:_tlpdMap(args.id, 'players')
 	end
 
 	if String.isEmpty(players) then

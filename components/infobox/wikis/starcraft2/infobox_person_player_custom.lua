@@ -9,22 +9,21 @@
 -- This module is used for both the Player and Commentator infoboxes
 
 local Abbreviation = require('Module:Abbreviation')
-local Achievements = require('Module:Achievements in infoboxes')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
-local MatchTicker = require('Module:MatchTicker/Participant')
-local Math = require('Module:Math')
+local MatchTicker = require('Module:MatchTicker/Custom')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Person = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
-local PersonSc2 = Lua.import('Module:Infobox/Person/Custom/Shared', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent/Starcraft', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
+local Opponent = Lua.import('Module:Opponent/Starcraft')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -49,7 +48,8 @@ local AVAILABLE_RACES = Array.append(Faction.knownFactions, 'total')
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = require('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+
 local Cell = require('Module:Infobox/Widget/Cell')
 local Title = require('Module:Infobox/Widget/Title')
 local Center = require('Module:Infobox/Widget/Center')
@@ -62,10 +62,9 @@ local _args
 local _player
 
 function CustomPlayer.run(frame)
-	local player = Person(frame)
+	local player = CustomPerson(frame)
 	_args = player.args
 	_player = player
-	PersonSc2.setArgs(_args)
 
 	player.recentMatches = {}
 	player.infoboxAchievements = {}
@@ -73,16 +72,10 @@ function CustomPlayer.run(frame)
 	player.achievements = {}
 	player.achievementsFallBack = {}
 	player.earningsGlobal = {}
-	player.shouldQueryData = PersonSc2.shouldStoreData()
+	player.shouldQueryData = player:shouldStoreData(_args)
 	if player.shouldQueryData then
 		player.yearsActive = CustomPlayer._getMatchupData(player.pagename)
 	end
-
-	player.shouldStoreData = PersonSc2.shouldStoreData
-	player.getStatusToStore = PersonSc2.getStatusToStore
-	player.adjustLPDB = PersonSc2.adjustLPDB
-	player.getPersonType = PersonSc2.getPersonType
-	player.nameDisplay = PersonSc2.nameDisplay
 
 	player.calculateEarnings = CustomPlayer.calculateEarnings
 	player.createBottomContent = CustomPlayer.createBottomContent
@@ -97,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Race',
-				content = {PersonSc2.getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
+				content = {_player:getRaceData(_args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
 	elseif id == 'role' then return {}
@@ -143,7 +136,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _player.earningsGlobal[tostring(CURRENT_YEAR)]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -156,7 +149,7 @@ function CustomInjector:addCustomCells(widgets)
 		},
 		Cell{name = rank1.name or 'Rank', content = {rank1.rank}},
 		Cell{name = rank2.name or 'Rank', content = {rank2.rank}},
-		Cell{name = 'Military Service', content = {PersonSc2.military(_args.military)}},
+		Cell{name = 'Military Service', content = {_args.military}},
 		Cell{
 			name = Abbreviation.make('Years active', 'Years active as a player'),
 			content = {_player.yearsActive}
@@ -192,7 +185,7 @@ end
 
 function CustomPlayer:createBottomContent(infobox)
 	if _player.shouldQueryData then
-		return MatchTicker.run({player = self.pagename}, _player.recentMatches)
+		return MatchTicker.participant({player = self.pagename}, _player.recentMatches)
 	end
 end
 
@@ -313,34 +306,38 @@ function CustomPlayer._setVarsForVS(table)
 end
 
 function CustomPlayer._addScoresToVS(vs, opponents, player, playerWithoutUnderscore)
+	--catch matches vs empty opponents and literals
+	if #opponents ~= 2 or Array.any(opponents, function(opponent) return opponent.type == Opponent.literal end) then
+
+		return vs
+	end
+
 	local plIndex = 1
 	local vsIndex = 2
-	--catch matches vs empty opponents
-	if opponents[1] and opponents[2] then
-		if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
-			plIndex = 2
-			vsIndex = 1
-		end
-		local plOpp = opponents[plIndex]
-		local vsOpp = opponents[vsIndex]
 
-		local prace = Faction.read(plOpp.match2players[1].extradata.faction)
-		prace = prace and prace ~= Faction.defaultFaction and prace or 'r'
-		local orace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
-		orace = orace and orace ~= Faction.defaultFaction and orace or 'r'
-
-		vs[prace][orace].win = vs[prace][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace][orace].loss = vs[prace][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total'][orace].win = vs['total'][orace].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total'][orace].loss = vs['total'][orace].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs[prace]['total'].win = vs[prace]['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs[prace]['total'].loss = vs[prace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
-
-		vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
-		vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+	if opponents[2].name == player or opponents[2].name == playerWithoutUnderscore then
+		plIndex = 2
+		vsIndex = 1
 	end
+	local plOpp = opponents[plIndex]
+	local vsOpp = opponents[vsIndex]
+
+	local pRace = Faction.read(plOpp.match2players[1].extradata.faction)
+	pRace = pRace and pRace ~= Faction.defaultFaction and pRace or 'r'
+	local oRace = Faction.read(vsOpp.match2players[1].extradata.faction) or 'r'
+	oRace = oRace and oRace ~= Faction.defaultFaction and oRace or 'r'
+
+	vs[pRace][oRace].win = vs[pRace][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace][oRace].loss = vs[pRace][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total'][oRace].win = vs['total'][oRace].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total'][oRace].loss = vs['total'][oRace].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs[pRace]['total'].win = vs[pRace]['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs[pRace]['total'].loss = vs[pRace]['total'].loss + (tonumber(vsOpp.score or 0) or 0)
+
+	vs['total']['total'].win = vs['total']['total'].win + (tonumber(plOpp.score or 0) or 0)
+	vs['total']['total'].loss = vs['total']['total'].loss + (tonumber(vsOpp.score or 0) or 0)
 
 	return vs
 end
@@ -348,7 +345,7 @@ end
 function CustomPlayer:calculateEarnings()
 	local earningsTotal
 	earningsTotal, _player.earningsGlobal = CustomPlayer._getEarningsMedalsData(self.pagename)
-	earningsTotal = Math.round{earningsTotal}
+	earningsTotal = Math.round(earningsTotal)
 	return earningsTotal, _player.earningsGlobal
 end
 
@@ -433,6 +430,7 @@ function CustomPlayer._addPlacementToEarnings(earnings, earnings_total, data)
 		earnings[mode] = {}
 	end
 	local year = string.sub(data.date, 1, 4)
+	data.individualprizemoney = tonumber(data.individualprizemoney) or 0
 	earnings[mode][year] = (earnings[mode][year] or 0) + data.individualprizemoney
 	earnings['total'][year] = (earnings['total'][year] or 0) + data.individualprizemoney
 	earnings_total = (earnings_total or 0) + data.individualprizemoney
@@ -560,9 +558,11 @@ function CustomPlayer._getAllkills()
 end
 
 function CustomPlayer:getWikiCategories(categories)
-	for _, faction in pairs(PersonSc2.readFactions(_args.race).factions) do
+	for _, faction in pairs(self:readFactions(_args.race).factions) do
 		table.insert(categories, faction .. ' Players')
 	end
+
+	table.insert(categories, self:military(_args.military).category)
 
 	return categories
 end

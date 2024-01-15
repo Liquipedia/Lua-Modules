@@ -16,11 +16,12 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled = true})
+local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 

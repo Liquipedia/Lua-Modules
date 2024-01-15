@@ -14,9 +14,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -29,6 +28,12 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TBD = 'TBD'
 
 -- Score Class
+---@class CounterstrikeScore
+---@operator call: CounterstrikeScore
+---@field root Html
+---@field table Html
+---@field top Html
+---@field bottom Html
 local Score = Class.new(
 	function(self, direction)
 		self.root = mw.html.create('div')
@@ -41,16 +46,20 @@ local Score = Class.new(
 	end
 )
 
+---@return self
 function Score:setLeft()
 	self.table:css('float', 'left')
 	return self
 end
 
+---@return self
 function Score:setRight()
 	self.table:css('float', 'right')
 	return self
 end
 
+---@param score string|number|nil
+---@return self
 function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 	mapScore
@@ -64,6 +73,9 @@ function Score:setMapScore(score)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return self
 function Score:setFirstHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -75,6 +87,9 @@ function Score:setFirstHalfScore(score, side)
 	return self
 end
 
+---@param side string
+---@param score number
+---@return self
 function Score:setSecondHalfScore(score, side)
 	local halfScore = mw.html.create('td')
 	halfScore
@@ -86,12 +101,17 @@ function Score:setSecondHalfScore(score, side)
 	return self
 end
 
+---@return Html
 function Score:create()
 	self.table:node(self.top):node(self.bottom)
 	return self.root
 end
 
 -- Map Veto Class
+---@class CounterstrikeMapVeto: MatchSummaryRowInterface
+---@operator call: CounterstrikeMapVeto
+---@field root Html
+---@field table Html
 local MapVeto = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -101,6 +121,7 @@ local MapVeto = Class.new(
 	end
 )
 
+---@return self
 function MapVeto:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','33%'):done()
@@ -109,6 +130,8 @@ function MapVeto:createHeader()
 	return self
 end
 
+---@param firstVeto number?
+---@return self
 function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
@@ -127,6 +150,8 @@ function MapVeto:vetoStart(firstVeto)
 	return self
 end
 
+---@param map string?
+---@return self
 function MapVeto:addDecider(map)
 	map = Logic.emptyOr(map, TBD)
 
@@ -140,6 +165,10 @@ function MapVeto:addDecider(map)
 	return self
 end
 
+---@param vetotype string?
+---@param map1 string?
+---@param map2 string?
+---@return self
 function MapVeto:addRound(vetotype, map1, map2)
 	map1 = Logic.emptyOr(map1, TBD)
 	map2 = Logic.emptyOr(map2, TBD)
@@ -169,6 +198,10 @@ function MapVeto:addRound(vetotype, map1, map2)
 	return self
 end
 
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return self
 function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	row:tag('td')
 		:tag('span')
@@ -178,15 +211,22 @@ function MapVeto:addColumnVetoType(row, styleClass, vetoText)
 	return self
 end
 
+---@param row Html
+---@param map string?
+---@return self
 function MapVeto:addColumnVetoMap(row, map)
 	row:tag('td'):wikitext(map):done()
 	return self
 end
 
+---@return Html
 function MapVeto:create()
 	return self.root
 end
 
+---@class CounterstrikeMatchStatus: MatchSummaryRowInterface
+---@operator call: CounterstrikeMatchStatus
+---@field root Html
 local MatchStatus = Class.new(
 	function(self)
 		self.root = mw.html.create('div')
@@ -197,31 +237,30 @@ local MatchStatus = Class.new(
 	end
 )
 
+---@param content string|number|Html|nil
+---@return self
 function MatchStatus:content(content)
 	self.root:node(content):node(MatchSummary.Break():create())
 	return self
 end
 
+---@return Html
 function MatchStatus:create()
 	return self.root
 end
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+end
 
-	local matchSummary = MatchSummary():init()
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
-		matchSummary:comment(comment)
-	end
-
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
 	local vods = {}
 	local secondVods = {}
 	if Logic.isNotEmpty(match.links.vod2) then
@@ -238,24 +277,15 @@ function CustomMatchSummary.getByMatchId(args)
 	end
 
 	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
-		matchSummary:footer(CustomMatchSummary._createFooter(match, vods, secondVods))
+		return CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
-	return matchSummary:create()
+	return footer
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
-end
-
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
 	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
@@ -309,6 +339,10 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param match MatchGroupUtilMatch
+---@param vods table<integer, string>
+---@param secondVods table<integer, table>
+---@return MatchSummaryFooter
 function CustomMatchSummary._createFooter(match, vods, secondVods)
 	local footer = MatchSummary.Footer()
 
@@ -423,6 +457,8 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	return footer
 end
 
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
 function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -489,6 +525,8 @@ function CustomMatchSummary._createMap(game)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
@@ -502,6 +540,9 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
+---@param map string?
+---@param game string?
+---@return string
 function CustomMatchSummary._createMapLink(map, game)
 	if Logic.isNotEmpty(map) then
 		if Logic.isNotEmpty(game) then

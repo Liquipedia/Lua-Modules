@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,13 +21,19 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class BuildingInfobox: BasicInfobox
 local Building = Class.new(BasicInfobox)
 
+---Entry point
+---@param frame Frame
+---@return Html
 function Building.run(frame)
 	local building = Building(frame)
 	return building:createInfobox()
 end
 
+---creates the infobox
+---@return Html
 function Building:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -102,10 +108,14 @@ function Building:createInfobox()
 	return builtInfobox
 end
 
+---@param args table
+---@return string[]
 function Building:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Building:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
@@ -119,10 +129,13 @@ function Building:_getHotkeys(args)
 	return display
 end
 
+---@param args table
+---@return string
 function Building:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Building:setLpdbData(args)
 end
 

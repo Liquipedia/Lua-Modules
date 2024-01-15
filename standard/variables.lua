@@ -10,9 +10,6 @@ local Class = require('Module:Class')
 
 local Variables = {}
 
----@alias wikiVaribleKey string|number
----@alias wikiVariableValue string|number|nil
-
 ---Stores a wiki-variable and returns the empty string
 ---@param name wikiVaribleKey Key of the wiki-variable
 ---@param value wikiVariableValue Value of the wiki-variable

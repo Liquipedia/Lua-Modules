@@ -11,8 +11,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -45,13 +45,13 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -66,6 +66,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Role', content = {
 				CustomPlayer._getRoleData('role').value,
 				CustomPlayer._getRoleData('role2').value,
+				CustomPlayer._getRoleData('role3').value,
 			}},
 		}
 	elseif id == 'history' then
@@ -80,6 +81,7 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role3 = Variables.varDefault('role3')
 
 	return lpdbData
 end
@@ -96,6 +98,7 @@ end
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role', CustomPlayer._getRoleData('role').value)
 	Variables.varDefine('role2', CustomPlayer._getRoleData('role2').value)
+	Variables.varDefine('role3', CustomPlayer._getRoleData('role3').value)
 end
 
 function CustomPlayer:getPersonType(args)

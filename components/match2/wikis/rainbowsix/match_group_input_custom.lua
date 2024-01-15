@@ -12,23 +12,21 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t') --[[@as osdate]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -308,13 +306,12 @@ function matchFunctions.getVodStuff(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.links = {
-		preview = match.preview,
 		stats = match.stats,
 		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
 		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,
 		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
 		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
-		lpl = match.lpl and 'https://letsplay.live/match/' .. match.lpl or nil,
+		lpl = match.lpl and 'https://old.letsplay.live/match/' .. match.lpl or nil,
 		r6esports = match.r6esports
 			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
 		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,
@@ -325,60 +322,12 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
-		mvp = matchFunctions.getMVP(match),
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+		mvp = MatchGroupInput.readMvp(match),
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 	return match
-end
-
-function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
-	if String.isEmpty(flag) then
-		flag = Variables.varDefault(name .. '_flag')
-	end
-	if String.isEmpty(displayName) then
-		displayName = Variables.varDefault(name .. '_dn')
-	end
-	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
-		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
-			query = 'flag, id',
-			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
-		end
-	end
-	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
-	end
-	if String.isEmpty(displayName) then
-		displayName = name
-	end
-	if String.isNotEmpty(displayName) then
-		Variables.varDefine(name .. '_dn', displayName)
-	end
-	return {
-		name = name,
-		displayName = displayName,
-		flag = flag,
-	}
 end
 
 -- Parse the mapVeto input
@@ -411,16 +360,6 @@ function matchFunctions.getMapVeto(match)
 	return data
 end
 
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return nil end
-
-	-- Split & trim the input
-	local players = Array.map(mw.text.split(match.mvp, ','), String.trim)
-
-	return {players = players, points = match.mvppoints or 1}
-end
-
 function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -448,7 +387,7 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -467,24 +406,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end

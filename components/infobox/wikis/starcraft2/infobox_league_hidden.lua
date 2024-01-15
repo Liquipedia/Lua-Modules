@@ -33,13 +33,13 @@ local _pagename = mw.title.getCurrentTitle().text
 
 local TODAY = os.date('%Y-%m-%d', os.time())
 local GAME_MOD = 'mod'
-local GAME_LOTV = Game.name{game = 'lotv'}
+local GAME_LOTV = Game.toIdentifier{game = 'lotv'}
 
 function HiddenInfoboxLeague.run(args)
 	_args = args
 
 	args.liquipediatiertype = args.liquipediatiertype or args.tiertype
-	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.name{game = _args.game}
+	_args.game = _args.game == GAME_MOD and GAME_MOD or Game.toIdentifier{game = _args.game}
 
 	HiddenInfoboxLeague._definePageVariables()
 
@@ -412,10 +412,10 @@ function HiddenInfoboxLeague._getMaps()
 	local mapArgs = HiddenInfoboxLeague._getAllArgsForBase(_args, prefix)
 
 	return Json.stringify(Table.map(mapArgs, function(mapIndex, map)
-		map = mw.text.split(map, '|')
+		local mapArray = mw.text.split(map, '|')
 		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(map[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or map[#map],
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = _args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
 		}
 	end))
 end

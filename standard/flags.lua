@@ -51,18 +51,18 @@ function Flags.Icon(args, flagName)
 				link = 'Category:' .. flagData.name
 			end
 			return '<span class="flag">[[' .. flagData.flag ..
-				'|' .. flagData.name .. '|link=' .. link .. ']]</span>'
+				'|36x24px|' .. flagData.name .. '|link=' .. link .. ']]</span>'
 		else
-			return '<span class="flag">[[' .. flagData.flag .. '|link=]]</span>'
+			return '<span class="flag">[[' .. flagData.flag .. '|36x24px|link=]]</span>'
 		end
 	elseif shouldLink then
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName:lower()) ..
-				'[[Category:Pages with unknown flags]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
+		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. mw.ustring.lower(flagName))
 	else
 		mw.log('Unknown flag: ', flagName)
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. flagName:lower()) ..
-				'[[Category:Pages with unknown flags]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
+		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. mw.ustring.lower(flagName))
 	end
 end
 
@@ -160,7 +160,11 @@ function Flags.CountryName(flagName)
 		return MasterData.data[flagKey].name
 	else
 		mw.log('Unknown flag: ', flagName)
-		return mw.text.trim(mw.text.split(Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName), '|', true)[2] or '')
+		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
+		return mw.text.trim(mw.text.split(mw.text.split(
+					Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. flagName),
+					'Category:', true)[2] or '',
+						"[%]%|]", false)[1])
 	end
 end
 
@@ -228,12 +232,18 @@ Flags.readKey('Czechoslovakia') -- returns nil
 ---@param flagName string
 ---@return string?
 function Flags._convertToKey(flagName)
-	flagName = flagName:gsub(' ', ''):lower()
+	-- lowercase all unicode
+	-- removes all accents and special characters
+	local parsedName = mw.ustring.toNFKD(mw.ustring.lower(flagName))
+	if not parsedName then
+		return
+	end
+	parsedName = string.gsub(parsedName, '[^%l]', '')
 
-	return MasterData.twoLetter[flagName]
-		or MasterData.threeLetter[flagName]
-		or MasterData.aliases[flagName]
-		or (MasterData.data[flagName] and flagName)
+	return MasterData.twoLetter[parsedName]
+		or MasterData.threeLetter[parsedName]
+		or MasterData.aliases[parsedName]
+		or (MasterData.data[parsedName] and parsedName)
 end
 
 ---@param langName string
@@ -242,6 +252,10 @@ function Flags._convertToLangKey(langName)
 	return MasterData.languageTwoLetter[langName]
 		or MasterData.languageThreeLetter[langName]
 		or langName
+end
+
+function Flags.isValidFlagInput(flagInput)
+	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
 return Class.export(Flags)

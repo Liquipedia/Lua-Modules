@@ -14,13 +14,12 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
@@ -292,12 +291,8 @@ function matchFunctions.getVodStuff(match)
 
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
 	local links = match.links
-	if match.preview then links.preview = match.preview end
-	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.faceit then links.faceit = 'https://www.faceit.com/en/halo_infinite/room/' .. match.faceit end
 	if match.halodatahive then links.halodatahive = 'https://halodatahive.com/Series/Summary/' .. match.halodatahive end
 	if match.stats then links.stats = match.stats end
@@ -306,76 +301,11 @@ function matchFunctions.getVodStuff(match)
 end
 
 function matchFunctions.getExtraData(match)
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-	table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
-
 	match.extradata = {
-		mvp = matchFunctions.getMVP(match),
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil,
+		mvp = MatchGroupInput.readMvp(match),
+		casters = MatchGroupInput.readCasters(match),
 	}
 	return match
-end
-
-function CustomMatchGroupInput._getCasterInformation(name, flag, displayName)
-	if String.isEmpty(flag) then
-		flag = Variables.varDefault(name .. '_flag')
-	end
-	if String.isEmpty(displayName) then
-		displayName = Variables.varDefault(name .. '_dn')
-	end
-	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
-		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
-		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
-			query = 'flag, id',
-			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
-		end
-	end
-	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
-	end
-	if String.isEmpty(displayName) then
-		displayName = name
-	end
-	if String.isNotEmpty(displayName) then
-		Variables.varDefine(name .. '_dn', displayName)
-	end
-	return {
-		name = name,
-		displayName = displayName,
-		flag = flag,
-	}
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -405,7 +335,7 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getTeamPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -433,7 +363,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
@@ -450,24 +380,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards) for team opponents
-function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end

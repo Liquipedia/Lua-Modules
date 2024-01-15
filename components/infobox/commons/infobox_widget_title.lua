@@ -9,8 +9,11 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
 
+---@class TitleWidget: Widget
+---@operator call({name: string|number|nil}): TitleWidget
+---@field content string|number|nil
 local Title = Class.new(
 	Widget,
 	function(self, input)
@@ -18,12 +21,13 @@ local Title = Class.new(
 	end
 )
 
+---@return {[1]: Html}
 function Title:make()
-	return {
-		Title:_create(self.content)
-	}
+	return {Title:_create(self.content)}
 end
 
+---@param infoDescription string|number|nil
+---@return Html
 function Title:_create(infoDescription)
 	local header = mw.html.create('div')
 	header	:addClass('infobox-header')

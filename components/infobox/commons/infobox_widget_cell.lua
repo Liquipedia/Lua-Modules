@@ -9,8 +9,18 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
 
+---@class CellWidgetOptions
+---@field columns number?
+---@field makeLink boolean?
+
+---@class CellWidget: Widget
+---@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
+---@field name string|number
+---@field content (string|number)[]
+---@field options CellWidgetOptions
+---@field classes string[]?
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
@@ -22,6 +32,8 @@ local Cell = Class.new(Widget,
 	end
 )
 
+---@param description string|number
+---@return CellWidget
 function Cell:_new(description)
 	self.root = mw.html.create('div')
 	self.description = mw.html.create('div')
@@ -32,6 +44,8 @@ function Cell:_new(description)
 	return self
 end
 
+---@param ... string
+---@return CellWidget
 function Cell:_class(...)
 	for i = 1, select('#', ...) do
 		local item = select(i, ...)
@@ -44,6 +58,8 @@ function Cell:_class(...)
 	return self
 end
 
+---@param ... string|number
+---@return CellWidget
 function Cell:_content(...)
 	local firstItem = select(1, ...)
 	if firstItem == nil or firstItem == '' then
@@ -71,6 +87,7 @@ function Cell:_content(...)
 	return self
 end
 
+---@return {[1]: Html?}
 function Cell:make()
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))

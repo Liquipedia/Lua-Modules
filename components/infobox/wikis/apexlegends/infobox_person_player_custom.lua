@@ -9,16 +9,16 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local LegendIcon = require('Module:LegendIcon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local UpcomingMatches = require('Module:Matches Player')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -56,20 +56,12 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -136,7 +128,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends', {requireIndex = false}) do
 		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
 	end
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
@@ -152,10 +144,8 @@ function CustomPlayer:createBottomContent(infobox)
 end
 
 function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
-		return {}
-	end
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+	local status = Logic.readBool(_args.banned) and 'Banned' or Logic.emptyOr(_args.banned, _args.status)
+	return {Page.makeInternalLink({onlyIfExists = true}, status) or status}
 end
 
 function CustomPlayer._createRole(key, role)
@@ -177,17 +167,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

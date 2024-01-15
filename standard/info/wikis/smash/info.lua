@@ -93,4 +93,5 @@ return {
 	defaultGame = 'melee',
 	defaultTeamLogo = 'Smashlogo std.png', ---@deprecated
 	defaultTeamLogoDark = 'Smashlogo std.png', ---@deprecated
+	match2 = 0,
 }

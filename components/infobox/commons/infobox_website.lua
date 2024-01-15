@@ -10,8 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Links = Lua.import('Module:Links')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -21,13 +21,17 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class WebsiteInfobox: BasicInfobox
 local Website = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Website.run(frame)
 	local website = Website(frame)
 	return website:createInfobox()
 end
 
+---@return Html
 function Website:createInfobox()
 	local infobox = self.infobox
 	local args = self.args

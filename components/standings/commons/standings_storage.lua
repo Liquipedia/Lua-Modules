@@ -15,11 +15,13 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
+local DISQUALIFIED = 'dq'
 
 ---@param data table
 function StandingsStorage.run(data)
@@ -76,7 +78,7 @@ function StandingsStorage.table(data)
 			title = mw.text.trim(cleanedTitle),
 			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
 			type = data.type,
-			matches = Json.stringify(data.matches or {}),
+			matches = Json.stringify(data.matches or {}, {asArray = true}),
 			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
 			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
 		}
@@ -121,6 +123,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 			buchholz = tonumber(entry.buchholz),
 		},
 		roundindex = roundIndex,
+		slotindex = slotIndex,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, entry.extradata)),
 	}
 
@@ -145,11 +148,10 @@ function StandingsStorage.toScoreBoardEntry(data)
 	end
 
 	local filterScoreBoard = function (key, value)
-		return key, Table.includes(ALLOWED_SCORE_BOARD_KEYS, key) and value or nil
+		return Table.includes(ALLOWED_SCORE_BOARD_KEYS, key)
 	end
 
-	-- Using Table.map to filter. Because strangely enough Table.filter has no access to keys...
-	local scoreBoard = Table.mapValues(Table.map(data, filterScoreBoard), tonumber)
+	local scoreBoard = Table.mapValues(Table.filterByKey(data, filterScoreBoard), tonumber)
 
 	if not scoreBoard.w or not scoreBoard.l then
 		mw.logObject(scoreBoard, 'invalid scoreBoardEntry')
@@ -166,6 +168,9 @@ function StandingsStorage.fromTemplateHeader(frame)
 	if not data.standingsindex then
 		return
 	end
+
+	data.roundcount = tonumber(data.roundcount) or 1
+	data.finished = Logic.readBool(data.finished)
 
 	StandingsStorage.table(data)
 end
@@ -190,7 +195,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 	elseif data.player then
 		-- TODO: sanity checks
 		data.participant, data.participantdisplay = string.match(data.player, '%[%[([^|]-)|?([^|]-)%]%]')
-		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|([^|]-)|')
+		data.participantflag = string.match(data.player, '<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
 		data.participant = String.nilIfEmpty(data.participant)
 		data.participantdisplay = String.nilIfEmpty(data.participantdisplay)
@@ -240,8 +245,14 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.opponent = Opponent.resolve(Opponent.readOpponentArgs(opponentArgs) or Opponent.tbd(), date)
 
-	-- Template don't have SlotIndex, use placement as workaround
-	data.slotindex = data.placement
+	if (data.placement or ''):lower() == DISQUALIFIED then
+		data.definitestatus = DISQUALIFIED
+		data.currentstatus = DISQUALIFIED
+	end
+
+	data.placement = tonumber(data.placement)
+	-- If template doesn't have slotIndex, use placement as workaround
+	data.slotindex = tonumber(data.slotindex) or data.placement
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}

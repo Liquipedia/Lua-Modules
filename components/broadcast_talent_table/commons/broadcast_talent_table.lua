@@ -21,7 +21,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Custom')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -293,27 +293,21 @@ function BroadcastTalentTable._fetchTournamentData(tournament)
 			.. 'liquipediatier, liquipediatiertype, publishertier, extradata',
 	})
 
+	local extradata = tournament.extradata or {}
+	if String.isNotEmpty(extradata.liquipediatier) then
+		tournament.liquipediatier = extradata.liquipediatier
+	end
+	if String.isNotEmpty(extradata.liquipediatiertype) then
+		tournament.liquipediatiertype = extradata.liquipediatiertype
+	end
+
 	if type(queryData[1]) ~= 'table' then
 		return tournament
 	end
 
 	queryData[1].tournamentExtradata = queryData[1].extradata
 
-	local tournamentData = Table.merge(queryData[1], tournament)
-
-	local extradata = tournamentData.extradata or {}
-	if Logic.readBool(extradata.showmatch) then
-		if String.isNotEmpty(extradata.liquipediatier) then
-			tournamentData.liquipediatier = extradata.liquipediatier
-		end
-		if String.isNotEmpty(extradata.liquipediatiertype) then
-			tournamentData.liquipediatiertype = extradata.liquipediatiertype
-		else
-			tournamentData.liquipediatiertype = 'Showmatch'
-		end
-	end
-
-	return tournamentData
+	return Table.merge(queryData[1], tournament)
 end
 
 ---@param tournament table
@@ -341,14 +335,7 @@ end
 ---@return string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	if not tier then
-		--on sc2 sometimes there are broadcaster cards on series pages
-		--for those the additional tournament data is stored in extradata
-		--including tier and tier type
-		tier, tierType, options = Tier.parseFromQueryData(tournament.extradata)
-	end
-
-	assert(tier, 'Broadcaster event with unset or invalid liquipedia tier: ' .. tournament.pagename)
+	assert(Tier.isValid(tier, tierType), 'Broadcaster event with unset or invalid tier/tiertype: ' .. tournament.pagename)
 
 	options.link = true
 	options.shortIfBoth = true

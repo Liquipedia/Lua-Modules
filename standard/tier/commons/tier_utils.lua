@@ -19,6 +19,7 @@ local TierData = mw.loadData('Module:Tier/Data')
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'
 
+---@class TierUtils
 local Tier = {}
 
 --- Converts input to standardized identifier format
@@ -189,17 +190,23 @@ function Tier.iterate(subTable)
 	end)
 end
 
+---@return {[string]: integer?}
 Tier.legacyNumbers = FnUtil.memoize(function()
-	return Table.map(TierData.tiers, function(key, data) return data.name:lower():gsub(' ', ''), tonumber(key) or '' end)
+	return Table.map(TierData.tiers, function(key, data)
+		return data.name:lower():gsub(' ', ''), tonumber(key)
+	end)
 end)
 
+---@return {[string]: integer?}
 Tier.legacyShortNumbers = FnUtil.memoize(function()
-	return Table.map(TierData.tiers, function(key, data) return data.short:lower():gsub(' ', ''), tonumber(key) or '' end)
+	return Table.map(TierData.tiers, function(key, data)
+		return data.short:lower():gsub(' ', ''), tonumber(key)
+	end)
 end)
 
 --- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
 ---@param tier string|integer|nil
----@return integer
+---@return integer?
 ---@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)

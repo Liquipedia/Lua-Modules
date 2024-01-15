@@ -28,4 +28,5 @@ return {
 	defaultGame = 'tf2',
 	defaultTeamLogo = 'Team Fortress logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Team Fortress logo.png', ---@deprecated
+	match2 = 0,
 }

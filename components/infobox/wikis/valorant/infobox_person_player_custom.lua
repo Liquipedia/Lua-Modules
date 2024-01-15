@@ -10,14 +10,13 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
+local Region = require('Module:Region')
 local String = require('Module:StringUtils')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -53,21 +52,14 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
 	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 
 	_args = player.args
+	_args.autoTeam = true
 	_player = player
 
 	return player:createInfobox()
@@ -80,6 +72,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
 			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
 			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
 		}
 	elseif id == 'role' then
 		return {
@@ -93,6 +86,8 @@ function CustomInjector:parse(id, widgets)
 			name = 'Retired',
 			content = {_args.retired}
 		})
+	elseif id == 'region' then
+		return {}
 	end
 	return widgets
 end
@@ -117,13 +112,13 @@ end
 function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(_args.role) and 'false' or 'true'
 
 	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
 	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
 	lpdbData.extradata.agent3 = Variables.varDefault('agent3')
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Region.name({region = _args.region, country = _args.country})
 
 	return lpdbData
 end
@@ -157,15 +152,6 @@ end
 function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
 end
 
 function CustomPlayer:getPersonType(args)

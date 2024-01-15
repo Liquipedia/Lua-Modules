@@ -9,99 +9,81 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+---@class CounterstrikeInfoboxTeam: InfoboxTeam
+---@field gamesList string[]
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
-local GAMES = {
-	cs = {name = 'Counter-Strike', link = 'Counter-Strike', category = 'CS Teams'},
-	cscz = {name = 'Condition Zero', link = 'Counter-Strike: Condition Zero', category = 'CSCZ Teams'},
-	css = {name = 'Source', link = 'Counter-Strike: Source', category = 'CSS Teams'},
-	cso = {name = 'Online', link = 'Counter-Strike Online', category = 'CSO Teams'},
-	csgo = {name = 'Global Offensive', link = 'Counter-Strike: Global Offensive', category = 'CSGO Teams'},
-}
-
-local _team
-
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
+	team.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+			return team.args[gameIdentifier]
+		end)
 
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'staff' then
 		return {
-			Cell{name = 'Founders',	content = {_team.args.founders}},
-			Cell{name = 'CEO', content = {_team.args.ceo}},
-			Cell{name = 'Gaming Director', content = {_team.args['gaming director']}},
+			Cell{name = 'Founders',	content = {args.founders}},
+			Cell{name = 'CEO', content = {args.ceo}},
+			Cell{name = 'Gaming Director', content = {args['gaming director']}},
 			widgets[4], -- Manager
 			widgets[5], -- Captain
-			Cell{name = 'In-Game Leader', content = {_team.args.igl}},
+			Cell{name = 'In-Game Leader', content = {args.igl}},
 			widgets[1], -- Coaches
-			Cell{name = 'Analysts', content = {_team.args.analysts}},
+			Cell{name = 'Analysts', content = {args.analysts}},
 		}
-	elseif id == 'earningscell' then
+	elseif id == 'earnings' then
+		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
+	elseif id == 'custom' then
+		return {Cell {
+			name = 'Games',
+			content = Array.map(self.caller.gamesList, function (gameIdentifier)
+					return Game.text{game = gameIdentifier}
+				end)
+		}}
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {Cell{
-		name = 'Games',
-		content = Array.map(CustomTeam.getGames(), function (gameData)
-			return Page.makeInternalLink({}, gameData.name, gameData.link)
-		end)
-	}}
-end
-
-function CustomTeam.getGames()
-	return Array.extractValues(Table.map(GAMES, function (key, data)
-		if _team.args[key] then
-			return key, data
-		end
-		return key, nil
-	end))
-end
-
+---@return string?
 function CustomTeam:createBottomContent()
-	if not _team.args.disbanded and mw.ext.TeamTemplate.teamexists(_team.pagename) then
-		local teamPage = mw.ext.TeamTemplate.teampage(_team.pagename)
+	if not self.args.disbanded and mw.ext.TeamTemplate.teamexists(self.pagename) then
+		local teamPage = mw.ext.TeamTemplate.teampage(self.pagename)
 
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.lpdbname or teamPage}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = _team.lpdbname or teamPage}
+			{team = self.args.lpdbname or teamPage}
 		)
 	end
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 	lpdbData.extradata.ismixteam = tostring(String.isNotEmpty(args.mixteam))
@@ -110,12 +92,19 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	Array.extendWith(categories, Array.map(CustomTeam.getGames(), function (gameData)
-		return gameData.category
-	end))
+	Array.forEach(self.gamesList, function (gameIdentifier)
+			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
+			table.insert(categories, prefix .. ' Teams')
+		end)
+
+	if Table.isEmpty(self.gamesList) then
+		table.insert(categories, 'Gameless Teams')
+	end
 
 	if args.teamcardimage then
 		table.insert(categories, 'Teams using TeamCardImage')

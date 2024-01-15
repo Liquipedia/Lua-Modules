@@ -9,9 +9,12 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
+---@class BuilderWidget: Widget
+---@operator call({builder: function}): BuilderWidget
+---@field builder fun(): Widget[]
 local Builder = Class.new(
 	Widget,
 	function(self, input)
@@ -19,6 +22,7 @@ local Builder = Class.new(
 	end
 )
 
+---@return Widget[]
 function Builder:make()
 	local children = self.builder()
 	local widgets = {}

@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local getArgs = require('Module:Arguments').getArgs
 local json = require('Module:Json')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local _MAX_NUMBER_OF_MATCHES = 64

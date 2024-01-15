@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Flags = require('Module:Flags')
 local Game = require('Module:Game')
-local HighlightConditions = require('Module:HighlightConditions')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local LeagueIcon = require('Module:LeagueIcon')
@@ -26,8 +25,9 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
-local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
+local Conditions = Lua.import('Module:TournamentsListing/Conditions')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Tier = Lua.import('Module:Tier/Custom')
 
 local LANG = mw.language.new('en')
 local NONBREAKING_SPACE = '&nbsp;'
@@ -274,12 +274,12 @@ function BaseTournamentsListing:_row(tournamentData)
 	if prizeValue > 0 then
 		priceCell
 			:wikitext(Currency.display('USD', prizeValue, {
-				dashIfZero = true, abbreviation = false, formatValue = true
+				dashIfZero = true, displayCurrencyCode = false, formatValue = true
 			}))
 	else
 		priceCell
 			:wikitext(NONBREAKING_SPACE)
-			:addClass(participantNumber == -1 and 'Blank' or nil)
+			:addClass('Blank')
 	end
 
 	row:tag('div')
@@ -293,7 +293,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	else
 		participantsNumberCell
 			:wikitext('-')
-			:addClass(prizeValue > 0 and 'Blank' or nil)
+			:addClass(not config.showTier and prizeValue == 0 and 'Blank' or nil)
 	end
 
 	if status == CANCELLED then
@@ -484,8 +484,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 			local opponent = Opponent.fromLpdbStruct(item)
 			if not opponent then
 				mw.logObject({pageName = tournamentData.pagename, place = item.placement}, 'Invalid Prize Pool Data returned from')
-			end
-			if Opponent.isTbd(opponent) then
+			elseif Opponent.isTbd(opponent) then
 				opponent = Opponent.tbd(Opponent.team)
 			end
 			table.insert(placements[place], opponent)

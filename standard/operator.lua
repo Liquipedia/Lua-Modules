@@ -8,6 +8,7 @@
 
 local Operator = {}
 
+---Uses the __add metamethod (a + b)
 ---@param a number
 ---@param b number
 ---@return number
@@ -15,6 +16,7 @@ function Operator.add(a, b)
 	return a + b
 end
 
+---Uses the __sub metamethod (a - b)
 ---@param a number
 ---@param b number
 ---@return number
@@ -22,6 +24,7 @@ function Operator.sub(a, b)
 	return a - b
 end
 
+---Uses the __mul metamethod (a * b)
 ---@param a number
 ---@param b number
 ---@return number
@@ -29,6 +32,7 @@ function Operator.mul(a, b)
 	return a * b
 end
 
+---Uses the __div metamethod (a / b)
 ---@param a number
 ---@param b number
 ---@return number
@@ -36,11 +40,28 @@ function Operator.div(a, b)
 	return a / b
 end
 
+---Uses the __pow metamethod (a ^ b)
 ---@param a number
 ---@param b number
 ---@return number
 function Operator.pow(a, b)
-	return math.pow(a, b)
+	return a ^ b
+end
+
+---Uses the __eq metamethod (a == b)
+---@param a any
+---@param b any
+---@return any
+function Operator.eq(a, b)
+	return a == b
+end
+
+--- Uses the __eq metamethod with negated result (a ~= b)
+---@param a any
+---@param b any
+---@return any
+function Operator.neq(a, b)
+	return a ~= b
 end
 
 ---@param item string|number

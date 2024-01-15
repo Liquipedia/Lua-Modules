@@ -9,12 +9,12 @@
 local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 
-local page = {}
+local Page = {}
 
 ---Checks if a page exists for a given (internal) link
 ---@param link string
 ---@return boolean
-function page.exists(link)
+function Page.exists(link)
 	local existingPage = mw.title.new(link)
 
 	-- In some cases we might have gotten an external link,
@@ -31,7 +31,7 @@ end
 ---@param customLink string?
 ---@return string?
 ---@overload fun(display: string?, customLink: string?): string?
-function page.makeInternalLink(options, display, customLink)
+function Page.makeInternalLink(options, display, customLink)
 	-- if no options are passed along (e.g. if the module is invoked from wiki code)
 	-- we need to shift the vars around to account for that
 	if type(options) == 'string' then
@@ -45,7 +45,7 @@ function page.makeInternalLink(options, display, customLink)
 	end
 	---@cast customLink -nil
 
-	if (options or {}).onlyIfExists == true and (not page.exists(customLink)) then
+	if (options or {}).onlyIfExists == true and (not Page.exists(customLink)) then
 		return nil
 	end
 
@@ -55,7 +55,7 @@ end
 ---@param display string?
 ---@param link string?
 ---@return string?
-function page.makeExternalLink(display, link)
+function Page.makeExternalLink(display, link)
 	if String.isEmpty(display) or String.isEmpty(link) then
 		return nil
 	end
@@ -63,4 +63,4 @@ function page.makeExternalLink(display, link)
 	return '[' .. link .. ' ' .. display .. ']'
 end
 
-return Class.export(page)
+return Class.export(Page)

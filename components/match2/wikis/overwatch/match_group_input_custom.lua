@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -14,13 +13,12 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local _FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
 local _MAX_NUM_OPPONENTS = 8
-local _MAX_NUM_PLAYERS = 10
 local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
@@ -292,11 +290,8 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
-
 	match.links = {}
 	local links = match.links
-	if match.preview then links.preview = match.preview end
 	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
 	if match.owl then links.owl = 'https://overwatchleague.com/en-us/match/' .. match.owl end
 	if match.owc then links.owc = 'https://www.overwatchcontenders.com/match/details/' .. match.owc end
@@ -313,25 +308,9 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = matchFunctions.getMVP(match),
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
-end
-
--- Parse MVP input
-function matchFunctions.getMVP(match)
-	if not match.mvp then return {} end
-	local mvppoints = match.mvppoints or 1
-
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
-
-	return {players=players, points=mvppoints}
 end
 
 function matchFunctions.getOpponents(match)
@@ -361,7 +340,7 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getTeamPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -389,7 +368,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
@@ -406,24 +385,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards) for team opponents
-function matchFunctions.getTeamPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end

@@ -9,10 +9,11 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@class CounterstrikeTierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
 --- Builds the display for a given (tier, tierType) tuple

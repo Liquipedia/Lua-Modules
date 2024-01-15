@@ -6,18 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local ClassIcon = require('Module:ClassIcon')
 local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local HeroWL = require('Module:HeroWL')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -37,6 +38,8 @@ local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|li
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@param frame Frame
+---@return Html
 function CustomHero.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -49,8 +52,11 @@ function CustomHero.run(frame)
 	return unit:createInfobox()
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
+	Array.appendWith(
+		widgets,
 		Cell{name = 'Specialty', content = {_args.specialty}},
 		Cell{name = 'Region', content = {_args.region}},
 		Cell{name = 'City', content = {_args.city}},
@@ -59,8 +65,8 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
 		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors()},
-	}
+		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors()}
+	)
 
 	local statisticsCells = {
 		hp = {order = 1, name = 'Health'},
@@ -93,16 +99,21 @@ function CustomInjector:addCustomCells()
 
 	table.insert(widgets, Title{name = 'Esports Statistics'})
 	table.insert(widgets, Cell{name = 'Win Rate', content = {CustomHero._heroStatsDisplay()}})
+
 	return widgets
 end
 
+---@return string
 function CustomHero._heroStatsDisplay()
 	local stats = mw.text.split(HeroWL.create({hero = _args.heroname or _pagename}), ';')
 	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-	winPercentage = Math.round({winPercentage, 4}) * 100
+	winPercentage = Math.round(winPercentage, 4) * 100
 	return (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		local breakDowns = {
@@ -140,6 +151,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return string[]
 function CustomHero._voiceActors()
 	local voiceActors = {}
 
@@ -154,34 +166,39 @@ function CustomHero._voiceActors()
 	return voiceActors
 end
 
+---@return WidgetInjector
 function CustomHero:createWidgetInjector()
 	return CustomInjector()
 end
 
-function CustomHero.getWikiCategories()
+---@param args table
+---@return string[]
+function CustomHero:getWikiCategories(args)
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
 		local categoryDefinitions = {'attacktype', 'primaryrole'}
 		for _, key in pairs(categoryDefinitions) do
-			if String.isNotEmpty(_args[key]) then
-				table.insert(categories, _args[key] .. ' Heroes')
+			if String.isNotEmpty(args[key]) then
+				table.insert(categories, args[key] .. ' Heroes')
 			end
 		end
 	end
 	return categories
 end
 
-function CustomHero.setLpdbData()
+---@param args table
+function CustomHero:setLpdbData(args)
 	local lpdbData = {
 		type = 'hero',
-		name = _args.heroname or _pagename,
-		image = _args.image,
+		name = args.heroname or _pagename,
+		image = args.image,
+		date = args.releasedate,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			releasedate = _args.releasedate,
+			releasedate = args.releasedate,
 		})
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (_args.heroname or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.heroname or _pagename), lpdbData)
 end
 
 return CustomHero

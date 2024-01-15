@@ -15,11 +15,11 @@ bracket finder (and code generator) / matchlist code generator
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
 local getArgs = require('Module:Arguments').getArgs
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local BracketAlias = Lua.loadDataIfExists('Module:BracketAlias')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {loadData = true})
 
 local copyPaste = {}
 

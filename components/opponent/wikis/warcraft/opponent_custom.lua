@@ -13,8 +13,8 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
@@ -126,10 +126,10 @@ function CustomOpponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
-				PlayerExt.syncPlayer(player, {savePageVar = not Opponent.playerIsTbd(player)})
-				if not player.team then
-					player.team = PlayerExt.syncTeam(player.pageName, nil, {date = date})
-				end
+				local savePageVar = not Opponent.playerIsTbd(player)
+				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
+				player.team =
+					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
 				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)

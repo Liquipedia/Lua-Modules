@@ -19,7 +19,7 @@ local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
 
 local BigMatch = Class.new()
 
@@ -41,7 +41,7 @@ function BigMatch.run(frame)
 	match['bracketid'] = 'MATCH_' .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	-- Don't store match1 as BigMatch records are not complete
-	Match.store(match, {storeMatch1 = false, storeSmw = false})
+	Match.store(match, {storeMatch1 = false})
 
 	-- Attempty to automatically retrieve tournament link from the bracket
 	if String.isEmpty(args.tournamentlink) then

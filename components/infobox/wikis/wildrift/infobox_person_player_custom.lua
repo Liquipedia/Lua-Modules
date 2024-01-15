@@ -11,15 +11,14 @@ local Class = require('Module:Class')
 local ChampionIcon = require('Module:ChampionIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -69,14 +68,6 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	if String.isEmpty(player.args.history) then
 		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 	end
@@ -84,9 +75,9 @@ function CustomPlayer.run(frame)
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -146,7 +137,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.signatureChampion3 = _args.champion3
 	lpdbData.extradata.signatureChampion4 = _args.champion4
 	lpdbData.extradata.signatureChampion5 = _args.champion5
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
 
@@ -185,17 +176,16 @@ function CustomPlayer._createRole(key, role)
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

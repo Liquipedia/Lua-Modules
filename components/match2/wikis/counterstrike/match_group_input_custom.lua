@@ -16,14 +16,13 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local EarningsOf = require('Module:Earnings of')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NP_MATCH_STATUS = {'cancelled','canceled', 'postponed'}
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
@@ -62,7 +61,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 
@@ -90,7 +88,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -331,13 +329,19 @@ function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
 	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	return MatchGroupInput.getCommonTournamentVars(match)
+	match = MatchGroupInput.getCommonTournamentVars(match)
+
+	--inherit from match to maps
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
+
+	return match
 end
 
 function matchFunctions.getLinks(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
 
 	match.links = {}
 
@@ -500,7 +504,9 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = matchFunctions.getPlayers(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					maxNumPlayers = 5, resolveRedirect = true, applyUnderScores = true
+				})
 			end
 		end
 	end
@@ -518,7 +524,7 @@ function matchFunctions.getOpponents(match)
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time( --[[@as osdate]])
+			local currentUnixTime = os.time( --[[@as osdateparam]])
 			local lang = mw.getContentLanguage()
 			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 			local threshold = match.dateexact and 30800 or 86400
@@ -535,26 +541,6 @@ function matchFunctions.getOpponents(match)
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
-	end
-	return match
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local count = 1
-	for playerIndex = 1, MAX_NUM_PLAYERS do
-		-- parse player
-		local player = match['opponent' .. opponentIndex .. '_p' .. playerIndex] or {}
-		player = Json.parseIfString(player)
-		local playerPrefix = teamName .. '_p' .. playerIndex
-		player.name = player.name or Variables.varDefault(playerPrefix)
-		player.flag = player.flag or Variables.varDefault(playerPrefix .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(playerPrefix .. 'dn')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. count] = player
-			count = count + 1
-		end
 	end
 	return match
 end
@@ -661,11 +647,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --

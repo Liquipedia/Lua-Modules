@@ -15,8 +15,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:HeroNames')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -48,7 +48,7 @@ local _SECONDS_UNTIL_FINISHED_EXACT = 30800
 local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local _MIN_EARNINGS_FOR_FEATURED = 100000
 
-local _CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local _CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -382,11 +382,12 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		featured = Logic.emptyOr(
+		featured = tostring(Logic.emptyOr(
 			match.featured,
-			matchFunctions.isFeatured(match)
-		),
-		mvp = match.mvp,
+			matchFunctions.isFeatured(match),
+			''
+		)),
+		mvp = MatchGroupInput.readMvp(match),
 		headtohead = match.headtohead,
 	}
 	return match
@@ -473,7 +474,11 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
+					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+						resolveRedirect = true,
+						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
+					})
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -545,29 +550,6 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].status = walkoverType
 	end
 	return opponents
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
-
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-	match['opponent' .. oppIndex].match2players = players
-	return match
 end
 
 --

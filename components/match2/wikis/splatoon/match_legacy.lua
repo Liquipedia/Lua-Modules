@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
@@ -77,9 +77,7 @@ function MatchLegacy._convertParameters(match2)
 
 	-- Handle extradata fields
 	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata = {
-		mvp = extradata.mvp,
-	}
+	match.extradata = {}
 
 	for index, map in pairs(match2.match2games or {}) do
 		match.extradata['vodgame' .. index] = map.vod

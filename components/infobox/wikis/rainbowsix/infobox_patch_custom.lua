@@ -9,71 +9,59 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Patch = Lua.import('Module:Infobox/Patch')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
-local CustomPatch = Class.new()
+---@class R6PatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
-	return customPatch:createInfobox()
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
+
+	return patch:createInfobox()
 end
 
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{
-				name = 'Release Date',
-				content = {_args.release}
-			},
-			Cell{
-				name = 'PC Release Date',
-				content = {_args.pcrelease}
-			},
-			Cell{
-				name = 'Console Release Date',
-				content = {_args.consolerelease}
-			},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = 'PC Release Date', content = {args.pcrelease}},
+			Cell{name = 'Console Release Date', content = {args.consolerelease}},
 		}
 	end
 	return widgets
 end
 
-function CustomPatch:addToLpdb(lpdbData)
-	local date = _args.release or _args.pcrelease or _args.consolerelease
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = _args.name,
-		type = 'patch',
-		information = _args.game,
-		date = date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			version = _args.version,
-		}
-	})
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata.version = args.version
+	lpdbData.extradata.game = args.game
+
 	return lpdbData
 end
 
-function CustomPatch:getChronologyData()
+---@param args table
+---@return {previous: string?, next: string?}
+function CustomPatch:getChronologyData(args)
 	local data = {}
-	if _args.previous then
-		data.previous = _args.previous .. ' Patch|' .. _args.previous
+	if args.previous then
+		data.previous = args.previous .. ' Patch|' .. args.previous
 	end
-	if _args.next then
-		data.next = _args.next .. ' Patch|' .. _args.next
+	if args.next then
+		data.next = args.next .. ' Patch|' .. args.next
 	end
 	return data
 end

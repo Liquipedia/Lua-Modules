@@ -9,20 +9,14 @@
 local MatchLegacy = {}
 
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
-
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match, match2)
-	end
 
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
@@ -32,65 +26,6 @@ function MatchLegacy.storeMatch(match2, options)
 			match
 		)
 	end
-end
-
-function MatchLegacy.storeMatchSMW(match, match2)
-	local streams = Json.parseIfString(match.stream or {})
-	local icon = Variables.varDefault('tournament_icon')
-	local opponents = match2.match2opponents
-
-	local subObjectTable = {
-		'legacymatch_' .. match2.match2id,
-		'has team left=' .. (match.opponent1 or ''),
-		'has team left template name=' .. (opponents[1].template or ''),
-		'Has team left score=' .. (match.opponent1score or '0'),
-		'has team right=' .. (match.opponent2 or ''),
-		'has team right template name=' .. (opponents[2].template or ''),
-		'Has team right score=' .. (match.opponent2score or '0'),
-		'Has match vod=' .. (match2.vod or ''),
-		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
-		'Has tournament tier=' .. (match.liquipediatier or ''),
-		'Has tournament name=' .. Logic.emptyOr(match.tickername, match.name, ''),
-		'Has tournament icon=' .. (icon or ''),
-		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
-		'Is hidden match=0',
-		'Has map date=' .. (match.date or ''),
-		'Has winner=' .. (match.winner or ''),
-		'Has special ticker name' .. Variables.varDefault('special_ticker_name', ''),
-		'Is part of tournament series' .. Variables.varDefault('tournament_series', ''),
-		'Is featured match' .. Variables.varDefault('match_featured', ''),
-		'Is major game' .. Variables.varDefault('tournament_valve_major', ''),
-		'Is major game' .. Variables.varDefault('tournament_valve_major', ''),
-		'Has tournament valve tier' .. Variables.varDefault('tournament_valve_tier', ''),
-
-		'Has teams=' .. (match.opponent1 or ''),
-		'Has teams=' .. (match.opponent2 or ''),
-		'Has teams name=' .. (match.opponent1 or ''),
-		'Has teams name=' .. (match.opponent2 or ''),
-		'has teams page=' .. mw.ext.TeamLiquidIntegration.resolve_redirect(match.opponent1 or ''),
-		'has teams page=' .. mw.ext.TeamLiquidIntegration.resolve_redirect(match.opponent2 or ''),
-	}
-
-	for key, item in pairs(streams) do
-		table.insert(
-			subObjectTable,
-			'Has match ' .. key .. '=' .. item
-		)
-	end
-
-	for key, map in pairs(match2.match2games) do
-		table.insert(
-			subObjectTable,
-			'Has match vodgame' .. key .. '=' .. (map.vod or '')
-		)
-	end
-
---[[
-|has teams page={{#resolve_redirect:{{#var:team1|TBD}}}},{{#resolve_redirect:{{#var:team2|TBD}}}}|+sep=,
-]]
-
-	mw.smw.subobject(subObjectTable)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -141,10 +76,18 @@ function MatchLegacy._convertParameters(match2)
 	match.staticid = match2.match2id
 
 	-- Handle extradata fields
-	local extradata = Json.parseIfString(match2.extradata)
-	match.extradata = {
-		mvp = extradata.mvp,
-	}
+	local extradata = Json.parseIfString(match2.extradata) or {}
+	match.extradata = {}
+
+	local mvp = Json.parseIfString(extradata.mvp)
+	if mvp and mvp.players then
+		local players = {}
+		for _, player in ipairs(mvp.players) do
+			table.insert(players, player.name .. '|' .. player.displayname)
+		end
+		match.extradata.mvp = table.concat(players, ',')
+		match.extradata.mvp = match.extradata.mvp .. ';' .. mvp.points
+	end
 
 	for index, map in pairs(match2.match2games or {}) do
 		match.extradata['vodgame' .. index] = map.vod

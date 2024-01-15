@@ -6,16 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Achievements = require('Module:Achievements in infoboxes')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
-local Placement = require('Module:Placement')
+local Math = require('Module:MathUtil')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -35,7 +34,7 @@ function CustomPlayer.run(frame)
 	_args = _player.args
 
 	-- Automatic achievements
-	_args.achievements = Achievements._player{player = _player.pagename}
+	_args.achievements = Achievements.player{noTemplate = true}
 
 	-- Profiles to links
 	_args.esl = _args.esl or _args.eslprofile
@@ -57,22 +56,11 @@ function CustomInjector:addCustomCells(widgets)
 	--Earnings this Year
 	local currentYearEarnings = _player.earningsPerYear[CURRENT_YEAR]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 
 	table.insert(widgets, Cell{name = 'Approx. Earnings '.. CURRENT_YEAR, content = {currentYearEarnings}})
-
-	--Ranking of Earnings this Year
-	local smwRes = mw.smw.ask('[[-Has subobject::<q>[[Earnings/'.. CURRENT_YEAR .. ']]</q>]]' ..
-		'[[Has player page::'.. _player.pagename .. ']] |link=none |mainlabel=- |headers=hide |?has earning ranking')
-
-	if smwRes and smwRes[1] then
-		local ranking = string.match(smwRes[1]['Has earning ranking'], '%d+')
-		table.insert(widgets, Cell{name = 'Earnings Ranking '.. CURRENT_YEAR, content = {
-			Placement.RangeLabel{ranking, ranking}
-		}})
-	end
 
 	return widgets
 end

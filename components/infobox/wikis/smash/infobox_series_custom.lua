@@ -9,49 +9,56 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Series = Lua.import('Module:Infobox/Series')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local CustomInjector = Class.new(Injector)
 
-local CustomSeries = {}
+---@class SmashSeriesInfobox: SeriesInfobox
+local CustomSeries = Class.new(Series)
 
-local _series
-
+---@param frame Frame
+---@return string
 function CustomSeries.run(frame)
-	_series = Series(frame)
+	local series = CustomSeries(frame)
+	series:setWidgetInjector(CustomInjector(series))
 
-	_series.createWidgetInjector = CustomSeries.createWidgetInjector
-	_series.addToLpdb = CustomSeries.addToLpdb
-
-	return _series:createInfobox()
+	return series:createInfobox()
 end
 
-function CustomSeries:createWidgetInjector()
-	return CustomInjector()
+---@param args table
+---@return string
+function CustomSeries:createLiquipediaTierDisplay(args)
+	return ''
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'type' then
 		return {
 			Cell{
 				name = 'Type',
-				content = { mw.language.getContentLanguage():ucfirst(_series.args.type or '') }
+				content = {mw.language.getContentLanguage():ucfirst(self.caller.args.type or '')}
 		}}
 	end
 
 	return widgets
 end
 
-function CustomSeries:addToLpdb(lpdbData)
-	lpdbData.game = _series.args.game or 'none'
-	lpdbData.launcheddate = _series.args.sdate
-	lpdbData.defunctdate = _series.args.edate
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomSeries:addToLpdb(lpdbData, args)
+	lpdbData.game = args.game or 'none'
+	lpdbData.launcheddate = args.sdate
+	lpdbData.defunctdate = args.edate
 	lpdbData.extradata = {
-		leagueiconsmall = _series.args.leagueiconsmall
+		leagueiconsmall = args.leagueiconsmall
 	}
 
 	return lpdbData

@@ -9,13 +9,15 @@
 local Abbreviation = {}
 
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
+local Logic = require('Module:Logic')
 
----@param title string?
----@param text string?
----@return string?
+---@param text string|number
+---@param title string|number
+---@return string
+---@overload fun(text: string|number):nil
+---@overload fun():nil
 function Abbreviation.make(text, title)
-	if String.isEmpty(title) or String.isEmpty(text) then
+	if Logic.isEmpty(title) or Logic.isEmpty(text) then
 		return nil
 	end
 	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'

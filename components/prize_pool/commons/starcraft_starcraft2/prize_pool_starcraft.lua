@@ -18,15 +18,14 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-local SmwInjector = Lua.import('Module:Smw/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
-local CustomSmwInjector = Class.new(SmwInjector)
 
 local pageVars = PageVariableNamespace('PrizePool')
 
@@ -48,9 +47,8 @@ function CustomPrizePool.run(frame)
 	-- set some default values
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
-	args.storelpdb = Logic.emptyOr(args.storelpdb, Namespace.isMain())
-	args.storesmw = Logic.emptyOr(args.storesmw, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
+	args.placementsExtendImportLimit = Logic.emptyOr(args.placementsExtendImportLimit, true)
 
 	-- overwrite some wiki vars for this PrizePool call
 	_tournament_name = args['tournament name']
@@ -69,10 +67,13 @@ function CustomPrizePool.run(frame)
 	-- stash seriesNumber
 	_series_number = CustomPrizePool._seriesNumber()
 
-	local prizePool = PrizePool(args):create()
+	local prizePool = PrizePool(args)
+
+	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
+
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
-	prizePool:setSmwInjector(CustomSmwInjector())
 
 	local builtPrizePool = prizePool:build()
 
@@ -80,7 +81,7 @@ function CustomPrizePool.run(frame)
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
 
-	if Logic.readBool(args.storelpdb) then
+	if prizePool.options.storeLpdb then
 		-- stash the lpdb_placement data so teamCards can use them
 		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
 	end
@@ -105,13 +106,14 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if type(lpdbData.opponentplayers) == 'table' then
 		-- following 2 lines as legacy support, to be removed once it is clear they are not needed anymore
 		lpdbData.players = Table.copy(lpdbData.opponentplayers)
+		---@diagnostic disable-next-line: inject-field
 		lpdbData.players.type = lpdbData.opponenttype
 	end
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = _series_number,
 
-		 -- to be removed once poinst storage is standardized
+		-- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
@@ -141,61 +143,6 @@ function CustomPrizePool._getMode(opponentType, opponent)
 	end
 
 	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
-end
-
-function CustomSmwInjector:adjust(smwEntry, lpdbEntry)
-	local lastVs = Json.parseIfString(lpdbEntry.lastvsdata) or {}
-
-	if Table.isNotEmpty(lastVs) then
-		lastVs = Opponent.fromLpdbStruct(lastVs)
-	end
-
-	-- fix lastvs opponent stuff
-	if Table.isNotEmpty(lastVs) then
-		if lastVs.type == Opponent.solo then
-			smwEntry['has last opponent page'] = lastVs.players[1].pageName
-			smwEntry['has last opponent'] = lastVs.players[1].displayName
-		elseif Opponent.typeIsParty(lastVs.type) then
-			smwEntry['has last opponent'] = nil
-			for playerIndex, player in ipairs(lastVs.players) do
-				smwEntry['has last opponent ' .. playerIndex .. ' page'] = player.pageName
-				smwEntry['has last opponent ' .. playerIndex] = player.displayName
-			end
-		elseif lastVs.type == Opponent.team then
-			smwEntry['has last opponent'] = lastVs.name
-		end
-	end
-
-	return CustomPrizePool._opponentSmwProps(smwEntry, lpdbEntry)
-end
-
-function CustomPrizePool._opponentSmwProps(smwEntry, lpdbData)
-	if lpdbData.opponenttype == Opponent.team or lpdbData.opponenttype == Opponent.literal then
-		return smwEntry
-	elseif lpdbData.opponenttype == Opponent.solo then
-		local playersData = Json.parseIfString(lpdbData.players) or {}
-		smwEntry['has race'] = playersData.p1race
-		return smwEntry
-	end
-
-	local playersData = Json.parseIfString(lpdbData.players) or {}
-	local isArchon = playersData.isArchon
-	if isArchon then
-		smwEntry['is Archon'] = 'true'
-	end
-
-	for prefix, playerPage, playerIndex in Table.iter.pairsByPrefix(playersData, 'p') do
-		-- skip first as it is already processed and syntax is different
-		if playerIndex ~= 1 then
-			smwEntry['has player ' .. playerIndex] = playersData[prefix .. 'dn']
-			smwEntry['has player ' .. playerIndex .. ' page'] = playerPage
-			smwEntry['has player ' .. playerIndex .. ' flag'] = playersData[prefix .. 'flag']
-			smwEntry['has player ' .. playerIndex .. ' team'] = playersData[prefix .. 'team']
-			smwEntry['has player ' .. playerIndex .. ' race'] = (not isArchon) and playersData[prefix .. 'race'] or nil
-		end
-	end
-
-	return smwEntry
 end
 
 function CustomPrizePool._defaultImportLimit()

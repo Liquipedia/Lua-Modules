@@ -17,8 +17,8 @@ local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -47,7 +47,7 @@ local _NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -409,7 +409,11 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name)
+					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+						resolveRedirect = true,
+						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
+					})
 				end
 			elseif opponent.type == Opponent.solo then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
@@ -501,35 +505,14 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	return opponents
 end
 
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
-
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-	match['opponent' .. oppIndex].match2players = players
-	return match
-end
-
 function matchFunctions.mergeWithStandalone(match)
 	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
 	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
 	if not standaloneMatch then
 		return match
 	end
+
+	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
 
 	-- Update Opponents from the Stanlone Match
 	match.opponent1 = standaloneMatch.match2opponents[1]

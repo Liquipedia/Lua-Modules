@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,13 +21,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class UnitInfobox: BasicInfobox
 local Unit = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Unit.run(frame)
 	local unit = Unit(frame)
 	return unit:createInfobox()
 end
 
+---@return Html
 function Unit:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -94,6 +98,7 @@ function Unit:createInfobox()
 		},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
+		Customizable{id = 'customcontent', children = {}},
 	}
 
 	infobox:categories('Units')
@@ -108,10 +113,14 @@ function Unit:createInfobox()
 	return builtInfobox
 end
 
+---@param args table
+---@return string[]
 function Unit:getWikiCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Unit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
@@ -125,14 +134,19 @@ function Unit:_getHotkeys(args)
 	return display
 end
 
+---@param args table
+---@return string?
 function Unit:nameDisplay(args)
 	return args.name
 end
 
+---@param args table
 function Unit:setLpdbData(args)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string?
 function Unit:subHeaderDisplay(args)
 	return args.title
 end

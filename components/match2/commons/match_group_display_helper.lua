@@ -15,8 +15,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Opponent = Lua.import('Module:Opponent')
 
 
 local DisplayHelper = {}
@@ -114,7 +114,9 @@ unusual status.
 function DisplayHelper.MapAndStatus(game, config)
 	config = config or {}
 	local mapText
-	if game.map and not config.noLink then
+	if game.map and game.mapDisplayName then
+		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
+	elseif game.map and not config.noLink then
 		mapText = '[[' .. game.map .. ']]'
 	elseif game.map then
 		mapText = game.map
@@ -152,7 +154,7 @@ in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
 DisplayHelper.DefaultMatchSummaryContainer = function(props)
-	local MatchSummaryModule = Lua.import('Module:MatchSummary', {requireDevIfEnabled = true})
+	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
 	if MatchSummaryModule.getByMatchId then
 		return MatchSummaryModule.getByMatchId(props)

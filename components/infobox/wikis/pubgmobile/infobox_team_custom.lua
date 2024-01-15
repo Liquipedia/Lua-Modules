@@ -8,36 +8,38 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local PlacementSummary = require('Module:Placement summary')
+local PlacementStats = require('Module:InfoboxPlacementStats')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
-local CustomTeam = Class.new()
-
-local _team
+---@class PubgmobileInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.defineCustomPageVariables = CustomTeam.defineCustomPageVariables
+	local team = CustomTeam(frame)
+
 	return team:createInfobox()
 end
 
+---@return string
 function CustomTeam:createBottomContent()
 	local upcomingTable = ''
-	if not _team.args.disbanded then
+	if not self.args.disbanded then
 		upcomingTable = upcomingTable .. Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = _team.name or _team.pagename}
+			{team = self.name or self.pagename}
 		)
 	end
-	return tostring(PlacementSummary.get_data({team = _team.pagename})) .. upcomingTable
+	return tostring(PlacementStats.run{
+		participant = self.pagename,
+		tiers = {'1', '2', '3', '4', '5'},
+	}) .. upcomingTable
 end
 
+---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)
 end

@@ -11,9 +11,9 @@ local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
+local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -24,6 +24,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
@@ -32,15 +34,22 @@ function CustomMap.run(frame)
 	return customMap:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	local gameModes = CustomMap._getGameMode()
 	table.insert(widgets, Cell{
 		name = #gameModes == 1 and 'Game Mode' or 'Game Modes',
 		content = gameModes,
+	})
+	table.insert(widgets, Cell{
+		name = 'Lighting',
+		content = {_args.lighting}
 	})
 	table.insert(widgets, Cell{
 		name = 'Checkpoints',
@@ -49,6 +58,9 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'location' then
 		return {
@@ -61,6 +73,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return string[]
 function CustomMap._getGameMode()
 	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
 		return {}
@@ -78,12 +91,15 @@ function CustomMap._getGameMode()
 	return modeDisplayTable
 end
 
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
-	if String.isNotEmpty(_args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator)
+	if String.isNotEmpty(args.creator2) then
+		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
 	end
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
+	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 

@@ -6,21 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class FifaLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local PLATFORMS = {
@@ -38,100 +38,73 @@ local PLATFORMS = {
 	xboxandplaystation = 'Xbox and PlayStation',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.player_number = _args.participants_number
-	_args.game = Game.name{game = _args.game}
-	_args.mode = (_args.mode or '1v1'):lower()
-	_args.platform = PLATFORMS[(_args.platform or 'pc'):lower():gsub(' ', '')]
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	league.args.player_number = league.args.participants_number
+	league.args.game = Game.name{game = league.args.game}
+	league.args.mode = (league.args.mode or '1v1'):lower()
+	league.args.platform = PLATFORMS[(league.args.platform or 'pc'):lower():gsub(' ', '')]
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Mode',
-		content = {_args.mode}
-	})
-	table.insert(widgets, Cell{
-		name = 'Platform',
-		content = {_args.platform}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {_args.game}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Players',
-		content = {_args.player_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Teams',
-		content = {_args.team_number}
-	})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Mode', content = {args.mode}},
+			Cell{name = 'Platform', content = {args.platform}},
+			Cell{name = 'Game', content = {args.game}},
+			Cell{name = 'Number of Players', content = {args.player_number}},
+			Cell{name = 'Number of Teams', content = {args.team_number}}
+		)
+	end
 
 	return widgets
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
-	return lpdbData
+---@param args table
+---@return boolean
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.publisherpremier)
 end
 
-function CustomLeague:defineCustomPageVariables()
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = Logic.readBool(args.publisherpremier) and 'true' or nil
+end
+
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('mode', args.mode)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if _args.game then
-		table.insert(categories, _args.game .. ' Competitions')
-	else
-		table.insert(categories, 'Tournaments without game version')
-	end
-
-	if _args.platform then
-		table.insert(categories, _args.platform .. ' Tournaments')
-	else
-		table.insert(categories, 'Tournaments without platform')
-	end
-
-	return categories
-end
-
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-		:css('white-space', 'nowrap')
-		:node(content)
-	return span
+	return {
+		args.game and (args.game .. ' Competitions') or 'Tournaments without game version',
+		args.platform and (args.platform .. ' Tournaments') or 'Tournaments without platform',
+	}
 end
 
 return CustomLeague

@@ -6,22 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class SimracingLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local SPECIAL_SPONSORS = {
@@ -34,91 +33,73 @@ local SPECIAL_SPONSORS = {
 	f1 ='[[File:F1 New Logo.png|x10px|Official Championship of the FIA Formula One World Championship]]',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.game = Game.name{game = _args.game}
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.args.game = Game.name{game = league.args.game}
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {_args.game}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Players',
-		content = {_args.player_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Teams',
-		content = {_args.team_number}
-	})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game', content = {args.game}},
+			Cell{name = 'Number of Players', content = {args.player_number}},
+			Cell{name = 'Number of Teams', content = {args.team_number}}
+		)
+	end
 
 	return widgets
 end
 
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
-	return lpdbData
-end
-
-function CustomLeague:defineCustomPageVariables()
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('mode', args.mode)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if _args.game then
-		table.insert(categories, _args.game .. ' Competitions')
-	else
-		table.insert(categories, 'Tournaments without game version')
-	end
-
-	return categories
+	return {
+		args.game and (args.game .. ' Competitions') or 'Tournaments without game version'
+	}
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Table.any(SPECIAL_SPONSORS, function(key)
 		return args[key..'-sponsored']
 	end)
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
+---@param args table
+---@return string
+function CustomLeague:appendLiquipediatierDisplay(args)
 	local content = ''
 
 	for param, icon in pairs(SPECIAL_SPONSORS) do
-		if _args[param..'-sponsored'] then
+		if args[param..'-sponsored'] then
 			content = content .. icon
 		end
 	end

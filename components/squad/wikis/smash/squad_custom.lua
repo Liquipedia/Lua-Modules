@@ -15,8 +15,8 @@ local ReferenceCleaner = require('Module:ReferenceCleaner')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Variables = require('Module:Variables')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
@@ -86,6 +86,7 @@ function CustomSquad.run(frame)
 			link = player.link,
 			team = player.activeteam,
 			name = Variables.varDefault('name') or player.name,
+			date = player.leavedate or player.inactivedate or player.leavedate,
 		}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')

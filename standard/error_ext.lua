@@ -7,9 +7,22 @@
 --
 
 local Array = require('Module:Array')
+local Error = require('Module:Error')
+local Json = require('Module:Json')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 
+local pageVars = PageVariableNamespace('ErrorStash')
+
+local _local_errors = {}
+
 local ErrorExt = {}
+
+---@param error error
+function ErrorExt.logAndStash(error)
+	ErrorExt.Stash.add(error)
+	ErrorExt.log(error)
+end
 
 ---@param error error
 function ErrorExt.log(error)
@@ -72,6 +85,40 @@ function ErrorExt.makeFullStackTrace(error)
 		end))
 	)
 	return table.concat(parts, '\n')
+end
+
+local Stash = {}
+ErrorExt.Stash = Stash
+
+---Adds an Error instance to the local store.
+---@param error error
+---@param storeAsPageVar boolean?
+function Stash.add(error, storeAsPageVar)
+	if storeAsPageVar then
+		local count = tonumber(pageVars:get('count')) or 0
+		pageVars:set('count', count + 1)
+		pageVars:set(count + 1, Json.stringify{error})
+	else
+		table.insert(_local_errors, error)
+	end
+end
+
+---Returns all errors (locally and from page variables), and clears the store.
+---@return error[]
+function Stash.retrieve()
+	local errors = {}
+
+	local count = tonumber(pageVars:get('count')) or 0
+	pageVars:delete('count')
+	for i = 1, count do
+		Array.extendWith(errors, Array.map(Json.parse(pageVars:get(i)), Error))
+		pageVars:delete(i)
+	end
+
+	Array.extendWith(errors, _local_errors)
+	_local_errors = {}
+
+	return errors
 end
 
 return ErrorExt

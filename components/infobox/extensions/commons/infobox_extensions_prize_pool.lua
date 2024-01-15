@@ -10,16 +10,29 @@ local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 local PrizePoolCurrency = {}
 
-local NOW = os.date('!%F')
+local NOW = os.date('!%F') --[[@as string]]
 local USD = 'USD'
 local CATEGRORY = '[[Category:Tournaments with invalid prize pool]]'
 
+---@class InfoboxExtensionsPrizePoolArgs
+---@field currency string?
+---@field date string?
+---@field displayRoundPrecision number|string|nil
+---@field prizepool number|string|nil
+---@field prizepoolusd number|string|nil
+---@field rate string?
+---@field setvariables string?
+---@field text string?
+---@field varRoundPrecision string?
+
+---@param args InfoboxExtensionsPrizePoolArgs
+---@return string|number|nil
 function PrizePoolCurrency.display(args)
 	args = args or {}
 	local currency = string.upper(args.currency or USD)
@@ -38,10 +51,10 @@ function PrizePoolCurrency.display(args)
 
 	if not prizepool and not prizepoolUsd then
 		if Namespace.isMain() then
-			return (args.prizepool or args.prizepoolUsd or '')
+			return (args.prizepool or args.prizepoolusd or '')
 				.. '[[Category:Tournaments with invalid prize pool]]'
 		else
-			return args.prizepool or args.prizepoolUsd or ''
+			return args.prizepool or args.prizepoolusd or ''
 		end
 	end
 
@@ -69,8 +82,8 @@ function PrizePoolCurrency.display(args)
 		end
 	end
 
-	if varRoundPrecision ~= -1 then
-		prizepoolUsd = Math.round{prizepoolUsd, varRoundPrecision}
+	if varRoundPrecision ~= -1 and prizepoolUsd then
+		prizepoolUsd = Math.round(prizepoolUsd, varRoundPrecision)
 	end
 
 	if setVariables then
@@ -111,6 +124,11 @@ function PrizePoolCurrency.display(args)
 	return display
 end
 
+---@param props table
+---@return number?
+---@return number?
+---@return number?
+---@return string?
 function PrizePoolCurrency._exchange(props)
 	local prizepool = props.prizepool
 	local prizepoolUsd = props.prizepoolUsd
@@ -137,16 +155,22 @@ function PrizePoolCurrency._exchange(props)
 	return prizepool, prizepoolUsd, currencyRate, nil
 end
 
+---@param dateString string
+---@return string?
 function PrizePoolCurrency._cleanDate(dateString)
 	dateString = string.gsub(dateString, '[^%d%-]', '')
 	return string.match(dateString, '%d%d%d%d%-%d%d%-%d%d')
 end
 
+---@param valueString string|number|nil
+---@return number?
 function PrizePoolCurrency._cleanValue(valueString)
 	valueString = string.gsub(valueString or '', '[^%d%.?]', '')
 	return tonumber(valueString)
 end
 
+---@param message string
+---@return string
 function PrizePoolCurrency._errorMessage(message)
 	local category = ''
 	if Namespace.isMain() then

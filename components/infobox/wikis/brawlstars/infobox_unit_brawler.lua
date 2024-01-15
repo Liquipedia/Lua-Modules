@@ -12,8 +12,8 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -27,6 +27,8 @@ local CustomUnit = Class.new()
 
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomUnit.run(frame)
 	local unit = Unit(frame)
 	_args = unit.args
@@ -38,8 +40,10 @@ function CustomUnit.run(frame)
 	return unit:createInfobox()
 end
 
-function CustomInjector:addCustomCells()
-	local widgets = {
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:addCustomCells(widgets)
+	return {
 		Cell{name = 'Release Date', content = {_args.releasedate}},
 		Cell{name = 'Health', content = {_args.hp}},
 		Cell{name = 'Movespeed', content = {_args.movespeed}},
@@ -50,10 +54,11 @@ function CustomInjector:addCustomCells()
 		Cell{name = 'Gadgets', content = {_args.gadget}},
 		Cell{name = 'Star Powers', content = {_args.star}},
 	}
-
-	return widgets
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'caption' and not String.isEmpty(_args.min) then
 		table.insert(widgets, Center{content = {_args.quote}})
@@ -74,20 +79,25 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@return WidgetInjector
 function CustomUnit:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@return string
 function CustomUnit:nameDisplay()
 	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), 'brawlername', {self.pagename}, self.pagename)
 
 	return _brawlerName
 end
 
+---@param args table
 function CustomUnit:setLpdbData(args)
 	Template.safeExpand(mw.getCurrentFrame(), 'HeroData', {name = _brawlerName, image = _args.image}, self.pagename)
 end
 
+---@param args table
+---@return table
 function CustomUnit:getWikiCategories(args)
 	local categories = {}
 	if Namespace.isMain() then

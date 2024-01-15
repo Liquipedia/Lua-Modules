@@ -10,9 +10,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Json = require('Module:Json')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Links = Lua.import('Module:Links')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -22,13 +23,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class GameInfobox: BasicInfobox
 local Game = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Game.run(frame)
 	local game = Game(frame)
 	return game:createInfobox()
 end
 
+---@return Html
 function Game:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -43,10 +48,55 @@ function Game:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = 'Game Information'},
-		Cell{name = 'Developer', content = self:getAllArgsForBase(args, 'developer')},
-		Cell{name = 'Publisher', content = self:getAllArgsForBase(args, 'publisher')},
+		Customizable{
+			id = 'developer',
+			children = {
+				Builder{
+					builder = function()
+						local developers = self:getAllArgsForBase(args, 'developer')
+						return {
+							Cell{
+								name = #developers > 1 and 'Developers' or 'Developer',
+								content = developers,
+							}
+						}
+					end
+				}
+			}
+		},
+		Customizable{
+			id = 'publisher',
+			children = {
+				Builder{
+					builder = function()
+						local publishers = self:getAllArgsForBase(args, 'publisher')
+						return {
+							Cell{
+								name = #publishers > 1 and 'Publishers' or 'Publisher',
+								content = publishers,
+							}
+						}
+					end
+				}
+			}
+		},
 		Cell{name = 'Release Date(s)', content = self:getAllArgsForBase(args, 'releasedate')},
-		Cell{name = 'Platforms', content = self:getAllArgsForBase(args, 'platform')},
+		Customizable{
+			id = 'platform',
+			children = {
+				Builder{
+					builder = function()
+						local platforms = self:getAllArgsForBase(args, 'platform')
+						return {
+							Cell{
+								name = #platforms > 1 and 'Platforms' or 'Platform',
+								content = platforms,
+							}
+						}
+					end
+				}
+			}
+		},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
@@ -63,9 +113,47 @@ function Game:createInfobox()
 
 	if Namespace.isMain() then
 		infobox:categories('Games')
+		self:_setLpdbData(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+end
+
+---@param args table
+function Game:_setLpdbData(args)
+	local lpdbData = {
+		name = args.romanized_name or self.name,
+		image = args.image,
+		imagedark = args.imagedark,
+		date = args.releasedate,
+		type = 'game',
+	}
+
+	local extradata = {}
+	local addToExtradata = function(prefix)
+		local data = Table.map(self:getAllArgsForBase(args, prefix),
+			function(idx, value) return prefix .. idx, value end
+		)
+		extradata = Table.merge(extradata, data)
+	end
+
+	addToExtradata('publisher')
+	addToExtradata('platform')
+	addToExtradata('developer')
+
+	lpdbData.extradata = extradata
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+
+	mw.ext.LiquipediaDB.lpdb_datapoint('game_' .. self.name, Json.stringifySubTables(lpdbData))
+end
+
+--- Allows for overriding this functionality
+---@param lpdbData table
+---@param args table
+---@return table
+function Game:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
 return Game

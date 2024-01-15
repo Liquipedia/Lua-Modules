@@ -9,8 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,6 +21,8 @@ local CustomInjector = Class.new(Injector)
 
 local _args
 
+---@param frame Frame
+---@return Html
 function CustomCharacter.run(frame)
 	local character = Character(frame)
 	_args = character.args
@@ -29,10 +31,13 @@ function CustomCharacter.run(frame)
 	return character:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomCharacter:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Age',
@@ -69,8 +74,11 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
-function CustomCharacter:addToLpdb(lpdbData)
-	lpdbData.extradata.class = _args.legendtype
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomCharacter:addToLpdb(lpdbData, args)
+	lpdbData.extradata.class = args.legendtype
 	return lpdbData
 end
 

@@ -8,10 +8,11 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class Infobox
 ---@field frame Frame?
@@ -54,15 +55,19 @@ end
 ---@param injector WidgetInjector?
 ---@return self
 function Infobox:widgetInjector(injector)
-	self.injector = injector
+	self.injector = injector or self.injector
 	return self
 end
 
----Adds a custom widgets to the bottom of the infobox
+---Adds custom components after the end the infobox
 ---@param wikitext string|number|Html|nil
 ---@return self
 function Infobox:bottom(wikitext)
-	self.bottomContent = wikitext
+	if Logic.isEmpty(wikitext) then
+		return self
+	end
+
+	self.bottomContent = (self.bottomContent or mw.html.create()):node(wikitext)
 	return self
 end
 
@@ -90,9 +95,7 @@ function Infobox:build(widgets)
 		self.root:node(self.adbox)
 		Variables.varDefine('is_first_infobox', 'false')
 	end
-	if self.bottomContent ~= nil then
-		self.root:node(self.bottomContent)
-	end
+	self.root:node(self.bottomContent)
 
 	return self.root
 end

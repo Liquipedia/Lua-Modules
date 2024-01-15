@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -15,8 +16,8 @@ local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:HeroNames')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -108,7 +109,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, date, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -328,8 +329,7 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = match.mvp,
-		mvpteam = match.mvpteam or match.winner
+		mvp = MatchGroupInput.readMvp(match),
 	}
 	return match
 end
@@ -363,9 +363,13 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = matchFunctions.getPlayersOfTeam(match, opponentIndex, opponent.name, opponent.players)
+					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+						resolveRedirect = true,
+						applyUnderScores = true,
+						maxNumPlayers = _MAX_NUM_PLAYERS,
+					})
 				end
-			elseif Opponent.typeIsParty(opponent) then
+			elseif Opponent.typeIsParty(opponent.type) then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
 			elseif opponent.type ~= Opponent.literal then
@@ -391,19 +395,15 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
-	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.ceil(match.bestof/2)
-		for _, item in pairs(opponents) do
-			if tonumber(item.score or 0) >= firstTo then
-				match.finished = true
-				break
-			end
-		end
-	end
+        match.finished = Logic.readBool(match.finished)
+		or isScoreSet and (
+			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
+			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)
+		)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
@@ -436,33 +436,6 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 		opponents[index].status = walkoverType
 	end
 	return opponents
-end
-
--- Get Playerdata from Vars (get's set in TeamCards)
-function matchFunctions.getPlayersOfTeam(match, oppIndex, teamName, playersData)
-	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
-	playersData = Json.parseIfString(playersData) or {}
-	local players = {}
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. oppIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if String.isNotEmpty(player.name) then
-			player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
-		end
-
-		if not Table.isEmpty(player) then
-			table.insert(players, player)
-		end
-	end
-	match['opponent' .. oppIndex].match2players = players
-	return match
 end
 
 --

@@ -285,6 +285,10 @@ return {
 		name = 'Uzbekistan Time',
 		offset = {5, 0},
 	},
+	VET = {
+		name = 'Venezuelan Standard Time',
+		offset = {-4, 0},
+	},
 	VLAT = {
 		name = 'Vladivostok Time',
 		offset = {10, 0},

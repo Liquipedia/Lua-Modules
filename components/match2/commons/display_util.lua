@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
+local ResultOrError = require('Module:ResultOrError')
 local TypeUtil = require('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
@@ -70,8 +71,18 @@ is encountered when rendering the component, show the error and stack trace
 instead of the component.
 ]]
 function DisplayUtil.TryPureComponent(Component, props)
-	local resultNode, errorNode = DisplayUtil.try(function() return Component(props) end)
-	return errorNode or resultNode
+	local resultOrError = ResultOrError.try(function() return Component(props) end)
+	if resultOrError:isResult() then
+		---@cast resultOrError Result
+		return resultOrError:get()
+	else
+		---@cast resultOrError Error
+		return mw.html.create('div')
+			:tag('strong'):addClass('error')
+			:tag('span'):addClass('scribunto-error')
+			:wikitext(resultOrError:getErrorJson() .. '.')
+			:allDone()
+	end
 end
 
 --[[

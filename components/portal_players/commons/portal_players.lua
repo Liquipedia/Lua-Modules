@@ -31,7 +31,7 @@ local BACKGROUND_CLASSES = {
 }
 
 --- @class PortalPlayers
----@operator call(table): PortalPlayers
+---@operator call(portalPlayerArgs): PortalPlayers
 local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 
 ---@class portalPlayerArgs
@@ -40,8 +40,10 @@ local PortalPlayers = Class.new(function(self, args) self:init(args) end)
 ---@field playerType string?
 ---@field game string?
 ---@field width string?
+---@field status string?
 ---@field queryOnlyByRegion boolean
 ---@field showLocalizedName boolean
+---@field additionalConditions string?
 
 ---Init function for PortalPlayers
 ---@param args portalPlayerArgs
@@ -107,10 +109,23 @@ function PortalPlayers:_getPlayers()
 
 	local conditionString = Table.isNotEmpty(conditions) and ('(' .. table.concat(conditions, ' OR ') .. ')') or ''
 
-	if String.isNotEmpty(conditionString) and String.isNotEmpty(gameConditions) then
-		conditionString = conditionString .. ' AND ' .. gameConditions
-	elseif String.isNotEmpty(gameConditions) then
-		conditionString = gameConditions
+	local addConidition = function(currentConditions, additionalCondition)
+		if String.isNotEmpty(currentConditions) then
+			return currentConditions .. ' AND ' .. additionalCondition
+		end
+		return additionalCondition
+	end
+
+	if String.isNotEmpty(gameConditions) then
+		conditionString = addConidition(conditionString, gameConditions)
+	end
+
+	if String.isNotEmpty(self.args.status) then
+		conditionString = addConidition(conditionString, '[[status::'.. self.args.status .. ']]')
+	end
+
+	if String.isNotEmpty(self.args.additionalConditions) then
+		conditionString = addConidition(conditionString, self.args.additionalConditions)
 	end
 
 	local players = mw.ext.LiquipediaDB.lpdb('player', {
@@ -279,7 +294,7 @@ function PortalPlayers.toOpponent(player)
 		link = player.pagename,
 		name = player.id,
 		flag = player.nationality,
-	}))
+	}))--[[@as standardOpponent]]
 end
 
 return PortalPlayers

@@ -7,11 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -23,13 +26,17 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 local Highlights = require('Module:Infobox/Widget/Highlights')
 
+---@class PatchInfobox: BasicInfobox
 local Patch = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Patch.run(frame)
 	local patch = Patch(frame)
 	return patch:createInfobox()
 end
 
+---@return Html
 function Patch:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -42,7 +49,7 @@ function Patch:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = 'Patch Information'},
+		Title{name = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release', content = {args.release}},
@@ -77,27 +84,52 @@ function Patch:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain() then
-		infobox:categories('Patches')
-		self:addToLpdb(args)
+	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		infobox:categories(self:getInformationType(args))
+		self:setLpdbData(args)
 	end
 
 	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 end
 
 --- Allows for overriding this functionality
-function Patch:addToLpdb(args)
-	local date = args.release
-	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = args.name,
-		type = 'patch',
-		information = monthAndDay,
-		date = date,
-	})
+---Adjust Lpdb data
+---@param lpdbData table
+---@param args table
+---@return table
+function Patch:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
 --- Allows for overriding this functionality
+---@param args table
+function Patch:setLpdbData(args)
+	local lpdbData = {
+		name = self.name,
+		type = self:getInformationType(args):lower(),
+		image = args.image,
+		imagedark = args.imagedark,
+		date = args.release,
+		information = mw.getContentLanguage():formatDate('m-d', args.release),
+		extradata = {
+			highlights = self:getAllArgsForBase(args, 'highlight')
+		},
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, Json.stringifySubTables(lpdbData))
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string
+function Patch:getInformationType(args)
+	return args.informationType or 'Patch'
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return {previous: string?, next: string?}
 function Patch:getChronologyData(args)
 	return { previous = args.previous, next = args.next }
 end

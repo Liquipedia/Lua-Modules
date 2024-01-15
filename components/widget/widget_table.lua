@@ -8,8 +8,10 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Widget = require('Module:Infobox/Widget')
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Infobox/Widget')
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableInput
 ---@field rows WidgetTableRow[]?
@@ -33,7 +35,7 @@ local Table = Class.new(
 	end
 )
 
----@param row Html
+---@param row WidgetTableRow?
 ---@return self
 function Table:addRow(row)
 	table.insert(self.rows, row)

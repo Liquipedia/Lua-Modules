@@ -95,6 +95,7 @@ function TournamentsListingConditions.base(args)
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
 				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
+				ConditionNode(ColumnName('organizers_organizer3'), Comparator.eq, organizer),
 			}
 		end
 		conditions:add{organizerConditions}

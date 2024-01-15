@@ -28,5 +28,5 @@ return {
 	defaultGame = 'fortnite',
 	defaultTeamLogo = 'Fortnite logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Fortnite logo.png', ---@deprecated
-	opponentDisplayLibrary = 'OpponentDisplay/Custom',
+	match2 = 0,
 }

@@ -9,11 +9,10 @@
 local ActiveYears = require('Module:YearsActive')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
-local Variables = require('Module:Variables')
 
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Player = Lua.import('Module:Infobox/Person')
 
 --role stuff tables
 local _ROLES = {
@@ -31,7 +30,6 @@ local _CLEAN_OTHER_ROLES = {
 }
 
 local _CURRENT_YEAR = tonumber(os.date('%Y'))
-local _statusStore
 
 local Injector = require('Module:Infobox/Widget/Injector')
 local Cell = require('Module:Infobox/Widget/Cell')
@@ -78,7 +76,7 @@ function CustomInjector:addCustomCells(widgets)
 
 	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
 	if currentYearEarnings then
-		currentYearEarnings = Math.round{currentYearEarnings}
+		currentYearEarnings = Math.round(currentYearEarnings)
 		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
 	end
 
@@ -101,20 +99,8 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, _, personType)
 	lpdbData.extradata.role = _args.role
 	lpdbData.extradata.role2 = _args.role2
-	lpdbData.extradata.activeplayer = (not _statusStore) and Variables.varDefault('isActive') or ''
 
 	return lpdbData
-end
-
-function CustomPlayer:getStatusToStore()
-	if _args.death_date then
-		_statusStore = 'Deceased'
-	elseif _args.retired then
-		_statusStore = 'Retired'
-	elseif string.lower(_args.role or 'player') ~= 'player' then
-		_statusStore = 'not player'
-	end
-	return _statusStore
 end
 
 function CustomPlayer:getPersonType()

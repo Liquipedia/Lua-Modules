@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local CustomData = Lua.loadDataIfExists('Module:Links/CustomData') or {}
+local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = true}) or {}
 
 local Links = {}
 
@@ -23,6 +23,7 @@ local PREFIXES = {
 	},
 	abiosgaming = {'https://abiosgaming.com/tournaments/'},
 	apexlegendsstatus = {'https://apexlegendsstatus.com/profile/uid/PC/'},
+	['apple-podcasts'] = {'https://podcasts.apple.com/'},
 	afreeca = {
 		'http://afreecatv.com/',
 		stream = 'https://play.afreecatv.com/',
@@ -51,7 +52,9 @@ local PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	chzzk = {'https://chzzk.naver.com/live/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
+	corestrike = {'https://corestrike.gg/lookup/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -79,6 +82,11 @@ local PREFIXES = {
 		player = 'https://play.eslgaming.com/player/',
 	},
 	esportal = {'https://esportal.com/tournament/'},
+	etf2l = {
+		'',
+		team = 'https://etf2l.org/teams/',
+		player = 'https://etf2l.org/forum/user/',
+	},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
 	faceit = {
@@ -89,17 +97,7 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
-	factor = {
-		'',
-		team = 'https://www.factor.gg/team/',
-		player = 'https://www.factor.gg/player/',
-	},
 	fanclub = {''},
-	gamersclub = {
-		'https://csgo.gamersclub.gg/campeonatos/csgo/',
-		team = 'https://csgo.gamersclub.gg/team/',
-		player = 'https://csgo.gamersclub.gg/jogador/',
-	},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
@@ -108,12 +106,22 @@ local PREFIXES = {
 		player = 'https://halodatahive.com/Player/Detail/',
 	},
 	home = {''},
+	haojiao = {
+		'https://web.haojiao.cc/wiki/tour/t2Ud5pOQlscKLbRC/',
+		team = 'https://web.haojiao.cc/wiki/team/t2Ud5pOQlscKLbRC/',
+		player = 'https://web.haojiao.cc/wiki/player/t2Ud5pOQlscKLbRC/',
+	},
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
-	letsplaylive = {'https://letsplay.live/profile/'},
+	letsplaylive = {
+		'https://old.letsplay.live/event/',
+		team = 'https://old.letsplay.live/team/',
+		player = 'https://old.letsplay.live/profile/',
+	},
+	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
@@ -127,9 +135,19 @@ local PREFIXES = {
 		player = 'https://nwc3l.com/profile/',
 	},
 	openrec = {'https://www.openrec.tv/live/'},
+	osu = {
+		'https://osu.ppy.sh/',
+		player = 'https://osu.ppy.sh/users/',
+	},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
+	replay = {''},
+	rgl = {
+		'https://rgl.gg/Public/LeagueTable?s=',
+		team = 'https://rgl.gg/Public/Team?t=',
+		player = 'https://rgl.gg/Public/PlayerProfile?p=',
+	},
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
@@ -148,8 +166,10 @@ local PREFIXES = {
 	},
 	steam = {'https://steamcommunity.com/id/'},
 	steamtv = {'https://steam.tv/'},
+	strikr = {'https://strikr.gg/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
+	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
 	stratz = {
 		'https://stratz.com/leagues/',
@@ -158,6 +178,10 @@ local PREFIXES = {
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
+	tftv = {
+		'https://www.teamfortress.tv/',
+		player = 'https://www.teamfortress.tv/user/',
+	},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
 	tlpdint = {
@@ -193,6 +217,7 @@ local PREFIXES = {
 		team = 'https://www.vlr.gg/team/',
 		player = 'https://www.vlr.gg/player/'
 	},
+	vod = {''},
 	weibo = {'https://weibo.com/'},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
@@ -228,6 +253,7 @@ local ALIASES = {
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
 	letsplaylive = {'cybergamer'},
+	replay = {'replays'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
@@ -323,10 +349,9 @@ end
 ---@param variant string?
 ---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
-	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
-	end
-	return links
+	return Table.map(links, function(key, item)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
+	end)
 end
 
 --remove appended number

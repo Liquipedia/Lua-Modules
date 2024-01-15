@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
@@ -14,14 +15,15 @@ local Lua = require('Module:Lua')
 local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Building = Lua.import('Module:Infobox/Building')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
-local CustomBuilding = Class.new()
+---@class Starcraft2BuildingInfobox: BuildingInfobox
+local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
@@ -30,163 +32,170 @@ local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
-local _args
-local _race
-local _building_attributes = {}
-
+---@param frame Frame
+---@return Html
 function CustomBuilding.run(frame)
-	local building = Building(frame)
-	_args = building.args
+	local building = CustomBuilding(frame)
+	building:setWidgetInjector(CustomInjector(building))
 
-	_args.game = Game.name{game = _args.game}
+	building.args.game = Game.name{game = building.args.game}
 
-	building.nameDisplay = CustomBuilding.nameDisplay
-	building.setLpdbData = CustomBuilding.setLpdbData
-	building.createWidgetInjector = CustomBuilding.createWidgetInjector
 	return building:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{name = 'Size', content = {_args.size}})
-	table.insert(widgets, Cell{name = 'Sight', content = {_args.sight}})
-	table.insert(widgets, Cell{name = 'Energy', content = {_args.energy}})
-	table.insert(widgets, Cell{name = 'Detection/Attack Range', content = {_args.detection_range}})
-
-	if _args.game ~= GAME_LOTV then
-		table.insert(widgets, Center{content = {
-			'<small><b>Note:</b> ' ..
-			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' <i>See [[Game Speed]].</i></small>'
-		}})
-	end
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Size', content = {args.size}},
+			Cell{name = 'Sight', content = {args.sight}},
+			Cell{name = 'Energy', content = {args.energy}},
+			Cell{name = 'Detection/Attack Range', content = {args.detection_range}}
+		)
+
+		if args.game ~= GAME_LOTV then
+			table.insert(widgets, Center{content = {
+				'<small><b>Note:</b> ' ..
+				'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
+				' <i>See [[Game Speed]].</i></small>'
+			}})
+		end
+	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _race,
-				minerals = _args.min,
+				faction = args.race,
+				minerals = args.min,
+				mineralsTotal = args.totalmin,
 				mineralsForced = true,
-				gas = _args.gas,
+				gas = args.gas,
+				gasTotal = args.totalgas,
 				gasForced = true,
-				buildTime = _args.buildtime,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
 			}}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomBuilding:_getHotkeys()}}
+			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(_args.builds)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(_args.morphs)}},
-			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(_args.addons)}},
+			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphs)}},
+			Cell{name = '[[Add-on]]s', content = {String.convertWikiListToHtmlList(args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(_args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(_args.upgrades)}},
+			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {CustomBuilding:_defenseDisplay()}}
+			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}}
 		}
 	elseif id == 'attack' then
 		return {
-			Cell{name = 'Ground Attack', content = {_args.ground_attack}},
-			Cell{name = 'Ground [[Damage Per Second|DPS]]', content = {_args.ground_dps}},
-			Cell{name = 'Air Attack', content = {_args.air_attack}},
-			Cell{name = 'Air [[Damage Per Second|DPS]]', content = {_args.air_dps}},
-			Cell{name = 'Bonus', content = {_args.bonus}},
-			Cell{name = 'Bonus [[Damage Per Second|DPS]]', content = {_args.bonus_dps}},
-			Cell{name = 'Range', content = {_args.range}},
-			Cell{name = 'Cooldown', content = {_args.cooldown}},
+			Cell{name = 'Ground Attack', content = {args.ground_attack}},
+			Cell{name = 'Ground [[Damage Per Second|DPS]]', content = {args.ground_dps}},
+			Cell{name = 'Air Attack', content = {args.air_attack}},
+			Cell{name = 'Air [[Damage Per Second|DPS]]', content = {args.air_dps}},
+			Cell{name = 'Bonus', content = {args.bonus}},
+			Cell{name = 'Bonus [[Damage Per Second|DPS]]', content = {args.bonus_dps}},
+			Cell{name = 'Range', content = {args.range}},
+			Cell{name = 'Cooldown', content = {args.cooldown}},
 		}
 	end
 	return widgets
 end
 
-function CustomBuilding:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@return string
 function CustomBuilding:_defenseDisplay()
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if _args.shield then
-		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if self.args.shield then
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. self.args.shield
 	end
-	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (self.args.armor or 1)
 
-	if _args.light then
-		table.insert(_building_attributes, 'Light')
+	return display .. ' ' .. table.concat(CustomBuilding._getAttributes(self.args, true), ', ')
+end
+
+---@param args table
+---@param makeLink boolean?
+---@return string[]
+function CustomBuilding._getAttributes(args, makeLink)
+	local race = Faction.read(args.race) or Faction.defaultFaction
+	local attributes = {}
+
+	if args.light then
+		table.insert(attributes, 'Light')
 	else
-		table.insert(_building_attributes, 'Armored')
+		table.insert(attributes, 'Armored')
 	end
-	table.insert(_building_attributes, 'Structure')
-	if _race == 't' then
-		table.insert(_building_attributes, 'Mechanical')
-	elseif _race == 'z' then
-		table.insert(_building_attributes, 'Biological')
+	table.insert(attributes, 'Structure')
+	if race == 't' then
+		table.insert(attributes, 'Mechanical')
+	elseif race == 'z' then
+		table.insert(attributes, 'Biological')
 	end
-	return display .. ' ' .. '[[' .. table.concat(_building_attributes, ']], [[') .. ']]'
+
+	if makeLink then
+		return Array.map(attributes, function(attribute) return '[[' .. attribute .. ']]' end)
+	end
+
+	return attributes
 end
 
+---@param args table
+---@return string
 function CustomBuilding:nameDisplay(args)
-	local raceIcon = CustomBuilding._getRace(args.race or 'unknown')
-	local name = args.name or self.pagename
+	local raceIcon = Faction.Icon{size = 'large', faction = args.race or Faction.defaultFaction}
+	raceIcon = raceIcon and (raceIcon .. '&nbsp;') or ''
 
-	return raceIcon .. '&nbsp;' .. name
+	return raceIcon .. (args.name or self.pagename)
 end
 
-function CustomBuilding._getRace(race)
-	_race = Faction.read(race)
-	local category = Faction.toName(_race)
-	local display = Faction.Icon{size = 'large', faction = _race} or ''
-	if not category and _race ~= 'unknown' then
-		category = '[[Category:InfoboxRaceError]]<strong class="error">' ..
-			mw.text.nowiki('Error: Invalid Race') .. '</strong>'
-	elseif category then
-		category = '[[Category:' .. category .. ' Buildings]]'
-	end
-
-	return display .. (category or '')
-end
-
+---@return string?
 function CustomBuilding:_getHotkeys()
 	local display
-	if not String.isEmpty(_args.hotkey) then
-		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'arrow')
+	if not String.isEmpty(self.args.hotkey) then
+		if not String.isEmpty(self.args.hotkey2) then
+			display = Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'arrow')
 		else
-			display = Hotkeys.hotkey(_args.hotkey)
+			display = Hotkeys.hotkey(self.args.hotkey)
 		end
 	end
 
 	return display
 end
 
+---@param args table
 function CustomBuilding:setLpdbData(args)
-	local lpdbData = {
+	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. (args.name or ''), {
 		name = args.name,
-		type = 'Building information ' .. _race,
+		type = 'Building information ' .. (Faction.read(args.race) or ''),
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			builtby = args.builtby,
 			minerals = args.min,
+			mineralstotal = args.totalmin,
 			gas = args.gas,
+			gastotal = args.totalgas,
 			buildtime = args.buildtime,
+			buildtimetotal = args.totalbuildtime,
 			hp = args.hp,
 			shield = args.shield,
 			armor = args.armor or 1,
-			attributes = table.concat(_building_attributes, ', '),
+			attributes = table.concat(CustomBuilding._getAttributes(args), ', '),
 			hotkey = (args.hotkey or '') .. (args.hotkey2 ~= nil and (', ' .. args.hotkey2) or ''),
 			energy = args.energy,
 			size = args.size,
@@ -207,8 +216,19 @@ function CustomBuilding:setLpdbData(args)
 			range = args.range,
 			cooldown = args.cooldown,
 		}),
-	}
-	mw.ext.LiquipediaDB.lpdb_datapoint(args.name or '', lpdbData)
+	})
+end
+
+---@param args table
+---@return string[]
+function CustomBuilding:getWikiCategories(args)
+	local race = Faction.read(args.race)
+
+	if not race then
+		return {}
+	end
+
+	return {Faction.toName(race) .. ' Buildings'}
 end
 
 return CustomBuilding

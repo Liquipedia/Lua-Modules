@@ -14,8 +14,8 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -55,7 +55,6 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 	_args = player.args
 
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 	player.getPersonType = CustomPlayer.getPersonType
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
@@ -103,7 +102,7 @@ function CustomPlayer:createWidgetInjector()
 end
 
 function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = Variables.varDefault('isplayer')
+	lpdbData.extradata.isplayer = tostring(CustomPlayer._isNotPlayer(_args.role) or CustomPlayer._isNotPlayer(_args.role2))
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
@@ -126,17 +125,6 @@ end
 function CustomPlayer._isNotPlayer(role)
 	local roleData = _ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if CustomPlayer._isNotPlayer(args.role) or CustomPlayer._isNotPlayer(args.role2) then
-		Variables.varDefine('isplayer', 'false')
-	else
-		Variables.varDefine('isplayer', 'true')
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
 end
 
 function CustomPlayer:getPersonType(args)

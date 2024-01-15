@@ -18,9 +18,9 @@ local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Flags = Lua.import('Module:Flags')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -82,10 +82,11 @@ function CustomPlayer.run(frame)
 	_args = player.args
 	player.args.informationType = player.args.informationType or 'Player'
 
+	player.args.banned = tostring(player.args.banned or '')
+
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	return player:createInfobox()
 end
@@ -273,21 +274,6 @@ function CustomPlayer._createRole(key, role)
 	else
 		return Variables.varDefineEcho(key or 'role', roleData.variable)
 	end
-end
-
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer and country needed for SMW
-	if String.isNotEmpty(args.role) then
-		local roleData = _ROLES[args.role:lower()]
-		-- If the role is missing, assume it is a player
-		if roleData and roleData.isplayer == false then
-			Variables.varDefine('isplayer', 'false')
-		else
-			Variables.varDefine('isplayer', 'true')
-		end
-	end
-
-	Variables.varDefine('country', Player:getStandardNationalityValue(args.country or args.nationality))
 end
 
 return CustomPlayer

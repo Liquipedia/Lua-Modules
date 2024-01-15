@@ -9,8 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -37,6 +37,8 @@ MODES.tdm = MODES.arena
 MODES.battleroyale = MODES['battle royale']
 MODES.br = MODES['battle royale']
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
@@ -45,10 +47,13 @@ function CustomMap.run(frame)
 	return customMap:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Span',
@@ -73,14 +78,18 @@ function CustomInjector:addCustomCells(widgets)
 	return widgets
 end
 
+---@return string?
 function CustomMap._getGameVersion()
 	return GAME[string.lower(_args.game or '')]
 end
 
+---@return string?
 function CustomMap._getGameMode()
 	return MODES[string.lower(_args.mode or '')]
 end
 
+---@param lpdbData table
+---@return table
 function CustomMap:addToLpdb(lpdbData)
 	lpdbData.extradata.theme = _args.theme
 	lpdbData.extradata.size = _args.sizeabr

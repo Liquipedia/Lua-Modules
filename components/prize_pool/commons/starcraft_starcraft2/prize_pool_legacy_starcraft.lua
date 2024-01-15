@@ -16,11 +16,12 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
-local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
-local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy', {requireDevIfEnabled = true})
+local CustomPrizePool = Lua.import('Module:PrizePool/Custom')
+local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom')
+local LegacyPrizePool = Lua.import('Module:PrizePool/Legacy')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local StarcraftLegacyPrizePool = {}
 
@@ -68,7 +69,6 @@ function StarcraftLegacyPrizePool.run(frame)
 	CACHED_DATA.defaultOpponentType = defaultOpponentType
 	CACHED_DATA.defaultIsArchon = header.defaultIsArchon
 
-	newArgs.storesmw = header.storeSmw or header['smw mute']
 	newArgs.storelpdb = header.storeLpdb
 	newArgs.storeTournament = header.storeTournament
 	newArgs.series = header.series

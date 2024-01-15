@@ -11,8 +11,8 @@ local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -26,6 +26,8 @@ local _game
 
 local _GAME = mw.loadData('Module:GameVersion')
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local customMap = Map(frame)
 	customMap.createWidgetInjector = CustomMap.createWidgetInjector
@@ -35,10 +37,13 @@ function CustomMap.run(frame)
 	return customMap:createInfobox()
 end
 
+---@return WidgetInjector
 function CustomMap:createWidgetInjector()
 	return CustomInjector()
 end
 
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:addCustomCells(widgets)
 	table.insert(widgets, Cell{
 		name = 'Location',
@@ -70,6 +75,7 @@ function CustomMap._getGameVersion()
 	return _game
 end
 
+---@return string[]
 function CustomMap._getGameMode()
 	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
 		return {}
@@ -88,15 +94,18 @@ function CustomMap._getGameMode()
 	return modeDisplayTable
 end
 
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator)
-	if String.isNotEmpty(_args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(_args.creator2)
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator)
+	if String.isNotEmpty(args.creator2) then
+		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
 	end
-	lpdbData.extradata.type = _args.type
-	lpdbData.extradata.players = _args.players
+	lpdbData.extradata.type = args.type
+	lpdbData.extradata.players = args.players
 	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(_args, 'mode'), ',')
+	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 

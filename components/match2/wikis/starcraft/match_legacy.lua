@@ -6,11 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[ToDo:
-* Remove temp smw support for Teams (after lpdb api is available)
-***** ADJUST THIS FOR BROODWAR WIKI!!! *****
-]]--
-
 local MatchLegacy = {}
 
 local json = require('Module:Json')
@@ -29,14 +24,6 @@ function MatchLegacy.storeMatch(match2, options)
 
 	match.games = MatchLegacy._storeGames(match, match2, options)
 
-	if options.storeSmw then
-		if (match2.match2opponents[1] or {}).type == 'team' then
-			MatchLegacy._storeTeamMatchSMW(match, match2)
-		elseif (match2.match2opponents[1] or {}).type == 'solo' then
-			MatchLegacy._storeSoloMatchSMW(match, match2)
-		end
-	end
-
 	if options.storeMatch1 then
 		return mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id,
@@ -50,7 +37,7 @@ function MatchLegacy._storeGames(match, match2, options)
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
 
-		if game.mode == '1v1' and game.extradata.isSubMatch == 'false' then
+		if game.mode == '1v1' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
@@ -87,10 +74,6 @@ function MatchLegacy._storeGames(match, match2, options)
 				)
 			end
 
-			if options.storeSmw then
-				MatchLegacy._storeSoloMapSMW(game, gameIndex, match.tournament or '', match2.match2id)
-			end
-
 			games = games .. res
 		elseif	game.mode == '1v1' and options.storeMatch1 then
 			local submatch = {}
@@ -122,7 +105,6 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''
 			submatch.stream = match2.stream
-			submatch.lrthread = match2.lrthread or ''
 			submatch.vod = game.vod
 			submatch.tournament = match2.tournament
 			submatch.tickername = match2.tickername
@@ -132,7 +114,7 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.liquipediatier = match2.liquipediatier
 			submatch.type = match2.type
 			submatch.game = match2.game
-			submatch.extradata = json.stringify(submatch.extradata)
+			submatch.extradata = json.stringify(submatch.extradata --[[@as table]])
 
 			mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id .. gameIndex,
@@ -202,106 +184,10 @@ function MatchLegacy._convertParameters(match2)
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = json.stringify(match.extradata)
 	else
-		doStore = false
-		match = nil
+		return nil, false
 	end
 
 	return match, doStore
-end
-
-function MatchLegacy._storeTeamMatchSMW(match, match2)
-	local streams = match.stream or {}
-	if type(streams) == 'string' then streams = json.parse(streams) end
-	local extradata = match.extradata or {}
-	if type(extradata) == 'string' then extradata = json.parse(extradata) end
-	mw.smw.subobject({
-		'legacymatch_' .. match2.match2id,
-		'has match vod=' .. (match.vod or ''),
-		'has team left page=' .. (match.opponent1 or ''),
-		'has team right page=' .. (match.opponent2 or ''),
-		'has team left=' .. string.lower(match2.match2opponents[1].template or ''),
-		'has team right=' .. string.lower(match2.match2opponents[2].template or ''),
-		--apparently needed for sorting ...
-		'has player left page=' .. (match.opponent1 or ''),
-		'has player right page=' .. (match.opponent2 or ''),
-		'has match date=' .. (match.date or ''),
-		'has tournament=' .. (match.tournament or ''),
-		'has tournament tier=' .. (match.liquipediatier or ''),
-		'is finished=' .. (match.finished == '1' and 'true' or ''),
-		'has winner=' .. (match.winner or ''),
-		'has winning team page=' ..
-			(match.winner == '1' and match.opponent1 or match.winner == '2' and match.opponent2 or ''),
-		'has losing team page=' ..
-			(match.winner == '2' and match.opponent1 or match.winner == '1' and match.opponent2 or ''),
-		'has team left score=' .. (match2.match2opponents[1].score or ''),
-		'has team right score=' .. (match2.match2opponents[2].score or ''),
-		'has exact time=' .. (match.dateexact == '1' and 'true' or ''),
-		'has match stream=' .. (streams.stream or ''),
-		'has match twitch=' .. (streams.twitch or ''),
-		'has match twitch2=' .. (streams.twitch2 or ''),
-		'has match trovo=' .. (streams.trovo or ''),
-		'has match afreeca=' .. (streams.afreeca or ''),
-		'has match afreecatv=' .. (streams.afreecatv or ''),
-		'has match dailymotion=' .. (streams.dailymotion or ''),
-		'has match douyu=' .. (streams.douyu or ''),
-		'has match youtube=' .. (streams.youtube or ''),
-		'has best of=' .. (extradata.bestof or ''),
-	})
-end
-
-function MatchLegacy._storeSoloMatchSMW(match, match2)
-	local streams = match.stream or {}
-	if type(streams) == 'string' then streams = json.parse(streams) end
-	local extradata = match.extradata or {}
-	if type(extradata) == 'string' then extradata = json.parse(extradata) end
-	mw.smw.subobject({
-		'legacymatch_' .. match2.match2id,
-		'has match vod=' .. (match.vod or ''),
-		'has player left=' .. extradata.opponent1name,
-		'has player right=' .. extradata.opponent2name,
-		'has player left page=' .. (match.opponent1 or ''),
-		'has player right page=' .. (match.opponent2 or ''),
-		'has player left flag=' .. match.opponent1flag,
-		'has player right flag=' .. match.opponent2flag,
-		'has player left race=' .. extradata.opponent1race,
-		'has player right race=' .. extradata.opponent2race,
-		'has match date=' .. (match.date or ''),
-		'has tournament=' .. (match.tournament or ''),
-		'has tournament tier=' .. (match.liquipediatier or ''),
-		'is finished=' .. (match.finished == '1' and 'true' or ''),
-		'has winner=' .. (match.winner or ''),
-		'has player left score=' .. (match2.match2opponents[1].score or ''),
-		'has player right score=' .. (match2.match2opponents[2].score or ''),
-		'has exact time=' .. (match.dateexact == '1' and 'true' or ''),
-		'has match stream=' .. (streams.stream or ''),
-		'has match twitch=' .. (streams.twitch or ''),
-		'has match twitch2=' .. (streams.twitch2 or ''),
-		'has match trovo=' .. (streams.trovo or ''),
-		'has match afreeca=' .. (streams.afreeca or ''),
-		'has match afreecatv=' .. (streams.afreecatv or ''),
-		'has match dailymotion=' .. (streams.dailymotion or ''),
-		'has match douyu=' .. (streams.douyu or ''),
-		'has match youtube=' .. (streams.youtube or ''),
-		'has best of=' .. (extradata.bestof or ''),
-	})
-end
-
-function MatchLegacy._storeSoloMapSMW(game, gameIndex, tournament, id)
-	game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
-	local object = 'Map ' .. (game.opponent1 or 'TBD') .. ' vs ' .. (game.opponent2 or 'TBD') .. ' at ' ..
-		(game.date or '') .. 'in Match TBD Map ' .. gameIndex .. ' on ' .. (game.map or '')
-	local losernumber = 3 - (tonumber(game.winner or '') or 0)
-	mw.smw.subobject({
-		'legacymatch_' .. id .. object,
-		'has loser=' .. (game['opponent' .. losernumber] or ''),
-		'has winner=' .. (game['opponent' .. (game.winner or '')] or ''),
-		'has player left=' .. (game.opponent1 or ''),
-		'has player right=' .. (game.opponent2 or ''),
-		'has winning race=' .. (game.extradata.winnerrace or ''),
-		'has losing race=' .. (game.extradata.loserrace or ''),
-		'has tournament=' .. (tournament or ''),
-		'is played on=' .. (game.map or ''),
-	})
 end
 
 return MatchLegacy

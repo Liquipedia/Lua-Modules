@@ -12,7 +12,7 @@ local Hotkey = require('Module:Hotkey')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,13 +21,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class SkillInfobox: BasicInfobox
 local Skill = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Skill.run(frame)
 	local skill = Skill(frame)
 	return skill:createInfobox()
 end
 
+---@return Html
 function Skill:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -49,19 +53,13 @@ function Skill:createInfobox()
 		Customizable{
 			id = 'cost',
 			children = {
-				Cell{
-					name = 'Cost',
-					content = {args.cost}
-				},
+				Cell{name = 'Cost', content = {args.cost}},
 			}
 		},
 		Customizable{
 			id = 'hotkey',
 			children = {
-				Cell{
-					name = 'Hotkey',
-					content = {self:_getHotkeys(args)}
-				},
+				Cell{name = 'Hotkey', content = {self:_getHotkeys(args)}},
 			}
 		},
 		Cell{name = 'Range', content = {args.range}},
@@ -69,19 +67,13 @@ function Skill:createInfobox()
 		Customizable{
 			id = 'cooldown',
 			children = {
-				Cell{
-					name = 'Cooldown',
-					content = {args.cooldown}
-				},
+				Cell{name = 'Cooldown', content = {args.cooldown}},
 			}
 		},
 		Customizable{
 			id = 'duration',
 			children = {
-				Cell{
-					name = 'Duration',
-					content = {args.duration}
-				},
+				Cell{name = 'Duration', content = {args.duration}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -93,14 +85,18 @@ function Skill:createInfobox()
 		infobox:categories(unpack(categories))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string[]
 function Skill:getCategories(args)
 	return {}
 end
 
+---@param args table
+---@return string?
 function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then

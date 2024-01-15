@@ -27,11 +27,13 @@ end
 
 ---@param tbl table
 ---@param value any
+---@param isPattern boolean?
 ---@return boolean
-function Table.includes(tbl, value)
+function Table.includes(tbl, value, isPattern)
 	for _, entry in pairs(tbl) do
-		if entry == value then
-			return true
+		if isPattern and string.find(entry, value)
+			or not isPattern and entry == value then
+				return true
 		end
 	end
 	return false
@@ -96,9 +98,9 @@ function Table.isNotEmpty(tbl)
 end
 
 ---Shallow copies a table
----@generic K, V
----@param tbl {[K]: V}
----@return {[K]: V}
+---@generic T:table
+---@param tbl T
+---@return T
 function Table.copy(tbl)
 	local result = {}
 
@@ -148,7 +150,8 @@ function Table.deepCopy(tbl_, options)
 	end
 
 	if options.reuseRef ~= false then
-		deepCopy = require('Module:FnUtil').memoize(deepCopy)
+		local FnUtil = require('Module:FnUtil')
+		deepCopy = FnUtil.memoize(deepCopy)
 	end
 
 	return deepCopy(tbl_)
@@ -286,6 +289,7 @@ f('player4', 4, 'player')
 ---@generic K, V, T, I
 ---@param args {[K] : V}
 ---@param prefixes string[]
+---@param f function
 ---@return {[I] : T}
 function Table.mapArgumentsByPrefix(args, prefixes, f)
 	local function indexFromKey(key)
@@ -308,7 +312,7 @@ end
 --
 ---@generic K, V, T, I
 ---@param args {[K] : V}
----@param indexFromKey fun(key?: K): integer
+---@param indexFromKey fun(key?: K): integer?
 ---@param f fun(key?: K, index?: integer, ...?: any): T
 ---@param noInterleave boolean?
 ---@return {[I] : T}

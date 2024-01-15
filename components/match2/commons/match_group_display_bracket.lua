@@ -17,9 +17,9 @@ local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -333,7 +333,7 @@ function BracketDisplay.computeHeaderRows(bracket, config)
 			local headerRow = getHeaderRow(matchId)
 			local roundIx = coords.roundIndex + 1 + bracketData.qualSkip
 			headerRow[roundIx] = {
-				header = config.qualifiedHeader or '!q',
+				header = bracketData.qualifiedHeader or config.qualifiedHeader or '!q',
 				roundIx = roundIx,
 			}
 		end

@@ -12,11 +12,13 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Title = Widgets.Title
 
 local _ROLES = {
 	-- Playes
@@ -54,9 +56,9 @@ function CustomPlayer.run(frame)
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -73,6 +75,9 @@ function CustomInjector:parse(id, widgets)
 				CustomPlayer._createRoleDisplay('role2', _args.role2)
 			}},
 		}
+	elseif id == 'history' and _args.nationalteams then
+		table.insert(widgets, 1, Title{name = 'National Teams'})
+		table.insert(widgets, 2, Center{content = {_args.nationalteams}})
 	end
 	return widgets
 end
@@ -85,7 +90,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
@@ -119,17 +124,16 @@ function CustomPlayer:createBottomContent()
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

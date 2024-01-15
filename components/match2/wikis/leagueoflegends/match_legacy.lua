@@ -13,18 +13,13 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local _NUMBER_OF_PLAYERS_TO_STORE = 10
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
-
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match, match2)
-	end
 
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
@@ -62,6 +57,7 @@ function MatchLegacy._convertParameters(match2)
 	local extradata = Json.parseIfString(match2.extradata)
 	match.extradata.gamecount = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata.matchsection = extradata.matchsection
+
 	local mvp = Json.parseIfString(extradata.mvp)
 	if mvp and mvp.players then
 		local players = {}
@@ -73,11 +69,13 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
-	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-		if bracketData.inheritedheader then
+	if type(bracketData) == 'table' then
+		if bracketData.type == 'bracket' and bracketData.inheritedheader then
 			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
+		match.extradata.matchpage = bracketData.matchpage
 	end
+
 
 	local opponents = match2.match2opponents or {}
 	match.extradata.team1icon = (opponents[1] or {}).icon
@@ -163,61 +161,6 @@ function MatchLegacy.storeGames(match, match2)
 		games = games .. res
 	end
 	return games
-end
-
-function MatchLegacy.storeMatchSMW(match, match2)
-	local data = {
-		'legacymatch_' .. match2.match2id,
-		'is map number=1',
-		'has team left=' .. (match.opponent1 or ''),
-		'has team right=' .. (match.opponent2 or ''),
-		'Has map date=' .. (match.date or ''),
-		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
-		'Has tournament tier=' .. (match.liquipediatier or ''),
-		'Has tournament name=' .. Logic.emptyOr(
-			match.tickername,
-			match.name,
-			Variables.varDefault('tournament_name', mw.title.getCurrentTitle().prefixedText)
-		),
-		'Has tournament icon=' .. Variables.varDefault('tournament_icon', ''),
-		'Is riot premier=' .. Variables.varDefault('tournament_riot_premier', ''),
-		'Has winner=' .. (match.winner or ''),
-		'Has team left score=' .. (match.opponent1score or '0'),
-		'Has team right score=' .. (match.opponent2score or '0'),
-		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
-		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-		'Has teams=' .. (match.opponent1 or ''),
-		'Has teams=' .. (match.opponent2 or ''),
-	}
-
-	local extradata = Json.parseIfString(match2.extradata) or {}
-	local mvp = Json.parseIfString(extradata.mvp)
-	if mvp and mvp.players then
-		for index, player in ipairs(mvp.players) do
-			local mvpString = player.name .. '§§§§'.. (player.team or '') ..'§§§§0'
-			table.insert(data, 'Has mvp ' .. index .. '=' .. mvpString)
-		end
-	end
-
-	local streams = match.stream or {}
-	streams = Json.parseIfString(streams)
-	for key, item in pairs(streams) do
-		table.insert(
-			data,
-			'Has match ' .. key .. '=' .. item
-		)
-	end
-
-	for key, item in pairs(extradata) do
-		if String.startsWith(key, 'vodgame') then
-			table.insert(
-				data,
-				'Has match ' .. key .. '=' .. item
-			)
-		end
-	end
-
-	mw.smw.subobject(data)
 end
 
 return MatchLegacy

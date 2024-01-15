@@ -76,4 +76,13 @@ function MathUtil.dotProduct(xs, ys)
 	return sum
 end
 
+---Rounds a number to specified precision
+---@param value number
+---@param precision number?
+---@return number
+function MathUtil.round(value, precision)
+	local rescale = math.pow(10, precision or 0);
+	return math.floor(value * rescale + 0.5) / rescale;
+end
+
 return MathUtil

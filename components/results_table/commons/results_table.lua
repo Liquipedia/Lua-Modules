@@ -16,9 +16,10 @@ local Page = require('Module:Page')
 local Placement = require('Module:Placement')
 local Table = require('Module:Table')
 
-local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
+local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 --- @class ResultsTable: BaseResultsTable
 local ResultsTable = Class.new(BaseResultsTable)
@@ -117,7 +118,7 @@ function ResultsTable:buildRow(placement)
 	local useIndivPrize = self.config.useIndivPrize and self.config.queryType ~= Opponent.team
 	row:tag('td'):wikitext(Currency.display('USD',
 			useIndivPrize and placement.individualprizemoney or placement.prizemoney,
-			{dashIfZero = true, abbreviation = false, formatValue = true}
+			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 		))
 
 	return row

@@ -7,6 +7,7 @@
 --
 
 local Table = require('Module:Table')
+local Logic = require('Module:Logic')
 
 --
 -- Array functions. Arrays are tables with numeric indexes that does not
@@ -77,7 +78,7 @@ end
 ---Applies a function to each element in an array and places the results in a new array.
 ---@generic V, T
 ---@param elements V[]
----@param funct fun(element: V, index?: integer): T
+---@param funct fun(element: V, index?: integer): T|nil
 ---@return T[]
 function Array.map(elements, funct)
 	local mappedArray = {}
@@ -126,8 +127,10 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
----@deprecated
----Use `Array.flatten(Array.map(tbl, funct))` instead
+---@generic T
+---@param tbl T[]
+---@param funct any
+---@return T[]
 function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
@@ -208,6 +211,39 @@ function Array.groupBy(tbl, funct)
 	end
 
 	return groups, groupsByKey
+end
+
+--[[
+Groups adjacent elements of an array based on applying a transformation to the
+elements. The function returns an array of groups.
+
+The optional equals parameter specifies the equality relation of the
+transformed elements.
+
+Example:
+Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
+-- returns {{2}, {3, 5, 7}, {14, 16}}
+]]
+---@generic V, T
+---@param array V[]
+---@param f fun(elem: V): T
+---@param equals? fun(key: T, currentKey: T): boolean
+---@return V[][]
+function Array.groupAdjacentBy(array, f, equals)
+	equals = equals or Logic.deepEquals
+
+	local groups = {}
+	local currentKey
+	for index, elem in ipairs(array) do
+		local key = f(elem)
+		if index == 1 or not equals(key, currentKey) then
+			currentKey = key
+			table.insert(groups, {})
+		end
+		table.insert(groups[#groups], elem)
+	end
+
+	return groups
 end
 
 ---Lexicographically compare two arrays.
@@ -540,6 +576,51 @@ end
 ---@return number?
 function Array.min(array, compare)
 	return Array.minBy(array, function(x) return x end, compare)
+end
+
+--[[
+Finds the index of the element in an array satisfying a predicate. Returs 0
+if no element satisfies the predicate.
+
+Example:
+
+Array.indexOf({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
+-- returns 3
+]]
+---@generic V
+---@param array V[]
+---@param pred fun(elem: V, ix: integer?): boolean
+---@return integer
+function Array.indexOf(array, pred)
+	for ix, elem in ipairs(array) do
+		if pred(elem, ix) then
+			return ix
+		end
+	end
+	return 0
+end
+
+--[[
+Returns distinct/unique elements of an array.
+
+Example:
+
+Array.unique({4, 5, 4, 3})
+-- Returns {4, 5, 3}
+]]
+---@generic V
+---@param elements V[]
+---@return V[]
+function Array.unique(elements)
+	local elementCache = {}
+	local uniqueElements = {}
+	for _, element in ipairs(elements) do
+		if elementCache[element] == nil then
+			table.insert(uniqueElements, element)
+			elementCache[element] = true
+		end
+	end
+	return uniqueElements
 end
 
 return Array

@@ -10,14 +10,17 @@ local Lua = require('Module:Lua')
 local DisplayUtil = require('Module:DisplayUtil')
 local Table = require('Module:Table')
 
-local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true})
-local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch')
+local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local StarcraftSingleMatchDisplay = {propTypes = {}}
 
 function StarcraftSingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+
+	assert(bracketId, 'Missing or invalid matchId')
+
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 
 	return match

@@ -8,7 +8,6 @@
 
 local CustomMatchGroupInput = {}
 
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
@@ -18,8 +17,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'
@@ -206,7 +205,7 @@ function matchFunctions.getOpponents(args)
 
 			-- get players from vars for teams
 			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = matchFunctions.getPlayers(args, opponentIndex, opponent.name)
+				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
 			end
 		end
 	end
@@ -219,7 +218,7 @@ function matchFunctions.getOpponents(args)
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time( --[[@as osdate]])
+		local currentUnixTime = os.time( --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
@@ -267,19 +266,6 @@ function matchFunctions.getOpponents(args)
 	then args.resulttype = _RESULT_TYPE_DRAW
 	end
 	return args
-end
-
-function matchFunctions.getPlayers(match, opponentIndex, teamName)
-	for playerIndex = 1, _MAX_NUM_PLAYERS do
-		-- parse player
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-		player.name = player.name or Variables.varDefault(teamName .. '_p' .. playerIndex)
-		player.flag = player.flag or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-		if not Table.isEmpty(player) then
-			match['opponent' .. opponentIndex .. '_p' .. playerIndex] = player
-		end
-	end
-	return match
 end
 
 --

@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
 
 SquadRow.specialTeamsTemplateMapping = {
 	retirement = 'Team/retired',
@@ -53,6 +53,7 @@ function CustomSquad.run(frame)
 			captain = player.captain,
 			role = player.role,
 			team = player.team,
+			date = player.leavedate or player.inactivedate or player.leavedate,
 		})
 			:name({name = player.name})
 			:role({role = player.role})

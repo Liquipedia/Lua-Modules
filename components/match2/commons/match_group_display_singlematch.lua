@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local SingleMatchDisplay = {propTypes = {}, types = {}}
 
@@ -44,6 +44,8 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatchContainer)
 
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
+
+	assert(bracketId, 'Missing or invalid matchId')
 
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
 	return match

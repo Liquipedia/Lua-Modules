@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -34,6 +35,7 @@ local BroadcasterCard = {}
 ---@field sort string|number
 ---@field date string
 ---@field flag string?
+---@field isManualInput boolean
 
 ---Template entry point
 ---@param frame Frame
@@ -55,6 +57,7 @@ function BroadcasterCard.create(frame)
 	else
 		position = TBD
 	end
+	---@cast position string
 
 	if args.title then
 		title = args.title
@@ -83,7 +86,9 @@ function BroadcasterCard.create(frame)
 	-- Add people
 	local casters = {}
 	for prefix, caster, casterIndex in Table.iter.pairsByPrefix(args, 'b') do
-		local link = args[prefix .. 'link'] or caster
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(args[prefix .. 'link'] or caster):gsub(' ','_')
+		args[prefix .. 'flag' ] = Flags.CountryName(args[prefix .. 'flag' ])
+
 		local name, nationality = BroadcasterCard.getData(args, prefix, link, restrictedQuery)
 		local date = Variables.varDefault('tournament_enddate')
 
@@ -91,7 +96,7 @@ function BroadcasterCard.create(frame)
 			id = caster,
 			name = name or '',
 			displayName = args[prefix .. 'name_o'],
-			page = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ','_' ),
+			page = link,
 			language = language,
 			position = position,
 			weight = BroadcasterCard.getWeight(),
@@ -99,6 +104,9 @@ function BroadcasterCard.create(frame)
 			date = date,
 			sort = tonumber(args[prefix .. 'sort'])
 		}
+		--if entered name and stored name as well as entered flag and stored flag match mark it as manual input
+		broadcaster.isManualInput = args[prefix .. 'name'] == name and args[prefix .. 'flag' ] == nationality
+
 		broadcaster.sort = BroadcasterCard.sortValue(broadcaster, args.sort, casterIndex)
 
 		BroadcasterCard.setLPDB(broadcaster, args.status)
@@ -113,17 +121,24 @@ function BroadcasterCard.create(frame)
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)
 
 	for _, broadcaster in ipairs(casters) do
-		outputList = outputList .. BroadcasterCard._display(broadcaster)
+		local alwaysShowName = Logic.readBool(args.alwaysShowName)
+		outputList = outputList .. BroadcasterCard._display(broadcaster, {alwaysShowName = alwaysShowName})
 	end
 
 	return outputList
 end
 
 ---@param broadcaster broadCasterData
+---@param options {alwaysShowName: boolean}
 ---@return string
-function BroadcasterCard._display(broadcaster)
+function BroadcasterCard._display(broadcaster, options)
 	local displayName = broadcaster.displayName or broadcaster.name
-	displayName = String.isEmpty(displayName) and '' or ('&nbsp;(' .. displayName ..')')
+
+	if String.isNotEmpty(displayName)  and (options.alwaysShowName or displayName ~= broadcaster.id) then
+		displayName = ('&nbsp;(' .. displayName ..')')
+	else
+		displayName = ''
+	end
 
 	return '\n**' .. Flags.Icon{flag = broadcaster.flag, shouldLink = true}
 		.. '&nbsp;[[' .. broadcaster.page .. '|'.. broadcaster.id .. ']]'
@@ -143,37 +158,58 @@ end
 ---@param restrictedQuery boolean
 ---@return string?, string?
 function BroadcasterCard.getData(args, prefix, casterPage, restrictedQuery)
-	local resolvedCasterPage = mw.ext.TeamLiquidIntegration.resolve_redirect(casterPage):gsub(' ','_' )
+	local data = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = '[[pagename::' .. casterPage .. ']]',
+		query = 'romanizedname, name, pagename, nationality',
+		limit = 1,
+	})
 
-	local function getPersonInfo()
-		local data = mw.ext.LiquipediaDB.lpdb('player', {
-			conditions = '[[pagename::' .. resolvedCasterPage .. ']]',
-			query = 'romanizedname, name, pagename, nationality',
-			limit = 1,
-		})
-
-		if type(data) == 'table' and data[1] then
-			return String.nilIfEmpty(data[1].romanizedname) or data[1].name, data[1].nationality
-		end
-
-		if String.isNotEmpty(args[prefix .. 'name']) and String.isNotEmpty(args[prefix .. 'flag' ]) or restrictedQuery then
-			return args[prefix .. 'name' ],	args[prefix .. 'flag' ]
-		end
-
-		data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
-			conditions = '[[page::' .. resolvedCasterPage .. ']] AND [[name::!]] AND [[flag::!]]',
-			query = 'name, flag, id',
-			order = 'date desc',
-			limit = 1
-		})
-		if type(data) == 'table' and data[1] then
-			return data[1].name, data[1].flag
-		end
-
-		return args[prefix .. 'name'], args[prefix .. 'flag']
+	if type(data) == 'table' and data[1] then
+		return String.nilIfEmpty(data[1].romanizedname) or data[1].name, data[1].nationality
 	end
 
-	return getPersonInfo()
+	local name, flag = args[prefix .. 'name'], args[prefix .. 'flag']
+
+	if String.isNotEmpty(name) and String.isNotEmpty(flag) or restrictedQuery then
+		return name, flag
+	end
+
+	data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
+		conditions = '[[extradata_manualinput::true]] AND [[page::' .. casterPage .. ']]'
+			.. ' AND ([[name::!]] OR [[flag::!]])'
+			.. ' AND [[pagename::!' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
+		query = 'name, flag',
+		groupby = 'flag asc, name asc',
+		limit = 5000,
+	})
+
+	if type(data) ~= 'table' or not data[1] then
+		return name, flag
+	end
+
+	return BroadcasterCard._findUnique(data, 'name', casterPage) or name,
+		BroadcasterCard._findUnique(data, 'flag', casterPage) or flag
+end
+
+---@param data {name: string?, flag: string?}
+---@param property 'name'|'flag'
+---@param page string
+---@return string?
+function BroadcasterCard._findUnique(data, property, page)
+	--remove all empty values
+	local foundItems = Array.filter(data, function(item) return String.isNotEmpty(item[property]) end)
+	--extract the array of tables to an array of values want to look at
+	foundItems = Array.map(foundItems, Operator.property(property))
+
+	--remove duplicates
+	foundItems = Array.unique(foundItems)
+
+	--if we only have 1 unique element then we have a definitive query, return the value
+	if #foundItems == 1 then
+		return foundItems[1]
+	elseif #foundItems > 1 then
+		mw.logObject(foundItems, property .. 's not unique for ' .. page)
+	end
 end
 
 ---Determines the sort value for a broadcaster
@@ -198,7 +234,7 @@ end
 ---@param status string?
 function BroadcasterCard.setLPDB(caster, status)
 	local smName = Variables.varDefault('show_match_name') or ''
-	local extradata = {status = ''}
+	local extradata = {status = '', manualinput = tostring(caster.isManualInput)}
 	if Logic.readBool(Variables.varDefault('show_match')) then
 		extradata.showmatchname = smName
 		extradata.showmatch = 'true'

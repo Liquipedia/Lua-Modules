@@ -12,10 +12,11 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Tier = Lua.import('Module:Tier/Utils', {requireDevIfEnabled = true})
+local Tier = Lua.import('Module:Tier/Utils')
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@class Starcraft2TierUtils: TierUtils
 local TierCustom = Table.copy(Tier)
 
 --- Parses queryData to be processable for other Tier functions

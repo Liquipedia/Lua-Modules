@@ -15,14 +15,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
-
-	if options.storeSmw then
-		MatchLegacy.storeMatchSMW(match, match2)
-	end
 
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
@@ -32,35 +28,6 @@ function MatchLegacy.storeMatch(match2, options)
 			match
 		)
 	end
-end
-
-function MatchLegacy.storeMatchSMW(match, match2)
-	local streams = match.stream or {}
-	if type(streams) == 'string' then streams = json.parse(streams) end
-	local icon = Variables.varDefault('tournament_icon')
-	mw.smw.subobject({
-		'legacymatch_' .. match2.match2id,
-		'is map number=1',
-		'has team left=' .. (match.opponent1 or ''),
-		'has team right=' .. (match.opponent2 or ''),
-		'has teams=' .. (match.opponent1 or '')..','..(match.opponent2 or ''),
-		'has teams page=' .. (match.opponent1 or '')..','..(match.opponent2 or ''),
-		'Has map date=' .. (match.date or ''),
-		'Has tournament=' .. mw.title.getCurrentTitle().prefixedText,
-		'Has tournament tier=' .. (match.liquipediatier or ''),
-		'Has match stream=' .. (streams.stream or ''),
-		'Has match twitch=' .. (streams.twitch or ''),
-		'Has match twitch2=' .. (streams.twitch2 or ''),
-		'Has match youtube=' .. (streams.youtube or ''),
-		'Has tournament name=' .. Logic.emptyOr(match.tickername, match.name, ''),
-		'Has tournament icon=' .. (icon or ''),
-		'Has winner=' .. (match.winner or ''),
-		'Has team left score=' .. (match.opponent1score or '0'),
-		'Has team right score=' .. (match.opponent2score or '0'),
-		'Has exact time=' .. (Logic.readBool(match.dateexact) and 'true' or 'false'),
-		'Is featured match=' .. (Logic.readBool(match.extradata.featured) and 'true' or 'false'),
-		'Is finished=' .. (Logic.readBool(match.finished) and 'true' or 'false'),
-	})
 end
 
 function MatchLegacy.storeGames(match, match2)

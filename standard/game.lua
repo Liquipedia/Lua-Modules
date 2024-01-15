@@ -6,19 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
 
 local GamesData = Info.games
 
-local ICON_STRING = '[[File:${icon}|link=${link}|class=${class}|${size}]]'
+local ICON_STRING = '[[File:${icon}|${alt}|link=${link}|class=${class}|${size}]]'
 local DEFAULT_SIZE = '25x25px'
+local DEFAULT_SPAN_CLASS = 'icon-16px'
 local ICON_PLACEHOLDER = 'LeaguesPlaceholder.png'
 
 local Game = {}
@@ -33,13 +37,13 @@ Game.getIdentifierByName = FnUtil.memoize(function()
 end)
 
 ---Get the identifier of a entered game. Checks against identifiers, full names and abbreviations.
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return string?
-function Game.toIdentifier(args)
-	args = args or {}
-	local gameInput = args.game
+function Game.toIdentifier(options)
+	options = options or {}
+	local gameInput = options.game
 
-	if String.isEmpty(gameInput) and Logic.nilOr(Logic.readBoolOrNil(args.useDefault), true) then
+	if String.isEmpty(gameInput) and Logic.nilOr(Logic.readBoolOrNil(options.useDefault), true) then
 		return Info.defaultGame
 	elseif String.isEmpty(gameInput) then
 		return
@@ -62,10 +66,10 @@ function Game.isValid(game)
 end
 
 ---Fetches the raw data for a given game
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return table
-function Game.raw(args)
-	local identifier = Game.toIdentifier(args)
+function Game.raw(options)
+	local identifier = Game.toIdentifier(options)
 	if not identifier then
 		return {}
 	end
@@ -73,67 +77,131 @@ function Game.raw(args)
 	return GamesData[identifier] or {}
 end
 
+---Fetches all valid game identifiers, potentially ordered
+---@param options? {ordered: boolean?}
+---@return string[]
+function Game.listGames(options)
+	options = options or {}
+
+	local function getGameOrder(gameIdentifier)
+		return tonumber(GamesData[gameIdentifier].order)
+	end
+
+	local gamesList = Array.extractKeys(GamesData)
+	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
+		return Array.sortBy(gamesList, getGameOrder)
+	end
+
+	Array.filter(gamesList, function(game)
+		return not game.unlisted
+	end)
+
+	return gamesList
+end
+
 ---Fetches the abbreviation for a given game
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return string?
-function Game.abbreviation(args)
-	return Game.raw(args).abbreviation
+function Game.abbreviation(options)
+	return Game.raw(options).abbreviation
 end
 
 ---Fetches the name for a given game
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return string?
-function Game.name(args)
-	return Game.raw(args).name
+function Game.name(options)
+	return Game.raw(options).name
 end
 
 ---Fetches the link for a given game
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return string?
-function Game.link(args)
-	return Game.raw(args).link
+function Game.link(options)
+	return Game.raw(options).link
 end
 
 ---Fetches the defaultTeamLogos (light & dark) for a given game
----@param args? {game: string?, useDefault: boolean?}
+---@param options? {game: string?, useDefault: boolean?}
 ---@return table?
-function Game.defaultTeamLogoData(args)
-	return Game.raw(args).defaultTeamLogo
+function Game.defaultTeamLogoData(options)
+	return Game.raw(options).defaultTeamLogo
 end
+
+---@class gameIconOptions
+---@field game string?
+---@field size string?
+---@field noLink boolean?
+---@field link string?
+---@field noSpan boolean?
+---@field spanClass string?
 
 ---Builds the icon for a given game
----@param args? {game: string?, useDefault: boolean?, size: string?, noLink: boolean?, link: string?}
+---@param options gameIconOptions?
 ---@return string
-function Game.icon(args)
-	args = args or {}
+function Game.icon(options)
+	options = options or {}
 
-	local gameData = Game.raw(args)
+	local gameData = Game.raw(options)
+
+	local gameIcons
+	local link = Logic.readBool(options.noLink) and '' or options.link or gameData.link
+	local spanClass = (Logic.readBool(options.noSpan) and '') or
+		(String.isNotEmpty(options.spanClass) and options.spanClass) or
+			DEFAULT_SPAN_CLASS
+
 	if Table.isEmpty(gameData) then
-		return Game._createIcon{icon = ICON_PLACEHOLDER, size = args.size}
+		gameIcons = Game._createIcon{icon = ICON_PLACEHOLDER, size = options.size}
+	elseif gameData.logo.lightMode == gameData.logo.darkMode then
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link, alt = gameData.name}
+	else
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size,
+				link = link, alt = gameData.name, mode = 'light'} ..
+			Game._createIcon{icon = gameData.logo.darkMode, size = options.size,
+				link = link, alt = gameData.name, mode = 'dark'}
 	end
 
-	local link = Logic.readBool(args.noLink) and '' or args.link or gameData.link
-
-	if gameData.logo.lightMode == gameData.logo.darkMode then
-		return Game._createIcon{icon = gameData.logo.lightMode, size = args.size, link = link}
+	if String.isNotEmpty(spanClass) then
+		return tostring(mw.html.create('span'):addClass(spanClass):node(gameIcons))
+	else
+		return gameIcons
 	end
-
-	return Game._createIcon{size = args.size, link = link, mode = 'light', icon = gameData.logo.lightMode}
-		.. Game._createIcon{size = args.size, link = link, mode = 'dark', icon = gameData.logo.darkMode}
 end
 
----@param args {mode: string?, icon: string?, size: string?, link: string?}
+---@param options {mode: string?, icon: string?, size: string?, link: string?, alt: string?}
 ---@return string
-function Game._createIcon(args)
+function Game._createIcon(options)
 	return String.interpolate(
 		ICON_STRING,
 		{
-			icon = args.icon,
-			size = args.size or DEFAULT_SIZE,
-			class = args.mode and ('show-when-' .. args.mode .. '-mode') or '',
-			link = args.link or '',
+			icon = options.icon,
+			size = options.size or DEFAULT_SIZE,
+			class = options.mode and ('show-when-' .. options.mode .. '-mode') or '',
+			link = options.link or '',
+			alt = options.alt or options.link or '',
 		}
 	)
+end
+
+---Fetches a text display for a given game
+---@param options? {game: string?, useDefault: boolean?, noLink: boolean?, link: string?, useAbbreviation: boolean?}
+---@return string?
+function Game.text(options)
+	options = options or {}
+
+	local useAbbreviation = Logic.readBool(options.useAbbreviation)
+	local gameData = Game.raw(options)
+	if Table.isEmpty(gameData) then
+		return Abbreviation.make(useAbbreviation and 'Unkwn.' or 'Unknown Game', 'The specified game input is not recognized')
+	end
+
+	if Logic.readBool(options.noLink) then
+		return useAbbreviation and gameData.abbreviation or gameData.name
+	else
+		return Page.makeInternalLink({},
+			useAbbreviation and gameData.abbreviation or gameData.name,
+			options.link or gameData.link
+		)
+	end
 end
 
 Game.defaultTeamLogos = FnUtil.memoize(function()
@@ -147,10 +215,10 @@ Game.defaultTeamLogos = FnUtil.memoize(function()
 	return defaultTeamLogos
 end)
 
----@param args {logo: string?, game: string?, useDefault: boolean?}
+---@param options {logo: string?, game: string?, useDefault: boolean?}
 ---@return boolean
-function Game.isDefaultTeamLogo(args)
-	local logo = args.logo
+function Game.isDefaultTeamLogo(options)
+	local logo = options.logo
 	if String.isEmpty(logo) then
 		return false
 	end
@@ -158,13 +226,13 @@ function Game.isDefaultTeamLogo(args)
 
 	logo = logo:gsub('_', ' ')
 
-	if String.isEmpty(args.game) then
+	if String.isEmpty(options.game) then
 		return Game.defaultTeamLogos()[logo] ~= nil
 	end
 
-	local defaultLogos = Game.raw(args).defaultTeamLogo
+	local defaultLogos = Game.raw(options).defaultTeamLogo
 	if not defaultLogos then
-		error('Invalid game input "' .. args.game .. '"')
+		error('Invalid game input "' .. options.game .. '"')
 	end
 
 	return Table.includes(defaultLogos, logo)

@@ -9,8 +9,17 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
 
+---@class HeaderWidget: Widget
+---@operator call(table): HeaderWidget
+---@field name string?
+---@field subHeader string?
+---@field image string?
+---@field imageDefault string?
+---@field imageDark string?
+---@field imageDefaultDark string?
+---@field size number|string|nil
 local Header = Class.new(
 	Widget,
 	function(self, input)
@@ -24,6 +33,7 @@ local Header = Class.new(
 	end
 )
 
+---@return Html[]
 function Header:make()
 	local header = {
 		Header:_name(self.name),
@@ -48,6 +58,8 @@ function Header:make()
 	return header
 end
 
+---@param name string?
+---@return Html
 function Header:_name(name)
 	local pagename = name or mw.title.getCurrentTitle().text
 	local infoboxHeader = mw.html.create('div')
@@ -58,6 +70,8 @@ function Header:_name(name)
 	return mw.html.create('div'):node(infoboxHeader)
 end
 
+---@param subHeader string?
+---@return Html?
 function Header:_subHeader(subHeader)
 	if not subHeader then
 		return nil
@@ -70,20 +84,33 @@ function Header:_subHeader(subHeader)
 	return mw.html.create('div'):node(infoboxSubHeader)
 end
 
+---@param fileName string?
+---@param fileNameDark string?
+---@param default string?
+---@param defaultDark string?
+---@param size number|string|nil
+---@return Html?
 function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	if (fileName == nil or fileName == '') and (default == nil or default == '') then
 		return nil
 	end
 
 	local imageName = fileName or default
+	---@cast imageName -nil
 	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
 
 	imageName = fileNameDark or fileName or defaultDark or default
+	---@cast imageName -nil
 	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
 
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
 
+---@param imageName string
+---@param fileName string?
+---@param size number|string|nil
+---@param mode string
+---@return Html
 function Header:_makeSizedImage(imageName, fileName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 
@@ -95,9 +122,9 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	-- Percentage (interpret as scaling)
 	elseif size:find('%%') then
 		local scale = size:gsub('%%', '')
-		scale = tonumber(scale)
-		if scale then
-			size = 'frameless|upright=' .. (scale / 100)
+		local scaleNumber = tonumber(scale)
+		if scaleNumber then
+			size = 'frameless|upright=' .. (scaleNumber / 100)
 			infoboxImage:addClass('infobox-fixed-size-image')
 		end
 	-- Default
@@ -111,6 +138,7 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 	return infoboxImage
 end
 
+---@return Html
 function Header:_createInfoboxButtons()
 	local rootFrame
 	local currentFrame = mw.getCurrentFrame()

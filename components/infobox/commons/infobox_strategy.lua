@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -20,13 +20,17 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
+---@class StrategyInfobox: BasicInfobox
 local Strategy = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Strategy.run(frame)
 	local strategy = Strategy(frame)
 	return strategy:createInfobox()
 end
 
+---@return Html
 function Strategy:createInfobox()
 	local infobox = self.infobox
 	local args = self.args

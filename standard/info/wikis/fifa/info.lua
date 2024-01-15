@@ -336,17 +336,17 @@ return {
 				lightMode = 'FIFA 23 default lightmode.png',
 			},
 		},
-		['24'] = {
+		['fc 24'] = {
 			abbreviation = '2024',
-			name = 'EA Sports FC 24',
-			link = 'EA Sports FC 24',
+			name = 'EA SPORTS FC 24',
+			link = 'EA SPORTS FC 24',
 			logo = {
-				darkMode = 'EA Sports FC 24 default darkmode.png',
-				lightMode = 'EA Sports FC 24 default lightmode.png',
+				darkMode = 'EA FC24 default allmode.png',
+				lightMode = 'EA FC24 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'EA Sports FC 24 default darkmode.png',
-				lightMode = 'EA Sports FC 24 default lightmode.png',
+				darkMode = 'EA FC24 default allmode.png',
+				lightMode = 'EA FC24 default allmode.png',
 			},
 		},
 		o2 = {
@@ -388,9 +388,36 @@ return {
 				lightMode = 'FIFA Online 4 default allmode.png',
 			},
 		},
+		['fc mobile'] = {
+			abbreviation = 'FCM',
+			name = 'EA SPORTS FC Mobile',
+			link = 'EA SPORTS FC Mobile',
+			logo = {
+				darkMode = 'EA FC Mobile default allmode.png',
+				lightMode = 'EA FC Mobile default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC Mobile default allmode.png',
+				lightMode = 'EA FC Mobile default allmode.png',
+			},
+		},
+		['fc online'] = {
+			abbreviation = 'FCO',
+			name = 'EA SPORTS FC Online',
+			link = 'EA SPORTS FC Online',
+			logo = {
+				darkMode = 'EA FC Online default allmode.png',
+				lightMode = 'EA FC Online default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC Online default allmode.png',
+				lightMode = 'EA FC Online default allmode.png',
+			},
+		},
 	},
 	defaultGame = 'fifa',
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
 	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
+	match2 = 1,
 }

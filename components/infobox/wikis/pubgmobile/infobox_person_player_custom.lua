@@ -9,15 +9,13 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
-local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -50,20 +48,12 @@ local _args
 function CustomPlayer.run(frame)
 	local player = Player(frame)
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createWidgetInjector = CustomPlayer.createWidgetInjector
 	player.createBottomContent = CustomPlayer.createBottomContent
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
 
 	_args = player.args
+	_args.autoTeam = true
 
 	return player:createInfobox()
 end
@@ -111,7 +101,7 @@ function CustomPlayer:adjustLPDB(lpdbData)
 	lpdbData.extradata.role = Variables.varDefault('role')
 	lpdbData.extradata.role2 = Variables.varDefault('role2')
 
-	lpdbData.type = Variables.varDefault('isplayer') == 'true' and 'player' or 'staff'
+	lpdbData.type = CustomPlayer._isPlayerOrStaff()
 
 	if String.isNotEmpty(_args.team2) then
 		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
@@ -147,24 +137,22 @@ function CustomPlayer._createRole(key, role)
 end
 
 function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+	if Player:shouldStoreData(_args) then
 		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of player', {player = _pagename})
 	end
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	-- isplayer needed for SMW
+function CustomPlayer._isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(args.role) then
-		roleData = _ROLES[args.role:lower()]
+	if String.isNotEmpty(_args.role) then
+		roleData = _ROLES[_args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
-		Variables.varDefine('isplayer', 'false')
+		return 'staff'
 	else
-		Variables.varDefine('isplayer', 'true')
+		return 'player'
 	end
 end
 

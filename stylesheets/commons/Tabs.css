@@ -1,0 +1,159 @@
+/*******************************************************************************
+Template(s): Tab Templates
+Author(s): FO-nTTaX
+*******************************************************************************/
+div.tabs-static,
+div.tabs-dynamic {
+	overflow: hidden;
+}
+
+div.tabs-dynamic > ul.nav-tabs {
+	margin-left: 0;
+	margin-bottom: 0;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li:not( .active ),
+div.tabs-static > ul.nav-tabs > li:not( .active ) {
+	cursor: pointer;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li,
+div.tabs-static > ul.nav-tabs > li {
+	float: left;
+	border-width: 2px 2px 0 2px !important;
+	border-style: solid;
+}
+
+div.tabs-dynamic > .nav-tabs > li > span > span > a,
+div.tabs-static > .nav-tabs > li > span > span > a {
+	margin-right: 0;
+	line-height: 1.42857143;
+	border: 1px solid transparent;
+	border-radius: 0 0 0 0;
+	position: relative;
+	display: block;
+	padding: 5px 10px;
+	outline: 0;
+}
+
+div.tabs-dynamic > .nav-tabs > li > span > span > a:first-of-type,
+div.tabs-static > .nav-tabs > li > span > span > a:first-of-type {
+	border-width: 1px 0 1px 1px;
+}
+
+div.tabs-dynamic > .nav-tabs > li > span > span > a:last-of-type,
+div.tabs-static > .nav-tabs > li > span > span > a:last-of-type {
+	border-width: 1px 1px 1px 0;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li .team-template-team-standard,
+div.tabs-static > ul.nav-tabs > li .team-template-team-standard {
+	white-space: nowrap;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li .team-template-team-standard > *,
+div.tabs-static > ul.nav-tabs > li .team-template-team-standard > * {
+	float: left;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li .team-template-image-legacy > *,
+div.tabs-static > ul.nav-tabs > li .team-template-image-legacy > *,
+div.tabs-dynamic > ul.nav-tabs > li .team-template-image-icon > *,
+div.tabs-static > ul.nav-tabs > li .team-template-image-icon > * {
+	padding-right: 0;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li .team-template-text > *,
+div.tabs-static > ul.nav-tabs > li .team-template-text > * {
+	padding-left: 0;
+}
+
+div.tabs-dynamic > ul.nav-tabs > li > a,
+div.tabs-static > ul.nav-tabs > li > a {
+	border: 1px solid transparent;
+	outline: 0;
+}
+
+.nav-tabs > li > span > span > strong {
+	background-color: #ffffff;
+	display: block;
+	padding: 5px 10px;
+	position: relative;
+}
+
+.nav-tabs > li > span > span > strong {
+	border: 1px solid transparent;
+	border-radius: 0;
+	line-height: 1.42857;
+	margin-right: 0;
+	outline: 0;
+}
+
+.nav-tabs > li.active {
+	background-color: #ffffff;
+}
+
+div.tabs-content {
+	border-width: 2px;
+	border-style: solid;
+	//border-color: var( --clr-border );
+	border-top: 0;
+	padding: 5px;
+}
+
+div.tabs-content > div:not( .active ) {
+	display: none;
+}
+
+html.client-nojs div.tabs-content > div:not( .active ) {
+	display: block;
+}
+
+div.tabs-content > div {
+	overflow: auto hidden;
+}
+
+.tabs-portal .tabs-portal-content-wrapper {
+	border-width: 2px;
+	border-style: solid;
+	padding: 5px;
+	margin-top: -7px;
+	z-index: 2;
+	position: relative;
+}
+
+.tabs-portal .tabs-portal-content {
+	border-width: 2px;
+	border-style: solid;
+	background-color: #ffffff;
+	padding: 5px;
+	overflow: auto hidden;
+}
+
+.tabs-portal > ul.tabs {
+	border: 0;
+	margin-bottom: 0;
+	margin-left: 12px;
+}
+
+.tabs-portal > ul.tabs > li {
+	border-bottom: 0;
+	font-size: 150%;
+	font-weight: bold;
+	position: relative;
+	z-index: 1;
+}
+
+.tabs-portal .nav-tabs > li.active {
+	position: relative;
+	z-index: 3;
+}
+
+/* Smash */
+div.tabs-static-games > ul.nav-tabs > li:first-of-type {
+	margin-right: 0;
+}
+
+div.tabs-static-games > ul.nav-tabs > li:last-of-type {
+	margin-right: 2px;
+}

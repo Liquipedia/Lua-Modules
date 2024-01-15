@@ -1,0 +1,57 @@
+/*******************************************************************************
+Template(s): Swisstable
+Author(s): FO-nTTaX
+*******************************************************************************/
+
+/*
+.swisstable .swisstable-bgc-draw {
+	background-color:#F9F9C7;
+}
+.swisstable .swisstable-bgc-win {
+	background-color:#DDF4DD;
+}
+.swisstable .swisstable-bgc-lose {
+	background-color:#FBDFDF;
+}
+.swisstable .swisstable-bgc-overturned {
+	background-color:#DEE3EF;
+}
+*/
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-up > td,
+body.skin-lakesideview table.swisstable .swisstable-row-bg-down > td,
+body.skin-lakesideview table.swisstable .swisstable-row-bg-dq > td {
+	//background-color: var( --table-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-up {
+	//border-bottom: 0.125rem solid var( --swiss-table-number-up-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-up > th:first-child {
+	//background-color: var( --swiss-table-number-up-background-color, var( --clr-confirmed-container, #ddf4dd ) )!important;
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-down {
+	//border-bottom: 0.125rem solid var( --swiss-table-number-down-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-down > th:first-child {
+	//background-color: var( --swiss-table-number-down-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-dq {
+	//TODO
+}
+
+body.skin-lakesideview table.swisstable .swisstable-row-bg-dq > th:first-child {
+	//background-color: var( --swiss-table-number-dq-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-bgc-win {
+	//background-color: var( --swiss-table-win-background-color );
+}
+
+body.skin-lakesideview table.swisstable .swisstable-bgc-lose {
+	//background-color: var( --swiss-table-lose-background-color );
+}

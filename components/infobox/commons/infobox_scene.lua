@@ -13,8 +13,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -24,13 +24,17 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class SceneInfobox: BasicInfobox
 local Scene = Class.new(BasicInfobox)
 
+---@param frame Frame
+---@return Html
 function Scene.run(frame)
 	local scene = Scene(frame)
 	return scene:createInfobox()
 end
 
+---@return Html
 function Scene:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -79,6 +83,8 @@ function Scene:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---@param args table
+---@return string
 function Scene:createNameDisplay(args)
 	local name = args.name
 	local country = Flags.CountryName(args.country or args.scene)

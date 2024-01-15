@@ -6,22 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class HearthstoneLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local MODES = {
@@ -30,35 +29,37 @@ local MODES = {
 	battlegrounds = 'Battlegrounds',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.player_number = _args.participants_number
-	_args.mode = CustomLeague:_modeLookup(_args.mode)
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.args.player_number = league.args.participants_number
+	league.args.mode = MODES[string.lower(league.args.mode or '')]
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'prizepool' then
-		if _args.bin or _args.binusd then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Mode', content = {args.mode}},
+			Cell{name = 'Number of Players', content = {args.player_number}},
+			Cell{name = 'Number of Teams', content = {args.team_number}}
+		)
+	elseif id == 'prizepool' then
+		if args.bin or args.binusd then
 			table.insert(widgets, Cell{name = 'Buy-in', content = {
 				InfoboxPrizePool.display{
-					prizepool = _args.bin,
-					prizepoolusd = _args.binusd,
-					currency = _args.localcurrency,
+					prizepool = args.bin,
+					prizepoolusd = args.binusd,
+					currency = args.localcurrency,
 					setVariables = false,
 				}
 			}})
@@ -68,72 +69,37 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Mode',
-		content = {_args.mode}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Players',
-		content = {_args.player_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Number of Teams',
-		content = {_args.team_number}
-	})
-
-	return widgets
-end
-
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.participantsnumber = args.player_number or args.team_number
-
-	return lpdbData
-end
-
-function CustomLeague:defineCustomPageVariables()
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or _args.name)
-	Variables.varDefine('tournament_tier', _args.liquipediatier)
-	Variables.varDefine('tournament_prizepool', _args.prizepoolusd)
-	Variables.varDefine('tournament_mode', _args.mode)
+	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
+	Variables.varDefine('tournament_prizepool', args.prizepoolusd)
+	Variables.varDefine('mode', args.mode)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
-	Variables.varDefine('mode', _args.mode)
+	Variables.varDefine('tournament_sdate', self.data.startDatesdate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if _args.mode then
-		table.insert(categories, _args.mode .. ' Tournaments')
-	end
-
-	return categories
+	return {args.mode and (args.mode .. ' Tournaments') or nil}
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	if Logic.readBool(_args.blizzardpremier) then
+---@param args table
+---@return string
+function CustomLeague:appendLiquipediatierDisplay(args)
+	if Logic.readBool(args.blizzardpremier) then
 		return '[[File:Blizzard_logo.png|x12px|link=Blizzard Entertainment|Premier Tournament held by Blizzard]]'
 	end
 
 	return ''
-end
-
-function CustomLeague:_modeLookup(mode)
-	if not mode then
-		return
-	end
-
-	return MODES[mode:lower()]
 end
 
 return CustomLeague

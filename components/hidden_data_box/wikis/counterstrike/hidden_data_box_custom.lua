@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
@@ -24,6 +24,7 @@ function CustomHiddenDataBox.run(args)
 	args.liquipediatier = Tier.toNumber(args.liquipediatier)
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
+
 	return BasicHiddenDataBox.run(args)
 end
 
@@ -44,7 +45,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
 	Variables.varDefine('match_featured_override', args.featured)
-	Variables.varDefine('tournament_valve_major', args.valvemajor or (args.valvetier == 'Major' and 'true') or 'false')
 	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
 
 	Variables.varDefine('match_hidden', tostring(
