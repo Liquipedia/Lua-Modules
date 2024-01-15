@@ -37,7 +37,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	
+
 	if id == 'location' then
 		return {
 			Cell{
