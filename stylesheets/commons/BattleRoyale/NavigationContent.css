@@ -4,7 +4,7 @@ Author(s): Elysienna
 *******************************************************************************/
 
 .navigation-content {
-    &.is--hidden {
-        display: none;
-    }
+	&.is--hidden {
+		display: none;
+	}
 }
