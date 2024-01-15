@@ -37,17 +37,15 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-
+	
 	if id == 'location' then
 		return {
-			Cell{name = 'Location', content = {
-					Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location
-				}
+			Cell{
+				name = 'Location',
+				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
 			},
 		}
-	end
-
-	if id == 'custom' then
+	elseif id == 'custom' then
 		local gameModes = self.caller:_getGameMode(args)
 		Array.appendWith(
 			widgets,
@@ -86,7 +84,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 	if String.isNotEmpty(args.creator2) then
 		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
 	end
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
+	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 
