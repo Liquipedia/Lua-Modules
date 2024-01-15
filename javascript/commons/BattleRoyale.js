@@ -22,11 +22,11 @@ liquipedia.battleRoyale = {
 		if ( !( 'onscrollend' in window ) || typeof window.onscrollend === 'undefined' ) {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 				.forEach( function( tableEl ) {
-					const scrollingEl = tableEl.querySelector( '[data-js-battle-royale="game-container"]' );
-					const options = {
+					let scrollingEl = tableEl.querySelector( '[data-js-battle-royale="game-container"]' );
+					let options = {
 						passive: true
 					};
-					const scrollEnd = this.debounce( function( e ) {
+					let scrollEnd = this.debounce( function( e ) {
 						e.target.dispatchEvent( new CustomEvent( 'scrollend', {
 							bubbles: true
 						} ) );
@@ -49,7 +49,7 @@ liquipedia.battleRoyale = {
 
 	handleTableSideScroll: function( tableElement, direction ) {
 		tableElement.querySelectorAll( '.cell--game-container' ).forEach( function( i ) {
-			const isNav = i.parentNode.classList.contains( 'cell--game-container-nav-holder' );
+			let isNav = i.parentNode.classList.contains( 'cell--game-container-nav-holder' );
 			if ( direction === this.DIRECTION_RIGHT ) {
 				i.scrollLeft += this.gameWidth;
 				if ( isNav ) {
@@ -73,13 +73,13 @@ liquipedia.battleRoyale = {
 	},
 
 	recheckSideScrollButtonStates: function( tableElement ) {
-		const navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
-		const navRight = tableElement.querySelector( '[data-js-battle-royale="navigate-right"]' );
-		const el = tableElement.querySelector(
+		let navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
+		let navRight = tableElement.querySelector( '[data-js-battle-royale="navigate-right"]' );
+		let el = tableElement.querySelector(
 			'[data-js-battle-royale="game-nav-holder"] > [data-js-battle-royale="game-container"]'
 		);
 
-		const isScrollable = el.scrollWidth > el.offsetWidth;
+		let isScrollable = el.scrollWidth > el.offsetWidth;
 		// Check LEFT
 		if ( isScrollable && el.scrollLeft > 0 ) {
 			navLeft.classList.remove( 'd-none' );
@@ -116,7 +116,7 @@ liquipedia.battleRoyale = {
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
-		const tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
+		let tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
 		tabs.forEach( function( item ) {
 			if ( item === panelTab ) {
 				// activate content tab
@@ -126,7 +126,7 @@ liquipedia.battleRoyale = {
 				item.classList.remove( 'is--active' );
 			}
 		} );
-		const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
+		let contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
 		Object.keys( contents ).forEach( function( panelId ) {
 			if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId ) {
 				// activate content tab panel
@@ -150,7 +150,7 @@ liquipedia.battleRoyale = {
 		};
 
 		this.battleRoyaleMap[ id ].navigationContents.forEach( function( content ) {
-			const brContentId = content.dataset.jsBattleRoyaleContentId;
+			let brContentId = content.dataset.jsBattleRoyaleContentId;
 			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ] =
 				Array.from( content.querySelectorAll( '[data-js-battle-royale="panel-tab"]' ) );
 
@@ -164,7 +164,7 @@ liquipedia.battleRoyale = {
 					content.querySelector( '#' + node.dataset.jsBattleRoyaleContentTargetId );
 
 				// Query all collapsible elements and push it to the array
-				const collapsibleElements = this.battleRoyaleMap[ id ]
+				let collapsibleElements = this.battleRoyaleMap[ id ]
 					.navigationContentPanelTabContents[ brContentId ][ node.dataset.jsBattleRoyaleContentTargetId ]
 					.querySelectorAll( '[data-js-battle-royale="collapsible"]' );
 
@@ -191,7 +191,7 @@ liquipedia.battleRoyale = {
 
 	makeCollapsibles: function ( id ) {
 		this.battleRoyaleMap[ id ].collapsibles.forEach( function( element ) {
-			const button = element.querySelector( '[data-js-battle-royale="collapsible-button"]' );
+			let button = element.querySelector( '[data-js-battle-royale="collapsible-button"]' );
 			if ( button && element ) {
 				button.addEventListener( 'click', function() {
 					element.classList.toggle( 'is--collapsed' );
@@ -201,11 +201,11 @@ liquipedia.battleRoyale = {
 	},
 
 	createNavigationElement: function( dir ) {
-		const element = document.createElement( 'div' );
+		let element = document.createElement( 'div' );
 		element.classList.add( 'panel-table__navigate', 'navigate--' + dir );
 		element.setAttribute( 'data-js-battle-royale', 'navigate-' + dir );
 
-		const icon = document.createElement( 'i' );
+		let icon = document.createElement( 'i' );
 		icon.classList.add( 'fas', `fa-chevron-${ dir }` );
 		element.append( icon );
 		return element;
@@ -213,10 +213,10 @@ liquipedia.battleRoyale = {
 
 	makeSideScrollElements: function( id ) {
 		this.battleRoyaleInstances[ id ].querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( function( table ) {
-			const navHolder = table.querySelector( '.row--header > .cell--game-container-nav-holder' );
+			let navHolder = table.querySelector( '.row--header > .cell--game-container-nav-holder' );
 			if ( navHolder ) {
-				for ( const dir of [ this.DIRECTION_LEFT, this.DIRECTION_RIGHT ] ) {
-					const element = this.createNavigationElement( dir );
+				for ( let dir of [ this.DIRECTION_LEFT, this.DIRECTION_RIGHT ] ) {
+					let element = this.createNavigationElement( dir );
 					element.addEventListener( 'click', function() {
 						this.handleTableSideScroll( table, dir );
 					}.bind( this ) );
@@ -233,7 +233,7 @@ liquipedia.battleRoyale = {
 	},
 
 	changeButtonStyle: function( button, order = 'default' ) {
-		const sortingOrder = {
+		let sortingOrder = {
 			ascending: this.ICON_SORT_DOWN,
 			descending: this.ICON_SORT_UP,
 			default: this.ICON_SORT
@@ -241,14 +241,14 @@ liquipedia.battleRoyale = {
 
 		button.setAttribute( 'data-order', order );
 
-		const sortIcon = this.getSortingIcon( button );
+		let sortIcon = this.getSortingIcon( button );
 		sortIcon.removeAttribute( 'class' );
 		sortIcon.classList.add( 'far', sortingOrder[ order ] );
 	},
 
 	comparator: function ( a, b, dir = 'ascending', sortType = 'team' ) {
-		const valA = a.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
-		const valB = b.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
+		let valA = a.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
+		let valB = b.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
 		if ( dir === 'ascending' ) {
 			return valB > valA ? -1 : ( valA > valB ? 1 : 0 );
 		} else {
@@ -257,25 +257,25 @@ liquipedia.battleRoyale = {
 	},
 
 	makeSortableTable: function( instance ) {
-		const sortButtons = instance.querySelectorAll( '[data-js-battle-royale="header-row"] > [data-sort-type]' );
+		let sortButtons = instance.querySelectorAll( '[data-js-battle-royale="header-row"] > [data-sort-type]' );
 
 		sortButtons.forEach( function( button ) {
 			button.addEventListener( 'click', function() {
 
-				const sortType = button.dataset.sortType;
-				const table = button.closest( '[data-js-battle-royale="table"]' );
-				const sortableRows = Array.from( table.querySelectorAll( '[data-js-battle-royale="row"]' ) );
+				let sortType = button.dataset.sortType;
+				let table = button.closest( '[data-js-battle-royale="table"]' );
+				let sortableRows = Array.from( table.querySelectorAll( '[data-js-battle-royale="row"]' ) );
 
 				/**
 				 * Check on dataset for descending/ascending order
 				 */
-				const expr = button.getAttribute( 'data-order' );
-				const newOrder = expr === 'ascending' ? 'descending' : 'ascending';
-				for ( const b of sortButtons ) {
+				let expr = button.getAttribute( 'data-order' );
+				let newOrder = expr === 'ascending' ? 'descending' : 'ascending';
+				for ( let b of sortButtons ) {
 					this.changeButtonStyle( b, 'default' );
 				}
 				this.changeButtonStyle( button, newOrder );
-				const sorted = sortableRows.sort( function( a, b ) {
+				let sorted = sortableRows.sort( function( a, b ) {
 					return this.comparator( a, b, newOrder, sortType );
 				}.bind( this ) );
 
@@ -291,15 +291,15 @@ liquipedia.battleRoyale = {
 
 	createBottomNav( instanceId, navigationTab, currentPanelIndex ) {
 		// eslint-disable-next-line es-x/no-object-values
-		const contentPanel = Object.values(
+		let contentPanel = Object.values(
 			this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ navigationTab ]
 		)[ currentPanelIndex ];
-		const navPanels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ navigationTab ];
+		let navPanels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ navigationTab ];
 		if ( navPanels.length <= 1 ) {
 			return;
 		}
 
-		const element = document.createElement( 'div' );
+		let element = document.createElement( 'div' );
 		element.classList.add( 'panel-content__bottom-navigation' );
 		element.setAttribute( 'data-js-battle-royale', 'bottom-nav' );
 		if ( currentPanelIndex !== 0 ) {
@@ -320,16 +320,16 @@ liquipedia.battleRoyale = {
 	},
 
 	createBottomNavLink: function( instanceId, navigationTab, destinationPanel, direction = this.DIRECTION_LEFT ) {
-		const element = document.createElement( 'div' );
+		let element = document.createElement( 'div' );
 		element.classList.add( 'panel-content__bottom-navigation__link', `navigate--${ direction }` );
 		element.setAttribute( 'data-js-battle-royale', `bottom-nav-${ direction }` );
 		element.setAttribute( 'tabindex', '0' );
 
-		const textElement = document.createElement( 'span' );
+		let textElement = document.createElement( 'span' );
 		textElement.setAttribute( 'data-js-battle-royale', `bottom-nav-${ direction }-text` );
 		textElement.innerText = destinationPanel.innerText;
 
-		const icon = document.createElement( 'i' );
+		let icon = document.createElement( 'i' );
 		icon.classList.add( 'fas', `fa-arrow-${ direction }`, 'panel-content__bottom-navigation__icon' );
 		icon.setAttribute( 'data-js-battle-royale', `bottom-nav-${ direction }-icon` );
 		element.append( textElement, icon );
@@ -359,8 +359,8 @@ liquipedia.battleRoyale = {
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( function( navTab ) {
-				const target = navTab.dataset.targetId;
-				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
+				let target = navTab.dataset.targetId;
+				let panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
 
 				if ( target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
