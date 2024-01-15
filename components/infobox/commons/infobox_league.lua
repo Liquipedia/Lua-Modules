@@ -215,7 +215,7 @@ function League:createInfobox()
 								Title{name = 'Chronology'},
 								Chronology{
 									content = Table.filterByKey(args, function(key)
-										return key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil
+										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 									end)
 								}
 							}
