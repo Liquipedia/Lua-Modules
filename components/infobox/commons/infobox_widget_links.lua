@@ -25,7 +25,7 @@ local Links = Class.new(
 	end
 )
 
-local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {requireDevIfEnabled = true, loadData = true})
+local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
 ---@return {[1]: Html}
 function Links:make()
