@@ -65,7 +65,7 @@ function CustomUnit:setLpdbData(args)
 
 	-- Wikicode was: car_{{#explode:{{PAGENAME}}|/|1}}
 	local splitPagename = mw.text.split(self.pagename, '/')
-	-- wiki code explode is 0 index, lua is 1 indexed, hence use 2 if present
+	-- wiki code explode is 0 indexed, lua is 1 indexed, hence use 2 if present
 	local objectName = 'car_' .. (splitPagename[2] or splitPagename[1])
 
 	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, lpdbData)
