@@ -80,10 +80,13 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator)
-	if String.isNotEmpty(args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
+	local resolveIfExists = function(value)
+		if not value then return end
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
 	end
+	lpdbData.extradata.creator = resolveIfExists(args.creator)
+	lpdbData.extradata.creator2 = resolveIfExists(args.creator2)
+
 	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
