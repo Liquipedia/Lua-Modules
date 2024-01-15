@@ -124,7 +124,11 @@ function HorizontallistDisplay.Bracket(props)
 		matchNode:node(HorizontallistDisplay.Match(matchProps))
 	end
 
-	return mw.html.create('div'):addClass('brkts-br-wrapper battle-royale'):attr('data-js-battle-royale-id', props.bracketId):node(bracketNode):node(matchNode)
+	return mw.html.create('div')
+			:addClass('brkts-br-wrapper battle-royale')
+			:attr('data-js-battle-royale-id', props.bracketId)
+			:node(bracketNode)
+			:node(matchNode)
 end
 
 ---@param bracket MatchGroupUtilMatchGroup

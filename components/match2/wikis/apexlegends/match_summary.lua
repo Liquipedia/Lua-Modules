@@ -427,7 +427,9 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createOverallPage(match)
-	local page = mw.html.create('div'):addClass('panel-content'):attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel0')
+	local page = mw.html.create('div')
+			:addClass('panel-content')
+			:attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel0')
 	local schedule = page:tag('div'):addClass('panel-content__collapsible'):attr('data-js-battle-royale', 'collapsible')
 	local button = schedule:tag('h5')
 			:addClass('panel-content__button')

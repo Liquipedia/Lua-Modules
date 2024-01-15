@@ -131,9 +131,10 @@ Author(s): Elysienna
             margin-right: 0.25rem;
         }
 
-        &__countdown {
+        div&__countdown {
             padding: 0;
             font-size: unset;
+            display: flex;
         }
     }
 
