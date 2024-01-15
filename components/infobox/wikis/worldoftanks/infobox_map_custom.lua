@@ -46,9 +46,7 @@ function CustomInjector:parse(id, widgets)
 				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
 			},
 		}
-	end
-
-	if id == 'custom' then
+	elseif id == 'custom' then
 		return Array.append(widgets,
 			Cell{name = 'Map Season', content = {args.season}},
 			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
@@ -86,7 +84,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 		battletiermin = args.btmin,
 		battletiermax = args.btmax,
 		season = args.season,
-		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
+		modes = Json.stringify(self:getAllArgsForBase(args, 'mode'))
 	})
 
 	return lpdbData
