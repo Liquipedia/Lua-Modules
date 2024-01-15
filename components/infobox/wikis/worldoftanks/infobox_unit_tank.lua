@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@args table
+---@param args table
 ---@return string[]
 function CustomUnit._getTankType(args)
 	if String.isEmpty(args.tanktype) then
