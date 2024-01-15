@@ -36,7 +36,6 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	mw.logObject(args)
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Type', content = {args.type}},
@@ -77,7 +76,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
-	lpdbData.extradata.game = args.game
+	lpdbData.extradata.game = Game.name{game = args.game}
 	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
