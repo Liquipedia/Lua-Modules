@@ -21,13 +21,6 @@ local Cell = Widgets.Cell
 local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
-local GAME = {
-	mobile = '[[Mobile]]',
-	newstate = '[[New State]]',
-	peace = '[[Peacekeeper Elite|Peace Elite]]',
-	bgmi = '[[Battlegrounds Mobile India|BGMI]]',
-}
-
 local MODES = {
 	['battle royale'] = 'Battle Royale',
 	arena = 'Arena',
