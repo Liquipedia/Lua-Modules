@@ -31,7 +31,6 @@ local ACHIEVEMENTS_BASE_CONDITIONS = {
 }
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')
