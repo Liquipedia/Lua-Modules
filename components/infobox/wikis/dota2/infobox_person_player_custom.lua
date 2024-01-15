@@ -62,6 +62,7 @@ local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 ---@field role {category: string, variable: string, isplayer: boolean?}?
 ---@field role2 {category: string, variable: string, isplayer: boolean?}?
 ---@field basePageName string
+---@field locations string[]
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -86,6 +87,7 @@ function CustomPlayer.run(frame)
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 	player.basePageName = mw.title.getCurrentTitle().baseText
+	player.locations = player:_getLocations()
 
 	return player:createInfobox()
 end
@@ -179,15 +181,6 @@ function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role2', (self.role2 or {}).variable)
 end
 
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
@@ -195,8 +188,8 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
 	lpdbData.extradata.hero = args.hero
 	lpdbData.extradata.hero2 = args.hero2
 	lpdbData.extradata.hero3 = args.hero3
@@ -246,37 +239,37 @@ end
 
 ---@return table
 function CustomPlayer:_createLocations()
-	local country = self.args.country or self.args.country1
-	if String.isEmpty(country) then
-		return {}
-	end
-
-	return Table.mapValues(self:getAllArgsForBase(self.args, 'country'), function(country)
-		return self:_createLocation(country)
+	return Array.map(self.locations, function(country)
+		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+			Page.makeInternalLink(country, ':Category:' .. country)
 	end)
 end
 
----@param country string
----@return nil
-function CustomPlayer:_createLocation(country)
-	if String.isEmpty(country) then
-		return nil
-	end
-	local countryDisplay = Flags.CountryName(country)
-	local demonym = Flags.getLocalisation(countryDisplay) or ''
-	countryDisplay = '[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]'
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	local countryRoleCategory = ROLES_CATEGORY[self.args.role] or 'Players'
+	local countryRoleCategory2 = ROLES_CATEGORY[self.args.role2]
 
-	local roleCategory = ROLES_CATEGORY[self.args.role or ''] or 'Players'
-	local role2Category = ROLES_CATEGORY[self.args.role2 or ''] or 'Players'
+	Array.forEach(self.locations, function (country)
+		local demonym = Flags.getLocalisation(country)
+		Array.appendWith(categories,
+			demonym .. ' ' .. countryRoleCategory,
+			countryRoleCategory2 and (demonym .. ' ' .. countryRoleCategory2) or nil
+		)
+	end)
 
-	local categories = ''
-	if Namespace.isMain() then
-		categories = '[[Category:' .. demonym .. ' ' .. roleCategory .. ']]'
-		.. '[[Category:' .. demonym .. ' ' .. role2Category .. ']]'
-	end
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. countryDisplay .. categories
-
+---@return string[]
+function CustomPlayer:_getLocations()
+	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)
+		return Flags.CountryName(country)
+	end)
 end
 
 return CustomPlayer
