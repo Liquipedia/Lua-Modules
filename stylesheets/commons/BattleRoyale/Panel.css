@@ -4,214 +4,214 @@ Author(s): Elysienna
 *******************************************************************************/
 
 .panel-tabs {
-	ul&__list {
-		display: flex;
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		overflow-x: auto;
-	}
+    ul&__list {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow-x: auto;
+    }
 
-	&__list-item {
-		font-size: 0.875rem;
-		background-color: #f5f5f5;
-		padding: 0 1rem;
-		border-radius: 0.25rem 0.25rem 0 0;
-		margin: 0;
-		font-weight: bold;
-		min-height: 3.125rem;
-		display: flex;
-		align-items: center;
-		color: var( --clr-secondary-25, #404040 );
-		flex: 0 0 auto;
-		cursor: pointer;
+    &__list-item {
+        font-size: 0.875rem;
+        background-color: #F5F5F5;
+        padding: 0 1rem;
+        border-radius: 0.25rem 0.25rem 0 0;
+        margin: 0;
+        font-weight: 700;
+        min-height: 3.125rem;
+        display: flex;
+        align-items: center;
+        color: var(--clr-secondary-25, #404040);
+        flex: 0 0 auto;
+        cursor: pointer;
 
-		&.is--active {
-			background-color: #ffffff;
-			color: var( --clr-secondary-16, #282828 );
-		}
+        &.is--active {
+            background-color: #ffffff;
+            color: var(--clr-secondary-16, #282828);
+        }
 
-		&:not( :first-child ) {
-			margin-left: 0.25rem;
-		}
-	}
+        &:not( :first-child) {
+            margin-left: 0.25rem;
+        }
+    }
 
-	&__list-icon {
-		margin-right: 0.5rem;
+    &__list-icon {
+        margin-right: 0.5rem;
 
-		&.icon--green {
-			color: var( --clr-semantic-positive-30, #1d7c1d );
-		}
-	}
+        &.icon--green {
+            color: var( --clr-semantic-positive-30, #1D7C1D );
+        }
+    }
 
-	&__title {
-		font-size: inherit;
-		font-weight: inherit;
-		margin: 0;
-		padding: 0;
-		color: inherit;
-	}
+    &__title {
+        font-size: inherit;
+        font-weight: inherit;
+        margin: 0;
+        padding: 0;
+        color: inherit;
+    }
 }
 
 .panel-content {
-	&.is--hidden {
-		display: none;
-	}
+    &.is--hidden {
+        display: none;
+    }
 
-	&__collapsible.is--collapsed {
-		.panel-content__container {
-			max-height: 0;
-		}
+    &__collapsible.is--collapsed {
+        .panel-content__container {
+            max-height: 0;
+        }
 
-		.panel-content__button-icon {
-			transform: rotate( -180deg );
-		}
-	}
+        .panel-content__button-icon {
+            transform: rotate(-180deg);
+        }
+    }
 
-	&__container {
-		overflow: hidden;
-		transition: max-height 0.2s linear;
-		padding: 0 1rem;
-	}
+    &__container {
+        overflow: hidden;
+        transition: max-height 0.2s linear;
+        padding: 0 1rem;
+    }
 
-	&__button {
-		height: 3.5rem;
-		color: var( --clr-secondary-16, #282828 );
-		font-size: 0.9375rem;
-		margin: 0;
-		padding: 0;
-		display: flex;
-		align-items: center;
-		border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		cursor: pointer;
-		transition: background-color 0.2s linear;
+    &__button {
+        height: 3.5rem;
+        color: var(--clr-secondary-16, #282828);
+        font-size: 0.9375rem;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        border-top: 0.0625rem solid rgba(0, 0, 0, 0.08);
+        border-bottom: 0.0625rem solid rgba(0, 0, 0, 0.08);
+        cursor: pointer;
+        transition: background-color 0.2s linear;
 
-		@media ( hover: hover ) {
-			&:hover {
-				background-color: rgba( 0, 0, 0, 0.08 );
-			}
-		}
+        @media( hover: hover ) {
+            &:hover {
+                background-color: rgba(0, 0, 0, 0.08);
+            }
+        }
 
-		&-icon {
-			margin: 0 1rem;
-			transition: transform linear 0.2s;
-		}
-	}
+        &-icon {
+            margin: 0 1rem;
+            transition: transform linear 0.2s;
+        }
+    }
 
-	&__game-schedule {
-		ul& {
-			list-style: none;
-			margin: 1rem 0;
-			padding: 0;
-		}
+    &__game-schedule {
+        ul& {
+            list-style: none;
+            margin: 1rem 0;
+            padding: 0;
+        }
 
-		> li {
-			margin: 0;
-			display: flex;
-			align-items: center;
-		}
+        > li {
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
 
-		&__icon {
-			margin: 0 0.5rem;
-			font-size: 0.75rem;
-			color: var( --clr-semantic-silver-30, #3c585d );
+        &__icon {
+            margin: 0 0.5rem;
+            font-size: 0.75rem;
+            color: var(--clr-semantic-silver-30, #3C585D);
 
-			&.icon--green {
-				color: var( --clr-semantic-positive-30, #1d7c1d );
-			}
+            &.icon--green {
+                color: var(--clr-semantic-positive-30, #1D7C1D);
+            }
 
-			&.icon--red {
-				color: var( --clr-semantic-negative-30, #b81414 );
-			}
-		}
+            &.icon--red {
+                color: var(--clr-semantic-negative-30, #B81414);
+            }
+        }
 
-		&__title {
-			font-weight: bold;
-			margin-right: 0.25rem;
-		}
+        &__title {
+            font-weight: 700;
+            margin-right: 0.25rem;
+        }
 
-		div&__countdown {
-			padding: 0;
-			font-size: unset;
-			display: flex;
-		}
-	}
+        div&__countdown {
+            padding: 0;
+            font-size: unset;
+            display: flex;
+        }
+    }
 
-	&__points-distribution {
-		list-style: none;
-		margin: 1rem 0;
-		padding: 0;
+    &__points-distribution {
+        list-style: none;
+        margin: 1rem 0;
+        padding: 0;
 
-		ul& {
-			margin: 1rem 0;
-		}
+        ul& {
+            margin: 1rem 0;
+        }
 
-		&__list-item {
-			margin: 0 0 0.125rem 0;
-			display: flex;
-			min-height: 1.5rem;
-			align-items: center;
-		}
+        &__list-item {
+            margin: 0 0 0.125rem 0;
+            display: flex;
+            min-height: 1.5rem;
+            align-items: center;
+        }
 
-		&__icon {
-			width: 1.5rem;
-			font-size: 0.875rem;
+        &__icon {
+            width: 1.5rem;
+            font-size: 0.875rem;
 
-			&.icon--gold {
-				color: var( --clr-semantic-gold-40, #ccab00 );
-			}
+            &.icon--gold {
+                color: var(--clr-semantic-gold-40, #CCAB00);
+            }
 
-			&.icon--silver {
-				color: var( --clr-semantic-silver-40, #557177 );
-			}
+            &.icon--silver {
+                color: var(--clr-semantic-silver-40, #557177);
+            }
 
-			&.icon--bronze {
-				color: var( --clr-semantic-bronze-40, #80704c );
-			}
+            &.icon--bronze {
+                color: var(--clr-semantic-bronze-40, #80704C);
+            }
 
-			&.icon--copper {
-				color: var( --clr-semantic-copper-40, #cc7800 );
-			}
-		}
+            &.icon--copper {
+                color: var(--clr-semantic-copper-40, #CC7800);
+            }
+        }
 
-		&__title {
-			font-weight: bold;
-			min-width: 5rem;
-			padding-left: 0.5rem;
-		}
-	}
+        &__title {
+            font-weight: 700;
+            min-width: 5rem;
+            padding-left: 0.5rem;
+        }
+    }
 
-	&__bottom-navigation {
-		height: 3.125rem;
-		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-top: 0;
-		display: flex;
-		align-items: center;
+    &__bottom-navigation {
+        height: 3.125rem;
+        border: 0.0625rem solid rgba( 0,0,0,0.08 );
+        border-top: 0;
+        display: flex;
+        align-items: center;
 
-		&__link {
-			color: var( --clr-on-background, #212529 );
-			display: flex;
-			align-items: center;
-			padding: 0 0.5rem;
-			cursor: pointer;
-			font-weight: bold;
+        &__link {
+            color: var( --clr-on-background, #212529 );
+            display: flex;
+            align-items: center;
+            padding: 0 0.5rem;
+            cursor: pointer;
+            font-weight: 700;
 
-			&.navigate--left {
-				flex-direction: row-reverse;
-			}
+            &.navigate--left {
+                flex-direction: row-reverse;
+            }
 
-			&.navigate--right {
-				margin-left: auto;
-			}
-		}
+            &.navigate--right {
+                margin-left: auto;
+            }
+        }
 
-		&__icon {
-			color: var( --clr-wiki-on-primary );
-			width: 1.5rem;
-			display: flex;
-			justify-content: center;
-			margin: 0 0.5rem;
-		}
-	}
+        &__icon {
+            color: var( --clr-wiki-on-primary );
+            width: 1.5rem;
+            display: flex;
+            justify-content: center;
+            margin: 0 0.5rem;
+        }
+    }
 }
