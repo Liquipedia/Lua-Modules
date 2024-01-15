@@ -10,12 +10,12 @@ liquipedia.battleRoyale = {
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
 	implementOnWindowResize: function( instanceId ) {
-		window.addEventListener( 'resize', () => {
+		window.addEventListener( 'resize', function () {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 				.forEach( ( tableEl ) => {
 					this.recheckSideScrollButtonStates( tableEl );
 				} );
-		} );
+		}.bind(this) );
 	},
 
 	implementScrollendEvent: function( instanceId ) {
