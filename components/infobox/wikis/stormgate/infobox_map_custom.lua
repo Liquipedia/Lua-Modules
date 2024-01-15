@@ -107,7 +107,7 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args-
+	local args = self.caller.args
 
 	if id == 'custom' then
 		local typeName = Table.size(args.types) == 1 and 'Type' or 'Types'
