@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
@@ -64,9 +65,9 @@ function CustomPlayer.run(frame)
 			name = Logic.emptyOr(args.romanized_name, args.name),
 			romanizedname = args.romanized_name,
 			status = args.status,
-			type = player.roleData.personType,
-			role = player.roleData.variable,
-			role2 = player.roleData2.variable,
+			type = player.role.personType,
+			role = player.role.variable,
+			role2 = player.role2.variable,
 			id = args.id,
 			idIPA = args.idIPA,
 			idAudio = args.idAudio,
@@ -178,10 +179,10 @@ function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
----@param roleData {category: string, variable: string, isplayer: boolean?, personType: string}?
+---@param roleData {category: string, variable: string, isplayer: boolean?, personType: string}
 ---@return string?
 function CustomPlayer:_displayRole(roleData)
-	if not roleData then return end
+	if Table.isEmpty(roleData) then return end
 
 	if not self:shouldStoreData(self.args) then
 		return roleData.variable
