@@ -410,11 +410,11 @@ function CustomPlayer:calculateEarnings(args)
 	CustomPlayer._setVarsFromTable(earnings)
 	CustomPlayer._setVarsFromTable(medals)
 
-	local eartningsByYear = Table.map(earnings['total'], function(key, value)
+	local earningsByYear = Table.map(earnings['total'], function(key, value)
 		return tonumber(key) or key, Math.round(value)
 	end)
 
-	return Math.round(earningsTotal), earnings['total']
+	return Math.round(earningsTotal), earningsByYear
 end
 
 ---@param earnings table<string, table<string, number>>
