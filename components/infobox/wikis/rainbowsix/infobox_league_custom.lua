@@ -14,8 +14,8 @@ local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -164,7 +164,7 @@ function CustomLeague:getWikiCategories(args)
 	local platform = self:_platformLookup(args.platform)
 
 	return {
-		game and (game .. 'Competitions') or 'Tournaments without game version',
+		game and (game .. ' Competitions') or 'Tournaments without game version',
 		platform and (platform .. ' Tournaments') or nil,
 	}
 end

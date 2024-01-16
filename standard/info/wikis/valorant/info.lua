@@ -28,5 +28,5 @@ return {
 	defaultGame = 'val',
 	defaultTeamLogo = 'VALORANT allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'VALORANT allmode.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }

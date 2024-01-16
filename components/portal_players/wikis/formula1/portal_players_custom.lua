@@ -16,8 +16,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local AgeCalculation = Lua.import('Module:AgeCalculation')
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay

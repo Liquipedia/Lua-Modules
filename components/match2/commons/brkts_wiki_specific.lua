@@ -8,4 +8,4 @@
 
 local Lua = require('Module:Lua')
 
-return Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true})
+return Lua.import('Module:Brkts/WikiSpecific/Base')

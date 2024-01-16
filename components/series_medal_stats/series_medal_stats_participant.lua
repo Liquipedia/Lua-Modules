@@ -17,7 +17,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local MedalStatsBase = Lua.import('Module:SeriesMedalStats', {requireDevIfEnabled = true})
+local MedalStatsBase = Lua.import('Module:SeriesMedalStats')
 
 ---@class SeriesMedalStatsParticipant: SeriesMedalStats
 ---@field teams table<string, string>

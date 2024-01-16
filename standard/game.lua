@@ -16,7 +16,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
 
 local GamesData = Info.games
 
@@ -91,6 +91,10 @@ function Game.listGames(options)
 	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
 		return Array.sortBy(gamesList, getGameOrder)
 	end
+
+	Array.filter(gamesList, function(game)
+		return not game.unlisted
+	end)
 
 	return gamesList
 end

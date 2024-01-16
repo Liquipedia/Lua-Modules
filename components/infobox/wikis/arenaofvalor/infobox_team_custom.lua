@@ -13,7 +13,7 @@ local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class ArenaofvalorInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)

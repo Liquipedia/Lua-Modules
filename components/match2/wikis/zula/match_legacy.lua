@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 local DRAW = 'draw'
 local LOSER_STATUSES = {'FF', 'DQ', 'L'}

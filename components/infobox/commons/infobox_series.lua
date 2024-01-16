@@ -18,13 +18,13 @@ local Tier = require('Module:Tier/Custom')
 local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 

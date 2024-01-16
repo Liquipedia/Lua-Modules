@@ -16,9 +16,9 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local Locale = Lua.import('Module:Locale')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

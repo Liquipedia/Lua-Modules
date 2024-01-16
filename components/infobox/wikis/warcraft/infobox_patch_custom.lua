@@ -14,8 +14,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Patch = Lua.import('Module:Infobox/Patch')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell

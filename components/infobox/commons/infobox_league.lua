@@ -21,15 +21,15 @@ local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
-local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local MetadataGenerator = Lua.import('Module:MetadataGenerator')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
@@ -215,7 +215,7 @@ function League:createInfobox()
 								Title{name = 'Chronology'},
 								Chronology{
 									content = Table.filterByKey(args, function(key)
-										return key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil
+										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 									end)
 								}
 							}

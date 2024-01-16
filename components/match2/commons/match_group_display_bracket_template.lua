@@ -12,8 +12,8 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local BracketTemplateDisplay = {propTypes = {}}
 

@@ -19,7 +19,7 @@ local Match = require('Module:Match')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
 
 local BigMatch = Class.new()
 

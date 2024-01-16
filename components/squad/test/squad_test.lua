@@ -9,9 +9,9 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
-local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
+local LpdbMock = Lua.import('Module:Mock/Lpdb')
 
 local suite = ScribuntoUnit:new()
 

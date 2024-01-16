@@ -16,8 +16,8 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Weapon = Lua.import('Module:Infobox/Weapon')
 
 ---@class ApexlegendsWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
