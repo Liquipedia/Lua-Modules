@@ -32,6 +32,7 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
@@ -47,6 +48,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 ---@return string[]
 function CustomMap:_getGameMode(args)
 	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
