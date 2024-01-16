@@ -62,6 +62,7 @@ ROLES.rifle = ROLES.rifler
 ---@field management boolean
 
 ---@class CounterstrikeInfoboxPlayer: Person
+---@field gamesList string[]
 ---@field role CounterstrikePersonRoleData?
 ---@field role2 CounterstrikePersonRoleData?
 local CustomPlayer = Class.new(Player)
@@ -84,7 +85,7 @@ function CustomPlayer.run(frame)
 
 	player.args.banned = tostring(player.args.banned or '')
 
-	player.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	player.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return player.args[gameIdentifier]
 		end)
 
@@ -105,7 +106,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell {
 				name = 'Games',
-				content = Array.map(args.gamesList, function (gameIdentifier)
+				content = Array.map(caller.gamesList, function (gameIdentifier)
 						return Game.text{game = gameIdentifier}
 					end)
 			}
@@ -179,12 +180,12 @@ end
 function CustomPlayer:getWikiCategories(categories)
 	local typeCategory = self:getPersonType(self.args).category
 
-	Array.forEach(self.args.gamesList, function (gameIdentifier)
+	Array.forEach(self.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
 		end)
 
-	if Table.isEmpty(self.args.gamesList) then
+	if Table.isEmpty(self.gamesList) then
 		table.insert(categories, 'Gameless Players')
 	end
 
