@@ -10,7 +10,7 @@ local lpdb = {}
 ---@field extradata table
 ---@field [any] any
 
----@class broadcaster:LpdbBaseData
+---@class broadcasters:LpdbBaseData
 ---@field id string
 ---@field name string
 ---@field page string
