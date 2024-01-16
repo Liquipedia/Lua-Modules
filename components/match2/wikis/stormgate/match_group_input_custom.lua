@@ -630,7 +630,7 @@ function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponent
 				map[prefix .. playerIndex .. 'heroes'],
 				faction,
 				player.name,
-				Logic.readBool(map[prefix .. playerIndex .. 'heroesNoCheck'])
+				Logic.readBool(map[prefix .. playerIndex .. 'noheroescheck'])
 			),
 		}
 	end
@@ -660,7 +660,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				faction = Faction.read(map[prefix .. 'faction']),
 				position = playerIndex,
 				heroes = map[prefix .. 'heroes'],
-				heroesCheckDisabled = Logic.readBool(map[prefix .. 'heroesNoCheck']),
+				heroesCheckDisabled = Logic.readBool(map[prefix .. 'noheroescheck']),
 				playedRandom = Logic.readBool(map[prefix .. 'random']),
 			}
 		end
