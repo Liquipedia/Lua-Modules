@@ -127,7 +127,7 @@ function CustomPlayer:_getActiveCasterYears()
 
 	local years = Set{}
 	Array.forEach(queryData,
-		---@param item broadcaster
+		---@param item broadcasters
 		---@return number?
 		function(item) years:add(tonumber(item.year_date)) end
 	)
