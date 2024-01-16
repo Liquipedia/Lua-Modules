@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -33,56 +34,48 @@ local ROLES = {
 }
 ROLES.dueler = ROLES.duel
 
-local CustomPlayer = Class.new()
+---@class ArenafpsInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'region' then return {}
+	local args = self.caller.args
+
+	if id == 'custom' then
+		local games = Array.map(Array.extractKeys(Table.filterByKey(args, Game.isValid)), function(game)
+			return Page.makeInternalLink({}, Game.name{game = game}, Game.link{game = game})
+		end)
+		table.insert(widgets, Cell{name = 'Games', content = games})
+	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role', content = Array.map(Player:getAllArgsForBase(_args, 'role'), function(role)
+			Cell{name = 'Role', content = Array.map(self.caller:getAllArgsForBase(args, 'role'), function(role)
 				return CustomPlayer._roleDisplay(role)
 			end)},
 		}
 	elseif id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {_args.years_active}})
-		table.insert(widgets, Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Org)', content = {args.years_active_manage}})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local games = {}
-	for param in pairs(_args) do
-		if Game.isValid(param) then
-			table.insert(games, Page.makeInternalLink({}, Game.name{game = param}, Game.link{game = param}))
-		end
-	end
-	table.insert(widgets, Cell{name = 'Games', content = games})
-	return widgets
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer._getRoleData(role)
-	return role and ROLES[role:lower()] or nil
-end
-
+---@param role string?
+---@return string?
 function CustomPlayer._roleDisplay(role)
-	local roleData = CustomPlayer._getRoleData(role)
+	local roleData = ROLES[(role or ''):lower()]
 	return roleData and roleData.variable or nil
 end
 
