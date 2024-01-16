@@ -24,39 +24,60 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _role
-local _role2
-local _CURRENT_YEAR = tonumber(os.date('%Y'))
+local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local CustomPlayer = Class.new()
-
+---@class FortniteInfoboxPlayer: Person
+---@field role table
+---@field role2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _player
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-	_player = player
-	_args.autoTeam = true
-	_role = Role.run({role = _args.role})
-	_role2 = Role.run({role = _args.role2})
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.args.autoTeam = true
+	player.role = Role.run{role = player.args.role}
+	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'history' then
-		local manualHistory = _args.history
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		local yearsActive = ActiveYears.display{player = caller.pagename}
+
+		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
+		if currentYearEarnings then
+			currentYearEarnings = Math.round(currentYearEarnings)
+			currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+		end
+
+		return {
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
+			Cell{name = 'Years active', content = {yearsActive}},
+			Cell{
+				name = Abbreviation.make(
+					'Epic Creator Code',
+					'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products'
+				),
+				content = {args.creatorcode}
+			},
+		}
+	elseif id == 'history' then
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			addlpdbdata = true,
 			convertrole = true,
-			player = _pagename
+			player = self.caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -69,50 +90,22 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
 		}
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local yearsActive = ActiveYears.display{
-		player = _player.pagename,
-	}
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
+	lpdbData.extradata.role = self.role.role
+	lpdbData.extradata.role2 = self.role2.role
 
-	local currentYearEarnings = _player.earningsPerYear[_CURRENT_YEAR]
-	if currentYearEarnings then
-		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
-	end
-
-	return {
-		Cell{
-			name = 'Approx. Winnings ' .. _CURRENT_YEAR,
-			content = {currentYearEarnings}
-		},
-		Cell{name = 'Years active', content = {yearsActive}},
-		Cell{
-			name = Abbreviation.make(
-				'Epic Creator Code',
-				'Support-A-Creator Code used when purchasing Fortnite or Epic Games Store products'
-			),
-			content = {_args.creatorcode}
-		},
-	}
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
-
-
-	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
+	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData
 end

@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -21,10 +22,9 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Builder = Widgets.Title
 local Cell = Widgets.Cell
 
-local _ROLES = {
+local ROLES = {
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
 	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
@@ -38,122 +38,129 @@ local _ROLES = {
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
-local _SIZE_HERO = '25x25px'
+local SIZE_HERO = '25x25px'
 
-local CustomPlayer = Class.new()
-
+---@class NarakaInfoboxPlayer: Person
+---@field role {category: string, variable: string, isplayer: boolean?}?
+---@field role2 {category: string, variable: string, isplayer: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-
-	_args = player.args
-	_args.autoTeam = true
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'region' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero, _)
+			return HeroIcon.getImage{hero, size = SIZE_HERO}
+		end)
+
+		return {
+			Cell{
+				name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
+				content = {table.concat(heroIcons, '&nbsp;')},
+			}
+		}
+	elseif id == 'region' then
 		return {}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
+
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Heroes
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local heroIcons = Array.map(Player:getAllArgsForBase(_args, 'hero'),
-					function(hero, _)
-						return HeroIcon.getImage{hero, size = _SIZE_HERO}
-					end
-				)
-				return {
-					Cell{
-						name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
-						content = {
-							table.concat(heroIcons, '&nbsp;')
-						}
-					}
-				}
-			end
-		})
-	return widgets
-end
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
-
-	for _, hero, heroIndex in Table.iter.pairsByPrefix(_args, 'hero', {requireIndex = false}) do
+	for _, hero, heroIndex in Table.iter.pairsByPrefix(args, 'hero', {requireIndex = false}) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = hero
 	end
-	lpdbData.type = CustomPlayer._isPlayerOrStaff()
+	lpdbData.type = self:_isPlayerOrStaff()
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
 end
 
-function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		return
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
 end
 
-function CustomPlayer._isPlayerOrStaff()
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	if not self:shouldStoreData(self.args) then
+		return roleData.variable
+	end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+end
+
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
+
+---@return string
+function CustomPlayer:_isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = _ROLES[_args.role:lower()]
+	if String.isNotEmpty(self.args.role) then
+		roleData = ROLES[self.args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
