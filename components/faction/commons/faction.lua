@@ -162,7 +162,7 @@ function Faction.toName(faction, options)
 end
 
 ---@class FactionIconProps
----@field faction string
+---@field faction string?
 ---@field showLink boolean?
 ---@field showTitle boolean?
 ---@field size string|number|nil
