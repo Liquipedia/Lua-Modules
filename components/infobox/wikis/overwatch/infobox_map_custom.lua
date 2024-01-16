@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
@@ -18,69 +19,53 @@ local Flags = Lua.import('Module:Flags')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class OverwatchMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.addToLpdb = CustomMap.addToLpdb
-	_args = customMap.args
-	return customMap:createInfobox()
-end
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local gameModes = CustomMap._getGameMode()
-	table.insert(widgets, Cell{
-		name = #gameModes == 1 and 'Game Mode' or 'Game Modes',
-		content = gameModes,
-	})
-	table.insert(widgets, Cell{
-		name = 'Lighting',
-		content = {_args.lighting}
-	})
-	table.insert(widgets, Cell{
-		name = 'Checkpoints',
-		content = {_args.checkpoints}
-	})
-	return widgets
+	return map:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'location' then
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = _args.location, shouldLink = false} .. '&nbsp;' .. _args.location}
+				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location},
 			},
 		}
+	elseif id == 'custom' then
+		local gameModes = self.caller:_getGameMode(args)
+		Array.appendWith(
+			widgets,
+			Cell{name = #gameModes == 1 and 'Game Mode' or 'Game Modes', content = gameModes},
+			Cell{name = 'Lighting', content = {args.lighting}},
+			Cell{name = 'Checkpoints', content = {args.checkpoints}}
+		)
 	end
 	return widgets
 end
 
+---@param args table
 ---@return string[]
-function CustomMap._getGameMode()
-	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
+function CustomMap:_getGameMode(args)
+	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
 		return {}
 	end
 
-	local modes = Map:getAllArgsForBase(_args, 'mode')
-	local releaseDate = _args.releasedate
+	local modes = self:getAllArgsForBase(args, 'mode')
+	local releaseDate = args.releasedate
 
 	local modeDisplayTable = {}
 	for _, mode in ipairs(modes) do
@@ -95,11 +80,14 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator)
-	if String.isNotEmpty(args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
+	local resolveIfExists = function(value)
+		if not value then return end
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
 	end
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
+	lpdbData.extradata.creator = resolveIfExists(args.creator)
+	lpdbData.extradata.creator2 = resolveIfExists(args.creator2)
+
+	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 
