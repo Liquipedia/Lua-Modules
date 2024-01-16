@@ -30,6 +30,8 @@ local TYPES = {
 	water = 'Water',
 }
 
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
@@ -37,6 +39,9 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
@@ -57,10 +62,15 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param input string?
+---@return string
 function CustomMap:_getType(input)
 	return TYPES[(input or ''):lower()] or 'Unknown Type'
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
@@ -72,6 +82,8 @@ function CustomMap:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomMap:getWikiCategories(args)
 	return {
 		Game.name{game = args.game} .. ' Maps',
