@@ -102,11 +102,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
 			Cell{name = 'Military Service', content = {args.military}},
 			Cell{
-				name = Abbreviation.make('Years active', 'Years active as a player'),
+				name = Abbreviation.make('Years Active', 'Years active as a player'),
 				content = {caller.yearsActive}
 			},
 			Cell{
-				name = Abbreviation.make('Years active (caster)', 'Years active as a caster'),
+				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
 				content = {self.caller:_getActiveCasterYears()}
 			},
 		}
@@ -128,7 +128,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{name = 'Achievements'},
 			Center{content = {Achievements.display(caller.infoboxAchievements)}},
-			Cell{name = 'All-kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
+			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
@@ -140,7 +140,7 @@ end
 
 ---@return string?
 function CustomPlayer:_getActiveCasterYears()
-	if not self:shouldStoreData(self.args) then return end
+	if not self.shouldQueryData then return end
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 		query = 'year::date',
