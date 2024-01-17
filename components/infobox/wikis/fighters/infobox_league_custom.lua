@@ -29,7 +29,7 @@ local DEFAULT_TYPE = 'offline'
 local MANUAL_SERIES_ICON = true
 local TODAY = os.date('%Y-%m-%d', os.time())
 
----@class FightersLeagueInfobox: InfoboxLeagueTemp
+---@class FightersLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
