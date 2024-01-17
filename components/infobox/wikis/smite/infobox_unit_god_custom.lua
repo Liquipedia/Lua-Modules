@@ -1,0 +1,196 @@
+---
+-- @Liquipedia
+-- wiki=leagueoflegends
+-- page=Module:Infobox/Unit/Champion
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+local Template = require('Module:Template')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
+
+local Widgets = require('Module:Infobox/Widget/All')
+local Breakdown = Widgets.Breakdown
+local Cell = Widgets.Cell
+local Center = Widgets.Center
+local Header = Widgets.Header
+local Title = Widgets.Title
+
+---@class SmiteUnitInfobox: UnitInfobox
+local CustomGod = Class.new(Unit)
+local CustomInjector = Class.new(Injector)
+
+local FAVOR_ICON = '[[File:Smite Currency Favor.png|x20px|Favor|link=Favor]]'
+local GEMS_ICON = '[[File:Smite Currency Gems.png|x20px|Gems|link=Gems]]'
+
+---@param frame Frame
+---@return Html
+function CustomGod.run(frame)
+	local unit = CustomGod(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
+	unit.args.informationType = 'God'
+
+	return unit:createInfobox()
+end
+
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'header' then
+		return {
+			Header {
+				name = args.godname,
+				subHeader = args.title,
+				image = args.image,
+				imageDefault = args.default,
+				imageDark = args.imagedark or args.imagedarkmode,
+				imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			},
+		}
+	elseif id == 'caption' then
+		table.insert(widgets, Center {content = {args.quote}})
+	elseif id == 'type' then
+		local breakDownContents = {}
+		local pantheon = args.pantheon
+		if not String.isEmpty(pantheon) then
+			pantheon = '<b>Pantheon</b><br>' ..
+				Template.safeExpand(mw.getCurrentFrame(), 'Pantheon icon', {pantheon}, '')
+			table.insert(breakDownContents, pantheon)
+		end
+		local class = args.class
+		if not String.isEmpty(class) then
+			class = '<b>Class</b><br>' ..
+				Template.safeExpand(mw.getCurrentFrame(), 'Class icon', {class},
+					'')
+			table.insert(breakDownContents, class)
+		end
+		local powerType = args.powertype
+		if not String.isEmpty(powerType) then
+			powerType = '<b>Power Type</b><br>' ..
+				Template.safeExpand(mw.getCurrentFrame(), 'Power icon', {powerType}, '')
+			table.insert(breakDownContents, powerType)
+		end
+		return {
+			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Cell{name = 'Real Name', content = {args.realname}},
+		}
+	elseif id == 'cost' then
+		local cost = ''
+		if not String.isEmpty(args.costfavor) then
+			cost = cost .. args.costfavor .. ' ' .. FAVOR_ICON
+		end
+		if not String.isEmpty(args.costgems) then
+			if cost ~= '' then
+				cost = cost .. '&emsp;&ensp;'
+			end
+			cost = cost .. args.costgems .. ' ' .. GEMS_ICON
+		end
+		return {
+			Cell{name = 'Price', content = {cost}},
+		}
+	elseif id == 'custom' then
+		self.caller:getCustomCells(widgets)
+	end
+
+	return widgets
+end
+
+---@param widgets Widget[]
+---@return Widget[]
+function CustomGod:getCustomCells(widgets)
+	local args = self.args
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Attack Type', content = {args.attacktype}},
+		Cell{name = 'Difficulty', content = {args.difficulty}},
+		Cell{name = 'Release Date', content = {args.releasedate}}
+	)
+
+	if not (
+			String.isEmpty(args.hp) and
+			String.isEmpty(args.hplvl) and
+			String.isEmpty(args.hpreg) and
+			String.isEmpty(args.hpreglvl)
+		) then
+		table.insert(widgets, Title {name = 'Base Statistics'})
+	end
+
+	local function bonusPerLevel(start, bonuslvl)
+		return bonuslvl and start .. ' (' .. bonuslvl .. ')' or start
+	end
+
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Health', content = {bonusPerLevel(args.hp, args.hplvl)}},
+		Cell{name = 'Health Regen (HP5)', content = {bonusPerLevel(args.hp5, args.hp5lvl)}},
+		Cell{name = 'Mana', content = {bonusPerLevel(args.mana, args.manalvl)}},
+		Cell{name = 'Mana Regen (MP5)', content = {bonusPerLevel(args.mp5, args.mp5lvl)}},
+		Cell{name = 'Movement Speed', content = {bonusPerLevel(args.speed, args.speedlvl)}},
+		Cell{name = 'Attack Range', content = {bonusPerLevel(args.attackrange, args.attackrangelvl)}},
+		Cell{name = 'Attack Speed', content = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
+		Cell{name = 'Attack Damage', content = {bonusPerLevel(args.damage, args.damagelvl), args.damagebonus}},
+		Cell{name = 'Progression', content = {args.progression}},
+		Title{name = 'Protections'},
+		Cell{name = 'Physical', content = {bonusPerLevel(args.physical, args.physicallvl)}},
+		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}},
+		Title{name = 'Esports Statistics'}
+	)
+
+	--[[local stats = GodWL.create({god = args.godname or self.pagename})
+	stats = mw.text.split(stats, ';')
+	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
+	winPercentage = Math.round(winPercentage, 4) * 100
+	local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
+	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})]]--
+
+	return widgets
+end
+
+---@param args table
+---@return string[]
+function CustomGod:getWikiCategories(args)
+	if not Namespace.isMain() then
+		return {}
+	end
+	local categories = {'Gods'}
+	if not String.isEmpty(args.attacktype) then
+		table.insert(categories, args.attacktype .. ' Gods')
+	end
+	if not String.isEmpty(args.primaryrole) then
+		table.insert(categories, args.primaryrole .. ' Gods')
+	end
+	return categories
+end
+
+---@param args table
+function CustomGod:setLpdbData(args)
+	local lpdbData = {
+		type = 'gods',
+		name = args.godname or self.pagename,
+		information = args.primaryrole,
+		image = args.image,
+		date = args.releasedate,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json {
+			pantheon = args.pantheon,
+			attacktype = args.attacktype,
+			primaryrole = args.primaryrole,
+			secondaryrole = args.secondaryrole,
+			secondarybar = args.secondarybar,
+			costfavor = args.costfavor,
+			costgems = args.costgems,
+		}
+	}
+	mw.ext.LiquipediaDB.lpdb_datapoint('god_' .. (args.godname or self.pagename), lpdbData)
+end
+
+return CustomGod
