@@ -273,6 +273,8 @@ function TournamentStructure.fetchGroupTableEntries(group)
 			local sortValue = tonumber(record.extradata.slotindex) or tonumber(record.placement)
 			sortValue = placeMapping[sortValue] or sortValue
 			record.extradata.slotindex = sortValue
+			--need to adjust it
+			---@diagnostic disable-next-line: assign-type-mismatch
 			record.placement = sortValue
 		end
 	end
