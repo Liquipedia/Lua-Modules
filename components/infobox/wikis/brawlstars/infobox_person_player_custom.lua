@@ -184,10 +184,6 @@ end
 function CustomPlayer:_displayRole(roleData)
 	if Table.isEmpty(roleData) then return end
 
-	if not self:shouldStoreData(self.args) then
-		return roleData.variable
-	end
-
 	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
