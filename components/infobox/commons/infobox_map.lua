@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -96,12 +97,11 @@ function Map:_setLpdbData(args)
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
-		extradata = { creator = args.creator }
+		extradata = {creator = args.creator}
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. lpdbData.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('map_' .. lpdbData.name, Json.stringifySubTables(lpdbData))
 end
 
 return Map
