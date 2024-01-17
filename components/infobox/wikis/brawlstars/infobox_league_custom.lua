@@ -32,7 +32,7 @@ local ORGANIZER_ICONS = {
 	['faceit'] = '[[File:FACEIT icon allmode.png|x18px|link=Esports Engine|Esports Engine]] ',
 }
 
----@class BrawlstarsLeagueInfobox: InfoboxLeagueTemp
+---@class BrawlstarsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

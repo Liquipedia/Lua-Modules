@@ -44,7 +44,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
----@class InfoboxLeagueTemp: BasicInfobox
+---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
 
 League.warnings = {}
