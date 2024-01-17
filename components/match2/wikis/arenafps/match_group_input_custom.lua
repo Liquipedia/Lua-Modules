@@ -49,7 +49,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getExtraData(match)
 
 	return match
 end
