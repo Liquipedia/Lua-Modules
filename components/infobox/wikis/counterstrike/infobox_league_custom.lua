@@ -30,7 +30,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class CounterstrikeLeagueInfobox: InfoboxLeagueTemp
+---@class CounterstrikeLeagueInfobox: InfoboxLeague
 ---@field gameData table
 ---@field valveTier {meta: string, name: string, link: string}?
 local CustomLeague = Class.new(League)
