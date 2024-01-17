@@ -5,24 +5,24 @@
 liquipedia.selectall = {
 	init: function() {
 		document.querySelectorAll( '.selectall' ).forEach( function( selectall ) {
-			var wrapper = document.createElement( 'div' );
+			const wrapper = document.createElement( 'div' );
 			wrapper.classList.add( 'selectall-wrapper' );
-			var buttonwrapper = document.createElement( 'div' );
+			const buttonwrapper = document.createElement( 'div' );
 			buttonwrapper.classList.add( 'selectall-buttons' );
 			wrapper.appendChild( buttonwrapper );
-			var relative = document.createElement( 'div' );
+			const relative = document.createElement( 'div' );
 			relative.classList.add( 'selectall-relative' );
 			wrapper.appendChild( relative );
 			selectall.parentNode.replaceChild( wrapper, selectall );
 			relative.appendChild( selectall );
-			var selectbutton = document.createElement( 'button' );
+			const selectbutton = document.createElement( 'button' );
 			selectbutton.innerHTML = 'Select';
 			selectbutton.onclick = function() {
 				liquipedia.selectall.selectText( this );
 			};
 			buttonwrapper.appendChild( selectbutton );
 			buttonwrapper.appendChild( document.createTextNode( ' ' ) );
-			var selectcopybutton = document.createElement( 'button' );
+			const selectcopybutton = document.createElement( 'button' );
 			selectcopybutton.innerHTML = 'Select and copy';
 			selectcopybutton.onclick = function() {
 				liquipedia.selectall.selectText( this );
@@ -35,9 +35,9 @@ liquipedia.selectall = {
 		this.parentNode.removeChild( this );
 	},
 	selectText: function( button ) {
-		var wrapper = button.closest( '.selectall-wrapper' );
-		var selectall = wrapper.querySelector( '.selectall' );
-		var textarea = document.createElement( 'textarea' );
+		const wrapper = button.closest( '.selectall-wrapper' );
+		const selectall = wrapper.querySelector( '.selectall' );
+		const textarea = document.createElement( 'textarea' );
 		textarea.readOnly = true;
 		textarea.classList.add( 'selectall-duplicate' );
 		textarea.innerHTML = selectall.innerHTML;

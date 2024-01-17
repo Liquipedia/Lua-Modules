@@ -1,6 +1,6 @@
 {
 	"extends": [
-		"wikimedia/client-es5",
+		"wikimedia/client",
 		"wikimedia/jquery",
 		"wikimedia/mediawiki"
 	],
@@ -25,10 +25,13 @@
 		"es-x/no-array-prototype-findindex": "off",
 		"es-x/no-spread-elements": "off",
 		"es-x/no-property-shorthands": "off",
-		"max-len": ["off", { "code": 120 }]
+		"max-len": ["warn", { "code": 120 }]
 	},
 	"parserOptions": {
-		"ecmaVersion": 5
+		"ecmaVersion": 2017
+	},
+	"env": {
+		"es6": true
 	}
 }
 

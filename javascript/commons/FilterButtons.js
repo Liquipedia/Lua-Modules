@@ -53,13 +53,13 @@ liquipedia.filterButtons = {
 		/**
 		 * Get all elements with data-filter attribute
 		 */
-		var elements = document.querySelectorAll( '[data-filter]' );
+		const elements = document.querySelectorAll( '[data-filter]' );
 		if ( elements.length === 0 ) {
 			return;
 		}
 
 		elements.forEach( function( element ) {
-			var filterGroup = element.dataset.filterGroup || this.bcFilterGroup;
+			const filterGroup = element.dataset.filterGroup || this.bcFilterGroup;
 			this.buttonContainerElements[ filterGroup ] = element;
 			// Start with empty activeFilters
 			this.activeFilters[ filterGroup ] = [];
@@ -77,7 +77,7 @@ liquipedia.filterButtons = {
 				}, this );
 			}
 
-			var itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
+			let itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
 			if ( filterGroup === this.bcFilterGroup ) {
 				itemQS = '[data-filter-category]:not([data-filter-group])';
 			}
@@ -157,7 +157,7 @@ liquipedia.filterButtons = {
 	 */
 	initButtonState: function( filterGroup, button ) {
 		// Check for data in local storage
-		var localStorageValue = this.getLocalStorage();
+		const localStorageValue = this.getLocalStorage();
 		if ( filterGroup in localStorageValue ) {
 			// console.log('filterGroup', filterGroup, this.activeFilters[filterGroup]);
 			// User has filter preferences. Remove all pre-set active classes and build from localstorage instead.
@@ -180,9 +180,9 @@ liquipedia.filterButtons = {
 
 	toggleItems: function( filterGroup ) {
 		this.items[ filterGroup ].forEach( function( item ) {
-			var filterCategory = item.getAttribute( 'data-filter-category' );
+			const filterCategory = item.getAttribute( 'data-filter-category' );
 
-			var index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
+			const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
 			if ( index > -1 ) {
 				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
 				item.classList.remove( this.hiddenCategoryClass );
@@ -239,13 +239,13 @@ liquipedia.filterButtons = {
 	},
 
 	filterItems: function( button, isInit ) {
-		var filterCategory = button.getAttribute( 'data-filter-on' );
-		var filterGroup = button.closest( '[data-filter]' ).getAttribute( 'data-filter-group' ) || this.bcFilterGroup;
+		const filterCategory = button.getAttribute( 'data-filter-on' );
+		const filterGroup = button.closest( '[data-filter]' ).getAttribute( 'data-filter-group' ) || this.bcFilterGroup;
 		if ( !( filterGroup in this.activeFilters ) ) {
 			return;
 		}
 
-		var index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
+		const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
 		if ( index > -1 ) {
 			if ( isInit === true ) {
 				return;
@@ -267,7 +267,7 @@ liquipedia.filterButtons = {
 	},
 
 	getLocalStorage: function() {
-		var check = window.localStorage.getItem( this.localStorageKey );
+		const check = window.localStorage.getItem( this.localStorageKey );
 		return check ? JSON.parse( window.localStorage.getItem( this.localStorageKey ) ) : {};
 	},
 
@@ -288,9 +288,9 @@ liquipedia.filterButtons = {
 	},
 
 	buildLocalStorageKey: function() {
-		var base = 'LiquipediaFilterButtons';
-		var scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
-		var pageName = mw.config.get( 'wgPageName' );
+		const base = 'LiquipediaFilterButtons';
+		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
+		const pageName = mw.config.get( 'wgPageName' );
 
 		return base + '-' + scriptPath + '-' + pageName;
 	}
