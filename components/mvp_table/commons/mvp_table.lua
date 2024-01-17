@@ -270,9 +270,8 @@ function MvpTable._queryMatch1(conditions)
 	local playerList = {}
 	local mvpList = {}
 
+	---@cast queryData table
 	for _, match in pairs(queryData) do
-		---legacy function using legacy lpdb table, hence ignore warning about it
-		---@diagnostic disable-next-line: undefined-field
 		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
 		if players and points then
 			for _, player in pairs(mw.text.split(players, ',')) do
