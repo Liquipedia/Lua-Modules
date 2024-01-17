@@ -32,6 +32,7 @@ local Center = Widgets.Center
 
 ---@class CounterstrikeLeagueInfobox: InfoboxLeagueTemp
 ---@field gameData table?
+---@field valveTier {meta: string, name: string, link: string}?
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -365,7 +366,6 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 end
 
----@param valveTier string?
 ---@return string?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
