@@ -18,7 +18,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class BrawlhallaLeagueInfobox: InfoboxLeagueTemp
+---@class BrawlhallaLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
