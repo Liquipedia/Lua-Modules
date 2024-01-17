@@ -433,7 +433,7 @@ end
 function CustomPlayer:_isAwardAchievemnet(placement, tier)
 	return String.isNotEmpty((placement.extradata or {}).award) and (
 		tier == 1 or
-		tier == 2 and placement.individualprizemoney > 50
+		tier == 2 and (tonumber(placement.individualprizemoney) or 0) > 50
 	)
 end
 
