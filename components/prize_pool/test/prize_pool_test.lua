@@ -11,9 +11,9 @@ local ScribuntoUnit = require('Module:ScribuntoUnit')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local LpdbMock = Lua.import('Module:Mock/Lpdb', {requireDevIfEnabled = true})
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
-local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
+local LpdbMock = Lua.import('Module:Mock/Lpdb')
+local PrizePool = Lua.import('Module:PrizePool')
+local TournamentMock = Lua.import('Module:Infobox/Mock/League')
 
 local suite = ScribuntoUnit:new()
 

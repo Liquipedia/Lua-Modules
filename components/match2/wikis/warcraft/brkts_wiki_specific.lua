@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
+	local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return CustomMatchGroupUtil.matchFromRecord
 end)
 

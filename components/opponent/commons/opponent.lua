@@ -15,8 +15,8 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
-local PlayerExtCustom = Lua.requireIfExists('Module:Player/Ext/Custom', {requireDevIfEnabled = true})
-local PlayerExt = PlayerExtCustom or Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
+local PlayerExtCustom = Lua.requireIfExists('Module:Player/Ext/Custom')
+local PlayerExt = PlayerExtCustom or Lua.import('Module:Player/Ext')
 
 local BYE = 'bye'
 

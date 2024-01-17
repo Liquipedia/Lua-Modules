@@ -270,6 +270,7 @@ function MvpTable._queryMatch1(conditions)
 	local playerList = {}
 	local mvpList = {}
 
+	---@cast queryData table
 	for _, match in pairs(queryData) do
 		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
 		if players and points then

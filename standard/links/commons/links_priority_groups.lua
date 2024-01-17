@@ -91,6 +91,7 @@ return {
 		'kuaishou',
 		'kick',
 		'cc',
+		'chzzk',
 		'niconico',
 		'nimotv',
 		'openrec',

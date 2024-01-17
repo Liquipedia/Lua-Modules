@@ -11,7 +11,7 @@ local Table = require('Module:Table')
 
 local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base', {requireDevIfEnabled = true}))
+local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
 function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact

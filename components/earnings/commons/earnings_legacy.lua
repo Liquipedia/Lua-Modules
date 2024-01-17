@@ -20,7 +20,7 @@ local MathUtils = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base', {requireDevIfEnabled = true}))
+local CustomEarnings = Table.deepCopy(Lua.import('Module:Earnings/Base'))
 
 ---
 -- Entry point for players and individuals

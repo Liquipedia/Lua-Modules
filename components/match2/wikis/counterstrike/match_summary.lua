@@ -14,8 +14,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -255,31 +255,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----CreateMatch cs specific overwrite due to altered styles for match comment
----@param matchData table?
----@return MatchSummaryMatch?
-function CustomMatchSummary.createMatch(matchData)
-	if not matchData then
-		return
-	end
-
-	local match = MatchSummary.Match()
-
-	match
-		:header(MatchSummary.createDefaultHeader(matchData))
-		:body(CustomMatchSummary.createBody(matchData))
-
-	if matchData.comment then
-		local comment = MatchSummary.Comment():content(matchData.comment)
-		comment.root:css('display', 'block'):css('text-align', 'center')
-		match:comment(comment)
-	end
-
-	match:footer(CustomMatchSummary.addToFooter(matchData, MatchSummary.Footer()))
-
-	return match
 end
 
 ---@param match MatchGroupUtilMatch

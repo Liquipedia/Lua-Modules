@@ -13,14 +13,14 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class AgeofEmpiresMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 local TYPES = {
@@ -30,60 +30,65 @@ local TYPES = {
 	water = 'Water',
 }
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.addToLpdb = CustomMap.addToLpdb
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	_args = customMap.args
-	_args.releasedate = _args.date
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
-	return customMap:createInfobox()
+	return map:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(widgets,
-		Cell{name = 'Map Type', content = {CustomMap:getType(_args.type)}},
-		Cell{name = 'Starting [[Town Center|TC]](s)', content = {_args.tc}},
-		Cell{name = 'Walls', content = {_args.walls}},
-		Cell{name = 'Nomad', content = {_args.nomad}},
-		Cell{name = 'Player Capacity', content = {_args.players}},
-		Cell{name = 'Game', content = {Page.makeInternalLink(Game.link{game = _args.game})}},
-		Cell{
-			name = 'First Appearance',
-			content = {Page.makeInternalLink({onlyIfExists = true}, _args.appearance) or _args.appearance}
-		},
-		Cell{name = 'Competition Span', content = {_args.span}}
-	)
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Map Type', content = {self.caller:_getType(args.type)}},
+			Cell{name = 'Starting [[Town Center|TC]](s)', content = {args.tc}},
+			Cell{name = 'Walls', content = {args.walls}},
+			Cell{name = 'Nomad', content = {args.nomad}},
+			Cell{name = 'Player Capacity', content = {args.players}},
+			Cell{name = 'Game', content = {Page.makeInternalLink(Game.link{game = args.game})}},
+			Cell{
+				name = 'First Appearance',
+				content = {Page.makeInternalLink({onlyIfExists = true}, args.appearance) or args.appearance}
+			},
+			Cell{name = 'Competition Span', content = {args.span}}
+		)
+	end
 	return widgets
 end
 
-function CustomMap:getType(input)
+---@param input string?
+---@return string
+function CustomMap:_getType(input)
 	return TYPES[(input or ''):lower()] or 'Unknown Type'
 end
 
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
-		maptype = CustomMap:getType(args.type),
+		maptype = self:_getType(args.type),
 		icon = args.icon,
 		game = Game.name{game = args.game}
 	}
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomMap:getWikiCategories(args)
 	return {
 		Game.name{game = args.game} .. ' Maps',
-		CustomMap:getType(args.type) .. ' Maps',
-		CustomMap:getType(args.type) .. ' Maps (' .. Game.abbreviation{game = args.game} .. ')'
+		self:_getType(args.type) .. ' Maps',
+		self:_getType(args.type) .. ' Maps (' .. Game.abbreviation{game = args.game} .. ')'
 	}
 end
 

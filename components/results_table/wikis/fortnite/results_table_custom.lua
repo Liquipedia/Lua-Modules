@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
-local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled = true})
+local ResultsTable = Lua.import('Module:ResultsTable')
+local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

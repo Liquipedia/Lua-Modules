@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local MvpTable = Lua.import('Module:MvpTable', {requireDevIfEnabled = true})
+local MvpTable = Lua.import('Module:MvpTable')
 
 -- overwrite functions in this module on your custom wiki
 -- e.g. `MvpTable.processData`

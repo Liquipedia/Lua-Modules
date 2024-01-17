@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
@@ -24,7 +24,7 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 StarcraftMatchGroupUtil.types = {}
 
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
+StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
 	race = StarcraftMatchGroupUtil.types.Race,

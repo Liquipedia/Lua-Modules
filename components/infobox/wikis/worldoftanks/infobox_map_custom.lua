@@ -14,70 +14,63 @@ local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
+local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class WorldoftanksMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-	_args = customMap.args
-	return customMap:createInfobox()
-end
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return Array.append(widgets,
-		Cell{name = 'Map Season', content = {_args.season}},
-		Cell{name = 'Size', content = {(_args.width or '') .. 'x' .. (_args.height or '')}},
-		Cell{name = 'Battle Tier', content = {(_args.btmin or '') .. '-' .. (_args.btmax or '')}},
-		Cell{name = 'Game Modes', content = CustomMap._getGameMode()}
-	)
-end
-
----@return string[]
-function CustomMap._getGameMode()
-	local modes = Map:getAllArgsForBase(_args, 'mode')
-	local releasedate = _args.releasedate
-
-	return Array.map(modes, function(mode)
-		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
-		return modeIcon .. ' [[' .. mode .. ']]'
-	end)
+	return map:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'location' then
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = _args.location, shouldLink = false} .. '&nbsp;' .. _args.location}
+				content = {Flags.Icon{flag = args.location, shouldLink = false} .. '&nbsp;' .. args.location}
 			},
 		}
+	elseif id == 'custom' then
+		return Array.append(widgets,
+			Cell{name = 'Map Season', content = {args.season}},
+			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', content = {(args.btmin or '') .. '-' .. (args.btmax or '')}},
+			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
+		)
 	end
 	return widgets
+end
+
+---@param args table
+---@return string[]
+function CustomMap:_getGameMode(args)
+	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
+		return {}
+	end
+
+	local modes = self:getAllArgsForBase(args, 'mode')
+	local releasedate = args.releasedate
+
+	return Array.map(modes, function(mode)
+		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
+		return modeIcon .. ' [[' .. mode .. ']]'
+	end)
 end
 
 ---@param lpdbData table
@@ -91,12 +84,14 @@ function CustomMap:addToLpdb(lpdbData, args)
 		battletiermin = args.btmin,
 		battletiermax = args.btmax,
 		season = args.season,
-		modes = Json.stringify(Map:getAllArgsForBase(args, 'mode'))
+		modes = Json.stringify(self:getAllArgsForBase(args, 'mode'))
 	})
 
 	return lpdbData
 end
 
+---@param args table
+---@return table
 function CustomMap:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.season) then

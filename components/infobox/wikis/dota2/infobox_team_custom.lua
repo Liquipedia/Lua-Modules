@@ -11,8 +11,8 @@ local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local Variables = require('Module:Variables')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local Team = Lua.import('Module:Infobox/Team')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Showmatch]]',
@@ -22,10 +22,11 @@ local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[placement::1]]',
 }
 
-local CustomTeam = Class.new()
+---@class Dota2InfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 
 	-- Override links to allow one param to set multiple links
 	team.args.datdota = team.args.teamid
@@ -43,12 +44,10 @@ function CustomTeam.run(frame)
 	team.args.manager = RoleOf.get{role = 'Manager'}
 	team.args.captain = RoleOf.get{role = 'Captain'}
 
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-
 	return team:createInfobox()
 end
 
+---@return string?
 function CustomTeam:createBottomContent()
 --[[
 	if not _team.args.disbanded then
@@ -69,6 +68,9 @@ function CustomTeam:createBottomContent()
 --]]
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.region = Variables.varDefault('region', '')
 

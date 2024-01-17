@@ -42,6 +42,7 @@ liquipedia.filterButtons = {
 	buttons: {},
 	items: {},
 	activeFilters: {},
+	activeAlwaysFilters: {},
 	localStorageKey: null,
 	localStorageValue: {},
 
@@ -67,6 +68,14 @@ liquipedia.filterButtons = {
 			this.buttons[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelectorAll( ':scope > [data-filter-on]:not([data-filter-on=all])' );
 			// Get only 'all' button
 			this.buttonFilterAll[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelector( '[data-filter-on=all]' );
+			// Get always active filters
+			this.activeAlwaysFilters[ filterGroup ] = [];
+			var activeAlwaysFilters = this.buttonContainerElements[ filterGroup ].getAttribute( 'data-filter-always-active' );
+			if ( typeof activeAlwaysFilters === 'string' ) {
+				activeAlwaysFilters.split( ',' ).forEach( function( alwaysActiveFilter ) {
+					this.activeAlwaysFilters[ filterGroup ].push( alwaysActiveFilter );
+				}, this );
+			}
 
 			var itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
 			if ( filterGroup === this.bcFilterGroup ) {
@@ -87,8 +96,8 @@ liquipedia.filterButtons = {
 	 * If button contains activeClass from start, toggle items.
 	 * When a button is clicked for the first time it will be added to the local storage to remember selection.
 	 *
-	 * @param button
-	 * @param filterGroup
+	 * @param {HTMLSpanElement} button
+	 * @param {string} filterGroup
 	 */
 	filterButtonAllInit: function( button, filterGroup ) {
 		if ( button ) {
@@ -116,8 +125,8 @@ liquipedia.filterButtons = {
 	 * Handles buttons except for the 'all' button.
 	 * Filter items on click and Enter key and write to localStorage.
 	 *
-	 * @param buttons
-	 * @param filterGroup
+	 * @param {HTMLSpanElement[]} buttons
+	 * @param {string} filterGroup
 	 */
 	filterButtonsInit: function( buttons, filterGroup ) {
 		buttons.forEach( function( button ) {
@@ -143,8 +152,8 @@ liquipedia.filterButtons = {
 	/**
 	 * Initial check if button states need to be changed
 	 *
-	 * @param filterGroup
-	 * @param button
+	 * @param {string} filterGroup
+	 * @param {HTMLSpanElement} button
 	 */
 	initButtonState: function( filterGroup, button ) {
 		// Check for data in local storage
@@ -193,23 +202,29 @@ liquipedia.filterButtons = {
 		}.bind( this ) );
 
 		this.items[ filterGroup ].forEach( function( item ) {
-			item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-			item.classList.remove( this.hiddenCategoryClass );
+			if ( this.activeFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
+				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.remove( this.hiddenCategoryClass );
+			}
 		}.bind( this ) );
 
 		this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
 	},
 
 	hideAllItems: function( filterGroup ) {
-		this.activeFilters[ filterGroup ] = [];
+		this.activeFilters[ filterGroup ] = this.activeAlwaysFilters[ filterGroup ].slice( 0 );
 
 		this.buttons[ filterGroup ].forEach( function( button ) {
-			button.classList.remove( this.activeButtonClass );
+			if ( !this.activeAlwaysFilters[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) ) {
+				button.classList.remove( this.activeButtonClass );
+			}
 		}.bind( this ) );
 
 		this.items[ filterGroup ].forEach( function( item ) {
-			item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-			item.classList.add( this.hiddenCategoryClass );
+			if ( !this.activeAlwaysFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
+				item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
+				item.classList.add( this.hiddenCategoryClass );
+			}
 		}.bind( this ) );
 
 		this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
@@ -266,7 +281,7 @@ liquipedia.filterButtons = {
 	/**
 	 * Add tabindex attribute to element
 	 *
-	 * @param element
+	 * @param {HTMLElement} element
 	 */
 	setTabIndex: function( element ) {
 		element.setAttribute( 'tabindex', '0' );

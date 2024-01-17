@@ -14,16 +14,17 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomTeam = Class.new()
+---@class WarcraftInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 -- These should be converted to proper links at some point
@@ -47,34 +48,32 @@ local PROFILES = {
 	},
 }
 
-local _team
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
 	-- Automatic achievements
 	team.args.achievements = Achievements.team{noTemplate = true}
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'topcustomcontent' then
 		table.insert(widgets, Cell{
 			name = 'Clan tag',
-			content = {_team.teamTemplate.shortname}
+			content = {self.caller.teamTemplate.shortname}
 		})
 	elseif id == 'customcontent' then
 		local profiles = Array.extractValues(Table.map(PROFILES, function (param, profileData)
-			return param, CustomTeam._createProfile(profileData, _team.args[param])
+			return param, self.caller:_createProfile(profileData, args[param])
 		end))
 		if not Table.isEmpty(profiles) then
 			table.insert(widgets, Title{name = 'Profiles'})
@@ -84,18 +83,24 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomTeam._createProfile(profileData, profileValue)
+---@param profileData {icon: string, link: string, text: string}
+---@param profileValue string?
+---@return string?
+function CustomTeam:_createProfile(profileData, profileValue)
 	if not profileValue then
 		return
 	end
 
 	return String.interpolate(PROFILE_DISPLAY, {
-		text = String.interpolate(profileData.text, {name = _team.name}),
+		text = String.interpolate(profileData.text, {name = self.name}),
 		link = profileData.link .. profileValue,
 		icon = profileData.icon,
 	})
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.clantag = args.clantag
 	lpdbData.extradata.isnationalteam = tostring(CustomTeam._isNationalTeam(self.name))
@@ -104,6 +109,8 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
@@ -127,10 +134,14 @@ function CustomTeam:getWikiCategories(args)
 	return categories
 end
 
+---@param name string
+---@return boolean
 function CustomTeam._isNationalTeam(name)
 	return Flags.getLocalisation(name) ~= nil
 end
 
+---@param name string
+---@return boolean
 function CustomTeam._isFactionTeam(name)
 	local strippedName = name:gsub('^Team ', '')
 	return Faction.read(strippedName) ~= nil

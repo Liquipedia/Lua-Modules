@@ -17,8 +17,8 @@ local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
-local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled = true})
+local ResultsTable = Lua.import('Module:ResultsTable')
+local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent

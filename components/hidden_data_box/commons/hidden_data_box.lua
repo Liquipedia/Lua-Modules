@@ -26,7 +26,7 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
-local OpponentLibraries = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true})
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
@@ -48,9 +48,9 @@ function HiddenDataBox.run(args)
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
-		})[1]
+		})[1] or {}
 
-		if not queryResult and Namespace.isMain() then
+		if Table.isEmpty(queryResult) and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
@@ -61,8 +61,6 @@ function HiddenDataBox.run(args)
 				HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 			end)
 		end
-
-		queryResult = queryResult or {}
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)

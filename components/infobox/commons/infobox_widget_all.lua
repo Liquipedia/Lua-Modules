@@ -10,15 +10,15 @@ local Widgets = {}
 
 local Lua = require('Module:Lua')
 
-Widgets.Breakdown = Lua.import('Module:Infobox/Widget/Breakdown', {requireDevIfEnabled = true})
-Widgets.Builder = Lua.import('Module:Infobox/Widget/Builder', {requireDevIfEnabled = true})
-Widgets.Cell = Lua.import('Module:Infobox/Widget/Cell', {requireDevIfEnabled = true})
-Widgets.Center = Lua.import('Module:Infobox/Widget/Center', {requireDevIfEnabled = true})
-Widgets.Chronology = Lua.import('Module:Infobox/Widget/Chronology', {requireDevIfEnabled = true})
-Widgets.Customizable = Lua.import('Module:Infobox/Widget/Customizable', {requireDevIfEnabled = true})
-Widgets.Error = Lua.import('Module:Infobox/Widget/Error', {requireDevIfEnabled = true})
-Widgets.Header = Lua.import('Module:Infobox/Widget/Header', {requireDevIfEnabled = true})
-Widgets.Links = Lua.import('Module:Infobox/Widget/Links', {requireDevIfEnabled = true})
-Widgets.Title = Lua.import('Module:Infobox/Widget/Title', {requireDevIfEnabled = true})
+Widgets.Breakdown = Lua.import('Module:Infobox/Widget/Breakdown')
+Widgets.Builder = Lua.import('Module:Infobox/Widget/Builder')
+Widgets.Cell = Lua.import('Module:Infobox/Widget/Cell')
+Widgets.Center = Lua.import('Module:Infobox/Widget/Center')
+Widgets.Chronology = Lua.import('Module:Infobox/Widget/Chronology')
+Widgets.Customizable = Lua.import('Module:Infobox/Widget/Customizable')
+Widgets.Error = Lua.import('Module:Infobox/Widget/Error')
+Widgets.Header = Lua.import('Module:Infobox/Widget/Header')
+Widgets.Links = Lua.import('Module:Infobox/Widget/Links')
+Widgets.Title = Lua.import('Module:Infobox/Widget/Title')
 
 return Widgets

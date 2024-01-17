@@ -14,40 +14,48 @@ local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _role
-local _role2
-
-local CustomPlayer = Class.new()
-
+---@class PokemonInfoboxPlayer: Person
+---@field roleData table
+---@field roleData2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.roleData = Role.run{role = player.args.role}
+	player.roleData2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'history' then
-		local manualHistory = _args.history
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Game Appearances', content = GameAppearances.player({player = caller.pagename})},
+		}
+	elseif id == 'history' then
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
-			player = _pagename
+			player = caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -59,34 +67,24 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
-		_role = Role.run({role = _args.role})
-		_role2 = Role.run({role = _args.role2})
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = 'Role(s)', content = {self.caller.roleData.display, self.caller.roleData2.display}}
 		}
 	end
+
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{
-			name = 'Game Appearances',
-			content = GameAppearances.player({player = _pagename})
-		},
-	}
-end
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.isplayer = self.roleData.isPlayer or 'true'
+	lpdbData.extradata.role = self.roleData.role
+	lpdbData.extradata.role2 = self.roleData2.role
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
-
-	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
+	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData
 end

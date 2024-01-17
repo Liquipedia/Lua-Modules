@@ -11,8 +11,10 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
+
 ---@class StormgateBrktsWikiSpecific: BrktsWikiSpecific
-local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
+local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')

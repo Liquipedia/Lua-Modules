@@ -7,11 +7,12 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Locale = Lua.import('Module:Locale')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -112,8 +113,7 @@ function Manufacturer:setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('manufacturer_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('manufacturer_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param lpdbData table

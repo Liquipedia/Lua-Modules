@@ -35,8 +35,8 @@ end
 
 ---Imports a module if it exists by its name.
 ---
----Allows requireDevIfEnabled option (requires the development version of a module if it
----exists and the dev feature flag is enabled. Otherwise requires the non-development module).
+---By default it will include the /dev module if in dev mode activated. This can be turned off by setting
+--- the requireDevIfEnabled option to false.
 ---@param name string
 ---@param options {requireDevIfEnabled: boolean, loadData: boolean?}?
 ---@return unknown?
@@ -56,16 +56,16 @@ function Lua.loadDataIfExists(name)
 end
 
 ---Imports a module by its name.
----
----Allows requireDevIfEnabled option (requires the development version of a module if it
----exists and the dev feature flag is enabled. Otherwise requires the non-development module).
+---By default it will include the /dev module if in dev mode activated. This can be turned off by setting
+--- the requireDevIfEnabled option to false.
+--- Optionally mw.loaddata can be used instead of require by passing the loadData option.
 ---@param name string
 ---@param options {requireDevIfEnabled: boolean?, loadData: boolean?}?
 ---@return unknown
 function Lua.import(name, options)
 	options = options or {}
 	local importFunction = options.loadData and mw.loadData or require
-	if options.requireDevIfEnabled then
+	if options.requireDevIfEnabled ~= false then
 		if StringUtils.endsWith(name, '/dev') then
 			error('Lua.import: Module name should not end in \'/dev\'')
 		end
@@ -137,7 +137,7 @@ function Lua.invoke(frame)
 
 	local flags = {dev = devEnabled(frame)}
 	return require('Module:FeatureFlag').with(flags, function()
-		local module = Lua.import('Module:' .. moduleName, {requireDevIfEnabled = true})
+		local module = Lua.import('Module:' .. moduleName)
 		return module[fnName](frame)
 	end)
 end
@@ -178,7 +178,7 @@ function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
 
 		local flags = {dev = Logic.readBoolOrNil(dev)}
 		return require('Module:FeatureFlag').with(flags, function()
-			local variantModule = Lua.import(baseModuleName, {requireDevIfEnabled = true})
+			local variantModule = Lua.import(baseModuleName)
 			local fn = module == variantModule and moduleFn or variantModule[fnName]
 			return fn(frame)
 		end)

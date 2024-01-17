@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Strategy = Lua.import('Module:Infobox/Strategy', {requireDevIfEnabled = true})
+local Strategy = Lua.import('Module:Infobox/Strategy')
 
 local CustomStrategy = Class.new()
 

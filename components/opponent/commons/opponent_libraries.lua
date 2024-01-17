@@ -8,11 +8,10 @@
 
 local Lua = require('Module:Lua')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
 
-local Opponent = Lua.import('Module:' .. (Info.opponentLibrary or 'Opponent'), {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:' .. (Info.opponentDisplayLibrary or 'OpponentDisplay'),
-	{requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:' .. (Info.opponentLibrary or 'Opponent'))
+local OpponentDisplay = Lua.import('Module:' .. (Info.opponentDisplayLibrary or 'OpponentDisplay'))
 
 return {
 	Opponent = Opponent, ---@module 'opponent.commons.opponent'

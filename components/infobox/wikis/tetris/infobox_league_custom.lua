@@ -6,24 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomLeague = Class.new()
+---@class TetrisLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 local GAME_GROUPS = {
 	classic = {'Tetris', 'NES (1989)', 'NES (1989) NTSC', 'NES (1989) PAL', 'NES (1989) DAS', 'Super Tetris',
@@ -36,47 +35,37 @@ local GAME_GROUPS = {
 	tgm = {'The Grand Master', 'The Grand Master 2', 'The Grand Master 3'},
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {_args.team_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Teams', content = {args.team_number}},
+			Cell{name = 'Players', content = {args.player_number}}
+		)
+	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					Game.name{game = _args.game}
-				}
-			},
+			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
 		}
 	end
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.gamegroup = CustomLeague._determineGameGroup(lpdbData.game)
@@ -84,6 +73,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param game string?
+---@return string?
 function CustomLeague._determineGameGroup(game)
 	for gameGroup, games in pairs(GAME_GROUPS) do
 		if Table.includes(games, game) then
@@ -92,15 +83,14 @@ function CustomLeague._determineGameGroup(game)
 	end
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	if args.team_number then
-		Variables.varDefine('tournament_mode', 'team')
-	else
-		Variables.varDefine('tournament_mode', 'individual')
-	end
-	Variables.varDefine('tournament_publishertier', args.publisherpremier)
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.mode = args.team_number and 'team' or 'individual'
+	self.data.publishertier = args.publisherpremier
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
 end

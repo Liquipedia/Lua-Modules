@@ -39,7 +39,7 @@ local Variables = require('Module:Variables')
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -60,6 +60,7 @@ function StarcraftParticipantTable.run(frame)
 	participantTable._displaySoloRaceTableSection = StarcraftParticipantTable._displaySoloRaceTableSection
 	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
+	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
 
 	participantTable:read():store()
 
@@ -122,6 +123,11 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
+	--unset wiki var for random events to not read players as random if prize pool already sets them as random
+	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
+		Variables.varDefine(opponentArgs.name .. '_race', '')
+	end
+
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
@@ -145,6 +151,10 @@ end
 ---@param entry StarcraftParticipantTableEntry
 ---@param config StarcraftParticipantTableConfig
 function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
+	if config.isRandomEvent then
+		lpdbData.opponentplayers.p1faction = Faction.read('r')
+	end
+
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
@@ -233,7 +243,7 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	end)
 
 	local factionNumbers = {}
-	for _, faction in pairs(Faction.factions) do
+	for _, faction in pairs(Faction.getFactions()) do
 		factionNumbers[faction] = calculatedNumbers[faction] or 0
 		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
 			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))
@@ -299,6 +309,14 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 		end)
 		self.display:node(sectionNode)
 	end)
+end
+
+---@param entry StarcraftParticipantTableEntry
+---@param config StarcraftParticipantTableConfig
+function StarcraftParticipantTable:setCustomPageVariables(entry, config)
+	if config.isRandomEvent then
+		Variables.varDefine(entry.opponent.players[1].displayName .. '_race', Faction.read('r'))
+	end
 end
 
 return StarcraftParticipantTable

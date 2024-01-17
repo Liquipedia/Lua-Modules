@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
@@ -13,67 +14,51 @@ local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _args
-
-local CustomLeague = Class.new()
+---@class OverwatchLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _BLIZZARD_TIERS = {
+local BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
 }
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {args.team_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {Game.text{game = _args.game}}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {args.player_number}
-	})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _args
-	if id == 'customcontent' then
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+		Cell{name = 'Teams', content = {args.team_number}},
+		Cell{name = 'Game', content = {Game.text{game = args.game}}},
+		Cell{name = 'Players', content = {args.player_number}}
+	)
+	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
 			for _, map in ipairs(League:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(CustomLeague:_createNoWrappingSpan(
+				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
 					PageLink.makeInternalLink({}, map, map .. game)
 				)))
 			end
@@ -81,11 +66,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		if CustomLeague:_validPublisherTier(args.blizzardtier) then
+		if self.caller:_validPublisherTier(args.blizzardtier) then
 			table.insert(widgets,
 				Cell{
 					name = 'Blizzard Tier',
-					content = {'[['.._BLIZZARD_TIERS[args.blizzardtier:lower()]..']]'},
+					content = {'[['..BLIZZARD_TIERS[args.blizzardtier:lower()]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -94,6 +79,9 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(League:getAllArgsForBase(args, 'map'), ';')
 
@@ -102,40 +90,45 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param publishertier string?
+---@return string?
 function CustomLeague:_validPublisherTier(publishertier)
-	return String.isNotEmpty(publishertier) and _BLIZZARD_TIERS[publishertier:lower()]
+	return BLIZZARD_TIERS[string.lower(publishertier or '')]
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
-	Variables.varDefine('tournament_ticker_name', _args.tickername or '')
-	Variables.varDefine('tournament_tier', _args.liquipediatier or '')
+	Variables.varDefine('tournament_ticker_name', args.tickername)
+	Variables.varDefine('tournament_tier', args.liquipediatier)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
 
-	if CustomLeague:_validPublisherTier(args.blizzardtier) then
+	if self:_validPublisherTier(args.blizzardtier) then
 		Variables.varDefine('tournament_blizzard_premier', args.blizzardtier:lower())
 	end
 
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if not Game.name{game = _args.game} then
+	if not Game.name{game = args.game} then
 		table.insert(categories, 'Tournaments without game version')
 	else
-		table.insert(categories, Game.name{game = _args.game} .. ' Competitions')
+		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
 	end
 
 	return categories
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 		:css('white-space', 'nowrap')

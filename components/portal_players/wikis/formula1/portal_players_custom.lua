@@ -16,8 +16,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local AgeCalculation = Lua.import('Module:AgeCalculation')
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -27,7 +27,7 @@ local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Team Principals, Race Engi
 local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'cinnabar-bg',
-	deceased = 'gray-bg',
+	['passed away'] = 'gray-bg',
 }
 
 local CustomPortalPlayers = {}
@@ -129,7 +129,7 @@ function CustomPortalPlayers._getAge(player)
 	})
 
 	if not ageCalculationSuccess then
-		return age
+		return age --[[@as string]]
 	end
 
 	if age.death then

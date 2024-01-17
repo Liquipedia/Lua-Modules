@@ -13,8 +13,8 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local _MAX_NUM_OPPONENTS = 8

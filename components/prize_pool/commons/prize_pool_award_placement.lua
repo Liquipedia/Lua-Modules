@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
+local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

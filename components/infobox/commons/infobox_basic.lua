@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
-local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
+local Infobox = Lua.import('Module:Infobox')
 
 ---@class BasicInfobox
 ---@operator call(Frame): BasicInfobox
@@ -32,6 +32,13 @@ local BasicInfobox = Class.new(
 		self.infobox = Infobox:create(frame, self.wiki, Logic.readBool(self.args.darkmodeforced))
 	end
 )
+
+---@param injector WidgetInjector?
+---@return self
+function BasicInfobox:setWidgetInjector(injector)
+	self.infobox:widgetInjector(injector)
+	return self
+end
 
 ---Creates an empty WidgetInjector
 ---@return WidgetInjector?

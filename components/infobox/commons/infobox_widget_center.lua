@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
 
 ---@class CentereWidget: Widget
 ---@operator call({content: (string|number)[], classes: string[]}): CentereWidget

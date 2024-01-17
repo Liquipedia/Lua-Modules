@@ -17,9 +17,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupLegacyDefault = Lua.import('Module:MatchGroup/Legacy/Default', {requireDevIfEnabled = true})
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupLegacyDefault = Lua.import('Module:MatchGroup/Legacy/Default')
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local IS_USERSPACE = false
 local NAMESPACE_USER = 2

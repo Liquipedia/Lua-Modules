@@ -482,8 +482,8 @@ Author(s): iMarbot
 	z-index: 17;
 }
 
-.inotes-inner {
-	margin-bottom: -10pt;
+.inotes-inner dl {
+	margin-bottom: 0;
 }
 
 .template-box .inotes-box {

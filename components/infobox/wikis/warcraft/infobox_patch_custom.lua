@@ -12,52 +12,43 @@ local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Patch = Lua.import('Module:Infobox/Patch')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPatch = Class.new()
+---@class WarcraftPatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 
 local BALANCE_UPDATE = 'Balance Update'
 local IGNORE_NET_EASE_RELEASE_BEFORE = DateExt.readTimestamp('2011-03-23')
 local SKIP = 'skip'
 local SKIPPED = 'skipped'
 
-local _args
-
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
 
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.addToLpdb = CustomPatch.addToLpdb
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-
-	return customPatch:createInfobox()
-end
-
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	return patch:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{name = '[[Public Test Realm|PTR]] Release Date', content = {_args.release_ptr}},
-			Cell{name = 'Release Date', content = {_args.release}},
-			Cell{name = '[[NetEase]] Release Date', content = {CustomPatch._netEaseRelease(_args)}},
+			Cell{name = '[[Public Test Realm|PTR]] Release Date', content = {args.release_ptr}},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = '[[NetEase]] Release Date', content = {CustomPatch._netEaseRelease(args)}},
 		}
 	end
 
@@ -77,9 +68,6 @@ end
 ---@param args table
 function CustomPatch:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
-		name = self.name,
-		type = 'patch',
-		date = args.release,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			beta = tostring(Logic.readBool(args.beta)),
 			version = self.name,
@@ -91,6 +79,24 @@ function CustomPatch:setLpdbData(args)
 			next = args.next and ('Patch args.previous') or nil,
 		})
 	})
+end
+
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
+		beta = tostring(Logic.readBool(args.beta)),
+		version = self.name,
+		release = args.release,
+		neteaserelease = args.release_netease ~= SKIP and args.release_netease or nil,
+		ptrdate = args.release_ptr,
+		balanceupdates = tostring(CustomPatch._hasBalanceUpdate(args)),
+		previous = args.previous and ('Patch args.previous') or nil,
+		next = args.next and ('Patch args.previous') or nil,
+	})
+
+	return lpdbData
 end
 
 ---@param args table

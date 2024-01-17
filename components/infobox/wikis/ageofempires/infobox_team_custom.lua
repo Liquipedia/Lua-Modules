@@ -14,9 +14,9 @@ local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 local TeamTemplates = require('Module:Team')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -28,53 +28,45 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local CustomTeam = Class.new()
+---@class AoeInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
 local MAX_NUMBER_OF_PLAYERS = 10
 local INACTIVITY_THRESHOLD_YEARS = 1
 
-local _args
-local _pagename
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
 
 	-- Automatic achievements
 	team.args.achievements = Achievements.team{noTemplate = true}
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-
-	_args = team.args
-	_pagename = team.pagename
+	team:setWidgetInjector(CustomInjector(team))
 
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'earningscell' then
+	if id == 'earnings' then
+		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
+	elseif id == 'custom' then
+		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Games',
-		content = CustomTeam._getGames()
-	})
-	return widgets
-end
+---@return string[]
+function CustomTeam:_getGames()
+	local games = self:_queryGames()
 
-function CustomTeam._getGames()
-	local games = CustomTeam._queryGames()
-
-	local manualGames = _args.games and Array.map(
-		mw.text.split(_args.games, ','),
+	local manualGames = self.args.games and Array.map(
+		mw.text.split(self.args.games, ','),
 		function(game)
 			return {game = GameLookup.getName(mw.text.trim(game))}
 		end) or {}
@@ -92,7 +84,7 @@ function CustomTeam._getGames()
 	dateThreshold = os.date('!%F', os.time(dateThreshold --[[@as osdateparam]]))
 
 	local isActive = function(game)
-		local placement = CustomTeam._getLatestPlacement(game)
+		local placement = self:_getLatestPlacement(game)
 		return placement and placement.date and placement.date >= dateThreshold
 	end
 
@@ -105,9 +97,10 @@ function CustomTeam._getGames()
 	return games
 end
 
-function CustomTeam._queryGames()
+---@return placement[]
+function CustomTeam:_queryGames()
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = CustomTeam._buildTeamPlacementConditions():toString(),
+			conditions = self:_buildTeamPlacementConditions():toString(),
 			query = 'game',
 			groupby = 'game asc',
 		})
@@ -119,9 +112,11 @@ function CustomTeam._queryGames()
 	return data
 end
 
-function CustomTeam._getLatestPlacement(game)
+---@param game string
+---@return placement
+function CustomTeam:_getLatestPlacement(game)
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		CustomTeam._buildTeamPlacementConditions(),
+		self:_buildTeamPlacementConditions(),
 		ConditionNode(ColumnName('game'), Comparator.eq, game)
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -138,8 +133,9 @@ function CustomTeam._getLatestPlacement(game)
 	return data[1]
 end
 
-function CustomTeam._buildTeamPlacementConditions()
-	local team = _args.teamtemplate or _args.name or _pagename
+---@return ConditionTree
+function CustomTeam:_buildTeamPlacementConditions()
+	local team = self.args.teamtemplate or self.args.name or self.pagename
 	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
@@ -148,7 +144,7 @@ function CustomTeam._buildTeamPlacementConditions()
 
 	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
 
-	local playerConditions = CustomTeam._buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
+	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 	for _, teamTemplate in pairs(opponentTeamTemplates) do
@@ -165,7 +161,9 @@ function CustomTeam._buildTeamPlacementConditions()
 	return conditions
 end
 
-function CustomTeam._buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
+---@param opponentTeamTemplates string[]
+---@return ConditionTree
+function CustomTeam:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 
 	local prefix = 'p'

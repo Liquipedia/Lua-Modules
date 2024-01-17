@@ -20,13 +20,13 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Battalion generic logo.png',
-				lightMode = 'Battalion generic logo.png',
+				darkMode = 'Battalion 1944 default darkmode.png',
+				lightMode = 'Battalion 1944 default lightmode.png',
 			},
 		},
 	},
 	defaultGame = 'battalion',
-	defaultTeamLogo = 'Battalion generic logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Battalion generic logo.png', ---@deprecated
+	defaultTeamLogo = 'Battalion 1944 default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Battalion 1944 default darkmode.png', ---@deprecated
 	match2 = 0,
 }
