@@ -23,7 +23,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class CallofdutyLeagueInfobox: InfoboxLeagueTemp
+---@class CallofdutyLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
