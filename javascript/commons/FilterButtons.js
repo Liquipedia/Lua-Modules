@@ -70,7 +70,7 @@ liquipedia.filterButtons = {
 			this.buttonFilterAll[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelector( '[data-filter-on=all]' );
 			// Get always active filters
 			this.activeAlwaysFilters[ filterGroup ] = [];
-			var activeAlwaysFilters = this.buttonContainerElements[ filterGroup ].getAttribute( 'data-filter-always-active' );
+			const activeAlwaysFilters = this.buttonContainerElements[ filterGroup ].getAttribute( 'data-filter-always-active' );
 			if ( typeof activeAlwaysFilters === 'string' ) {
 				activeAlwaysFilters.split( ',' ).forEach( function( alwaysActiveFilter ) {
 					this.activeAlwaysFilters[ filterGroup ].push( alwaysActiveFilter );
