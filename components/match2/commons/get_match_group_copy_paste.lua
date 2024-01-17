@@ -15,12 +15,13 @@ bracket finder (and code generator) / matchlist code generator
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki', {requireDevIfEnabled = true})
+local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
 local getArgs = require('Module:Arguments').getArgs
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {requireDevIfEnabled = true, loadData = true})
 
+---@class Match2CopyPaste
 local copyPaste = {}
 
 function copyPaste.generateID()

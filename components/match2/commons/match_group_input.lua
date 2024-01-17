@@ -17,9 +17,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Opponent = Lua.import('Module:Opponent')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local globalVars = PageVariableNamespace({cached = true})
 
@@ -126,7 +126,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		end
 
 		matchArgs = Json.parseIfString(matchArgs)
-			or Json.parse(Lua.import('Module:Match', {requireDevIfEnabled = true}).toEncodedJson({}))
+			or Json.parse(Lua.import('Module:Match').toEncodedJson({}))
 
 		local context = MatchGroupInput.readContext(matchArgs, args)
 		MatchGroupInput.persistContextChanges(context)
@@ -408,6 +408,8 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
 	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
 	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
+	obj.patch = Logic.emptyOr(obj.patch, parent.patch, Variables.varDefault('tournament_patch'))
+	obj.date = Logic.emptyOr(obj.date, parent.date)
 
 	return obj
 end

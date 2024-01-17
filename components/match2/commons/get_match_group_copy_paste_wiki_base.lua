@@ -14,6 +14,7 @@ adjust this to fit the needs of your wiki^^
 
 ]]--
 
+---@class Match2CopyPasteBase:Match2CopyPaste
 local wikiCopyPaste = {}
 
 local INDENT = '    '
