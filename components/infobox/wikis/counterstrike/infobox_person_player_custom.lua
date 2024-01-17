@@ -57,9 +57,9 @@ ROLES.rifle = ROLES.rifler
 ---@field display string
 ---@field display2 string?
 ---@field store string?
----@field coach boolean
----@field talent boolean
----@field management boolean
+---@field coach boolean?
+---@field talent boolean?
+---@field management boolean?
 
 ---@class CounterstrikeInfoboxPlayer: Person
 ---@field gamesList string[]
