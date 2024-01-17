@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -158,8 +159,7 @@ function Weapon:setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param lpdbData table

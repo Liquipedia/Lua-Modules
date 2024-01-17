@@ -18,7 +18,16 @@ local Table = require('Module:Table')
 
 local Info = Lua.import('Module:Info')
 
-local GamesData = Info.games
+---@class GameData
+---@field abbreviation string
+---@field name string
+---@field link string
+---@field logo {darkMode: string, lightMode: string}
+---@field defaultTeamLogo {darkMode: string, lightMode: string}
+---@field order number?
+---@field unlisted boolean?
+
+local GamesData = Info.games --[[@as table<string, GameData>]]
 
 local ICON_STRING = '[[File:${icon}|${alt}|link=${link}|class=${class}|${size}]]'
 local DEFAULT_SIZE = '25x25px'
@@ -88,6 +97,7 @@ function Game.listGames(options)
 	end
 
 	local gamesList = Array.extractKeys(GamesData)
+	---@cast gamesList GameData[]
 	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
 		return Array.sortBy(gamesList, getGameOrder)
 	end

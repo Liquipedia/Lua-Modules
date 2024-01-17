@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -141,8 +142,7 @@ function Character:setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('character_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('character_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param lpdbData table
