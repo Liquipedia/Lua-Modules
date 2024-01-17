@@ -17,13 +17,13 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Playes
-	['healer'] = {category = 'Healers', variable = 'Healer'},
-	['DPS'] = {category = 'DPS players', variable = 'DPS'},
+	healer = {category = 'Healers', variable = 'Healer'},
+	dps = {category = 'DPS players', variable = 'DPS'},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst'},
-	['host'] = {category = 'Hosts', variable = 'Host'},
-	['caster'] = {category = 'Casters', variable = 'Caster'},
+	analyst = {category = 'Analysts', variable = 'Analyst'},
+	host = {category = 'Hosts', variable = 'Host'},
+	caster = {category = 'Casters', variable = 'Caster'},
 }
 
 ---@class WorldofwarcraftInfoboxPlayer: Person
