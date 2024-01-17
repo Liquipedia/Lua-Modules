@@ -3,3 +3,4 @@ node_modules
 package-lock.json
 luacov.report.out
 luacov.stats.out
+yarn.lock
