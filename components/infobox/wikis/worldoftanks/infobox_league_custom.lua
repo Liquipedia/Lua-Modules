@@ -23,7 +23,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class WorldoftanksLeagueInfobox: InfoboxLeagueTemp
+---@class WorldoftanksLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
