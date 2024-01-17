@@ -16,50 +16,52 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
-local CustomPlayer = Class.new()
+---@class CrossfireInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'history' then
-		local manualHistory = _args.history
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
-			player = mw.title.getCurrentTitle().prefixedText
+			player = self.caller.pagename
 		}
 
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{name = 'History'},
-				Center{content = {manualHistory}},
-				Center{content = {automatedHistory}},
-			}
-		end
+		if String.isEmpty(manualHistory) and not automatedHistory then return {} end
+		return {
+			Title{name = 'History'},
+			Center{content = {manualHistory}},
+			Center{content = {automatedHistory}},
+		}
 	elseif id == 'region' then return {}
 	end
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	local role = Role.run{role = _args.role}
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	local role = Role.run{role = self.args.role}
 	lpdbData.extradata.isplayer = role.isPlayer or 'true'
 	lpdbData.extradata.role = role.role
 

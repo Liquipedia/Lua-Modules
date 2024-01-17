@@ -14,10 +14,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -78,7 +78,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
 	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary{
+		return Lua.import('Module:MatchSummary/Ffa/Starcraft').FfaMatchSummary{
 			match = match,
 			bracketResetMatch = bracketResetMatch,
 			config = args.config
@@ -232,6 +232,8 @@ end
 ---@param options {noLink: boolean}?
 ---@return (Html|string)[]
 function StarcraftMatchSummary.Game(game, options)
+	options = options or {}
+	options.noLink = options.noLink or (game.map or ''):upper() == TBD
 	local getWinnerIcon = function(opponentIndex)
 		return StarcraftMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
 			or game.winner == opponentIndex and 'greenCheck')

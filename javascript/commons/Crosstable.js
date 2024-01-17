@@ -7,10 +7,10 @@ liquipedia.crosstable = {
 		document.querySelectorAll( '.crosstable' ).forEach( function( crosstable ) {
 			crosstable.querySelectorAll( 'td, th' ).forEach( function( cell ) {
 				cell.onmouseover = function() {
-					const row = this.closest( 'tr' );
+					var row = this.closest( 'tr' );
 					crosstable.classList.add( 'row-' + ( row.rowIndex + 1 ) );
 					crosstable.classList.add( 'col-' + ( this.cellIndex + 1 ) );
-					let element;
+					var element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {
 						element.classList.add( 'crosstable-top-left' );
@@ -30,10 +30,10 @@ liquipedia.crosstable = {
 
 				};
 				cell.onmouseleave = function() {
-					const row = this.closest( 'tr' );
+					var row = this.closest( 'tr' );
 					crosstable.classList.remove( 'row-' + ( row.rowIndex + 1 ) );
 					crosstable.classList.remove( 'col-' + ( this.cellIndex + 1 ) );
-					let element;
+					var element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {
 						element.classList.remove( 'crosstable-top-left' );

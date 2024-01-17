@@ -139,20 +139,19 @@ Author(s): ???
 }
 
 .teamcard-toggle-button {
+	display: flow-root;
 	height: 40px;
-	overflow: hidden;
-}
-
-.teamcard-toggle-button::after {
-	content: " ";
-	display: block;
-	clear: left;
 }
 
 .teamcard-toggle-button button {
-	float: right;
 	margin: 0 0 10px 10px;
 	width: fit-content;
+	float: right;
+}
+
+.teamcard-toggle-button-left button {
+	margin: 0 10px 10px 0;
+	float: left;
 }
 
 @media ( max-width: 600px ) {
@@ -483,8 +482,8 @@ Author(s): iMarbot
 	z-index: 17;
 }
 
-.inotes-inner {
-	margin-bottom: -10pt;
+.inotes-inner dl {
+	margin-bottom: 0;
 }
 
 .template-box .inotes-box {

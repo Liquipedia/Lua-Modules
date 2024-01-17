@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 
 local CustomHiddenDataBox = {}
 

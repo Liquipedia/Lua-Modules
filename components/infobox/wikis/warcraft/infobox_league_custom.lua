@@ -10,22 +10,22 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapsData = mw.loadData('Module:Maps/data')
-local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
-local PageLink = require('Module:Page')
+local Page = require('Module:Page')
 local PatchAuto = require('Module:PatchAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -33,25 +33,19 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+---@class WarcraftLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _league
+local CANCELLED = 'cancelled'
+local FINISHED = 'finished'
 
 local OFFLINE = 'offline'
 local ONLINE = 'online'
 
 local GAME_REFORGED = 'wc3r'
 local GAME_FROZEN_THRONE = 'tft'
-local GAME_REIGN = 'roc'
 local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
-
-local GAMES = {
-	[GAME_REFORGED] = 'Reforged',
-	[GAME_FROZEN_THRONE] = 'The Frozen Throne',
-	[GAME_REIGN] = 'Reign of Chaos',
-}
 
 local MODES = {
 	team = {tier = 'Team', store = 'team', category = 'Team'},
@@ -76,106 +70,232 @@ local ESL_TIERS = {
 }
 
 ---@param frame Frame
----@return Html|string
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.game = CustomLeague._determineGame()
-	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
+	local args = league.args
 
-	if not _args.prizepoolusd and not _args.localcurrency and _args.prizepool then
-		_args.prizepoolusd = _args.prizepool
-		_args.prizepool = nil
+	args.liquipediatiertype = args.liquipediatiertype or args.tiertype
+
+	if not args.prizepoolusd and not args.localcurrency and args.prizepool then
+		args.prizepoolusd = args.prizepool
+		args.prizepool = nil
 	end
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.shouldStore = CustomLeague.shouldStore
-	league.createLiquipediaTierDisplay = CustomLeague.createLiquipediaTierDisplay
-	league.addParticipantTypeCategory = CustomLeague.addParticipantTypeCategory
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
-	league.getWikiCategories = CustomLeague.getWikiCategories
 
 	return league:createInfobox(frame)
 end
 
----@return WidgetInjector
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.game = self:_determineGame(args.game)
+	self.data.status = self:_getStatus(args)
+	self.data.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
+	self.data.raceBreakDown = RaceBreakdown.run(args, BREAKDOWN_RACES) or {}
+	self.data.maps = self:_getMaps('map', args)
+	self.data.number = tonumber(args.number)
+	self.data.playerNumberDisplay = args.player_number or self.data.raceBreakDown.total
+
+	args.player_number = string.gsub(self.data.playerNumberDisplay or 0, '%+', '')
+
+	--this sets the below used wiki vars
+	PatchAuto.infobox{
+		patch = args.patch,
+		epatch = args.epatch,
+		patchFeature = (args.patch_feature or ''):lower(),
+		sDate = self.data.startDate,
+		eDate = self.data.endDate,
+		server = args.server,
+	}
+	self.data.patch = Variables.varDefault('tournament_patch')
+	self.data.endPatch = Variables.varDefault('tournament_endpatch', self.data.patch)
+	self.data.patchFeature = Variables.varDefault('tournament_patchfeature')
+
+	self.data.startTime = args.starttime and {
+		raw = (self.data.startDate or '') .. args.starttime,
+		startTime = (self.data.startDate or '') .. ' ' .. args.starttime:gsub('<.*', ''),
+		timeZone = args.starttime:match('data%-tz="(.-)"'),
+	} or {}
+
+	self.data.firstMatch = CustomLeague._getFirstMatchTime()
+end
+
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
+	--Legacy vars
+	Variables.varDefine('tournament_ticker_name', args.tickername or self.name)
+	Variables.varDefine('tournament_tier', self.data.liquipediatier)
+	Variables.varDefine('tournament_icon_filename', self.data.icon)
+	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
+
+	Variables.varDefine('usd prize', self.data.prizepoolUsd)
+	Variables.varDefine('localcurrency', self.data.localCurrency)
+	Variables.varDefine('local prize', Variables.varDefault('tournament_prizepoollocal'))
+
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
+	Variables.varDefine('tempdate', self.data.endDate)
+
+	-- Warcraft specific stuff
+	Variables.varDefine('environment', (args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
+
+	Variables.varDefine('tournament_starttimeraw', self.data.startTime.raw)
+	Variables.varDefine('tournament_starttime', self.data.startTime.startTime)
+	Variables.varDefine('start_time', self.data.startTime.startTime)
+	Variables.varDefine('tournament_timezone', self.data.startTime.timeZone)
+
+	Variables.varDefine('firstmatch', self.data.firstMatch)
+	Variables.varDefine('tournament_finished', tostring(self.data.isFinished or false))
+	Variables.varDefine('tournament_maps', Json.stringify(self.data.maps))
+	Variables.varDefine('tournament_series_number', self.data.number)
+end
+
+---@param prefix string
+---@param args table
+---@return {link: string, displayname: string}[]
+function CustomLeague:_getMaps(prefix, args)
+	local maps = Table.map(self:getAllArgsForBase(args, 'map'), function(mapIndex, map)
+		local mapArray = mw.text.split(map, '|')
+
+		mapArray[1] = (MapsData[mapArray[1]:lower()] or {}).name or mapArray[1]
+
+		return mapIndex, {
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
+		}
+	end)
+
+	Array.sortInPlaceBy(maps, Operator.property('link'))
+
+	return maps
+end
+
+---@param game string?
+---@return string?
+function CustomLeague:_determineGame(game)
+	game = Game.toIdentifier{game = game}
+	if game then return game end
+
+	local startDate = self.data.startDate or self.data.endDate
+
+	if startDate and startDate > GAME_DEFAULT_SWITCH_DATE then
+		return Game.toIdentifier{game = GAME_REFORGED}
+	end
+
+	return Game.toIdentifier{game = GAME_FROZEN_THRONE}
+end
+
+---@param args table
+---@return string?
+function CustomLeague:_getStatus(args)
+	local status = args.status or Variables.varDefault('tournament_status')
+	if Logic.isNotEmpty(status) then
+		---@cast status -nil
+		return status:lower()
+	end
+
+	if Logic.readBool(args.cancelled or Variables.varDefault('cancelled tournament')) then
+		return CANCELLED
+	end
+
+	if self:_isFinished(args) then
+		self.data.isFinished = true
+		return FINISHED
+	end
+end
+
+---@param args table
+---@return boolean
+function CustomLeague:_isFinished(args)
+	local finished = Logic.readBoolOrNil(args.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	local queryDate = self.data.endDate or self.data.startDate
+
+	if not queryDate or os.date('%Y-%m-%d') < queryDate then
+		return false
+	end
+
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
+		query = 'date',
+		order = 'date asc',
+		limit = 1
+	})[1] ~= nil
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local caller = self.caller
+	local args = caller.args
+
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game', content = {GAMES[_args.game] and ('[[' .. GAMES[_args.game] .. ']]') or nil}},
+			Cell{name = 'Game', content = {Game.text{game = caller.data.game}}},
 			Cell{name = 'Game Version', content = {
-				CustomLeague._displayGameVersion(),
-				_args.patch2 and ('[[' .. _args.patch2 .. ']]') or nil
+				caller:_displayGameVersion(),
+				args.patch2 and ('[[' .. args.patch2 .. ']]') or nil
 			}},
-			Cell{name = 'Server', content = CustomLeague._getServers(_args)}
+			Cell{name = 'Server', content = caller:_getServers(args)}
 			}
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
 			name = ESL_ICON .. 'Pro Tour Tier',
-			content = {ESL_TIERS[(_args.eslprotier or ''):lower()]}
+			content = {ESL_TIERS[(args.eslprotier or ''):lower()]}
 		})
 	elseif id == 'dates' then
-		if _args.starttime then
+		if args.starttime then
 			local dateCells = {}
-			if _args.sdate then
-				table.insert(dateCells, Cell{name = 'Start Date', content = {CustomLeague._displayStartDateTime()}})
-			elseif _args.date then
-				table.insert(dateCells, Cell{name = 'Date', content = {CustomLeague._displayStartDateTime()}})
+			if args.sdate then
+				table.insert(dateCells, Cell{name = 'Start Date', content = {caller:_displayStartDateTime()}})
+			elseif args.date then
+				table.insert(dateCells, Cell{name = 'Date', content = {caller:_displayStartDateTime()}})
 			end
-			table.insert(dateCells, Cell{name = 'End Date', content = {_args.edate}})
+			table.insert(dateCells, Cell{name = 'End Date', content = {args.edate}})
 			return dateCells
 		end
 	elseif id == 'customcontent' then
-		local raceBreakdown = RaceBreakdown.run(_args, BREAKDOWN_RACES) or {}
-		_args.player_number = _args.player_number or raceBreakdown.total
-
-		if _args.player_number or _args.team_number then
+		local playerNumber = caller.data.playerNumberDisplay
+		if playerNumber or args.team_number then
 			table.insert(widgets, Title{name = 'Participants breakdown'})
 		end
 
-		if _args.player_number then
+		if playerNumber then
 			Array.appendWith(widgets,
-				Cell{name = 'Number of Players', content = {_args.player_number or raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display or {}, classes = { 'infobox-center' }}
+				Cell{name = 'Number of Players', content = {playerNumber}},
+				Breakdown{content = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
-
-			_args.player_number = string.gsub(_args.player_number, '%+', '')
 		end
 
-		if _args.team_number then
+		if args.team_number then
 			table.insert(widgets, Cell{name = 'Number of Teams',
-				content = {CustomLeague._displayParticipantNumber(_args.team_number)}})
+				content = {CustomLeague._displayParticipantNumber(args.team_number)}})
 
 			-- clean var of '+' suffix
-			_args.team_number = string.gsub(_args.team_number, '%+', '')
+			args.team_number = string.gsub(args.team_number, '%+', '')
 		end
 
 		--maps
-		if String.isNotEmpty(_args.map1) then
-			table.insert(widgets, Title{name = _args['maptitle'] or 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('map')})
+		---@param prefix string
+		---@param defaultTitle string
+		---@param maps {link: string, displayname: string}[]?
+		local displayMaps = function(prefix, defaultTitle, maps)
+			if String.isEmpty(args[prefix .. 1]) then return end
+			Array.appendWith(widgets,
+				Title{name = args[prefix .. 'title'] or defaultTitle},
+				Center{content = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
+			)
 		end
 
-		if String.isNotEmpty(_args['2map1']) then
-			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('2map')})
-		end
-
-		if String.isNotEmpty(_args['3map1']) then
-			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = CustomLeague._mapsDisplay('3map')})
-		end
+		displayMaps('map', 'Maps', caller.data.maps)
+		displayMaps('2map', '2v2 Maps')
+		displayMaps('3map', '3v3 Maps')
 	end
 	return widgets
 end
@@ -196,22 +316,20 @@ function CustomLeague._displayParticipantNumber(number)
 end
 
 ---@return string
-function CustomLeague._displayStartDateTime()
+function CustomLeague:_displayStartDateTime()
 	return Countdown._create{
-		date = Variables.varDefault('tournament_starttimeraw'),
-		finished = Variables.varDefault('tournament_finished'),
+		date = self.data.startTime.raw,
+		finished = self.data.isFinished,
 	}
 end
 
----@param prefix string
+---@param maps {link: string, displayname: string}[]
 ---@return string[]
-function CustomLeague._mapsDisplay(prefix)
-	local maps = CustomLeague._getMaps(prefix)
-
+function CustomLeague:_mapsDisplay(maps)
 	return {table.concat(
-		Array.map(maps or {}, function(mapData)
-			return tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, mapData.displayname, mapData.link)
+		Array.map(maps, function(mapData)
+			return tostring(self:_createNoWrappingSpan(
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
 		end),
 		'&nbsp;• '
@@ -219,10 +337,10 @@ function CustomLeague._mapsDisplay(prefix)
 end
 
 ---@return string?
-function CustomLeague._displayGameVersion()
-	local patch = Variables.varDefault('tournament_patch')
-	local endPatch = Variables.varDefault('tournament_endpatch')
-	local patchFeature = Variables.varDefault('tournament_patchfeature')
+function CustomLeague:_displayGameVersion()
+	local patch = self.data.patch
+	local endPatch = self.data.endPatch
+	local patchFeature = self.data.patchFeature
 
 	if not patch then return end
 
@@ -240,102 +358,10 @@ function CustomLeague._displayGameVersion()
 		.. '[[' .. endPatch .. '|' .. endPatch .. ']]'
 end
 
-function CustomLeague._getGameVersion()
-	-- calculates patch data and sets several variables
-	PatchAuto.infobox{
-		patch = _args.patch,
-		epatch = _args.epatch,
-		patchFeature = (_args.patch_feature or ''):lower(),
-		sDate = Variables.varDefault('tournament_startdate'),
-		eDate = Variables.varDefault('tournament_enddate'),
-		server = _args.server,
-	}
-end
-
----@param args table
----@return boolean
-function CustomLeague:shouldStore(args)
-	return Namespace.isMain() and
-		not Logic.readBool(Variables.varDefault('disable_LPDB_storage', 'false'))
-end
-
 ---@param args table
 ---@return table
-function CustomLeague._getServers(args)
-	return Array.map(_league:getAllArgsForBase(args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
-end
-
----@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	--Legacy vars
-	local name = self.name
-	Variables.varDefine('tournament_ticker_name', args.tickername or name)
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
-	Variables.varDefine('tournament_icon_filename', Variables.varDefault('tournament_icon'))
-	Variables.varDefine('tournament_icon_name', (args.abbreviation or ''):lower())
-
-	Variables.varDefine('usd prize', Variables.varDefault('tournament_prizepoolusd'))
-	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency'))
-	Variables.varDefine('local prize', Variables.varDefault('tournament_prizepoollocal'))
-
-	Variables.varDefine('sdate', Variables.varDefault('tournament_startdate'))
-	Variables.varDefine('edate', Variables.varDefault('tournament_enddate'))
-	Variables.varDefine('tempdate', Variables.varDefault('tournament_enddate'))
-
-	-- Warcraft specific stuff
-	Variables.varDefine('environment', (args.type or ''):lower() == OFFLINE and OFFLINE or ONLINE)
-
-	if args.starttime then
-		Variables.varDefine('tournament_starttimeraw', Variables.varDefault('tournament_startdate', '') .. args.starttime)
-
-		local startTime = Variables.varDefault('tournament_startdate', '') .. ' '
-			.. args.starttime:gsub('<.*', '')
-
-		Variables.varDefine('tournament_starttime', startTime)
-		Variables.varDefine('start_time', startTime)
-		local timeZone = args.starttime:match('data%-tz="(.-)"')
-		if timeZone then
-			Variables.varDefine('tournament_timezone', timeZone)
-		end
-	end
-
-	Variables.varDefine('firstmatch', CustomLeague._getFirstMatchTime())
-
-	--override var to standardize its entries
-	Variables.varDefine('tournament_game', GAMES[args.game])
-
-	--check if tournament is finished
-	local finished = Logic.readBoolOrNil(args.finished)
-	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if finished == nil and os.date('%Y-%m-%d') >= queryDate then
-		local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-			query = 'date',
-			order = 'date asc',
-			limit = 1
-		})
-		if data and type(data[1]) == 'table' then
-			finished = true
-		end
-	end
-	Variables.varDefine('tournament_finished', tostring(finished or false))
-
-	--maps
-	local maps = CustomLeague._getMaps('map')
-	Variables.varDefine('tournament_maps', maps and Json.stringify(maps) or '')
-
-	local seriesNumber = args.number
-	if Logic.isNumeric(seriesNumber) then
-		Variables.varDefine('tournament_series_number', seriesNumber)
-	end
-
-	--publisher tier
-	Variables.varDefine('tournament_publishertier',
-		ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
-	)
-
-	CustomLeague._getGameVersion()
+function CustomLeague:_getServers(args)
+	return Array.map(self:getAllArgsForBase(args, 'server'), function(server) return '[[Server|'.. server ..']]' end)
 end
 
 ---@return string?
@@ -352,53 +378,24 @@ function CustomLeague._getFirstMatchTime()
 	end
 end
 
----@param prefix string
----@return {link: string, displayname: string}[]?
-function CustomLeague._getMaps(prefix)
-	if String.isEmpty(_args[prefix .. '1']) then
-		return
-	end
-	local mapArgs = _league:getAllArgsForBase(_args, prefix)
-
-	local maps = Table.map(mapArgs, function(mapIndex, map)
-		local splitMap = mw.text.split(map, '|')
-
-		splitMap[1] = (MapsData[splitMap[1]:lower()] or {}).name or splitMap[1]
-
-		return mapIndex, {
-			link = mw.ext.TeamLiquidIntegration.resolve_redirect(splitMap[1]),
-			displayname = _args[prefix .. mapIndex .. 'display'] or splitMap[#splitMap],
-		}
-	end)
-
-	Array.sortInPlaceBy(maps, Operator.property('link'))
-
-	return maps
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.game = GAMES[args.game]
-	lpdbData.patch = Variables.varDefault('tournament_patch')
-	lpdbData.endpatch = Variables.varDefault('tournament_endpatch', Variables.varDefault('tournament_patch'))
-	local status = args.status
-		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
-		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
-	lpdbData.status = status
-	lpdbData.maps = Variables.varDefault('tournament_maps')
+	lpdbData.patch = self.data.patch
+	lpdbData.endpatch = self.data.endPatch
+	lpdbData.maps = self.data.maps
 	local participantsNumber = tonumber(args.team_number) or 0
 	if participantsNumber == 0 then
 		participantsNumber = tonumber(args.player_number) or 0
 	end
 	lpdbData.participantsnumber = participantsNumber
-	lpdbData.sortdate = Variables.varDefault('tournament_starttime')
-		and (Variables.varDefault('tournament_starttime') .. (Variables.varDefault('tournament_timezone') or ''))
-		or Variables.varDefault('firstmatch', Variables.varDefault('tournament_startdate'))
-	lpdbData.mode = CustomLeague._getMode()
-	lpdbData.extradata.seriesnumber = Variables.varDefault('tournament_series_number')
+	lpdbData.sortdate = self.data.startTime.startTime
+		and (self.data.startTime.startTime .. (self.data.startTime.timeZone or ''))
+		or self.data.firstMatch or  self.data.startDate
+	lpdbData.mode = self:_getMode()
+	lpdbData.extradata.seriesnumber = self.data.number
 
 	lpdbData.extradata.server2 = args.server2
 	lpdbData.extradata.patch2 = args.patch2
@@ -414,21 +411,6 @@ function CustomLeague:_createNoWrappingSpan(content)
 		:node(content)
 end
 
----@return string
-function CustomLeague._determineGame()
-	if _args.game and GAMES[_args.game:lower()] then
-		return _args.game:lower()
-	end
-
-	local startDate = _league:_cleanDate(_args.sdate) or _league:_cleanDate(_args.date)
-
-	if startDate and startDate > GAME_DEFAULT_SWITCH_DATE then
-		return GAME_REFORGED
-	end
-
-	return GAME_FROZEN_THRONE
-end
-
 ---@param args table
 ---@return string[]
 function CustomLeague:addParticipantTypeCategory(args)
@@ -438,24 +420,23 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {'Tournaments'}
+	local tier = tonumber(args.liquipediatier)
 
-	if GAMES[args.game] then
-		table.insert(categories, GAMES[args.game] .. ' Competitions')
+	local categories = {
+		'Tournaments',
+		(tier == TIER_1 or tier == TIER_2) and 'Big Tournaments' or 'Small Tournaments'
+	}
+
+	local game = Game.name{game = self.data.game}
+	if game then
+		table.insert(categories, game .. ' Competitions')
 	end
 
 	if String.isNotEmpty(args.eslprotier) then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	local tier = tonumber(args.liquipediatier)
-	if tier == TIER_1 or tier == TIER_2 then
-		table.insert(categories, 'Big Tournaments')
-	else
-		table.insert(categories, 'Small Tournaments')
-	end
-
-	local year = string.sub(Variables.varDefault('tournament_enddate', ''), 1, 4)
+	local year = string.sub(self.data.endDate or '', 1, 4)
 	if String.isNotEmpty(year) then
 		table.insert(categories, 'Tournaments in ' .. year)
 	end
@@ -464,8 +445,8 @@ function CustomLeague:getWikiCategories(args)
 end
 
 ---@return string
-function CustomLeague._getMode()
-	return (MODES[_args.mode] or MODES.default).store
+function CustomLeague:_getMode()
+	return (MODES[self.args.mode] or MODES.default).store
 end
 
 ---@param args table

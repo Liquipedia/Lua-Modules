@@ -9,17 +9,15 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Patch = Lua.import('Module:Infobox/Patch')
 
-local CustomPatch = Class.new()
+--@Class HaloPatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local patch = Patch(frame)
-	patch.args.informationType = 'Version'
-
-	patch.getChronologyData = CustomPatch.getChronologyData
+	local patch = CustomPatch(frame)
 
 	return patch:createInfobox()
 end

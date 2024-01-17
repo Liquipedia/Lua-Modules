@@ -4,15 +4,15 @@
  ******************************************************************************/
 liquipedia.liquipedialinks = {
 	init: function() {
-		const countOtherWikis = parseInt( document.getElementById( 'ext-wikimenu' ).dataset.countOtherWikis );
+		var countOtherWikis = parseInt( document.getElementById( 'ext-wikimenu' ).dataset.countOtherWikis );
 		if ( countOtherWikis > 0 ) {
-			const badge = document.createElement( 'span' );
+			var badge = document.createElement( 'span' );
 			badge.classList.add(
 				'badge', 'badge-pill', 'wiki-backgroundcolor-navbar-badge', 'liquipedia-links-badge'
 			);
 			badge.innerHTML = countOtherWikis;
 
-			const badgeTooltip = document.createElement( 'span' );
+			var badgeTooltip = document.createElement( 'span' );
 			badgeTooltip.classList.add(
 				'liquipedia-links-badge--tooltip'
 			);

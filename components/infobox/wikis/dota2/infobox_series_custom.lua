@@ -10,51 +10,46 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Series = Lua.import('Module:Infobox/Series')
+local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomSeries = {}
+---@class DotaSeriesInfobox: SeriesInfobox
+local CustomSeries = Class.new(Series)
 
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return string
 function CustomSeries.run(frame)
-	local series = Series(frame)
-	_args = series.args
-	series.createWidgetInjector = CustomSeries.createWidgetInjector
+	local series = CustomSeries(frame)
+	series:setWidgetInjector(CustomInjector(series))
 
 	return series:createInfobox()
-end
-
----@return WidgetInjector
-function CustomSeries:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'location' then
 		local locations = {}
-		_args.city1 = _args.city1 or _args.city
-		for prefix, country, index in Table.iter.pairsByPrefix(_args, 'country', {requireIndex = false}) do
-			local city = _args['city'.. index]
-			local locationDate = _args[prefix..'date']
+		args.city1 = args.city1 or args.city
+		for prefix, country, index in Table.iter.pairsByPrefix(args, 'country', {requireIndex = false}) do
+			local city = args['city'.. index]
+			local locationDate = args[prefix..'date']
 			local text = Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 			if locationDate then
 				text = text .. '&nbsp;<small>' .. locationDate .. '</small>'
 			end
 			table.insert(locations, text)
 		end
-		return { Cell{name = 'Location', content = locations} }
+		return {Cell{name = 'Location', content = locations}}
 	end
 	return widgets
 end

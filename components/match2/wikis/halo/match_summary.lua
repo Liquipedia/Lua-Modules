@@ -13,8 +13,8 @@ local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -26,13 +26,6 @@ local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
-	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
-		text = 'Match page on ESL'
-	},
 	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
 	headtohead = {

@@ -47,7 +47,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2bracketdata',
 }
 local NONE = 'none'
-local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox'
+local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local LIMIT_INCREASE = 20
@@ -84,7 +84,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
 
-MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents', {requireDevIfEnabled = true})
+MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 
 ---@param args table?
 ---@return table
@@ -120,7 +120,8 @@ function MatchTicker:init(args)
 		not (config.upcoming or config.ongoing)),
 		'Invalid recent, upcoming, ongoing combination')
 
-	local teamPages = args.team and Team.queryHistoricalNames(args.team) or nil
+	local teamPages = args.team and Team.queryHistoricalNames(args.team)
+		or args.team and {args.team} or nil
 	if teamPages then
 		Array.extendWith(teamPages,
 		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),
@@ -290,7 +291,7 @@ function MatchTicker:adjustMatch(match)
 		return match
 	end
 
-	local opponentNames = Array.append({self.config.player}, self.config.teamPages)
+	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
 		Table.includes(opponentNames, (match.match2opponents[2].name:gsub(' ', '_')))
@@ -310,18 +311,16 @@ function MatchTicker.switchOpponents(match)
 		or winner == 2 and 1
 		or match.winner
 
-	local tempOpponent = match.match2opponents[1]
-	match.match2opponents[1] = match.match2opponents[2]
-	match.match2opponents[2] = tempOpponent
+	match.match2opponents[1], match.match2opponents[2] = match.match2opponents[2], match.match2opponents[1]
 
 	return match
 end
 
 ---@param header MatchTickerHeader?
----@return Html|string
+---@return Html
 function MatchTicker:create(header)
 	if not self.matches and not self.config.showInfoForEmptyResults then
-		return ''
+		return mw.html.create()
 	end
 
 	local wrapper = mw.html.create('div')

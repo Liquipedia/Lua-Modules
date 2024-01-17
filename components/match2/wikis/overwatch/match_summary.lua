@@ -12,8 +12,8 @@ local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local MapModes = require('Module:MapModes')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -27,8 +27,6 @@ local ICONS = {
 }
 
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 	esl = {
 		icon = 'File:ESL_2019_icon_lightmode.png',
 		iconDark = 'File:ESL_2019_icon_darkmode.png',

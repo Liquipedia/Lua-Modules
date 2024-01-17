@@ -17,8 +17,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_HAS_SCORE = 'S'
 local _STATUS_DEFAULT_WIN = 'W'

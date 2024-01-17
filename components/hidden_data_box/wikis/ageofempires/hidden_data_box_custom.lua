@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 
 local CustomHiddenDataBox = {}
 
@@ -42,6 +42,8 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('date', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('edate', Variables.varDefault('tournament_enddate', ''))
 	Variables.varDefine('sdate', Variables.varDefault('tournament_startdate', ''))
+
+	Variables.varDefine('tournament_game', args.game or queryResult.game)
 
 	--headtohead option
 	Variables.varDefine('tournament_headtohead', args.headtohead)

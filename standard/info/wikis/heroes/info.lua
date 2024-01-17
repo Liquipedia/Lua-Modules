@@ -29,4 +29,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Hots logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Hots logo.png', ---@deprecated
+	match2 = 1,
 }

@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -60,10 +60,7 @@ function UnofficialWorldChampion:createInfobox()
 					end
 					return {
 						Title{name = 'Title Gained'},
-						Cell{
-							name = args['gained date'],
-							content = { contentCell },
-						},
+						Cell{name = args['gained date'], content = { contentCell }},
 					}
 				end
 			end
@@ -103,7 +100,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 return UnofficialWorldChampion

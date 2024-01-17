@@ -21,6 +21,7 @@ local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achie
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
+local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_PLAYER_LIMIT = 10
 local DEFAULT_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',
@@ -206,7 +207,7 @@ function Achievements.display(data, options)
 
 	return String.nilIfEmpty(table.concat(Array.map(data, function(item)
 		return Achievements._displayIcon(item, options)
-	end)))
+	end), NON_BREAKING_SPACE))
 end
 
 ---Build the icon for a single entry

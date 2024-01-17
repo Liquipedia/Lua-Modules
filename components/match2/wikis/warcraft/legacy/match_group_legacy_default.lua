@@ -138,7 +138,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 		opponent2 = opponents[2],
 		finished = finished[1] .. '|' .. finished[2],
 		-- reference to variables that shall be flattened
-		['$flatten$'] = { 'R' .. round.R .. 'G' .. round.G .. 'details' }
+		['$flatten$'] = {reset and 'resetDetails' or ('R' .. round.R .. 'G' .. round.G .. 'details')}
 	}
 
 	bracketData[id] = MatchGroupLegacyDefault.addMaps(match)

@@ -633,7 +633,7 @@
 	display: flex;
 	flex-direction: column;
 	width: 48%;
-	border: 1px solid #dddddd;
+	border: 1px solid var( --table-border-color, #dddddd );
 	padding: 5px;
 	border-radius: 5px;
 	line-height: 13px;
@@ -648,7 +648,7 @@
 }
 
 .brkts-popup-header-reset {
-	border-top: 2px solid #dddddd;
+	border-top: 2px solid var( --table-border-color, #dddddd );
 }
 
 .brkts-popup-header-score {
@@ -729,7 +729,7 @@
 }
 
 .brkts-popup-mapveto tr {
-	border-top: 1px dotted #dddddd;
+	border-top: 1px dotted var( --table-border-color, #dddddd );
 	height: 10px;
 }
 
@@ -739,16 +739,16 @@
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetostart {
-	background-color: #f5f5f5;
+	background-color: var( --table-striped-background-color, #f5f5f5 );
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetoround {
-	background-color: #ffffff;
+	background-color: var( --table-background-color, #ffffff );
 }
 
 .brkts-popup-mapveto .brkts-popup-mapveto-vetotype {
 	font-weight: bold;
-	color: #000000;
+	color: var( --clr-on-background, #000000 );
 	border: 0;
 	border-radius: 0;
 	letter-spacing: 0.1em;
@@ -922,7 +922,7 @@ img.brkts-champion-icon,
  */
 
 .ffa-match-summary {
-	background: #f9f9f9;
+	background: var( --table-background-color, #f9f9f9 );
 	max-height: 80vh;
 	overflow: hidden auto;
 }
@@ -935,8 +935,8 @@ img.brkts-champion-icon,
 
 .ffa-match-summary-grid {
 	align-items: flex-start;
-	background: #f5f5f5;
-	border-bottom: 1px solid #bbbbbb;
+	background: var( --table-striped-background-color, #f5f5f5 );
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
 	display: flex;
 }
 
@@ -974,15 +974,15 @@ img.brkts-champion-icon,
 }
 
 .ffa-match-summary-header-bg-row {
-	background: #eaecf0;
+	background: var( --table-header-variant-background-color, #eaecf0 );
 }
 
 .ffa-match-summary-body-bg-row {
-	background: #ffffff;
+	background: var( --table-background-color, #ffffff );
 }
 
 .ffa-match-summary-body-bg-row:nth-of-type( 2n ) {
-	background: #f5f5f5;
+	background: var( --table-striped-background-color, #f5f5f5 );
 }
 
 .ffa-match-summary-grid-header,
@@ -1056,7 +1056,7 @@ img.brkts-champion-icon,
 }
 
 .ffa-match-summary-maps {
-	background: #ffffff;
+	background: var( --table-background-color, #ffffff );
 	padding: 4px 10px;
 }
 
@@ -1074,13 +1074,13 @@ img.brkts-champion-icon,
 }
 
 .ffa-match-summary-comment {
-	border-top: 1px solid #dddddd;
+	border-top: 1px solid var( --table-border-color, #dddddd );
 	padding: 2px 10px;
 	text-align: center;
 }
 
 .ffa-match-summary-footer {
-	border-top: 1px solid #dddddd;
+	border-top: 1px solid var( --table-border-color, #dddddd );
 	padding: 2px 10px;
 	text-align: center;
 }

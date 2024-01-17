@@ -13,42 +13,49 @@ local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local CustomPlayer = Class.new()
-
+---@class CallofdutyInfoboxPlayer: Person
+---@field role table
+---@field role2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _role
-local _role2
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-	_args.autoTeam = true
-	_role = Role.run({role = _args.role})
-	_role2 = Role.run({role = _args.role2})
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.args.autoTeam = true
+	player.role = Role.run({role = player.args.role})
+	player.role2 = Role.run({role = player.args.role2})
 
 	return player:createInfobox(frame)
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'history' then
-		local manualHistory = _args.history
+	local args = self.caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
+		}
+	elseif id == 'history' then
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = 'true',
-			player = _pagename
+			convertrole = true,
+			addlpdbdata = true,
+			player = self.caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -60,29 +67,21 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {_role.display, _role2.display}}
+			Cell{name = 'Role(s)', content = {self.caller.role.display, self.caller.role2.display}}
 		}
 	end
+
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{
-			name = 'Game Appearances',
-			content = GameAppearances.player({player = _pagename})
-		},
-	}
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.isplayer = _role.isPlayer or 'true'
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
+	lpdbData.extradata.role = self.role.role
+	lpdbData.extradata.role2 = self.role2.role
 
 	return lpdbData
 end

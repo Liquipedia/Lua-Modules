@@ -28,4 +28,5 @@ return {
 	defaultGame = 'mobilelegends',
 	defaultTeamLogo = 'Mobile Legends allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Mobile Legends allmode.png', ---@deprecated
+	match2 = 2,
 }

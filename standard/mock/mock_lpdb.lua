@@ -129,9 +129,10 @@ dbStructure.squadplayer = {
 ---- query with `::`
 ---- order
 ---- groupby
----@param dbTable string
+---@generic T:LpdbBaseData
+---@param dbTable `T`
 ---@param parameters table
----@return table<string, any>[]
+---@return T[]
 function mockLpdb.lpdb(dbTable, parameters)
 	local lpdbData = mockLpdb._getMockData(dbTable)
 
@@ -148,7 +149,7 @@ end
 ---@param dbTable string
 ---@return table
 function mockLpdb._getMockData(dbTable)
-	local data = Lua.import('Module:TestAssets/Lpdb/' .. dbTable, {requireDevIfEnabled = true})
+	local data = Lua.import('Module:TestAssets/Lpdb/' .. dbTable)
 
 	if not data then
 		error(mw.message.new('liquipediadb-error-invalid-datatype'))

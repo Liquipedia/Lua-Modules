@@ -9,10 +9,9 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -21,46 +20,47 @@ local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supe
 	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
 	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
-local _args
-
-local CustomLeague = Class.new()
+---@class ClashofclansLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {_args.team_number}
-	})
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Teams', content = {args.team_number}})
+	end
 
 	return widgets
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args['supercell-sponsored'])
 end
 
+---@param args table
+---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
 	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_publishertier', Logic.readBool(args['supercell-sponsored']) and 'true' or nil)
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = Logic.readBool(args['supercell-sponsored']) and 'true' or nil
 end
 
 return CustomLeague

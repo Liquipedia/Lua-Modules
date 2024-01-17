@@ -12,67 +12,62 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
+---@class WarcraftMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-
-	_args = customMap.args
-	return customMap:createInfobox()
+	return map:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(widgets,
-		Cell{name = 'Tileset', content = {_args.tileset}},
-		Cell{name = 'Size', content = {(_args.width or '') .. 'x' .. (_args.height or '')}},
-		Cell{name = 'Spawn Positions', content = {(_args.players or '') .. ' at ' .. (_args.positions or '')}},
-		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(_args.versions)}},
-		Cell{name = 'Competition Span', content = {_args.span}},
-		Cell{name = 'Leagues Featured', content = {_args.leagues}},
-		Cell{name = 'Mercenary Camps', content = {
-			CustomMap._mercenaryCamp(),
-			CustomMap._mercenaryCamp(2),
-			CustomMap._mercenaryCamp(3),
-		}}
-	)
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Tileset', content = {args.tileset}},
+			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
+			Cell{name = 'Spawn Positions', content = {(args.players or '') .. ' at ' .. (args.positions or '')}},
+			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Competition Span', content = {args.span}},
+			Cell{name = 'Leagues Featured', content = {args.leagues}},
+			Cell{name = 'Mercenary Camps', content = {
+				self.caller:_mercenaryCamp(),
+				self.caller:_mercenaryCamp(2),
+				self.caller:_mercenaryCamp(3),
+			}}
+		)
+	end
 
 	return widgets
 end
 
 ---@param postfix number|string|nil
 ---@return string?
-function CustomMap._mercenaryCamp(postfix)
+function CustomMap:_mercenaryCamp(postfix)
 	postfix = postfix or ''
-	local campInput = _args['merccamp' .. postfix]
+	local campInput = self.args['merccamp' .. postfix]
 	if not campInput then
 		return nil
 	end
 
 	return Page.makeInternalLink({onlyIfExists = true}, campInput, 'Mercenary Camp#' .. campInput)
 		or campInput
-end
-
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@param lpdbData table

@@ -16,9 +16,9 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -35,7 +35,6 @@ local LINKS_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	review = {icon = 'File:Reviews32.png', text = 'Review'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'Live Report Thread'},
 	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 }
 LINKS_DATA.preview2 = LINKS_DATA.preview
@@ -113,7 +112,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 
 	match.links.lrthread = match.links.lrthread or match.lrthread
 
-	if not match.headToHead or #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
+	if #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
 	then
 		return footer:addLinks(LINKS_DATA, match.links)

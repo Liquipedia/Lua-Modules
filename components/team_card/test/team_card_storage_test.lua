@@ -9,9 +9,9 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local TCStorage = Lua.import('Module:TeamCard/Storage', {requireDevIfEnabled = true})
-local TournamentMock = Lua.import('Module:Infobox/Mock/League', {requireDevIfEnabled = true})
-local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
+local TCStorage = Lua.import('Module:TeamCard/Storage')
+local TournamentMock = Lua.import('Module:Infobox/Mock/League')
+local Variables = Lua.import('Module:Variables')
 
 local suite = ScribuntoUnit:new()
 

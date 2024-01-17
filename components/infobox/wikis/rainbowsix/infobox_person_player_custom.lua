@@ -18,8 +18,17 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
+
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	'[[liquipediatiertype::!Showmatch]]',
+	'[[liquipediatiertype::!Qualifier]]',
+	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+	'[[placement::1]]',
+}
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Builder = Widgets.Builder
@@ -67,6 +76,12 @@ function CustomPlayer.run(frame)
 	local player = Player(frame)
 
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
+	-- Automatic achievements
+	player.args.achievements = Achievements.player{
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
+
+	player.args.banned = tostring(player.args.banned or '')
 
 	player.adjustLPDB = CustomPlayer.adjustLPDB
 	player.createBottomContent = CustomPlayer.createBottomContent

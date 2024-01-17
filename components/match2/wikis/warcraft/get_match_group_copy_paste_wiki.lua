@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true})
+local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

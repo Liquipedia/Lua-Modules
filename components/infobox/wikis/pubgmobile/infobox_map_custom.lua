@@ -6,27 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class PubgMobileMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
-
-local GAME = {
-	mobile = '[[Mobile]]',
-	newstate = '[[New State]]',
-	peace = '[[Peacekeeper Elite|Peace Elite]]',
-	bgmi = '[[Battlegrounds Mobile India|BGMI]]',
-}
 
 local MODES = {
 	['battle royale'] = 'Battle Royale',
@@ -40,63 +33,49 @@ MODES.br = MODES['battle royale']
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.addToLpdb = CustomMap.addToLpdb
-	_args = customMap.args
-	return customMap:createInfobox()
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+
+	return map:createInfobox()
 end
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Span',
-		content = {_args.span}
-	})
-	table.insert(widgets, Cell{
-		name = 'Theme',
-		content = {_args.theme}
-	})
-	table.insert(widgets, Cell{
-		name = 'Size',
-		content = {_args.size}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Version',
-		content = {CustomMap._getGameVersion()}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Mode(s)',
-		content = {CustomMap._getGameMode()}
-	})
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Span', content = {args.span}},
+			Cell{name = 'Theme', content = {args.theme}},
+			Cell{name = 'Size', content = {args.size}},
+			Cell{name = 'Game Version', content = {Game.text{
+				game = args.game,
+				useDefault = true,
+				useAbbreviation = true,
+			}}},
+			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
+		)
+	end
 	return widgets
 end
 
+---@param args table
 ---@return string?
-function CustomMap._getGameVersion()
-	return GAME[string.lower(_args.game or '')]
-end
-
----@return string?
-function CustomMap._getGameMode()
-	return MODES[string.lower(_args.mode or '')]
+function CustomMap:_getGameMode(args)
+	return MODES[string.lower(args.mode or '')]
 end
 
 ---@param lpdbData table
+---@param args table
 ---@return table
-function CustomMap:addToLpdb(lpdbData)
-	lpdbData.extradata.theme = _args.theme
-	lpdbData.extradata.size = _args.sizeabr
-	lpdbData.extradata.span = _args.span
-	lpdbData.extradata.mode = string.lower(_args.mode or '')
-	lpdbData.extradata.perpective = string.lower(_args.perspective or '')
-	lpdbData.extradata.game = string.lower(_args.game or '')
+function CustomMap:addToLpdb(lpdbData, args)
+	lpdbData.extradata.theme = args.theme
+	lpdbData.extradata.size = args.sizeabr
+	lpdbData.extradata.span = args.span
+	lpdbData.extradata.mode = string.lower(args.mode or '')
+	lpdbData.extradata.perpective = string.lower(args.perspective or '')
+	lpdbData.extradata.game = Game.toIdentifier{game = args.game, useDefault = true}
 	return lpdbData
 end
 

@@ -43,6 +43,7 @@ curl \
   > /dev/null
 
 allDeployed=true
+changesMade=false
 for file in $files; do
   if [[ -n "$1" ]]; then
     file="./$file"
@@ -89,8 +90,12 @@ for file in $files; do
       | gunzip
   )
   result=$(echo "$rawResult" | jq ".edit.result" -r)
+  newRevId=$(echo "$rawResult" | jq ".edit.newrevid" -r)
   echo "DEBUG: ...${rawResult}"
   if [[ "${result}" == "Success" ]]; then
+    if [[ "${newRevId}" != "null" ]]; then
+      changesMade=true
+    fi
     echo "...${result}"
     echo '...done'
   else
@@ -103,8 +108,28 @@ for file in $files; do
 done
 
 if [ "$allDeployed" != true ]; then
-  echo "DEBUG: Some files were not deployed!"
+  echo "DEBUG: Some files were not deployed; resource cache version not updated!"
   exit 1
+elif [ "$changesMade" == true ]; then
+  cacheResult=$(
+    curl \
+      -s \
+      -b "$ckf" \
+      -c "$ckf" \
+      --data-urlencode "messagename=Resourceloaderarticles-cacheversion" \
+      --data-urlencode "value=$(git log -1 --pretty='%h')" \
+      -H "User-Agent: ${userAgent}" \
+      -H 'Accept-Encoding: gzip' \
+      -X POST "${wikiApiUrl}?format=json&action=updatelpmwmessageapi" \
+      | gunzip \
+      | jq ".updatelpmwmessageapi.message" -r
+  )
+  if [[ "${cacheResult}" == "Successfully changed the message value" ]]; then
+  	echo "Resource cache version updated succesfully!"
+  else
+    echo "DEBUG: Resource cache version unable to be updated!"
+    exit 1
+  fi
 fi
 
 rm -f cookie_*

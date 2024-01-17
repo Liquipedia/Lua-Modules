@@ -7,86 +7,84 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+---@class CrossfireLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
-local _GAME = mw.loadData('Module:GameVersion')
-
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'sponsors' then
-		table.insert(widgets, Cell{name = 'Official Device', content = {_args.device}})
+		table.insert(widgets, Cell{name = 'Official Device', content = {args.device}})
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}},
-			}
+			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+		}
 	elseif id == 'customcontent' then
-		if _args.player_number then
+		if args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
+			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
 		end
 
 		--teams section
-		if _args.team_number then
+		if args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
 		end
 	end
 	return widgets
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.cfpremier)
+---@param args table
+---@return boolean
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.cfpremier)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = CustomLeague._getGameVersion() or args.game
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_game', CustomLeague._getGameVersion() or args.game)
-	Variables.varDefine('tournament_publishertier', args.cfpremier)
-	--Legacy Vars:
-	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = args.cfpremier
 end
 
-function CustomLeague._getGameVersion()
-	return _GAME[string.lower(_args.game or '')]
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
+	--Legacy Vars:
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
 end
 
 return CustomLeague

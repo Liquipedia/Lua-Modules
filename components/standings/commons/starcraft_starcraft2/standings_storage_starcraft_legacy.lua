@@ -15,8 +15,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local LEAGUE_TYPE = 'league'
 local TYPE_FROM_NUMBER = Table.map(Opponent.partySizes, function(key, code) return code, key end)

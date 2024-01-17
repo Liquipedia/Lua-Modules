@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local Series = Lua.import('Module:Infobox/Series', {requireDevIfEnabled = true})
+local Series = Lua.import('Module:Infobox/Series')
 
 local CustomSeries = {}
 

@@ -13,8 +13,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
@@ -283,6 +283,7 @@ function matchFunctions.getVodStuff(match)
 	local links = match.links
 	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
+	if match.breakingpoint then links.breakingpoint = 'https://www.breakingpoint.gg/match/' .. match.breakingpoint end
 
 	return match
 end

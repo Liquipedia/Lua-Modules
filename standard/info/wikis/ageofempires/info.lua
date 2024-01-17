@@ -12,7 +12,7 @@ return {
 	name = 'Age of Empires',
 
 	games = {
-		aoe1 = {
+		['Age of Empires I'] = {
 			abbreviation = 'AoE1',
 			name = 'Age of Empires I',
 			link = 'Age of Empires I',
@@ -25,7 +25,7 @@ return {
 				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
-		aoe2 = {
+		['Age of Empires II'] = {
 			abbreviation = 'AoE2',
 			name = 'Age of Empires II',
 			link = 'Age of Empires II',
@@ -38,7 +38,7 @@ return {
 				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
-		aoe3 = {
+		['Age of Empires III'] = {
 			abbreviation = 'AoE3',
 			name = 'Age of Empires III',
 			link = 'Age of Empires III',
@@ -51,7 +51,7 @@ return {
 				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
-		aoe4 = {
+		['Age of Empires IV'] = {
 			abbreviation = 'AoE4',
 			name = 'Age of Empires IV',
 			link = 'Age of Empires IV',
@@ -64,7 +64,7 @@ return {
 				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
-		aom = {
+		['Age of Mythology'] = {
 			abbreviation = 'AoM',
 			name = 'Age of Mythology',
 			link = 'Age of Mythology',
@@ -77,7 +77,7 @@ return {
 				lightMode = 'Age of Empires default allmode.png',
 			},
 		},
-		aoeo = {
+		['Age of Empires Online'] = {
 			abbreviation = 'AoEO',
 			name = 'Age of Empires Online',
 			link = 'Age of Empires Online',
@@ -91,8 +91,9 @@ return {
 			},
 		},
 	},
-	defaultGame = 'aoe2',
+	defaultGame = 'Age of Empires II',
 
 	defaultTeamLogo = 'Age of Empires default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Age of Empires default allmode.png', ---@deprecated
+	match2 = 0,
 }

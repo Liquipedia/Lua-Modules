@@ -11,8 +11,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Building = Lua.import('Module:Infobox/Building')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -24,10 +24,9 @@ local MODE_AVAILABILITY = {
 	clan 	= {order = 3, name = 'Clan Capital'},
 }
 
----@class CustomBuildingInfobox: BuildingInfobox
+---@class ClashOfClansCustomBuildingInfobox: BuildingInfobox
 local CustomBuilding = Class.new()
 
----@class CustomWidgetInjector: WidgetInjector
 local CustomInjector = Class.new(Injector)
 
 local _args

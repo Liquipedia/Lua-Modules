@@ -12,10 +12,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true})
-local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
+local Match = Lua.import('Module:Match')
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local BracketTemplate = {}
 

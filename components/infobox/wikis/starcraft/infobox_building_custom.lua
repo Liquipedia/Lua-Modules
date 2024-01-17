@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 local Hotkeys = require('Module:Hotkey')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Building = Lua.import('Module:Infobox/Building')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -136,7 +136,7 @@ function CustomBuilding._contentWithBonus(key, bonusNumber)
 		or _args[key]}
 end
 
----@return CustomWidgetInjector
+---@return WidgetInjector
 function CustomBuilding:createWidgetInjector()
 	return CustomInjector()
 end

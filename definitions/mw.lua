@@ -60,7 +60,7 @@ function mw.log(...) end
 function mw.logObject(object, prefix) end
 
 ---@class Frame
----@field args table
+---@field args table?
 mw.frame = {}
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
@@ -202,6 +202,9 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
+--- Include the full functionality for faking
+mw.html = require('3rd.mw.html')
+
 ---@class Language
 mw.language = {}
 
@@ -287,7 +290,13 @@ function mw.language:uc(str) end
 ---Converts the first character of the string to uppercase.
 ---@param str string
 ---@return string
-function mw.language:ucfirst(str) end
+function mw.language:ucfirst(str)
+	-- TODO: UTF8 support in fake
+	if str == 'übung' then
+		return 'Übung'
+	end
+	return (str:gsub("^%l", string.upper))
+end
 
 ---Converts the string to a representation appropriate for case-insensitive comparison. Note that the result may not make any sense when displayed.
 ---@param str string
@@ -494,7 +503,22 @@ function mw.text.listToText(list, separator, conjunction) end
 ---Replaces various characters in the string with HTML entities to prevent their interpretation as wikitext.
 ---@param s string
 ---@return string
-function mw.text.nowiki(s) end
+function mw.text.nowiki(s)
+	-- TODO: This only covers some
+	return (string.gsub( s, '["&\'<=>%[%]{|}]', {
+		['"'] = '&#34;',
+		['&'] = '&#38;',
+		["'"] = '&#39;',
+		['<'] = '&#60;',
+		['='] = '&#61;',
+		['>'] = '&#62;',
+		['['] = '&#91;',
+		[']'] = '&#93;',
+		['{'] = '&#123;',
+		['|'] = '&#124;',
+		['}'] = '&#125;',
+	}))
+end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
 ---@param s string
@@ -823,17 +847,7 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 function mw.ustring.upper(s) return string.upper(s) end
 
 mw.ext = {}
-mw.ext.LiquipediaDB = {}
-
----@param obj table
----@return string
----Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
-function mw.ext.LiquipediaDB.lpdb_create_json(obj) end
-
----@param obj any[]
----@return string
----Encode an Array to a JSON array. Errors are raised if the passed value cannot be encoded in JSON.
-function mw.ext.LiquipediaDB.lpdb_create_array(obj) end
+mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.VariablesLua = {}
 ---@alias wikiVaribleKey string|number

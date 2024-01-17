@@ -18,15 +18,16 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Item = Lua.import('Module:Infobox/Item', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Item = Lua.import('Module:Infobox/Item')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomItem = Class.new()
+---@class WarcraftItemInfobox: ItemInfobox
+local CustomItem = Class.new(Item)
 
 local CustomInjector = Class.new(Injector)
 
@@ -51,31 +52,27 @@ local CLASSES = {
 	miscellaneous = MISCELLANEOUS,
 }
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomItem.run(frame)
-	local customItem = Item(frame)
-	_args = customItem.args
+	local item = CustomItem(frame)
+	item:setWidgetInjector(CustomInjector(item))
 
-	_args.imagesize = 64
-	if _args.icon and not _args.image then
-		_args.image = 'Wc3BTN' .. _args.icon .. '.png'
+	local args = item.args
+
+	args.imagesize = 64
+	if args.icon and not args.image then
+		args.image = 'Wc3BTN' .. args.icon .. '.png'
 	end
-	local caption = Array.append({_args.caption},
-		Logic.readBool(_args.noncombat) and 'Non-Combat Consumable' or nil,
-		Logic.readBool(_args.artifact) and 'Artifact' or nil,
-		Logic.readBool(_args.unique) and 'Unique' or nil
+	local caption = Array.append({args.caption},
+		Logic.readBool(args.noncombat) and 'Non-Combat Consumable' or nil,
+		Logic.readBool(args.artifact) and 'Artifact' or nil,
+		Logic.readBool(args.unique) and 'Unique' or nil
 	)
-	_args.caption = Table.isNotEmpty(caption) and table.concat(caption, '<br>') or nil
-	_args.soldFrom = CustomItem._soldFrom(_args.soldfrom)
+	args.caption = Table.isNotEmpty(caption) and table.concat(caption, '<br>') or nil
+	args.soldFrom = CustomItem._soldFrom(args.soldfrom)
 
-	customItem.createWidgetInjector = CustomItem.createWidgetInjector
-	customItem.getWikiCategories = CustomItem.getWikiCategories
-	customItem.setLpdbData = CustomItem.setLpdbData
-
-	return customItem:createInfobox()
+	return item:createInfobox()
 end
 
 ---@param soldFromInput string?
@@ -90,64 +87,56 @@ function CustomItem._soldFrom(soldFromInput)
 	return soldFrom
 end
 
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		_args.desc and Title{name = 'Description'} or nil,
-		Center{content = {_args.desc}},
-		_args.history and Title{name = 'Item History'} or nil,
-		Center{content = {_args.history}}
-	}
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'info' then
+	local args = self.caller.args
+	if id == 'custom' then
+		return {
+			args.desc and Title{name = 'Description'} or nil,
+			Center{content = {args.desc}},
+			args.history and Title{name = 'Item History'} or nil,
+			Center{content = {args.history}}
+		}
+	elseif id == 'info' then
 		return {
 			Title{name = 'Item Information'},
-			Cell{name = 'Level', content = {_args.level}},
-			Cell{name = 'Class', content = {CLASSES[(_args.class or ''):lower()] or _args.class}},
-			Cell{name = 'Charges', content = {_args.charges}},
+			Cell{name = 'Level', content = {args.level}},
+			Cell{name = 'Class', content = {CLASSES[(args.class or ''):lower()] or args.class}},
+			Cell{name = 'Charges', content = {args.charges}},
 		}
 	elseif id == 'availability' then
 		return Array.append(widgets,
-			Cell{name = 'Sold From', content = Array.map(_args.soldFrom, function(soldFrom)
+			Cell{name = 'Sold From', content = Array.map(args.soldFrom, function(soldFrom)
 				return '[[' .. soldFrom.link .. '|' .. soldFrom.name .. ']]' end)},
-			Cell{name = 'Requirements', content = {_args.requires}},
-			Cell{name = 'Cost', content = {CostDisplay.run{gold = _args.gold, lumber = _args.lumber}}},
+			Cell{name = 'Requirements', content = {args.requires}},
+			Cell{name = 'Cost', content = {CostDisplay.run{gold = args.gold, lumber = args.lumber}}},
 			Cell{name = 'Sell value', content = {CostDisplay.run{
-				gold = SELL_FACTOR * (tonumber(_args.gold) or 0),
-				lumber = SELL_FACTOR * (tonumber(_args.lumber) or 0)
+				gold = SELL_FACTOR * (tonumber(args.gold) or 0),
+				lumber = SELL_FACTOR * (tonumber(args.lumber) or 0)
 			}}},
-			Cell{name = 'Purchase Hotkey', content = {_args.hotkey and Hotkey.hotkey(_args.hotkey) or nil}},
-			Cell{name = 'Stock Max', content = {_args.stock}},
-			Cell{name = 'Stock Start Delay', content = {_args.stockstart and (
-				Abbreviation.make(_args.stockstart .. 's', 'First available at ' .. GameClock.run(_args.stockstart))
+			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey(args.hotkey) or nil}},
+			Cell{name = 'Stock Max', content = {args.stock}},
+			Cell{name = 'Stock Start Delay', content = {args.stockstart and (
+				Abbreviation.make(args.stockstart .. 's', 'First available at ' .. GameClock.run(args.stockstart))
 			) or nil}},
-			Cell{name = Abbreviation.make('Stock Repl. Interval', 'Stock Replenish Interval'), content = {_args.stockreplenish}}
+			Cell{name = Abbreviation.make('Stock Repl. Interval', 'Stock Replenish Interval'), content = {args.stockreplenish}}
 		)
 	elseif id == 'ability' then
 		return Array.append(widgets,
-			Cell{name = 'Cast Time', content = {_args.cast}},
-			Cell{name = 'Cooldown', content = {_args.cooldown}},
-			Cell{name = 'Cooldown Group', content = {_args.cooldown and (_args.coolgroup or
+			Cell{name = 'Cast Time', content = {args.cast}},
+			Cell{name = 'Cooldown', content = {args.cooldown}},
+			Cell{name = 'Cooldown Group', content = {args.cooldown and (args.coolgroup or
 				Abbreviation.make('Custom', 'This item has its own cooldown group.')
 			) or nil}},
-			Cell{name = 'Duration', content = {_args.duration}}
+			Cell{name = 'Duration', content = {args.duration}}
 		)
 	elseif Table.includes({'attributes', 'maps', 'recipe'}, id) then
 		return {}
 	end
 
 	return widgets
-end
-
----@return WidgetInjector
-function CustomItem:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@param args table

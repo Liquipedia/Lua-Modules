@@ -11,37 +11,34 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+---@class BrawlhallaLeagueInfobox: InfoboxLeagueTemp
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _TODAY = os.date('%Y-%m-%d')
+local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
-local _league
-
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = _league.args
+	local args = self.caller.args
+
 	if id == 'customcontent' then
 		if not String.isEmpty(args.player_number) or not String.isEmpty(args.doubles_number) then
 			table.insert(widgets, Title{name = 'Player Breakdown'})
@@ -58,10 +55,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Legacy vars
-	local sdate = Variables.varDefault('tournament_startdate', _TODAY)
-	local edate = Variables.varDefault('tournament_enddate', _TODAY)
+	local sdate = self.data.startDate or TODAY
+	local edate = self.data.endDate or TODAY
 	Variables.varDefine('tournament_sdate', sdate)
 	Variables.varDefine('tournament_edate', edate)
 	Variables.varDefine('tournament_date', edate)
@@ -71,8 +69,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_link', mw.title.getCurrentTitle().prefixedText)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.patch = args.patch
 	lpdbData.extradata.region = args.region
 	lpdbData.extradata.mode = args.mode
 

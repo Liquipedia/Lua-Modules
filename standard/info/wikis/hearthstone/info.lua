@@ -28,4 +28,5 @@ return {
 	defaultGame = 'hs',
 	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
+	match2 = 0,
 }
