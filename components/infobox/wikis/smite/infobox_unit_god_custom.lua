@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
+-- wiki=smite
 -- page=Module:Infobox/Unit/Champion
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local GodWL = require('Module:GodWL')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
@@ -26,6 +27,7 @@ local Title = Widgets.Title
 
 ---@class SmiteUnitInfobox: UnitInfobox
 local CustomGod = Class.new(Unit)
+
 local CustomInjector = Class.new(Injector)
 
 local FAVOR_ICON = '[[File:Smite Currency Favor.png|x20px|Favor|link=Favor]]'
@@ -146,12 +148,12 @@ function CustomGod:getCustomCells(widgets)
 		Title{name = 'Esports Statistics'}
 	)
 
-	--[[local stats = GodWL.create({god = args.godname or self.pagename})
+	local stats = GodWL.create({god = args.godname or self.pagename})
 	stats = mw.text.split(stats, ';')
 	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
 	winPercentage = Math.round(winPercentage, 4) * 100
 	local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
-	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})]]--
+	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})
 
 	return widgets
 end
@@ -192,5 +194,7 @@ function CustomGod:setLpdbData(args)
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('god_' .. (args.godname or self.pagename), lpdbData)
 end
+
+
 
 return CustomGod
