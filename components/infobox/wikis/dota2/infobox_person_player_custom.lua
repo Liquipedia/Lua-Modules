@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local HeroIcon = require('Module:HeroIcon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
@@ -75,7 +76,7 @@ function CustomPlayer.run(frame)
 	player.args.datdota = player.args.playerid
 	player.args.dotabuff = player.args.playerid
 	player.args.stratz = player.args.playerid
-	if not String.isEmpty(player.args.playerid) then
+	if Logic.isNumeric(player.args.playerid) then
 		player.args.steamalternative = '765' .. (tonumber(player.args.playerid) + CONVERSION_PLAYER_ID_TO_STEAM)
 	end
 
@@ -166,10 +167,6 @@ end
 ---@return string?
 function CustomPlayer:_displayRole(roleData)
 	if not roleData then return end
-
-	if not self:shouldStoreData(self.args) then
-		return roleData.variable
-	end
 
 	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
