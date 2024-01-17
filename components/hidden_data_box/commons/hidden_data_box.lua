@@ -147,9 +147,7 @@ end
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
 		---Opponent.resolve with syncPlayer enabled sets wiki variables as needed
-		local opponent = Opponent.fromLpdbStruct(placement)
-		---@cast opponent -nil
-		Opponent.resolve(opponent, date, {syncPlayer = true})
+		Opponent.resolve(Opponent.fromLpdbStruct(placement), date, {syncPlayer = true})
 		return
 	end
 
