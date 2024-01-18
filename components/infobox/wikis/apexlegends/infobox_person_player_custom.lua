@@ -23,7 +23,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _INPUTS = {
+local INPUTS = {
 	controller = 'Controller',
 	cont = 'Controller',
 	c = 'Controller',
@@ -31,7 +31,7 @@ local _INPUTS = {
 	default = 'Mouse & Keyboard',
 }
 
-local _ROLES = {
+local ROLES = {
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
 	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
@@ -45,132 +45,145 @@ local _ROLES = {
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
-local _SIZE_LEGEND = '25x25px'
+local SIZE_LEGEND = '25x25px'
 
-local CustomPlayer = Class.new()
-
+---@class ApexlegendsInfoboxPlayer: Person
+---@field role {category: string, variable: string, isplayer: boolean?}?
+---@field role2 {category: string, variable: string, isplayer: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-
-	_args = player.args
-	_args.autoTeam = true
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'region' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		local legendIcons = Array.map(caller:getAllArgsForBase(args, 'legends'), function(legend)
+			return LegendIcon.getImage{legend, size = SIZE_LEGEND}
+		end)
+		Array.appendWith(widgets,
+			Cell{
+				name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
+				content = {table.concat(legendIcons, '&nbsp;')}
+			},
+			Cell{name = 'Input', content = {caller:formatInput()}}
+		)
+	elseif id == 'region' then
 		return {}
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
+			Cell{name = 'Status', content = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2)
 			}},
 		}
 	elseif id == 'history' then
 		table.insert(widgets, Cell{
 			name = 'Retired',
-			content = {_args.retired}
+			content = {args.retired}
 		})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Legends
-	local legendIcons = Array.map(Player:getAllArgsForBase(_args, 'legends'),
-		function(legend)
-			return LegendIcon.getImage{legend, size = _SIZE_LEGEND}
-		end
-	)
-	table.insert(widgets,
-		Cell{
-			name = #legendIcons > 1 and 'Signature Legends' or 'Signature Legend',
-			content = {
-				table.concat(legendIcons, '&nbsp;')
-			}
-		}
-	)
-
-	table.insert(widgets, Cell{
-			name = 'Input',
-			content = {CustomPlayer:formatInput()}
-		})
-	return widgets
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	if not self:shouldStoreData(self.args) then
+		return roleData.variable
+	end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.input = CustomPlayer:formatInput()
-	lpdbData.extradata.retired = _args.retired
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
 
-	for _, legend, legendIndex in Table.iter.pairsByPrefix(_args, 'legends', {requireIndex = false}) do
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
+
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
+
+
+	lpdbData.extradata.input = self:formatInput()
+	lpdbData.extradata.retired = args.retired
+
+	for _, legend, legendIndex in Table.iter.pairsByPrefix(args, 'legends', {requireIndex = false}) do
 		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
 	end
-	lpdbData.type = CustomPlayer._isPlayerOrStaff()
+	lpdbData.type = self:_isPlayerOrStaff()
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
 end
 
-function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) then
-		return UpcomingMatches.get(_args)
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) then
+		return UpcomingMatches.get(self.args)
 	end
 end
 
-function CustomPlayer._getStatusContents()
-	local status = Logic.readBool(_args.banned) and 'Banned' or Logic.emptyOr(_args.banned, _args.status)
+---@return string[]
+function CustomPlayer:_getStatusContents()
+	local status = Logic.readBool(self.args.banned) and 'Banned' or Logic.emptyOr(self.args.banned, self.args.status)
 	return {Page.makeInternalLink({onlyIfExists = true}, status) or status}
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
-function CustomPlayer._isPlayerOrStaff()
+---@return string
+function CustomPlayer:_isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = _ROLES[_args.role:lower()]
+	if String.isNotEmpty(self.args.role) then
+		roleData = ROLES[self.args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
@@ -180,9 +193,10 @@ function CustomPlayer._isPlayerOrStaff()
 	end
 end
 
+---@return string
 function CustomPlayer:formatInput()
-	local lowercaseInput = _args.input and _args.input:lower() or nil
-	return _INPUTS[lowercaseInput] or _INPUTS.default
+	local lowercaseInput = self.args.input and self.args.input:lower() or nil
+	return INPUTS[lowercaseInput] or INPUTS.default
 end
 
 return CustomPlayer

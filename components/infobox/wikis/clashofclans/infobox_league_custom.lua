@@ -20,7 +20,7 @@ local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supe
 	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
 	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
 
----@class ClashofclansLeagueInfobox: InfoboxLeagueTemp
+---@class ClashofclansLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

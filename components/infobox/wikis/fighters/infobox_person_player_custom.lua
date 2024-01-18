@@ -18,36 +18,30 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class FightersInfoboxPlayer: Person
+---@field games string[]
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _games = {}
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	local gamesText = GamesPlayed.get{game = player.args.game, player = mw.title.getCurrentTitle().baseText}
-	_games = mw.text.split(gamesText, '</br>', true)
-
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.defineCustomPageVariables = CustomPlayer.defineCustomPageVariables
+	player.games = mw.text.split(gamesText, '</br>', true)
 
 	return player:createInfobox()
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{name = 'Games', content = _games})
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Games', content = self.caller.games})
+	elseif id == 'status' then
 		table.insert(widgets,
 			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
@@ -56,10 +50,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomPlayer:defineCustomPageVariables(args)
-	self.infobox:categories(unpack(Array.map(_games, function(game)
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.extendWith(categories, Array.map(self.games, function(game)
 		return game .. ' Players'
-	end)))
+	end))
 end
 
 return CustomPlayer

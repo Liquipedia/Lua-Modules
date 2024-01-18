@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class RainbowsixLeagueInfobox: InfoboxLeagueTemp
+---@class RainbowsixLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -164,7 +164,7 @@ function CustomLeague:getWikiCategories(args)
 	local platform = self:_platformLookup(args.platform)
 
 	return {
-		game and (game .. 'Competitions') or 'Tournaments without game version',
+		game and (game .. ' Competitions') or 'Tournaments without game version',
 		platform and (platform .. ' Tournaments') or nil,
 	}
 end

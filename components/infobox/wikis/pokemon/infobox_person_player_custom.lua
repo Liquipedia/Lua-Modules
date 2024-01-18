@@ -22,34 +22,40 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-
-local CustomPlayer = Class.new()
-
+---@class PokemonInfoboxPlayer: Person
+---@field roleData table
+---@field roleData2 table
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-	_args = player.args
 
-	player.roleData = Role.run({role = _args.role})
-	player.roleData2 = Role.run({role = _args.role2})
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.roleData = Role.run{role = player.args.role}
+	player.roleData2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'history' then
-		local manualHistory = _args.history
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Game Appearances', content = GameAppearances.player({player = caller.pagename})},
+		}
+	elseif id == 'history' then
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
-			player = _pagename
+			player = caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -65,24 +71,20 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Role(s)', content = {self.caller.roleData.display, self.caller.roleData2.display}}
 		}
 	end
+
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{
-			name = 'Game Appearances',
-			content = GameAppearances.player({player = _pagename})
-		},
-	}
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.isplayer = self.roleData.isPlayer or 'true'
 	lpdbData.extradata.role = self.roleData.role
 	lpdbData.extradata.role2 = self.roleData2.role
 
-	lpdbData.region = String.nilIfEmpty(Region.name({region = _args.region, country = _args.country}))
+	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData
 end

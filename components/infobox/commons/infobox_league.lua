@@ -44,7 +44,7 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
----@class InfoboxLeagueTemp: BasicInfobox
+---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
 
 League.warnings = {}
@@ -215,7 +215,7 @@ function League:createInfobox()
 								Title{name = 'Chronology'},
 								Chronology{
 									content = Table.filterByKey(args, function(key)
-										return key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil
+										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 									end)
 								}
 							}

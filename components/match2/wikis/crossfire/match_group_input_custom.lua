@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
@@ -330,15 +331,11 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
-	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.ceil(match.bestof/2)
-		for _, item in pairs(opponents) do
-			if (tonumber(item.score) or 0) >= firstTo then
-				match.finished = true
-				break
-			end
-		end
-	end
+	 match.finished = Logic.readBool(match.finished)
+		or isScoreSet and (
+			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
+			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)
+		)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then

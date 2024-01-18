@@ -6,10 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
@@ -21,7 +21,7 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
+	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
 
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
@@ -34,22 +34,21 @@ local ROLES = {
 	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
 
-local CustomPlayer = Class.new()
-
+---@class WorldoftanksInfoboxPlayer: Person
+---@field role {category: string, variable: string, staff: boolean?, talent: boolean?}?
+---@field role2 {category: string, variable: string, staff: boolean?, talent: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getPersonType = CustomPlayer.getPersonType
-
-	_args = player.args
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
@@ -58,77 +57,74 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local caller = self.caller
+	local args = caller.args
+
 	if id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active', content = {_args.years_active}},
+			Cell{name = 'Status', content = caller:_getStatusContents()},
+			Cell{name = 'Years Active', content = {args.years_active}},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2)
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
+
 	return widgets
 end
 
----@return WidgetInjector
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@return string[]
-function CustomPlayer._getStatusContents()
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+function CustomPlayer:_getStatusContents()
+	return {Page.makeInternalLink({onlyIfExists = true}, self.args.status) or self.args.status}
 end
 
----@param key string
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
+
 ---@param role string?
+---@return {category: string, variable: string, staff: boolean?, talent: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
+end
+
+---@param roleData {category: string, variable: string, staff: boolean?, talent: boolean?}?
 ---@return string?
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-	---@cast role -nil
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
 
-	local roleData = ROLES[role:lower()]
-	if not roleData then
-		return nil
+	if not self:shouldStoreData(self.args) then
+		return roleData.variable
 	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
 
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
----@param role string?
----@return boolean
-function CustomPlayer._isNotPlayer(role)
-	local roleData = ROLES[(role or ''):lower()]
-	return roleData and (roleData.talent or roleData.staff)
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
-	local roleData = ROLES[(args.role or ''):lower()]
-	if roleData then
-		if roleData.staff then
-			return {store = 'staff', category = 'Staff'}
-		elseif roleData.talent then
-			return {store = 'talent', category = 'Talent'}
-		end
+	local roleData = self.role or {}
+	if roleData.staff then
+		return {store = 'staff', category = 'Staff'}
+	elseif roleData.talent then
+		return {store = 'talent', category = 'Talent'}
 	end
 	return {store = 'player', category = 'Player'}
 end

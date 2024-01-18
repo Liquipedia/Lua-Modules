@@ -30,8 +30,9 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class CounterstrikeLeagueInfobox: InfoboxLeagueTemp
----@field gameData table?
+---@class CounterstrikeLeagueInfobox: InfoboxLeague
+---@field gameData table
+---@field valveTier {meta: string, name: string, link: string}?
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -188,10 +189,9 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local gameData = self.gameData
+	local gameData = Table.isNotEmpty(self.gameData) and self.gameData
 	local categories = {
 		gameData and ((gameData.abbreviation or gameData.name) .. ' Tournaments') or 'Tournaments without game version',
-
 	}
 
 	if not Logic.readBool(args.cancelled) and
@@ -365,7 +365,6 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 end
 
----@param valveTier string?
 ---@return string?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then

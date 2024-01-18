@@ -25,7 +25,7 @@ local Center = Widgets.Center
 
 local DEFAULT_MODE = 'solo'
 
----@class TrackmaniaLeagueInfobox: InfoboxLeagueTemp
+---@class TrackmaniaLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
