@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=leagueoflegends
--- page=Module:Infobox/Unit/Champion/Custom
+-- page=Module:Infobox/Unit/Champion/Custom/dev
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -105,28 +105,29 @@ function CustomChampion:getCustomCells(widgets)
 		table.insert(widgets, Title{name = 'Base Statistics'})
 	end
 
+	local function bonusPerLevel(start, bonuslvl)
+		return bonuslvl and start .. ' (' .. bonuslvl .. ')' or start
+	end
+
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Health', content = {args.hp}},
-		Cell{name = 'Health Regen', content = {args.hpreg}},
+		Cell{name = 'Health', content = {bonusPerLevel(args.hp, args.hplvl)}},
+		Cell{name = 'Health Regen', content = {bonusPerLevel(args.hpreg, args.hpreglvl)}},
 		Cell{name = 'Courage', content = {args.courage}},
 		Cell{name = 'Rage', content = {args.rage}},
 		Cell{name = 'Fury', content = {args.fury}},
 		Cell{name = 'Heat', content = {args.heat}},
 		Cell{name = 'Ferocity', content = {args.ferocity}},
 		Cell{name = 'Bloodthirst', content = {args.bloodthirst}},
-		Cell{name = 'Mana', content = {args.mana}},
-		Cell{name = 'Mana Regen', content = {args.manareg}},
-		Cell{name = 'Cooldown Reduction', content = {args.cdr}},
+		Cell{name = 'Mana', content = {bonusPerLevel(args.mana, args.manalvl)}},
+		Cell{name = 'Mana Regen', content = {bonusPerLevel(args.manareg, args.manareglvl)}},
 		Cell{name = 'Energy', content = {args.energy}},
 		Cell{name = 'Energy Regen', content = {args.energyreg}},
-		Cell{name = 'Attack Type', content = {args.attacktype}},
-		Cell{name = 'Attack Damage', content = {args.damage}},
-		Cell{name = 'Attack Speed', content = {args.attackspeed}},
+		Cell{name = 'Attack Damage', content = {bonusPerLevel(args.damage, args.damagelvl)}},
+		Cell{name = 'Attack Speed', content = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
 		Cell{name = 'Attack Range', content = {args.attackrange}},
-		Cell{name = 'Ability Power', content = {args.ap}},
-		Cell{name = 'Armor', content = {args.armor}},
-		Cell{name = 'Magic Resistance', content = {args.magicresistance}},
+		Cell{name = 'Armor', content = {bonusPerLevel(args.armor, args.armorlvl)}},
+		Cell{name = 'Magic Resistance', content = {bonusPerLevel(args.magicresistance, args.magicresistancelvl)}},
 		Cell{name = 'Movement Speed', content = {args.movespeed}}
 	)
 
