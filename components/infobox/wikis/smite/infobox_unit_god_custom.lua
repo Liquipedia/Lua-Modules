@@ -7,11 +7,14 @@
 --
 
 local Array = require('Module:Array')
+local CharacterWinLoss = require('Module:CharacterWinLoss')
 local Class = require('Module:Class')
 local DisplayIcon = require('Module:DisplayIcon')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -63,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 				if String.isEmpty(args[key]) then return end
 				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
 			end
-
+	
 			local breakDownContents = Array.append({},
 				toBreakDownCell('pantheon', 'Pantheon', 'PantheonIcon'),
 				toBreakDownCell('class', 'Class', 'ClassIcon'),
@@ -82,7 +85,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
 			}
 	elseif id == 'custom' then
-		self.caller:getCustomCells(widgets)
+		return self.caller:getCustomCells(widgets)
 	end
 
 	return widgets
@@ -122,7 +125,16 @@ function CustomGod:getCustomCells(widgets)
 		Cell{name = 'Physical', content = {bonusPerLevel(args.physical, args.physicallvl)}},
 		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}}
 	)
-	return widgets
+
+	local wins, loses = CharacterWinLoss.run()
+	if wins + loses == 0 then return widgets end
+
+	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+
+	return Array.append(widgets,
+		Title{name = 'Esports Statistics'},
+		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+	)
 end
 
 ---@param args table
@@ -156,5 +168,7 @@ function CustomGod:setLpdbData(args)
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('god_' .. (args.godname or self.pagename), lpdbData)
 end
+
+
 
 return CustomGod
