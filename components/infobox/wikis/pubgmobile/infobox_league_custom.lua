@@ -26,7 +26,7 @@ local Title = Widgets.Title
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _MODES = {
+local MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
 	duo = 'Duos[[Category:Duos Mode Tournaments]]',
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
@@ -35,18 +35,18 @@ local _MODES = {
 	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
-_MODES.solos = _MODES.solo
-_MODES.duos = _MODES.duo
-_MODES.squads = _MODES.squad
-_MODES.tdm = _MODES['2v2']
+MODES.solos = _MODES.solo
+MODES.duos = _MODES.duo
+MODES.squads = _MODES.squad
+MODES.tdm = _MODES['2v2']
 
-local _PERSPECTIVES = {
+local PERSPECTIVES = {
 	fpp = {'FPP'},
 	tpp = {'TPP'},
 	mixed = {'FPP', 'TPP'},
 }
-_PERSPECTIVES.first = _PERSPECTIVES.fpp
-_PERSPECTIVES.third = _PERSPECTIVES.tpp
+PERSPECTIVES.first = PERSPECTIVES.fpp
+PERSPECTIVES.third = PERSPECTIVES.tpp
 
 ---@param frame Frame
 ---@return Html
