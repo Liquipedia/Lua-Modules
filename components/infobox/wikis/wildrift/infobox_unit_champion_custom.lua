@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -157,7 +156,7 @@ end
 function CustomChampion:setLpdbData(args)
 	local lpdbData = {
 		type = 'hero',
-		name = args.championname or _pagename,
+		name = args.championname or self.pagename,
 		information = args.primaryrole,
 		image = args.image,
 		date = args.releasedate,
