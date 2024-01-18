@@ -22,7 +22,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class PubgmobileLeagueInfobox: InfoboxLeagueTemp
+---@class PubgmobileLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

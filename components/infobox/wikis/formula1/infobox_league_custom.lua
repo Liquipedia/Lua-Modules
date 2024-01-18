@@ -16,7 +16,7 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class Formula1LeagueInfobox: InfoboxLeagueTemp
+---@class Formula1LeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
