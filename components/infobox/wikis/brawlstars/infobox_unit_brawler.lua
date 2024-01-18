@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -20,80 +20,68 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _brawlerName
-local _args
-
-local CustomUnit = Class.new()
-
+---@class BrawlStarsUnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Brawler'
-	unit.nameDisplay = CustomUnit.nameDisplay
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.getWikiCategories = CustomUnit.getWikiCategories
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
 	return unit:createInfobox()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Health', content = {_args.hp}},
-		Cell{name = 'Movespeed', content = {_args.movespeed}},
-		Title{name = 'Weapon & Super'},
-		Cell{name = 'Primary Weapon', content = {_args.attack}},
-		Cell{name = 'Super Ability', content = {_args.super}},
-		Title{name = 'Gadgets & Star Powers'},
-		Cell{name = 'Gadgets', content = {_args.gadget}},
-		Cell{name = 'Star Powers', content = {_args.star}},
-	}
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'caption' and not String.isEmpty(_args.min) then
-		table.insert(widgets, Center{content = {_args.quote}})
+	local args = self.caller.args
+	if id == 'caption' and not String.isEmpty(args.min) then
+		table.insert(widgets, Center{content = {args.quote}})
 	elseif id == 'type' then
 		return {
-			Cell{name = 'Real Name', content = {_args.realname}},
-			Cell{name = 'Rarity', content = {_args.rarity}},
+			Cell{name = 'Real Name', content = {args.realname}},
+			Cell{name = 'Rarity', content = {args.rarity}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Unlock', content = {_args.unlock}},
+			Cell{name = 'Unlock', content = {args.unlock}},
 		}
 	elseif id == 'attack' then
 		return {}
 	elseif id == 'defense' then
 		return {}
+	elseif id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Release Date', content = {args.releasedate}},
+			Cell{name = 'Health', content = {args.hp}},
+			Cell{name = 'Movespeed', content = {args.movespeed}},
+			Title{name = 'Weapon & Super'},
+			Cell{name = 'Primary Weapon', content = {args.attack}},
+			Cell{name = 'Super Ability', content = {args.super}},
+			Title{name = 'Gadgets & Star Powers'},
+			Cell{name = 'Gadgets', content = {args.gadget}},
+			Cell{name = 'Star Powers', content = {args.star}}
+		)
 	end
+
 	return widgets
-end
-
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
----@return string
-function CustomUnit:nameDisplay()
-	_brawlerName = Template.safeExpand(mw.getCurrentFrame(), 'brawlername', {self.pagename}, self.pagename)
-
-	return _brawlerName
 end
 
 ---@param args table
 function CustomUnit:setLpdbData(args)
-	Template.safeExpand(mw.getCurrentFrame(), 'HeroData', {name = _brawlerName, image = _args.image}, self.pagename)
+	local lpdbData = {
+		name = args.name or self.pagename,
+		type = 'brawler',
+		image = args.image,
+		date = args.releasedate,
+		information = 'brawler',
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+		}
+	}
+	mw.ext.LiquipediaDB.lpdb_datapoint('brawler_' .. (args.name or self.pagename), lpdbData)
 end
 
 ---@param args table
