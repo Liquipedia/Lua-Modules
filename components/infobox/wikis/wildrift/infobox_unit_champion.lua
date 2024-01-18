@@ -1,14 +1,15 @@
 ---
 -- @Liquipedia
 -- wiki=wildrift
--- page=Module:Infobox/Unit/Champion
+-- page=Module:Infobox/Unit/Champion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local ChampionWL = require('Module:ChampionWL')
+local CharacterWinLoss = require('Module:CharacterWinLoss')
 local Class = require('Module:Class')
+local DisplayIcon = require('Module:DisplayIcon')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
@@ -25,14 +26,9 @@ local Center = Widgets.Center
 local Header = Widgets.Header
 local Title = Widgets.Title
 
-local CustomChampion = Class.new()
-
+---@class WildRiftUnitInfobox: UnitInfobox
+local CustomChampion = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
-
-local _args
-
-local _pagename = mw.title.getCurrentTitle().text
-local _frame
 
 local _BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
 local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
@@ -40,150 +36,121 @@ local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild C
 ---@param frame Frame
 ---@return Html
 function CustomChampion.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
-	_frame = frame
-	_args.informationType = 'Champion'
-
-	unit.getWikiCategories = CustomChampion.getWikiCategories
-	unit.setLpdbData = CustomChampion.setLpdbData
-	unit.createWidgetInjector = CustomChampion.createWidgetInjector
-
+	local unit = CustomChampion(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
+	unit.args.informationType = 'Champion'
 	return unit:createInfobox()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(
-		widgets,
-		Cell{name = 'Resource Bar', content = {_args.secondarybar}},
-		Cell{name = 'Secondary Bar', content = {_args.secondarybar1}},
-		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
-		Cell{name = 'Release Date', content = {_args.releasedate}}
-	)
-
-	if not (
-		String.isEmpty(_args.hp) and
-		String.isEmpty(_args.hplvl) and
-		String.isEmpty(_args.hpreg) and
-		String.isEmpty(_args.hpreglvl)
-	) then
-		table.insert(widgets, Title{name = 'Base Statistics'})
-	end
-
-	Array.appendWith(
-		widgets,
-		Cell{name = 'Health', content = {_args.hp}},
-		Cell{name = 'Health Regen', content = {_args.hpreg}},
-		Cell{name = 'Courage', content = {_args.courage}},
-		Cell{name = 'Rage', content = {_args.rage}},
-		Cell{name = 'Fury', content = {_args.fury}},
-		Cell{name = 'Heat', content = {_args.heat}},
-		Cell{name = 'Ferocity', content = {_args.ferocity}},
-		Cell{name = 'Bloodthirst', content = {_args.bloodthirst}},
-		Cell{name = 'Mana', content = {_args.mana}},
-		Cell{name = 'Mana Regen', content = {_args.manareg}},
-		Cell{name = 'Cooldown Reduction', content = {_args.cdr}},
-		Cell{name = 'Energy', content = {_args.energy}},
-		Cell{name = 'Energy Regen', content = {_args.energyreg}},
-		Cell{name = 'Attack Type', content = {_args.attacktype}},
-		Cell{name = 'Attack Damage', content = {_args.damage}},
-		Cell{name = 'Attack Speed', content = {_args.attackspeed}},
-		Cell{name = 'Attack Range', content = {_args.attackrange}},
-		Cell{name = 'Ability Power', content = {_args.ap}},
-		Cell{name = 'Armor', content = {_args.armor}},
-		Cell{name = 'Magic Resistance', content = {_args.magicresistance}},
-		Cell{name = 'Movement Speed', content = {_args.movespeed}},
-		Title{name = 'Esports Statistics'}
-	)
-
-	local stats = ChampionWL.create({champion = _args.championname or _pagename})
-	stats = mw.text.split(stats, ';')
-	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-	winPercentage = Math.round(winPercentage, 4) * 100
-	local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
-	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})
-
-	return widgets
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'header' then
 		return {
 			Header{
-				name = _args.championname,
-				subHeader = _args.title,
-				image = _args.image,
-				imageDefault = _args.default,
-				imageDark = _args.imagedark or _args.imagedarkmode,
-				imageDefaultDark = _args.defaultdark or _args.defaultdarkmode,
+				name = args.championname,
+				subHeader = args.title,
+				image = args.image,
+				imageDefault = args.default,
+				imageDark = args.imagedark or args.imagedarkmode,
+				imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			},
 		}
 	elseif id == 'caption' then
-		table.insert(widgets, Center{content = {_args.quote}})
+		table.insert(widgets, Center{content = {args.quote}})
 	elseif id == 'type' then
-		local breakDownContents = {}
-		local region = _args.region
-		if not String.isEmpty(region) then
-			region = '<b>Region</b><br>' .. Template.safeExpand(_frame, 'Region icon', {region}, '')
-			table.insert(breakDownContents, region)
-		end
-		local primaryRole = _args.primaryrole
-		if not String.isEmpty(primaryRole) then
-			primaryRole = '<b>Primary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {primaryRole}, '')
-			table.insert(breakDownContents, primaryRole)
-		end
-		local secondaryRole = _args.secondaryrole
-		if not String.isEmpty(secondaryRole) then
-			secondaryRole = '<b>Secondary Role</b><br>' .. Template.safeExpand(_frame, 'Class icon', {secondaryRole}, '')
-			table.insert(breakDownContents, secondaryRole)
-		end
+		local toBreakDownCell = function(key, title, dataModule)
+				if String.isEmpty(args[key]) then return end
+				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
+			end
+
+			local breakDownContents = Array.append({},
+				toBreakDownCell('region', 'Region', 'RegionIcon'),
+				toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
+				toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
+			)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
-			Cell{name = 'Real Name', content = {_args.realname}},
+			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
-		local cost = ''
-		if not String.isEmpty(_args.costbe) then
-			cost = cost .. _args.costbe .. ' ' .. _BLUE_MOTES_ICON
-		end
-		if not String.isEmpty(_args.costrp) then
-			if cost ~= '' then
-				cost = cost .. '&emsp;&ensp;'
-			end
-			cost = cost .. _args.costrp .. ' ' .. _WILD_CORES_ICON
-		end
-		return {
-			Cell{name = 'Price', content = {cost}},
-		}
+		local cost = Array.append({},
+				String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. _BLUE_MOTES_ICON) or nil,
+				String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. _WILD_CORES_ICON) or nil
+			)
+			return {
+				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+			}
+	elseif id == 'custom' then
+		self.caller:getCustomCells(widgets)
 	end
 
 	return widgets
 end
 
----@return WidgetInjector
-function CustomChampion:createWidgetInjector()
-	return CustomInjector()
+---@param widgets Widget[]
+---@return Widget[]
+function CustomChampion:getCustomCells(widgets)
+	local args = self.args
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Resource Bar', content = {args.secondarybar}},
+		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
+		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
+		Cell{name = 'Release Date', content = {args.releasedate}}
+	)
+
+	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
+		table.insert(widgets, Title{name = 'Base Statistics'})
+	end
+
+	Array.appendWith(
+		widgets,
+		Cell{name = 'Health', content = {args.hp}},
+		Cell{name = 'Health Regen', content = {args.hpreg}},
+		Cell{name = 'Courage', content = {args.courage}},
+		Cell{name = 'Rage', content = {args.rage}},
+		Cell{name = 'Fury', content = {args.fury}},
+		Cell{name = 'Heat', content = {args.heat}},
+		Cell{name = 'Ferocity', content = {args.ferocity}},
+		Cell{name = 'Bloodthirst', content = {args.bloodthirst}},
+		Cell{name = 'Mana', content = {args.mana}},
+		Cell{name = 'Mana Regen', content = {args.manareg}},
+		Cell{name = 'Cooldown Reduction', content = {args.cdr}},
+		Cell{name = 'Energy', content = {args.energy}},
+		Cell{name = 'Energy Regen', content = {args.energyreg}},
+		Cell{name = 'Attack Type', content = {args.attacktype}},
+		Cell{name = 'Attack Damage', content = {args.damage}},
+		Cell{name = 'Attack Speed', content = {args.attackspeed}},
+		Cell{name = 'Attack Range', content = {args.attackrange}},
+		Cell{name = 'Ability Power', content = {args.ap}},
+		Cell{name = 'Armor', content = {args.armor}},
+		Cell{name = 'Magic Resistance', content = {args.magicresistance}},
+		Cell{name = 'Movement Speed', content = {args.movespeed}},
+		Title{name = 'Esports Statistics'}
+	)
+
+	local wins, loses = CharacterWinLoss.run()
+	if wins + loses == 0 then return widgets end
+
+	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
+
+	return Array.append(widgets,
+		Title{name = 'Esports Statistics'},
+		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
+	)
 end
 
 ---@param args table
 ---@return string[]
 function CustomChampion:getWikiCategories(args)
-	local categories = {}
-	if Namespace.isMain() then
-		categories = {'Champions'}
-		if not String.isEmpty(args.attacktype) then
-			table.insert(categories, args.attacktype .. ' Champions')
-		end
-		if not String.isEmpty(args.primaryrole) then
-			table.insert(categories, args.primaryrole .. ' Champions')
-		end
-	end
-	return categories
+	if not Namespace.isMain() then return {} end
+	return Array.appendWith({'Champions'},
+		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Champions') or nil,
+		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' Champions') or nil
+	)
 end
 
 ---@param args table
@@ -199,7 +166,7 @@ function CustomChampion:setLpdbData(args)
 			costrp = args.costrp,
 		}
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.championname or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.championname or self.pagename), lpdbData)
 end
 
 return CustomChampion
