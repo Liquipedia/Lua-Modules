@@ -94,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 	end
 	return widgets
 end
-	
+
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomUnit:getCustomCells(widgets)
