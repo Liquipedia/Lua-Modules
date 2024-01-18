@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
----@class HeroesLeagueInfobox: InfoboxLeagueTemp
+---@class HeroesLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

@@ -18,13 +18,13 @@ liquipedia.collapse = {
 	},
 	setupCollapsibleButtons: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( function( collapsible ) {
-			var row = collapsible.querySelector( 'tr' );
+			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null ) {
-				var collapseShowButton = document.createElement( 'span' );
+				const collapseShowButton = document.createElement( 'span' );
 				collapseShowButton.classList.add( 'collapseButton' );
 				collapseShowButton.classList.add( 'collapseButtonShow' );
 				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				var collapseShowLink = document.createElement( 'a' );
+				const collapseShowLink = document.createElement( 'a' );
 				collapseShowLink.href = '#';
 				collapseShowLink.innerHTML = 'show';
 				collapseShowLink.onclick = function( ev ) {
@@ -34,11 +34,11 @@ liquipedia.collapse = {
 				collapseShowButton.appendChild( collapseShowLink );
 				collapseShowButton.appendChild( document.createTextNode( ']' ) );
 				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				var collapseHideButton = document.createElement( 'span' );
+				const collapseHideButton = document.createElement( 'span' );
 				collapseHideButton.classList.add( 'collapseButton' );
 				collapseHideButton.classList.add( 'collapseButtonHide' );
 				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				var collapseHideLink = document.createElement( 'a' );
+				const collapseHideLink = document.createElement( 'a' );
 				collapseHideLink.href = '#';
 				collapseHideLink.innerHTML = 'hide';
 				collapseHideLink.onclick = function( ev ) {
@@ -63,7 +63,7 @@ liquipedia.collapse = {
 		// Replaces the button (usually a <span>) with <a href="#">...</a>.
 		// For xss safety, only the child nodes and class name are copied over.
 		function replaceWithAnchor( button ) {
-			var anchor = document.createElement( 'a' );
+			const anchor = document.createElement( 'a' );
 			button.childNodes.forEach( function ( node ) {
 				anchor.append( node );
 			} );
@@ -74,11 +74,11 @@ liquipedia.collapse = {
 		}
 
 		document.querySelectorAll( '#mw-content-text .general-collapsible' ).forEach( function( collapsible ) {
-			var collapseButton = collapsible.querySelector( '.general-collapsible-collapse-button' );
-			var expandButton = collapsible.querySelector( '.general-collapsible-expand-button' );
-			var anchor;
+			const collapseButton = collapsible.querySelector( '.general-collapsible-collapse-button' );
+			const expandButton = collapsible.querySelector( '.general-collapsible-expand-button' );
+
 			if ( expandButton ) {
-				anchor = replaceWithAnchor( expandButton );
+				const anchor = replaceWithAnchor( expandButton );
 				anchor.addEventListener( 'click', function( event ) {
 					collapsible.classList.remove( 'collapsed' );
 					event.preventDefault();
@@ -86,7 +86,7 @@ liquipedia.collapse = {
 			}
 
 			if ( collapseButton ) {
-				anchor = replaceWithAnchor( collapseButton );
+				const anchor = replaceWithAnchor( collapseButton );
 				anchor.addEventListener( 'click', function( event ) {
 					collapsible.classList.add( 'collapsed' );
 					event.preventDefault();
@@ -96,13 +96,13 @@ liquipedia.collapse = {
 	},
 	setupCollapsibleMapsButtons: function() {
 		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( function( collapsible ) {
-			var row = collapsible.querySelector( 'tr' );
+			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null && collapsible.querySelector( '.maprow' ) !== null ) {
-				var collapseShowButton = document.createElement( 'span' );
+				const collapseShowButton = document.createElement( 'span' );
 				collapseShowButton.classList.add( 'collapseButton' );
 				collapseShowButton.classList.add( 'collapseButtonMapsShow' );
 				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				var collapseShowLink = document.createElement( 'a' );
+				const collapseShowLink = document.createElement( 'a' );
 				collapseShowLink.href = '#';
 				collapseShowLink.innerHTML = '+maps';
 				collapseShowLink.onclick = function( ev ) {
@@ -112,11 +112,11 @@ liquipedia.collapse = {
 				collapseShowButton.appendChild( collapseShowLink );
 				collapseShowButton.appendChild( document.createTextNode( ']' ) );
 				row.lastElementChild.insertBefore( collapseShowButton, row.lastElementChild.firstChild );
-				var collapseHideButton = document.createElement( 'span' );
+				const collapseHideButton = document.createElement( 'span' );
 				collapseHideButton.classList.add( 'collapseButton' );
 				collapseHideButton.classList.add( 'collapseButtonMapsHide' );
 				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				var collapseHideLink = document.createElement( 'a' );
+				const collapseHideLink = document.createElement( 'a' );
 				collapseHideLink.href = '#';
 				collapseHideLink.innerHTML = '-maps';
 				collapseHideLink.onclick = function( ev ) {
@@ -131,13 +131,13 @@ liquipedia.collapse = {
 	},
 	setupCollapsibleNavFrameButtons: function() {
 		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( function( navFrame ) {
-			var head = navFrame.querySelector( '.NavHead' );
+			const head = navFrame.querySelector( '.NavHead' );
 			if ( head !== null ) {
-				var collapseShowButton = document.createElement( 'span' );
+				const collapseShowButton = document.createElement( 'span' );
 				collapseShowButton.classList.add( 'collapseButton' );
 				collapseShowButton.classList.add( 'collapseButtonShow' );
 				collapseShowButton.appendChild( document.createTextNode( '[' ) );
-				var collapseShowLink = document.createElement( 'a' );
+				const collapseShowLink = document.createElement( 'a' );
 				collapseShowLink.href = '#';
 				collapseShowLink.innerHTML = 'show';
 				collapseShowLink.onclick = function( ev ) {
@@ -147,11 +147,11 @@ liquipedia.collapse = {
 				collapseShowButton.appendChild( collapseShowLink );
 				collapseShowButton.appendChild( document.createTextNode( ']' ) );
 				head.insertBefore( collapseShowButton, head.firstChild );
-				var collapseHideButton = document.createElement( 'span' );
+				const collapseHideButton = document.createElement( 'span' );
 				collapseHideButton.classList.add( 'collapseButton' );
 				collapseHideButton.classList.add( 'collapseButtonHide' );
 				collapseHideButton.appendChild( document.createTextNode( '[' ) );
-				var collapseHideLink = document.createElement( 'a' );
+				const collapseHideLink = document.createElement( 'a' );
 				collapseHideLink.href = '#';
 				collapseHideLink.innerHTML = 'hide';
 				collapseHideLink.onclick = function( ev ) {
@@ -166,19 +166,19 @@ liquipedia.collapse = {
 	},
 	setupToggleGroups: function() {
 		document.querySelectorAll( '#mw-content-text .toggle-group' ).forEach( function( toggleGroup ) {
-			var showAllText;
+			let showAllText;
 			if ( toggleGroup.dataset.showAllText !== undefined ) {
 				showAllText = toggleGroup.dataset.showAllText;
 			} else {
 				showAllText = 'Show all';
 			}
-			var hideAllText;
+			let hideAllText;
 			if ( toggleGroup.dataset.hideAllText !== undefined ) {
 				hideAllText = toggleGroup.dataset.hideAllText;
 			} else {
 				hideAllText = 'Hide all';
 			}
-			var button = document.createElement( 'button' );
+			const button = document.createElement( 'button' );
 			if ( toggleGroup.classList.contains( 'toggle-state-hide' ) ) {
 				button.innerHTML = hideAllText;
 			} else {
@@ -211,7 +211,7 @@ liquipedia.collapse = {
 		} );
 	},
 	setupDropdownBox: function() {
-		var toggleActive = false;
+		let toggleActive = false;
 		document.querySelector( 'html' ).addEventListener( 'click', function( ev ) {
 			if ( ev.target.closest( '.dropdown-box' ) === null ) {
 				if ( toggleActive ) {
@@ -223,7 +223,7 @@ liquipedia.collapse = {
 			}
 		} );
 		document.querySelectorAll( '#mw-content-text .dropdown-box-wrapper' ).forEach( function( dropdownBox ) {
-			var dropdownButton = dropdownBox.querySelector( '.dropdown-box-button' );
+			const dropdownButton = dropdownBox.querySelector( '.dropdown-box-button' );
 			dropdownButton.onclick = function( ev ) {
 				ev.stopPropagation();
 				dropdownBox.querySelectorAll( '.dropdown-box' ).forEach( function ( box ) {

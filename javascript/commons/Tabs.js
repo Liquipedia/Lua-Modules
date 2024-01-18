@@ -5,31 +5,30 @@
 liquipedia.tabs = {
 	init: function() {
 		document.querySelectorAll( '.tabs-dynamic' ).forEach( function( tabs ) {
-			var tabItems = [];
-			var tabContents = [];
-			for ( var i = 0; i < tabs.children.length; i++ ) {
-				var j;
+			const tabItems = [];
+			const tabContents = [];
+			for ( let i = 0; i < tabs.children.length; i++ ) {
 				if ( tabs.children[ i ].classList.contains( 'tabs-content' ) ) {
-					for ( j = 0; j < tabs.children[ i ].children.length; j++ ) {
+					for ( let j = 0; j < tabs.children[ i ].children.length; j++ ) {
 						tabs.children[ i ].children[ j ].dataset.count = j + 1;
 						tabContents.push( tabs.children[ i ].children[ j ] );
 					}
 				} else {
-					for ( j = 0; j < tabs.children[ i ].children.length; j++ ) {
+					for ( let j = 0; j < tabs.children[ i ].children.length; j++ ) {
 						tabs.children[ i ].children[ j ].dataset.count = j + 1;
 						tabItems.push( tabs.children[ i ].children[ j ] );
 					}
 				}
 			}
-			tabContents.forEach( function( tabContent, idx ) {
-				var heading = document.createElement( 'h6' );
+			tabContents.forEach( function( tabContent, i ) {
+				const heading = document.createElement( 'h6' );
 				heading.style.display = 'none';
-				heading.innerHTML = tabItems[ idx ].innerHTML;
+				heading.innerHTML = tabItems[ i ].innerHTML;
 				tabContent.insertAdjacentElement( 'afterbegin', heading );
 			} );
-			tabItems.forEach( function( tabItem, idx ) {
+			tabItems.forEach( function( tabItem, i ) {
 				if ( tabItem.classList.contains( 'active' ) ) {
-					tabContents[ idx ].classList.add( 'active' );
+					tabContents[ i ].classList.add( 'active' );
 				}
 				tabItem.innerHTML = '<a href="#">' + tabItem.innerHTML + '</a>';
 				tabItem.addEventListener( 'click', function( ev ) {
@@ -60,11 +59,11 @@ liquipedia.tabs = {
 		window.addEventListener( 'hashchange', liquipedia.tabs.onHashChange, false );
 	},
 	onHashChange: function() {
-		var hash = location.hash.slice( 1 );
-		var tabno;
-		var scrollto;
+		const hash = location.hash.slice( 1 );
+		let tabno;
+		let scrollto;
 		if ( hash.slice( 0, 4 ) === 'tab-' ) {
-			var hasharr = hash.split( '-scrollto-' );
+			const hasharr = hash.split( '-scrollto-' );
 			tabno = hasharr[ 0 ].replace( 'tab-', '' );
 			scrollto = null;
 			if ( hasharr.length === 2 ) {
@@ -74,7 +73,7 @@ liquipedia.tabs = {
 		} else {
 			scrollto = location.hash.replace( /(\.)/g, '\\\\$1' );
 			if ( scrollto.length > 0 ) {
-				var tabs = document.getElementById( scrollto.slice( 1 ) );
+				const tabs = document.getElementById( scrollto.slice( 1 ) );
 				if ( tabs !== null && tabs.closest( '.tabs-dynamic > .tabs-content > div' ) !== null ) {
 					tabno = tabs.closest( '.tabs-dynamic > .tabs-content > div' ).dataset.count;
 					if ( typeof tabno !== 'undefined' ) {
@@ -85,20 +84,20 @@ liquipedia.tabs = {
 		}
 	},
 	showDynamicTab: function( tabno, scrollto ) {
-		var scrolltoelement = null;
+		let scrolltoelement = null;
 		if ( scrollto !== null ) {
 			scrolltoelement = document.getElementById( scrollto.slice( 1 ) );
 		}
 		if ( scrolltoelement !== null ) {
-			var scrollTabs = scrolltoelement.closest( '.tabs-dynamic' );
-			scrollTabs.querySelectorAll( '.nav-tabs li' ).forEach( function( listelement ) {
+			const tabs = scrolltoelement.closest( '.tabs-dynamic' );
+			tabs.querySelectorAll( '.nav-tabs li' ).forEach( function( listelement ) {
 				listelement.classList.remove( 'active' );
 			} );
-			scrollTabs.querySelector( '.nav-tabs .tab' + tabno ).classList.add( 'active' );
-			scrollTabs.querySelectorAll( '.tabs-content > div' ).forEach( function( contentelement ) {
+			tabs.querySelector( '.nav-tabs .tab' + tabno ).classList.add( 'active' );
+			tabs.querySelectorAll( '.tabs-content > div' ).forEach( function( contentelement ) {
 				contentelement.classList.remove( 'active' );
 			} );
-			scrollTabs.querySelector( '.tabs-content > .content' + tabno ).classList.add( 'active' );
+			tabs.querySelector( '.tabs-content > .content' + tabno ).classList.add( 'active' );
 			if ( scrollto !== null ) {
 				setTimeout( function() {
 					if ( typeof window.scrollY !== 'undefined' ) {
