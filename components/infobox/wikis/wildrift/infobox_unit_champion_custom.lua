@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
 			}
 	elseif id == 'custom' then
-		self.caller:getCustomCells(widgets)
+		return self.caller:getCustomCells(widgets)
 	end
 
 	return widgets
@@ -127,8 +127,7 @@ function CustomChampion:getCustomCells(widgets)
 		Cell{name = 'Ability Power', content = {args.ap}},
 		Cell{name = 'Armor', content = {args.armor}},
 		Cell{name = 'Magic Resistance', content = {args.magicresistance}},
-		Cell{name = 'Movement Speed', content = {args.movespeed}},
-		Title{name = 'Esports Statistics'}
+		Cell{name = 'Movement Speed', content = {args.movespeed}}
 	)
 
 	local wins, loses = CharacterWinLoss.run()
