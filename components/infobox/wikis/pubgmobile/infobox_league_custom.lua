@@ -30,6 +30,7 @@ local _MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
 	duo = 'Duos[[Category:Duos Mode Tournaments]]',
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
+	['1v1'] = '1v1 TDM[[Category:1v1 TDM Tournaments]]',
 	['2v2'] = '2v2 TDM[[Category:2v2 TDM Tournaments]]',
 	['4v4'] = '4v4 TDM[[Category:4v4 TDM Tournaments]]',
 	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
@@ -39,6 +40,7 @@ _MODES.solos = _MODES.solo
 _MODES.duos = _MODES.duo
 _MODES.squads = _MODES.squad
 _MODES.tdm = _MODES['2v2']
+_MODES.tdm1 = _MODES['1v1']
 
 local _PERSPECTIVES = {
 	fpp = {'FPP'},
