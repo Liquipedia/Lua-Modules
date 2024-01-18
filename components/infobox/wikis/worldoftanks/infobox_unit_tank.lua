@@ -21,8 +21,8 @@ local Nation = Lua.import('Module:Infobox/Extension/Nation')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
+---@class WorldofTanksUnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
-
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
