@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
 -- wiki=smite
--- page=Module:Infobox/Unit/Champion
+-- page=Module:Infobox/Unit/God/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local GodWL = require('Module:GodWL')
+local DisplayIcon = require('Module:DisplayIcon')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
@@ -27,7 +27,6 @@ local Title = Widgets.Title
 
 ---@class SmiteUnitInfobox: UnitInfobox
 local CustomGod = Class.new(Unit)
-
 local CustomInjector = Class.new(Injector)
 
 local FAVOR_ICON = '[[File:Smite Currency Favor.png|x20px|Favor|link=Favor]]'
@@ -62,44 +61,28 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'caption' then
 		table.insert(widgets, Center {content = {args.quote}})
 	elseif id == 'type' then
-		local breakDownContents = {}
-		local pantheon = args.pantheon
-		if not String.isEmpty(pantheon) then
-			pantheon = '<b>Pantheon</b><br>' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Pantheon icon', {pantheon}, '')
-			table.insert(breakDownContents, pantheon)
-		end
-		local class = args.class
-		if not String.isEmpty(class) then
-			class = '<b>Class</b><br>' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Class icon', {class},
-					'')
-			table.insert(breakDownContents, class)
-		end
-		local powerType = args.powertype
-		if not String.isEmpty(powerType) then
-			powerType = '<b>Power Type</b><br>' ..
-				Template.safeExpand(mw.getCurrentFrame(), 'Power icon', {powerType}, '')
-			table.insert(breakDownContents, powerType)
-		end
+		local toBreakDownCell = function(key, title, dataModule)
+				if String.isEmpty(args[key]) then return end
+				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
+			end
+
+			local breakDownContents = Array.append({},
+				toBreakDownCell('pantheon', 'Pantheon', 'PantheonIcon'),
+				toBreakDownCell('class', 'Class', 'ClassIcon'),
+				toBreakDownCell('powertype', 'Power Type', 'PowerTypeIcon')
+			)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
-		local cost = ''
-		if not String.isEmpty(args.costfavor) then
-			cost = cost .. args.costfavor .. ' ' .. FAVOR_ICON
-		end
-		if not String.isEmpty(args.costgems) then
-			if cost ~= '' then
-				cost = cost .. '&emsp;&ensp;'
-			end
-			cost = cost .. args.costgems .. ' ' .. GEMS_ICON
-		end
-		return {
-			Cell{name = 'Price', content = {cost}},
-		}
+		local cost = Array.append({},
+				String.isNotEmpty(args.costfavor) and (args.costfavor .. ' ' .. FAVOR_ICON) or nil,
+				String.isNotEmpty(args.costgems ) and (args.costgems .. ' ' .. GEMS_ICON) or nil
+			)
+			return {
+				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+			}
 	elseif id == 'custom' then
 		self.caller:getCustomCells(widgets)
 	end
@@ -118,12 +101,7 @@ function CustomGod:getCustomCells(widgets)
 		Cell{name = 'Release Date', content = {args.releasedate}}
 	)
 
-	if not (
-			String.isEmpty(args.hp) and
-			String.isEmpty(args.hplvl) and
-			String.isEmpty(args.hpreg) and
-			String.isEmpty(args.hpreglvl)
-		) then
+	if Array.any({'hp', 'hplvl', 'hp5', 'hp5lvl'}, function(key) return String.isNotEmpty(args[key]) end) then
 		table.insert(widgets, Title {name = 'Base Statistics'})
 	end
 
@@ -144,34 +122,20 @@ function CustomGod:getCustomCells(widgets)
 		Cell{name = 'Progression', content = {args.progression}},
 		Title{name = 'Protections'},
 		Cell{name = 'Physical', content = {bonusPerLevel(args.physical, args.physicallvl)}},
-		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}},
-		Title{name = 'Esports Statistics'}
+		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}}
 	)
-
-	local stats = GodWL.create({god = args.godname or self.pagename})
-	stats = mw.text.split(stats, ';')
-	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-	winPercentage = Math.round(winPercentage, 4) * 100
-	local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
-	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})
-
 	return widgets
 end
 
 ---@param args table
 ---@return string[]
 function CustomGod:getWikiCategories(args)
-	if not Namespace.isMain() then
-		return {}
-	end
-	local categories = {'Gods'}
-	if not String.isEmpty(args.attacktype) then
-		table.insert(categories, args.attacktype .. ' Gods')
-	end
-	if not String.isEmpty(args.primaryrole) then
-		table.insert(categories, args.primaryrole .. ' Gods')
-	end
-	return categories
+	if not Namespace.isMain() then return {} end
+
+	return Array.appendWith({'Gods'},
+		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Gods') or nil,
+		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' Gods') or nil
+	)
 end
 
 ---@param args table
@@ -194,7 +158,5 @@ function CustomGod:setLpdbData(args)
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('god_' .. (args.godname or self.pagename), lpdbData)
 end
-
-
 
 return CustomGod
