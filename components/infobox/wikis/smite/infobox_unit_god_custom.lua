@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -66,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 				if String.isEmpty(args[key]) then return end
 				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
 			end
-	
+
 			local breakDownContents = Array.append({},
 				toBreakDownCell('pantheon', 'Pantheon', 'PantheonIcon'),
 				toBreakDownCell('class', 'Class', 'ClassIcon'),
