@@ -486,6 +486,10 @@ Author(s): iMarbot
 	margin-bottom: 0;
 }
 
+.inotes-inner dd {
+	margin-left: 0;
+}
+
 .template-box .inotes-box {
 	background-color: var( --clr-background, #f8f9fa );
 	border-color: var( --table-border-color, #a2a9b1 );
