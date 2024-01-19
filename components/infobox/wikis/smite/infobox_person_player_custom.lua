@@ -32,7 +32,7 @@ function CustomPlayer.run(frame)
 
 	player.args.autoTeam = true
 	player.args.history = TeamHistoryAuto._results{
-		convertrole = 'true',
+		convertrole = true,
 		iconModule = 'Module:PositionIcon/data',
 		player = player.pagename
 	}
@@ -50,16 +50,6 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 	return widgets
-end
-
-function CustomPlayer:adjustLPDB(lpdbData, args)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
-	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
-
-	return lpdbData
 end
 
 return CustomPlayer
