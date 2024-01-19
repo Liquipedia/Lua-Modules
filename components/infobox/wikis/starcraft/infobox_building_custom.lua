@@ -124,8 +124,9 @@ end
 ---@param bonusNumber integer
 ---@return string[]
 function CustomBuilding:_contentWithBonus(key, bonusNumber)
-	return {self.args[key] and self.args['bonus' .. bonusNumber] and (self.args[key] .. ' ' .. self.args['bonus' .. bonusNumber])
-		or self.args[key]}
+	return {self.args[key] and self.args['bonus' .. bonusNumber] and
+		(self.args[key] .. ' ' .. self.args['bonus' .. bonusNumber]) or self.args[key]
+	}
 end
 
 ---@return string
