@@ -41,5 +41,5 @@ return {
 	defaultGame = 'smite',
 	defaultTeamLogo = 'SMITE default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'SMITE default darkmode.png', ---@deprecated
-	match2 = 2,
+	match2 = 0,
 }
