@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
@@ -19,8 +18,6 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 ---@class SmiteInfoboxPlayer: Person
 ---@field role table
@@ -46,7 +43,6 @@ function CustomPlayer.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
 	if id == 'region' then return {}
 	elseif id == 'role' then
 		return {
