@@ -24,7 +24,7 @@ return {
 				lightMode = 'SMITE default lightmode.png',
 			},
 		},
-		['smite 2'] = {
+		smite2 = {
 			abbreviation = 'S2',
 			name = 'SMITE 2',
 			link = 'SMITE 2',
