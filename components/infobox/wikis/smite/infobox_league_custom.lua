@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
@@ -46,16 +47,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
 		}
 	elseif id == 'customcontent' then
-		if args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
-		end
-
-		--teams section
-		if args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
-		end
+		Array.appendWith(widgets,
+			args.player_number and Title{name = 'Players'} or nil,
+			Cell{name = 'Number of players', content = {args.player_number}},
+			args.team_number and Title{name = 'Teams'} or nil,
+			Cell{name = 'Number of teams', content = {args.team_number}}
+		)
 	end
 	return widgets
 end
@@ -66,24 +63,9 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-
-	return lpdbData
-end
-
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.publisherpremier) and 'true' or nil
-end
-
----@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	--Legacy Vars:
-	Variables.varDefine('tournament_edate', self.data.endDate)
+	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
 end
 
 return CustomLeague
