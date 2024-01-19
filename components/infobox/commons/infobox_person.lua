@@ -522,7 +522,7 @@ function Person:getCategories(args, birthDisplay, personType, status)
 	end
 
 	Array.extendWith(categories, Array.map(self.locations, function(country)
-		return Flags.getLocalisation(country) .. personType .. 's'
+		return Flags.getLocalisation(country) .. ' ' .. personType .. 's'
 	end))
 
 	return self:getWikiCategories(categories)
