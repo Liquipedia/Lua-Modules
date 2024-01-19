@@ -11,11 +11,9 @@ local Class = require('Module:Class')
 local GodIcon = require('Module:GodIcon')
 local GodNames = mw.loadData('Module:GodNames')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
@@ -70,7 +68,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		-- Signature Gods
 		local godIcons = Array.map(self.caller:getAllArgsForBase(args, 'god'), function(god)
-				return GodIcon.getImage{standardizedGod or god, size = SIZE_GOD}
+				return GodIcon.getImage{god, size = SIZE_GOD}
 			end)
 		table.insert(widgets, Cell{
 			name = #godIcons > 1 and 'Signature Gods' or 'Signature God',
