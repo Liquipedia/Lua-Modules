@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=leagueoflegends
--- page=Module:Infobox/Unit/Champion/Custom/dev
+-- page=Module:Infobox/Unit/Champion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -29,8 +29,8 @@ local Title = Widgets.Title
 local CustomChampion = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local _BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
-local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
+local BLUE_ESSENCE_ICON = '[[File:Blue Essence Icon.png|x20px|Blue Essence|link=Blue Essence]]'
+local RIOT_POINTS_ICON = '[[File:RP Points.png|x20px|Riot Points|link=Riot Points]]'
 
 ---@param frame Frame
 ---@return Html
@@ -76,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
-				String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. _BLUE_MOTES_ICON) or nil,
-				String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. _WILD_CORES_ICON) or nil
+				String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. BLUE_ESSENCE_ICON) or nil,
+				String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. RIOT_POINTS_ICON) or nil
 			)
 			return {
 				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
