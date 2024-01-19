@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=wildrift
--- page=Module:Infobox/Unit/Champion/Custom/dev
+-- page=Module:Infobox/Unit/Champion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -29,8 +29,8 @@ local Title = Widgets.Title
 local CustomChampion = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local _BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
-local _WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
+local BLUE_MOTES_ICON = '[[File:Blue Motes icon.png|20px|Blue Motes|link=Blue Motes]]'
+local WILD_CORES_ICON = '[[File:Wild Cores icon.png|20px|Wild Cores|link=Wild Cores]]'
 
 ---@param frame Frame
 ---@return Html
@@ -61,27 +61,26 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Center{content = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title, dataModule)
-				if String.isEmpty(args[key]) then return end
-				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
-			end
-
-			local breakDownContents = Array.append({},
-				toBreakDownCell('region', 'Region', 'RegionIcon'),
-				toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
-				toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
-			)
+			if String.isEmpty(args[key]) then return end
+			return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
+		end
+		local breakDownContents = Array.append({},
+			toBreakDownCell('region', 'Region', 'RegionIcon'),
+			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
+			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
+		)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
-				String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. _BLUE_MOTES_ICON) or nil,
-				String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. _WILD_CORES_ICON) or nil
-			)
-			return {
-				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
-			}
+			String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. BLUE_MOTES_ICON) or nil,
+			String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. WILD_CORES_ICON) or nil
+		)
+		return {
+			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+		}
 	elseif id == 'custom' then
 		return self.caller:getCustomCells(widgets)
 	end
