@@ -265,7 +265,6 @@ liquipedia.battleRoyale = {
 
 		sortButtons.forEach( ( button ) => {
 			button.addEventListener( 'click', () => {
-
 				const sortType = button.dataset.sortType;
 				const table = button.closest( '[data-js-battle-royale="table"]' );
 				const sortableRows = Array.from( table.querySelectorAll( '[data-js-battle-royale="row"]' ) );
@@ -384,4 +383,3 @@ liquipedia.battleRoyale = {
 	}
 };
 liquipedia.core.modules.push( 'battleRoyale' );
-liquipedia.battleRoyale.init();
