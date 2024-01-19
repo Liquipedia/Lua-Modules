@@ -38,19 +38,15 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'sponsors' then
-		table.insert(widgets, Cell{name = 'Official Device', content = {args.device}})
+	if id == 'custom' then
+		return {
+			Cell{name = 'Number of teams', content = {args.team_number}},
+			Cell{name = 'Number of players', content = {args.player_number}},
+		}
 	elseif id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game', content = {Game.name{game = args.game}}},
 		}
-	elseif id == 'customcontent' then
-		Array.appendWith(widgets,
-			args.player_number and Title{name = 'Players'} or nil,
-			Cell{name = 'Number of players', content = {args.player_number}},
-			args.team_number and Title{name = 'Teams'} or nil,
-			Cell{name = 'Number of teams', content = {args.team_number}}
-		)
 	end
 	return widgets
 end
