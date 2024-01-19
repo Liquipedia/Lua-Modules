@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=brawlstars
--- page=Module:Infobox/Unit/Brawler
+-- page=Module:Infobox/Unit/Brawler/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -78,8 +78,7 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		date = args.releasedate,
 		information = 'brawler',
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-		}
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{}
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('brawler_' .. (args.name or self.pagename), lpdbData)
 end
@@ -87,18 +86,12 @@ end
 ---@param args table
 ---@return table
 function CustomUnit:getWikiCategories(args)
-	local categories = {}
-	if Namespace.isMain() then
-		categories = {'Brawlers'}
-		if not String.isEmpty(args.attacktype) then
-			table.insert(categories, args.attacktype .. ' brawlers')
-		end
-		if not String.isEmpty(args.primaryrole) then
-			table.insert(categories, args.primaryrole .. ' brawlers')
-		end
-	end
+	if not Namespace.isMain() then return {} end
 
-	return categories
+	return Array.append({'Brawlers'},
+		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' brawlers') or nil,
+		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' brawlers') or nil,
+	)
 end
 
 return CustomUnit
