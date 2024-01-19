@@ -26,6 +26,7 @@ function CustomCompany.run(frame)
 	company:setWidgetInjector(CustomInjector(company))
 	return company:createInfobox()
 end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
