@@ -34,7 +34,7 @@ function CustomPlayer.run(frame)
 	player.args.history = TeamHistoryAuto._results{
 		convertrole = 'true',
 		iconModule = 'Module:PositionIcon/data',
-		player = pagename
+		player = player.pagename
 	}
 	player.role = Role.run{role = player.args.role}
 	player.role2 = Role.run{role = player.args.role2}
