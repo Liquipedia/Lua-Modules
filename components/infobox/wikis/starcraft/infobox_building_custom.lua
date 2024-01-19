@@ -19,8 +19,8 @@ local Building = Lua.import('Module:Infobox/Building')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomBuilding = Class.new()
-
+---@class StarcraftBuildingInfobox: BuildingInfobox
+local CustomBuilding = Class.new(Building)
 local CustomInjector = Class.new(Injector)
 
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
@@ -28,101 +28,93 @@ local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local UNKNOWN_RACE = 'u'
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomBuilding.run(frame)
-	local building = Building(frame)
-	_args = building.args
-
-	building.nameDisplay = CustomBuilding.nameDisplay
-	building.setLpdbData = CustomBuilding.setLpdbData
-	building.getWikiCategories = CustomBuilding.getWikiCategories
-	building.createWidgetInjector = CustomBuilding.createWidgetInjector
+	local building = CustomBuilding(frame)
+	building:setWidgetInjector(CustomInjector(building))
 
 	return building:createInfobox()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Attributes', content = {_args.att}},
-		Cell{name = '[[Distance#Sight Range|Sight]]', content = {_args.sight}},
-		Cell{name = '[[Distance#Sight Range|Detection Range]]', content = {_args.detection_range}},
-		Cell{name = 'Type', content = {_args.type}},
-		Cell{name = 'Size', content = {_args.size}},
-		Cell{name = '[[Game Speed#DPS|Energy Maximum]]', content = CustomBuilding._contentWithBonus('energy', 8)},
-		Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]',
-			content = CustomBuilding._contentWithBonus('energystart', 9)},
-		Cell{name = 'Animated', content = {_args.banimation}},
-	}
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Attributes', content = {args.att}},
+			Cell{name = '[[Distance#Sight Range|Sight]]', content = {args.sight}},
+			Cell{name = '[[Distance#Sight Range|Detection Range]]', content = {args.detection_range}},
+			Cell{name = 'Type', content = {args.type}},
+			Cell{name = 'Size', content = {args.size}},
+			Cell{name = '[[Game Speed#DPS|Energy Maximum]]', content = caller:_contentWithBonus('energy', 8)},
+			Cell{name = '[[Game Speed#Regeneration Rates|Starting Energy]]',
+				content = caller:_contentWithBonus('energystart', 9)},
+			Cell{name = 'Animated', content = {args.banimation}},
+		}
+	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _args.race,
-				minerals = _args.min,
-				mineralsTotal = _args.totalmin,
+				faction = args.race,
+				minerals = args.min,
+				mineralsTotal = args.totalmin,
 				mineralsForced = true,
-				gas = _args.gas,
-				gasTotal = _args.totalgas,
+				gas = args.gas,
+				gasTotal = args.totalgas,
 				gasForced = true,
-				buildTime = _args.buildtime,
-				buildTimeTotal = _args.totalbuildtime,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
 			}}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Shortcuts|Hotkey]]', content = {CustomBuilding:_getHotkeys()}}
+			Cell{name = '[[Shortcuts|Hotkey]]', content = {caller:_getHotkeys()}}
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Built By', content = {_args.builtfrom}},
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(_args.builds)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(_args.morphs)}},
-			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(_args.morphsf)}},
-			Cell{name = 'Add-Ons', content = {String.convertWikiListToHtmlList(_args.addons)}},
+			Cell{name = 'Built By', content = {args.builtfrom}},
+			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
+			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphs)}},
+			Cell{name = 'Morphs into', content = {String.convertWikiListToHtmlList(args.morphsf)}},
+			Cell{name = 'Add-Ons', content = {String.convertWikiListToHtmlList(args.addons)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(_args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(_args.upgrades)}},
+			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {CustomBuilding:_defenseDisplay()}}
+			Cell{name = 'Defense', content = {caller:_defenseDisplay()}}
 		}
 	elseif id == 'attack' then
 		return {
-			Cell{name = 'Damage', content = {_args.damage}},
-			Cell{name = '[[Distance#Range|Range]]', content = {_args.range}},
-			Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {_args.cooldown}},
-			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('cd2', 2)},
-			Cell{name = '[[Game Speed#DPS|DPS]]', content = {_args.dps}},
-			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = CustomBuilding._contentWithBonus('dps2', 3)},
-			Cell{name = 'Ground Attack', content = {_args.ground_attack}},
-			Cell{name = '[[Distance#Range|Ground Range]]', content = {_args.grange}},
-			Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {_args.gcd}},
-			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('gcd2', 4)},
-			Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {_args.gdps}},
-			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = CustomBuilding._contentWithBonus('gdps2', 6)},
-			Cell{name = 'Air Attack', content = {_args.air_attack}},
-			Cell{name = '[[Distance#Range|Air Range]]', content = {_args.arange}},
-			Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {_args.acd}},
-			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = CustomBuilding._contentWithBonus('acd2', 5)},
-			Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {_args.adps}},
-			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = CustomBuilding._contentWithBonus('adps2', 7)},
+			Cell{name = 'Damage', content = {args.damage}},
+			Cell{name = '[[Distance#Range|Range]]', content = {args.range}},
+			Cell{name = '[[Game Speed#Cooldown|Cooldown]]', content = {args.cooldown}},
+			Cell{name = '[[Game Speed#Cooldown|Cooldown Bonus]]', content = caller:_contentWithBonus('cd2', 2)},
+			Cell{name = '[[Game Speed#DPS|DPS]]', content = {args.dps}},
+			Cell{name = '[[Game Speed#DPS|DPS Bonus]]', content = caller:_contentWithBonus('dps2', 3)},
+			Cell{name = 'Ground Attack', content = {args.ground_attack}},
+			Cell{name = '[[Distance#Range|Ground Range]]', content = {args.grange}},
+			Cell{name = '[[Game Speed#Cooldown|G. Cooldown]]', content = {args.gcd}},
+			Cell{name = '[[Game Speed#Cooldown|G. Cooldown Bonus]]', content = caller:_contentWithBonus('gcd2', 4)},
+			Cell{name = '[[Game Speed#DPS|G. DPS]]', content = {args.gdps}},
+			Cell{name = '[[Game Speed#DPS|G. DPS Bonus]]', content = caller:_contentWithBonus('gdps2', 6)},
+			Cell{name = 'Air Attack', content = {args.air_attack}},
+			Cell{name = '[[Distance#Range|Air Range]]', content = {args.arange}},
+			Cell{name = '[[Game Speed#Cooldown|A. Cooldown]]', content = {args.acd}},
+			Cell{name = '[[Game Speed#Cooldown|A. Cooldown Bonus]]', content = caller:_contentWithBonus('acd2', 5)},
+			Cell{name = '[[Game Speed#DPS|A. DPS]]', content = {args.adps}},
+			Cell{name = '[[Game Speed#DPS|A. DPS Bonus]]', content = caller:_contentWithBonus('adps2', 7)},
 		}
 	end
 	return widgets
@@ -131,23 +123,18 @@ end
 ---@param key string
 ---@param bonusNumber integer
 ---@return string[]
-function CustomBuilding._contentWithBonus(key, bonusNumber)
-	return {_args[key] and _args['bonus' .. bonusNumber] and (_args[key] .. ' ' .. _args['bonus' .. bonusNumber])
-		or _args[key]}
-end
-
----@return WidgetInjector
-function CustomBuilding:createWidgetInjector()
-	return CustomInjector()
+function CustomBuilding:_contentWithBonus(key, bonusNumber)
+	return {self.args[key] and self.args['bonus' .. bonusNumber] and (self.args[key] .. ' ' .. self.args['bonus' .. bonusNumber])
+		or self.args[key]}
 end
 
 ---@return string
 function CustomBuilding:_defenseDisplay()
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if _args.shield then
-		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if self.args.shield then
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. self.args.shield
 	end
-	return display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	return display .. ' ' .. ICON_ARMOR .. ' ' .. (self.args.armor or 1)
 end
 
 ---@param args table
@@ -162,11 +149,11 @@ end
 ---@return string?
 function CustomBuilding:_getHotkeys()
 	local display
-	if not String.isEmpty(_args.shortcut) then
-		if not String.isEmpty(_args.shortcut2) then
-			display = Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'arrow')
+	if not String.isEmpty(self.args.shortcut) then
+		if not String.isEmpty(self.args.shortcut2) then
+			display = Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
 		else
-			display = Hotkeys.hotkey(_args.shortcut)
+			display = Hotkeys.hotkey(self.args.shortcut)
 		end
 	end
 
