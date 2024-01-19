@@ -4667,7 +4667,7 @@ Author(s): iMarbot via ???
 
 .recent-matches-bg-tie {
 	//background: var( --clr-sun-10, rgb(249, 249, 199) ) !important;
-	background-color: #f9f9c7 !important;
+	background-color: var( --table-yellow-background-color, #f9f9c7 ) !important;
 }
 
 .recent-matches-bg-lose {
