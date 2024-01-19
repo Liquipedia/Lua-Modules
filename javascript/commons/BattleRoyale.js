@@ -251,8 +251,14 @@ liquipedia.battleRoyale = {
 	},
 
 	comparator: function ( a, b, dir = 'ascending', sortType = 'team' ) {
-		const valA = a.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
-		const valB = b.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
+		let valA = a.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
+		let valB = b.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
+
+		if (sortType === 'rank' || sortType === 'total-points') {
+			valA = parseInt(valA);
+			valB = parseInt(valB);
+		}
+
 		if ( dir === 'ascending' ) {
 			return valB > valA ? -1 : ( valA > valB ? 1 : 0 );
 		} else {
