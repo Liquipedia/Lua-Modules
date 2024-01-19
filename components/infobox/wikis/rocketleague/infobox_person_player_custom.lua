@@ -32,7 +32,6 @@ local BANNED = mw.loadData('Module:Banned')
 local NOT_APPLICABLE = 'N/A'
 
 ---@class RocketleagueInfoboxPlayer: Person
----@field locations string[]
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -48,7 +47,6 @@ function CustomPlayer.run(frame)
 	player.args.banned = tostring(player.args.banned or '')
 
 	player.basePageName = mw.title.getCurrentTitle().baseText
-	player.locations = player:_getLocations()
 
 	return player:createInfobox()
 end
@@ -138,7 +136,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'nationality' then
 		return {
 			Cell{name = 'Location', content = {args.location}},
-			Cell{name = 'Nationality', content = caller:_createLocations()}
+			Cell{name = 'Nationality', content = caller:displayLocations()}
 		}
 	end
 	return widgets
@@ -287,8 +285,8 @@ function CustomPlayer._getStatusContents(args)
 	return statusContents
 end
 
----@return table
-function CustomPlayer:_createLocations()
+---@return string[]
+function CustomPlayer:displayLocations()
 	return Array.map(self.locations, function(country)
 		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
 			Page.makeInternalLink(country, ':Category:' .. country)
@@ -296,7 +294,7 @@ function CustomPlayer:_createLocations()
 end
 
 ---@return string[]
-function CustomPlayer:_getLocations()
+function CustomPlayer:getLocations()
 	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)
 		return Flags.CountryName(country)
 	end)
