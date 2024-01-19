@@ -22,6 +22,17 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
+	implementScrollWheelEvent: function() {
+		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
+			el.addEventListener( 'wheel', ( e ) => {
+				e.preventDefault();
+				const delta = e.deltaY || e.detail || e.wheelDelta;
+				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
+				this.handleTableSideScroll( el.closest( '[data-js-battle-royale="table"]' ), dir );
+			} );
+		} );
+	},
+
 	implementScrollendEvent: function( instanceId ) {
 		if ( !( 'onscrollend' in window ) || typeof window.onscrollend === 'undefined' ) {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
@@ -384,6 +395,7 @@ liquipedia.battleRoyale = {
 
 			this.implementScrollendEvent( instanceId );
 			this.implementOnWindowResize( instanceId );
+			this.implementScrollWheelEvent();
 
 		}.bind( this ) );
 	}
