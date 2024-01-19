@@ -5,10 +5,10 @@
 liquipedia.mainpage = {
 	init: function() {
 		/* This day */
-		var date = new Date();
-		var day = date.getDate();
-		var month = ( date.getMonth() + 1 );
-		var thisDayDate = document.getElementById( 'this-day-date' );
+		const date = new Date();
+		const day = date.getDate();
+		const month = ( date.getMonth() + 1 );
+		const thisDayDate = document.getElementById( 'this-day-date' );
 		if ( thisDayDate !== null && thisDayDate.innerHTML !== '(' + liquipedia.mainpage.getMonthName( month ) + ' ' + liquipedia.mainpage.getOrdinal( day ) + ')' ) {
 			liquipedia.mainpage.getData( month, day );
 		}
@@ -20,7 +20,7 @@ liquipedia.mainpage = {
 	},
 	getData: function( month, day ) {
 		mw.loader.using( [ 'mediawiki.api', 'mediawiki.util' ] ).then( function() {
-			var api = new mw.Api();
+			const api = new mw.Api();
 			api.get( {
 				action: 'parse',
 				maxage: 600,
@@ -77,12 +77,12 @@ liquipedia.mainpage = {
 	},
 	shareBirthday: function( event ) {
 		event.stopPropagation();
-		var button = this;
+		const button = this;
 		mw.loader.using( 'mediawiki.util' ).then( function() {
-			var url = mw.config.get( 'wgServer' ) + mw.config.get( 'wgArticlePath' ).replace( '$1', mw.util.wikiUrlencode( button.dataset.page ) );
-			var twitterhandlearr = button.dataset.url.replace( '#!/', '' ).replace( '[', '' ).replace( ']', '' ).split( ' ' )[ 0 ].split( 'twitter.com/' );
-			var twitterhandle = twitterhandlearr[ twitterhandlearr.length - 1 ];
-			var text = 'Happy birthday, @' + twitterhandle + '!';
+			const url = mw.config.get( 'wgServer' ) + mw.config.get( 'wgArticlePath' ).replace( '$1', mw.util.wikiUrlencode( button.dataset.page ) );
+			const twitterhandlearr = button.dataset.url.replace( '#!/', '' ).replace( '[', '' ).replace( ']', '' ).split( ' ' )[ 0 ].split( 'twitter.com/' );
+			const twitterhandle = twitterhandlearr[ twitterhandlearr.length - 1 ];
+			const text = 'Happy birthday, @' + twitterhandle + '!';
 			liquipedia.tracker.track( 'Birthdaytweet' );
 			Share.twitter( url, text );
 		} );

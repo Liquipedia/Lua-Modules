@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class TeamfortressLeagueInfobox: InfoboxLeagueTemp
+---@class TeamfortressLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

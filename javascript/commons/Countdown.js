@@ -8,10 +8,10 @@ liquipedia.countdown = {
 		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
 			mw.loader.using( 'user.options', function() {
 				liquipedia.countdown.timerObjectNodes.forEach( function( timerObjectNode ) {
-					var dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
-					var dateChild = document.createElement( 'span' );
+					const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
+					const dateChild = document.createElement( 'span' );
 					if ( typeof dateObject === 'object' ) {
-						var disableTimeZoneAdjust = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === '1' || mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === 1;
+						const disableTimeZoneAdjust = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === '1' || mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === 1;
 						if ( disableTimeZoneAdjust ) {
 							dateChild.innerHTML = timerObjectNode.innerHTML;
 						} else {
@@ -23,7 +23,7 @@ liquipedia.countdown = {
 					dateChild.classList.add( 'timer-object-date' );
 					timerObjectNode.innerHTML = '';
 					timerObjectNode.appendChild( dateChild );
-					var separatorChild;
+					let separatorChild;
 					if ( typeof timerObjectNode.dataset.separator !== 'undefined' ) {
 						separatorChild = document.createElement( 'span' );
 						separatorChild.innerText = timerObjectNode.dataset.separator;
@@ -33,7 +33,7 @@ liquipedia.countdown = {
 						separatorChild.classList.add( 'timer-object-separator' );
 					}
 					timerObjectNode.appendChild( separatorChild );
-					var countdownChild = document.createElement( 'span' );
+					const countdownChild = document.createElement( 'span' );
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
@@ -60,27 +60,27 @@ liquipedia.countdown = {
 		liquipedia.countdown.timeoutFunctions.set( liquipedia.countdown.runCountdown, 1000 );
 	},
 	setCountdownString: function( timerObjectNode ) {
-		var streamsarr = [ ];
-		var datestr = '', live = 'LIVE!';
+		const streamsarr = [ ];
+		let datestr = '', live = 'LIVE!';
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
 			live = timerObjectNode.dataset.countdownEndText;
 		}
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			var differenceInSeconds = Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
+			const differenceInSeconds = Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
 			if ( differenceInSeconds <= 0 ) {
 				if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
 					datestr = '<span class="timer-object-countdown-live">' + live + '</span>';
 				}
 			} else {
-				var differenceInSecondsMath = differenceInSeconds;
-				var weeks = Math.floor( differenceInSecondsMath / 604800 );
+				let differenceInSecondsMath = differenceInSeconds;
+				const weeks = Math.floor( differenceInSecondsMath / 604800 );
 				differenceInSecondsMath = differenceInSecondsMath % 604800;
-				var days = Math.floor( differenceInSecondsMath / 86400 );
+				const days = Math.floor( differenceInSecondsMath / 86400 );
 				differenceInSecondsMath = differenceInSecondsMath % 86400;
-				var hours = Math.floor( differenceInSecondsMath / 3600 );
+				const hours = Math.floor( differenceInSecondsMath / 3600 );
 				differenceInSecondsMath = differenceInSecondsMath % 3600;
-				var minutes = Math.floor( differenceInSecondsMath / 60 );
-				var seconds = Math.floor( differenceInSecondsMath % 60 );
+				const minutes = Math.floor( differenceInSecondsMath / 60 );
+				const seconds = Math.floor( differenceInSecondsMath % 60 );
 				if ( differenceInSeconds >= 604800 ) {
 					datestr = weeks + 'w ' + days + 'd';
 				} else if ( differenceInSeconds >= 86400 ) {
@@ -150,7 +150,7 @@ liquipedia.countdown = {
 		if ( timerObjectNode.dataset.streamTl ) {
 			streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset.streamTl + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
 		}
-		var html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
+		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
 		if ( datestr.length > 0 && streamsarr.length > 0 ) {
 			html += ' - ';
 		}
@@ -162,7 +162,6 @@ liquipedia.countdown = {
 	getStreamName: function( url ) {
 		return url.replace( /\s/g, '_' );
 	},
-	// eslint-disable-next-line no-undef
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
 		[ 'Afghanistan Time', 'AFT' ],
@@ -282,13 +281,13 @@ liquipedia.countdown = {
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
 	getMonthNameFromMonthNumber: function( newFutureMonth ) {
-		var monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
 	getTimeZoneNameLong: function( dateObject ) {
-		var date;
-		var result;
-		var dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
+		let date;
+		let result;
+		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
 		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			date = dateTimeFormat.formatToParts( dateObject );
 			date.forEach( function( element ) {
@@ -307,7 +306,7 @@ liquipedia.countdown = {
 		return result;
 	},
 	getCorrectTimeZoneString: function( dateObject ) {
-		var userTime = {
+		const userTime = {
 			localYear: dateObject.getFullYear(),
 			localMonth: dateObject.getMonth(),
 			localDay: dateObject.getDate(),
@@ -329,11 +328,11 @@ liquipedia.countdown = {
 			timeZoneName: liquipedia.countdown.getTimeZoneNameLong( dateObject )
 		};
 
-		var calculatedOffsetHours = 0;
-		var calculatedOffsetMinutes = ( userTime.localMinutes - userTime.utcMinutes );
-		var offsetMinutesAsString = '';
-		var offsetHoursWithSign = '+0';
-		var finalTimeZoneAbbr = '';
+		let calculatedOffsetHours = 0;
+		const calculatedOffsetMinutes = ( userTime.localMinutes - userTime.utcMinutes );
+		let offsetMinutesAsString = '';
+		let offsetHoursWithSign = '+0';
+		let finalTimeZoneAbbr = '';
 
 		if ( userTime.localDay === userTime.utcDay ) {
 			calculatedOffsetHours = userTime.localHours - userTime.utcHours;
@@ -354,7 +353,7 @@ liquipedia.countdown = {
 			calculatedOffsetHours = -( userTime.utcHours ) + userTime.localHours - 24;
 		}
 
-		var calculatedOffsetInMinutes = ( calculatedOffsetHours * 60 ) + calculatedOffsetMinutes;
+		const calculatedOffsetInMinutes = ( calculatedOffsetHours * 60 ) + calculatedOffsetMinutes;
 
 		if ( calculatedOffsetHours > 0 ) {
 			if ( calculatedOffsetInMinutes % 60 !== 0 ) {
@@ -366,7 +365,7 @@ liquipedia.countdown = {
 			}
 		}
 
-		var finalTimeZoneName = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
+		let finalTimeZoneName = 'UTC' + offsetHoursWithSign + offsetMinutesAsString;
 
 		if ( calculatedOffsetHours < 0 ) {
 			offsetHoursWithSign = '-' + Math.abs( calculatedOffsetHours );
@@ -383,10 +382,10 @@ liquipedia.countdown = {
 			finalTimeZoneName = userTime.timeZoneName + ' (UTC' + offsetHoursWithSign + offsetMinutesAsString + ')';
 		}
 
-		var strLocalTime1 = ( liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth ) ) + ' ' + userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
-		var strLocalTime2 = ' <abbr data-tz="' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 ) + '"';
-		var strLocalTime3 = ' title="' + finalTimeZoneName + '">' + finalTimeZoneAbbr + '</abbr>';
-		var dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
+		const strLocalTime1 = ( liquipedia.countdown.getMonthNameFromMonthNumber( userTime.dateObjectMonth ) ) + ' ' + userTime.dateObjectDay + ', ' + userTime.dateObjectYear + ' - ' + ( '0' + userTime.dateObjectHours ).slice( -2 ) + ':' + ( '0' + userTime.dateObjectMinutes ).slice( -2 );
+		const strLocalTime2 = ' <abbr data-tz="' + offsetHoursWithSign + ':' + ( '0' + calculatedOffsetMinutes ).slice( -2 ) + '"';
+		const strLocalTime3 = ' title="' + finalTimeZoneName + '">' + finalTimeZoneAbbr + '</abbr>';
+		const dateObjectString = strLocalTime1 + strLocalTime2 + strLocalTime3;
 		return dateObjectString;
 	}
 };

@@ -29,7 +29,7 @@ local GAME_MODE = mw.loadData('Module:GameMode')
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 
----@class ApexlegendsLeagueInfobox: InfoboxLeagueTemp
+---@class ApexlegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

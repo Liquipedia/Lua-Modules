@@ -52,7 +52,10 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Abbreviation', content = {args.abbreviation}})
+		return {
+			Cell{name = 'Abbreviation', content = {args.abbreviation}},
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {args.affiliate and Team.team(args.affiliate) or nil}}
+		}
 	end
 
 	return widgets
