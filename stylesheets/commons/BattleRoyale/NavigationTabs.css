@@ -4,7 +4,7 @@ Author(s): Elysienna
 *******************************************************************************/
 
 .navigation-tabs {
-	@list-item: e('.navigation-tabs__list-item');
+	@list-item: e(".navigation-tabs__list-item");
 	display: flex;
 	border-radius: 0.25rem;
 	margin-bottom: 1.5rem;
