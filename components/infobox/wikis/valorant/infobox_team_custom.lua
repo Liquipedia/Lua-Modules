@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -40,6 +39,10 @@ function CustomInjector:parse(id, widgets)
 			name = 'In-Game Leader',
 			content = {args.igl}
 		})
+	elseif id == 'custom' then
+		return {
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {args.affiliate and Team.team(args.affiliate) or nil}}
+		}
 	end
 	return widgets
 end
@@ -53,15 +56,6 @@ function CustomTeam:createBottomContent()
 			{team = self.name or self.pagename}
 		)
 	end
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
 end
 
 return CustomTeam
