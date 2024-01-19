@@ -15,34 +15,30 @@ local Company = Lua.import('Module:Infobox/Company')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomCompany = Class.new()
-
+---@class PubgCompanyInfobox: CompanyInfobox
+local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
-
-local _args
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell({
-		name = CustomCompany._createSisterCompaniesDescription(_args),
-		content = Company:getAllArgsForBase(_args, 'sister', {})
-	}))
-	return widgets
-end
 
 ---@param frame Frame
 ---@return Html
 function CustomCompany.run(frame)
-	local company = Company(frame)
-	company.createWidgetInjector = CustomCompany.createWidgetInjector
-	_args = company.args
+	local company = CustomCompany(frame)
+	company:setWidgetInjector(CustomInjector(company))
 	return company:createInfobox()
 end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
----@return WidgetInjector
-function CustomCompany:createWidgetInjector()
-	return CustomInjector()
+	if id == 'custom' then
+		table.insert(widgets, Cell{
+			name = CustomCompany._createSisterCompaniesDescription(args),
+			content = self.caller:getAllArgsForBase(args, 'sister', {})
+		})
+	end
+	return widgets
 end
 
 ---@param args table
