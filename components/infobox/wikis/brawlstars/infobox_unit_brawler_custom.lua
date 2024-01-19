@@ -90,7 +90,7 @@ function CustomUnit:getWikiCategories(args)
 
 	return Array.append({'Brawlers'},
 		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' brawlers') or nil,
-		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' brawlers') or nil,
+		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' brawlers') or nil
 	)
 end
 
