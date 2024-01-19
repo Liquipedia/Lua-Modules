@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
@@ -17,7 +16,6 @@ local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
 
 ---@class ArenaofvalorLeagueInfobox: InfoboxLeagueTemp
 local CustomLeague = Class.new(League)
