@@ -35,6 +35,7 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 ---@class Person: BasicInfobox
+---@field locations string[]
 local Person = Class.new(BasicInfobox)
 
 Person.warnings = {}
@@ -80,6 +81,8 @@ end
 function Person:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
+
+	self.locations = self:getLocations()
 
 	local lowerStatus = (args.status or ''):lower()
 	if lowerStatus == BANNED then
@@ -139,7 +142,7 @@ function Person:createInfobox()
 		Cell{name = 'Name', content = {args.name}},
 		Cell{name = 'Romanized Name', content = {args.romanized_name}},
 		Customizable{id = 'nationality', children = {
-				Cell{name = 'Nationality', content = self:_createLocations(args, personType.category)}
+				Cell{name = 'Nationality', content = self:displayLocations()}
 			}
 		},
 		Cell{name = 'Born', content = {age.birth}},
@@ -231,10 +234,6 @@ function Person:createInfobox()
 				statusToStore
 			)))
 
-	--remove this after all customs have been cleaned up
-	--only here so we do not break role storage on 16 wikis ...
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if self:shouldStoreData(args) then
 		self:_definePageVariables(args)
 		self:_setLpdbData(
@@ -246,9 +245,7 @@ function Person:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
-		--kick above line and un-comment below line after customs have been cleaned up
-		--:node(infobox:build(widgets))
+		:node(infobox:build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 
@@ -438,47 +435,26 @@ function Person:calculateEarnings(args)
 	}
 end
 
----@param args table
----@param personType string
 ---@return string[]
-function Person:_createLocations(args, personType)
-	local countryDisplayData = {}
-	local country = args.country or args.country1 or args.nationality or args.nationality1
-	if country == nil or country == '' then
-		return countryDisplayData
+function Person:getLocations()
+	local locations = {}
+	for _, country in Table.iter.pairsByPrefix(self.args, {'country', 'nationality'}, {requireIndex = false}) do
+		table.insert(locations, country)
 	end
 
-	countryDisplayData[1] = self:_createLocation(country, args.location, personType)
-
-	local index = 2
-	country = args['country2'] or args['nationality2']
-	while(not String.isEmpty(country)) do
-		countryDisplayData[index] = self:_createLocation(country, args['location' .. index], personType)
-		index = index + 1
-		country = args['country' .. index] or args['nationality' .. index]
-	end
-
-	return countryDisplayData
+	return Array.map(locations, function(country)
+		return Flags.CountryName(country)
+	end)
 end
 
----@param country string?
----@param location string?
----@param personType string
----@return string?
-function Person:_createLocation(country, location, personType)
-	if country == nil or country == '' then
-		return nil
-	end
-	local countryDisplay = Flags.CountryName(country)
-	local demonym = Flags.getLocalisation(countryDisplay) or ''
-
-	if Namespace.isMain() then
-		self.infobox:categories(demonym .. ' ' .. personType .. 's')
-	end
-
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-		'[[:Category:' .. countryDisplay .. '|' .. countryDisplay .. ']]' ..
-		(location ~= nil and (',&nbsp;' .. location) or '')
+---@return string[]
+function Person:displayLocations()
+	return Array.map(self.locations, function(country, locationIndex)
+		local location = self.args['location' .. locationIndex]
+		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+			Page.makeInternalLink(country, ':Category:' .. country) ..
+			(location and (',&nbsp;' .. location) or '')
+	end)
 end
 
 ---@param team string?
@@ -544,6 +520,10 @@ function Person:getCategories(args, birthDisplay, personType, status)
 	if String.isNotEmpty(team) and not mw.ext.TeamTemplate.teamexists(team) then
 		table.insert(categories, 'Players with invalid team')
 	end
+
+	Array.extendWith(categories, Array.map(self.locations, function(country)
+		return Flags.getLocalisation(country) .. ' ' .. personType .. 's'
+	end))
 
 	return self:getWikiCategories(categories)
 end

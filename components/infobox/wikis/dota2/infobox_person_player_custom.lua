@@ -62,7 +62,6 @@ local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 ---@field role {category: string, variable: string, isplayer: boolean?}?
 ---@field role2 {category: string, variable: string, isplayer: boolean?}?
 ---@field basePageName string
----@field locations string[]
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -87,7 +86,6 @@ function CustomPlayer.run(frame)
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 	player.basePageName = mw.title.getCurrentTitle().baseText
-	player.locations = player:_getLocations()
 
 	return player:createInfobox()
 end
@@ -148,10 +146,6 @@ function CustomInjector:parse(id, widgets)
 				caller:_displayRole(caller.role),
 				caller:_displayRole(caller.role2),
 			}},
-		}
-	elseif id == 'nationality' then
-		return {
-			Cell{name = 'Nationality', content = caller:_createLocations()}
 		}
 	end
 	return widgets
@@ -233,14 +227,6 @@ function CustomPlayer:_getStatusContents()
 	return statusContents
 end
 
----@return table
-function CustomPlayer:_createLocations()
-	return Array.map(self.locations, function(country)
-		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
-			Page.makeInternalLink(country, ':Category:' .. country)
-	end)
-end
-
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
@@ -262,7 +248,7 @@ function CustomPlayer:getWikiCategories(categories)
 end
 
 ---@return string[]
-function CustomPlayer:_getLocations()
+function CustomPlayer:getLocations()
 	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)
 		return Flags.CountryName(country)
 	end)
