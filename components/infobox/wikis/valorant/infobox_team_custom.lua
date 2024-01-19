@@ -41,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 		})
 	elseif id == 'custom' then
 		return {
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {mw.ext.TeamTemplate.raw(args.affiliate).page}}
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {args.affiliate and Team.team(args.affiliate) or nil}}
 		}
 	end
 	return widgets
