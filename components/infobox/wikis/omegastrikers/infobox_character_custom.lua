@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -16,65 +17,42 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomCharacter = Class.new()
+---@class OmegastrikersCharacterInfobox: CharacterInfobox
+local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomCharacter.run(frame)
-	local character = Character(frame)
-	_args = character.args
-	character.createWidgetInjector = CustomCharacter.createWidgetInjector
+	local character = CustomCharacter(frame)
+	character:setWidgetInjector(CustomInjector(character))
 	return character:createInfobox()
 end
 
----@return WidgetInjector
-function CustomCharacter:createWidgetInjector()
-	return CustomInjector()
-end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Age',
-		content = {_args.age}
-	})
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-	table.insert(widgets, Cell{
-		name = 'Cost',
-		content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. _args.strikercredits ..
-				'  [[File:Omega Strikers Ody Points.png|20px]] ' .. _args.odypoints}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Affiliation',
-		content = {'[[File:' .. _args.affiliation .. ' allmode.png|20px]] ' .. _args.affiliation}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Voice Actor(s)',
-		content = {_args.voiceactors}
-	})
-
-	table.insert(widgets, Title{name = 'Abilities'})
-
-	table.insert(widgets, Cell{
-		name = 'Primary',
-		content = {'[[File:' .. _args.name .. ' - Primary.png|20px]] ' .. _args.primary}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Secondary',
-		content = {'[[File:' .. _args.name .. ' - Secondary.png|20px]] ' .. _args.secondary}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Special',
-		content = {'[[File:' .. _args.name .. ' - Special.png|20px]] ' .. _args.special}
-	})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Age', content = {args.age}},
+			Cell{
+				name = 'Cost',
+				content = {'[[File:Omega Strikers Striker Credits.png|20px]] ' .. args.strikercredits ..
+						'  [[File:Omega Strikers Ody Points.png|20px]] ' .. args.odypoints}
+			},
+			Cell{name = 'Affiliation', content = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
+			},
+			Cell{name = 'Voice Actor(s)', content = {args.voiceactors}},
+			Title{name = 'Abilities'},
+			Cell{name = 'Primary', content = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
+			Cell{name = 'Secondary', content = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
+			Cell{name = 'Special', content = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}
+		)
+	end
 
 	return widgets
 end
