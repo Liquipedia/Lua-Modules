@@ -34,7 +34,7 @@ function CustomStrategy.run(frame)
 	strategy:setWidgetInjector(CustomInjector(strategy))
 
 	if Namespace.isMain() then
-		local categories = CustomStrategy:_getCategories(strategy.args.race, strategy.args.matchups)
+		local categories = strategy:_getCategories(strategy.args.race, strategy.args.matchups)
 		strategy.infobox:categories(unpack(categories))
 	end
 
