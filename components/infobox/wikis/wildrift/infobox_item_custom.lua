@@ -147,8 +147,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'maps' then
 		if String.isEmpty(args.wr) and String.isEmpty(args.ha) then return {} end
 		Array.appendWith(widgets,
-			widgets, Cell{name = '[[Wild Rift (Map)|Wild Rift]]', content = {args.wr}},
-			widgets, Cell{name = '[[Howling Abyss]]', content = {args.ha}}
+			Cell{name = '[[Wild Rift (Map)|Wild Rift]]', content = {args.wr}},
+			Cell{name = '[[Howling Abyss]]', content = {args.ha}}
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
