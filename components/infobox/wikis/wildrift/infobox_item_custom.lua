@@ -69,8 +69,8 @@ function CustomInjector:parse(id, widgets)
 			})
 		end
 		if String.isEmpty(args.itemname) then return widgets end
-		local iconImage = Template.safeExpand(args, 'ItemIcon', {string.lower(args.itemname)}, '')
-		if not String.isEmpty(args.itemtext) then
+		local iconImage = Template.safeExpand(mw.getCurrentFrame(), 'ItemIcon', {string.lower(args.itemname)}, '')
+		if String.isNotEmpty(args.itemtext) then
 			iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 		end
 		table.insert(widgets, Center{content = {iconImage}})
@@ -212,7 +212,7 @@ function CustomItem:_getCostDisplay()
 		)
 	local display = tostring(outerDiv)
 
-	if not String.isEmpty(self.args.recipecost) then
+	if String.isNotEmpty(self.args.recipecost) then
 		innerDiv = mw.html.create('div')
 			:css('display', 'inline-block')
 			:css('padding', '0px 3px')
@@ -342,7 +342,7 @@ function CustomItem:_shopDisplay()
 	local contents = {}
 	local index = 1
 	self.args.shop1 = self.args.shop1 or self.args.shop
-	while not String.isEmpty(self.args['shop' .. index]) do
+	while String.isNotEmpty(self.args['shop' .. index]) do
 		local shop = Template.safeExpand(mw.getCurrentFrame(), 'Shop', {self.args['shop' .. index]})
 		table.insert(contents, shop)
 		index = index + 1

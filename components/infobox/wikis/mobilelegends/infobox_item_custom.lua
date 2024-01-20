@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if String.isNotEmpty(args.itemcost) then
 			table.insert(widgets, Breakdown{
-				content = CustomItem:_getCostDisplay(),
+				content = caller:_getCostDisplay(),
 				classes = {
 					'infobox-header',
 					'wiki-backgroundcolor-light',
@@ -191,7 +191,7 @@ end
 
 ---@return string[]
 function CustomItem:_getCostDisplay()
-	local costs = Item:getAllArgsForBase(self.args, 'itemcost')
+	local costs = self:getAllArgsForBase(self.args, 'itemcost')
 
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
@@ -234,7 +234,7 @@ end
 ---@param base string?
 ---@return string?
 function CustomItem._positivePercentDisplay(caller, base)
-	if String.isEmpty(caller.args[base]) and not Logic.isNumeric(caller.args[base]) then
+	if String.isNotEmpty(caller.args[base]) and not Logic.isNumeric(caller.args[base]) then
 		error('"' .. base .. '" has to be numerical')
 	elseif String.isEmpty(caller.args[base]) then
 		return
