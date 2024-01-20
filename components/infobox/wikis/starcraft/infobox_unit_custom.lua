@@ -143,6 +143,7 @@ function CustomUnit:getCustomCells(widgets)
 	}
 end
 
+---@param args table
 ---@return string
 function CustomUnit:_defenseDisplay(args)
 	local display = ICON_HP .. ' ' .. (args.hp or 0)
@@ -163,6 +164,7 @@ function CustomUnit:nameDisplay(args)
 	return raceIcon .. (args.name or self.pagename)
 end
 
+---@param args table
 ---@return string?
 function CustomUnit:_getHotkeys(args)
 	local display
