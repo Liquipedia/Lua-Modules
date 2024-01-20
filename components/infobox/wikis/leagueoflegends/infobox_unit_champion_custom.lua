@@ -95,6 +95,7 @@ function CustomChampion:getCustomCells(widgets)
 	local args = self.args
 	Array.appendWith(
 		widgets,
+		Cell{name = 'Attack Type', content = {args.attacktype}},
 		Cell{name = 'Resource Bar', content = {args.secondarybar}},
 		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
 		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
