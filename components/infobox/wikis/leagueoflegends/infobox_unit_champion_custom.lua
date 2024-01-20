@@ -61,27 +61,27 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Center{content = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title, dataModule)
-				if String.isEmpty(args[key]) then return end
-				return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
-			end
+			if String.isEmpty(args[key]) then return end
+			return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
+		end
 
-			local breakDownContents = Array.append({},
-				toBreakDownCell('region', 'Region', 'RegionIcon'),
-				toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
-				toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
-			)
+		local breakDownContents = Array.append({},
+			toBreakDownCell('region', 'Region', 'RegionIcon'),
+			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
+			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
+		)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
-				String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. BLUE_ESSENCE_ICON) or nil,
-				String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. RIOT_POINTS_ICON) or nil
-			)
-			return {
-				Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
-			}
+			String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. BLUE_ESSENCE_ICON) or nil,
+			String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. RIOT_POINTS_ICON) or nil
+		)
+		return {
+			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
+		}
 	elseif id == 'custom' then
 		return self.caller:getCustomCells(widgets)
 	end
