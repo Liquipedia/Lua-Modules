@@ -35,7 +35,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		Array.appendedWith(widgets,
+		Array.appendWith(widgets,
 			Cell{name = 'Age', content = {args.age}},
 			Cell{name = 'Home World', content = {args.homeworld}},
 			Title{name = 'Abilities'},
