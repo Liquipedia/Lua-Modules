@@ -566,6 +566,10 @@ ul.nav-tabs li.game-64,
 	color: var( --clr-semantic-gold-40, #ffdd3c );
 }
 
+.gold-text-alt {
+	color: #ffaa00;
+}
+
 .gold-bg {
 	background-color: var( --clr-semantic-gold-90, #fff6c9 );
 }
@@ -674,6 +678,12 @@ ul.nav-tabs li.game-wiiu,
 
 .transparent-bg-striped {
 	background: repeating-linear-gradient( 135deg, transparent, transparent 4px, rgba( 0, 0, 0, 0.5 ) 4px, rgba( 0, 0, 0, 0.5 ) 8px );
+}
+
+.bg-active {
+	background: #009E60;
+	font-weight: bold;
+	color: white;
 }
 
 /* BORDER COLOURS */
