@@ -74,8 +74,8 @@ function ManualPointsTable._makePointsCell(slot, points, suffix)
 		:addClass(Logic.readBool(slot['active' .. suffix]) and 'bg-active' or '')
 		:css('font-weight', Logic.readBool(slot['gold' .. suffix]) and 'bold' or nil)
 
-	if Table.includes(POINTS_TYPES, points) then
-		td:wikitext(POINTS_ACTIONS[points](slot['link' .. suffix] and slot['link' .. suffix] or ''))
+	if Table.includes(POINTS_TYPES, points:lower()) then
+		td:wikitext(POINTS_ACTIONS[points:lower()](slot['link' .. suffix] and slot['link' .. suffix] or ''))
 	else
 		td:wikitext(suffix == TOTAL and '\'\'\'' .. points .. '\'\'\'' or points)
 	end
