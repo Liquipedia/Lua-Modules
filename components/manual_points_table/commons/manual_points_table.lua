@@ -54,19 +54,19 @@ local ManualPointsTable = Class.new(
 ---@param args table
 ---@return Html
 function ManualPointsTable:_makeSubHeader(args)
-	local row = mw.html.create('tr')
+	local subHeader = mw.html.create('tr')
 		:tag('th'):wikitext('#'):done()
 		:tag('th'):wikitext(self.isSolo and 'Player' or 'Team'):done()
 
 	if self.isSolo and self.showPlayerTeam then
-		row:tag('th'):wikitext('Team')
+		subHeader:tag('th'):wikitext('Team')
 	end
 
 	Array.mapIndexes(function(index)
 		local event = args['event' .. index]
 		local eventLink = args['event' .. index .. 'link']
 		if String.isNotEmpty(event) then
-			row:tag('th')
+			subHeader:tag('th')
 				:css('min-width:80px')
 				:wikitext(String.isNotEmpty(eventLink) and '[['.. eventLink .. '|' .. event .. ']]' or event)
 		end
@@ -74,11 +74,11 @@ function ManualPointsTable:_makeSubHeader(args)
 		return event
 	end)
 
-	row:tag('th')
+	subHeader:tag('th')
 		:css('min-width:80px')
 		:wikitext('Points')
 
-	return row
+	return subHeader
 end
 
 ---@param slot table
@@ -86,52 +86,52 @@ end
 ---@param suffix string
 ---@return Html
 function ManualPointsTable:_makePointsCell(slot, points, suffix)
-	local td = mw.html.create('td')
+	local pointsCell = mw.html.create('td')
 		:addClass(Logic.readBool(slot['gold' .. suffix]) and 'gold-text-alt' or nil)
 		:addClass(Logic.readBool(slot['active' .. suffix]) and 'bg-active' or nil)
 		:css('font-weight', Logic.readBool(slot['gold' .. suffix]) and 'bold' or nil)
 
 	if Table.includes(POINTS_TYPES, points:lower()) then
-		td:wikitext(POINTS_ACTIONS[points:lower()](slot['link' .. suffix] and slot['link' .. suffix] or ''))
+		pointsCell:wikitext(POINTS_ACTIONS[points:lower()](slot['link' .. suffix] and slot['link' .. suffix] or ''))
 	else
-		td:wikitext(suffix == TOTAL and '\'\'\'' .. points .. '\'\'\'' or points)
+		pointsCell:wikitext(suffix == TOTAL and '\'\'\'' .. points .. '\'\'\'' or points)
 	end
 
-	return td
+	return pointsCell
 end
 
 ---@param slot table
-function ManualPointsTable:_makeParticipantSlot(slot)
-	local td = mw.html.create('td')
+function ManualPointsTable:_makeParticipantCell(slot)
+	local participantCell = mw.html.create('td')
 		:css('text-align', 'left')
 
 	if self.isSolo then
-		td:node(PlayerDisplay.InlinePlayer{player = {
+		participantCell:node(PlayerDisplay.InlinePlayer{player = {
 			displayName = slot[1],
 			pageName = slot[1],
 			flag = slot.flag,
 			showLink = true
 		}})
 	else
-		td:node(OpponentDisplay.InlineOpponent{opponent = {
+		participantCell:node(OpponentDisplay.InlineOpponent{opponent = {
 			type = Opponent.team,
 			template = slot[1]
 		}})
 	end
 
-	return td
+	return participantCell
 end
 
 ---@param slot table
 ---@return Html
-function ManualPointsTable:_makeSlot(slot)
+function ManualPointsTable:_makeSlotRow(slot)
 	local slotRow = mw.html.create('tr')
 		:addClass(slot.bg and 'bg-' .. slot.bg or nil)
 		:tag('td')
 			:addClass(slot.pbg and 'bg-' .. slot.pbg or nil)
 			:wikitext(slot.place and '\'\'\'' .. slot.place .. '\'\'\'' or '')
 			:done()
-		:node(self:_makeParticipantSlot(slot))
+		:node(self:_makeParticipantCell(slot))
 			:done()
 
 	if self.isSolo and self.showPlayerTeam then
@@ -187,7 +187,7 @@ function ManualPointsTable.run()
 	wrapper:node(manualPointsTable:_makeSubHeader(header))
 
 	Array.forEach(slots, function (slot)
-		wrapper:node(manualPointsTable:_makeSlot(slot))
+		wrapper:node(manualPointsTable:_makeSlotRow(slot))
 	end)
 
 	return mw.html.create('div')
