@@ -135,6 +135,10 @@ Author(s): Elysienna
 			padding: 0;
 			font-size: unset;
 			display: flex;
+
+			.vodlink {
+				margin-left: 0.25rem;
+			}
 		}
 	}
 
