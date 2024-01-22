@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
@@ -19,6 +20,7 @@ local Template = require('Module:Template')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local NONBREAKING_SPACE = '&nbsp;'
 local TOTAL = 'total'
 local QUALIFIED = 'q'
 local DID_NOT_QUALIFY = 'dnq'
@@ -113,10 +115,15 @@ function ManualPointsTable:_makeParticipantCell(slot)
 			showLink = true
 		}})
 	else
-		participantCell:node(OpponentDisplay.InlineOpponent{opponent = {
+		local teamOpponentText = ''
+		if String.isNotEmpty(slot.flag) then
+			teamOpponentText = teamOpponentText .. Flags.Icon{flag = slot.flag} .. NONBREAKING_SPACE
+		end
+		teamOpponentText = teamOpponentText .. tostring(OpponentDisplay.InlineOpponent{opponent = {
 			type = Opponent.team,
 			template = slot[1]
 		}})
+		participantCell:wikitext(teamOpponentText)
 	end
 
 	return participantCell
@@ -170,7 +177,7 @@ function ManualPointsTable.run()
 	local slots = Array.sub(args, 2)
 
 	manualPointsTable.isSolo = Logic.readBool(header.isSolo)
-	manualPointsTable.showPlayerTeam = Logic.readBool(header.showPlayerTeam)
+	manualPointsTable.showPlayerTeam = Logic.readBool(header.teams)
 
 	local wrapper = mw.html.create('table')
 		:addClass('table table-bordered wikitable prizepooltable collapsed')
@@ -180,7 +187,7 @@ function ManualPointsTable.run()
 
 	if String.isNotEmpty(header.title) then
 		wrapper:tag('tr'):tag('th')
-			:css('colspan', 100)
+			:attr('colspan', 100)
 			:wikitext(header.title)
 	end
 
