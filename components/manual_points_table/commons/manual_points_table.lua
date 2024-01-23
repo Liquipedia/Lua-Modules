@@ -14,11 +14,8 @@ local Logic = require('Module:Logic')
 local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Team = require('Module:Team')
 local Template = require('Module:Template')
-
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local NONBREAKING_SPACE = '&nbsp;'
 local TOTAL = 'total'
@@ -119,10 +116,7 @@ function ManualPointsTable:_makeParticipantCell(slot)
 		if String.isNotEmpty(slot.flag) then
 			teamOpponentText = teamOpponentText .. Flags.Icon{flag = slot.flag} .. NONBREAKING_SPACE
 		end
-		teamOpponentText = teamOpponentText .. tostring(OpponentDisplay.InlineOpponent{opponent = {
-			type = Opponent.team,
-			template = slot[1]
-		}})
+		teamOpponentText = teamOpponentText .. tostring(Team.team(nil, slot[1]) or '')
 		participantCell:wikitext(teamOpponentText)
 	end
 
@@ -144,10 +138,7 @@ function ManualPointsTable:_makeSlotRow(slot)
 	if self.isSolo and self.showPlayerTeam then
 		if String.isNotEmpty(slot.team) then
 			slotRow:tag('td')
-				:node(OpponentDisplay.InlineOpponent{opponent = {
-					type = Opponent.team,
-					template = slot.team,
-				}, teamStyle = 'short'})
+				:node(Team.icon(nil, slot.team) or nil)
 		else
 			slotRow:tag('td'):wikitext('')
 		end
