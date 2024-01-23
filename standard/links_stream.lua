@@ -143,19 +143,12 @@ end
 ---@field languageCode string
 ---@field index integer
 ---@field is_a function
----@field new function
----@field _fromLegacy function
----@field toLegacy function
----@field toString function
----@field _isStreamKey function
----@field _isValid function
----@field __tostring function
-StreamLinks.StreamKey = Class.new(
+local StreamKey = Class.new(
 	function (self, ...)
 		self:new(...)
 	end
 )
-local StreamKey = StreamLinks.StreamKey
+StreamLinks.StreamKey = StreamKey
 
 ---@param tbl string|StreamKey
 ---@param languageCode string
