@@ -75,7 +75,7 @@ function Company:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				if not String.isEmpty(args.companytype) and args.companytype == COMPANY_TYPE_ORGANIZER then
+				if args.companytype == COMPANY_TYPE_ORGANIZER then
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
