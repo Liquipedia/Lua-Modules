@@ -234,7 +234,7 @@ end
 ---@param base string?
 ---@return string?
 function CustomItem._positivePercentDisplay(caller, base)
-	if String.isEmpty(caller.args[base]) and  then
+	if String.isEmpty(caller.args[base]) then
 		return
 	elseif not Logic.isNumeric(caller.args[base]) then
 		error('"' .. base .. '" has to be numerical')
@@ -269,8 +269,6 @@ function CustomItem:_getAttributeCells(attributeCells)
 		if String.isEmpty(content) then return end
 		return Cell{name = attribute.name, content = {content}}
 	end)
-
-	return widgets
 end
 
 return CustomItem
