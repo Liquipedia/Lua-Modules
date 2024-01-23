@@ -13,6 +13,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Team = require('Module:Team')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
@@ -38,13 +39,16 @@ local DRAW = 'draw'
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
 ---@field limit number?
----@field overallStats boolean
 ---@field displayGameIcons boolean
 ---@field showResult boolean
----@field includeAllGames boolean
 ---@field opponent standardOpponent
 ---@field aliases table<string, true>
 ---@field timeRange {startDate: number, endDate: number}
+---@field title string?
+---@field showTier boolean
+---@field showIcon boolean
+---@field showVod boolean
+---@field showStats boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -59,6 +63,7 @@ local DRAW = 'draw'
 ---@field vods {index: number, link: string}[]
 ---@field type string
 ---@field result MatchTableMatchResult
+---@field game string?
 
 ---@class MatchTableMatchResult
 ---@field opponent table #match2opponent table
@@ -90,13 +95,16 @@ function MatchTable:init()
 	self.config = {
 		mode = mode,
 		limit = tonumber(args.limit),
-		overallStats = Logic.readBool(args.overallStats),
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
-		includeAllGames = Logic.nilOr(Logic.readBoolOrNil(args.includeAllGames), true),
 		opponent = self:readOpponent(mode),
 		timeRange = self:readTimeRange(),
 		aliases = {}, -- shut up anno warning
+		title = args.title,
+		showTier = not Logic.readBool(args.hide_tier),
+		showIcon = not Logic.readBool(args.hide_icon),
+		showVod = Logic.readBool(args.vod),
+		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true)
 	}
 	self.config.aliases = self:readAliases(mode)
 
@@ -202,6 +210,7 @@ function MatchTable:buildConditions()
 		:add{ConditionNode(ColumnName('finished'), Comparator.eq, 1)}
 		:add{self:buildDateConditions()}
 		:add{self:buildOpponentConditions()}
+		:add{self:buildAdditionalConditions()}
 		:toString()
 end
 
@@ -232,6 +241,31 @@ function MatchTable:buildOpponentConditions()
 	return conditions
 end
 
+---@return ConditionTree
+function MatchTable:buildAdditionalConditions()
+	local args = self.args
+	local conditions = ConditionTree(BooleanOperator.all)
+
+	local getOrCondition = function(lpdbKey, input)
+		if Logic.isEmpty(input) then return end
+
+		local orConditions = ConditionTree(BooleanOperator.any)
+		Array.forEach(mw.text.split(input, ','), function(value)
+			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
+		end)
+		conditions:add(orConditions)
+	end
+
+	getOrCondition('liquipediatier', args.tier)
+	getOrCondition('game', args.game)
+
+	if Logic.isNotEmpty(args.bestof) then
+		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
+	end
+
+	return conditions
+end
+
 ---@param record table
 ---@return MatchTableMatch?
 function MatchTable:matchFromRecord(record)
@@ -255,6 +289,7 @@ function MatchTable:matchFromRecord(record)
 		vods = self:vodsFromRecord(record),
 		type = record.type,
 		result = result,
+		game = record.game,
 	}
 end
 
@@ -335,6 +370,7 @@ function MatchTable:statsFromMatches()
 	end
 
 	Array.forEach(self.matches, function(match)
+		---TODO: decide if we want default wins to count towards this
 		if match.result.resultType == DRAW then
 			totalMatches.d = totalMatches.d + 1
 		elseif match.result.winner == 1 then
@@ -343,7 +379,7 @@ function MatchTable:statsFromMatches()
 			totalMatches.l = totalMatches.l + 1
 		end
 
-		if match.result.countGames or not self.config.includeAllGames then
+		if match.result.countGames then
 			totalGames.w = totalGames.w + nonNegative(match.result.opponent.score)
 			totalGames.l = totalGames.l + nonNegative(match.result.vs.score)
 		end
@@ -357,9 +393,120 @@ end
 
 ---@return Html
 function MatchTable:build()
+	local display = mw.html.create('table')
+		:addClass('wikitable wikitable-striped sortable')
+		:css('text-align', 'center')
+		:node(self.config.title and self:_titleRow())
+		:node(self:headerRow())
+
+	if Table.isEmpty(self.matches) then
+		local text = 'This ' .. (self.config.mode == PLAYER_MODE and PLAYER_MODE or TEAM_MODE)
+			.. ' has not played any matches under the specified conditions.'
+
+		return mw.html.create('tr')
+			:tag('td')
+				:attr('colspan', '100')
+				:css('font-style', 'italic')
+				:wikitext(text)
+				:done()
+	end
+
+	Array.forEach(self.matches, function(match)
+		display:node(self:matchRow())
+	end)
+
+	local wrappedTableNode = mw.html.create('div')
+		:addClass('match-table-wrapper')
+		:addClass('table-responsive')
+		:node(display)
+
+	return mw.html.create('div')
+		:node(self:displayStats())
+		:node(wrappedTableNode)
 
 end
 
---todo: display, incl. overall stats (runtime issues???)
+---@return Html?
+function MatchTable:_titleRow()
+	if not self.config.title then return end
+	return mw.html.create('tr')
+		:tag('th')
+			:attr('colspan', '100')
+			:addClass('unsortable')
+			:wikitext(self.config.title)
+			:done()
+end
+
+---@return Html
+function MatchTable:headerRow()
+	local th = function(text, width)
+		return mw.html.create('th'):css('max-width', width):node(text)
+	end
+
+	local config = self.config
+
+	return mw.html.create('tr')
+		:node(th('Date', '100px'))
+		:node(config.showTier and th('Tier', '70px') or nil)
+		:node(config.showIcon and th(nil, '25px'):addClass('unsortable') or nil)
+		:node(config.displayGameIcons and th(nil, '25px') or nil)
+		:node(th('Tournament'))
+		:node(th('Participant', '80px'))
+		:node(config.showResult and th('Score', '40px'):addClass('unsortable') or nil)
+		:node(config.showResult and th('Vs', '80px') or nil)
+		:node(config.showVod and th('VOD', '60px') or nil)
+end
+
+---@return Html?
+function MatchTable:matchRow()
+	--TODO: build row display
+end
+
+---@return Html?
+function MatchTable:displayStats()
+	if not self.config.showStats or Table.isEmpty(self.matches) then return end
+
+	local endTimeStamp = math.min(self.matches[1].timestamp, self.config.timeRange.endDate)
+	local startTimeStamp = math.max(self.matches[#self.matches].timestamp, self.config.timeRange.startDate)
+
+	---@param data {w: number, d: number, l: number}
+	---@param statsType string
+	---@return Html?
+	local displayScores = function(data, statsType)
+		local sum = data.w + data.d + data.l
+		if sum == 0 then return end
+
+		local scoreText = table.concat(Array.extend(
+			data.w .. 'W',
+			data.d > 0 and (data.d .. 'D') or nil,
+			data.l .. 'L'
+		), ' : ')
+
+		local percentage = (data.w + 0.5 * data.d) / sum
+
+		local parts = {
+			scoreText,
+			'(' .. percentage .. '%)',
+			'in',
+			statsType,
+		}
+
+		return mw.html.create('div')
+			:wikitext(table.concat(parts, ' '))
+	end
+
+	--TODO: decide if we should format timestamps differently here???
+	local titleText = 'For matches between ' .. DateExt.toYmdInUtc(startTimeStamp) ..
+		' and ' .. DateExt.toYmdInUtc(endTimeStamp) .. ':'
+
+	local titleNode = mw.html.create('div')
+		:css('font-weight', 'bold')
+		:wikitext(titleText)
+
+	return mw.html.create('div')
+		:node(titleNode)
+		:node(displayScores(self.stats.matches, 'matches'))
+		:node(displayScores(self.stats.games, 'games'))
+end
 
 return MatchTable
