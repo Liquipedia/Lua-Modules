@@ -15,19 +15,15 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomCompany = Class.new()
-
+---@class FifaCompanyInfobox: CompanyInfobox
+local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomCompany.run(frame)
-	local company = Company(frame)
-	_args = company.args
-
-	company.createWidgetInjector = CustomCompany.createWidgetInjector
+	local company = CustomCompany(frame)
+	company:setWidgetInjector(CustomInjector(company))
 
 	return company:createInfobox()
 end
@@ -36,16 +32,12 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'parent' then
-		table.insert(widgets, Cell{name = 'Focus', content = {_args.focus}})
+		table.insert(widgets, Cell{name = 'Focus', content = {args.focus}})
 	end
 
 	return widgets
-end
-
----@return WidgetInjector
-function CustomCompany:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomCompany
