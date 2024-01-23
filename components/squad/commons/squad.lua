@@ -50,7 +50,9 @@ end
 
 function Squad:title()
 	local defaultTitle
-	if self.type == Squad.TYPE_INACTIVE then
+	if self.type == Squad.TYPE_FORMER then
+		defaultTitle = 'Former Squad'
+	elseif self.type == Squad.TYPE_INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
