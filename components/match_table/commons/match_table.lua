@@ -8,13 +8,19 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local Game = require('Module:Game')
+local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+local Tier = require('Module:Tier/Custom')
+local VodLink = require('Module:VodLink')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
 
@@ -33,6 +39,8 @@ local PLAYER_MODE = 'player'
 local TEAM_MODE = 'team'
 local UTC = 'UTC'
 local DRAW = 'draw'
+local INVALID_TIER_DISPLAY = 'Undefined'
+local INVALID_TIER_SORT = 'ZZ'
 
 ---@alias MatchTableMode `PLAYER_MODE` | `TEAM_MODE`
 
@@ -412,7 +420,7 @@ function MatchTable:build()
 	end
 
 	Array.forEach(self.matches, function(match)
-		display:node(self:matchRow())
+		display:node(self:matchRow(match))
 	end)
 
 	local wrappedTableNode = mw.html.create('div')
@@ -439,27 +447,148 @@ end
 
 ---@return Html
 function MatchTable:headerRow()
-	local th = function(text, width)
+	local makeHeaderCell = function(text, width)
 		return mw.html.create('th'):css('max-width', width):node(text)
 	end
 
 	local config = self.config
 
 	return mw.html.create('tr')
-		:node(th('Date', '100px'))
-		:node(config.showTier and th('Tier', '70px') or nil)
+		:node(makeHeaderCell('Date', '100px'))
+		:node(config.showTier and makeHeaderCell('Tier', '70px') or nil)
+		:node(config.displayGameIcons and makeHeaderCell(nil, '25px') or nil)
 		:node(config.showIcon and th(nil, '25px'):addClass('unsortable') or nil)
-		:node(config.displayGameIcons and th(nil, '25px') or nil)
-		:node(th('Tournament'))
-		:node(th('Participant', '80px'))
-		:node(config.showResult and th('Score', '40px'):addClass('unsortable') or nil)
-		:node(config.showResult and th('Vs', '80px') or nil)
-		:node(config.showVod and th('VOD', '60px') or nil)
+		:node(makeHeaderCell('Tournament'))
+		:node(config.showResult and makeHeaderCell('Participant', '80px') or nil)
+		:node(config.showResult and makeHeaderCell('Score', '40px'):addClass('unsortable') or nil)
+		:node(config.showResult and makeHeaderCell('Vs', '80px') or nil)
+		:node(config.showVod and makeHeaderCell('VOD', '60px') or nil)
 end
 
+---@param match MatchTableMatch
 ---@return Html?
-function MatchTable:matchRow()
-	--TODO: build row display
+function MatchTable:matchRow(match)
+	return mw.html.create('tr')
+		:addClass(self:_getBackgroundClass(match.result.winner))
+		:node(self:_displayDate(match))
+		:node(self:_dispalyTier(match))
+		:node(self:_displayGameIcon(match))
+		:node(self:_displayIcon(match))
+		:node(self:_displayTournament(match))
+		:node(self:_displayMatch(match))
+		:node(self:__displayVods(match))
+end
+
+---@param match MatchTableMatch
+---@return Html
+function MatchTable:_displayDate(match)
+	local cell = mw.html.create('td')
+		:css('text-align', 'left')
+
+	if not match.timeIsExact then
+		return cell:node(DateExt.formatTimestamp('F j, Y', match.timestamp or ''))
+	end
+
+	return Countdown._create{
+		timestamp = match.timestamp
+	}
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:_dispalyTier(match)
+	if not self.config.showTier then return end
+
+	local tier, tierType, options = Tier.parseFromQueryData(match)
+	options.link = true
+	options.onlyTierTypeIfBoth = true
+
+	if not Tier.isValid(tier, tierType) then
+		return mw.html.create('td')
+			:attr('data-sort-value', INVALID_TIER_DISPLAY)
+			:wikitext(INVALID_TIER_SORT)
+	end
+
+	return mw.html.create('td')
+		:attr('data-sort-value', Tier.toSortValue(tier, tierType))
+		:wikitext(Tier.display(tier, tierType, options))
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:_displayGameIcon(match)
+	if not self.config.displayGameIcons then return end
+
+	return mw.html.create('td')
+		:node(Game.icon{game = match.game})
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:_displayIcon(match)
+	if not self.config.showIcon then return end
+
+	return mw.html.create('td')
+		:node(LeagueIcon.display{
+			icon = match.icon,
+			iconDark = match.iconDark,
+			link = match.pageName,
+			name = match.displayName,
+			options = {noTemplate = true},
+		})
+end
+
+---@param match MatchTableMatch
+---@return Html
+function MatchTable:_displayTournament(match)
+	return mw.html.create('td')
+		:css('text-align', 'left')
+		:css('max-width', '400px')
+		:wikitext(Page.makeInternalLink(match.displayName, match.pageName))
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:_displayMatch(match)
+	if not self.config.showResult then
+		return
+	elseif Logic.isEmpty(match.result.vs) then
+		return self:nonStandardMatch(match)
+	end
+
+	--TODO:Opponentdisplay and vsdisplay
+	intentionalAnnoErrorToFindItEasier
+end
+
+---overwritable for wikis that have BR/FFA matches
+---@param match MatchTableMatch
+---@return Html
+function MatchTable:nonStandardMatch(match)
+	return mw.html.create('td')
+		:attr('colspan', 3)
+		:wikitext('')
+end
+
+---@param match MatchTableMatch
+---@return Html?
+function MatchTable:__displayVods(match)
+	if not self.config.showVod then return end
+
+	local vodsNode = mw.html.create('td')
+	Array.forEach(match.vods, function(vod)
+		vodsNode:node(VodLink.display{vod = vod.link, gamenum = vod.index})
+	end)
+
+	return vodsNode
+end
+
+---@param winner any
+---@return string?
+function MatchTable:_getBackgroundClass(winner)
+	return winner == 1 and 'bg-up' or
+		winner == 0 and 'bg-draw' or
+		winner == 2 and 'bg-down' or
+		nil
 end
 
 ---@return Html?
