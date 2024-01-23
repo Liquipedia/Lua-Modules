@@ -77,17 +77,6 @@ function Countdown._create(args)
 		end
 	end
 
-	--legacy???
-	if args.pandatv then
-		wrapper:attr('data-stream-pandatv', args.pandatv)
-	end
-	if args.play2live then
-		wrapper:attr('data-stream-play2live', args.play2live)
-	end
-	if args.smashcast then
-		wrapper:attr('data-stream-smashcast', args.smashcast)
-	end
-
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
 	end
