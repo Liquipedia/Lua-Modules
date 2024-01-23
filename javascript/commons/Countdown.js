@@ -114,22 +114,22 @@ liquipedia.countdown = {
 			Trovo: 'trovo'
 		};
 		for ( const dataSetName in streamKeys ) {
-			const icon = streamKeys[dataSetName];
+			const icon = streamKeys[ dataSetName ];
 			const platform = dataSetName.toLowerCase();
-			if ( timerObjectNode.dataset['stream' + dataSetName] ) {
-				streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset['stream' + dataSetName] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
+			if ( timerObjectNode.dataset[ 'stream' + dataSetName ] ) {
+				streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset[ 'stream' + dataSetName ] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
 				let i = 2
-				while( timerObjectNode.dataset['stream' + dataSetName + i] ) {
-					streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset['stream' + dataSetName + i] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
+				while ( timerObjectNode.dataset[ 'stream' + dataSetName + i ] ) {
+					streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset[ 'stream' + dataSetName + i ] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
 					i++;
 				}
 			}
 		}
 		if ( timerObjectNode.dataset.streamTl ) {
 			streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset.streamTl + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
-			let tlStreamIndex = 2
-			while( timerObjectNode.dataset['streamTl' + tlStreamIndex] ) {
-				streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset['streamTl' + tlStreamIndex] + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
+			let tlStreamIndex = 2;
+			while ( timerObjectNode.dataset[ 'streamTl' + tlStreamIndex ] ) {
+				streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset[ 'streamTl' + tlStreamIndex ] + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
 				tlStreamIndex++;
 			}
 		}
