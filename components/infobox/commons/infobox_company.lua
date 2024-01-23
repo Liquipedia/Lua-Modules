@@ -12,7 +12,6 @@ local Links = require('Module:Links')
 local Locale = require('Module:Locale')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
