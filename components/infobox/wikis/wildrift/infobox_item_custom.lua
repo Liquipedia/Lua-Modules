@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 			})
 		end
 		if String.isEmpty(args.itemname) then return widgets end
-		local iconImage = Template.safeExpand(mw.getCurrentFrame(), 'ItemIcon', {string.lower(args.itemname)}, '')
+		local iconImage = Template.safeExpand(mw.getCurrentFrame(), 'ItemIcon', {string.lower(args.itemname)}) or ''
 		if String.isNotEmpty(args.itemtext) then
 			iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 		end
