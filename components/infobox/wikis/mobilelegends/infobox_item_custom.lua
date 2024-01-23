@@ -234,10 +234,10 @@ end
 ---@param base string?
 ---@return string?
 function CustomItem._positivePercentDisplay(caller, base)
-	if String.isNotEmpty(caller.args[base]) and not Logic.isNumeric(caller.args[base]) then
-		error('"' .. base .. '" has to be numerical')
-	elseif String.isEmpty(caller.args[base]) then
+	if String.isEmpty(caller.args[base]) and  then
 		return
+	elseif not Logic.isNumeric(caller.args[base]) then
+		error('"' .. base .. '" has to be numerical')
 	end
 	---@cast base -nil
 	return '+ ' .. (tonumber(caller.args[base]) * 100) .. '%'
