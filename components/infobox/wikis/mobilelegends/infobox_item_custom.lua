@@ -263,7 +263,6 @@ end
 ---@param attributeCells {name: string, parameter: string?, funct: string?}[]
 ---@return table
 function CustomItem:_getAttributeCells(attributeCells)
-	local widgets = {}
 	return Array.map(attributeCells, function(attribute)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
