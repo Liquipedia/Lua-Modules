@@ -13,98 +13,91 @@ local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Skill = Lua.import('Module:Infobox/Skill', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Skill = Lua.import('Module:Infobox/Skill')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomSkill = Class.new()
+---@class StarcraftSkillInfobox: SkillInfobox
+local CustomSkill = Class.new(Skill)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomSkill.run(frame)
-	local customSkill = Skill(frame)
-	customSkill.createWidgetInjector = CustomSkill.createWidgetInjector
-	customSkill.getCategories = CustomSkill.getCategories
-	_args = customSkill.args
-	assert(_args.informationType, 'Missing "informationType"')
-	return customSkill:createInfobox()
-end
+	local skill = CustomSkill(frame)
 
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Area of Effect', content = {_args.area}},
-		Cell{name = 'Move Speed', content = {_args.movespeed}},
-		Cell{name = 'Researched from', content = {CustomSkill:getResearchFrom()}},
-		Cell{name = 'Research Cost', content = {CustomSkill:getResearchCost()}},
-		Cell{name = 'Research Hotkey', content = {CustomSkill:getResearchHotkey()}},
-	}
+	assert(skill.args.informationType, 'Missing "informationType"')
+
+	skill:setWidgetInjector(CustomInjector(skill))
+
+	return skill:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' then
-		return {Cell{name = 'Cost', content = {CustomSkill:getCostDisplay()}}}
+	local args = self.caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Area of Effect', content = {args.area}},
+			Cell{name = 'Move Speed', content = {args.movespeed}},
+			Cell{name = 'Researched from', content = {self.caller:getResearchFrom()}},
+			Cell{name = 'Research Cost', content = {self.caller:getResearchCost()}},
+			Cell{name = 'Research Hotkey', content = {self.caller:getResearchHotkey()}},
+		}
+	elseif id == 'cost' then
+		return {Cell{name = 'Cost', content = {self.caller:getCostDisplay()}}}
 	elseif id == 'hotkey' then
-		return {Cell{name = '[[Shortcuts|Hotkey]]', content = {CustomSkill:getHotkeys()}}}
+		return {Cell{name = '[[Shortcuts|Hotkey]]', content = {self.caller:getHotkeys()}}}
 	elseif id == 'cooldown' then
-		return {Cell{name = '[[Cooldown]]', content = {_args.cooldown}}}
+		return {Cell{name = '[[Cooldown]]', content = {args.cooldown}}}
 	elseif id == 'duration' then
-		return {Cell{name = '[[Game Speed|Duration]]', content = {_args.duration}}}
+		return {Cell{name = '[[Game Speed|Duration]]', content = {args.duration}}}
 	end
 
 	return widgets
 end
 
----@return WidgetInjector
-function CustomSkill:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@return string?
 function CustomSkill:getResearchCost()
-	if String.isEmpty(_args.from) then
+	if String.isEmpty(self.args.from) then
 		return nil
 	end
 
 	return CostDisplay.run{
-		faction = _args.race,
-		minerals = _args.min,
-		gas = _args.gas,
-		buildTime = _args.buildtime,
-		supply = _args.supply or _args.control or _args.psy,
+		faction = self.args.race,
+		minerals = self.args.min,
+		gas = self.args.gas,
+		buildTime = self.args.buildtime,
+		supply = self.args.supply or self.args.control or self.args.psy,
 	}
 end
 
 ---@return string
 function CustomSkill:getResearchFrom()
-	if String.isEmpty(_args.from) then
+	if String.isEmpty(self.args.from) then
 		return 'No research needed'
-	elseif String.isEmpty(_args.from2) then
-		return '[[' .. _args.from .. ']]'
+	elseif String.isEmpty(self.args.from2) then
+		return '[[' .. self.args.from .. ']]'
 	else
-		return '[[' .. _args.from .. ']], [[' .. _args.from2 .. ']]'
+		return '[[' .. self.args.from .. ']], [[' .. self.args.from2 .. ']]'
 	end
 end
 
 ---@return string?
 function CustomSkill:getResearchHotkey()
-	if String.isEmpty(_args.from) then
+	if String.isEmpty(self.args.from) then
 		return
 	end
 
-	return Hotkeys.hotkey(_args.rshortcut)
+	return Hotkeys.hotkey(self.args.rshortcut)
 end
 
 ---@param args table
@@ -122,18 +115,18 @@ end
 
 ---@return string?
 function CustomSkill:getHotkeys()
-	if not String.isEmpty(_args.shortcut) then
-		if not String.isEmpty(_args.shortcut2) then
-			return Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'slash')
+	if not String.isEmpty(self.args.shortcut) then
+		if not String.isEmpty(self.args.shortcut2) then
+			return Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'slash')
 		else
-			return Hotkeys.hotkey(_args.shortcut)
+			return Hotkeys.hotkey(self.args.shortcut)
 		end
 	end
 end
 
 ---@return string
 function CustomSkill:getCostDisplay()
-	local energy = tonumber(_args.energy) or 0
+	local energy = tonumber(self.args.energy) or 0
 	return ENERGY_ICON .. '&nbsp;' .. energy
 end
 

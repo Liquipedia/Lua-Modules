@@ -7,11 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -81,7 +84,7 @@ function Patch:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain() then
+	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		infobox:categories(self:getInformationType(args))
 		self:setLpdbData(args)
 	end
@@ -90,21 +93,31 @@ function Patch:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---Adjust Lpdb data
+---@param lpdbData table
+---@param args table
+---@return table
+function Patch:addToLpdb(lpdbData, args)
+	return lpdbData
+end
+
+--- Allows for overriding this functionality
 ---@param args table
 function Patch:setLpdbData(args)
-	local date = args.release
-	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	local informationType = self:getInformationType(args):lower()
-	mw.ext.LiquipediaDB.lpdb_datapoint(informationType .. '_' .. self.name, {
-		name = args.name,
-		type = informationType,
-		information = monthAndDay,
+	local lpdbData = {
+		name = self.name,
+		type = self:getInformationType(args):lower(),
 		image = args.image,
-		date = date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+		imagedark = args.imagedark,
+		date = args.release,
+		information = mw.getContentLanguage():formatDate('m-d', args.release),
+		extradata = {
 			highlights = self:getAllArgsForBase(args, 'highlight')
 		},
-	})
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality

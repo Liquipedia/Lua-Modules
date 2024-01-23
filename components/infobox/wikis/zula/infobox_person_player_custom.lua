@@ -11,52 +11,45 @@ local Lua = require('Module:Lua')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-local _role
-local _role2
-
-local CustomPlayer = Class.new()
+---@class ZulaInfoboxPlayer: Person
+---@field role table
+---@field role2 table
+local CustomPlayer = Class.new(Player)
 
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-
-	_args = player.args
-	_role = Role.run({role = _args.role})
-	_role2 = Role.run({role = _args.role2})
+	player.args.autoTeam = true
+	player.role = Role.run({role = player.args.role})
+	player.role2 = Role.run({role = player.args.role2})
 
 	return player:createInfobox(frame)
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'history' then
-		local manualHistory = _args.history
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
-			player = _pagename
+			player = self.caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -70,13 +63,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = _role.role
-	lpdbData.extradata.role2 = _role2.role
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = self.role.role
+	lpdbData.extradata.role2 = self.role2.role
 	return lpdbData
 end
 

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -17,8 +18,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
@@ -130,6 +131,7 @@ end
 
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -171,7 +173,7 @@ function matchFunctions.getOpponents(args)
 	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
 	bestof = tonumber(bestof) or 5
 	Variables.varDefine('bestof', bestof)
-	local firstTo = math.ceil(bestof / 2)
+	local firstTo = bestof / 2
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
@@ -194,7 +196,7 @@ function matchFunctions.getOpponents(args)
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = 'S'
 				isScoreSet = true
-				if firstTo <= tonumber(opponent.score) then
+				if firstTo < tonumber(opponent.score) then
 					args.finished = true
 				end
 			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -236,7 +238,7 @@ function matchFunctions.getOpponents(args)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
@@ -245,26 +247,63 @@ function matchFunctions.getOpponents(args)
 		end
 	end
 
+	if not args.winner then
+		matchFunctions._checkDraw(opponents, firstTo, args)
+	end
+
 	-- apply placements and winner if finshed
 	if Logic.readBool(args.finished) then
-		local placement = 1
-		-- luacheck: push ignore
-		for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-			if placement == 1 then
-				args.winner = opponentIndex
-			end
-			opponent.placement = placement
-			args['opponent' .. opponentIndex] = opponent
-			placement = placement + 1
+		matchFunctions._setPlacementsAndWinner(opponents, args)
+	end
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		args['opponent' .. opponentIndex] = opponent
+	end)
+
+	return args
+end
+
+---@param opponents table
+---@param match table
+function matchFunctions._setPlacementsAndWinner(opponents, match)
+	local counter = 0
+	local lastScore
+	local lastPlacement
+
+	match.winner = tonumber(match.winner)
+
+	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
+		local score = tonumber(opponent.score)
+		counter = counter + 1
+		if not match.winner then
+			match.winner = opponentIndex
 		end
-	-- luacheck: pop
-	-- only apply arg changes otherwise
-	else
-		for opponentIndex, opponent in pairs(opponents) do
-			args['opponent' .. opponentIndex] = opponent
+		if lastScore == score then
+			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or lastPlacement
+		else
+			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or counter
+			lastPlacement = counter
+			lastScore = score or nil
 		end
 	end
-	return args
+end
+
+---@param opponents table
+---@param firstTo number
+---@param match table
+function matchFunctions._checkDraw(opponents, firstTo, match)
+	local finished = Logic.readBool(match.finished)
+	local score1 = opponents[1].score
+	local isDraw = Array.all(opponents, function(opponent)
+		return opponent.score == firstTo
+			or finished and opponent.score == score1
+	end)
+
+	if not isDraw then return end
+
+	match.winner = 0
+	match.finished = true
+	match.resulttype = 'draw'
 end
 
 --
@@ -375,6 +414,7 @@ end
 --in the team template extension
 function opponentFunctions.getLegacyTeamName(template)
 	local team = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	if not team then return end
 	team = team:gsub('%&', '')
 	team = String.split(team, 'link=')[2]
 	team = String.split(team, ']]')[1]
@@ -383,6 +423,7 @@ end
 
 function opponentFunctions.getLegacyTeamIcon(template)
 	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
+	if not iconTemplate then return end
 	iconTemplate = iconTemplate:gsub('%&', '')
 	local icon = String.split(iconTemplate, 'File:')[2]
 	local iconDark = String.split(iconTemplate, 'File:')[3] or icon

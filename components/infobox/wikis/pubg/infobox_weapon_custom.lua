@@ -6,68 +6,58 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
 local Center = Widgets.Center
+local Title = Widgets.Title
 
-local CustomWeapon = Class.new()
+---@class PubgWeaponInfobox: WeaponInfobox
+local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
-
-local _weapon
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomWeapon.run(frame)
-	local weapon = Weapon(frame)
-	_weapon = weapon
-	_args = _weapon.args
-	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
+	local weapon = CustomWeapon(frame)
+	weapon:setWidgetInjector(CustomInjector(weapon))
+
 	return weapon:createInfobox()
 end
 
----@return WidgetInjector
-function CustomWeapon:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Ammo Type',
-		content = {args.ammotype}
-	})
-	table.insert(widgets, Cell{
-		name = 'Throw Speed',
-		content = {args.throwspeed}
-	})
-	table.insert(widgets, Cell{
-		name = 'Throw Cooldown',
-		content = {args.throwcooldown}
-	})
-	if String.isNotEmpty(args.map1) then
-		local maps = {}
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Ammo Type', content = {args.ammotype}},
+			Cell{name = 'Throw Speed', content = {args.throwspeed}},
+			Cell{name = 'Throw Cooldown', content = {args.throwcooldown}}
+		)
 
-		for _, map in ipairs(_weapon:getAllArgsForBase(args, 'map')) do
-			table.insert(maps, tostring(CustomWeapon:_createNoWrappingSpan(
-						PageLink.makeInternalLink({}, map)
-					)))
-
+		if String.isEmpty(args.map1) then
+			return widgets
 		end
+
+		local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
+			return tostring(CustomWeapon:_createNoWrappingSpan(PageLink.makeInternalLink({}, map)))
+		end)
+
 		table.insert(widgets, Title{name = 'Maps'})
 		table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 	end
+
 	return widgets
 end
 

@@ -13,8 +13,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -32,107 +32,97 @@ local ORGANIZER_ICONS = {
 	['faceit'] = '[[File:FACEIT icon allmode.png|x18px|link=Esports Engine|Esports Engine]] ',
 }
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class BrawlstarsLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'organizers' then
-		local organizers = CustomLeague._createOrganizers()
+	local args = self.caller.args
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Teams', content = {args.team_number}})
+	elseif id == 'organizers' then
+		local organizers = self.caller:_createOrganizers()
 		local title = Table.size(organizers) == 1 and 'Organizer' or 'Organizers'
 
-		return {
-			Cell{
-				name = title,
-				content = organizers
-			}
-		}
+		return {Cell{name = title, content = organizers}}
 	end
 
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {args.team_number}
-	})
-
-	return widgets
-end
-
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args['supercell-sponsored'])
 end
 
-function CustomLeague:appendLiquipediatierDisplay()
-	return Logic.readBool(_args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
+---@param args table
+---@return string
+function CustomLeague:appendLiquipediatierDisplay(args)
+	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_publishertier', args['supercell-sponsored'])
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = args['supercell-sponsored']
+end
 
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
 	Variables.varDefine('tournament_tier', args.liquipediatier or '')
 	Variables.varDefine('tournament_prizepool', args.prizepool or '')
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
+---@param organizer string?
+---@return string
 function CustomLeague._organizerIcon(organizer)
-	if not organizer then return '' end
-
-	return ORGANIZER_ICONS[organizer:lower()] or ''
+	return ORGANIZER_ICONS[string.lower(organizer or '')] or ''
 end
 
-function CustomLeague._createOrganizers()
-	if not _args.organizer then
+---@return string[]
+function CustomLeague:_createOrganizers()
+	local args = self.args
+	if not args.organizer then
 		return {}
 	end
 
 	local organizers = {
-		CustomLeague._organizerIcon(_args.organizer) .. _league:createLink(
-			_args.organizer, _args['organizer-name'], _args['organizer-link'], _args.organizerref),
+		CustomLeague._organizerIcon(args.organizer) .. self:createLink(
+			args.organizer, args['organizer-name'], args['organizer-link'], args.organizerref),
 	}
 
 	local index = 2
-	while not String.isEmpty(_args['organizer' .. index]) do
+	while not String.isEmpty(args['organizer' .. index]) do
 		table.insert(
 			organizers,
-			CustomLeague._organizerIcon(_args['organizer' .. index]) .. _league:createLink(
-				_args['organizer' .. index],
-				_args['organizer' .. index .. '-name'],
-				_args['organizer' .. index .. '-link'],
-				_args['organizerref' .. index])
+			CustomLeague._organizerIcon(args['organizer' .. index]) .. self:createLink(
+				args['organizer' .. index],
+				args['organizer' .. index .. '-name'],
+				args['organizer' .. index .. '-link'],
+				args['organizerref' .. index])
 		)
 		index = index + 1
 	end

@@ -73,7 +73,7 @@ return {
 	{
 		name = 'lpl',
 		icon = 'LPL Play icon.png',
-		prefixLink = 'https://letsplay.live/match/',
+		prefixLink = 'https://old.letsplay.live/match/',
 		label = 'Matchpage on LPL Play',
 	},
 	{

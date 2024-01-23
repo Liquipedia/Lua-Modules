@@ -12,13 +12,13 @@ local ClassIcon = require('Module:ClassIcon')
 local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local HeroWL = require('Module:HeroWL')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -107,7 +107,7 @@ end
 function CustomHero._heroStatsDisplay()
 	local stats = mw.text.split(HeroWL.create({hero = _args.heroname or _pagename}), ';')
 	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-	winPercentage = Math.round({winPercentage, 4}) * 100
+	winPercentage = Math.round(winPercentage, 4) * 100
 	return (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 end
 

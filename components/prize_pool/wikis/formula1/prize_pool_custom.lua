@@ -14,8 +14,8 @@ local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
-local PrizePoolPlacement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
+local PrizePoolPlacement = Lua.import('Module:PrizePool/Placement')
 
 PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatuses, {
 	DNS = {
@@ -56,7 +56,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 	},
 })
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}

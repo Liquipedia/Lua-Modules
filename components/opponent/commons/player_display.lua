@@ -14,8 +14,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Flags = require('Module:Flags')
 local Abbreviation = require('Module:Abbreviation')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 

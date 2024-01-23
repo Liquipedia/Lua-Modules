@@ -1,5 +1,6 @@
--- luacheck: ignore
 ---@meta mw
+-- luacheck: ignore
+---This file contains definitions and simulations of the MediaWiki enviroment
 mw = {}
 
 ---Adds a warning which is displayed above the preview when previewing an edit. `text` is parsed as wikitext.
@@ -34,7 +35,10 @@ function mw.isSubsting() end
 ---See www.mediawiki.org/wiki/Extension:Scribunto/Lua_reference_manual#mw.loadData
 ---@param module string
 ---@return table
-function mw.loadData(module) end
+function mw.loadData(module)
+	--TODO: add __index that errors
+	return require(module)
+end
 
 ---This is the same as mw.loadData(), except it loads data from JSON pages rather than Lua tables. The JSON content must be an array or object. See also mw.text.jsonDecode().
 ---@param page string
@@ -56,7 +60,7 @@ function mw.log(...) end
 function mw.logObject(object, prefix) end
 
 ---@class Frame
----@field args table
+---@field args table?
 mw.frame = {}
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
@@ -198,6 +202,9 @@ function mw.html:done() end
 ---@return Html
 function mw.html:allDone() end
 
+--- Include the full functionality for faking
+mw.html = require('3rd.mw.html')
+
 ---@class Language
 mw.language = {}
 
@@ -215,7 +222,9 @@ function mw.language.fetchLanguageNames(inLanguage, include) end
 
 ---Returns a new language object for the wiki's default content language.
 ---@return Language
-function mw.language.getContentLanguage() end
+function mw.language.getContentLanguage()
+	return setmetatable(mw.language, {})
+end
 mw.getContentLanguage = mw.language.getContentLanguage
 
 ---Returns a list of MediaWiki's fallback language codes for the specified code.
@@ -246,7 +255,9 @@ function mw.language.isValidCode(code) end
 ---Creates a new language object. Language objects do not have any publicly accessible properties, but they do have several methods, which are documented below.
 ---@param code string
 ---@return Language
-function mw.language.new(code) end
+function mw.language.new(code)
+	return mw.language.getContentLanguage()
+end
 mw.getLanguage = mw.language.new
 
 ---Returns the language code for this language object.
@@ -279,7 +290,13 @@ function mw.language:uc(str) end
 ---Converts the first character of the string to uppercase.
 ---@param str string
 ---@return string
-function mw.language:ucfirst(str) end
+function mw.language:ucfirst(str)
+	-- TODO: UTF8 support in fake
+	if str == 'übung' then
+		return 'Übung'
+	end
+	return (str:gsub("^%l", string.upper))
+end
 
 ---Converts the string to a representation appropriate for case-insensitive comparison. Note that the result may not make any sense when displayed.
 ---@param str string
@@ -289,8 +306,18 @@ function mw.language:caseFold(str) end
 ---Formats a number with grouping and decimal separators appropriate for the given language. Given 123456.78, this may produce "123,456.78", "123.456,78", or even something like "١٢٣٬٤٥٦٫٧٨" depending on the language and wiki configuration.
 ---@param num number
 ---@param options? {noCommafy: boolean}
----@return number
-function mw.language:formatNum(num, options) end
+---@return string
+function mw.language:formatNum(num, options)
+	local k
+	local formatted = tostring(num)
+	while true do
+		formatted, k = string.gsub(formatted, '^(-?%d+)(%d%d%d)', '%1,%2')
+		if (k == 0) then
+			break
+		end
+	end
+	return formatted
+end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
@@ -476,14 +503,36 @@ function mw.text.listToText(list, separator, conjunction) end
 ---Replaces various characters in the string with HTML entities to prevent their interpretation as wikitext.
 ---@param s string
 ---@return string
-function mw.text.nowiki(s) end
+function mw.text.nowiki(s)
+	-- TODO: This only covers some
+	return (string.gsub( s, '["&\'<=>%[%]{|}]', {
+		['"'] = '&#34;',
+		['&'] = '&#38;',
+		["'"] = '&#39;',
+		['<'] = '&#60;',
+		['='] = '&#61;',
+		['>'] = '&#62;',
+		['['] = '&#91;',
+		[']'] = '&#93;',
+		['{'] = '&#123;',
+		['|'] = '&#124;',
+		['}'] = '&#125;',
+	}))
+end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
 ---@param s string
 ---@param pattern string?
 ---@param plain boolean?
 ---@return string[]
-function mw.text.split(s, pattern, plain) end
+function mw.text.split(s, pattern, plain)
+	pattern = pattern or "%s"
+	local t = {}
+	for str in string.gmatch(s, "([^"..pattern.."]+)") do
+			table.insert(t, str)
+	end
+	return t
+end
 
 ---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
 ---@param s string
@@ -504,7 +553,10 @@ function mw.text.tag(name, attrs, content) end
 ---@param s string
 ---@param charset string?
 ---@return string
-function mw.text.trim(s, charset) end
+function mw.text.trim(s, charset)
+	-- TODO: UTF8 support in fake
+	return string.match( s, '^()%s*$' ) and '' or string.match( s, '^%s*(.*%S)' )
+end
 
 ---Truncates text to the specified length in code points, adding ellipsis if truncation was performed. If length is positive, the end of the string will be truncated; if negative, the beginning will be removed
 ---@param text string
@@ -651,5 +703,209 @@ function mw.title:canonicalUrl(query) end
 ---Returns the (unparsed) content of the page, or nil if there is no page. The page will be recorded as a transclusion.
 ---@return string?
 function mw.title:getContent() end
+
+---@class ustring
+---@field maxPatternLength number The maximum allowed length of a pattern, in bytes.
+---@field maxStringLength number The maximum allowed length of a string, in bytes.
+mw.ustring = {}
+
+---Returns individual bytes; identical to string.byte().
+---@see string.byte
+---@param s  string|number
+---@param i? integer
+---@param j? integer
+---@return integer ...
+function mw.ustring.byte(s, i, j) end
+
+---Returns the byte offset of a character in the string. The default for both l and i is 1. i may be negative, in which case it counts from the end of the string.
+---@param s  string|number
+---@param l? integer
+---@param i? integer
+---@return integer ...
+function mw.ustring.byteoffset(s, l, i) end
+
+---Much like string.char(), except that the integers are Unicode codepoints rather than byte values.
+---@see string.char
+---@param ... integer
+---@return string
+function mw.ustring.char(...) end
+
+---Much like string.byte(), except that the return values are codepoints and the offsets are characters rather than bytes.
+---@see string.byte
+---@param s  string|number
+---@param i? integer
+---@param j? integer
+---@return integer ...
+function mw.ustring.codepoint(s, i, j) end
+
+---Much like string.find(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
+---@see string.find
+---@param s       string|number
+---@param pattern string|number
+---@param init?   integer
+---@param plain?  boolean
+---@return integer|nil start
+---@return integer|nil end
+---@return any|nil ... captured
+function mw.ustring.find(s, pattern, init, plain) end
+
+---Identical to string.format(). Widths and precisions for strings are expressed in bytes, not codepoints.
+---@see string.format
+---@param format string|number
+---@param ... any
+---@return string
+function mw.ustring.format(format, ...) end
+
+---Returns three values for iterating over the codepoints in the string. i defaults to 1, and j to -1. This is intended for use in the iterator form of for:
+---@param s  string|number
+---@param i? integer
+---@param j? integer
+---@return string
+function mw.ustring.gcodepoint(s, i, j) end
+
+---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
+---@see string.gmatch
+---@param s       string|number
+---@param pattern string|number
+---@return fun():string, ...
+function mw.ustring.gmatch(s, pattern) end
+
+---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
+---@see string.gsub
+---@param s       string|number
+---@param pattern string|number
+---@param repl    string|number|table|function
+---@param n?      integer
+---@return string
+---@return integer count
+function mw.ustring.gsub(s, pattern, repl, n) end
+
+---Returns true if the string is valid UTF-8, false if not.
+---@param s string|number
+---@return boolean
+function mw.ustring.isutf8(s) end
+
+---Returns the length of the string in codepoints, or nil if the string is not valid UTF-8.
+---@see string.len
+---@param s string|number
+---@return integer
+function mw.ustring.len(s) end
+
+---Much like string.lower(), except that all characters with lowercase to uppercase definitions in Unicode are converted.
+---@see string.lower
+---@param s string|number
+---@return string
+function mw.ustring.lower(s) return string.lower(s) end
+
+---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
+---@see string.match
+---@param s       string|number
+---@param pattern string|number
+---@param init?   integer
+---@return any ...
+function mw.ustring.match(s, pattern, init) end
+
+---Identical to string.rep().
+---@see string.rep
+---@param s    string|number
+---@param n    integer
+---@return string
+function mw.ustring.rep(s, n) end
+
+---Identical to string.sub().
+---@see string.sub
+---@param s  string|number
+---@param i  integer
+---@param j? integer
+---@return string
+function mw.ustring.sub(s, i, j) end
+
+---Converts the string to Normalization Form C (also known as Normalization Form Canonical Composition). Returns nil if the string is not valid UTF-8.
+---@param s  string|number
+---@return string?
+function mw.ustring.toNFC(s) return tostring(s) end
+
+---Converts the string to Normalization Form D (also known as Normalization Form Canonical Decomposition). Returns nil if the string is not valid UTF-8.
+---@param s  string|number
+---@return string?
+function mw.ustring.toNFD(s) return tostring(s) end
+
+---Converts the string to Normalization Form KC (also known as Normalization Form Compatibility Composition). Returns nil if the string is not valid UTF-8.
+---@param s  string|number
+---@return string?
+function mw.ustring.toNFKC(s) return tostring(s) end
+
+---Converts the string to Normalization Form KD (also known as Normalization Form Compatibility Decomposition). Returns nil if the string is not valid UTF-8.
+---@param s  string|number
+---@return string?
+function mw.ustring.toNFKD(s) return tostring(s) end
+
+---Much like string.upper(), except that all characters with uppercase to lowercase definitions in Unicode are converted.
+---@see string.upper
+---@param s string|number
+---@return string
+function mw.ustring.upper(s) return string.upper(s) end
+
+mw.ext = {}
+mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
+
+mw.ext.VariablesLua = {}
+---@alias wikiVaribleKey string|number
+---@alias wikiVariableValue string|number|nil
+
+---Fake storage for enviroment simulation
+---@private
+mw.ext.VariablesLua.variablesStorage = {}
+
+---Stores a wiki-variable and returns the empty string
+---@param name wikiVaribleKey
+---@param value wikiVariableValue
+---@return string #always an empty string
+function mw.ext.VariablesLua.vardefine(name, value)
+	mw.ext.VariablesLua.variablesStorage[name] = value
+	return ''
+end
+
+---Stores a wiki-variable and returns the stored value
+---@param name wikiVaribleKey Key of the wiki-variable
+---@param value wikiVariableValue Value of the wiki-variable
+---@return string
+function mw.ext.VariablesLua.vardefineecho(name, value)
+	mw.ext.VariablesLua.vardefine(name, value)
+	return mw.ext.VariablesLua.var(name)
+end
+
+---Gets the stored value of a wiki-variable
+---@param name wikiVaribleKey Key of the wiki-variable
+---@return string
+function mw.ext.VariablesLua.var(name)
+	return mw.ext.VariablesLua.variablesStorage[name] and tostring(mw.ext.VariablesLua.variablesStorage[name]) or ''
+end
+
+---Checks if a wiki-variable is stored
+---@param name wikiVaribleKey Key of the wiki-variable
+---@return boolean
+function mw.ext.VariablesLua.varexist(name)
+	return mw.ext.VariablesLua.variablesStorage[name] ~= nil
+end
+
+mw.ext.CurrencyExchange = {}
+
+---@param amount number
+---@param fromCurrency string
+---@param toCurrency string
+---@param date? string
+---@return number
+function mw.ext.CurrencyExchange.currencyexchange(amount, fromCurrency, toCurrency, date)
+	-- Fake mock number
+	return 0.97097276906869
+end
+
+mw.ext.TeamLiquidIntegration = {}
+
+---Adds a category to a page
+---@param name string
+---@param sortName string?
+function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
 
 return mw

@@ -13,9 +13,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'

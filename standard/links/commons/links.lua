@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local CustomData = Lua.requireIfExists('Module:Links/CustomData', {requireDevIfEnabled = true, loadData = true}) or {}
+local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = true}) or {}
 
 local Links = {}
 
@@ -52,6 +52,7 @@ local PREFIXES = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
+	chzzk = {'https://chzzk.naver.com/live/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},
 	datdota = {
@@ -96,11 +97,6 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
-	factor = {
-		'',
-		team = 'https://www.factor.gg/team/',
-		player = 'https://www.factor.gg/player/',
-	},
 	fanclub = {''},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
@@ -120,7 +116,12 @@ local PREFIXES = {
 	instagram = {'https://www.instagram.com/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
-	letsplaylive = {'https://letsplay.live/profile/'},
+	letsplaylive = {
+		'https://old.letsplay.live/event/',
+		team = 'https://old.letsplay.live/team/',
+		player = 'https://old.letsplay.live/profile/',
+	},
+	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
@@ -134,9 +135,14 @@ local PREFIXES = {
 		player = 'https://nwc3l.com/profile/',
 	},
 	openrec = {'https://www.openrec.tv/live/'},
+	osu = {
+		'https://osu.ppy.sh/',
+		player = 'https://osu.ppy.sh/users/',
+	},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
 	reddit = {'https://www.reddit.com/user/'},
+	replay = {''},
 	rgl = {
 		'https://rgl.gg/Public/LeagueTable?s=',
 		team = 'https://rgl.gg/Public/Team?t=',
@@ -247,6 +253,7 @@ local ALIASES = {
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
 	letsplaylive = {'cybergamer'},
+	replay = {'replays'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
 	yandexefir = {'yandex'},
@@ -342,10 +349,9 @@ end
 ---@param variant string?
 ---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant)
-	for key, item in pairs(links) do
-		links[key] = Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
-	end
-	return links
+	return Table.map(links, function(key, item)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
+	end)
 end
 
 --remove appended number

@@ -6,21 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-
-local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
--- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
-local Qualifier = require('Module:TeamCard/Qualifier')
 local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local Custom = Lua.import('Module:TeamCard/Custom')
+-- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
+local Qualifier = require('Module:TeamCard/Qualifier')
+
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local TeamCardStorage = {}
 
 ---@param args table
----@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?}
+---@param teamObject {teamtemplate: string?, lpdb: string, team2: string?, team3: string?, aliases: string[]?}
 ---@param players table
 ---@param playerPrize number
 function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
@@ -48,15 +50,17 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	-- If a custom override for LPDB exists, use it
 	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, lpdbPrefix) or lpdbData
 
-	-- Jsonify the json fields
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-	lpdbData.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.players)
+	-- Store aliases (page names) for opponenets for setting page vars
+	if Table.isNotEmpty(teamObject.aliases) then
+		lpdbData.extradata.opponentaliases = teamObject.aliases
+	end
 
 	-- Store into the standardized lpdb fields
 	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
 		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName} or Opponent.tbd(Opponent.team),
 		lpdbData.date
 	)))
+	lpdbData = Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)

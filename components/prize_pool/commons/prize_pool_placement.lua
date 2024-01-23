@@ -17,9 +17,10 @@ local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
+local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DASH = '&#045;'
 
@@ -31,7 +32,7 @@ local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
 local _tbd_index = 0
 
---- @class Placement
+--- @class PrizePoolPlacement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)

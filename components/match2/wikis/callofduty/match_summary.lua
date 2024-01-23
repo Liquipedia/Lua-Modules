@@ -12,8 +12,8 @@ local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -23,6 +23,11 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
 	cdl = {icon = 'File:Call of Duty League Logo Small.png', text = 'Call of Duty League matchpage'},
+	breakingpoint = {
+		icon = 'File:Breaking Point GG icon lightmode.png',
+		iconDark = 'File:Breaking Point GG icon darkmode.png',
+		text = 'Breaking Point matchpage'
+	},
 	reddit = {icon = 'File:Reddit-icon.png', text = 'Reddit stats'},
 }
 

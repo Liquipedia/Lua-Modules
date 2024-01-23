@@ -1,0 +1,253 @@
+/*******************************************************************************
+Template: New GroupTableLeague/SwissTableLeague
+Author: warnull
+*******************************************************************************/
+
+.group-table {
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+}
+
+@media ( max-width: 435px ) {
+	.group-table {
+		width: 100% !important;
+	}
+}
+
+.collapsed > .group-table-countdown,
+.collapsed > .group-table-header-row,
+.collapsed > .group-table-results {
+	display: none;
+}
+
+.group-table-header {
+	align-items: center;
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	display: flex;
+	gap: 5px;
+	justify-content: space-between;
+	padding: 5px;
+	background-color: var( --clr-surface-2 );
+}
+
+.group-table-header * + .general-collapsible-default-toggle {
+	margin-left: 1px;
+}
+
+.group-table-title {
+	flex: 1 1 auto;
+	font-weight: bold;
+	min-width: 0;
+	text-align: center;
+}
+
+.group-table-header-right {
+	flex: 0 1 auto;
+	min-width: 0;
+	text-align: right;
+}
+
+.group-table-countdown {
+	background-color: var( --table-header-variant-background-color, #f2f2f2 ) !important;
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	font-size: 85%;
+	line-height: 1.1;
+	padding: 3px 5px;
+	text-align: center;
+}
+
+.group-table .dropdown-box-button {
+	padding: 2px 0;
+}
+
+.group-table .dropdown-box {
+	border: 0;
+	padding: 0;
+}
+
+.group-table .dropdown-box > div {
+	border-top-width: 0;
+	padding: 2px 0;
+}
+
+.group-table-header-row,
+.group-table-result-row {
+	background-color: inherit;
+	display: contents;
+}
+
+@supports not (display: contents) {
+	.group-table-header-row,
+	.group-table-result-row {
+		display: grid;
+		grid-column: ~"1 / -1";
+		grid-template-columns: 36px 1fr repeat( 8, auto );
+	}
+}
+
+.group-table-header-row > .group-table-cell {
+	padding: 3px 2px;
+}
+
+.group-table-results {
+	display: grid;
+}
+
+.group-table-cell {
+	align-items: center;
+	background-color: inherit;
+	border-left: 1px solid var( --table-border-color, #bbbbbb );
+	border-top: 1px solid var( --table-border-color, #bbbbbb );
+	display: flex;
+	justify-content: center;
+	min-width: 0;
+	padding: 5px;
+	text-align: center;
+}
+
+.group-table-cell.brkts-opponent-hover {
+	transition: 0.5s;
+	transition-property: border-color;
+}
+
+.group-table-cell.brkts-opponent-hover-active {
+	border-color: transparent;
+}
+
+.group-table-cell-content {
+	flex: 1 1;
+	min-width: 0;
+}
+
+.group-table-entry {
+	justify-content: space-between;
+	text-align: left;
+}
+
+.group-table-entry-left {
+	min-width: 0;
+}
+
+.group-table-rank-change {
+	font-size: 90%;
+}
+
+.group-table-rank {
+	font-weight: bold;
+	min-width: 28px;
+}
+
+.group-table-match-score {
+	font-weight: bold;
+	white-space: pre;
+}
+
+.group-table-match-win-rate,
+.group-table-game-score {
+	white-space: pre;
+}
+
+.group-table-game-diff {
+	font-style: italic;
+	min-width: 28px;
+	white-space: pre;
+}
+
+.group-table-points {
+	font-weight: bold;
+	white-space: pre;
+}
+
+.group-table-rank-change-up {
+	color: #008000 !important;
+}
+
+.group-table-rank-change-down {
+	color: #ff0000 !important;
+}
+
+.group-table-rank-change-same {
+	color: #ff00ff !important;
+}
+
+/**
+ * Styles for SwissTableLeague
+ */
+
+.swiss-table-wrapper {
+	margin: -2px;
+	padding: 2px;
+}
+
+.swiss-table {
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	display: inline-grid;
+}
+
+.collapsed > .swiss-table-results {
+	display: none;
+}
+
+.swiss-table-header-row {
+	background: var( --clr-surface-2, #eaecf0 );
+	display: contents;
+	font-weight: bold;
+}
+
+.swiss-table-match-header-row,
+.swiss-table-match-row {
+	background: inherit;
+	display: contents;
+}
+
+.swiss-table-body-row {
+	display: contents;
+}
+
+@supports not (display: contents) {
+	.swiss-table-header-row,
+	.swiss-table-body-row {
+		display: grid;
+		grid-column: ~"1 / -1";
+		grid-template-columns: 50% 50%;
+	}
+
+	.swiss-table-header-row > .group-table-header-row,
+	.swiss-table-body-row > .group-table-result-row {
+		grid-column-end: 1;
+	}
+
+	.swiss-table-match-header-row,
+	.swiss-table-match-row {
+		display: grid;
+		grid-template-columns: repeat( 100, auto );
+	}
+}
+
+.swiss-table-body-row:nth-of-type( 2n ) {
+	background: var( --table-striped-background-color, #f5f5f5 );
+}
+
+.swiss-table-header-row > .group-table-header-row > .group-table-cell:last-child,
+.swiss-table-body-row > .group-table-result-row > .group-table-cell:last-child {
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+}
+
+.swiss-table-match {
+	flex-direction: column;
+	padding: 3px;
+}
+
+.swiss-table-match-score {
+	font-size: 80%;
+	margin-bottom: -3px;
+}
+
+.swiss-table-live-text {
+	color: #008000;
+	font-size: 11px;
+	font-weight: bold;
+}

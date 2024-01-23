@@ -12,58 +12,51 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class StarcraftMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getWikiCategories = CustomMap.getWikiCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-
-	_args = customMap.args
-	return customMap:createInfobox()
+	return map:createInfobox()
 end
 
+---@param widgetId string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local id = _args.id
+function CustomInjector:parse(widgetId, widgets)
+	local args = self.caller.args
+	local id = args.id
 
-	Array.appendWith(widgets,
-		Cell{name = 'Tileset', content = {_args.tileset or CustomMap:_tlpdMap(id, 'tileset')}},
-		Cell{name = 'Size', content = {CustomMap:_getSize(id)}},
-		Cell{name = 'Spawn Positions', content = {CustomMap:_getSpawn(id)}},
-		Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(_args.versions)}},
-		Cell{name = 'Competition Span', content = {_args.span}},
-		Cell{name = 'Leagues Featured', content = {_args.leagues}}
-	)
+	if widgetId == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Tileset', content = {args.tileset or self.caller:_tlpdMap(id, 'tileset')}},
+			Cell{name = 'Size', content = {self.caller:_getSize(id, args)}},
+			Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id, args)}},
+			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
+			Cell{name = 'Competition Span', content = {args.span}},
+			Cell{name = 'Leagues Featured', content = {args.leagues}}
+		)
+	end
 
 	return widgets
-end
-
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
 end
 
 ---@param args table
 ---@return string?
 function CustomMap:getNameDisplay(args)
 	if String.isEmpty(args.name) then
-		return CustomMap:_tlpdMap(args.id, 'name')
+		return self:_tlpdMap(args.id, 'name')
 	end
 
 	return args.name
@@ -73,7 +66,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.name = CustomMap:getNameDisplay(args)
+	lpdbData.name = self:getNameDisplay(args)
 	lpdbData.extradata = {
 		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
@@ -84,22 +77,24 @@ function CustomMap:addToLpdb(lpdbData, args)
 end
 
 ---@param id string?
+---@param args table
 ---@return string
-function CustomMap:_getSize(id)
-	local width = _args.width
-		or CustomMap:_tlpdMap(id, 'width') or ''
-	local height = _args.height
-		or CustomMap:_tlpdMap(id, 'height') or ''
+function CustomMap:_getSize(id, args)
+	local width = args.width
+		or self:_tlpdMap(id, 'width') or ''
+	local height = args.height
+		or self:_tlpdMap(id, 'height') or ''
 	return width .. 'x' .. height
 end
 
 ---@param id string?
+---@param args table
 ---@return string
-function CustomMap:_getSpawn(id)
-	local players = _args.players
-		or CustomMap:_tlpdMap(id, 'players') or ''
-	local positions = _args.positions
-		or CustomMap:_tlpdMap(id, 'positions') or ''
+function CustomMap:_getSpawn(id, args)
+	local players = args.players
+		or self:_tlpdMap(id, 'players') or ''
+	local positions = args.positions
+		or self:_tlpdMap(id, 'positions') or ''
 	return players .. ' at ' .. positions
 end
 
@@ -114,14 +109,8 @@ end
 ---@param args table
 ---@return string[]
 function CustomMap:getWikiCategories(args)
-	local players = args.players
-	if String.isEmpty(players) then
-		players = CustomMap:_tlpdMap(args.id, 'players')
-	end
-
-	if String.isEmpty(players) then
-		return {}
-	end
+	local players = args.players or self:_tlpdMap(args.id, 'players')
+	if String.isEmpty(players) then return {} end
 
 	return {'Maps (' .. players .. ' Players)'}
 end

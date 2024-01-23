@@ -9,6 +9,7 @@
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
+---@class BrktsWikiSpecific
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
@@ -17,7 +18,7 @@ local WikiSpecificBase = {}
 -- @parameter match - a match
 -- @returns the match after changes have been applied
 WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processMatch
 		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
@@ -28,7 +29,7 @@ end)
 -- @parameter map - a map
 -- @returns the map after changes have been applied
 WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processMap
 		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
@@ -39,7 +40,7 @@ end)
 -- @parameter player - a player
 -- @returns the player after changes have been applied
 WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
+	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processPlayer
 		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
@@ -55,7 +56,8 @@ Called from MatchGroup/Util
 -- @returns match
 ]]
 WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	return Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true}).matchFromRecord
+	local MatchUtil = Lua.import('Module:MatchGroup/Util')
+	return MatchUtil.matchFromRecord
 end)
 
 --[[
@@ -72,9 +74,13 @@ Called from MatchGroup
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist', {requireDevIfEnabled = true}).MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket', {requireDevIfEnabled = true}).BracketContainer
+	if matchGroupType == 'matchlist' then
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
+		return MatchList.MatchlistContainer
+	end
+
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket')
+	return Bracket.BracketContainer
 end
 
 --[[
@@ -92,7 +98,8 @@ Called from MatchGroup
 function WikiSpecificBase.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		return Lua.import('Module:MatchGroup/Display/SingleMatch', {requireDevIfEnabled = true}).SingleMatchContainer
+		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
+		return SingleMatch.SingleMatchContainer
 	end
 end
 

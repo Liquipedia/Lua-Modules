@@ -18,16 +18,17 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
-local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Building = Lua.import('Module:Infobox/Building')
+local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
-local CustomBuilding = Class.new()
+---@class WarcraftBuildingInfobox: BuildingInfobox
+local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
@@ -42,68 +43,58 @@ local ADDITIONAL_BUILDING_RACES = {
 	c = 'Creeps',
 }
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomBuilding.run(frame)
-	local building = Building(frame)
-	_args = building.args
-
-	building.nameDisplay = CustomBuilding.nameDisplay
-	building.setLpdbData = CustomBuilding.setLpdbData
-	building.getWikiCategories = CustomBuilding.getWikiCategories
-	building.createWidgetInjector = CustomBuilding.createWidgetInjector
+	local building = CustomBuilding(frame)
+	building:setWidgetInjector(CustomInjector(building))
 
 	return building:createInfobox()
 end
 
----@return WidgetInjector
-function CustomBuilding:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local mana = Shared.manaValues(_args)
-	local acquisitionRange = tonumber(_args.acq_range) or 0
-	local level = tonumber(_args.level) or 0
-	local race = Faction.toName(Faction.read(_args.race)) or ADDITIONAL_BUILDING_RACES[string.lower(_args.race or '')]
+function CustomBuilding:addCustomCells(widgets)
+	local args = self.args
+
+	local mana = Shared.manaValues(args)
+	local acquisitionRange = tonumber(args.acq_range) or 0
+	local level = tonumber(args.level) or 0
+	local race = Faction.toName(Faction.read(args.race)) or ADDITIONAL_BUILDING_RACES[string.lower(args.race or '')]
 
 	Array.appendWith(widgets,
 		Cell{name = '[[Food supplied|Food]]', content = {
-			_args.foodproduced and (ICON_FOOD .. ' ' .. _args.foodproduced) or nil,
+			args.foodproduced and (ICON_FOOD .. ' ' .. args.foodproduced) or nil,
 		}},
-		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or _args.race}},
+		Cell{name = '[[Race]]', content = {race and ('[[' .. race .. ']]') or args.race}},
 		Cell{name = '[[Targeting#Target_Classifications|Classification]]', content = {
-			_args.class and String.convertWikiListToHtmlList(_args.class) or nil}},
-		Cell{name = 'Sleeps', content = {_args.sleeps}},
-		Cell{name = 'Cargo Capacity', content = {_args.cargo_capacity}},
-		Cell{name = 'Morphs into', content = {_args.morphs}},
-		Cell{name = 'Duration', content = {_args.duration}},
-		Cell{name = 'Formation Rank', content = {_args.formationrank}},
-		Cell{name = '[[Sight_Range|Sight]]', content = {race and (_args.daysight .. ' / ' .. _args.nightsight) or nil}},
+			args.class and String.convertWikiListToHtmlList(args.class) or nil}},
+		Cell{name = 'Sleeps', content = {args.sleeps}},
+		Cell{name = 'Cargo Capacity', content = {args.cargo_capacity}},
+		Cell{name = 'Morphs into', content = {args.morphs}},
+		Cell{name = 'Duration', content = {args.duration}},
+		Cell{name = 'Formation Rank', content = {args.formationrank}},
+		Cell{name = '[[Sight_Range|Sight]]', content = {race and (args.daysight .. ' / ' .. args.nightsight) or nil}},
 		Cell{name = 'Acquisition Range', content = {acquisitionRange > 0 and acquisitionRange or nil}},
 		Cell{name = '[[Experience#Determining_Experience_Gained|Level]]', content = {
-			level > 0 and ('[[Experience|'.._args.level..']]') or nil}},
+			level > 0 and ('[[Experience|'..args.level..']]') or nil}},
 		Cell{name = '[[Mana]]', content = {mana.manaDisplay}},
 		Cell{name = '[[Mana|Initial Mana]]', content = {mana.initialManaDisplay}},
 		Cell{name = '[[Mana#Mana_Gain|Mana Regeneration]]', content = {mana.manaRegenDisplay}},
-		Cell{name = 'Selection Priorty', content = {_args.priority}}
+		Cell{name = 'Selection Priorty', content = {args.priority}}
 	)
 
-	local movement = Shared.movement(_args, 'Uprooted Movement')
+	local movement = Shared.movement(args, 'Uprooted Movement')
 	if movement then
 		Array.appendWith(widgets, unpack(movement))
 	end
 
-	local mercenaryStats = Shared.mercenaryStats(_args)
+	local mercenaryStats = Shared.mercenaryStats(args)
 	if mercenaryStats then
 		Array.appendWith(widgets, unpack(mercenaryStats))
 	end
 
-	local pathingMap = CustomBuilding._pathingMap(_args)
+	local pathingMap = CustomBuilding._pathingMap(args)
 	if pathingMap then
 		Array.appendWith(widgets,
 			Title{name = 'Pathing Map'},
@@ -111,50 +102,53 @@ function CustomInjector:addCustomCells(widgets)
 		)
 	end
 
-	if _args.icon then
+	if args.icon then
 		Array.appendWith(widgets,
 			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. _args.icon .. '.png]]'}}
+			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 
-	return Array.append(widgets, unpack(Shared.attackDisplay(_args)))
+	return Array.append(widgets, unpack(Shared.attackDisplay(args)))
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' then
+	local args = self.caller.args
+	if id == 'custom' then
+		return self.caller:addCustomCells(widgets)
+	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _args.race,
-				gold = CustomBuilding._calculateCostValue('gold'),
-				lumber = CustomBuilding._calculateCostValue('lumber'),
-				buildTime = _args.build_time,
-				food = _args.food,
+				faction = args.race,
+				gold = self.caller:_calculateCostValue('gold'),
+				lumber = self.caller:_calculateCostValue('lumber'),
+				buildTime = args.build_time,
+				food = args.food,
 			}}},
 		}
 	elseif id == 'requirements' then
-		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}}}
+		return {Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Built From:', content = {_args.builtfrom}},
-			Cell{name = '[[Hotkeys_per_Race|Hotkey]]', content = {CustomBuilding:_getHotkeys()}},
-			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(_args.builds)}},
+			Cell{name = 'Built From:', content = {args.builtfrom}},
+			Cell{name = '[[Hotkeys_per_Race|Hotkey]]', content = {self.caller:_getHotkeys()}},
+			Cell{name = 'Builds', content = {String.convertWikiListToHtmlList(args.builds)}},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(_args.unlocks)}},
-			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(_args.upgrades)}},
-			Cell{name = 'Upgrades to', content = {String.convertWikiListToHtmlList(_args.upgradesTo)}},
+			Cell{name = 'Unlocked Tech', content = {String.convertWikiListToHtmlList(args.unlocks)}},
+			Cell{name = 'Upgrades available', content = {String.convertWikiListToHtmlList(args.upgrades)}},
+			Cell{name = 'Upgrades to', content = {String.convertWikiListToHtmlList(args.upgradesTo)}},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = '[[Hit Points|Hit Points]]', content = {CustomBuilding:_defenseDisplay()}},
+			Cell{name = '[[Hit Points|Hit Points]]', content = {self.caller:_defenseDisplay()}},
 			Cell{name = '[[Hit Points#Hit Points Gain|HP Regeneration]]', content = {
-				Shared.hitPointsRegeneration(_args, {display = true})}},
-			Cell{name = '[[Armor|Armor]]', content = {CustomBuilding:_armorDisplay()}}
+				Shared.hitPointsRegeneration(args, {display = true})}},
+			Cell{name = '[[Armor|Armor]]', content = {self.caller:_armorDisplay()}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -180,41 +174,41 @@ end
 
 ---@param key string
 ---@return number?
-function CustomBuilding._calculateCostValue(key)
-	local value = tonumber(_args[key]) or 0
+function CustomBuilding:_calculateCostValue(key)
+	local value = tonumber(self.args[key]) or 0
 	if value == 0 then return end
 
-	local previousValue = tonumber(_args['previous_' .. key]) or 0
+	local previousValue = tonumber(self.args['previous_' .. key]) or 0
 
 	return value - previousValue
 end
 
 ---@return string?
 function CustomBuilding:_defenseDisplay()
-	if Logic.readBool(_args.invulnerable) then
+	if Logic.readBool(self.args.invulnerable) then
 		return
 	end
 
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if (tonumber(_args.hitpoint_bonus) or 0) > 0 then
-		return display .. ' (' .. _args.hp + _args.hitpoint_bonus .. ')'
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if (tonumber(self.args.hitpoint_bonus) or 0) > 0 then
+		return display .. ' (' .. self.args.hp + self.args.hitpoint_bonus .. ')'
 	end
 	return display
 end
 
 ---@return string
 function CustomBuilding:_armorDisplay()
-	if Logic.readBool(_args.invulnerable) then
-		return ArmorIcon.run(_args.armortype) .. ' invulnerable'
+	if Logic.readBool(self.args.invulnerable) then
+		return ArmorIcon.run(self.args.armortype) .. ' invulnerable'
 	end
 
-	local display = ArmorIcon.run(_args.armortype)
-	if _args.armortype2 then
-		display = display .. ' / ' .. ArmorIcon.run(_args.armortype2)
+	local display = ArmorIcon.run(self.args.armortype)
+	if self.args.armortype2 then
+		display = display .. ' / ' .. ArmorIcon.run(self.args.armortype2)
 	end
-	display = display .. ' ' .. (_args.armor or 0)
-	if _args.armor_upgrades then
-		display = display.. ' (' .. (_args.armor + _args.armor_upgrades) .. ')'
+	display = display .. ' ' .. (self.args.armor or 0)
+	if self.args.armor_upgrades then
+		display = display.. ' (' .. (self.args.armor + self.args.armor_upgrades) .. ')'
 	end
 	return display
 end
@@ -231,11 +225,11 @@ end
 
 ---@return string?
 function CustomBuilding:_getHotkeys()
-	if not String.isEmpty(_args.shortcut) then
-		if not String.isEmpty(_args.shortcut2) then
-			return Hotkeys.hotkey2(_args.shortcut, _args.shortcut2, 'arrow')
+	if not String.isEmpty(self.args.shortcut) then
+		if not String.isEmpty(self.args.shortcut2) then
+			return Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
 		else
-			return Hotkeys.hotkey(_args.shortcut)
+			return Hotkeys.hotkey(self.args.shortcut)
 		end
 	end
 end
@@ -247,8 +241,8 @@ function CustomBuilding:setLpdbData(args)
 		buildtime = args.build_time,
 		israngedattack = tostring(args.weapontype ~= 'normal'),
 		experience = EXPERIENCE[tonumber(args.level)],
-		gold = CustomBuilding._calculateCostValue('gold'),
-		lumber = CustomBuilding._calculateCostValue('lumber'),
+		gold = self:_calculateCostValue('gold'),
+		lumber = self:_calculateCostValue('lumber'),
 	})
 
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. (args.name or ''), {

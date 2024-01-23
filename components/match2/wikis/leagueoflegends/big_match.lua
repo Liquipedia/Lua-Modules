@@ -22,11 +22,11 @@ local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
-local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom', {requireDevIfEnabled = true})
-local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+local Template = Lua.import('Module:BigMatch/Template')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local BigMatch = {}
 

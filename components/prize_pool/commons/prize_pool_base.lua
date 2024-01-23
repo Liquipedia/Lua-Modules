@@ -17,9 +17,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Currency = Lua.import('Module:Currency')
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
+local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -814,6 +814,10 @@ function BasePrizePool:storeData()
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		prizepoolindex = prizePoolIndex,
+		lastvsdata = {},
+		opponentplayers = {},
+		players = {},
+		extradata = {},
 	}
 
 	local lpdbData = {}
@@ -826,10 +830,7 @@ function BasePrizePool:storeData()
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
-		lpdbEntry.lastvsdata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.lastvsdata or {})
-		lpdbEntry.opponentplayers = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.opponentplayers or {})
-		lpdbEntry.players = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.players or {})
-		lpdbEntry.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbEntry.extradata or {})
+		lpdbEntry = Json.stringifySubTables(lpdbEntry)
 
 		if self.options.storeLpdb then
 			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)

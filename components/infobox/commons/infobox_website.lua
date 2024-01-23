@@ -10,8 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Links = Lua.import('Module:Links')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header

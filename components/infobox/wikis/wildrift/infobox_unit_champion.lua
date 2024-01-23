@@ -10,13 +10,13 @@ local Array = require('Module:Array')
 local ChampionWL = require('Module:ChampionWL')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -101,7 +101,7 @@ function CustomInjector:addCustomCells(widgets)
 	local stats = ChampionWL.create({champion = _args.championname or _pagename})
 	stats = mw.text.split(stats, ';')
 	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
-	winPercentage = Math.round({winPercentage, 4}) * 100
+	winPercentage = Math.round(winPercentage, 4) * 100
 	local statsDisplay = (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
 	table.insert(widgets, Cell{name = 'Win Rate', content = {statsDisplay}})
 

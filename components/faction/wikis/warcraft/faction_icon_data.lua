@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = mw.loadData('Module:Info')
+
 local byFaction = {
 	h = {
 		icon = 'File:Human icon small.png',
@@ -30,4 +32,4 @@ local byFaction = {
 	},
 }
 
-return {byFaction = byFaction, randomIcons = {}}
+return {byFaction = {[Info.defaultGame] = byFaction}, randomIcons = {}}

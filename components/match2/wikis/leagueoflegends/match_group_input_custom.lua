@@ -17,8 +17,8 @@ local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -47,7 +47,7 @@ local _NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}

@@ -15,10 +15,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local CustomPrizePool = Lua.import('Module:PrizePool/Custom', {requireDevIfEnabled = true})
-local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom', {requireDevIfEnabled = true})
+local CustomPrizePool = Lua.import('Module:PrizePool/Custom')
+local CustomAwardPrizePool = Lua.import('Module:PrizePool/Award/Custom')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local LegacyPrizePool = {}
 

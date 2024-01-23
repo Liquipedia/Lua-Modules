@@ -18,11 +18,12 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
@@ -47,6 +48,7 @@ function CustomPrizePool.run(frame)
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
+	args.placementsExtendImportLimit = Logic.emptyOr(args.placementsExtendImportLimit, true)
 
 	-- overwrite some wiki vars for this PrizePool call
 	_tournament_name = args['tournament name']

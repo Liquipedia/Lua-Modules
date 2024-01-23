@@ -42,4 +42,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Dota2 logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Dota2 logo.png', ---@deprecated
+	match2 = 1,
 }

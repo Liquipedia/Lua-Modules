@@ -16,9 +16,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 --[[
 Module containing display components for match summaries of free-for-all matches.

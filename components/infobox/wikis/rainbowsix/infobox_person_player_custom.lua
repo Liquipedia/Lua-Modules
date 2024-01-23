@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -19,15 +18,23 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
+
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+
+local ACHIEVEMENTS_BASE_CONDITIONS = {
+	'[[liquipediatiertype::!Showmatch]]',
+	'[[liquipediatiertype::!Qualifier]]',
+	'([[liquipediatier::1]] OR [[liquipediatier::2]])',
+	'[[placement::1]]',
+}
 
 local Widgets = require('Module:Infobox/Widget/All')
-local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 
-local _BANNED = mw.loadData('Module:Banned')
-local _ROLES = {
+local BANNED = mw.loadData('Module:Banned')
+local ROLES = {
 	-- Players
 	['entry'] = {category = 'Entry fraggers', variable = 'Entry fragger', isplayer = true},
 	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
@@ -47,195 +54,186 @@ local _ROLES = {
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
-_ROLES.entryfragger = _ROLES.entry
-_ROLES['assistant coach'] = _ROLES.coach
+ROLES.entryfragger = ROLES.entry
+ROLES['assistant coach'] = ROLES.coach
 
-local _GAMES = {
+local GAMES = {
 	r6s = '[[Rainbow Six Siege|Siege]]',
 	vegas2 = '[[Rainbow Six Vegas 2|Vegas 2]]',
 }
-_GAMES.siege = _GAMES.r6s
+GAMES.siege = GAMES.r6s
 
-local _SIZE_OPERATOR = '25x25px'
+local SIZE_OPERATOR = '25x25px'
 
-local CustomPlayer = Class.new()
-
+---@class RainbowsixInfoboxPlayer: Person
+---@field role {category: string, variable: string, isplayer: boolean?}?
+---@field role2 {category: string, variable: string, isplayer: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
+	-- Automatic achievements
+	player.args.achievements = Achievements.player{
+		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
+	}
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.args.banned = tostring(player.args.banned or '')
 
-	_args = player.args
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		-- Signature Operators
+		local operatorIcons = Array.map(caller:getAllArgsForBase(args, 'operator'), function(operator)
+			return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
+		end)
+		table.insert(widgets, Cell{
+			name = #operatorIcons > 1 and 'Signature Operators' or 'Signature Operator',
+			content = {table.concat(operatorIcons, '&nbsp;')},
+		})
+
+		-- Active in Games
+		local activeInGames = {}
+		Table.iter.forEachPair(GAMES, function(key)
+			if args[key] then
+				table.insert(activeInGames, GAMES[key])
+			end
+		end)
+		table.insert(widgets, Cell{
+			name = #activeInGames > 1 and 'Games' or 'Game',
+			content = activeInGames,
+		})
+
+	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
-			Cell{name = 'Time Banned', content = {_args.time_banned}},
+			Cell{name = 'Status', content = caller:_getStatusContents()},
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
+			Cell{name = 'Time Banned', content = {args.time_banned}},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Operators
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local operatorIcons = Array.map(Player:getAllArgsForBase(_args, 'operator'),
-					function(operator, _)
-						return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
-					end
-				)
-				return {
-					Cell{
-						name = #operatorIcons > 1 and 'Signature Operators' or 'Signature Operator',
-						content = {
-							table.concat(operatorIcons, '&nbsp;')
-						}
-					}
-				}
-			end
-		})
-	-- Active in Games
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local activeInGames = {}
-				Table.iter.forEachPair(_GAMES,
-					function(key)
-						if _args[key] then
-							table.insert(activeInGames, _GAMES[key])
-						end
-					end
-				)
-				return {
-					Cell{
-						name = #activeInGames > 1 and 'Games' or 'Game',
-						content = activeInGames
-					}
-				}
-			end
-		})
-	return widgets
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
 
-	lpdbData.extradata.signatureOperator1 = _args.operator1 or _args.operator
-	lpdbData.extradata.signatureOperator2 = _args.operator2
-	lpdbData.extradata.signatureOperator3 = _args.operator3
-	lpdbData.extradata.signatureOperator4 = _args.operator4
-	lpdbData.extradata.signatureOperator5 = _args.operator5
-	lpdbData.type = CustomPlayer._isPlayerOrStaff()
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+	lpdbData.extradata.signatureOperator1 = args.operator1 or args.operator
+	lpdbData.extradata.signatureOperator2 = args.operator2
+	lpdbData.extradata.signatureOperator3 = args.operator3
+	lpdbData.extradata.signatureOperator4 = args.operator4
+	lpdbData.extradata.signatureOperator5 = args.operator5
+	lpdbData.type = self:_isPlayerOrStaff()
+
+	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
+
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
 end
 
-function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
 		return
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
-function CustomPlayer._getStatusContents()
+---@return string[]
+function CustomPlayer:_getStatusContents()
+	local args = self.args
 	local statusContents = {}
 
-	if String.isNotEmpty(_args.status) then
-		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
+	if String.isNotEmpty(args.status) then
+		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status)
 	end
 
-	local banned = _BANNED[string.lower(_args.banned or '')]
-	if not banned and String.isNotEmpty(_args.banned) then
+	local banned = BANNED[string.lower(args.banned or '')]
+	if not banned and String.isNotEmpty(args.banned) then
 		banned = '[[Banned Players|Multiple Bans]]'
 		table.insert(statusContents, banned)
 	end
 
 	return Array.extendWith(statusContents,
-		Array.map(Player:getAllArgsForBase(_args, 'banned'),
+		Array.map(self:getAllArgsForBase(args, 'banned'),
 			function(item, _)
-				return _BANNED[string.lower(item)]
+				return BANNED[string.lower(item)]
 			end
 		)
 	)
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
-function CustomPlayer._isPlayerOrStaff()
-	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = _ROLES[_args.role:lower()]
-	end
+---@return string
+function CustomPlayer:_isPlayerOrStaff()
 	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
+	if self.role and self.role.isplayer == false then
 		return 'staff'
 	else
 		return 'player'

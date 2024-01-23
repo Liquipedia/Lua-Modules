@@ -15,8 +15,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -402,7 +402,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400

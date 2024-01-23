@@ -8,13 +8,23 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local FILTERED_ERROR_STACK_ITEMS = {
+	'^Module:ResultOrError:%d+: in function <Module:ResultOrError:%d+>$',
+	'^%[C%]: in function \'xpcall\'$',
+	'^Module:ResultOrError:%d+: in function \'try\'$',
+}
 
 --[[
 A structurally typed, immutable class that represents either a result or an
 error. Used for representing the outcome of a function that can throw.
 
 Usage:
-
+```
 local socketOrError = ResultOrError.try(function()
 	return socketlib.open()
 end)
@@ -27,7 +37,9 @@ local parsedText = socketOrError
 		socketOrError:map(function(socket) socket:close() end)
 	end)
 	:get()
+```
 ]]
+---@class ResultOrError: BaseClass
 local ResultOrError = Class.new(function(self)
 	-- ResultOrError is an abstract class. Don't call this constructor directly.
 	--error('Cannot construct abstract class')
@@ -60,6 +72,8 @@ end
 --[[
 Result case
 ]]
+---@class Result: ResultOrError
+---@field result any
 local Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
 end)
@@ -83,6 +97,9 @@ continuation of the stack trace of the error that was handled (and so on).
 This allows error handlers to rethrow the original error without losing the
 stack trace, and is needed to implement :finally().
 ]]
+---@class Error: ResultOrError
+---@field error string?
+---@field stacks string[]?
 local Error = Class.new(ResultOrError, function(self, error, stacks)
 	self.error = error
 	self.stacks = stacks
@@ -94,8 +111,68 @@ function Error:map(_, onError)
 		or ResultOrError.Result()
 end
 
+---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
+---@return string
+function Error:getErrorJson()
+	local stackTrace = {}
+
+	local processStackFrame = function(frame, frameIndex)
+		if frameIndex == 1 and frame == '[C]: ?' then
+			return
+		end
+
+		local stackEntry = {content = frame}
+		local frameSplit = mw.text.split(frame, ':', true)
+		if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
+			stackEntry.prefix = frameSplit[1]
+			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
+		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
+			stackEntry.content =  table.concat(frameSplit, ':', 3)
+		elseif frameSplit[1] == 'Module' then
+			local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
+				or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'
+			stackEntry.link = {wiki = wiki, title = table.concat(frameSplit, ':', 1, 2), ln = frameSplit[3]}
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 3)
+			stackEntry.content = table.concat(frameSplit, ':', 4)
+		end
+
+		table.insert(stackTrace, stackEntry)
+	end
+
+	Array.forEach(self.stacks, function(stack)
+		local stackFrames = mw.text.split(stack, '\n')
+		stackFrames = Array.filter(
+			Array.map(
+				Array.sub(stackFrames, 2, #stackFrames),
+				function(frame) return String.trim(frame) end
+			),
+			function(frame) return not Table.any(FILTERED_ERROR_STACK_ITEMS, function(_, filter)
+				return string.find(frame, filter) ~= nil
+			end) end
+		)
+		Array.forEach(stackFrames, processStackFrame)
+	end)
+
+	local errorSplit = mw.text.split(self.error, ':', true)
+	local errorText
+	if #errorSplit == 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit))
+	elseif #errorSplit > 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s', unpack(Array.sub(errorSplit, 1, 4)))
+		errorText = errorText .. ':' .. table.concat(Array.sub(errorSplit, 5), ':') .. '.'
+	else
+		errorText = string.format('Lua error: %s.', self.error)
+	end
+	return Json.stringify({
+			errorShort = errorText,
+			stackTrace = stackTrace,
+		}, {asArray = true})
+end
+
+---Errors with a JSON string for use by `liquipedia.customLuaErrors` JS module.
 function Error:get()
-	error(table.concat(Array.extend(self.error, self.stacks), '\n'))
+	error(self:getErrorJson(), 0)
 end
 
 --[[
@@ -108,6 +185,9 @@ can be used when rethrowing an error to include the stack trace of the existing
 error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
 automatically include both stack traces.
 ]]
+---@param f function
+---@param lowerStacks table?
+---@return Result|Error
 function ResultOrError.try(f, lowerStacks)
 	local resultOrError
 	xpcall(
@@ -133,12 +213,16 @@ array of results. Otherwise returns a ResultOrError of the first error. Note
 that this function swaps the types: it converts an array of ResultOrErrors of
 values into a ResultOrError of an array of values.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.all(resultOrErrors)
 	local results = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			table.insert(results, resultOrError.result)
 		else
+			---@cast resultOrError Error
 			return resultOrError
 		end
 	end
@@ -150,12 +234,16 @@ If any input ResultOrErrors is a result, then returns the first such
 ResultOrError. Otherwise, all input ResultOrErrors are errors, and this
 aggregates them together and returns a ResultOrError of the aggregate error.
 ]]
+---@param resultOrErrors ResultOrError[]
+---@return Result|Error
 function ResultOrError.any(resultOrErrors)
 	local errors = {}
 	for _, resultOrError in ipairs(resultOrErrors) do
 		if resultOrError:isResult() then
+			---@cast resultOrError Result
 			return resultOrError
 		else
+			---@cast resultOrError Error
 			table.insert(errors, resultOrError.error)
 		end
 	end
