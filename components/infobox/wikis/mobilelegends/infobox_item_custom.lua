@@ -264,11 +264,11 @@ end
 ---@return table
 function CustomItem:_getAttributeCells(attributeCells)
 	local widgets = {}
-	Array.forEach(attributeCells, function(attribute)
+	return Array.map(attributeCells, function(attribute)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
 		if String.isEmpty(content) then return end
-		table.insert(widgets, Cell{name = attribute.name, content = {content}})
+		return Cell{name = attribute.name, content = {content}}
 	end)
 
 	return widgets
