@@ -104,6 +104,9 @@ function ManualPointsTable:_makeParticipantCell(slot)
 	local participantCell = mw.html.create('td')
 		:css('text-align', 'left')
 
+	if String.isEmpty(slot[1]) then
+		return participantCell:wikitext(Abbreviation.make('TBD', 'To Be Determined'))
+	end
 	if self.isSolo then
 		participantCell:node(PlayerDisplay.InlinePlayer{player = {
 			displayName = slot[1],
