@@ -118,7 +118,7 @@ liquipedia.countdown = {
 			const platform = dataSetName.toLowerCase();
 			if ( timerObjectNode.dataset[ 'stream' + dataSetName ] ) {
 				streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset[ 'stream' + dataSetName ] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
-				let i = 2
+				let i = 2;
 				while ( timerObjectNode.dataset[ 'stream' + dataSetName + i ] ) {
 					streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/' + platform + '/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset[ 'stream' + dataSetName + i ] ) + '"><i class="lp-icon lp-icon-21 lp-' + icon + '"></i></a>' );
 					i++;
