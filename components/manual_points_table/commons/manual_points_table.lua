@@ -108,9 +108,16 @@ function ManualPointsTable:_makeParticipantCell(slot)
 		return participantCell:wikitext(Abbreviation.make('TBD', 'To Be Determined'))
 	end
 	if self.isSolo then
+		local name = slot[1]
+		local link = slot[1]
+		if String.contains(name, '|') then
+			local splitName = mw.text.split(name, '|')
+			link = splitName[1]
+			name = splitName[2]
+		end
 		participantCell:node(PlayerDisplay.InlinePlayer{player = {
-			displayName = slot[1],
-			pageName = slot[1],
+			displayName = name,
+			pageName = link,
 			flag = slot.flag,
 			showLink = true
 		}})
