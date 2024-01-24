@@ -208,38 +208,38 @@ Author(s): Elysienna
 		/* Modifier title */
 		&.title {
 			&--advance {
-				color: var( --clr-semantic-positive-20, #145214 );
+				color: #145214;
 			}
 
 			&--out {
-				color: var( --clr-semantic-negative-20, #5c0a0a );
+				color: #5c0a0a;
 			}
 		}
 
 		/* Modifier - icons */
 		.icon {
 			&--gold {
-				color: var( --clr-semantic-gold-40, #ccab00 );
+				color: #ccab00;
 			}
 
 			&--silver {
-				color: var( --clr-semantic-silver-40, #557177 );
+				color: #557177;
 			}
 
 			&--bronze {
-				color: var( --clr-semantic-bronze-40, #80704c );
+				color: #80704c;
 			}
 
 			&--copper {
-				color: var( --clr-semantic-copper-40, #cc7800 );
+				color: #cc7800;
 			}
 
 			&--green {
-				color: var( --clr-semantic-positive-30, #1d7c1d );
+				color: #1d7c1d;
 			}
 
 			&--red {
-				color: var( --clr-semantic-negative-30, #b81414 );
+				color: #b81414;
 			}
 		}
 	}
@@ -280,13 +280,13 @@ Author(s): Elysienna
 		}
 
 		&--green {
-			background-color: var( --clr-semantic-positive-40, #27a527 );
-			color: var( --clr-on-background, #ffffff );
+			background-color: #27a527;
+			color: #ffffff;
 		}
 
 		&--red {
-			background-color: var( --clr-semantic-negative-40, #b81414 );
-			color: var( --clr-on-background, #ffffff );
+			background-color: #b81414;
+			color: #ffffff;
 		}
 
 		&--rank {
