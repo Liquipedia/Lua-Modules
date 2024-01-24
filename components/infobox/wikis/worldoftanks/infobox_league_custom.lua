@@ -36,6 +36,11 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -67,11 +72,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 	return lpdbData
-end
-
----@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_publishertier', args.publisherpremier)
 end
 
 ---@param args table
