@@ -70,7 +70,6 @@ function HorizontallistDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.BracketContainer)
 	return HorizontallistDisplay.Bracket({
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
-		bracketId = props.bracketId,
 		config = props.config,
 	})
 end
