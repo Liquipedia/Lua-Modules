@@ -20,18 +20,18 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	['solo'] = {category = 'Solo players', variable = 'Solo', isplayer = true},
-	['jungler'] = {category = 'Jungle players', variable = 'Jungler', isplayer = true},
-	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
-	['mid'] = {category = 'Mid Lane players', variable = 'Mid', isplayer = true},
-	['carry'] = {category = 'Carry players', variable = 'Carry', isplayer = true},
+	['solo'] = {category = 'Solo players', display = 'Solo'},
+	['jungler'] = {category = 'Jungle players', display = 'Jungler'},
+	['support'] = {category = 'Support players', display = 'Support'},
+	['mid'] = {category = 'Mid Lane players', display = 'Mid'},
+	['carry'] = {category = 'Carry players', display = 'Carry'},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
+	['analyst'] = {category = 'Analysts', display = 'Analyst'},
+	['observer'] = {category = 'Observers', display = 'Observer'},
+	['host'] = {category = 'Hosts', display = 'Host'},
+	['coach'] = {category = 'Coaches', display = 'Coach'},
+	['caster'] = {category = 'Casters', display = 'Caster'},
 }
 
 ---@class SmiteInfoboxPlayer: Person
@@ -72,17 +72,17 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param role string?
----@return {category: string, variable: string, isplayer: boolean?}?
+---@return {category: string, display: string, isplayer: boolean?}?
 function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
----@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@param roleData {category: string, display: string, isplayer: boolean?}?
 ---@return string?
 function CustomPlayer:_displayRole(roleData)
 	if not roleData then return end
 
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+	return Page.makeInternalLink(roleData.display, ':Category:' .. roleData.category)
 end
 
 ---@param categories string[]
