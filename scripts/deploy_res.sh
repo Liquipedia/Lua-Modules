@@ -8,7 +8,7 @@ if [[ -n "$1" ]]; then
   files=$1
   gitDeployReason="\"$(git log -1 --pretty='%h %s')\""
 else
-  files=$(find stylesheets javascript -type f -name '*.css' -o -name '*.js')
+  files=$(find stylesheets javascript -type f -name '*.less' -o -name '*.css' -o -name '*.js')
   gitDeployReason='Automated Weekly Re-Sync'
 fi
 
