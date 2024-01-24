@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
+local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -54,7 +55,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
 			Cell{name = 'Abbreviation', content = {args.abbreviation}},
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {args.affiliate and Team.team(args.affiliate) or nil}}
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
 		}
 	end
 
