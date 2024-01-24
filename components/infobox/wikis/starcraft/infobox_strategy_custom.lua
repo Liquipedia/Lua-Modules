@@ -23,56 +23,46 @@ local DEFAULT_COUNTER_GAME = 'Starcraft: Broodwar'
 local COUNTER_INFORMATION_TYPE = 'Counter'
 local STRATEGY_INFORMATION_TYPE = 'Strategy'
 
-local CustomStrategy = Class.new()
-
-local _args
-
+---@class StarcraftStrategyInfobox: StrategyInfobox
+local CustomStrategy = Class.new(Strategy)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomStrategy.run(frame)
-	local customStrategy = Strategy(frame)
-	_args = customStrategy.args
-
-	customStrategy.createWidgetInjector = CustomStrategy.createWidgetInjector
+	local strategy = CustomStrategy(frame)
+	strategy:setWidgetInjector(CustomInjector(strategy))
 
 	if Namespace.isMain() then
-		local categories = CustomStrategy:_getCategories(_args.race, _args.matchups)
-		customStrategy.infobox:categories(unpack(categories))
+		local categories = strategy:_getCategories(strategy.args.race, strategy.args.matchups)
+		strategy.infobox:categories(unpack(categories))
 	end
 
-	return customStrategy:createInfobox()
-end
-
----@return WidgetInjector
-function CustomStrategy:createWidgetInjector()
-	return CustomInjector()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell{name = 'Matchups', content = {_args.matchups or 'All'}},
-		Cell{name = 'Type', content = {_args.type or 'Opening'}},
-		Cell{name = 'Popularized by', content = {_args.popularized}},
-		Cell{name = 'Converted Form', content = {_args.convert}},
-		Cell{name = 'TL-Article', content = {CustomStrategy:_getTLarticle(_args.tlarticle)}},
-		Cell{name = 'Game', content = {_args.game or
-			(_args.informationType == COUNTER_INFORMATION_TYPE and DEFAULT_COUNTER_GAME or nil)}},
-	}
+	return strategy:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'header' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		return {
+			Cell{name = 'Matchups', content = {args.matchups or 'All'}},
+			Cell{name = 'Type', content = {args.type or 'Opening'}},
+			Cell{name = 'Popularized by', content = {args.popularized}},
+			Cell{name = 'Converted Form', content = {args.convert}},
+			Cell{name = 'TL-Article', content = {caller:_getTLarticle(args.tlarticle)}},
+			Cell{name = 'Game', content = {args.game or
+				(args.informationType == COUNTER_INFORMATION_TYPE and DEFAULT_COUNTER_GAME or nil)}},
+		}
+	elseif id == 'header' then
 		return {
 			Header{
-				name = CustomStrategy:_getNameDisplay(),
-				image = _args.image
+				name = caller:_getNameDisplay(),
+				image = args.image
 			},
 		}
 	end
@@ -81,8 +71,8 @@ end
 
 ---@return string
 function CustomStrategy:_getNameDisplay()
-	local race = Faction.Icon{size = 'large', faction = _args.race} or ''
-	return race .. (_args.name or mw.title.getCurrentTitle().text)
+	local race = Faction.Icon{size = 'large', faction = self.args.race} or ''
+	return race .. (self.args.name or mw.title.getCurrentTitle().text)
 end
 
 ---@param tlarticle string?
@@ -108,7 +98,7 @@ function CustomStrategy:_getCategories(race, matchups)
 
 	local categories = {}
 
-	local informationType = _args.informationType
+	local informationType = self.args.informationType
 	if informationType == STRATEGY_INFORMATION_TYPE then
 		informationType = 'Build Order'
 	end
