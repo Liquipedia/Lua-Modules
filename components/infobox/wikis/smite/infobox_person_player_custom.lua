@@ -31,22 +31,9 @@ local ROLES = {
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
 	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
 	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
-	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
 	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
 	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
-	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
-ROLES['assistant coach'] = ROLES.coach
-ROLES['head coach'] = ROLES.coach
-ROLES['jgl'] = ROLES.jungler
-ROLES['adc'] = ROLES.carry
-ROLES['sup'] = ROLES.support
-ROLES['top'] = ROLES.solo
 
 ---@class SmiteInfoboxPlayer: Person
 ---@field role table
@@ -106,31 +93,6 @@ function CustomPlayer:getWikiCategories(categories)
 		(self.role or {}).category,
 		(self.role2 or {}).category
 	)
-end
-
----@param lpdbData table
----@param args table
----@param personType string
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.type = self:_isPlayerOrStaff()
-	return lpdbData
-end
-
----@return string
-function CustomPlayer:_isPlayerOrStaff()
-	local roleData
-	if String.isNotEmpty(self.args.role) then
-		roleData = ROLES[self.args.role:lower()]
-	end
-	-- If the role is missing, assume it is a player
-	if roleData and roleData.isplayer == false then
-		return 'staff'
-	else
-		return 'player'
-	end
 end
 
 return CustomPlayer
