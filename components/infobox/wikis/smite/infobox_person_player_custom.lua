@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
