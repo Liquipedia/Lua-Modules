@@ -137,12 +137,11 @@ end
 --- StreamKey Class
 -- Contains the triplet that makes up a stream key
 -- [platform, languageCode, index]
----@class StreamKey
+---@class StreamKey: BaseClass
 ---@operator call(...): StreamKey
 ---@field platform string
 ---@field languageCode string
 ---@field index integer
----@field is_a function
 local StreamKey = Class.new(
 	function (self, ...)
 		self:new(...)
