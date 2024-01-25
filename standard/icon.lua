@@ -5,6 +5,7 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
+local Class = require('Module:Class')
 local IconData = require('Module:Icon/Data')
 local Logic = require('Module:Logic')
 
@@ -31,4 +32,4 @@ function Icon.makeIcon(args)
 	)
 end
 
-return Icon
+return Class.export(Icon)
