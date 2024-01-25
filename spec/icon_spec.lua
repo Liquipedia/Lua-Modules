@@ -9,34 +9,34 @@ describe('Icon Maker', function()
 		end)
 
 		it('icon builds', function()
-			assert.are_equal('<i class="fas fa-check"></i>', Icon.makeIcon{iconName = 'check'})
+			assert.are_equal('<i class="fas fa-check"></i>', Icon.makeIcon{iconName = 'winner'})
 		end)
 
 		it('can apply color', function()
 			assert.are_equal('<i class="fas fa-check forest-green-text"></i>',
-				Icon.makeIcon{iconName = 'check', color = 'forest-green-text'})
+				Icon.makeIcon{iconName = 'winner', color = 'forest-green-text'})
 		end)
 
 		it('can hover text', function()
 			assert.are_equal('<i class="fas fa-check" title="someTitle"></i>',
-				Icon.makeIcon{iconName = 'check', hover = 'someTitle'})
+				Icon.makeIcon{iconName = 'winner', hover = 'someTitle'})
 		end)
 
 		it('can set size pixels', function()
 			assert.are_equal('<i class="fas fa-check" style="font-size:14px"></i>',
-				Icon.makeIcon{iconName = 'check', size = 14})
+				Icon.makeIcon{iconName = 'winner', size = 14})
 			assert.are_equal('<i class="fas fa-check" style="font-size:14px"></i>',
-				Icon.makeIcon{iconName = 'check', size = '14'})
+				Icon.makeIcon{iconName = 'winner', size = '14'})
 		end)
 
 		it('can set size string', function()
 			assert.are_equal('<i class="fas fa-check" style="font-size:initial"></i>',
-				Icon.makeIcon{iconName = 'check', size = 'initial'})
+				Icon.makeIcon{iconName = 'winner', size = 'initial'})
 		end)
 
 		it('can set hidden for screen readers', function()
 			assert.are_equal('<i class="fas fa-check" aria-hidden="true"></i>',
-				Icon.makeIcon{iconName = 'check', screenReaderHidden = true})
+				Icon.makeIcon{iconName = 'winner', screenReaderHidden = true})
 		end)
 	end)
 end)
