@@ -34,7 +34,7 @@ local UNKNOWN_RACE = 'u'
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
+	local unit = CustomUnit(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
 
 	return unit:createInfobox()
