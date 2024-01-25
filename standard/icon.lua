@@ -21,7 +21,7 @@ function Icon.makeIcon(args)
 		return
 	end
 
-	local aria = args.screenReaderHidden and 'aria-hidden="true"' or nil
+	local aria = args.screenReaderHidden and 'aria-hidden="true"' or ''
 	local size = args.size or ''
 	if Logic.isNumeric(size) then
 		size = size .. 'px'
