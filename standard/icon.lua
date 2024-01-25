@@ -11,9 +11,10 @@ local String = require('Module:StringUtils')
 
 local Icon = {}
 local FontAwesomeString =
-'<i class="${icon} ${color}" title="${hoverText}" style="font-size:${size}" ${ariaHiddenText}></i>'
+'<i class="${icon} ${color}" title="${hover}" style="font-size:${size}" ${ariaHiddenText}></i>'
 
----@param args {iconName: string, color: string?, screenReaderHidden: boolean?, hoverText: string?, size: integer|string|nil}
+---@param args {iconName: string, color: string?, screenReaderHidden: boolean?, hover: string?, size: integer|string?}
+---@return string?
 function Icon.makeIcon(args)
 	local icon = IconData[(args.iconName or ''):lower()]
 	if not icon then
@@ -27,7 +28,7 @@ function Icon.makeIcon(args)
 	end
 
 	return String.interpolate(FontAwesomeString,
-		{icon = icon, ariaHiddenText = aria, size = size, hoverText = args.hoverText or '', color = args.color or ''})
+		{icon = icon, ariaHiddenText = aria, size = size, hover = args.hover or '', color = args.color or ''})
 end
 
 return Icon
