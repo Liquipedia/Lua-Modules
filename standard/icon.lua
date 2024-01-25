@@ -21,14 +21,17 @@ function Icon.makeIcon(args)
 		return
 	end
 
-	local aria = args.screenReaderHidden and 'aria-hidden="true"' or ''
-	local size = args.size or ''
+	local size = args.size
 	if Logic.isNumeric(size) then
 		size = size .. 'px'
 	end
-
-	return String.interpolate(FontAwesomeString,
-		{icon = icon, ariaHiddenText = aria, size = size, hover = args.hover or '', color = args.color or ''})
+	return tostring(mw.html.create('i')
+			:addClass(icon)
+			:addClass(args.color)
+			:attr('title', args.hover)
+			:css('font-size', size)
+			:attr('aria-hidden', args.screenReaderHidden and 'true' or nil)
+	)
 end
 
 return Icon
