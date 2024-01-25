@@ -7,11 +7,8 @@
 
 local IconData = require('Module:Icon/Data')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
 
 local Icon = {}
-local FontAwesomeString =
-'<i class="${icon} ${color}" title="${hover}" style="font-size:${size}" ${ariaHiddenText}></i>'
 
 ---@param args {iconName: string, color: string?, screenReaderHidden: boolean?, hover: string?, size: integer|string?}
 ---@return string?
