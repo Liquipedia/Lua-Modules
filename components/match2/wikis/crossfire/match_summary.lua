@@ -20,7 +20,7 @@ local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 ---@enum CrossFireMatchIcons
-local Icon = {
+local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
@@ -119,13 +119,13 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icon.CHECK))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icon.CHECK))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -166,7 +166,7 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	if showIcon then
 		return container:node(iconType)
 	end
-	return container:node(Icon.EMPTY)
+	return container:node(Icons.EMPTY)
 end
 
 return CustomMatchSummary
