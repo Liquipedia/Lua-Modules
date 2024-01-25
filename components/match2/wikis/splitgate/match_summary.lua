@@ -7,6 +7,7 @@
 --
 
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -17,9 +18,8 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local ICONS = {
-	check = GREEN_CHECK,
+	check = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local LINK_DATA = {

@@ -11,6 +11,7 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
@@ -25,7 +26,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local MATCH_STATUS_TO_ICON = {
-	finished = 'fas fa-check icon--green',
+	finished = Icon.makeIcon{iconName = 'check', color = 'icon--green', size = 'initial'},
 	live = 'fas fa-circle icon--red',
 	upcoming = 'fas fa-clock',
 }

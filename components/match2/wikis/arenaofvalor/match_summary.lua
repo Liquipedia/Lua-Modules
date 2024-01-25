@@ -9,12 +9,13 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
-local ChampionIcon = require('Module:HeroIcon')
 local Class = require('Module:Class')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local ExternalLinks = require('Module:ExternalLinks')
+local ChampionIcon = require('Module:HeroIcon')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -23,7 +24,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
 
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local EPOCH_TIME = '1970-01-01 00:00:00'

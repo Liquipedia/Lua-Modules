@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -23,7 +24,7 @@ local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local ICONS = {
-	check = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	check = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
 

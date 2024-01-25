@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -267,7 +268,8 @@ function StarcraftOpponentDisplay.BlockArchon(props)
 		:node(playersNode)
 end
 
-StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
+StarcraftOpponentDisplay.CheckMark =
+	Icon.makeIcon{iconName = 'check', color = 'forest-green-text', screenReaderHidden = true}
 
 ---Displays a score within the context of an inline element.
 ---@param opponent StarcraftStandardOpponent
