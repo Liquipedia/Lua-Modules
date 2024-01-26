@@ -1,7 +1,3 @@
-additionally:
---allow to add vs conditions
---allow playerX//teamX input
-
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -55,8 +51,8 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field limit number?
 ---@field displayGameIcons boolean
 ---@field showResult boolean
----@field opponent standardOpponent
 ---@field aliases table<string, true>
+---@field vs table<string, true>
 ---@field timeRange {startDate: number, endDate: number}
 ---@field title string?
 ---@field showTier boolean
@@ -112,9 +108,9 @@ function MatchTable:init()
 		limit = tonumber(args.limit),
 		displayGameIcons = Logic.readBool(args.gameIcons),
 		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
-		opponent = self:readOpponent(mode),
 		timeRange = self:readTimeRange(),
-		aliases = {}, -- shut up anno warning
+		aliases = self:readAliases(mode),
+		vs = {},
 		title = args.title,
 		showTier = not Logic.readBool(args.hide_tier),
 		showIcon = not Logic.readBool(args.hide_icon),
@@ -122,24 +118,66 @@ function MatchTable:init()
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOpponent = Logic.readBool(args.showOpponent),
 	}
-	self.config.aliases = self:readAliases(mode)
+
+	Array.forEach(self:_readOpponents(mode), function(opponent)
+		Table.merge(self.config.aliases, self:getOpponentAliases(mode, opponent))
+	end)
+
+	local vsMode = args.vsMode or mode
+	assert(vsMode == PLAYER_MODE or vsMode == TEAM_MODE, 'Unsupported "|vsMode=" input')
+
+	Array.forEach(self:_readVsOpponents(mode), function(opponent)
+		Table.merge(self.config.vs, self:getOpponentAliases(mode, opponent))
+	end)
 
 	return self
 end
 
 ---@param mode MatchTableMode
+---@return standardOpponent[]
+function MatchTable:_readOpponents(mode)
+	local base = mode == PLAYER_MODE and 'player' or 'team'
+	local inputs = self:_readOpponentInputsFromBase(base)
+
+	if Logic.isEmpty(inputs) then
+		assert(self.title.namespace == 0, 'Required ' .. base .. '= argument')
+		table.insert(inputs, self.title.rootText)
+	end
+
+	return Array.map(inputs, function(input) return self:_readOpponent(mode, input) end)
+end
+
+---@param mode MatchTableMode
+---@return standardOpponent[]
+function MatchTable:_readVsOpponents(mode)
+	local inputs = self:_readOpponentInputsFromBase('vs' .. (mode == PLAYER_MODE and 'player' or 'team'))
+
+	return Array.map(inputs, function(input) return self:_readOpponent(mode, input) end)
+end
+
+---@param base string
+---@return string[]
+function MatchTable:_readOpponentInputsFromBase(base)
+	local inputs = Array.extractValues(Table.filterByKey(self.args, function(key)
+		return key:find('^' .. base .. '%d*$') ~= nil
+	end))
+
+	if Logic.isNotEmpty(inputs) or Logic.isEmpty(self.args[base .. 's']) then return inputs end
+
+	return Array.map(mw.text.split(self.args[base .. 's'], ',', true), String.trim)
+end
+
+---@param mode MatchTableMode
+---@param input string
 ---@return standardOpponent
-function MatchTable:readOpponent(mode)
+function MatchTable:_readOpponent(mode, input)
 	if mode == PLAYER_MODE then
-		local player = {displayName = self.args.player or self.title.rootText}
+		local player = {displayName = input}
 		PlayerExt.populatePageName(player)
 		return {type = 'solo', players = {player}}
 	end
 
-	local team = self.args.team or self.title.namespace == 0 and self.title.rootText or nil
-	assert(team, 'Required team= argument')
-
-	return {type = 'team', template = team:lower():gsub('_', ' ')}
+	return {type = 'team', template = input:lower():gsub('_', ' ')}
 end
 
 ---@param mode MatchTableMode
@@ -153,17 +191,26 @@ function MatchTable:readAliases(mode)
 		aliases[aliasWithSpaces] = true
 	end)
 
-	if mode == PLAYER_MODE then
-		local name = self.config.opponent.players[1].pageName:gsub(' ', '_')
-		local nameWithSpaces = name:gsub('_', ' ')
-		aliases[name] = true
-		aliases[nameWithSpaces] = true
+	return aliases
+end
 
-		return aliases
+---@param mode MatchTableMode
+---@param opponent standardOpponent
+---@return string[]
+function MatchTable:getOpponentAliases(mode, opponent)
+	if mode == PLAYER_MODE then
+		local name = opponent.players[1].pageName:gsub(' ', '_')
+		local nameWithSpaces = name:gsub('_', ' ')
+
+		return {
+			[name] = true,
+			[nameWithSpaces] = true,
+		}
 	end
 
-	--for team matches also query pagenames from team template
-	local opponentNames = Team.queryHistoricalNames(self.config.opponent.template)
+	local aliases = {}
+	--for teams also query pagenames from team template
+	local opponentNames = Team.queryHistoricalNames(opponent.template)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
@@ -249,12 +296,23 @@ end
 
 ---@return ConditionTree
 function MatchTable:buildOpponentConditions()
-	local conditions = ConditionTree(BooleanOperator.any)
+	local opponentConditions = ConditionTree(BooleanOperator.any)
 	Array.forEach(Array.extractKeys(self.config.aliases), function(alias)
-		conditions:add{ConditionNode(ColumnName('opponent'), Comparator.eq, alias)}
+		opponentConditions:add{ConditionNode(ColumnName('opponent'), Comparator.eq, alias)}
 	end)
 
-	return conditions
+	if Logic.isEmpty(self.config.vs) then
+		return opponentConditions
+	end
+
+	local vsConditions = ConditionTree(BooleanOperator.any)
+	Array.forEach(Array.extractKeys(self.config.vs), function(alias)
+		vsConditions:add{ConditionNode(ColumnName('opponent'), Comparator.eq, alias)}
+	end)
+
+	return ConditionTree(BooleanOperator.all)
+		:add(opponentConditions)
+		:add(vsConditions)
 end
 
 ---@return ConditionTree
