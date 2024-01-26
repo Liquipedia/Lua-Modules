@@ -287,7 +287,8 @@ function MatchTable:buildDateConditions()
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	if timeRange.startDate ~= DateExt.minTimestamp then
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.formatTimestamp('c', timeRange.startDate - 1))}
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.gt,
+			DateExt.formatTimestamp('c', timeRange.startDate - 1))}
 	end
 
 	if timeRange.endDate ~= DateExt.maxTimestamp then
