@@ -515,9 +515,10 @@ function CustomMatchSummary._createGameTab(game, idx)
 						:done()
 
 	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
-		gameDetails:tag('div')
+		gameDetails:tag('li')
 				:tag('i')
 						:addClass('fas fa-clock')
+						:addClass('panel-content__game-schedule__icon')
 						:done()
 				:node(CustomMatchSummary._gameCountdown(game))
 	end
@@ -751,7 +752,7 @@ function CustomMatchSummary._gameCountdown(game)
 		finished = CustomMatchSummary._isFinished(game) and 'true' or nil,
 	})
 
-	return mw.html.create('div'):addClass('panel-content__game-schedule__countdown'):addClass('match-countdown-block')
+	return mw.html.create('div'):addClass('match-countdown-block')
 			:node(require('Module:Countdown')._create(stream))
 			:node(game.vod and VodLink.display{vod = game.vod} or nil)
 end

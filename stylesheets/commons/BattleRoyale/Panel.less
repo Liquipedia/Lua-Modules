@@ -110,6 +110,11 @@ Author(s): Elysienna
 			margin: 0;
 			display: flex;
 			align-items: center;
+
+			@media ( max-width: 767px ) {
+				flex-wrap: wrap;
+				margin-bottom: 0.5rem;
+			}
 		}
 
 		&__icon {
@@ -131,13 +136,31 @@ Author(s): Elysienna
 			margin-right: 0.25rem;
 		}
 
-		div&__countdown {
+		.match-countdown-block {
 			padding: 0;
 			font-size: unset;
 			display: flex;
+			text-align: initial;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 100%;
+				margin-bottom: 0.5rem;
+			}
 
 			.vodlink {
 				margin-left: 0.25rem;
+			}
+
+			.timer-object {
+				display: inline-flex;
+
+				@media ( max-width: 767px ) {
+					flex-wrap: wrap;
+				}
+			}
+
+			.timer-object-date {
+				margin-right: 1rem;
 			}
 		}
 	}
