@@ -8,8 +8,10 @@
 
 local MatchLegacy = {}
 
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
 local Table = require('Module:Table')
+
 
 function MatchLegacy.storeMatch(match2, options)
 	if options.storeMatch1 then
@@ -28,10 +30,16 @@ function MatchLegacy._storeMatch1(match2)
 		match.staticid = match2.match2id .. '_' .. gameIndex
 
 		-- Handle extradata fields
+		local bracketData = Json.parseIfString(match2.match2bracketdata)
+		if type(bracketData) == 'table' and bracketData.type == 'bracket' then
+			if bracketData.inheritedheader then
+				match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
+			end
+		end
 		local m1extradata = {}
 
 		m1extradata.map = game2.map
-		m1extradata.round = gameIndex
+		m1extradata.round = tostring(gameIndex)
 
 		match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(m1extradata)
 
