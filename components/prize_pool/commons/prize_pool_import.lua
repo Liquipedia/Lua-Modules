@@ -65,6 +65,7 @@ function Import._getConfig(args, placements)
 	return {
 		ignoreNonScoreEliminations = Logic.readBool(args.ignoreNonScoreEliminations),
 		importLimit = Import._importLimit(args.importLimit, placements, args.placementsExtendImportLimit),
+		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
 		groupElimStatuses = Array.map(
@@ -76,6 +77,12 @@ function Import._getConfig(args, placements)
 		stageImportLimits = Table.mapArguments(
 			args,
 			function(key) return tonumber(string.match(key, '^stage(%d+)importLimit$')) end,
+			function(key) return tonumber(args[key]) end,
+			true
+		),
+		stagePlacementsToSkip = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)placementsToSkip$')) end,
 			function(key) return tonumber(args[key]) end,
 			true
 		),
@@ -123,6 +130,7 @@ end
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
 	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
+	local startingPlacement = 1 + (Import.config.placementsToSkip or 0)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 				local stageIndex = #stages + 1 - reverseStageIndex
@@ -132,6 +140,7 @@ function Import._importPlacements(inputPlacements)
 						groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or
 							Import.config.groupElimStatuses,
 						importLimit = Import.config.stageImportLimits[stageIndex] or 0,
+						placementsToSkip = Import.config.stagePlacementsToSkip[stageIndex],
 					})
 			end))
 
@@ -142,8 +151,10 @@ function Import._importPlacements(inputPlacements)
 		-- slotIndex of the slot until which we want to import based on importLimit
 		local slotIndex = Array.indexOf(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
 		if slotIndex ~= 0 then
-			placementEntries = Array.sub(placementEntries, 1, slotIndex - 1)
+			placementEntries = Array.sub(placementEntries, startingPlacement, slotIndex - 1)
 		end
+	else
+		placementEntries = Array.sub(placementEntries, startingPlacement)
 	end
 
 	return Import._mergePlacements(placementEntries, inputPlacements)
@@ -158,6 +169,8 @@ function Import._computeStagePlacementEntries(stage, options)
 			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
 
+	local startingPlacement = 1 + (options.placementsToSkip or 0)
+
 	local maxPlacementCount = Array.max(Array.map(
 			groupPlacementEntries,
 			function(placementEntries) return #placementEntries end
@@ -167,7 +180,7 @@ function Import._computeStagePlacementEntries(stage, options)
 		and math.min(maxPlacementCount, options.importLimit)
 		or maxPlacementCount
 
-	return Array.map(Array.range(1, maxPlacementCount), function(placementIndex)
+	return Array.map(Array.range(startingPlacement, maxPlacementCount), function(placementIndex)
 		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
 		end))
