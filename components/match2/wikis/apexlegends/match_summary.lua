@@ -317,7 +317,7 @@ function CustomMatchSummary._opponents(match)
 			if opponent1.score and opponent2.score then
 				return opponent1.score > opponent2.score
 			else
-				return (opponent1.name or '') > (opponent2.name or '')
+				return (opponent1.name or '') < (opponent2.name or '')
 			end
 		end
 		return opponent1.placement < opponent2.placement
