@@ -130,7 +130,6 @@ end
 -- fills in placements and opponents using data fetched from LPDB
 function Import._importPlacements(inputPlacements)
 	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
-	local startingPlacement = 1 + (Import.config.placementsToSkip or 0)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 				local stageIndex = #stages + 1 - reverseStageIndex
@@ -144,6 +143,8 @@ function Import._importPlacements(inputPlacements)
 					})
 			end))
 
+	placementEntries = Array.sub(placementEntries, 1 + (Import.config.placementsToSkip or 0))
+
 	-- Apply importLimit if set
 	if Import.config.importLimit then
 		-- array of partial sums of the number of entries until a given placement/slot
@@ -151,10 +152,8 @@ function Import._importPlacements(inputPlacements)
 		-- slotIndex of the slot until which we want to import based on importLimit
 		local slotIndex = Array.indexOf(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
 		if slotIndex ~= 0 then
-			placementEntries = Array.sub(placementEntries, startingPlacement, slotIndex - 1)
+			placementEntries = Array.sub(placementEntries, 1, slotIndex - 1)
 		end
-	else
-		placementEntries = Array.sub(placementEntries, startingPlacement)
 	end
 
 	return Import._mergePlacements(placementEntries, inputPlacements)
