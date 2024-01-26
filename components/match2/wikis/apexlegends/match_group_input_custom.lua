@@ -43,6 +43,8 @@ local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+
 local MatchFunctions = {}
 local MapFunctions = {}
 local OpponentFunctions = {}
@@ -167,6 +169,10 @@ function MatchFunctions.adjustMapData(match)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
 		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
+
+		if map.map == DUMMY_MAP_NAME then
+			map.map = ''
+		end
 
 		match[key] = map
 	end
