@@ -110,6 +110,11 @@ Author(s): Elysienna
 			margin: 0;
 			display: flex;
 			align-items: center;
+
+			@media ( max-width: 767px ) {
+				flex-wrap: wrap;
+				margin-bottom: 0.5rem;
+			}
 		}
 
 		&__icon {
@@ -152,6 +157,10 @@ Author(s): Elysienna
 				@media ( max-width: 767px ) {
 					flex-wrap: wrap;
 				}
+			}
+
+			.timer-object-date {
+				margin-right: 1rem;
 			}
 		}
 	}
