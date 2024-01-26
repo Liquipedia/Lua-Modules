@@ -28,7 +28,7 @@ local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local MATCH_STATUS_TO_ICON = {
 	finished = 'fas fa-check icon--green',
 	live = 'fas fa-circle icon--red',
-	upcoming = 'fa-clock',
+	upcoming = 'fas fa-clock',
 }
 
 local PLACEMENT_BG = {
@@ -503,7 +503,7 @@ function CustomMatchSummary._createGameTab(game, idx)
 							:done()
 					:tag('li')
 						:tag('i')
-							:addClass('far fa-clock')
+							:addClass('fas fa-clock')
 							:addClass('panel-content__game-schedule__icon')
 							:done()
 						:node(CustomMatchSummary._gameCountdown(game))
@@ -512,7 +512,7 @@ function CustomMatchSummary._createGameTab(game, idx)
 	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
 		gameDetails:tag('div')
 				:tag('i')
-						:addClass('far fa-clock')
+						:addClass('fas fa-clock')
 						:done()
 				:node(CustomMatchSummary._gameCountdown(game))
 	end
