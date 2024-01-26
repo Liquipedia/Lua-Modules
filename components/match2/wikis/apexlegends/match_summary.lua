@@ -308,7 +308,7 @@ function CustomMatchSummary._opponents(match)
 	end)
 
 	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement == opponent2.placement then
+		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
 			return opponent1.score > opponent2.score
 		end
 		return opponent1.placement < opponent2.placement
@@ -739,8 +739,9 @@ end
 ---@param game table
 ---@return Html?
 function CustomMatchSummary._gameCountdown(game)
-	local timestamp = Date.readTimestamp(game.date)
+	local timestamp = Date.readTimestampOrNil(game.date)
 	if not timestamp then
+		mw.log('Invalid date ', game.date)
 		return
 	end
 	-- TODO Use local TZ
