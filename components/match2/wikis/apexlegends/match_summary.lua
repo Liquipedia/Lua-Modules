@@ -515,9 +515,10 @@ function CustomMatchSummary._createGameTab(game, idx)
 						:done()
 
 	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
-		gameDetails:tag('div')
+		gameDetails:tag('li')
 				:tag('i')
 						:addClass('fas fa-clock')
+						:addClass('panel-content__game-schedule__icon')
 						:done()
 				:node(CustomMatchSummary._gameCountdown(game))
 	end
