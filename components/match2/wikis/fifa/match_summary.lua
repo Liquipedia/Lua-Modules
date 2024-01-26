@@ -19,7 +19,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 

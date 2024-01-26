@@ -22,7 +22,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local POSITION_LEFT = 1
 local POSITION_RIGHT = 2
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local ROUND_ICONS = {
 	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',

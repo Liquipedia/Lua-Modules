@@ -21,7 +21,7 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local ICONS = {
 	check = GREEN_CHECK,

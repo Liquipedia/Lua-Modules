@@ -27,7 +27,7 @@ local Opponent = Lua.import('Module:Opponent')
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
-local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 -- Hero Ban Class

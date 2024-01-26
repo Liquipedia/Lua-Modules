@@ -269,7 +269,7 @@ function StarcraftOpponentDisplay.BlockArchon(props)
 end
 
 StarcraftOpponentDisplay.CheckMark =
-	Icon.makeIcon{iconName = 'check', color = 'forest-green-text', screenReaderHidden = true}
+	Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', screenReaderHidden = true}
 
 ---Displays a score within the context of an inline element.
 ---@param opponent StarcraftStandardOpponent

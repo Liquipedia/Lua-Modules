@@ -26,7 +26,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local GREEN_CHECK  = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK  = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'

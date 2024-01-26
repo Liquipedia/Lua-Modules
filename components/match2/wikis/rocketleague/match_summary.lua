@@ -19,7 +19,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 

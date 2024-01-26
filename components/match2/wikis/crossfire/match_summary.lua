@@ -21,7 +21,7 @@ local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 ---@enum CrossFireMatchIcons
 local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 

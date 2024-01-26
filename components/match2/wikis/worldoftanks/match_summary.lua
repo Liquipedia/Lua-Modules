@@ -28,7 +28,7 @@ local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
 
 ---@enum WoTMatchIcons
 local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 

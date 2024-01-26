@@ -20,7 +20,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 ---@enum AFPSMatchIcons
 local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'check', color = 'forest-green-text', size = 'initial'},
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
