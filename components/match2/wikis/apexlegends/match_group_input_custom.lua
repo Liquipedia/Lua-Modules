@@ -423,7 +423,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 		end
 		local scoreBreakdown = {}
 		local placement, kills = tonumber(opponentData[1]), tonumber(opponentData[2])
-		if scoreBreakdown and kills then
+		if placement and kills then
 			scoreBreakdown.placePoints = scoreSettings[placement] or 0
 			scoreBreakdown.killPoints = kills * scoreSettings.kill
 			scoreBreakdown.kills = kills
@@ -435,7 +435,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			placement = placement,
 			score = scoreBreakdown.totalPoints,
 		}
-		table.insert(map.scores, scoreBreakdown.totalPoints)
+		table.insert(map.scores, opponent.score or 0)
 		indexedScores[opponentIndex] = opponent
 	end
 
