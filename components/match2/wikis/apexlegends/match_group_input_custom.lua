@@ -347,6 +347,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(map, scores)
 	map.extradata = {
+		dateexact = map.dateexact,
 		comment = map.comment,
 		opponents = scores,
 	}
