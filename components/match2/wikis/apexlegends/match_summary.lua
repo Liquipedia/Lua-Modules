@@ -66,12 +66,12 @@ local MATCH_STANDING_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.placement or idx
+				return opponent.placement ~= -1 and opponent.placement or idx
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				local place = opponent.placement or idx
+				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local icon, color = CustomMatchSummary._getIcon(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
@@ -178,12 +178,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.placement or idx
+				return opponent.placement ~= -1 and opponent.placement or idx
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				local place = opponent.placement or idx
+				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local icon, color = CustomMatchSummary._getIcon(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
@@ -298,7 +298,12 @@ function CustomMatchSummary._opponents(match)
 	-- Add match opponent data to game opponent and the other way around
 	Array.forEach(match.games, function (game)
 		game.extradata.opponents = Array.map(game.extradata.opponents, function (opponent, opponentIdx)
-			return Table.merge(match.opponents[opponentIdx], opponent)
+			local o = Table.merge(match.opponents[opponentIdx], opponent)
+			-- These values are only allowed to come from Game and not Match
+			o.placement = opponent.placement
+			o.score = opponent.score
+			o.status = opponent.status
+			return o
 		end)
 	end)
 	Array.forEach(match.opponents, function (opponent, idx)
