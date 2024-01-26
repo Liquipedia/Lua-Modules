@@ -31,10 +31,8 @@ function MatchLegacy._storeMatch1(match2)
 
 		-- Handle extradata fields
 		local bracketData = Json.parseIfString(match2.match2bracketdata)
-		if type(bracketData) == 'table' and bracketData.type == 'bracket' then
-			if bracketData.inheritedheader then
-				match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
-			end
+		if type(bracketData) == 'table' and bracketData.type == 'bracket' and bracketData.inheritedheader then
+			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
 		local m1extradata = {}
 
