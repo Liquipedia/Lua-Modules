@@ -51,7 +51,7 @@ local MATCH_STANDING_COLUMNS = {
 			value = '',
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return '-'
 			end,
 		},
@@ -65,16 +65,17 @@ local MATCH_STANDING_COLUMNS = {
 			value = 'Rank',
 		},
 		sortVal = {
-			value = function (opponent)
-				return opponent.placement
+			value = function (opponent, idx)
+				return opponent.placement or idx
 			end,
 		},
 		row = {
-			value = function (opponent)
-				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+			value = function (opponent, idx)
+				local place = opponent.placement or idx
+				local icon, color = CustomMatchSummary._getIcon(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('span'):wikitext(CustomMatchSummary._displayRank(place)):done()
 			end,
 		},
 	},
@@ -87,12 +88,12 @@ local MATCH_STANDING_COLUMNS = {
 			value = 'Team',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.name
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return CustomMatchSummary._displayOpponent(opponent)
 			end,
 		},
@@ -106,12 +107,12 @@ local MATCH_STANDING_COLUMNS = {
 			value = 'Total Points',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.score
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.score
 			end,
 		},
@@ -162,7 +163,7 @@ local GAME_STANDINGS_COLUMNS = {
 			value = '',
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return ''
 			end,
 		},
@@ -176,16 +177,17 @@ local GAME_STANDINGS_COLUMNS = {
 			value = 'Rank',
 		},
 		sortVal = {
-			value = function (opponent)
-				return opponent.placement
+			value = function (opponent, idx)
+				return opponent.placement or idx
 			end,
 		},
 		row = {
-			value = function (opponent)
-				local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+			value = function (opponent, idx)
+				local place = opponent.placement or idx
+				local icon, color = CustomMatchSummary._getIcon(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+						:tag('span'):wikitext(CustomMatchSummary._displayRank(place)):done()
 			end,
 		},
 	},
@@ -198,12 +200,12 @@ local GAME_STANDINGS_COLUMNS = {
 			value = 'Team',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.name
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return CustomMatchSummary._displayOpponent(opponent)
 			end,
 		},
@@ -217,12 +219,12 @@ local GAME_STANDINGS_COLUMNS = {
 			value = 'Total Points',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.score
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.score
 			end,
 		},
@@ -236,12 +238,12 @@ local GAME_STANDINGS_COLUMNS = {
 			value = 'Placement Points',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.scoreBreakdown.placePoints
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.scoreBreakdown.placePoints
 			end,
 		},
@@ -255,12 +257,12 @@ local GAME_STANDINGS_COLUMNS = {
 			value = 'Kill Points',
 		},
 		sortVal = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.scoreBreakdown.killPoints
 			end,
 		},
 		row = {
-			value = function (opponent)
+			value = function (opponent, idx)
 				return opponent.scoreBreakdown.killPoints
 			end,
 		},
@@ -613,16 +615,16 @@ function CustomMatchSummary._createMatchStandings(match)
 		end)
 	end)
 
-	Array.forEach(match.opponents, function (opponentMatch)
+	Array.forEach(match.opponents, function (opponentMatch, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
 		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
-					:node(column.row.value(opponentMatch))
+					:node(column.row.value(opponentMatch, index))
 				if(column.sortVal and column.sortType) then
-					cell:attr('data-sort-val', column.sortVal.value(opponentMatch)):attr('data-sort-type', column.sortType)
+					cell:attr('data-sort-val', column.sortVal.value(opponentMatch, index)):attr('data-sort-type', column.sortType)
 					end
 		end)
 
@@ -679,15 +681,15 @@ function CustomMatchSummary._createGameStandings(game)
 						end
 	end)
 
-	Array.forEach(game.extradata.opponents, function (opponent)
+	Array.forEach(game.extradata.opponents, function (opponent, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
-					:node(column.row.value(opponent))
+					:node(column.row.value(opponent, index))
 			if (column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponent)):attr('data-sort-type', column.sortType)
+				cell:attr('data-sort-val', column.sortVal.value(opponent, index)):attr('data-sort-type', column.sortType)
 			end
 		end)
 	end)
