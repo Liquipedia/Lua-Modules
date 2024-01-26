@@ -16,7 +16,7 @@ local CustomMatchTable = {}
 ---@param args table
 ---@return Html
 function CustomMatchTable.results(args)
-	return MatchTable(args):init():query():build()
+	return MatchTable(args):readConfig():query():build()
 end
 
 return Class.export(CustomMatchTable)
