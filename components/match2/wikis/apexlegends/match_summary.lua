@@ -276,6 +276,7 @@ function CustomMatchSummary.getByMatchId(args)
 	match.scoringTable = CustomMatchSummary._createScoringData(match)
 	Array.forEach(match.games, function(game)
 		game.scoringTable = match.scoringTable
+		game.stream = match.stream
 	end)
 
 	match = CustomMatchSummary._opponents(match)
