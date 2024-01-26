@@ -1,3 +1,7 @@
+additionally:
+--allow to add vs conditions
+--allow playerX//teamX input
+
 ---
 -- @Liquipedia
 -- wiki=commons
@@ -41,6 +45,8 @@ local UTC = 'UTC'
 local DRAW = 'draw'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
+local SCORE_STATUS = 'S'
+local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@alias MatchTableMode `PLAYER_MODE` | `TEAM_MODE`
 
@@ -57,6 +63,7 @@ local INVALID_TIER_SORT = 'ZZ'
 ---@field showIcon boolean
 ---@field showVod boolean
 ---@field showStats boolean
+---@field showOpponent boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -74,8 +81,8 @@ local INVALID_TIER_SORT = 'ZZ'
 ---@field game string?
 
 ---@class MatchTableMatchResult
----@field opponent table #match2opponent table
----@field vs table #match2opponent table
+---@field opponent match2opponent
+---@field vs match2opponent
 ---@field winner number
 ---@field resultType string?
 ---@field countGames boolean
@@ -112,7 +119,8 @@ function MatchTable:init()
 		showTier = not Logic.readBool(args.hide_tier),
 		showIcon = not Logic.readBool(args.hide_icon),
 		showVod = Logic.readBool(args.vod),
-		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true)
+		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
+		showOpponent = Logic.readBool(args.showOpponent),
 	}
 	self.config.aliases = self:readAliases(mode)
 
@@ -556,8 +564,10 @@ function MatchTable:_displayMatch(match)
 		return self:nonStandardMatch(match)
 	end
 
-	--TODO:Opponentdisplay and vsdisplay
-	intentionalAnnoErrorToFindItEasier
+	return mw.html.create()
+		:node(self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil)
+		:node(self:_displayScore(match.result))
+		:node(self:_displayOpponent(match.result.vs))
 end
 
 ---overwritable for wikis that have BR/FFA matches
@@ -565,8 +575,35 @@ end
 ---@return Html
 function MatchTable:nonStandardMatch(match)
 	return mw.html.create('td')
-		:attr('colspan', 3)
+		:attr('colspan', self.config.showOpponent and 3 or 2)
 		:wikitext('')
+end
+
+---@param opponentRecord match2opponent
+---@param flipped boolean?
+---@return Html
+function MatchTable:_displayOpponent(opponentRecord, flipped)
+	local cell = mw.html.create('td')
+	local opponent = Opponent.fromMatch2Record(opponentRecord)
+	if Logic.isEmpty(opponent) then return cell:wikitext('Unknown') end
+
+	return cell
+		:node(OpponentDisplay.BlockOpponent{flip = flipped, opponent = opponent, overflow = 'wrap'})
+end
+
+---@param result MatchTableMatchResult
+---@return Html
+function MatchTable:_displayScore(result)
+	---@param opponentRecord match2opponent
+	---@return unknown
+	local toScore = function(opponentRecord)
+		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
+		return opponentRecord.status == SCORE_STATUS and (opponentRecord.score or '–') or opponentRecord.status
+	end
+
+	return mw.html.create('td')
+		:addClass('match-table-score')
+		:wikitext(table.concat({toScore(result.opponent), toScore(result.vs)}, SCORE_CONCAT))
 end
 
 ---@param match MatchTableMatch
