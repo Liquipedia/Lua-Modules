@@ -135,9 +135,23 @@ Author(s): Elysienna
 			padding: 0;
 			font-size: unset;
 			display: flex;
+			text-align: initial;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 100%;
+				margin-bottom: 0.5rem;
+			}
 
 			.vodlink {
 				margin-left: 0.25rem;
+			}
+
+			.timer-object {
+				display: inline-flex;
+
+				@media ( max-width: 767px ) {
+					flex-wrap: wrap;
+				}
 			}
 		}
 	}
