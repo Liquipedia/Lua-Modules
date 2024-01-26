@@ -687,7 +687,7 @@ function MatchTable:__displayVods(match)
 
 	local vodsNode = mw.html.create('td')
 	Array.forEach(match.vods, function(vod)
-		vodsNode:node(VodLink.display{vod = vod.link, gamenum = vod.index})
+		vodsNode:node(VodLink.display{vod = vod.link, gamenum = vod.index ~= 0 and vod.index or nil})
 	end)
 
 	return vodsNode
