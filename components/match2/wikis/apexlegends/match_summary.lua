@@ -313,8 +313,12 @@ function CustomMatchSummary._opponents(match)
 	end)
 
 	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement == opponent2.placement then
-			return opponent1.score > opponent2.score
+		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
+			if opponent1.score and opponent2.score then
+				return opponent1.score > opponent2.score
+			else
+				return (opponent1.name or '') > (opponent2.name or '')
+			end
 		end
 		return opponent1.placement < opponent2.placement
 	end
