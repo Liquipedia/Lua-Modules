@@ -305,16 +305,19 @@ function CustomMatchSummary._opponents(match)
 		end)
 	end)
 
-	if not CustomMatchSummary._isFinished(match) then
-		return match
+	local placementSortFunction = function(opponent1, opponent2)
+		if opponent1.placement == opponent2.placement then
+			return opponent1.score > opponent2.score
+		end
+		return opponent1.placement < opponent2.placement
 	end
 
-	-- Sort match level based on score (placement works too)
-	Array.sortInPlaceBy(match.opponents, Operator.property('placement'))
+	-- Sort match level based on final placement & score
+	Array.sortInPlaceBy(match.opponents, FnUtil.identity, placementSortFunction)
 
 	-- Sort game level based on placement
 	Array.forEach(match.games, function (game)
-		Array.sortInPlaceBy(game.extradata.opponents, Operator.property('placement'))
+		Array.sortInPlaceBy(game.extradata.opponents, FnUtil.identity, placementSortFunction)
 	end)
 
 	return match
