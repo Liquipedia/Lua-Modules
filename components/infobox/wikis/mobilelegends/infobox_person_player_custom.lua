@@ -60,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 				-- we have an invalid hero entry
 				-- add warning (including tracking category)
 				table.insert(
-					caller.warnings,
+					caller.infobox.warnings,
 					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
 				)
 			end
