@@ -22,7 +22,7 @@ DateExt.minTimestamp = -62167219200
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
--- 1970-01-01 00:00:00
+-- 0000-01-01 00:00:00
 DateExt.epochZero = 0
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
@@ -123,7 +123,7 @@ end
 ---@param offsetString string?
 ---@return integer # default `0`
 function DateExt.getOffsetSeconds(offsetString)
-	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
+	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '0000-01-01T00:00:00' .. (offsetString or '')))
 end
 
 return DateExt
