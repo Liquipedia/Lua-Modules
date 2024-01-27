@@ -33,7 +33,7 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local DEFAULT_DATE = '1970-01-01'
+local DEFAULT_DATE = '0000-01-01'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
