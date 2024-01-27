@@ -169,14 +169,18 @@ function Import._computeStagePlacementEntries(stage, options)
 	end)
 
 	local startingPlacement = 1 + (options.placementsToSkip or 0)
+	local endingPlacement = options.importLimit
+	if options.importLimit > 0 and startingPlacement > 1 then
+		endingPlacement = options.importLimit + options.placementsToSkip
+	end
 
 	local maxPlacementCount = Array.max(Array.map(
 			groupPlacementEntries,
 			function(placementEntries) return #placementEntries end
 		)) or 0
 
-	maxPlacementCount = options.importLimit > 0
-		and math.min(maxPlacementCount, options.importLimit)
+	maxPlacementCount = endingPlacement > 0
+		and math.min(maxPlacementCount, endingPlacement)
 		or maxPlacementCount
 
 	return Array.map(Array.range(startingPlacement, maxPlacementCount), function(placementIndex)
