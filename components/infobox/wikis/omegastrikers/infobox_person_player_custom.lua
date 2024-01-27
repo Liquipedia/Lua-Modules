@@ -20,22 +20,22 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	['forward'] = {category = 'Forwards', display = 'Forward'},
-	['goalie'] = {category = 'Goalies', display = 'Goalie'},
-	['goalkeeper'] = {category = 'Goalkeepers', display = 'Goalkeeper'},
-	['flex'] = {category = 'Flex', display = 'Flex'},
+	forward = {category = 'Forwards', display = 'Forward'},
+	goalie = {category = 'Goalies', display = 'Goalie'},
+	goalkeeper = {category = 'Goalkeepers', display = 'Goalkeeper'},
+	flex = {category = 'Flex', display = 'Flex'},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', display = 'Analyst'},
-	['observer'] = {category = 'Observers', display = 'Observer'},
-	['host'] = {category = 'Hosts', display = 'Host'},
-	['coach'] = {category = 'Coaches', display = 'Coach'},
-	['caster'] = {category = 'Casters', display = 'Caster'},
+	analyst = {category = 'Analysts', display = 'Analyst'},
+	observer = {category = 'Observers', display = 'Observer'},
+	host = {category = 'Hosts', display = 'Host'},
+	coach = {category = 'Coaches', display = 'Coach'},
+	caster = {category = 'Casters', display = 'Caster'},
 }
 
 ---@class OmegaStrikersInfoboxPlayer: Person
----@field role table
----@field role2 table
+---@field role {category: string, display: string}?
+---@field role2 {category: string, display: string}?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
