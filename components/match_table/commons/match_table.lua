@@ -15,6 +15,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -722,7 +723,7 @@ function MatchTable:displayStats()
 			data.l .. 'L'
 		), ' : ')
 
-		local percentage = (data.w + 0.5 * data.d) / sum
+		local percentage = Math.round((data.w + 0.5 * data.d) / sum, 2)
 
 		local parts = {
 			scoreText,
