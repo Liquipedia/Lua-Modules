@@ -32,11 +32,13 @@ local Infobox = Class.new()
 function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
-	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:node(self.frame:preprocess('<adbox />'))
-	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-	self.root	:addClass('fo-nttax-infobox-wrapper')
-				:addClass('infobox-' .. gameName:lower())
+		:addClass('fo-nttax-infobox-wrapper')
+		:addClass('infobox-' .. gameName:lower())
+	self.adbox = mw.html.create('div')
+		:addClass('fo-nttax-infobox-adbox')
+		:node(self.frame:preprocess('<adbox />'))
+	self.content = mw.html.create('div')
+		:addClass('fo-nttax-infobox')
 	if forceDarkMode then
 		self.root:addClass('infobox-darkmodeforced')
 	end
