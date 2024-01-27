@@ -6,25 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
+local Region = require('Module:Region')
 local String = require('Module:StringUtils')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _ROLES = {
+local ROLES = {
 	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader', isplayer = true},
+	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
 
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
@@ -41,126 +41,127 @@ local _ROLES = {
 	['director'] = {category = 'Production Staff', variable = 'Director', talent = true},
 	['interviewer'] = {category = 'Interviewers', variable = 'Interviewer', talent = true},
 }
-_ROLES['in-game leader'] = _ROLES.igl
+ROLES['in-game leader'] = ROLES.igl
 
-local CustomPlayer = Class.new()
-
+---@class ValorantInfoboxPlayer: Person
+---@field role {category: string, variable: string, talent: boolean?, staff: boolean?}?
+---@field role2 {category: string, variable: string, talent: boolean?, staff: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _player
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
 	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getPersonType = CustomPlayer.getPersonType
-
-	_args = player.args
-	_player = player
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Main Agents', content = {PlayersSignatureAgents.get{player = caller.pagename}}})
+	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
+			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
+	elseif id == 'region' then
+		return {}
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Main Agents
-	table.insert(widgets,
-		Cell{
-			name = 'Main Agents',
-			content = {
-				PlayersSignatureAgents.get{player = _player.pagename}
-			}
-		}
+---@param role string?
+---@return {category: string, variable: string, talent: boolean?, staff: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
+end
+
+---@param roleData {category: string, variable: string, talent: boolean?, staff: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+end
+
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
 	)
-	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(_args.role) and 'false' or 'true'
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
+	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
 
 	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
 	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
 	lpdbData.extradata.agent3 = Variables.varDefault('agent3')
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Region.name({region = args.region, country = args.country})
 
 	return lpdbData
 end
 
-function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
+---@param args table
+---@return string[]
+function CustomPlayer._getStatusContents(args)
+	if String.isEmpty(args.status) then
 		return {}
 	end
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+	return {Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status}
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
+---@param role string?
+---@return boolean?
 function CustomPlayer._isNotPlayer(role)
-	local roleData = _ROLES[(role or ''):lower()]
+	local roleData = ROLES[(role or ''):lower()]
 	return roleData and (roleData.talent or roleData.staff)
 end
 
+---@param args table
+---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
-	local roleData = _ROLES[(args.role or ''):lower()]
+	local roleData = ROLES[(args.role or ''):lower()]
 	if roleData then
 		if roleData.staff then
 			return {store = 'staff', category = 'Staff'}

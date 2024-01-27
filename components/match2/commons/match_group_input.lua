@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -17,13 +18,14 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local globalVars = PageVariableNamespace({cached = true})
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
-local DEFAULT_MAX_NUM_PLAYERS = 10
+local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInput = {}
 
@@ -81,6 +83,8 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 			bracketData.sectionheader = context.sectionHeader
 			bracketData.dateheader = Logic.readBool(match.dateheader) or nil
 
+			bracketData.matchpage = match.matchPage
+
 			local nextMatchId = bracketId .. '_' .. MatchGroupInput._matchlistMatchIdFromIndex(matchIndex + 1)
 			bracketData.next = matchIndex ~= #matchKeys and nextMatchId or nil
 
@@ -124,7 +128,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		end
 
 		matchArgs = Json.parseIfString(matchArgs)
-			or Json.parse(Lua.import('Module:Match', {requireDevIfEnabled = true}).toEncodedJson({}))
+			or Json.parse(Lua.import('Module:Match').toEncodedJson({}))
 
 		local context = MatchGroupInput.readContext(matchArgs, args)
 		MatchGroupInput.persistContextChanges(context)
@@ -142,6 +146,8 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
 		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
+
+		bracketData.matchpage = match.matchPage
 
 		match.parent = context.tournamentParent
 		match.matchsection = context.matchSection
@@ -384,20 +390,26 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- Retrieves Common Tournament Variables used inside match2 and match2game
-function MatchGroupInput.getCommonTournamentVars(obj)
-	obj.game = Logic.emptyOr(obj.game, Variables.varDefault('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, Variables.varDefault('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(obj.liquipediatier, Variables.varDefault('tournament_liquipediatier'))
+function MatchGroupInput.getCommonTournamentVars(obj, parent)
+	parent = parent or {}
+	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
+	obj.icon = Logic.emptyOr(obj.icon, parent.icon, Variables.varDefault('tournament_icon'))
+	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, Variables.varDefault('tournament_icondark'))
+	obj.liquipediatier = Logic.emptyOr(
+		obj.liquipediatier,
+		parent.liquipediatier,
+		Variables.varDefault('tournament_liquipediatier')
+	)
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
+		parent.liquipediatiertype,
 		Variables.varDefault('tournament_liquipediatiertype')
 	)
-	obj.series = Logic.emptyOr(obj.series, Variables.varDefault('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, Variables.varDefault('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, Variables.varDefault('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, Variables.varDefault('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, Variables.varDefault('tournament_type'))
+	obj.series = Logic.emptyOr(obj.series, parent.series, Variables.varDefault('tournament_series'))
+	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, Variables.varDefault('tournament_shortname'))
+	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
+	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
+	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
 
 	return obj
 end
@@ -446,35 +458,124 @@ end
 function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
 	options = options or {}
 
-	local maxNumPlayers = options.maxNumPlayers or DEFAULT_MAX_NUM_PLAYERS
 	local opponent = match['opponent' .. opponentIndex]
-	local playersData = Json.parseIfString(opponent.players) or {}
-
 	local players = {}
+	local playersIndex = 0
 
-	for playerIndex = 1, maxNumPlayers do
-		local player = Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex]) or {}
-
-		player.name = player.name or playersData['p' .. playerIndex]
-			or Variables.varDefault(teamName .. '_p' .. playerIndex)
-
-		player.name = player.name and options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name)
-			or player.name
-
-		player.name = player.name and options.applyUnderScores and player.name:gsub(' ', '_') or player.name
-
-		player.flag = player.flag or playersData['p' .. playerIndex .. 'flag']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'flag')
-
-		player.displayname = player.displayname or playersData['p' .. playerIndex .. 'dn']
-			or Variables.varDefault(teamName .. '_p' .. playerIndex .. 'dn')
-
-		if Table.isNotEmpty(player) then
-			table.insert(players, player)
+	local insertIntoPlayers = function(player)
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name or player.pageName) then
+			return
 		end
+
+		player.name = Logic.emptyOr(player.name, player.pageName) --[[@as string]]
+		player.name = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name) or player.name
+		player.name = options.applyUnderScores and player.name:gsub(' ', '_') or player.name
+		player.flag = Flags.CountryName(player.flag)
+		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
+		playersIndex = playersIndex + 1
+		player.index = playersIndex
+
+		players[player.name] = players[player.name] or {}
+		Table.mergeInto(players[player.name], player)
 	end
 
-	opponent.match2players = players
+	local playerIndex = 1
+	local varPrefix = teamName .. '_p' .. playerIndex
+	local name = Variables.varDefault(varPrefix)
+	while name do
+		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
+
+		local wasPresentInMatch = function()
+			if not match.timestamp then return true end
+
+			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
+			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
+
+			if (not joinDate) and (not leaveDate) then return true end
+
+			-- need to offset match time to correct timezone as transfers do not have a time associated with them
+			local timestampLocal = match.timestamp + DateExt.getOffsetSeconds(match.timezoneOffset or '')
+
+			return (not joinDate or (joinDate <= timestampLocal)) and
+				(not leaveDate or (leaveDate > timestampLocal))
+		end
+
+		if wasPresentInMatch() then
+			insertIntoPlayers{
+				pageName = name,
+				displayName = Variables.varDefault(varPrefix .. 'dn'),
+				flag = Variables.varDefault(varPrefix .. 'flag'),
+			}
+		end
+		playerIndex = playerIndex + 1
+		varPrefix = teamName .. '_p' .. playerIndex
+		name = Variables.varDefault(varPrefix)
+	end
+
+	--players from manual input as `opponnetX_pY`
+	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
+		local playerTable = Json.parseIfString(player) or {}
+		insertIntoPlayers(playerTable)
+	end
+
+	--players from manual input in `opponent.players`
+	local playersData = Json.parseIfString(opponent.players) or {}
+	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+		insertIntoPlayers{
+			pageName = playerName,
+			displayName = playersData[playerPrefix .. 'dn'],
+			flag = playersData[playerPrefix .. 'flag'],
+		}
+	end
+
+	---@param playerData table|string|nil
+	---@return standardPlayer?
+	local getStandardPlayer = function(playerData)
+		if not playerData then return end
+		playerData = type(playerData) == 'string' and {playerData} or playerData
+		local player = {
+			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
+			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
+			flag = playerData.flag,
+		}
+		if Logic.isEmpty(player.displayName) then return end
+		player = PlayerExt.populatePlayer(player)
+		player.pageName = options.applyUnderScores and player.pageName:gsub(' ', '_') or player.pageName
+		return player
+	end
+
+	local substitutions, parseFailure = Json.parseStringified(opponent.substitutes)
+	if parseFailure then
+		substitutions = {}
+	end
+
+	--handle `substitutes` input for opponenets
+	Array.forEach(substitutions, function(substitution)
+		if type(substitution) ~= 'table' or not substitution['in'] then return end
+		local substitute = getStandardPlayer(substitution['in'])
+
+		local subbedGames = substitution['games']
+
+		local player = getStandardPlayer(substitution['out'])
+		if player then
+			players[player.pageName] = subbedGames and players[player.pageName] or nil
+		end
+
+		opponent.extradata = Table.merge({substitutions = {}}, opponent.extradata or {})
+		table.insert(opponent.extradata.substitutions, {
+			substitute = substitute,
+			player = player,
+			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
+			reason = substitution['reason'],
+		})
+
+		insertIntoPlayers(substitute)
+	end)
+
+	opponent.match2players = Array.extractValues(players)
+	Array.sortInPlaceBy(opponent.match2players, function (player)
+		return player.index
+	end)
 
 	return match
 end

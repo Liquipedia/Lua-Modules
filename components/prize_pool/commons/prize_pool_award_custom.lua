@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Lua = require('Module:Lua')
 
-local AwardPrizePool = Lua.import('Module:PrizePool/Award', {requireDevIfEnabled = true})
+local AwardPrizePool = Lua.import('Module:PrizePool/Award')
 
 local CustomAwardPrizePool = {}
 

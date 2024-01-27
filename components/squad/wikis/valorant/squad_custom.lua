@@ -11,9 +11,9 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
+local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
@@ -131,6 +131,7 @@ function CustomSquad._playerRow(player, squadType)
 		role = player.role,
 		team = player.team,
 		teamrole = player.teamrole,
+		date = player.leavedate or player.inactivedate or player.leavedate,
 	}
 	row:name{name = player.name}
 	row:role{role = player.role}

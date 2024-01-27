@@ -10,127 +10,110 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local PageLink = require('Module:Page')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
-local Chronology = Widgets.Chronology
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+---@class StarcraftLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _next
-local _previous
+local CANCELLED = 'cancelled'
+local FINISHED = 'finished'
+local DEFAULT_MODE = '1v1'
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.shouldStore = CustomLeague.shouldStore
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.raceBreakDown = RaceBreakdown.run(args) or {}
+	self.data.maps = self:_getMaps('map', args)
+	self.data.number = tonumber(args.number)
+	self.data.mode = args.mode or DEFAULT_MODE
+	self.data.status = self:_getStatus(args)
+
+	args.player_number = self.data.raceBreakDown.total
+
+	self:_computeChronology(args)
 end
 
-function CustomInjector:parse(id, widgets)
-	if id == 'chronology' then
-		local content = CustomLeague._getChronologyData()
-		if String.isNotEmpty(content.previous) or String.isNotEmpty(content.next) then
-			return {
-				Title{name = 'Chronology'},
-				Chronology{
-					content = content
-				}
-			}
-		end
-	elseif id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch()}})
-	elseif id == 'customcontent' then
-		local raceBreakdown = RaceBreakdown.run(_args)
-		if raceBreakdown then
-			Array.appendWith(widgets,
-				Title{name = 'Player Breakdown'},
-				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
-			)
-		end
+---@param prefix string
+---@param args table
+---@return {link: string, displayname: string}[]
+function CustomLeague:_getMaps(prefix, args)
+	local mapArgs = self:getAllArgsForBase(args, prefix)
 
-		--teams section
-		if _args.team_number or String.isNotEmpty(_args.team1) then
-			Variables.varDefine('is_team_tournament', 1)
-			table.insert(widgets, Title{name = 'Teams'})
-		end
-		table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
-		if String.isNotEmpty(_args.team1) then
-			local teams = CustomLeague:_makeBasedListFromArgs('team')
-			table.insert(widgets, Center{content = teams})
-		end
-
-		--maps
-		if String.isNotEmpty(_args.map1) then
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
-		elseif String.isNotEmpty(_args['2map1']) then
-			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
-		elseif String.isNotEmpty(_args['3map1']) then
-			table.insert(widgets, Title{name = _args['3maptitle'] or '3v3 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('3map')})
-		end
-	end
-	return widgets
+	return Table.map(mapArgs, function(mapIndex, map)
+		local mapArray = mw.text.split(map, '|')
+		return mapIndex, {
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(mapArray[1]),
+			displayname = args[prefix .. mapIndex .. 'display'] or mapArray[#mapArray],
+		}
+	end)
 end
 
-function CustomLeague._getPatch()
-	local patch = _args.patch
-	local endPatch = _args.epatch
-	if String.isEmpty(patch) then
-		return nil
+---@param args table
+---@return string?
+function CustomLeague:_getStatus(args)
+	local status = args.status or Variables.varDefault('tournament_status')
+	if Logic.isNotEmpty(status) then
+		---@cast status -nil
+		return status:lower()
 	end
 
-	Variables.varDefine('patch', patch)
-	Variables.varDefine('epatch', String.isNotEmpty(endPatch) and endPatch or patch)
+	if Logic.readBool(args.cancelled or Variables.varDefault('cancelled tournament')) then
+		return CANCELLED
+	end
 
-	if String.isEmpty(endPatch) then
-		return '[[' .. patch .. ']]'
-	else
-		return '[[' .. patch .. ']] &ndash; [[' .. endPatch .. ']]'
+	if self:_isFinished(args) then
+		return FINISHED
 	end
 end
 
-function CustomLeague._getChronologyData()
-	_next, _previous = CustomLeague._computeChronology()
-	return {
-		previous = _previous,
-		next = _next,
-		previous2 = _args.previous2,
-		next2 = _args.next2,
-		previous3 = _args.previous3,
-		next3 = _args.next3,
-	}
+---@param args table
+---@return boolean
+function CustomLeague:_isFinished(args)
+	local finished = Logic.readBoolOrNil(args.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	local queryDate = self.data.endDate or self.data.startDate
+
+	if not queryDate or os.date('%Y-%m-%d') < queryDate then
+		return false
+	end
+
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
+		query = 'date',
+		order = 'date asc',
+		limit = 1
+	})[1] ~= nil
 end
 
 -- Automatically fill in next/previous for touranaments that are part of a series
-function CustomLeague._computeChronology()
+---@param args table
+function CustomLeague:_computeChronology(args)
 	-- Criteria for automatic chronology are
 	-- - part of a series and numbered
 	-- - the subpage name matches the number
@@ -138,119 +121,127 @@ function CustomLeague._computeChronology()
 	-- - and not suppressed via auto_chronology=false
 	local title = mw.title.getCurrentTitle()
 	local number = tonumber(title.subpageText)
-	local automateChronology = String.isNotEmpty(_args.series)
+	local automateChronology = String.isNotEmpty(args.series)
 		and number
-		and tonumber(_args.number) == number
+		and self.data.number == number
 		and title.subpageText ~= title.text
-		and Logic.readBool(_args.auto_chronology or true)
-		and (String.isEmpty(_args.next) or String.isEmpty(_args.previous))
+		and Logic.readBool(args.auto_chronology or true)
+		and (String.isEmpty(args.next) or String.isEmpty(args.previous))
 
-	if automateChronology then
-		local previous = String.isNotEmpty(_args.previous) and _args.previous
-		local next = String.isNotEmpty(_args.next) and _args.next
-		local nextPage = String.isEmpty(_args.next) and
-			title.basePageTitle:subPageTitle(tostring(number + 1)).fullText
-		local previousPage = String.isEmpty(_args.previous) and
-			title.basePageTitle:subPageTitle(tostring(number - 1)).fullText
-
-		if not next and PageLink.exists(nextPage) then
-			next = nextPage .. '|#' .. tostring(number + 1)
-		end
-
-		if not previous and 1 < number and PageLink.exists(previousPage) then
-			previous = previousPage .. '|#' .. tostring(number - 1)
-		end
-
-		return next or nil, previous or nil
-	else
-		return _args.next, _args.previous
+	if not automateChronology then
+		return
 	end
+
+	local fromAutomated = function(shiftedNumber)
+		local page = title.basePageTitle:subPageTitle(tostring(shiftedNumber)).fullText
+		return Page.exists(page) and (page .. '|#' .. shiftedNumber) or nil
+	end
+
+	args.previous = Logic.emptyOr(args.previous, fromAutomated(number - 1))
+	args.next = Logic.emptyOr(args.next, fromAutomated(number + 1))
 end
 
-function CustomLeague:shouldStore(args)
-	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'gamesettings' then
+		table.insert(widgets, Cell{name = 'Patch', content = {CustomLeague._getPatch(args)}})
+	elseif id == 'customcontent' then
+		if args.player_number and args.player_number > 0 or args.team_number then
+			Array.appendWith(widgets,
+				Title{name = 'Participants'},
+				Cell{name = 'Number of Players', content = {self.caller.data.raceBreakDown.total}},
+				Cell{name = 'Number of Teams', content = {args.team_number}},
+				Breakdown{content = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+			)
+		end
+
+		--maps
+		---@param prefix string
+		---@param defaultTitle string
+		---@param maps {link: string, displayname: string}[]?
+		local displayMaps = function(prefix, defaultTitle, maps)
+			if String.isEmpty(args[prefix .. 1]) then return end
+			Array.appendWith(widgets,
+				Title{name = args[prefix .. 'title'] or defaultTitle},
+				Center{content = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
+			)
+		end
+
+		displayMaps('map', 'Maps', self.caller.data.maps)
+		displayMaps('2map', '2v2 Maps')
+		displayMaps('3map', '3v3 Maps')
+	end
+
+	return widgets
 end
 
-function CustomLeague:_makeBasedListFromArgs(prefix)
-	local foundArgs = {}
-	for key, linkValue in Table.iter.pairsByPrefix(_args, prefix) do
-		local displayValue = String.isNotEmpty(_args[key .. 'display'])
-			and _args[key .. 'display']
-			or linkValue
-
-		table.insert(
-			foundArgs,
-			tostring(CustomLeague:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, displayValue, linkValue)
+---@param maps {link: string, displayname: string}[]
+---@return string[]
+function CustomLeague:_mapsDisplay(maps)
+	return {table.concat(
+		Array.map(maps, function(mapData)
+			return tostring(self:_createNoWrappingSpan(
+				Page.makeInternalLink({}, mapData.displayname, mapData.link)
 			))
-		)
-	end
-
-	return {table.concat(foundArgs, '&nbsp;• ')}
+		end),
+		'&nbsp;• '
+	)}
 end
 
+---@param content string|Html|number|nil
+---@return Html
+function CustomLeague:_createNoWrappingSpan(content)
+	local span = mw.html.create('span')
+	span:css('white-space', 'nowrap')
+		:node(content)
+	return span
+end
+
+---@param args table
+---@return string
+function CustomLeague._getPatch(args)
+	return table.concat({
+		Page.makeInternalLink(args.patch),
+		Page.makeInternalLink(args.epatch ~= args.patch and args.patch and args.epatch or nil)
+	}, ' &ndash; ')
+end
+
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	local name = self.name
 	Variables.varDefine('tournament_ticker_name', args.tickername or name)
 	Variables.varDefine('tournament_abbreviation', args.abbreviation or '')
-	Variables.varDefine('tournament_tier', Variables.varDefault('tournament_liquipediatier', ''))
+	Variables.varDefine('tournament_tier', self.data.liquipediatier)
 
 	--Legacy date vars
-	local startDate = Variables.varDefault('tournament_startdate', '')
-	local endDate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('date', endDate)
-	Variables.varDefine('sdate', startDate)
-	Variables.varDefine('edate', endDate)
-	Variables.varDefine('formatted_tournament_date', startDate)
-	Variables.varDefine('formatted_tournament_edate', endDate)
-	Variables.varDefine('prizepooldate', endDate)
-	Variables.varDefine('lpdbtime', mw.getContentLanguage():formatDate('U', endDate))
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
+	Variables.varDefine('formatted_tournament_date', self.data.startDate)
+	Variables.varDefine('formatted_tournament_edate', self.data.endDate)
+	Variables.varDefine('prizepooldate', self.data.endDate)
+	Variables.varDefine('lpdbtime', mw.getContentLanguage():formatDate('U', self.data.endDate))
 
 	--SC specific vars
-	Variables.varDefine('tournament_mode', args.mode or '1v1')
 	Variables.varDefine('headtohead', args.headtohead or 'true')
-	--series number
-	local seriesNumber = args.number or ''
-	if String.isNotEmpty(seriesNumber) then
-		seriesNumber = string.format('%05i', seriesNumber)
-	end
-	Variables.varDefine('tournament_series_number', seriesNumber)
-	--check if tournament is finished
-	local finished = Logic.readBool(args.finished)
-	local queryDate = Variables.varDefault('tournament_enddate', '2999-99-99')
-	if not finished and os.date('%Y-%m-%d') >= queryDate then
-		local data = mw.ext.LiquipediaDB.lpdb('placement', {
-			conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-				.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
-			query = 'date',
-			order = 'date asc',
-			limit = 1
-		})
-		if data and data[1] then
-			finished = true
-		end
-	end
-
-	Variables.varDefine('tournament_finished', tostring(finished))
+	Variables.varDefine('tournament_series_number', self.data.number and string.format('%05i', self.data.number) or nil)
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
 	Variables.varDefine('tournament_series', args.series)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.tickername = lpdbData.tickername or lpdbData.name
-	lpdbData.patch = Variables.varDefault('patch', '')
-	lpdbData.endpatch = Variables.varDefault('epatch', '')
-	local status = args.status
-		or Logic.readBool(Variables.varDefault('cancelled tournament')) and 'cancelled'
-		or Logic.readBool(Variables.varDefault('tournament_finished')) and 'finished'
-	lpdbData.status = status
-	lpdbData.maps = CustomLeague:_concatArgs('map')
-	lpdbData.participantsnumber = (RaceBreakdown.run(args) or {}).total or args.team_number or 0
-	lpdbData.next = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_next))
-	lpdbData.previous = mw.ext.TeamLiquidIntegration.resolve_redirect(CustomLeague:_getPageNameFromChronology(_previous))
+	lpdbData.maps = self:_concatArgs('map')
 	-- do not resolve redirect on the series input
 	-- BW wiki has several series that are displayed on the same page
 	-- hence they need to not RR them
@@ -261,34 +252,19 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
-	if Logic.readBool(args.female) then
-		return {'Female Tournaments'}
-	end
-
-	return {}
+	return {Logic.readBool(args.female) and 'Female Tournaments' or nil}
 end
 
+---@param base string
+---@return string
 function CustomLeague:_concatArgs(base)
 	return table.concat(
-		Array.map(League:getAllArgsForBase(_args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
+		Array.map(self:getAllArgsForBase(self.args, base), mw.ext.TeamLiquidIntegration.resolve_redirect),
 		';'
 	)
-end
-
-function CustomLeague:_createNoWrappingSpan(content)
-	local span = mw.html.create('span')
-	span:css('white-space', 'nowrap')
-		:node(content)
-	return span
-end
-
-function CustomLeague:_getPageNameFromChronology(item)
-	if String.isEmpty(item) then
-		return ''
-	end
-
-	return mw.text.split(item, '|')[1]
 end
 
 return CustomLeague

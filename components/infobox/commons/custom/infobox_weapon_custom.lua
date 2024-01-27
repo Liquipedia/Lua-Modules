@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local Weapon = Lua.import('Module:Infobox/Weapon', {requireDevIfEnabled = true})
+local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local CustomWeapon = {}
 

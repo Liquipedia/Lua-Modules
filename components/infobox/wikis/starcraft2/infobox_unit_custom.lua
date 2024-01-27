@@ -12,18 +12,20 @@ local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Unit = Lua.import('Module:Infobox/Unit', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local CustomUnit = Class.new()
+---@class Starcraft2UnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 
 local CustomInjector = Class.new(Injector)
 
@@ -32,91 +34,53 @@ local ICON_SHIELDS = '[[File:Icon_Shields.png|link=Plasma Shield]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local GAME_LOTV = Game.name{game = 'lotv'}
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomUnit.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 
-	_args.game = Game.name{game = _args.game}
-
-	unit.nameDisplay = CustomUnit.nameDisplay
-	unit.setLpdbData = CustomUnit.setLpdbData
-	unit.createWidgetInjector = CustomUnit.createWidgetInjector
-	unit.getWikiCategories = CustomUnit.getWikiCategories
+	unit.args.game = Game.name{game = unit.args.game}
 
 	return unit:createInfobox()
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(
-		widgets,
-		Title{name = 'Unit stats'},
-		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay()}},
-		Cell{name = 'Attributes', content = {_args.attributes}},
-		Cell{name = 'Energy', content = {_args.energy}},
-		Cell{name = 'Sight', content = {_args.sight}},
-		Cell{name = 'Detection range', content = {_args.detection_range}},
-		Cell{name = 'Speed', content = {_args.speed}},
-		Cell{name = 'Speed Multiplier on Creep', content = {_args.creepspeedmult}},
-		Cell{name = 'Speed on Creep', content = {_args.speedoncreep}},
-		Cell{name = 'Flags', content = {_args.flags}},
-		Cell{name = 'Morphs into', content = {_args.morphs}},
-		Cell{name = 'Cargo size', content = {_args.cargo_size}},
-		Cell{name = 'Cargo capacity', content = {_args.cargo_capacity}},
-		Cell{name = 'Strong against', content = {String.convertWikiListToHtmlList(_args.strong)}},
-		Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(_args.weak)}}
-	)
-
-	if _args.game ~= GAME_LOTV and _args.buildtime then
-		table.insert(widgets, Center{content = {
-			'<small><b>Note:</b> ' ..
-			'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
-			' <i>See [[Game Speed]].</i></small>'
-		}})
-	end
-
-	return widgets
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'cost' and not String.isEmpty(_args.min) then
+	local args = self.caller.args
+
+	if id == 'cost' and not String.isEmpty(args.min) then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = _args.race,
-				minerals = _args.min,
-				mineralsTotal = _args.totalmin,
+				faction = args.race,
+				minerals = args.min,
+				mineralsTotal = args.totalmin,
 				mineralsForced = true,
-				gas = _args.gas,
-				gasTotal = _args.totalgas,
+				gas = args.gas,
+				gasTotal = args.totalgas,
 				gasForced = true,
-				buildTime = _args.buildtime,
-				buildTimeTotal = _args.totalbuildtime,
-				supply = _args.supply or _args.control or _args.psy,
-				supplyTotal = _args.totalsupply or _args.totalcontrol or _args.totalpsy,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
+				supply = args.supply or args.control or args.psy,
+				supplyTotal = args.totalsupply or args.totalcontrol or args.totalpsy,
 			}}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(_args.requires)}},
+			Cell{name = 'Requirements', content = {String.convertWikiListToHtmlList(args.requires)}},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {CustomUnit:_getHotkeys()}}
+			Cell{name = '[[Hotkeys per Race|Hotkey]]', content = {self.caller:_getHotkeys()}}
 		}
-	elseif id == 'type' and (not String.isEmpty(_args.size) or not String.isEmpty(_args.type)) then
-		local display = _args.size
+	elseif id == 'type' and (not String.isEmpty(args.size) or not String.isEmpty(args.type)) then
+		local display = args.size
 		if not display then
-			display = _args.type
-		elseif _args.type then
-			display = display .. ' ' .. _args.type
+			display = args.type
+		elseif args.type then
+			display = display .. ' ' .. args.type
 		end
 		return {
 			Cell{name = 'Type', content = {display}}
@@ -125,29 +89,51 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'attack' then
 		local attacks = {}
 		local index = 1
-		while not String.isEmpty(_args['attack' .. index .. '_target']) do
-			for _, item in ipairs(CustomUnit:_getAttack(index)) do
+		while not String.isEmpty(args['attack' .. index .. '_target']) do
+			for _, item in ipairs(self.caller:_getAttack(index)) do
 				table.insert(attacks, item)
 			end
 			index = index + 1
 		end
 		return attacks
+	elseif id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Title{name = 'Unit stats'},
+			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}},
+			Cell{name = 'Attributes', content = {args.attributes}},
+			Cell{name = 'Energy', content = {args.energy}},
+			Cell{name = 'Sight', content = {args.sight}},
+			Cell{name = 'Detection range', content = {args.detection_range}},
+			Cell{name = 'Speed', content = {args.speed}},
+			Cell{name = 'Speed Multiplier on Creep', content = {args.creepspeedmult}},
+			Cell{name = 'Speed on Creep', content = {args.speedoncreep}},
+			Cell{name = 'Flags', content = {args.flags}},
+			Cell{name = 'Morphs into', content = {args.morphs}},
+			Cell{name = 'Cargo size', content = {args.cargo_size}},
+			Cell{name = 'Cargo capacity', content = {args.cargo_capacity}},
+			Cell{name = 'Strong against', content = {String.convertWikiListToHtmlList(args.strong)}},
+			Cell{name = 'Weak against', content = {String.convertWikiListToHtmlList(args.weak)}}
+		)
+
+		if args.game ~= GAME_LOTV and args.buildtime then
+			table.insert(widgets, Center{content = {
+				'<small><b>Note:</b> ' ..
+				'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
+				' <i>See [[Game Speed]].</i></small>'
+			}})
+		end
 	end
 	return widgets
 end
 
----@return WidgetInjector
-function CustomUnit:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@return string
 function CustomUnit:_defenseDisplay()
-	local display = ICON_HP .. ' ' .. (_args.hp or 0)
-	if _args.shield then
-		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. _args.shield
+	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
+	if self.args.shield then
+		display = display .. ' ' .. ICON_SHIELDS .. ' ' .. self.args.shield
 	end
-	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (_args.armor or 1)
+	display = display .. ' ' .. ICON_ARMOR .. ' ' .. (self.args.armor or 1)
 
 	return display
 end
@@ -164,11 +150,11 @@ end
 ---@return string?
 function CustomUnit:_getHotkeys()
 	local display
-	if not String.isEmpty(_args.hotkey) then
-		if not String.isEmpty(_args.hotkey2) then
-			display = Hotkeys.hotkey2(_args.hotkey, _args.hotkey2, 'arrow')
+	if not String.isEmpty(self.args.hotkey) then
+		if not String.isEmpty(self.args.hotkey2) then
+			display = Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'arrow')
 		else
-			display = Hotkeys.hotkey(_args.hotkey)
+			display = Hotkeys.hotkey(self.args.hotkey)
 		end
 	end
 
@@ -183,6 +169,9 @@ function CustomUnit:setLpdbData(args)
 		information = args.game,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			wasonlybeta = tostring(Logic.readBool(args.wasOnlyBeta)),
+			deprecated = tostring(Logic.readBool(args.deprecated)),
+			iscampaignunit = tostring(Logic.readBool(args.isCampaignUnit)),
 			race = Faction.read(args.race),
 			size = args.size,
 			type = args.type,
@@ -219,24 +208,25 @@ end
 ---@param index number
 ---@return Widget[]
 function CustomUnit:_getAttack(index)
+	local args = self.args
 	local attackHeader = 'Attack ' .. index
-	if not String.isEmpty(_args['attack' .. index .. '_name']) then
-		attackHeader = attackHeader .. ': ' .. _args['attack' .. index .. '_name']
+	if not String.isEmpty(args['attack' .. index .. '_name']) then
+		attackHeader = attackHeader .. ': ' .. args['attack' .. index .. '_name']
 	end
 
-	CustomUnit:_storeAttack(index)
+	self:_storeAttack(index)
 
 	return {
 		Title{name = attackHeader},
-		Cell{name = 'Targets', content = {_args['attack' .. index .. '_target']}},
-		Cell{name = 'Damage', content = {_args['attack' .. index .. '_damage']}},
-		Cell{name = '[[Damage Per Second|DPS]]', content = {_args['attack' .. index .. '_dps']}},
-		Cell{name = '[[Cooldown]]', content = {_args['attack' .. index .. '_cooldown']}},
-		Cell{name = 'Bonus', content = {_args['attack' .. index .. '_bonus']}},
-		Cell{name = 'Bonus DPS', content = {_args['attack' .. index .. '_bonus_dps']}},
+		Cell{name = 'Targets', content = {args['attack' .. index .. '_target']}},
+		Cell{name = 'Damage', content = {args['attack' .. index .. '_damage']}},
+		Cell{name = '[[Damage Per Second|DPS]]', content = {args['attack' .. index .. '_dps']}},
+		Cell{name = '[[Cooldown]]', content = {args['attack' .. index .. '_cooldown']}},
+		Cell{name = 'Bonus', content = {args['attack' .. index .. '_bonus']}},
+		Cell{name = 'Bonus DPS', content = {args['attack' .. index .. '_bonus_dps']}},
 		Cell{name = '[[Range]]', content = {
-				(_args['attack' .. index .. '_range'] or '')..
-				(_args['attack' .. index .. '_range_note'] or '')
+				(args['attack' .. index .. '_range'] or '')..
+				(args['attack' .. index .. '_range_note'] or '')
 			}
 		}
 	}
@@ -244,20 +234,21 @@ end
 
 ---@param index number
 function CustomUnit:_storeAttack(index)
-	mw.ext.LiquipediaDB.lpdb_datapoint((_args.name or '') .. 'attack' .. index, {
-		name = _args['attack' .. index .. '_name'] or ('Attack ' .. index),
+	local args = self.args
+	mw.ext.LiquipediaDB.lpdb_datapoint((args.name or '') .. 'attack' .. index, {
+		name = args['attack' .. index .. '_name'] or ('Attack ' .. index),
 		type = 'Unit attack ' .. index,
-		information = _args.game,
-		image = _args.image,
+		information = args.game,
+		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			race = Faction.read(_args.race),
-			damage = _args['attack' .. index .. '_damage'],
-			dps = _args['attack' .. index .. '_dps'],
-			cooldown = _args['attack' .. index .. '_cooldown'],
-			bonus = _args['attack' .. index .. '_bonus'],
-			bonus_dps = _args['attack' .. index .. '_bonus_dps'],
-			range = _args['attack' .. index .. '_range'],
-			target = _args['attack' .. index .. '_target'],
+			race = Faction.read(args.race),
+			damage = args['attack' .. index .. '_damage'],
+			dps = args['attack' .. index .. '_dps'],
+			cooldown = args['attack' .. index .. '_cooldown'],
+			bonus = args['attack' .. index .. '_bonus'],
+			bonus_dps = args['attack' .. index .. '_bonus_dps'],
+			range = args['attack' .. index .. '_range'],
+			target = args['attack' .. index .. '_target'],
 		}),
 	})
 end

@@ -68,4 +68,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'PUBG Mobile Default logo allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'PUBG Mobile Default logo allmode.png', ---@deprecated
+	match2 = 0,
 }

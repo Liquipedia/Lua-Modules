@@ -12,9 +12,9 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}

@@ -16,8 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -26,7 +26,7 @@ local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t') --[[@as osdate]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -306,13 +306,12 @@ function matchFunctions.getVodStuff(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.links = {
-		preview = match.preview,
 		stats = match.stats,
 		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
 		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,
 		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
 		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
-		lpl = match.lpl and 'https://letsplay.live/match/' .. match.lpl or nil,
+		lpl = match.lpl and 'https://old.letsplay.live/match/' .. match.lpl or nil,
 		r6esports = match.r6esports
 			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
 		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,

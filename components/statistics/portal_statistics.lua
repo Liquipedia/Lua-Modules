@@ -11,11 +11,12 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local DateExt = require('Module:Date/Ext')
+local Game = require('Module:Game')
 local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:Math')
+local Math = require('Module:MathUtil')
 local Medal = require('Module:Medal')
 local Operator = require('Module:Operator')
 local Logic = require('Module:Logic')
@@ -34,9 +35,9 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Count = Lua.import('Module:Count', {requireDevIfEnabled = true})
+local Count = Lua.import('Module:Count')
 
-local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, abbreviation = false, formatValue = true}
+local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
 local EPOCH_DATE = '1970-01-01'
@@ -109,6 +110,7 @@ end
 function StatisticsPortal.topEarningsChart(args)
 	args = args or {}
 	args.limit = tonumber(args.limit) or 10
+	args.startYear = tonumber(args.year)
 
 	local params = {
 		catLabel = Logic.readBool(args.isForTeam) and 'Teams' or 'Players',
@@ -117,25 +119,9 @@ function StatisticsPortal.topEarningsChart(args)
 	}
 
 	local config = StatisticsPortal._getChartConfig(args, params)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
-	local topEarningsList
+	local topEarningsList = StatisticsPortal._getOpponentEarningsData(args, config)
 
-	if config.opponentType == Opponent.team then
-		topEarningsList = StatisticsPortal._getTeams(
-			args.limit,
-			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
-	elseif config.opponentType == Opponent.solo then
-		topEarningsList = StatisticsPortal._getPlayers(
-			args.limit,
-			conditions:toString(),
-			'sum::earnings desc',
-			'earnings asc')
-	end
-
-	local yearSeriesData = Array.map(Array.range(config.startYear, CURRENT_YEAR), function(year)
+	local yearSeriesData = Array.map(Array.range(config.startYear, tonumber(args.year) or CURRENT_YEAR), function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
 			return teamData.extradata['earningsin' .. year] or 0
 		end)
@@ -265,7 +251,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local matchCountValue
 	local gameCountValue
 
-	if Logic.readBool(args.queryMatch2) then
+	if Info.match2 == 2 then
 		matchCountValue = Count.match2gamesData(parameters)
 		gameCountValue = Count.match2(parameters)
 	else
@@ -459,7 +445,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	args.startYear = tonumber(args.startYear) or Info.startYear
 
 	local yearTable, defaultYearTable = StatisticsPortal._returnCustomYears(args)
-	local rowLimit = Math._round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2, 0)
+	local rowLimit = Math.round(((Logic.readBool(args.showAverage) and 1 or 0) + 1 + Table.size(yearTable)) / 2)
 
 	local wrapper = mw.html.create('div')
 
@@ -815,14 +801,12 @@ Section: Query Functions
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@param addGroupBy string?
 ---@return table
-function StatisticsPortal._getPlayers(limit, addConditions, addOrder, addGroupBy)
+function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		query = 'pagename, id, nationality, earnings, extradata, birthdate, team',
 		conditions = addConditions or '',
 		order = addOrder,
-		groupby = addGroupBy,
 		limit = limit or MAX_QUERY_LIMIT,
 	})
 
@@ -833,18 +817,59 @@ end
 ---@param limit number?
 ---@param addConditions string?
 ---@param addOrder string?
----@param addGroupBy string?
 ---@return table
-function StatisticsPortal._getTeams(limit, addConditions, addOrder, addGroupBy)
+function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		query = 'pagename, name, template, earnings, extradata',
 		conditions = addConditions or '',
 		order = addOrder,
-		groupby = addGroupBy,
 		limit = limit or MAX_QUERY_LIMIT,
 	})
 
 	return data
+end
+
+
+---@param args table
+---@param config table
+---@return table
+function StatisticsPortal._getOpponentEarningsData(args, config)
+	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
+	local queryFields
+	if opponentType == Opponent.team then
+		queryFields = 'pagename, name, template, earnings, extradata'
+	else
+		queryFields = 'pagename, id, nationality, earnings, extradata, birthdate, team'
+	end
+
+	local conditions = ConditionTree(BooleanOperator.all)
+		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, 0)}
+
+	local data = {}
+
+	local processData = function(item)
+		table.insert(data, item)
+	end
+
+	local queryParameters = {
+		conditions = conditions:toString(),
+		limit = MAX_QUERY_LIMIT,
+		query = queryFields,
+	}
+
+	Lpdb.executeMassQuery(opponentType, queryParameters, processData)
+
+	local earningsFunction = function (a)
+		if String.isNotEmpty(args.year) and a.extradata then
+			return tonumber(a.extradata['earningsin'..args.year]) or 0
+		else
+			return tonumber(a.earnings) or 0
+		end
+	end
+
+	table.sort(data, function(a, b) return earningsFunction(a) > earningsFunction(b) end)
+
+	return Array.sub(data, 1, args.limit)
 end
 
 
@@ -904,6 +929,13 @@ function StatisticsPortal._getPieChartData(args, groupBy, defaultValue, groupVal
 	local chartData = Array.map(Array.extractValues(groupValues), function(value)
 		return prizes[value:lower()]
 	end)
+
+	if groupBy == 'game' and Logic.readBool(args.abbreviateGame) then
+		chartData = Array.map(chartData, function(entry)
+			entry.name = Game.abbreviation{game = entry.name} or entry.name
+			return entry
+		end)
+	end
 
 	return StatisticsPortal._drawPieChart(args, chartData)
 end
@@ -996,7 +1028,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 	local function makeOpponentTable(item)
 		local opponentNames = {}
 		if args.opponentType == Opponent.solo then
-			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers, 'p') do
+			for _, playerName in Table.iter.pairsByPrefix(item.opponentplayers or {}, 'p') do
 				local name = string.gsub(playerName or '', ' ', '_')
 				table.insert(opponentNames, name)
 			end
@@ -1270,7 +1302,9 @@ function StatisticsPortal._buildChartData(config, yearSeriesData, nonYearCategor
 			rotate = config.axisRotate,
 		},
 	}
-	config.customLegend = config.customLegend or seriesNames
+	if Table.isEmpty(config.customLegend) then
+		config.customLegend = seriesNames
+	end
 
 	return StatisticsPortal._drawChart(config, chartData)
 end
@@ -1357,7 +1391,7 @@ end
 ---@param tablePlace number
 ---@param item table
 ---@param config table
----@return table
+---@return number
 function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 	local earnings
 	if String.isNotEmpty(config.opponentName) and item.opponenttype == Opponent.team then
@@ -1365,7 +1399,7 @@ function StatisticsPortal._defaultProcessFunction(tablePlace, item, config)
 	else
 		earnings = item.prizemoney
 	end
-	return tablePlace + Math._round(earnings or 0, DEFAULT_ROUND_PRECISION)
+	return tablePlace + Math.round(earnings or 0, DEFAULT_ROUND_PRECISION)
 end
 
 

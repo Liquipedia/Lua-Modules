@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 local Hotkey = require('Module:Hotkey')
 local String = require('Module:StringUtils')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -99,13 +99,11 @@ function Building:createInfobox()
 	infobox:categories('Buildings')
 	infobox:categories(unpack(self:getWikiCategories(args)))
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return infobox:build(widgets)
 end
 
 ---@param args table

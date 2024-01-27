@@ -18,11 +18,12 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
@@ -46,8 +47,8 @@ function CustomPrizePool.run(frame)
 	-- set some default values
 	args.prizesummary = Logic.emptyOr(args.prizesummary, false)
 	args.exchangeinfo = Logic.emptyOr(args.exchangeinfo, false)
-	args.storelpdb = Logic.emptyOr(args.storelpdb, Namespace.isMain())
 	args.syncPlayers = Logic.emptyOr(args.syncPlayers, true)
+	args.placementsExtendImportLimit = Logic.emptyOr(args.placementsExtendImportLimit, true)
 
 	-- overwrite some wiki vars for this PrizePool call
 	_tournament_name = args['tournament name']
@@ -66,7 +67,11 @@ function CustomPrizePool.run(frame)
 	-- stash seriesNumber
 	_series_number = CustomPrizePool._seriesNumber()
 
-	local prizePool = PrizePool(args):create()
+	local prizePool = PrizePool(args)
+
+	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
+
+	prizePool:create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
@@ -76,7 +81,7 @@ function CustomPrizePool.run(frame)
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
 
-	if Logic.readBool(args.storelpdb) then
+	if prizePool.options.storeLpdb then
 		-- stash the lpdb_placement data so teamCards can use them
 		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
 	end

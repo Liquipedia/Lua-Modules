@@ -28,4 +28,5 @@ return {
 	defaultGame = 'cops',
 	defaultTeamLogo = 'Critical Ops allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Critical Ops allmode.png', ---@deprecated
+	match2 = 2,
 }

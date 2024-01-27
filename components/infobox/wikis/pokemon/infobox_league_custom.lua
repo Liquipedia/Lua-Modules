@@ -7,108 +7,97 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomLeague = Class.new()
+---@class PokemonLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _args
+local MODES = mw.loadData('Module:GameModes')
+local FORMATS = mw.loadData('Module:GameFormats')
 
-local _GAME = mw.loadData('Module:GameVersion')
-local _MODES = mw.loadData('Module:GameModes')
-local _FORMATS = mw.loadData('Module:GameFormats')
-
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-	_args.format = CustomLeague:_getGameFormat()
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
+	league.args.format = league:_getGameFormat()
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game version', content = {
-					CustomLeague._getGameVersion()
-				}
-			},
-			Cell{name = 'Game mode', content = {
-					CustomLeague:_getGameMode()
-				}
-			},
+			Cell{name = 'Game version', content = {Game.name{game = args.game}}},
+			Cell{name = 'Game mode', content = {self.caller:_getGameMode()}},
 		}
 	elseif id == 'customcontent' then
-		if _args.player_number then
+		if args.player_number then
 			table.insert(widgets, Title{name = 'Players'})
-			table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-		elseif _args.team_number then
+			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
+		elseif args.team_number then
 			table.insert(widgets, Title{name = 'Teams'})
-			table.insert(widgets, Cell{name = 'Number of teams', content = {_args.team_number}})
+			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
 		end
 	end
+
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.game = CustomLeague._getGameVersion()
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
-	lpdbData.mode = CustomLeague:_getGameMode()
 
 	return lpdbData
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = args.pokemonpremier
+	self.data.mode = self:_getGameMode()
+end
+
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_game', CustomLeague._getGameVersion())
-	Variables.varDefine('tournament_publishertier', args.pokemonpremier)
-	Variables.varDefine('tournament_mode', CustomLeague:_getGameMode())
-
 	--Legacy Vars:
-	Variables.varDefine('tournament_sdate', Variables.varDefault('tournament_startdate'))
-	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
 end
 
-function CustomLeague._getGameVersion()
-	return _GAME[string.lower(_args.game or '')]
+---@param args table
+---@return boolean
+function CustomLeague:liquipediaTierHighlighted(args)
+	return Logic.readBool(args.pokemonpremier)
 end
 
-function CustomLeague:liquipediaTierHighlighted()
-	return Logic.readBool(_args.pokemonpremier)
-end
-
+---@return string?
 function CustomLeague:_getGameMode()
-	if String.isEmpty(_args.mode) then
-		return
-	end
-
-	return _MODES[_args.mode:lower()]
+	return MODES[string.lower(self.args.mode or '')]
 end
 
+---@return string?
 function CustomLeague:_getGameFormat()
-	if String.isEmpty(_args.format) then
-		return
-	end
-
-	return _FORMATS[_args.format:lower()]
+	return FORMATS[string.lower(self.args.format or '')]
 end
 
 return CustomLeague

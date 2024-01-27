@@ -28,4 +28,5 @@ return {
 	defaultGame = 'brawl',
 	defaultTeamLogo = 'Brawlhalla Default logo.png', ---@deprecated
 	defaultTeamLogoDark = 'Brawlhalla Default logo.png', ---@deprecated
+	match2 = 0,
 }

@@ -73,7 +73,7 @@ return {
 	{
 		name = 'lpl',
 		icon = 'LPL Play icon.png',
-		prefixLink = 'https://letsplay.live/match/',
+		prefixLink = 'https://old.letsplay.live/match/',
 		label = 'Matchpage on LPL Play',
 	},
 	{
@@ -178,7 +178,7 @@ return {
 		name = 'gamersclub',
 		icon = 'Gamers Club icon lightmode.png',
 		iconDark = 'Gamers Club icon darkmode.png',
-		prefixLink = 'https://csgo.gamersclub.gg/tournaments/csgo/',
+		prefixLink = 'https://gamersclub.com.br/tournaments/cs/',
 		label = 'Matchpage and Stats on Gamers Club',
 		isMapStats = true
 	},
@@ -186,7 +186,7 @@ return {
 		name = 'gamersclublobby',
 		icon = 'Gamers Club icon lightmode.png',
 		iconDark = 'Gamers Club icon darkmode.png',
-		prefixLink = 'https://csgo.gamersclub.gg/lobby/partida/',
+		prefixLink = 'https://gamersclub.com.br/lobby/partida/',
 		label = 'Matchpage and Stats on Gamers Club',
 		isMapStats = true
 	},

@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
-local Namespace = Lua.import('Module:Namespace', {requireDevIfEnabled = true})
+local Namespace = Lua.import('Module:Namespace')
 
 local suite = ScribuntoUnit:new()
 

@@ -1,0 +1,234 @@
+/*******************************************************************************
+Template(s): All Crosstables
+Author(s): FO-nTTaX
+*******************************************************************************/
+@crosstable-max: 40;
+@crosstable-size: 40;
+@crosstable-yellow: var( --clr-pear-background-color, #f9f9c7 );
+@crosstable-green: var( --table-green-background-color, #ddf4dd );
+@crosstable-red: var( --table-red-background-color, #fbdfdf );
+
+.crosstable[ class*="row-" ] td,
+.crosstable[ class*="col-" ] td {
+	opacity: 0.5;
+	-moz-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
+	-webkit-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
+	box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
+	background-color: var( --table-background-color, #ffffff );
+	background-clip: padding-box;
+}
+
+.crosstable-shadows(@size) {
+	.crosstable-col(1, @size);
+	.crosstable-row(1, @size);
+}
+.crosstable-col(@id, @max) when (@id <= @max) {
+	@idp1: @id + 1;
+	.crosstable.col-@{idp1} td:nth-child(@{id}) {
+		&:extend( .crosstable-row-left );
+	}
+	.crosstable.col-@{id} td:nth-child(@{idp1}) {
+		&:extend( .crosstable-row-right );
+	}
+	.crosstable.col-@{id} td:nth-child(@{id}) {
+		&:extend( .crosstable-row-standard );
+	}
+	.crosstable-col(@id + 1, @max);
+}
+.crosstable-row(@id, @max) when (@id <= @max) {
+	@idp1: @id + 1;
+	.crosstable.row-@{idp1} tr:nth-child(@{id}) td {
+		&:extend( .crosstable-row-over );
+	}
+	.crosstable.row-@{id} tr:nth-child(@{idp1}) td {
+		&:extend( .crosstable-row-under );
+	}
+	.crosstable.row-@{id} tr:nth-child(@{id}) td {
+		&:extend( .crosstable-row-standard );
+	}
+	.crosstable-row(@id + 1, @max);
+}
+
+.crosstable-shadows(@crosstable-size);
+
+.crosstable-row-over {
+	-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	-webkit-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+}
+
+.crosstable-row-under {
+	-moz-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	-webkit-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+}
+
+.crosstable-row-left {
+	-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	-webkit-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+}
+
+.crosstable-row-right {
+	-moz-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	-webkit-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+	box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) );
+}
+
+.crosstable-row-standard {
+	opacity: 1 !important;
+	-moz-box-shadow: unset !important;
+	-webkit-box-shadow: unset !important;
+	box-shadow: unset !important;
+}
+
+.crosstable .crosstable-top-left {
+	-moz-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	-webkit-box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	box-shadow: inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+}
+
+.crosstable .crosstable-top-right {
+	-moz-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	-webkit-box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	box-shadow: inset 10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 -10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+}
+
+.crosstable .crosstable-bottom-left {
+	-moz-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	-webkit-box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	box-shadow: inset 0 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset -10px 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+}
+
+.crosstable .crosstable-bottom-right {
+	-moz-box-shadow: inset 10px 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	-webkit-box-shadow: inset 10px 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+	box-shadow: inset 10px 10px 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ), inset 0 0 10px -7px var( --crosstable-box-shadow-color, rgba( 0, 0, 0, 1 ) ) !important;
+}
+
+.crosstable-color-gray {
+	background-color: @crosstable-yellow;
+}
+
+.crosstable-color-green {
+	background-color: @crosstable-green;
+}
+
+.crosstable-color-red {
+	background-color: @crosstable-red;
+}
+
+.crosstable(@min, @max) {
+	.crosstable-outer(@min, @max, @min);
+}
+
+.crosstable-outer(@min, @max, @current) when (@current <= @max) {
+	.crosstable-inner(@min, @max, @min, @current);
+	.crosstable-outer(@min, @max, @current + 1);
+}
+.crosstable-inner(@min, @max, @current, @outer) when (@current <= @max) {
+	.crosstable-gray(@current, @outer);
+	.crosstable-green(@current, @outer);
+	.crosstable-red(@current, @outer);
+
+	.crosstable-inner(@min, @max, @current + 1, @outer);
+}
+
+.crosstable-gray(@s1, @s2) when (@s1 = @s2) {
+	td.crosstable-bgc-r@{s1}-r@{s2} {
+		&:extend( .crosstable-color-gray );
+	}
+}
+.crosstable-green(@s1, @s2) when (@s1 > @s2) {
+	td.crosstable-bgc-r@{s1}-r@{s2} {
+		&:extend( .crosstable-color-green );
+	}
+}
+.crosstable-red(@s1, @s2) when (@s1 < @s2) {
+	td.crosstable-bgc-r@{s1}-r@{s2} {
+		&:extend( .crosstable-color-red );
+	}
+}
+
+.crosstable tr {
+	.crosstable(0, @crosstable-max);
+}
+
+.crosstable tr td.crosstable-bgc-r0-r0 {
+	background-color: var( --table-background-color, #f9f9f9 );
+}
+
+.crosstable.zerodraw .crosstable-bgc-r0-r0,
+.crosstable tr td.crosstable-bgc-r0-r0-draw,
+.crosstable tr td.crosstable-bgc-r½-r½ {
+	background-color: var( --table-yellow-background-color, #f9f9c7 );
+}
+
+.crosstable tr td.crosstable-bgc-rW-rFF,
+.crosstable tr td.crosstable-bgc-rw-r {
+	background-color: var( --table-green-background-color, #ddf4dd );
+}
+
+.crosstable tr td.crosstable-bgc-rFF-rW,
+.crosstable tr td.crosstable-bgc-rFF-rFF,
+.crosstable tr td.crosstable-bgc-r-rw {
+	background-color: var( --table-red-background-color, #fbdfdf );
+}
+
+.crosstable tr td.crosstable-bgc-rw-r b {
+	display: none;
+}
+
+.crosstable tr td.crosstable-bgc-r-rw b {
+	display: none;
+}
+
+.crosstable tr td.crosstable-bgc-rW-rFF,
+.crosstable tr td.crosstable-bgc-rW-rL,
+.crosstable tr td.crosstable-bgc-rW-rDQ,
+.crosstable tr td.crosstable-bgc-rw-r {
+	background-color: var( --table-green-background-color, #ddf4dd );
+}
+
+.crosstable tr td.crosstable-bgc-rFF-rW,
+.crosstable tr td.crosstable-bgc-rL-rW,
+.crosstable tr td.crosstable-bgc-rDQ-rW,
+.crosstable tr td.crosstable-bgc-rFF-rFF,
+.crosstable tr td.crosstable-bgc-rDQ-rDQ,
+.crosstable tr td.crosstable-bgc-r-rw {
+	background-color: var( --table-red-background-color, #fbdfdf );
+}
+
+.crosstable tr td.crosstable-bgc-cross {
+	background-color: var( --table-variant-background-color, #f2f2f2 );
+}
+
+.crosstable .crosstable-bgc-span {
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	text-align: center;
+}
+
+.crosstable .crosstable-tr {
+	height: 30px;
+}
+
+.crosstable {
+	text-align: center;
+	margin: 0;
+	line-height: 14px;
+}
+
+.crosstable th,
+.crosstable td {
+	padding: 1px;
+}
+
+/* fix for i icon in crosstables */
+.crosstable .bracket-game .icon {
+	margin-top: 2px !important;
+	margin-right: -6px !important;
+	opacity: 0.6;
+}

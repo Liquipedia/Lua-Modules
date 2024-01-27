@@ -882,6 +882,19 @@ return {
 				lightMode = 'Mortal Kombat 11 default allmode.png',
 			},
 		},
+		mk1 = {
+			abbreviation = 'MK1',
+			name = 'Mortal Kombat 1',
+			link = 'Mortal Kombat 1',
+			logo = {
+				darkMode = 'Mortal Kombat 1 default allmode.png',
+				lightMode = 'Mortal Kombat 1 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Mortal Kombat 1 default allmode.png',
+				lightMode = 'Mortal Kombat 1 default allmode.png',
+			},
+		},
 		mvc2 = {
 			abbreviation = 'MvC 2',
 			name = 'Marvel vs. Capcom 2',
@@ -1597,6 +1610,19 @@ return {
 				lightMode = 'UNIEL Logo.png',
 			},
 		},
+		uni2 = {
+			abbreviation = 'UNI2',
+			name = 'Under Night In-Birth II',
+			link = 'Under Night In-Birth II',
+			logo = {
+				darkMode = 'Under Night In-Birth II allmode.png',
+				lightMode = 'Under Night In-Birth II allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Under Night In-Birth II allmode.png',
+				lightMode = 'Under Night In-Birth II allmode.png',
+			},
+		},
 		['project l'] = {
 			abbreviation = 'Project L',
 			name = 'Project L',
@@ -1627,4 +1653,5 @@ return {
 	defaultGame = 'fighters',
 	defaultTeamLogo = 'Fighters default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Fighters default darkmode.png', ---@deprecated
+	match2 = 0,
 }

@@ -8,6 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -15,15 +16,16 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
+local AUTOMATION_START_DATE = '2023-10-16'
 
 -- Template entry point
 function CustomPrizePool.run(frame)
@@ -32,8 +34,8 @@ function CustomPrizePool.run(frame)
 	-- adjust import settings params
 	args.allGroupsUseWdl = Logic.emptyOr(args.allGroupsUseWdl, true)
 	args.groupScoreDelimiter = '-'
-	-- currently no match2 implemented; enable once it is with the date it goes live as switch date
-	args.import = Logic.emptyOr(args.import, false)
+	-- match2 implemented as of 2023-10-15
+	args.import = Logic.nilOr(args.import, DateExt.getContextualDateOrNow() >= AUTOMATION_START_DATE)
 
 	local prizePool = PrizePool(args)
 

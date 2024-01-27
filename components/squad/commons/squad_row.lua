@@ -59,10 +59,8 @@ function SquadRow:id(args)
 	cell:addClass('ID')
 
 	local opponent = Opponent.resolve(
-		Opponent.readOpponentArgs(
-			Table.merge(args, {type = Opponent.solo}),
-			nil, {syncPlayer = true}
-		)
+		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo})),
+		nil, {syncPlayer = true}
 	)
 	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
 
@@ -82,7 +80,8 @@ function SquadRow:id(args)
 
 	local teamNode = mw.html.create('td')
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
-		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team))
+		local date = String.nilIfEmpty(ReferenceCleaner.clean(args.date))
+		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team, date))
 		if args.teamrole then
 			teamNode:css('text-align', 'center')
 			teamNode:tag('div'):css('font-size', '85%'):tag('i'):wikitext(args.teamrole)

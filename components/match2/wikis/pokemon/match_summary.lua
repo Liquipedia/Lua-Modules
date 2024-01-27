@@ -19,19 +19,22 @@ local String = require('Module:StringUtils')
 local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local _MAX_NUM_BANS = 5
-local _NUM_CHAMPIONS_PICK = 5
+local MAX_NUM_BANS = 5
+local NUM_CHAMPIONS_PICK = 5
 
-local _GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local _NO_CHECK = '[[File:NoCheck.png|link=]]'
+local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Champion Ban Class
+---@class PokemonChampionBan: MatchSummaryRowInterface
+---@operator call: PokemonChampionBan
+---@field root Html
+---@field table Html
 local ChampionBan = Class.new(
 	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -41,6 +44,7 @@ local ChampionBan = Class.new(
 	end
 )
 
+---@return self
 function ChampionBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width','40%'):wikitext(''):done()
@@ -49,6 +53,11 @@ function ChampionBan:createHeader()
 	return self
 end
 
+---@param banData {numberOfBans: integer, [1]: table, [2]: table}
+---@param gameNumber integer
+---@param numberOfBans integer
+---@param date string
+---@return self
 function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	self.table:tag('tr')
 		:tag('td')
@@ -65,66 +74,36 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 	return self
 end
 
+---@return Html
 function ChampionBan:create()
 	return self.root
 end
 
-
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-
-	local matchSummary = MatchSummary():init('420px')
-
-	matchSummary:header(CustomMatchSummary._createHeader(match))
-				:body(CustomMatchSummary._createBody(match))
-
-	if match.comment then
-		local comment = MatchSummary.Comment():content(match.comment)
-		matchSummary:comment(comment)
-	end
-
-	local vods = {}
-	for index, game in ipairs(match.games) do
-		if game.vod then
-			vods[index] = game.vod
-		end
-	end
-
-	match.links.lrthread = match.lrthread
-	match.links.vod = match.vod
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
-		local footer = MatchSummary.Footer()
-
-		-- Game Vods
-		for index, vod in pairs(vods) do
-			match.links['vodgame' .. index] = vod
-		end
-
-		footer.inner = mw.html.create('div')
-			:addClass('bracket-popup-footer plainlinks vodlink')
-			:node(ExternalLinks.print(match.links))
-
-		matchSummary:footer(footer)
-	end
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
 end
 
-function CustomMatchSummary._createHeader(match)
-	local header = MatchSummary.Header()
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left', 'bracket'))
-		:leftScore(header:createScore(match.opponents[1]))
-		:rightScore(header:createScore(match.opponents[2]))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', 'bracket'))
+	if Table.isNotEmpty(match.links) then
+		footer:addElement(ExternalLinks.print(match.links))
+	end
 
-	return header
+	return footer
 end
 
-function CustomMatchSummary._createBody(match)
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
@@ -158,10 +137,10 @@ function CustomMatchSummary._createBody(match)
 	-- Pre-Process Champion Ban Data
 	local championBanData = {}
 	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
+		local extradata = game.extradata or {}
 		local banData = {{}, {}}
 		local numberOfBans = 0
-		for index = 1, _MAX_NUM_BANS do
+		for index = 1, MAX_NUM_BANS do
 			if String.isNotEmpty(extradata['team1ban' .. index]) then
 				numberOfBans = index
 				banData[1][index] = extradata['team1ban' .. index]
@@ -194,6 +173,10 @@ function CustomMatchSummary._createBody(match)
 	return body
 end
 
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@param date string
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -202,14 +185,14 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		local getChampFromIndex = function(champIndex)
 			return champIndex, String.nilIfEmpty(extradata['team' .. team .. 'champion' .. champIndex])
 		end
-		return Table.map(Array.range(1, _NUM_CHAMPIONS_PICK), getChampFromIndex)
+		return Table.map(Array.range(1, NUM_CHAMPIONS_PICK), getChampFromIndex)
 	end
-	local championsData = Array.map(Array.range(1, 2), getChampsForTeam)
+	local championsData = Array.map(Array.range(1, 2), getChampsForTeam)--[[@as table]]
 	local championsDataIsEmpty = Array.all(championsData, Table.isEmpty)
 	championsData[1].color = extradata.team1side
 	championsData[2].color = extradata.team2side
 
-	if Table.isEmpty(game.scores) and String.isEmpty(game.winner) and championsDataIsEmpty then
+	if Table.isEmpty(game.scores) and Logic.isEmpty(game.winner) and championsDataIsEmpty then
 		return nil
 	end
 
@@ -222,7 +205,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		score = table.concat(game.scores, '-')
 	end
 
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], _NUM_CHAMPIONS_PICK, date, false))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], NUM_CHAMPIONS_PICK, date, false))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -232,7 +215,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		))
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], _NUM_CHAMPIONS_PICK, date, true))
+	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -246,6 +229,8 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	return row
 end
 
+---@param isWinner boolean?
+---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
@@ -254,14 +239,20 @@ function CustomMatchSummary._createCheckMark(isWinner)
 		:css('margin-right', '3%')
 
 	if isWinner then
-		container:node(_GREEN_CHECK)
+		container:node(GREEN_CHECK)
 	else
-		container:node(_NO_CHECK)
+		container:node(NO_CHECK)
 	end
 
 	return container
 end
 
+---@param opponentChampionsData table
+---@param numberOfChampions integer
+---@param date string
+---@param flip boolean?
+---@param isBan boolean?
+---@return Html
 function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
 	local opponentChampionsDisplay = {}
 	local color = Table.extract(opponentChampionsData, 'color') or ''

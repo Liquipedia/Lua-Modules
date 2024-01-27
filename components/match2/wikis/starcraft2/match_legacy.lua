@@ -39,7 +39,6 @@ function MatchLegacy.storeGames(match, match2, options)
 
 		if
 			game.mode == '1v1' and
-			game.extradata.isSubMatch == 'false' and
 			game.winner ~= 'skip' and
 			game.map ~= 'Definitions'
 		then

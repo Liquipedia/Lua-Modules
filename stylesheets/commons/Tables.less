@@ -1,0 +1,233 @@
+/*******************************************************************************
+Template(s): Wikitables
+Author(s): FO-nTTaX, salle
+*******************************************************************************/
+.table-responsive {
+	display: block;
+	width: auto;
+	overflow-x: auto;
+}
+
+.wikitable {
+	margin-bottom: 1rem;
+	background-color: var( --table-background-color, var( --clr-surface-5, #ffffff ) ) !important;
+	border: 0.0625rem solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.wikitable > tr > th,
+.wikitable > * > tr > th {
+	background-color: #eaecf0;
+	text-align: center;
+}
+
+.wikitable > tr > th,
+.wikitable > thead > tr > th,
+.wikitable > tbody > tr > th,
+.wikitable > tr > td,
+.wikitable > thead > tr > td,
+.wikitable > tbody > tr > td {
+	padding: 5px;
+	vertical-align: middle;
+	border: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.wikitable > thead > tr > th {
+	vertical-align: middle;
+	border-bottom: 2px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.wikitable > thead > tr > th,
+.wikitable > thead > tr > td {
+	border-bottom-width: 2px !important;
+}
+
+.wikitable > tbody + tbody {
+	border-top: 2px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.wikitable > tfoot > tr > th {
+	border-color: var( --table-border-color, #bbbbbb );
+}
+
+table.wikitable-striped {
+	margin: 0;
+}
+
+.wikitable.wikitable-striped > thead > tr,
+.wikitable.wikitable-striped > tfoot > th {
+	background-color: var( --table-header-variant-background-color, var( --clr-surface-2, #f5f5f5 ) );
+}
+
+.wikitable.wikitable-striped > tbody tr:nth-of-type( 2n ) {
+	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) );
+}
+
+.wikitable.wikitable-striped > tbody tr:nth-of-type( 2n + 1 ) {
+	background-color: var( --table-background-color, var( --clr-surface-1, #ffffff ) );
+}
+
+.wikitable.wikitable-striped > thead > tr > th:not( :first-child ),
+.wikitable.wikitable-striped > thead > tr > td:not( :first-child ),
+.wikitable.wikitable-striped > tbody > tr > th:not( :first-child ),
+.wikitable.wikitable-striped > tbody > tr > td:not( :first-child ),
+.wikitable.wikitable-striped > tr > th:not( :first-child ),
+.wikitable.wikitable-striped > tr > td:not( :first-child ) {
+	border-left: 0 !important;
+}
+
+.wikitable.wikitable-striped > thead > tr > th:not( :last-child ),
+.wikitable.wikitable-striped > thead > tr > td:not( :last-child ),
+.wikitable.wikitable-striped > tbody > tr > th:not( :last-child ),
+.wikitable.wikitable-striped > tbody > tr > td:not( :last-child ),
+.wikitable.wikitable-striped > tr > th:not( :last-child ),
+.wikitable.wikitable-striped > tr > td:not( :last-child ) {
+	border-right: 0 !important;
+}
+
+.wikitable.wikitable-bordered > thead > tr > th,
+.wikitable.wikitable-bordered > thead > tr > td,
+.wikitable.wikitable-bordered > thead > tr > th:not( :first-child ),
+.wikitable.wikitable-bordered > thead > tr > td:not( :first-child ),
+.wikitable.wikitable-bordered > thead > tr > th:not( :last-child ),
+.wikitable.wikitable-bordered > thead > tr > td:not( :last-child ),
+.wikitable.wikitable-bordered > tbody > tr > th,
+.wikitable.wikitable-bordered > tbody > tr > td,
+.wikitable.wikitable-bordered > tbody > tr > th:not( :first-child ),
+.wikitable.wikitable-bordered > tbody > tr > td:not( :first-child ),
+.wikitable.wikitable-bordered > tbody > tr > th:not( :last-child ),
+.wikitable.wikitable-bordered > tbody > tr > td:not( :last-child ),
+.wikitable.wikitable-bordered > tr > th,
+.wikitable.wikitable-bordered > tr > td,
+.wikitable.wikitable-bordered > tr > th:not( :first-child ),
+.wikitable.wikitable-bordered > tr > td:not( :first-child ),
+.wikitable.wikitable-bordered > tr > th:not( :last-child ),
+.wikitable.wikitable-bordered > tr > td:not( :last-child ) {
+	border-left: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+	border-right: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.panel-box table.wikitable-striped,
+.panel-box .wikitable-striped td,
+.panel-box .wikitable-striped th,
+.panel table.wikitable-striped,
+.panel .wikitable-striped td,
+.panel .wikitable-striped th {
+	border-left: 0 !important;
+	border-right: 0 !important;
+}
+
+.panel-box table.wikitable-striped,
+.panel table.wikitable-striped,
+.panel-box .wikitable-striped tr:last-child > td,
+.panel-box .wikitable-striped tr:last-child > th,
+.panel .wikitable-striped tr:last-child > td,
+.panel .wikitable-striped tr:last-child > th {
+	border-bottom: 0 !important;
+}
+
+.panel-box table.wikitable-striped,
+.panel table.wikitable-striped,
+.panel-box .wikitable-striped tr:first-child td,
+.panel-box .wikitable-striped tr:first-child th,
+.panel .wikitable-striped tr:first-child > td,
+.panel .wikitable-striped tr:first-child > th {
+	border-top: 0 !important;
+}
+
+table.wikitable.wikitable-striped.infobox_matches_content {
+	border-top: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+	border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+}
+
+.panel-box .wikitable.wikitable-striped > tbody > tr:nth-of-type( 2n + 1 ),
+.panel .wikitable.wikitable-striped > tbody > tr:nth-of-type( 2n + 1 ),
+.wikitable.grouptable th,
+.teamcard .wikitable th {
+	background-color: unset;
+}
+
+.teamcard table,
+table.crosstable {
+	line-height: initial;
+}
+
+.matchpage {
+	table.headtohead tr {
+		& > td {
+			border-top: 1px dotted var( --table-border-color, var( --clr-border, #bbbbbb ) );
+		}
+
+		&.firstmap > td {
+			border-top: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
+		}
+	}
+
+	table.stats,
+	table.maps {
+		tr > td {
+			border-top: 1px dotted var( --table-border-color, var( --clr-border, #bbbbbb ) );
+		}
+
+		tr:nth-child( 2 ) > td {
+			border-top: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
+		}
+	}
+
+	table.streams tr > td:last-of-type {
+		border-right: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+	}
+}
+
+div.table-responsive + div.table-responsive > table.matchlist {
+	margin-top: -1px !important;
+}
+
+/* Background colors */
+
+.wikitable .wikitable--blue-bg {
+	background-color: #dee3ef;
+}
+
+.theme--light .wikitable .wikitable--blue-bg {
+	background-color: var( --clr-sapphire-90 );
+}
+
+.theme--dark .wikitable .wikitable--blue-bg {
+	background-color: var( --clr-sapphire-20 );
+}
+
+.wikitable .wikitable--red-bg {
+	background-color: #fbdfdf;
+}
+
+.theme--light .wikitable .wikitable--red-bg {
+	background-color: var( --clr-cinnabar-90 );
+}
+
+.theme--dark .wikitable .wikitable--red-bg {
+	background-color: var( --clr-cinnabar-20 );
+}
+
+.wikitable .wikitable--radiant-bg {
+	background-color: #bcd985;
+}
+
+.theme--light .wikitable .wikitable--radiant-bg {
+	background-color: var( --clr-atlantis-80 );
+}
+
+.theme--dark .wikitable .wikitable--radiant-bg {
+	background-color: var( --clr-atlantis-20 );
+}
+
+.wikitable .wikitable--dire-bg {
+	background-color: #e79e7e;
+}
+
+.theme--light .wikitable .wikitable--dire-bg {
+	background-color: var( --clr-california-80 );
+}
+
+.theme--dark .wikitable .wikitable--dire-bg {
+	background-color: var( --clr-california-20 );
+}

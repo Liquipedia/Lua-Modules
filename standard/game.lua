@@ -16,11 +16,20 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
 
-local GamesData = Info.games
+---@class GameData
+---@field abbreviation string
+---@field name string
+---@field link string
+---@field logo {darkMode: string, lightMode: string}
+---@field defaultTeamLogo {darkMode: string, lightMode: string}
+---@field order number?
+---@field unlisted boolean?
 
-local ICON_STRING = '[[File:${icon}|link=${link}|class=${class}|${size}]]'
+local GamesData = Info.games --[[@as table<string, GameData>]]
+
+local ICON_STRING = '[[File:${icon}|${alt}|link=${link}|class=${class}|${size}]]'
 local DEFAULT_SIZE = '25x25px'
 local DEFAULT_SPAN_CLASS = 'icon-16px'
 local ICON_PLACEHOLDER = 'LeaguesPlaceholder.png'
@@ -88,9 +97,14 @@ function Game.listGames(options)
 	end
 
 	local gamesList = Array.extractKeys(GamesData)
+	---@cast gamesList GameData[]
 	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
 		return Array.sortBy(gamesList, getGameOrder)
 	end
+
+	Array.filter(gamesList, function(game)
+		return not game.unlisted
+	end)
 
 	return gamesList
 end
@@ -148,10 +162,12 @@ function Game.icon(options)
 	if Table.isEmpty(gameData) then
 		gameIcons = Game._createIcon{icon = ICON_PLACEHOLDER, size = options.size}
 	elseif gameData.logo.lightMode == gameData.logo.darkMode then
-		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link}
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size, link = link, alt = gameData.name}
 	else
-		gameIcons = Game._createIcon{ icon = gameData.logo.lightMode, size = options.size, link = link, mode = 'light'} ..
-			Game._createIcon{icon = gameData.logo.darkMode, size = options.size, link = link, mode = 'dark'}
+		gameIcons = Game._createIcon{icon = gameData.logo.lightMode, size = options.size,
+				link = link, alt = gameData.name, mode = 'light'} ..
+			Game._createIcon{icon = gameData.logo.darkMode, size = options.size,
+				link = link, alt = gameData.name, mode = 'dark'}
 	end
 
 	if String.isNotEmpty(spanClass) then
@@ -161,7 +177,7 @@ function Game.icon(options)
 	end
 end
 
----@param options {mode: string?, icon: string?, size: string?, link: string?}
+---@param options {mode: string?, icon: string?, size: string?, link: string?, alt: string?}
 ---@return string
 function Game._createIcon(options)
 	return String.interpolate(
@@ -171,6 +187,7 @@ function Game._createIcon(options)
 			size = options.size or DEFAULT_SIZE,
 			class = options.mode and ('show-when-' .. options.mode .. '-mode') or '',
 			link = options.link or '',
+			alt = options.alt or options.link or '',
 		}
 	)
 end

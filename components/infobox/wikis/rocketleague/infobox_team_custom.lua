@@ -6,61 +6,74 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local TeamRanking = require('Module:TeamRanking')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+---@class RocketleagueInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
 local CustomInjector = Class.new(Injector)
 
-local _team
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	_team.args.rating, _team.args.ratingRank = CustomTeam.fetchRating(_team.pagename)
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
+	team.args.rating, team.args.ratingRank = CustomTeam.fetchRating(team.pagename)
+
 	return team:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = '[[Portal:Rating|LPRating]]',
-		content = {
-			_team.args.rating and _team.args.ratingRank and
-				math.floor(_team.args.rating + 0.5) .. ' (Rank #'.. _team.args.ratingRank ..')'
-			or 'Not enough data'}
-	})
-	table.insert(widgets, Cell{
-		name = '[[RankingTableRLCS|RLCS Points]]',
-		content = {TeamRanking.run{
-			ranking = _team.args.ranking_name,
-			team = _team.pagename
-		}}
-	})
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{
+				name = '[[Portal:Rating|LPRating]]',
+				content = {
+					args.rating and args.ratingRank and math.floor(args.rating + 0.5) .. ' (Rank #'.. args.ratingRank ..')'
+						or 'Not enough data'
+				}
+			},
+			Cell{
+				name = '[[RankingTableRLCS|RLCS Points]]',
+				content = {TeamRanking.run{
+					ranking = args.ranking_name,
+					team = self.caller.pagename
+				}}
+			}
+		)
+	end
+
 	return widgets
 end
 
-function CustomInjector:parse(_, widgets)
-	return widgets
-end
-
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.extradata.rating = _team.args.rating
+	lpdbData.extradata.rating = self.args.rating
 	lpdbData.extradata.tier = string.lower(args.tier or '')
 
 	return lpdbData
 end
 
+---@param findTeam string
+---@return number?
+---@return integer?
 function CustomTeam.fetchRating(findTeam)
 	local latestSnap = mw.ext.LiquipediaDB.lpdb(
 		'datapoint',
@@ -84,10 +97,6 @@ function CustomTeam.fetchRating(findTeam)
 			return latestSnap.extradata.table[findTeam].rating, rank
 		end
 	end
-end
-
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomTeam

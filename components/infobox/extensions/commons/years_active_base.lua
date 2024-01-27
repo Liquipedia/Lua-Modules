@@ -23,13 +23,14 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _CURRENT_YEAR = tonumber(os.date('%Y'))
+local DEFAULT_DATE = '1970-01-01 00:00:00'
+local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
 ActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 ActiveYears.additionalConditions = ''
+ActiveYears.noResultsText = 'Player has no results.'
 
 ---
 -- Entry point
@@ -62,16 +63,20 @@ function ActiveYears.display(args)
 		error('"playerPositionLimit" has to be >= 1')
 	end
 
+	-- Build conditions
 	local conditions = ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, args.mode)
 
 	return ActiveYears._calculate(conditions)
 end
 
 function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLimit, prefix, mode)
-	local playerConditionTree = ConditionTree(BooleanOperator.any):add({
-		ConditionNode(ColumnName('participant'), Comparator.eq, player),
-		ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
-	})
+	local playerConditionTree = ConditionTree(BooleanOperator.any)
+	if prefix == 'p' then
+		playerConditionTree:add({
+			ConditionNode(ColumnName('participant'), Comparator.eq, player),
+			ConditionNode(ColumnName('participant'), Comparator.eq, playerAsPageName),
+		})
+	end
 	for playerIndex = 1, playerPositionLimit do
 		playerConditionTree:add({
 			ConditionNode(ColumnName('players_' .. prefix .. playerIndex), Comparator.eq, player),
@@ -81,7 +86,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
-		ConditionNode(ColumnName('date'), Comparator.neq, _DEFAULT_DATE),
+		ConditionNode(ColumnName('date'), Comparator.neq, DEFAULT_DATE),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
 			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
@@ -98,12 +103,16 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 end
 
 function ActiveYears._calculate(conditions)
+	-- Get years
 	local years = ActiveYears._getYears(conditions)
-
 	if Table.isEmpty(years) then
-		return 'Player has no results.'
+		return ActiveYears.noResultsText
 	end
 
+	return ActiveYears.displayYears(years)
+end
+
+function ActiveYears.displayYears(years)
 	-- Sort years chronologically
 	table.sort(years)
 
@@ -132,6 +141,8 @@ function ActiveYears._getYears(conditions)
 end
 
 function ActiveYears._groupYears(sortedYears)
+	if Logic.isEmpty(sortedYears) then return {} end
+
 	local startYear
 	local endYear
 	local yearRanges = {}
@@ -146,7 +157,8 @@ function ActiveYears._groupYears(sortedYears)
 		end
 		endYear = year
 	end
-	if endYear >= _CURRENT_YEAR then
+
+	if endYear >= CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. '<b>Present</b>')
 	else
 		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)

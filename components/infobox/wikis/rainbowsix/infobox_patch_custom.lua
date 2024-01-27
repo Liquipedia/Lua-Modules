@@ -9,68 +9,48 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Patch = Lua.import('Module:Infobox/Patch', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Patch = Lua.import('Module:Infobox/Patch')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
-local CustomPatch = Class.new()
+---@class R6PatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
-	_args = customPatch.args
-	customPatch.createWidgetInjector = CustomPatch.createWidgetInjector
-	customPatch.getChronologyData = CustomPatch.getChronologyData
-	customPatch.setLpdbData = CustomPatch.setLpdbData
-	return customPatch:createInfobox()
-end
+	local patch = CustomPatch(frame)
+	patch:setWidgetInjector(CustomInjector(patch))
 
----@return WidgetInjector
-function CustomPatch:createWidgetInjector()
-	return CustomInjector()
+	return patch:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 	if id == 'release' then
 		return {
-			Cell{
-				name = 'Release Date',
-				content = {_args.release}
-			},
-			Cell{
-				name = 'PC Release Date',
-				content = {_args.pcrelease}
-			},
-			Cell{
-				name = 'Console Release Date',
-				content = {_args.consolerelease}
-			},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = 'PC Release Date', content = {args.pcrelease}},
+			Cell{name = 'Console Release Date', content = {args.consolerelease}},
 		}
 	end
 	return widgets
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomPatch:setLpdbData(args)
-	local date = args.release or args.pcrelease or args.consolerelease
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = args.name,
-		type = 'patch',
-		information = args.game,
-		date = date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			version = args.version,
-		}
-	})
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.extradata.version = args.version
+	lpdbData.extradata.game = args.game
+
+	return lpdbData
 end
 
 ---@param args table

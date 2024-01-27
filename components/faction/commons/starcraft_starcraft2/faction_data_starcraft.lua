@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = mw.loadData('Module:Info')
+
 local factionProps = {
 	p = {
 		bgClass = 'Protoss',
@@ -43,17 +45,24 @@ local factionProps = {
 }
 
 return {
-	factionProps = factionProps,
+	defaultGame = Info.defaultGame,
+	factionProps = {
+		[Info.defaultGame] = factionProps
+	},
 	defaultFaction = 'u',
-	factions = {'p', 't', 'z', 'r', 'u'},
+	factions = {
+		[Info.defaultGame] = {'p', 't', 'z', 'r', 'u'},
+	},
 	knownFactions = {'p', 't', 'z', 'r'},
 	coreFactions = {'p', 't', 'z'},
 	aliases = {
-		pt = 'p',
-		pz = 'p',
-		tp = 't',
-		tz = 't',
-		zp = 'z',
-		zt = 'z',
+		[Info.defaultGame] = {
+			pt = 'p',
+			pz = 'p',
+			tp = 't',
+			tz = 't',
+			zp = 'z',
+			zt = 'z',
+		},
 	},
 }

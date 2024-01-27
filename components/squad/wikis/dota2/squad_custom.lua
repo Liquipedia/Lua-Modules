@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 
-local Squad = Lua.import('Module:Squad', {requireDevIfEnabled = true})
-local SquadRow = Lua.import('Module:Squad/Row', {requireDevIfEnabled = true})
+local Squad = Lua.import('Module:Squad')
+local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
@@ -118,6 +118,7 @@ function CustomSquad.run(frame)
 			role = player.role,
 			team = player.team,
 			teamrole = player.teamrole,
+			date = player.leavedate or player.inactivedate or player.leavedate,
 		}
 			:name{name = player.name}
 			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}

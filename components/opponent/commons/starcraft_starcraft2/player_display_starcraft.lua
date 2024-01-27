@@ -14,11 +14,11 @@ local String = require('Module:StringUtils')
 local TypeUtil = require('Module:TypeUtil')
 local Abbreviation = require('Module:Abbreviation')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
-local PlayerExt = Lua.import('Module:Player/Ext', {requireDevIfEnabled = true})
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
-local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local PlayerExt = Lua.import('Module:Player/Ext')
+local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
@@ -39,6 +39,7 @@ StarcraftPlayerDisplay.propTypes.BlockPlayer = {
 	showPlayerTeam = 'boolean?',
 	showRace = 'boolean?',
 	abbreviateTbd = 'boolean?',
+	note = 'string?',
 }
 
 --[[
@@ -50,7 +51,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = html.create(props.dq and 's' or 'span'):addClass('name')
+	local nameNode = html.create(props.dq and 's' or 'span')
 		:wikitext(
 			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and player.pageName
@@ -58,6 +59,14 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 			or Logic.emptyOr(player.displayName, zeroWidthSpace)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
+
+	if props.note then
+		nameNode = mw.html.create('span'):addClass('name')
+			:node(nameNode)
+			:tag('sup'):addClass('note'):wikitext(props.note):done()
+	else
+		nameNode:addClass('name')
+	end
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then

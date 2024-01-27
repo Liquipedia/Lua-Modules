@@ -233,14 +233,17 @@ Flags.readKey('Czechoslovakia') -- returns nil
 ---@return string?
 function Flags._convertToKey(flagName)
 	-- lowercase all unicode
-	flagName = mw.ustring.lower(flagName)
 	-- removes all accents and special characters
-	flagName = string.gsub(mw.ustring.toNFKD(flagName), '[^%l]', '')
+	local parsedName = mw.ustring.toNFKD(mw.ustring.lower(flagName))
+	if not parsedName then
+		return
+	end
+	parsedName = string.gsub(parsedName, '[^%l]', '')
 
-	return MasterData.twoLetter[flagName]
-		or MasterData.threeLetter[flagName]
-		or MasterData.aliases[flagName]
-		or (MasterData.data[flagName] and flagName)
+	return MasterData.twoLetter[parsedName]
+		or MasterData.threeLetter[parsedName]
+		or MasterData.aliases[parsedName]
+		or (MasterData.data[parsedName] and parsedName)
 end
 
 ---@param langName string

@@ -12,9 +12,10 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
-local BaseResultsTable = Lua.import('Module:ResultsTable/Base', {requireDevIfEnabled = true})
+local BaseResultsTable = Lua.import('Module:ResultsTable/Base')
 
 local AwardsTable = Class.new(BaseResultsTable)
 
@@ -76,7 +77,7 @@ function AwardsTable:buildRow(placement)
 			placement.pagename
 		))
 
-	row:tag('td'):css('text-align', 'left'):wikitext(placement.extradata.award)
+	row:tag('td'):wikitext(placement.extradata.award)
 
 	if self.config.playerResultsOfTeam or self.config.queryType ~= Opponent.team then
 		row:tag('td'):css('text-align', 'left'):attr('data-sort-value', placement.opponentname):node(self:opponentDisplay(
@@ -87,7 +88,7 @@ function AwardsTable:buildRow(placement)
 
 	row:tag('td'):wikitext(Currency.display('USD',
 			self.config.queryType ~= Opponent.team and placement.individualprizemoney or placement.prizemoney,
-			{dashIfZero = true, abbreviation = false, formatValue = true}
+			{dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 		))
 
 	return row

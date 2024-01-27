@@ -8,8 +8,8 @@
 
 local Lua = require('Module:Lua')
 
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local Variables = Lua.import('Module:Variables', {requireDevIfEnabled = true})
+local League = Lua.import('Module:Infobox/League')
+local Variables = Lua.import('Module:Variables')
 
 local mockTournament = {}
 

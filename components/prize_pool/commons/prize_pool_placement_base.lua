@@ -11,10 +11,16 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
+local BASE_CURRENCY = 'USD'
+local LOCAL_CURRENCY_VARIABLE_POST_FIX = 'local'
 local PRIZE_TYPE_BASE_CURRENCY = 'BASE_CURRENCY'
+local PRIZE_TYPE_LOCAL_CURRENCY = 'LOCAL_CURRENCY'
+local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 
 --- @class BasePlacement
 --- A BasePlacement is a set of opponents who all share the same final place/award in the tournament.
@@ -177,6 +183,26 @@ function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 		end)
 
 		opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] = baseReward
+	end)
+end
+
+function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
+	local baseMoney = tonumber(Variables.varDefault(hasLocalCurrency and
+			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or
+			('tournament_prizepool' .. BASE_CURRENCY:lower())
+		)) or 0
+
+	Array.forEach(self.opponents, function(opponent)
+		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1]
+			or opponent.prizeRewards[PRIZE_TYPE_LOCAL_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_LOCAL_CURRENCY .. 1]
+			or (opponent.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or self.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or 0) == 0
+		then
+			return
+		end
+
+		local percentage = opponent.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1] or self.prizeRewards[PRIZE_TYPE_PERCENTAGE .. 1]
+		opponent.prizeRewards[(hasLocalCurrency and PRIZE_TYPE_LOCAL_CURRENCY or PRIZE_TYPE_BASE_CURRENCY) .. 1]
+			= baseMoney * percentage / 100
 	end)
 end
 
