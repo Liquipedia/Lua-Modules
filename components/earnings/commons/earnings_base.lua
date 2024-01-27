@@ -18,7 +18,7 @@ local Team = require('Module:Team')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local DEFAULT_DATE = '1970-01-01 00:00:00'
+local DEFAULT_DATE = '0000-01-01 00:00:00'
 
 local Earnings = {}
 
