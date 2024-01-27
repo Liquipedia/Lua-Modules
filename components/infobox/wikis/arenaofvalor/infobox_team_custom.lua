@@ -56,7 +56,7 @@ function CustomTeam:createRegion(region)
 	if Logic.isEmpty(region) then return {} end
 
 	local regionData = Region.run{region = region} or {}
-	local remappedRegion = regionData.region and REGION_REMAPPINGS[regionData.region:lower()]
+	local remappedRegion = regionData.region and REGION_REMAPPINGS[(regionData.region or ''):lower()]
 
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
