@@ -193,7 +193,7 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	local builtInfobox = infobox:build(widgets)
 
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then

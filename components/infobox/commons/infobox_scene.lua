@@ -79,7 +79,7 @@ function Scene:createInfobox()
 
 	infobox:categories('Scene')
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 --- Allows for overriding this functionality

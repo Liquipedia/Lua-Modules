@@ -81,7 +81,7 @@ function Show:createInfobox()
 		infobox:categories('Shows')
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 ---@param country string?
