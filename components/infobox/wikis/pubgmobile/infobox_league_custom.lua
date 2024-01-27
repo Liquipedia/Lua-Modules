@@ -22,11 +22,11 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class PubgmobileLeagueInfobox: InfoboxLeagueTemp
+---@class PubgmobileLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _MODES = {
+local MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
 	duo = 'Duos[[Category:Duos Mode Tournaments]]',
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
@@ -36,19 +36,19 @@ local _MODES = {
 	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
-_MODES.solos = _MODES.solo
-_MODES.duos = _MODES.duo
-_MODES.squads = _MODES.squad
-_MODES.tdm = _MODES['2v2']
-_MODES.tdm1 = _MODES['1v1']
+MODES.solos = MODES.solo
+MODES.duos = MODES.duo
+MODES.squads = MODES.squad
+MODES.tdm = MODES['2v2']
+MODES.tdm1 = MODES['1v1']
 
-local _PERSPECTIVES = {
+local PERSPECTIVES = {
 	fpp = {'FPP'},
 	tpp = {'TPP'},
 	mixed = {'FPP', 'TPP'},
 }
-_PERSPECTIVES.first = _PERSPECTIVES.fpp
-_PERSPECTIVES.third = _PERSPECTIVES.tpp
+PERSPECTIVES.first = PERSPECTIVES.fpp
+PERSPECTIVES.third = PERSPECTIVES.tpp
 
 ---@param frame Frame
 ---@return Html
@@ -125,14 +125,14 @@ function CustomLeague._getGameMode(args)
 		-- Clean unnecessary data from the input
 		perspective = string.gsub(perspective, ' person', '')
 		perspective = string.gsub(perspective, ' perspective', '')
-		return _PERSPECTIVES[perspective] or {}
+		return PERSPECTIVES[perspective] or {}
 	end
 	local getPerspectiveDisplay = function(perspective)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective)
 	end
 	local displayPerspectives = Table.mapValues(getPerspectives(args.perspective), getPerspectiveDisplay)
 
-	local mode = _MODES[string.lower(args.mode or '')] or _MODES['default']
+	local mode = MODES[string.lower(args.mode or '')] or MODES['default']
 
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end
