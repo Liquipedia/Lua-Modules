@@ -73,15 +73,13 @@ function Manufacturer:createInfobox()
 		}
 	}
 
-	local builtInfobox = infobox:build(widgets)
-
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 		infobox:categories('Manufacturers')
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return builtInfobox
+	return infobox:build(widgets)
 end
 
 ---@param args table

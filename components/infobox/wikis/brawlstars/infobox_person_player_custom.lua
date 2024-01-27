@@ -56,8 +56,6 @@ function CustomPlayer.run(frame)
 
 	local args = player.args
 
-	local builtInfobox = player:createInfobox()
-
 	local autoPlayerIntro = ''
 	if Logic.readBool((args.autoPI or ''):lower()) then
 		autoPlayerIntro = PlayerIntroduction.run{
@@ -84,7 +82,7 @@ function CustomPlayer.run(frame)
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(player:createInfobox())
 		:node(autoPlayerIntro)
 end
 

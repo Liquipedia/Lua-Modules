@@ -227,8 +227,6 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:build(widgets)
-
 	if self:shouldStore(args) then
 		self.infobox:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
@@ -236,7 +234,7 @@ function League:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(self.infobox:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 

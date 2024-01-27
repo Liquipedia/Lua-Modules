@@ -106,8 +106,6 @@ function CustomPlayer.run(frame)
 	end) or {}
 	args.gameList = player:_getGames()
 
-	local builtInfobox = player:createInfobox()
-
 	local autoPlayerIntro = ''
 	if Logic.readBool((args.autoPI or ''):lower()) then
 		local _, roleType = CustomPlayer._getRoleType(args.roleList)
@@ -141,7 +139,7 @@ function CustomPlayer.run(frame)
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(player:createInfobox())
 		:node(autoPlayerIntro)
 end
 
