@@ -27,7 +27,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local ICONS = {
 	greenCheck = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
 	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
-	yellowQuestionMark = '<i class="fas fa-question bright-sun-text" style="width: 14px; text-align: center" ></i>',
 	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
 	noCheck = '[[File:NoCheck.png|link=]]',
 }

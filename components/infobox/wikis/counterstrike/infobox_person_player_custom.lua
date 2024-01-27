@@ -210,7 +210,13 @@ function CustomPlayer._displayRole(roleData)
 		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
 	end
 
-	return table.concat({toDisplay(), toDisplay(2)})
+	local role1Display = toDisplay()
+	local role2Display = toDisplay(2)
+	if role1Display and role2Display then
+		role2Display = '(' .. role2Display .. ')'
+	end
+
+	return table.concat({role1Display, role2Display}, ' ')
 end
 
 ---@param args table
