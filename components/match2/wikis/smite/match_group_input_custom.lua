@@ -37,7 +37,6 @@ local MAX_NUM_PLAYERS = 5
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 local NO_SCORE = -99
-local DUMMY_MAP = 'default'
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local DEFAULT_RESULT_TYPE = 'default'
@@ -91,9 +90,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(map)
-	if map.map == DUMMY_MAP then
-		map.map = nil
-	end
 	map = mapFunctions.getScoresAndWinner(map)
 	map = mapFunctions.getTournamentVars(map)
 
