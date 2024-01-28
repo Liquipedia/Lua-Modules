@@ -619,7 +619,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 end
 
 function Import._removeEpochZeroDate(entry)
-	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.epochZero and entry.date
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.minTimestamp and entry.date
 		or nil
 
 	return entry
