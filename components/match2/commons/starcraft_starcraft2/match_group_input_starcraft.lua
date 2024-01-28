@@ -82,7 +82,7 @@ function StarcraftMatchGroupInput._readDate(matchArgs)
 			'Match_date',
 			'tournament_startdate',
 			'tournament_enddate',
-			'1970-01-01'
+			'0000-01-01'
 		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
