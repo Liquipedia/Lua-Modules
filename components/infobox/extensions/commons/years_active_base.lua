@@ -23,7 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local DEFAULT_DATE = '1970-01-01 00:00:00'
+local DEFAULT_DATE = '0000-01-01 00:00:00'
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
