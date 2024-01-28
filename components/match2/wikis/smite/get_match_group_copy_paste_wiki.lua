@@ -28,12 +28,12 @@ local MODES = {
 local DEFAULT_MODE = 'team'
 
 --returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
+function WikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DEFAULT_MODE
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '    '
 
 	if bestof == 0 and args.score ~= 'false' then
@@ -51,7 +51,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score))
 	end
 
 	if bestof ~= 0 then
@@ -90,7 +90,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == 'solo' then
@@ -104,4 +104,4 @@ function wikiCopyPaste._getOpponent(mode, score)
 	return out
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
