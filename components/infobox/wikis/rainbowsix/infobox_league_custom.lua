@@ -45,7 +45,7 @@ local UBISOFT_TIERS = {
 	pl = 'Pro League',
 	cl = 'Challenger League',
 	national = 'National',
-	major = 'Six Major',
+	major = 'Major',
 	minor = 'Minor',
 }
 
