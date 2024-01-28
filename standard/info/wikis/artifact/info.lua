@@ -28,4 +28,5 @@ return {
 	defaultGame = 'artifact',
 	defaultTeamLogo = 'Artifact allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Artifact allmode.png', ---@deprecated
+	match2 = 0,
 }

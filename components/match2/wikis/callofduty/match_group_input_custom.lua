@@ -13,8 +13,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local FINISHED_INDICATORS = {'skip', 'np', 'cancelled', 'canceled'}
@@ -71,7 +71,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	Opponent.resolve(opponent, date, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -283,6 +283,7 @@ function matchFunctions.getVodStuff(match)
 	local links = match.links
 	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
+	if match.breakingpoint then links.breakingpoint = 'https://www.breakingpoint.gg/match/' .. match.breakingpoint end
 
 	return match
 end
@@ -366,7 +367,7 @@ function matchFunctions.getOpponents(match)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT

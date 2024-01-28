@@ -8,7 +8,7 @@
 
 local Lua = require('Module:Lua')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 return {
 	emptyTeam = {type = Opponent.team, template = ''},

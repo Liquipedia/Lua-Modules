@@ -34,9 +34,10 @@ local Variables = require('Module:Variables')
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local CustomParticipantTable = {}
 
@@ -85,35 +86,42 @@ end
 
 ---@param sectionArgs table
 ---@param key string|number
+---@param index number
 ---@param config WarcraftParticipantTableConfig
 ---@return WarcraftParticipantTableEntry
-function CustomParticipantTable:readEntry(sectionArgs, key, config)
+function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
+	local prefix = 'p' .. index
+	local valueFromArgs = function(postfix)
+		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
+	end
 	--if not a json assume it is a solo opponent
 	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'],
-		flag = sectionArgs[key .. 'flag'],
-		team = sectionArgs[key .. 'team'],
-		race = sectionArgs[key .. 'race'],
+		link = valueFromArgs('link'),
+		flag = valueFromArgs('flag'),
+		team = valueFromArgs('team'),
+		dq = valueFromArgs('dq'),
+		note = valueFromArgs('note'),
+		race = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
-		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		dq = Logic.readBool(opponentArgs.dq),
+		note = opponentArgs.note,
 		opponent = opponent,
 		name = Opponent.toName(opponent),
 	}
@@ -196,7 +204,7 @@ function CustomParticipantTable:_getFactionNumbers()
 	end)
 
 	local factionNumbers = {}
-	for _, faction in pairs(Faction.factions) do
+	for _, faction in pairs(Faction.getFactions()) do
 		factionNumbers[faction] = calculatedNumbers[faction] or 0
 		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
 			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))

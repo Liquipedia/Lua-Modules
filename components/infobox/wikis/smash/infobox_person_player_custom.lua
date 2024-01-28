@@ -17,37 +17,36 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local YearsActive = require('Module:YearsActive') -- TODO Convert to use the commons YearsActive
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomPlayer = Class.new()
-
+---@class SmashInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 local GAME_ORDER = {'64', 'melee', 'brawl', 'pm', 'wiiu', 'ultimate'}
 
-local _args
-
 local NON_BREAKING_SPACE = '&nbsp;'
 
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	_args.residence, _args.location = _args.location, nil
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getWikiCategories = CustomPlayer.getWikiCategories
-	player.nameDisplay = CustomPlayer.nameDisplay
+	player.args.residence, player.args.location = player.args.location, nil
 
 	return player:createInfobox(frame)
 end
 
+---@param input string?
+---@param game string
+---@param fn string
+---@return string[]?
 function CustomPlayer.inputToCharacterIconList(input, game, fn)
 	if type(input) ~= 'string' then
 		return nil
@@ -57,97 +56,93 @@ function CustomPlayer.inputToCharacterIconList(input, game, fn)
 	end)
 end
 
-function CustomInjector:addCustomCells(widgets)
-	for _, game in ipairs(GAME_ORDER) do
-		local gameData = Info.games[game]
-		local main = CustomPlayer.inputToCharacterIconList(_args['main-' .. game], game, 'InfoboxCharacter')
-		local former = CustomPlayer.inputToCharacterIconList(_args['former-main-' .. game], game, 'InfoboxCharacter')
-		local alt = CustomPlayer.inputToCharacterIconList(_args['alt-' .. game], game, 'InfoboxCharacter')
-
-		if main or former or alt then
-			table.insert(widgets, Title{name = gameData.name})
-			table.insert(widgets, Cell{name = 'Current Mains', content = main or {}})
-			table.insert(widgets, Cell{name = 'Former Mains', content = former or {}})
-			table.insert(widgets, Cell{name = 'Secondaries', content = alt or {}})
-		end
-	end
-
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		Array.forEach(GAME_ORDER, function(game)
+			local gameData = Info.games[game]
+			local main = CustomPlayer.inputToCharacterIconList(args['main-' .. game], game, 'InfoboxCharacter')
+			local former = CustomPlayer.inputToCharacterIconList(args['former-main-' .. game], game, 'InfoboxCharacter')
+			local alt = CustomPlayer.inputToCharacterIconList(args['alt-' .. game], game, 'InfoboxCharacter')
+
+			Array.appendWith(widgets,
+				(main or former or alt) and Title{name = gameData.name} or nil,
+				Cell{name = 'Current Mains', content = main or {}},
+				Cell{name = 'Former Mains', content = former or {}},
+				Cell{name = 'Secondaries', content = alt or {}}
+			)
+		end)
+	elseif id == 'status' then
 		table.insert(widgets,
 			Cell{name = 'Years Active', content = {YearsActive.get{player = mw.title.getCurrentTitle().baseText}}}
 		)
 	elseif id == 'team' then
-		table.insert(widgets,
-			Cell{name = 'Crew', content = {_args.crew}}
-		)
+		table.insert(widgets, Cell{name = 'Crew', content = {args.crew}})
 	elseif id == 'nationality' then
-		table.insert(widgets,
-			Cell{name = 'Location', content = {_args.residence}}
-		)
+		table.insert(widgets, Cell{name = 'Location', content = {args.residence}})
 	elseif id == 'achievements' then
-		widgets = {}
 		local achievements = {}
-		for _, game in ipairs(GAME_ORDER) do
+		Array.forEach(GAME_ORDER, function(game)
 			local gameData = Info.games[game]
 			local icons = AchievementIcons.drawRow(game, true)
-			if String.isNotEmpty(icons) then
-				table.insert(achievements, {gameName = gameData.abbreviation, icons = icons})
-			end
-		end
-		if #achievements > 0 then
-			table.insert(widgets, Title{name = 'Achievements'})
-			for _, achievement in ipairs(achievements) do
-				table.insert(widgets,
-					Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
-				)
-			end
-		end
+			if String.isEmpty(icons) then return end
+			table.insert(achievements, {gameName = gameData.abbreviation, icons = icons})
+		end)
+		if #achievements == 0 then return {} end
+		return Array.extend({Title{name = 'Achievements'}}, Array.map(achievements, function(achievement)
+			return Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
+		end))
 	end
 
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.localid = _args.localid
-	lpdbData.extradata.maingame = _args.game or Info.defaultGame
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.localid = args.localid
+	lpdbData.extradata.maingame = args.game or Info.defaultGame
 	for game in pairs(Info.games) do
-		lpdbData.extradata['main' .. game] = _args['main-' .. game]
+		lpdbData.extradata['main' .. game] = args['main-' .. game]
 	end
 
-	lpdbData.region = Template.expandTemplate(mw.getCurrentFrame(), 'Player region', {_args.country})
+	lpdbData.region = Template.expandTemplate(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	return lpdbData
 end
 
-function CustomPlayer:getWikiCategories(args)
-	local categories = {}
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	local args = self.args
 	for game, gameData in pairs(Info.games) do
-		if _args['main-' .. game] then
+		if args['main-' .. game] then
 			table.insert(categories, gameData.name .. ' Players')
 		end
 	end
 
-	if not _args.game then
+	if not args.game then
 		table.insert(categories, 'Player without game parameter')
 	else
-		table.insert(categories, Game.name{game = _args.game} .. ' Players')
+		table.insert(categories, Game.name{game = args.game} .. ' Players')
 	end
 	return categories
 end
 
+---@param args table
+---@return string
 function CustomPlayer:nameDisplay(args)
 	local name = args.id or mw.title.getCurrentTitle().text
 	local display = name
-	if _args.game then
-		local icons = CustomPlayer.inputToCharacterIconList(_args['main-'.. _args.game], _args.game, 'GetIconAndName')
+	if args.game then
+		local icons = CustomPlayer.inputToCharacterIconList(args['main-'.. args.game], args.game, 'GetIconAndName')
 		display = table.concat(icons or {}, NON_BREAKING_SPACE) .. NON_BREAKING_SPACE .. name
 	end
 	return display

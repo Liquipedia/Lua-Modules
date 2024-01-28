@@ -1,0 +1,48 @@
+/*******************************************************************************
+Template(s): Quotes
+Author(s): ???
+*******************************************************************************/
+blockquote.quote {
+	font-style: italic;
+	overflow: hidden;
+	padding: 5px 60px;
+	position: relative;
+	max-width: 990px;
+	font-size: 16px;
+}
+
+blockquote.quote::before {
+	content: open-quote;
+	font-size: 5em;
+	position: absolute;
+	top: -25px;
+	left: 0;
+}
+
+blockquote.quote::after {
+	content: close-quote;
+	font-size: 5em;
+	position: absolute;
+	bottom: -58px;
+	right: 10px;
+}
+
+blockquote.quote div.quote-source {
+	text-align: right;
+}
+
+@media ( max-width: 767px ) {
+	blockquote.quote {
+		padding: 15px 30px;
+	}
+
+	blockquote.quote::before {
+		font-size: 3em;
+		top: -15px;
+	}
+
+	blockquote.quote::after {
+		font-size: 3em;
+		bottom: -30px;
+	}
+}

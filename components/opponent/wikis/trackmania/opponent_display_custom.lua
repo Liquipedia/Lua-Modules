@@ -11,8 +11,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 local OpponentDisplayCustom = Table.deepCopy(OpponentDisplay)
 

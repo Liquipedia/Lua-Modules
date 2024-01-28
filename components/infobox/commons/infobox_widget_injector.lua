@@ -9,7 +9,14 @@
 local Class = require('Module:Class')
 
 ---@class WidgetInjector
-local Injector = Class.new()
+---@operator call(table?): WidgetInjector
+---@field caller table?
+local Injector = Class.new(
+	---@param self self
+	---@param caller table?
+	function(self, caller)
+		self.caller = caller
+end)
 
 ---Parses the widgets
 ---@param id string
@@ -27,4 +34,3 @@ function Injector:addCustomCells(widgets)
 end
 
 return Injector
-

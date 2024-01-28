@@ -29,4 +29,5 @@ return {
 
 	defaultTeamLogo = 'Clash of Clans default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Clash of Clans default allmode.png', ---@deprecated
+	match2 = 0,
 }

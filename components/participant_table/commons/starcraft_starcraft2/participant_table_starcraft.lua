@@ -33,14 +33,16 @@ local Variables = require('Module:Variables')
 ---@field entries StarcraftParticipantTableEntry[]
 
 ---@class StarcraftParticipantTable: ParticipantTable
+---@field config StarcraftParticipantTableConfig
 ---@field isPureSolo boolean
 ---@field _displaySoloRaceTableSection function
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local prizePoolVars = PageVariableNamespace('PrizePool')
 
@@ -58,6 +60,7 @@ function StarcraftParticipantTable.run(frame)
 	participantTable._displaySoloRaceTableSection = StarcraftParticipantTable._displaySoloRaceTableSection
 	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
+	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
 
 	participantTable:read():store()
 
@@ -96,40 +99,51 @@ end
 
 ---@param sectionArgs table
 ---@param key string|number
+---@param index number
 ---@param config StarcraftParticipantTableConfig
 ---@return StarcraftParticipantTableEntry
-function StarcraftParticipantTable:readEntry(sectionArgs, key, config)
-	local prefix = Logic.isNumeric(key) and ('p' .. key) or key
+function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
+	local prefix = 'p' .. index
+	local valueFromArgs = function(postfix)
+		return sectionArgs[key .. postfix] or sectionArgs[prefix .. postfix]
+	end
 
 	--if not a json assume it is a solo opponent
 	local opponentArgs = Json.parseIfTable(sectionArgs[key]) or {
 		type = Opponent.solo,
 		name = sectionArgs[key],
-		link = sectionArgs[key .. 'link'] or sectionArgs[prefix .. 'link'],
-		flag = sectionArgs[key .. 'flag'] or sectionArgs[prefix .. 'flag'],
-		team = sectionArgs[key .. 'team'] or sectionArgs[prefix .. 'team'],
-		race = sectionArgs[key .. 'race'] or sectionArgs[prefix .. 'race'],
+		link = valueFromArgs('link'),
+		flag = valueFromArgs('flag'),
+		team = valueFromArgs('team'),
+		dq = valueFromArgs('dq'),
+		note = valueFromArgs('note'),
+		race = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
-	local opponent = Opponent.readOpponentArgs(opponentArgs)
+	--unset wiki var for random events to not read players as random if prize pool already sets them as random
+	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
+		Variables.varDefine(opponentArgs.name .. '_race', '')
+	end
+
+	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
 		table.sort(opponent.players, function (player1, player2)
-			local name1 = (player1.displayName or player1.name):lower()
-			local name2 = (player2.displayName or player2.name):lower()
+			local name1 = (player1.displayName or player1.pageName):lower()
+			local name2 = (player2.displayName or player2.pageName):lower()
 			return name1 < name2
 		end)
 	end
 
 	return {
-		dq = Logic.readBool(opponentArgs.dq or sectionArgs[key .. 'dq']),
-		note = opponentArgs.note or sectionArgs[key .. 'note'],
+		dq = Logic.readBool(opponentArgs.dq),
+		note = opponentArgs.note,
 		opponent = opponent,
 		name = Opponent.toName(opponent),
-		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']) or config.isQualified),
+		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 	}
 end
 
@@ -137,6 +151,10 @@ end
 ---@param entry StarcraftParticipantTableEntry
 ---@param config StarcraftParticipantTableConfig
 function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
+	if config.isRandomEvent then
+		lpdbData.opponentplayers.p1faction = Faction.read('r')
+	end
+
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
@@ -225,7 +243,7 @@ function StarcraftParticipantTable:_getFactionNumbers()
 	end)
 
 	local factionNumbers = {}
-	for _, faction in pairs(Faction.factions) do
+	for _, faction in pairs(Faction.getFactions()) do
 		factionNumbers[faction] = calculatedNumbers[faction] or 0
 		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
 			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))
@@ -291,6 +309,14 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 		end)
 		self.display:node(sectionNode)
 	end)
+end
+
+---@param entry StarcraftParticipantTableEntry
+---@param config StarcraftParticipantTableConfig
+function StarcraftParticipantTable:setCustomPageVariables(entry, config)
+	if config.isRandomEvent then
+		Variables.varDefine(entry.opponent.players[1].displayName .. '_race', Faction.read('r'))
+	end
 end
 
 return StarcraftParticipantTable

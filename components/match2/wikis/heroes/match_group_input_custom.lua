@@ -16,8 +16,8 @@ local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:HeroNames')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
 local STATUS_DRAW = 'D'
@@ -443,7 +443,7 @@ function matchFunctions.checkIfFinished(match, isScoreSet, opponents)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
+		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 		local lang = mw.getContentLanguage()
 		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT

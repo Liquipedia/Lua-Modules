@@ -37,10 +37,15 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 		winner = 'map$1$win',
 		race1 = 'map$1$p1race',
 		race2 = 'map$1$p2race',
+		score1 = 'map$1$p1score',
+		score2 = 'map$1$p2score',
 		heroes1 = 'map$1$p1heroes',
 		heroes2 = 'map$1$p2heroes',
+		t1p1heroesNoCheck = 'map$1$p1heroesNoCheck',
+		t2p1heroesNoCheck = 'map$1$p2heroesNoCheck',
 		vod = 'vodgame$1$',
 		subgroup = 'map$1$subgroup',
+		walkover = 'map$1$walkover',
 	}
 
 	if bracketType == 'team' then
@@ -103,7 +108,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 			p1flag = prefix .. 'flag',
 			p1race = prefix .. 'race',
 			p1link = prefix .. 'link',
-			score = prefix .. 'score',
+			score = prefix .. 'score' .. (reset and '2' or ''),
 			win = prefix .. 'win',
 			['$notEmpty$'] = bracketType == 'team' and (prefix .. 'team') or prefix,
 		}
@@ -121,7 +126,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 			round.D = round.D + 1
 		else
 			prefix = 'R' .. round.R .. 'W' .. round.W
-			round.D = round.D + 1
+			round.W = round.W + 1
 		end
 
 		opponents[opponentIndex] = readOpponent(prefix)
@@ -133,7 +138,7 @@ function MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType
 		opponent2 = opponents[2],
 		finished = finished[1] .. '|' .. finished[2],
 		-- reference to variables that shall be flattened
-		['$flatten$'] = { 'R' .. round.R .. 'G' .. round.G .. 'details' }
+		['$flatten$'] = {reset and 'resetDetails' or ('R' .. round.R .. 'G' .. round.G .. 'details')}
 	}
 
 	bracketData[id] = MatchGroupLegacyDefault.addMaps(match)

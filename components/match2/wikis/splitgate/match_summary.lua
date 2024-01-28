@@ -10,7 +10,7 @@ local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
@@ -23,8 +23,6 @@ local ICONS = {
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	lrthread = {icon = 'File:LiveReport32.png', text = 'LiveReport.png'},
 }
 
 local CustomMatchSummary = {}

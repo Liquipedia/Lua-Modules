@@ -17,9 +17,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local UNKNOWNREASON_DEFAULT_LOSS = 'L'
 local TBD = 'TBD'
@@ -241,6 +242,7 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	local game = Table.deepCopy(match)
 	game.winner = game2.winner
 	game.vod = game2.vod
+	game.map = game2.map
 
 	game2.scores = game2.scores or {}
 	game.opponent1score = game2.scores[1]

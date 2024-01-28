@@ -17,8 +17,8 @@ local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
-local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled = true})
+local ResultsTable = Lua.import('Module:ResultsTable')
+local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -247,13 +247,14 @@ end
 
 ---Determines the opponent type based on a given number of players
 ---@param numberOfPlayers integer
----@return string?
+---@return string
 function CustomResultsTable._getOpponentType(numberOfPlayers)
 	for opponentType, playerNumber in pairs(Opponent.partySizes) do
 		if playerNumber == numberOfPlayers then
 			return opponentType
 		end
 	end
+	error('invalid number of players ' .. numberOfPlayers)
 end
 
 return CustomResultsTable

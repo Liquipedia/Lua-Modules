@@ -16,8 +16,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local EarningsOf = require('Module:Earnings of')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
@@ -88,7 +88,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -342,7 +342,6 @@ end
 function matchFunctions.getLinks(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-	match.lrthread = Logic.emptyOr(match.lrthread, Variables.varDefault('lrthread'))
 
 	match.links = {}
 
@@ -505,7 +504,9 @@ function matchFunctions.getOpponents(match)
 
 			-- get players from vars for teams
 			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					maxNumPlayers = 5, resolveRedirect = true, applyUnderScores = true
+				})
 			end
 		end
 	end
@@ -523,7 +524,7 @@ function matchFunctions.getOpponents(match)
 	else
 		-- see if match should actually be finished if score is set
 		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time( --[[@as osdate]])
+			local currentUnixTime = os.time( --[[@as osdateparam]])
 			local lang = mw.getContentLanguage()
 			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
 			local threshold = match.dateexact and 30800 or 86400

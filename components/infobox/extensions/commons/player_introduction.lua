@@ -25,120 +25,148 @@ local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
 local DEFAULT_DATE = '1970-01-01'
 
+---@class playerIntroArgsValues
+---@field [1] string?
+---@field player string?
+---@field playerInfo string?
+---@field birthdate string?
+---@field deathdate string?
+---@field defaultGame string?
+---@field faction string?
+---@field faction2 string?
+---@field faction3 string?
+---@field firstname string?
+---@field lastname string?
+---@field freetext string?
+---@field game string?
+---@field id string?
+---@field name string?
+---@field nationality string?
+---@field nationality2 string?
+---@field nationality3 string?
+---@field role string?
+---@field role2 string?
+---@field status string?
+---@field subtext string?
+---@field team string?
+---@field team2 string?
+---@field type string?
+---@field transferquery string?
+---@field convert_role boolean?
+---@field show_role boolean?
+---@field show_faction boolean?
+---@field formername1 string?
+---@field formername2 string?
+---@field formername3 string?
+---@field aka1 string?
+---@field aka2 string?
+---@field aka3 string?
+
 ---@class PlayerIntroduction
 ---@operator call(playerIntroArgsValues): PlayerIntroduction
+---@field player string
+---@field args playerIntroArgsValues
+---@field playerInfo table
+---@field transferInfo table
 local PlayerIntroduction = Class.new(function(self, ...) self:init(...) end)
 
----@deprecated
---- only for legacy support
----@param args table
----@return string
-function PlayerIntroduction._main(args)
-	return PlayerIntroduction.run(args)
-end
-
----@deprecated
---- only for legacy support
----@param frame Frame
----@return string
-function PlayerIntroduction.main(frame)
-	return PlayerIntroduction.run(Arguments.getArgs(frame))
-end
-
----@deprecated
---- only legacy support for `Module:PlayerTeamAuto`
----@param player string
----@param queryType string?
----@return table
-function PlayerIntroduction._get_lpdbtransfer(player, queryType)
-	return PlayerIntroduction._readTransferData(player, queryType == 'datapoint')
-end
-
--- template entry point
+-- template entry point for PlayerIntroduction
 ---@param frame Frame
 ---@return string
 function PlayerIntroduction.templatePlayerIntroduction(frame)
 	return PlayerIntroduction.run(Arguments.getArgs(frame))
 end
 
--- module entry point
----@param args table
+-- module entry point for PlayerIntroduction
+---@param args playerIntroArgsValues?
 ---@return string
 function PlayerIntroduction.run(args)
-	return PlayerIntroduction(args):create()
+	return PlayerIntroduction(args):queryPlayerInfo():queryTransferData(true):adjustData():create()
 end
 
----@class playerIntroArgsValues
----@field [1] string?,
----@field player string?,
----@field playerInfo string?,
----@field birthdate string?,
----@field deathdate string?,
----@field defaultGame string?,
----@field faction string?,
----@field faction2 string?,
----@field faction3 string?,
----@field firstname string?,
----@field lastname string?,
----@field freetext string?,
----@field game string?,
----@field id string?,
----@field name string?,
----@field nationality string?,
----@field nationality2 string?,
----@field nationality3 string?,
----@field role string?,
----@field role2 string?,
----@field status string?,
----@field subtext string?,
----@field team string?,
----@field team2 string?,
----@field type string?,
----@field transferquery string?,
----@field convert_role boolean?,
----@field show_role boolean?,
----@field show_faction boolean?
----@field formername1 string?,
----@field formername2 string?,
----@field formername3 string?,
----@field aka1 string?,
----@field aka2 string?,
----@field aka3 string?,
+-- template entry point for PlayerTeamAuto
+---@param frame Frame
+---@return string
+function PlayerIntroduction.templatePlayerTeamAuto(frame)
+	local args = Arguments.getArgs(frame)
+	local team, team2 = PlayerIntroduction.playerTeamAuto(args)
+
+	return args.team == 'team2' and (team2 or '') or team or ''
+end
+
+-- module entry point for PlayerTeamAuto
+---@param args playerIntroArgsValues?
+---@return string?
+---@return string?
+function PlayerIntroduction.playerTeamAuto(args)
+	return PlayerIntroduction(args):queryTransferData(false):returnTeams()
+end
 
 --- Init function for PlayerIntroduction
----@param args playerIntroArgsValues
+---@param args playerIntroArgsValues?
 ---@return self
 function PlayerIntroduction:init(args)
+	args = args or {}
+	self.args = args
+
 	self.player = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		args.player or args[1] or mw.title.getCurrentTitle().text
 	):gsub(' ', '_')
 
+	return self
+end
+
+---@return self
+function PlayerIntroduction:queryPlayerInfo()
 	local playerInfo = {}
-	if Logic.emptyOr(args.playerInfo, SHOULD_QUERY_KEYWORD) == SHOULD_QUERY_KEYWORD then
+	if Logic.emptyOr(self.args.playerInfo, SHOULD_QUERY_KEYWORD) == SHOULD_QUERY_KEYWORD then
 		playerInfo = self:_playerQuery()
 	end
 
-	self:_parsePlayerInfo(args, playerInfo)
+	self:_parsePlayerInfo(self.args, playerInfo)
 
-	if Table.isEmpty(self.playerInfo) then
+	return self
+end
+
+---@param queryOnlyIfPlayerInfoIsPresent boolean
+---@return self
+function PlayerIntroduction:queryTransferData(queryOnlyIfPlayerInfoIsPresent)
+	if queryOnlyIfPlayerInfoIsPresent and Table.isEmpty(self.playerInfo) then
 		return self
 	end
 
 	-- can not use `:` here due to `Module:PlayerTeamAuto`
-	self.transferInfo = PlayerIntroduction._readTransferData(self.player, args.transferquery == 'datapoint')
+	self.transferInfo = PlayerIntroduction._readTransferData(self.player, self.args.transferquery == 'datapoint')
 
+	return self
+end
+
+---@return string?
+---@return string?
+function PlayerIntroduction:returnTeams()
+	local transfer = self.transferInfo
+	if not transfer or (transfer.type ~= 'current' and transfer.type ~= 'loan') then
+		return
+	end
+
+	return transfer.team, transfer.team2
+end
+
+---@return self
+function PlayerIntroduction:adjustData()
 	self:_adjustTransferData()
 
-	self:_roleAdjusts(args)
+	self:_roleAdjusts(self.args)
 
 	self.options = {
-		showRole = Logic.readBool(args.show_role),
-		showFaction = Logic.readBool(args.show_faction),
+		showRole = Logic.readBool(self.args.show_role),
+		showFaction = Logic.readBool(self.args.show_faction),
 	}
 
 	return self
 end
 
+---@return table
 function PlayerIntroduction:_playerQuery()
 	local queryData = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. self.player .. ']]',

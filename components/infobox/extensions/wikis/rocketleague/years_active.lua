@@ -19,7 +19,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local CustomActiveYears = Lua.import('Module:YearsActive/Base', {requireDevIfEnabled = true})
+local CustomActiveYears = Lua.import('Module:YearsActive/Base')
 
 -- wiki specific settings
 CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 6
@@ -70,7 +70,7 @@ function CustomActiveYears._getBroadcaster(conditions)
 		return
 	end
 
-	return CustomActiveYears._displayYears(years)
+	return CustomActiveYears.displayYears(years)
 end
 
 function CustomActiveYears._getYearsBroadcast(conditions)

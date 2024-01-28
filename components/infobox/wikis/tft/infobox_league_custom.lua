@@ -5,22 +5,22 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-
-local CustomLeague = Class.new()
+---@class TftLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local GAME_MODES = {
@@ -31,60 +31,45 @@ local GAME_MODES = {
 local DEFAULT_MODE = GAME_MODES.solo
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
-	_args.mode = _args.mode and GAME_MODES[string.lower(_args.mode):gsub('s$', '')] or DEFAULT_MODE -- Normalize Mode input
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
-	league.getWikiCategories = CustomLeague.getWikiCategories
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox(frame)
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Teams',
-		content = {args.team_number}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {args.participants_number}
-	})
-	return widgets
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		table.insert(widgets, Cell{
-			name = 'Game',
-			content = {Game.name{game = _args.game}}
-		})
-		table.insert(widgets, Cell{
-			name = 'Patch',
-			content = {CustomLeague:_createPatchCell(_args)}
-		})
-		table.insert(widgets, Cell{
-			name = 'Game Mode',
-			content = {_args.mode}
-		})
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Teams', content = {args.team_number}},
+			Cell{name = 'Players', content = {args.participants_number}}
+		)
+	elseif id == 'gamesettings' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game', content = {Game.name{game = args.game}}},
+			Cell{name = 'Patch', content = {self.caller:_createPatchCell(args)}},
+			Cell{name = 'Game Mode', content = {args.mode}}
+		)
 	end
 
 	return widgets
 end
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args['riot-sponsored'])
 end
 
+---@param args table
+---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
 	if Logic.readBool(args['riot-sponsored']) then
 		return ' ' .. RIOT_ICON
@@ -92,10 +77,16 @@ function CustomLeague:appendLiquipediatierDisplay(args)
 	return ''
 end
 
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_mode', string.lower(args.mode or ''))
+---@param args table
+function CustomLeague:customParseArguments(args)
+	-- Normalize Mode input
+	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
+
+	self.data.mode = string.lower(args.mode)
 end
 
+---@param args table
+---@return string?
 function CustomLeague:_createPatchCell(args)
 	if String.isEmpty(args.patch) then
 		return nil
@@ -110,6 +101,8 @@ function CustomLeague:_createPatchCell(args)
 	return content .. ' &ndash; [[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
 	return {args.mode .. ' Mode Tournaments'}
 end

@@ -11,13 +11,14 @@ local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local MatchGroupUtil = require('Module:MatchGroup/Util')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {requireDevIfEnabled = true, loadData = true})
+local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 
 -- These last_headings are considered sub headings
 -- and matchsection should be used instead if available
@@ -71,8 +72,8 @@ function Match.storeMatchGroup(matchRecords, options)
 		storeMatch2 = Logic.nilOr(options.storeMatch2, true),
 		storePageVar = Logic.nilOr(options.storePageVar, false),
 	}
-	local LegacyMatch = options.storeMatch1
-		and Lua.requireIfExists('Module:Match/Legacy', {requireDevIfEnabled = true})
+	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy')
+	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
 	matchRecords = Array.map(matchRecords, function(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
@@ -202,7 +203,7 @@ end
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
-		table.insert(list, item)
+		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list
@@ -243,26 +244,22 @@ function Match.copyRecords(matchRecord)
 	})
 end
 
-local function stringifyIfTable(tbl)
-	return type(tbl) == 'table' and Json.stringify(tbl) or nil
-end
-
 function Match.encodeJson(matchRecord)
-	matchRecord.match2bracketdata = stringifyIfTable(matchRecord.match2bracketdata)
-	matchRecord.stream = stringifyIfTable(matchRecord.stream)
-	matchRecord.links = stringifyIfTable(matchRecord.links)
-	matchRecord.extradata = stringifyIfTable(matchRecord.extradata)
+	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata, {asArray = true})
+	matchRecord.stream = Json.stringify(matchRecord.stream)
+	matchRecord.links = Json.stringify(matchRecord.links)
+	matchRecord.extradata = Json.stringify(matchRecord.extradata)
 
 	for _, opponentRecord in ipairs(matchRecord.match2opponents) do
-		opponentRecord.extradata = stringifyIfTable(opponentRecord.extradata)
+		opponentRecord.extradata = Json.stringify(opponentRecord.extradata)
 		for _, playerRecord in ipairs(opponentRecord.match2players) do
-			playerRecord.extradata = stringifyIfTable(playerRecord.extradata)
+			playerRecord.extradata = Json.stringify(playerRecord.extradata)
 		end
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
-		gameRecord.extradata = stringifyIfTable(gameRecord.extradata)
-		gameRecord.participants = stringifyIfTable(gameRecord.participants)
-		gameRecord.scores = stringifyIfTable(gameRecord.scores)
+		gameRecord.extradata = Json.stringify(gameRecord.extradata)
+		gameRecord.participants = Json.stringify(gameRecord.participants)
+		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
 end
 
@@ -295,7 +292,7 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 
 	matchRecord.match2games = table.concat(gameIndexes)
 	matchRecord.match2opponents = table.concat(opponentIndexes)
-	mw.ext.LiquipediaDB.lpdb_match2(matchRecord.match2id, matchRecord)
+	Lpdb.Match2:new(matchRecord):save()
 end
 
 --[[
@@ -370,7 +367,6 @@ Match.matchFields = Table.map({
 	'links',
 	'liquipediatier',
 	'liquipediatiertype',
-	'lrthread',
 	'match2bracketdata',
 	'match2bracketid',
 	'match2id',

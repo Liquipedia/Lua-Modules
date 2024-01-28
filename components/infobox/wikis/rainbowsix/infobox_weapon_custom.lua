@@ -6,63 +6,50 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Weapon = require('Module:Infobox/Weapon')
-local Class = require('Module:Class')
-local Builder = require('Module:Infobox/Widget/Builder')
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Cell = require('Module:Infobox/Widget/Cell')
+local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 
-local CustomWeapon = Class.new()
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Weapon = Lua.import('Module:Infobox/Weapon')
+
+---@class RainbowsixWeaponInfobox: WeaponInfobox
+local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
-local _SIZE_OPERATOR = '25x25px'
-
-local _weapon
-local _args
+local SIZE_OPERATOR = '25x25px'
 
 ---@param frame Frame
 ---@return Html
 function CustomWeapon.run(frame)
-	local weapon = Weapon(frame)
-	_weapon = weapon
-	_args = _weapon.args
+	local weapon = CustomWeapon(frame)
+	weapon:setWidgetInjector(CustomInjector(weapon))
 
-	weapon.addToLpdb = CustomWeapon.addToLpdb
-	weapon.createWidgetInjector = CustomWeapon.createWidgetInjector
 	return weapon:createInfobox()
 end
 
----@return WidgetInjector
-function CustomWeapon:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	-- Operators
-	table.insert(widgets,
-		Builder{
-			builder = function()
-				local operatorIcons = Array.map(Weapon:getAllArgsForBase(_args, 'operator'),
-					function(operator, _)
-						return OperatorIcon.getImage{operator, size = _SIZE_OPERATOR}
-					end
-				)
-				return {
-					Cell{
-						name = #operatorIcons > 1 and 'Operators' or 'Operator',
-						content = {
-							table.concat(operatorIcons, '&nbsp;')
-						}
-					}
-				}
-			end
-		})
+function CustomInjector:parse(id, widgets)
+	if id == 'custom' then
+		return {
+			Cell{name = 'Operators', content = {self.caller:_getOperators()}},
+		}
+	end
 	return widgets
+end
+
+---@return string
+function CustomWeapon:_getOperators()
+	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator)
+		return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
+	end)
+
+	return table.concat(operatorIcons, '&nbsp;')
 end
 
 ---@param lpdbData table
@@ -77,9 +64,9 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		ammocap = args.ammocap,
 		reloadspeed = args.reloadspeed,
 		rateoffire = args.rateoffire,
-		firemode = table.concat(_weapon:getAllArgsForBase(args, 'firemode'), ';'),
-		operators = table.concat(_weapon:getAllArgsForBase(args, 'operator'), ';'),
-		games = table.concat(_weapon:getAllArgsForBase(args, 'game'), ';'),
+		firemode = table.concat(self:getAllArgsForBase(args, 'firemode'), ';'),
+		operators = table.concat(self:getAllArgsForBase(args, 'operator'), ';'),
+		games = table.concat(self:getAllArgsForBase(args, 'game'), ';'),
 	})
 	return lpdbData
 end

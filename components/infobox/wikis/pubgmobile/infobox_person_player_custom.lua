@@ -6,26 +6,24 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerTeamAuto = require('Module:PlayerTeamAuto')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _pagename = mw.title.getCurrentTitle().prefixedText
-
-local _ROLES = {
+local ROLES = {
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
 	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
@@ -40,38 +38,37 @@ local _ROLES = {
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
 
-local CustomPlayer = Class.new()
-
+---@class PubgmobileInfoboxPlayer: Person
+---@field role {category: string, variable: string, isplayer: boolean?}?
+---@field role2 {category: string, variable: string, isplayer: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	if String.isEmpty(player.args.team) then
-		player.args.team = PlayerTeamAuto._main{team = 'team'}
-	end
-
-	if String.isEmpty(player.args.team2) then
-		player.args.team2 = PlayerTeamAuto._main{team = 'team2'}
-	end
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.createBottomContent = CustomPlayer.createBottomContent
-
-	_args = player.args
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local caller = self.caller
+	local args = caller.args
+
 	if id == 'history' then
-		local manualHistory = _args.history
+		local manualHistory = args.history
 		local automatedHistory = TeamHistoryAuto._results{
 			convertrole = 'true',
-			player = _pagename
+			player = caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
@@ -83,78 +80,92 @@ function CustomInjector:parse(id, widgets)
 		end
 	elseif id == 'status' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
+			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
 	elseif id == 'region' then return {}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
 			}},
 		}
 	end
 	return widgets
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
 end
 
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
 
-	lpdbData.type = CustomPlayer._isPlayerOrStaff()
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+end
 
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
+end
+
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
+
+	lpdbData.type = self:_isPlayerOrStaff()
+
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
 end
 
-function CustomPlayer._getStatusContents()
-	if String.isEmpty(_args.status) then
+---@param args table
+---@return string[]
+function CustomPlayer._getStatusContents(args)
+	if String.isEmpty(args.status) then
 		return {}
 	end
-	return {Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status}
+	return {Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status}
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
-function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) then
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) then
 		return
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of player', {player = _pagename})
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of player', {player = self.pagename})
 	end
 end
 
-function CustomPlayer._isPlayerOrStaff()
+---@return string
+function CustomPlayer:_isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = _ROLES[_args.role:lower()]
+	if String.isNotEmpty(self.args.role) then
+		roleData = ROLES[self.args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then

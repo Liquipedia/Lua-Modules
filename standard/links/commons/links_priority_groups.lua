@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Links/PriorityGroups
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 return {
 	core = {
 		'home',
@@ -25,13 +33,13 @@ return {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
-		'factor',
 		'gamersclub',
 		'halodatahive',
 		'letsplaylive',
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
+		'osu',
 		'rgl',
 		'royaleapi',
 		'siege-gg',
@@ -47,11 +55,13 @@ return {
 		'bracket',
 		'rules',
 		'rulebook',
+		'replay',
 	},
 	social = {
 		'discord',
 		'facebook',
 		'instagram',
+		'linkedin',
 		'privsteam',
 		'pubsteam',
 		'reddit',
@@ -81,6 +91,7 @@ return {
 		'kuaishou',
 		'kick',
 		'cc',
+		'chzzk',
 		'niconico',
 		'nimotv',
 		'openrec',

@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
 --[[
@@ -104,15 +103,27 @@ function DateExt.parseIsoDate(str)
 		return
 	end
 	local year, month, day = str:match('^(%d%d%d%d)%-?(%d?%d?)%-?(%d?%d?)')
+	year, month, day = tonumber(year), tonumber(month), tonumber(day)
+
+	if not year then
+		return
+	end
 	-- Default month and day to 1 if not set
-	if String.isEmpty(month) then
+	if not month then
 		month = 1
 	end
-	if String.isEmpty(day) then
+	if not day then
 		day = 1
 	end
 	-- create simplified osdate
 	return {year = year, month = month, day = day}
+end
+
+--- Converts a timezone offset (e.g. `+2:00`) to a UTC offset in seconds.
+---@param offsetString string?
+---@return integer # default `0`
+function DateExt.getOffsetSeconds(offsetString)
+	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
 end
 
 return DateExt

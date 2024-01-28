@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Error = require('Module:Error')
-
 local Logic = {}
 
 ---Returns `val1` if it isn't empty else returns `val2` if that isn't empty, else returns default
@@ -52,7 +50,8 @@ end
 ---@overload fun(val: any):false
 function Logic.isEmpty(val)
 	if type(val) == 'table' then
-		return require('Module:Table').isEmpty(val)
+		local Table = require('Module:Table')
+		return Table.isEmpty(val)
 	else
 		return val == '' or val == nil
 	end
@@ -64,7 +63,8 @@ end
 ---@overload fun(val: any):true
 function Logic.isNotEmpty(val)
 	if type(val) == 'table' then
-		return require('Module:Table').isNotEmpty(val)
+		local Table = require('Module:Table')
+		return Table.isNotEmpty(val)
 	else
 		return val ~= nil and val ~= ''
 	end
@@ -76,8 +76,9 @@ end
 ---@return boolean
 ---@overload fun(val: any):false
 function Logic.isDeepEmpty(val)
+	local Table = require('Module:Table')
 	return Logic.isEmpty(val) or type(val) == 'table' and
-		require('Module:Table').all(val, function(key, item) return Logic.isDeepEmpty(item) end)
+		Table.all(val, function(key, item) return Logic.isDeepEmpty(item) end)
 end
 
 ---Inverse of `Logic.isDeepEmpty`
@@ -149,7 +150,7 @@ function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
 		:catch(function(error)
 			if type(error) == 'string' then
-				error = Error(error)
+				error = require('Module:Error')(error)
 			end
 
 			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
@@ -194,7 +195,8 @@ function Logic.deepEquals(x, y)
 	if x == y then
 		return true
 	elseif type(x) == 'table' and type(y) == 'table' then
-		return require('Module:Table').deepEquals(x, y)
+		local Table = require('Module:Table')
+		return Table.deepEquals(x, y)
 	else
 		return false
 	end

@@ -12,10 +12,9 @@ local Links = require('Module:Links')
 local Locale = require('Module:Locale')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -30,7 +29,7 @@ local Language = mw.language.new('en')
 ---@class CompanyInfobox: BasicInfobox
 local Company = Class.new(BasicInfobox)
 
-local _COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
+local COMPANY_TYPE_ORGANIZER = 'ORGANIZER'
 
 ---@param frame Frame
 ---@return Html
@@ -75,7 +74,7 @@ function Company:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
-				if not String.isEmpty(args.companytype) and args.companytype == _COMPANY_TYPE_ORGANIZER then
+				if args.companytype == COMPANY_TYPE_ORGANIZER then
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
@@ -126,7 +125,7 @@ function Company:createInfobox()
 
 	infobox:categories('Companies')
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 ---@param location string?

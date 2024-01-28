@@ -15,7 +15,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local OpponentDisplay = require('Module:OpponentLibraries').OpponentDisplay
+local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local Characters = require('Module:Characters')
 
@@ -27,7 +28,7 @@ local BACKGROUND_CLASSES = {
 	banned = 'cinnabar-bg',
 }
 
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local CustomPortalPlayers = {}
 

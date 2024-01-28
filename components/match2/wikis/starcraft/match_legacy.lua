@@ -105,7 +105,6 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''
 			submatch.stream = match2.stream
-			submatch.lrthread = match2.lrthread or ''
 			submatch.vod = game.vod
 			submatch.tournament = match2.tournament
 			submatch.tickername = match2.tickername

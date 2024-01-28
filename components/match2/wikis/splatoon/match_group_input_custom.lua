@@ -16,8 +16,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local WeaponNames = mw.loadData('Module:WeaponNames')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
 local STATUS_DRAW = 'D'
@@ -46,7 +46,7 @@ local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdate]])
+local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}

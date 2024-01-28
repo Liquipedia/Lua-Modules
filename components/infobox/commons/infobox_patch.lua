@@ -7,11 +7,14 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -46,7 +49,7 @@ function Patch:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = 'Patch Information'},
+		Title{name = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release', content = {args.release}},
@@ -81,8 +84,8 @@ function Patch:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	if Namespace.isMain() then
-		infobox:categories('Patches')
+	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		infobox:categories(self:getInformationType(args))
 		self:setLpdbData(args)
 	end
 
@@ -90,16 +93,38 @@ function Patch:createInfobox()
 end
 
 --- Allows for overriding this functionality
+---Adjust Lpdb data
+---@param lpdbData table
+---@param args table
+---@return table
+function Patch:addToLpdb(lpdbData, args)
+	return lpdbData
+end
+
+--- Allows for overriding this functionality
 ---@param args table
 function Patch:setLpdbData(args)
-	local date = args.release
-	local monthAndDay = mw.getContentLanguage():formatDate('m-d', date)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, {
-		name = args.name,
-		type = 'patch',
-		information = monthAndDay,
-		date = date,
-	})
+	local lpdbData = {
+		name = self.name,
+		type = self:getInformationType(args):lower(),
+		image = args.image,
+		imagedark = args.imagedark,
+		date = args.release,
+		information = mw.getContentLanguage():formatDate('m-d', args.release),
+		extradata = {
+			highlights = self:getAllArgsForBase(args, 'highlight')
+		},
+	}
+
+	lpdbData = self:addToLpdb(lpdbData, args)
+	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, Json.stringifySubTables(lpdbData))
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string
+function Patch:getInformationType(args)
+	return args.informationType or 'Patch'
 end
 
 --- Allows for overriding this functionality

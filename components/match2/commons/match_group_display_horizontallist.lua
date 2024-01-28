@@ -16,8 +16,8 @@ local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -70,6 +70,7 @@ function HorizontallistDisplay.BracketContainer(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.BracketContainer)
 	return HorizontallistDisplay.Bracket({
 		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracketId = props.bracketId,
 		config = props.config,
 	})
 end
@@ -123,7 +124,11 @@ function HorizontallistDisplay.Bracket(props)
 		matchNode:node(HorizontallistDisplay.Match(matchProps))
 	end
 
-	return mw.html.create('div'):addClass('brkts-br-wrapper'):node(bracketNode):node(matchNode)
+	return mw.html.create('div')
+			:addClass('brkts-br-wrapper battle-royale')
+			:attr('data-js-battle-royale-id', props.bracketId)
+			:node(bracketNode)
+			:node(matchNode)
 end
 
 ---@param bracket MatchGroupUtilMatchGroup
@@ -186,7 +191,7 @@ function HorizontallistDisplay.NodeHeader(props)
 
 	return mw.html.create('li')
 			:addClass('navigation-tabs__list-item')
-			:addClass(isSelected and 'tab--active' or nil)
+			:attr('data-target-id', 'navigationContent' .. props.index)
 			:attr('role', 'tab')
 			:attr('aria-selected', tostring(isSelected))
 			:attr('aria-controls', 'panel' .. props.index)
@@ -211,8 +216,7 @@ function HorizontallistDisplay.Match(props)
 	DisplayUtil.assertPropTypes(props, HorizontallistDisplay.propTypes.Match)
 	local matchNode = mw.html.create('div')
 			:addClass('navigation-content')
-			:attr('id', 'navigationContent' .. props.index)
-			:addClass(props.index > 1 and 'is--hidden' or nil)
+			:attr('data-js-battle-royale-content-id', 'navigationContent' .. props.index)
 
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.matchId:match('^(.*)_'), -- everything up to the final '_'
