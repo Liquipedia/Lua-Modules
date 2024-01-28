@@ -23,7 +23,7 @@ local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_PLAYER = 'player'
 local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
-local DEFAULT_DATE = '1970-01-01'
+local DEFAULT_DATE = '0000-01-01'
 
 ---@class playerIntroArgsValues
 ---@field [1] string?
@@ -396,7 +396,7 @@ function PlayerIntroduction:create()
 		return ''
 	end
 
-	local isDeceased = self.playerInfo.deathDate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
+	local isDeceased = self.playerInfo.deathDate ~= '0000-01-01' or self.playerInfo.status == 'passed away'
 
 	local statusDisplay = self:_statusDisplay(isDeceased)
 	local nationalityDisplay = self:_nationalityDisplay()
