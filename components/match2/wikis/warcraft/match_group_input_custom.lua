@@ -79,7 +79,7 @@ function CustomMatchGroupInput._readDate(matchArgs)
 	suggestedDate = suggestedDate or Variables.varDefaultMulti(
 		'tournament_startdate',
 		'tournament_enddate',
-		'1970-01-01'
+		'0000-01-01'
 	)
 
 	return {
