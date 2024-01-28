@@ -20,8 +20,8 @@ local Json = require('Module:Json')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local _EPOCH_TIME = '0000-01-01 00:00:00'
+local _EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 
 local LEFT_SIDE = 1
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|First pick]]'
