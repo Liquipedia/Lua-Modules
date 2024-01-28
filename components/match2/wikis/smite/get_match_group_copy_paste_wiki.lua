@@ -15,7 +15,7 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 --allowed opponent types on the wiki
 local MODES = {
@@ -25,11 +25,11 @@ local MODES = {
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'team'
+local DEFAULT_MODE = 'team'
 
 --returns the cleaned opponent type
 function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
+	return MODES[string.lower(mode or '')] or DEFAULT_MODE
 end
 
 --returns the Code for a Match, depending on the input
