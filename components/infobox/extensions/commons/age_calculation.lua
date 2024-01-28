@@ -12,7 +12,7 @@ local String = require('Module:StringUtils')
 
 local AgeCalculation = {}
 
-local _EPOCH_DATE = { year = 1970, month = 1, day = 1 }
+local _EPOCH_DATE = { year = 0000, month = 1, day = 1 }
 local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 local _MAXIMUM_DAYS_IN_FEBRUARY = 29
 local _MONTH_DECEMBER = 12
