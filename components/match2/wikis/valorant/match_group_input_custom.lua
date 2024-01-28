@@ -26,7 +26,7 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local MAX_NUM_ROUNDS = 24
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local _EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
 
@@ -83,7 +83,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local teamTemplateDate = date
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	-- In order to get correct child team template, we will use an approximately date and not 0000-01-01
 	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
