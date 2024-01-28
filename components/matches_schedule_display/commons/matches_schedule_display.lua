@@ -110,7 +110,7 @@ function MatchesTable:buildConditions()
 	local config = self.config
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, '1970-01-01')}
+		:add{ConditionNode(ColumnName('date'), Comparator.gt, '0000-01-01')}
 
 	local pageConditions = ConditionTree(BooleanOperator.any)
 	for _, page in pairs(config.pages --[[@as string[] ]]) do
