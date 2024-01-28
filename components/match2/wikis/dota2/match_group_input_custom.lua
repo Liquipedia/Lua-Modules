@@ -40,7 +40,7 @@ local _DEFAULT_GAME = 'dota2'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local _EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -116,7 +116,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local teamTemplateDate = date
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	-- In order to get correct child team template, we will use an approximately date and not 0000-01-01
 	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
@@ -401,7 +401,7 @@ function matchFunctions.isFeatured(match)
 
 	local opponent1, opponent2 = match.opponent1, match.opponent2
 	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
-	if year == '1970' then
+	if year == '0000' then
 		return false
 	end
 	if tonumber(month) < 3 then
