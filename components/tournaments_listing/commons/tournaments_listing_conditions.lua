@@ -27,7 +27,7 @@ function TournamentsListingConditions.base(args)
 	local endDate = args.enddate or args.edate
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, '1970-01-01')}
+		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, '0000-01-01')}
 
 	if args.year then
 		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
