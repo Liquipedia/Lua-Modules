@@ -19,7 +19,7 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class SplatoonLeagueInfobox: InfoboxLeagueTemp
+---@class SplatoonLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

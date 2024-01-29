@@ -15,33 +15,33 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class HearthstoneInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 local GM_ICON = '[[File:HS grandmastersIconSmall.png|x15px|link=Grandmasters]]&nbsp;'
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	return player:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	if _args.grandmasters then
-		table.insert(widgets, Cell{name = 'Grandmasters', content = {GM_ICON .. _args.grandmasters}})
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		local grandMaster = args.grandmasters and (GM_ICON .. args.grandmasters) or nil
+		table.insert(widgets, Cell{name = 'Grandmasters', content = {grandMaster}})
 	end
 
 	return widgets
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomPlayer

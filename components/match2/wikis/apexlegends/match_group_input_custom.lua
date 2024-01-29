@@ -43,6 +43,8 @@ local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+
 local MatchFunctions = {}
 local MapFunctions = {}
 local OpponentFunctions = {}
@@ -167,6 +169,10 @@ function MatchFunctions.adjustMapData(match)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
 		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
+
+		if map.map == DUMMY_MAP_NAME then
+			map.map = ''
+		end
 
 		match[key] = map
 	end
@@ -347,6 +353,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(map, scores)
 	map.extradata = {
+		dateexact = map.dateexact,
 		comment = map.comment,
 		opponents = scores,
 	}
@@ -423,7 +430,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 		end
 		local scoreBreakdown = {}
 		local placement, kills = tonumber(opponentData[1]), tonumber(opponentData[2])
-		if scoreBreakdown and kills then
+		if placement and kills then
 			scoreBreakdown.placePoints = scoreSettings[placement] or 0
 			scoreBreakdown.killPoints = kills * scoreSettings.kill
 			scoreBreakdown.kills = kills
@@ -435,7 +442,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			placement = placement,
 			score = scoreBreakdown.totalPoints,
 		}
-		table.insert(map.scores, scoreBreakdown.totalPoints)
+		table.insert(map.scores, opponent.score or 0)
 		indexedScores[opponentIndex] = opponent
 	end
 

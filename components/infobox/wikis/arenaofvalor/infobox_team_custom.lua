@@ -7,13 +7,32 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
+local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+
+local REGION_REMAPPINGS = {
+	['latin america'] = 'south america',
+
+	['thailand'] = 'southeast asia',
+	['vietnam'] = 'southeast asia',
+	['indonesia'] = 'southeast asia',
+	['philippines'] = 'southeast asia',
+	['singapore'] = 'southeast asia',
+	['malaysia'] = 'southeast asia',
+
+	['bangladesh'] = 'south asia',
+	['pakistan'] = 'south asia',
+
+	['taiwan'] = 'asia',
+	['asia-pacific'] = 'asia',
+	['japan'] = 'asia',
+}
 
 ---@class ArenaofvalorInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -31,6 +50,17 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
+
+	local regionData = Region.run{region = region} or {}
+	local remappedRegion = regionData.region and REGION_REMAPPINGS[(regionData.region or ''):lower()]
+
+	return remappedRegion and self:createRegion(remappedRegion) or regionData
+end
+
 ---@return string?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
@@ -39,15 +69,6 @@ function CustomTeam:createBottomContent()
 			'Upcoming and ongoing tournaments of'
 		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
 	end
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
 end
 
 return CustomTeam

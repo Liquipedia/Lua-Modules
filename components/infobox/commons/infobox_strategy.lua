@@ -64,7 +64,7 @@ function Strategy:createInfobox()
 		infobox:categories('Strategies')
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 return Strategy

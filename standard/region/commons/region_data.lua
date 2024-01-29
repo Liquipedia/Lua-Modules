@@ -11,7 +11,6 @@ return {
 		europe = 'eu',
 
 		america = 'na',
-		americas = 'na',
 		['north america'] = 'na',
 		['northern america'] = 'na',
 
@@ -46,9 +45,34 @@ return {
 		['latin america north'] = 'latam north',
 		['latin america south'] = 'latam south',
 
+		['apacn'] = 'apac north',
+		['asia pacific north'] = 'apac north',
+		['asia-pacific north'] = 'apac north',
+
+		['apacs'] = 'apac south',
+		['asia pacific south'] = 'apac south',
+		['asia-pacific south'] = 'apac south',
+
+		['ssa'] = 'sub-saharan africa',
 		['sub saharan africa'] = 'sub-saharan africa',
 
 		['global'] = 'world',
+		['rest of the world'] = 'rotw',
+
+		-- "country" regions
+		kr = 'korea',
+		sk = 'korea',
+		['south korea'] = 'korea',
+
+		['in'] = 'india',
+		tr = 'turkey',
+		tw = 'taiwan',
+		jp = 'japan',
+		br = 'brazil',
+		vn = 'vietnam',
+		pk = 'pakistan',
+		id = 'indonesia',
+		th = 'thailand',
 	},
 
 	cis = {
@@ -66,6 +90,10 @@ return {
 	sa = {
 		region = 'South America',
 		file = 'unasur.png',
+	},
+	americas = {
+		region = 'Americas',
+		flag = 'americas',
 	},
 	['central america'] = {
 		region = 'Central America',
@@ -120,8 +148,20 @@ return {
 		flag = 'asia',
 	},
 	apac = {
-		region = 'Asia Pacific',
+		region = 'Asia-Pacific',
 		flag = 'asia-pacific',
+	},
+	['apac north'] = {
+		region = 'Asia-Pacific North',
+		flag = 'asia-pacific',
+	},
+	['apac south'] = {
+		region = 'Asia-Pacific South',
+		flag = 'asia-pacific',
+	},
+	['pacific'] = {
+		region = 'Pacific',
+		flag = 'asia',
 	},
 	msp = {
 		region = 'MSP',
@@ -170,5 +210,55 @@ return {
 	world = {
 		region = 'World',
 		flag = 'world',
+	},
+	rotw = {
+		region = 'Rest of the World',
+		flag = 'world',
+	},
+
+	-- "country" regions
+	china = {
+		region = 'China',
+		flag = 'china',
+	},
+	india = {
+		region = 'India',
+		flag = 'india',
+	},
+	korea = {
+		region = 'Korea',
+		flag = 'south korea',
+	},
+	turkey = {
+		region = 'Turkey',
+		flag = 'turkey',
+	},
+	taiwan = {
+		region = 'Taiwan',
+		flag = 'taiwan',
+	},
+	japan = {
+		region = 'Japan',
+		flag = 'japan',
+	},
+	brazil = {
+		region = 'Brazil',
+		flag = 'brazil',
+	},
+	vietnam = {
+		region = 'Vietnam',
+		flag = 'vietnam',
+	},
+	pakistan = {
+		region = 'Pakistan',
+		flag = 'pakistan',
+	},
+	thailand = {
+		region = 'Thailand',
+		flag = 'thailand',
+	},
+	indonesia = {
+		region = 'Indonesia',
+		flag = 'indonesia',
 	},
 }

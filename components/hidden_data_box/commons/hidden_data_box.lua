@@ -31,7 +31,7 @@ local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
----@return string
+---@return Html
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
@@ -48,9 +48,9 @@ function HiddenDataBox.run(args)
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
-		})[1]
+		})[1] or {}
 
-		if not queryResult and Namespace.isMain() then
+		if Table.isEmpty(queryResult) and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
@@ -61,8 +61,6 @@ function HiddenDataBox.run(args)
 				HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 			end)
 		end
-
-		queryResult = queryResult or {}
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)

@@ -6,83 +6,57 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
 
+local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class HaloMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
-local _game
-
-local _GAME = mw.loadData('Module:GameVersion')
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.getCategories = CustomMap.getCategories
-	customMap.addToLpdb = CustomMap.addToLpdb
-	_args = customMap.args
-	return customMap:createInfobox()
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+
+	return map:createInfobox()
 end
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Location',
-		content = {_args.location}
-	})
-	table.insert(widgets, Cell{
-		name = 'Type',
-		content = {_args.type}
-	})
-	table.insert(widgets, Cell{
-		name = 'Max Players',
-		content = {_args.players}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Version',
-		content = {CustomMap._getGameVersion()},
-		options = {makeLink = true}
-	})
-	table.insert(widgets, Cell{
-		name = 'Game Modes',
-		content = CustomMap._getGameMode(),
-	})
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Type', content = {args.type}},
+			Cell{name = 'Max Players', content = {args.players}},
+			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
+			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
+		)
+	end
 	return widgets
 end
 
-function CustomMap._getGameVersion()
-	local game = string.lower(_args.game or '')
-	_game = _GAME[game]
-	return _game
-end
-
+---@param args table
 ---@return string[]
-function CustomMap._getGameMode()
-	if String.isEmpty(_args.mode) and String.isEmpty(_args.mode1) then
+function CustomMap:_getGameMode(args)
+	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
 		return {}
 	end
 
-	local modes = Map:getAllArgsForBase(_args, 'mode')
-	local releasedate = _args.releasedate
+	local modes = self:getAllArgsForBase(args, 'mode')
+	local releasedate = args.releasedate
 
 	local modeDisplayTable = {}
 	for _, mode in ipairs(modes) do
@@ -104,8 +78,8 @@ function CustomMap:addToLpdb(lpdbData, args)
 	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
-	lpdbData.extradata.game = _game
-	lpdbData.extradata.modes = table.concat(Map:getAllArgsForBase(args, 'mode'), ',')
+	lpdbData.extradata.game = Game.name{game = args.game}
+	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 

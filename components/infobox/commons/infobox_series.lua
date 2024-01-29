@@ -15,7 +15,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
-local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -38,8 +37,6 @@ local Builder = Widgets.Builder
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
-
-Series.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -183,9 +180,7 @@ function Series:createInfobox()
 		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
-	return mw.html.create()
-		:node(infobox:widgetInjector():build(widgets))
-		:node(WarningBox.displayAll(self.warnings))
+	return infobox:build(widgets)
 end
 
 ---@param args table
@@ -299,7 +294,7 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 
 	if String.isNotEmpty(trackingCategory) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'Missing icon while icondark is set.' .. trackingCategory
 		)
 	end
@@ -401,11 +396,12 @@ function Series:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.infobox.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 

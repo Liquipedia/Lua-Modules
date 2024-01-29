@@ -15,19 +15,15 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomCompany = Class.new()
-
+---@class CounterstrikeCompanyInfobox: CompanyInfobox
+local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomCompany.run(frame)
-	local company = Company(frame)
-	_args = company.args
-
-	company.createWidgetInjector = CustomCompany.createWidgetInjector
+	local company = CustomCompany(frame)
+	company:setWidgetInjector(CustomInjector(company))
 
 	return company:createInfobox()
 end
@@ -36,32 +32,21 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'parent' then
-		table.insert(widgets, Cell{name = 'Sister Company', content = {_args.sister}})
-		table.insert(widgets, Cell{name = 'Subsidiaries', content = {_args.subsidiaries}})
-		table.insert(widgets, Cell{name = 'Focus', content = {_args.focus or _args.industry}})
+	local args = self.caller.args
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Series', content = {args.series}})
+	elseif id == 'parent' then
+		table.insert(widgets, Cell{name = 'Sister Company', content = {args.sister}})
+		table.insert(widgets, Cell{name = 'Subsidiaries', content = {args.subsidiaries}})
+		table.insert(widgets, Cell{name = 'Focus', content = {args.focus or args.industry}})
 	elseif id == 'dates' then
-		table.insert(widgets, Cell{name = 'Fate', content = {_args.fate}})
+		table.insert(widgets, Cell{name = 'Fate', content = {args.fate}})
 	elseif id == 'employees' then
-		table.insert(widgets, Cell{name = 'Key People', content = {_args.people}})
+		table.insert(widgets, Cell{name = 'Key People', content = {args.people}})
 	end
 
 	return widgets
-end
-
----@param widgets Widget[]
----@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell({
-		name = 'Series',
-		content = {_args.series}
-	}))
-	return widgets
-end
-
----@return WidgetInjector
-function CustomCompany:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomCompany

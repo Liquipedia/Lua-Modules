@@ -10,7 +10,7 @@ local lpdb = {}
 ---@field extradata table
 ---@field [any] any
 
----@class broadcaster:LpdbBaseData
+---@class broadcasters:LpdbBaseData
 ---@field id string
 ---@field name string
 ---@field page string
@@ -20,6 +20,7 @@ local lpdb = {}
 ---@field weight number
 ---@field date string
 ---@field parent string
+---@field year_date string
 
 ---@class datapoint:LpdbBaseData
 ---@field type string

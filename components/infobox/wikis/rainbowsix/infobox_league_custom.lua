@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
----@class RainbowsixLeagueInfobox: InfoboxLeagueTemp
+---@class RainbowsixLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -45,7 +45,7 @@ local UBISOFT_TIERS = {
 	pl = 'Pro League',
 	cl = 'Challenger League',
 	national = 'National',
-	major = 'Six Major',
+	major = 'Major',
 	minor = 'Minor',
 }
 

@@ -17,34 +17,36 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class SimracingInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
-
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	return player:createInfobox()
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local games = Array.map(Player:getAllArgsForBase(_args, 'game'),
-		function(game)
-			return Template.safeExpand(mw.getCurrentFrame(), 'Game/' .. game)
-		end
-	)
-	table.insert(widgets, Cell{name = 'Games', content = {table.concat(games, '&nbsp;')}})
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		local games = Array.map(caller:getAllArgsForBase(args, 'game'),
+			function(game)
+				return Template.safeExpand(mw.getCurrentFrame(), 'Game/' .. game)
+			end
+		)
+		table.insert(widgets, Cell{name = 'Games', content = {table.concat(games, '&nbsp;')}})
+	end
 
 	return widgets
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomPlayer

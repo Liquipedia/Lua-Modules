@@ -21,7 +21,7 @@ local Cell = Widgets.Cell
 
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier Tournament held by Riot Games]]'
 
----@class LeagueoflegendsLeagueInfobox: InfoboxLeagueTemp
+---@class LeagueoflegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

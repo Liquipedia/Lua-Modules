@@ -65,7 +65,7 @@ function Website:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 return Website
