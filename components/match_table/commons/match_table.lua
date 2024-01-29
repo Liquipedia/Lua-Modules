@@ -175,7 +175,7 @@ end
 ---@return standardOpponent
 function MatchTable:_readOpponent(mode, input)
 	if mode == PLAYER_MODE then
-		local player = {displayName = input}
+		local player = {pageName = input}
 		PlayerExt.populatePageName(player)
 		return {type = 'solo', players = {player}}
 	end
