@@ -194,6 +194,7 @@ function Team:createInfobox()
 	end
 
 	return infobox:build(widgets)
+end
 
 ---@param region string?
 ---@return {display: string?, region: string?}
