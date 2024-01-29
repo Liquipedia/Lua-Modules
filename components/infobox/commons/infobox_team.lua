@@ -44,7 +44,7 @@ local LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
 
-local CREATED_STRING = '<span class="icon-16px">[[File:${icon}|32px]]</span> ${date}'
+local CREATED_STRING = '<span class="icon-16px">${icon}</span> ${date}'
 
 ---@enum statuses
 local Status = {
@@ -173,6 +173,7 @@ function Team:createInfobox()
 
 							if game:lower() == 'org' then
 								icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
+								icon = icon and '[[File:' .. icon .. ']]' or nil
 							else
 								local timestamp = Team._parseDate(date)
 								if timestamp and timestamp < earliestGameTimestamp then
@@ -239,7 +240,7 @@ function Team:_getTeamIcon(date)
 end
 
 function Team._isValidDate(date)
-	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
+	return date and date:match('%d%d%d%d%-[%d%?]?[%d%?]?%-[%d%?]?[%d%?]?')
 end
 
 function Team._parseDate(date)
