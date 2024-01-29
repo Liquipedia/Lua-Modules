@@ -25,7 +25,7 @@ local NO_SCORE = -99
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
+local EPOCH_TIME = '0000-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
