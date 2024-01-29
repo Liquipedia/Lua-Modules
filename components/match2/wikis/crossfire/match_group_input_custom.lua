@@ -25,7 +25,7 @@ local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 local GAME = mw.loadData('Module:GameVersion')
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
