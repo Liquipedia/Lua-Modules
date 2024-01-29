@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
@@ -50,15 +49,6 @@ function CustomTeam:createBottomContent()
 		'Upcoming and ongoing tournaments of',
 		{team = self.name or self.pagename}
 	)
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
 end
 
 return CustomTeam

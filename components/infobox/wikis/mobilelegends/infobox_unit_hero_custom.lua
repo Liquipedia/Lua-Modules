@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=mobilelegends
--- page=Module:Infobox/Unit/Hero
+-- page=Module:Infobox/Unit/Hero/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -25,47 +25,41 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Breakdown = Widgets.Breakdown
 
-local CustomHero = {}
-
+---@class MobilelegendsHeroInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
-local _pagename = mw.title.getCurrentTitle().text
-
-local _BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Point]]'
-local _DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamond]]'
+local BATTLE_POINTS_ICON = '[[File:Mobile_Legends_BP_icon.png|x16px|Battle Points|link=Battle Point]]'
+local DIAMONDS_ICON = '[[File:Mobile_Legends_Diamond_icon.png|Diamonds|x16px|link=Diamond]]'
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param frame Frame
 ---@return Html
-function CustomHero.run(frame)
-	local unit = Unit(frame)
-	_args = unit.args
-	_args.informationType = 'Hero'
+function CustomUnit.run(frame)
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
 
-	unit.getWikiCategories = CustomHero.getWikiCategories
-	unit.setLpdbData = CustomHero.setLpdbData
-	unit.createWidgetInjector = CustomHero.createWidgetInjector
+	unit.args.informationType = 'Hero'
 
 	return unit:createInfobox()
 end
 
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
+function CustomUnit:addCustomCells(widgets)
+	local args = self.args
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Specialty', content = {_args.specialty}},
-		Cell{name = 'Region', content = {_args.region}},
-		Cell{name = 'City', content = {_args.city}},
-		Cell{name = 'Attack Type', content = {_args.attacktype}},
-		Cell{name = 'Resource Bar', content = {_args.resourcebar}},
-		Cell{name = 'Secondary Bar', content = {_args.secondarybar}},
-		Cell{name = 'Secondary Attributes', content = {_args.secondaryattributes1}},
-		Cell{name = 'Release Date', content = {_args.releasedate}},
-		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors()}
+		Cell{name = 'Specialty', content = {args.specialty}},
+		Cell{name = 'Region', content = {args.region}},
+		Cell{name = 'City', content = {args.city}},
+		Cell{name = 'Attack Type', content = {args.attacktype}},
+		Cell{name = 'Resource Bar', content = {args.resourcebar}},
+		Cell{name = 'Secondary Bar', content = {args.secondarybar}},
+		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
+		Cell{name = 'Release Date', content = {args.releasedate}},
+		Cell{name = 'Voice Actor(s)', content = CustomUnit._voiceActors(args)}
 	)
 
 	local statisticsCells = {
@@ -89,23 +83,23 @@ function CustomInjector:addCustomCells(widgets)
 		magicresistance = {order = 18, name = 'Magic Resistance'},
 		movespeed = {order = 19, name = 'Movement Speed'},
 	}
-	if Table.any(_args, function(key) return statisticsCells[key] end) then
+	if Table.any(args, function(key) return statisticsCells[key] end) then
 		table.insert(widgets, Title{name = 'Base Statistics'})
 		local statisticsCellsOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
 		for key, item in Table.iter.spairs(statisticsCells, statisticsCellsOrder) do
-			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
+			table.insert(widgets, Cell{name = item.name, content = {args[key]}})
 		end
 	end
 
 	table.insert(widgets, Title{name = 'Esports Statistics'})
-	table.insert(widgets, Cell{name = 'Win Rate', content = {CustomHero._heroStatsDisplay()}})
+	table.insert(widgets, Cell{name = 'Win Rate', content = {self:_heroStatsDisplay()}})
 
 	return widgets
 end
 
 ---@return string
-function CustomHero._heroStatsDisplay()
-	local stats = mw.text.split(HeroWL.create({hero = _args.heroname or _pagename}), ';')
+function CustomUnit:_heroStatsDisplay()
+	local stats = mw.text.split(HeroWL.create({hero = self.args.heroname or self.pagename}), ';')
 	local winPercentage = (tonumber(stats[1]) or 0) / ((tonumber(stats[1]) or 0) + (tonumber(stats[2]) or 1))
 	winPercentage = Math.round(winPercentage, 4) * 100
 	return (stats[1] or 0) .. 'W : ' .. (stats[2] or 0) .. 'L (' .. winPercentage .. '%)'
@@ -115,7 +109,11 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'type' then
+	local caller = self.caller
+	local args = caller.args
+	if id == 'custom' then
+		return caller:addCustomCells(widgets)
+	elseif id == 'type' then
 		local breakDowns = {
 			lane = 'Lane',
 			primaryrole = 'Primary Role',
@@ -123,24 +121,24 @@ function CustomInjector:parse(id, widgets)
 		}
 		local breakDownContents = {}
 		for key, display in pairs(breakDowns) do
-			if String.isNotEmpty(_args[key]) then
-				local displayText = '<b>'.. display..'</b><br>' .. ClassIcon.display({}, _args[key])
+			if String.isNotEmpty(args[key]) then
+				local displayText = '<b>'.. display..'</b><br>' .. ClassIcon.display({}, args[key])
 				table.insert(breakDownContents, displayText)
 			end
 		end
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
-			Cell{name = 'Real Name', content = {_args.realname}},
+			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
 		local costTypes = {
-			costbp = _BATTLE_POINTS_ICON,
-			costdia = _DIAMONDS_ICON,
+			costbp = BATTLE_POINTS_ICON,
+			costdia = DIAMONDS_ICON,
 		}
 		local costs = {}
 		for key, icon in pairs(costTypes) do
-			if String.isNotEmpty(_args[key]) then
-				table.insert(costs, _args[key] .. ' ' .. icon)
+			if String.isNotEmpty(args[key]) then
+				table.insert(costs, args[key] .. ' ' .. icon)
 			end
 		end
 		return {
@@ -151,12 +149,13 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
 ---@return string[]
-function CustomHero._voiceActors()
+function CustomUnit._voiceActors(args)
 	local voiceActors = {}
 
-	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(_args, 'voice') do
-		local flag = _args[voiceActorKey .. 'flag']
+	for voiceActorKey, voiceActor in Table.iter.pairsByPrefix(args, 'voice') do
+		local flag = args[voiceActorKey .. 'flag']
 		if flag then
 			voiceActor = Flags.Icon{flag = flag} .. NON_BREAKING_SPACE .. voiceActor
 		end
@@ -166,14 +165,9 @@ function CustomHero._voiceActors()
 	return voiceActors
 end
 
----@return WidgetInjector
-function CustomHero:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param args table
 ---@return string[]
-function CustomHero:getWikiCategories(args)
+function CustomUnit:getWikiCategories(args)
 	local categories = {}
 	if Namespace.isMain() then
 		categories = {'Heroes'}
@@ -188,17 +182,17 @@ function CustomHero:getWikiCategories(args)
 end
 
 ---@param args table
-function CustomHero:setLpdbData(args)
+function CustomUnit:setLpdbData(args)
 	local lpdbData = {
 		type = 'hero',
-		name = args.heroname or _pagename,
+		name = args.heroname or self.pagename,
 		image = args.image,
 		date = args.releasedate,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			releasedate = args.releasedate,
 		})
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.heroname or _pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.heroname or self.pagename), lpdbData)
 end
 
-return CustomHero
+return CustomUnit
