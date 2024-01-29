@@ -396,7 +396,7 @@ function PlayerIntroduction:create()
 		return ''
 	end
 
-	local isDeceased = self.playerInfo.deathDate ~= '0000-01-01' or self.playerInfo.status == 'passed away'
+	local isDeceased = self.playerInfo.deathDate ~= DEFAULT_DATE or self.playerInfo.status == 'passed away'
 
 	local statusDisplay = self:_statusDisplay(isDeceased)
 	local nationalityDisplay = self:_nationalityDisplay()
