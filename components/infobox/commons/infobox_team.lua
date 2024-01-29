@@ -15,9 +15,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
@@ -27,6 +26,7 @@ local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Region = Lua.import('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -79,6 +79,8 @@ function Team:createInfobox()
 	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
 	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
 
+	self.region = self:createRegion(args.region)
+
 	--- Display
 	local widgets = {
 		Header{
@@ -102,12 +104,7 @@ function Team:createInfobox()
 		Customizable{
 			id = 'region',
 			children = {
-				Cell{
-					name = 'Region',
-					content = {
-						self:_createRegion(args.region)
-					}
-				},
+				Cell{name = 'Region', content = {self.region.display}},
 			}
 		},
 		Customizable{
@@ -193,28 +190,23 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		self:defineCustomPageVariables(args)
+		self:_definePageVariables(args)
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
+		:node(infobox:build(widgets))
 		:node(WarningBox.displayAll(self.warnings))
 end
 
---to be reworked in another PR
 ---@param region string?
----@return string?
-function Team:_createRegion(region)
-	if String.isEmpty(region) then
-		return
-	end
+---@return {display: string?, region: string?}
+function Team:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
 
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	return Region.run{region = region, linkToCategory = true} or {}
 end
 
 ---@param location string?
@@ -244,7 +236,8 @@ end
 ---@return Html?
 function Team:_createUpcomingMatches()
 	if self:shouldStore(self.args) and Info.match2 > 0 then
-		return MatchTicker.team{short = true}
+		local frame = {short = true} ---@type Frame
+		return MatchTicker.team(frame)
 	end
 end
 
@@ -277,7 +270,7 @@ function Team:_setLpdbData(args, links)
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
-		region = args.region,
+		region = self.region.region,
 		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark,
@@ -304,6 +297,14 @@ function Team:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
+end
+
+--- Allows for overriding this functionality
+---@param args table
+function Team:_definePageVariables(args)
+	Variables.varDefine('region', self.region.region)
+
+	self:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
