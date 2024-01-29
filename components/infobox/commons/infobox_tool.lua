@@ -58,7 +58,7 @@ function Tool:createInfobox()
 		infobox:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 --- Allows for overriding this functionality

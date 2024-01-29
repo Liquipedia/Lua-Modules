@@ -175,7 +175,7 @@ end
 
 ---@param role string?
 ---@return {category: string, variable: string, isplayer: boolean?, personType: string}?
-function CustomPlayer:_getRoleData(role)
+function CustomPlayer._getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 

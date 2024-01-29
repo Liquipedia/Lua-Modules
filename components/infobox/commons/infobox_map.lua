@@ -61,7 +61,7 @@ function Map:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 --- Allows for overriding this functionality

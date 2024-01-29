@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
 
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
@@ -19,6 +20,7 @@ local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 ---@field root Html?
 ---@field adbox Html?
 ---@field content Html?
+---@field warnings string[]
 ---@field injector WidgetInjector?
 local Infobox = Class.new()
 
@@ -30,16 +32,20 @@ local Infobox = Class.new()
 function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
-	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:node(self.frame:preprocess('<adbox />'))
-	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-	self.root	:addClass('fo-nttax-infobox-wrapper')
-				:addClass('infobox-' .. gameName:lower())
+		:addClass('fo-nttax-infobox-wrapper')
+		:addClass('infobox-' .. gameName:lower())
+	self.adbox = mw.html.create('div')
+		:addClass('fo-nttax-infobox-adbox')
+		:node(self.frame:preprocess('<adbox />'))
+	self.content = mw.html.create('div')
+		:addClass('fo-nttax-infobox')
 	if forceDarkMode then
 		self.root:addClass('infobox-darkmodeforced')
 	end
 
 	self.injector = nil
+	self.warnings = {}
+
 	return self
 end
 
@@ -55,7 +61,7 @@ end
 ---@param injector WidgetInjector?
 ---@return self
 function Infobox:widgetInjector(injector)
-	self.injector = injector or self.injector
+	self.injector = injector
 	return self
 end
 
@@ -97,7 +103,9 @@ function Infobox:build(widgets)
 	end
 	self.root:node(self.bottomContent)
 
-	return self.root
+	return mw.html.create()
+		:node(self.root)
+		:node(WarningBox.displayAll(self.warnings))
 end
 
 return Infobox

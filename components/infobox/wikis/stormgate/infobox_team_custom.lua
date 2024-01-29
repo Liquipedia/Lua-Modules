@@ -69,15 +69,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = nil
-
-	return lpdbData
-end
-
 ---@param args table
 ---@return table
 function CustomTeam:getWikiCategories(args)

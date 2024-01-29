@@ -40,12 +40,6 @@ function BasicInfobox:setWidgetInjector(injector)
 	return self
 end
 
----Creates an empty WidgetInjector
----@return WidgetInjector?
-function BasicInfobox:createWidgetInjector()
-	return nil
-end
-
 --- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
 ---@return string?

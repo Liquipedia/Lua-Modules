@@ -116,7 +116,7 @@ function Game:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 ---@param args table

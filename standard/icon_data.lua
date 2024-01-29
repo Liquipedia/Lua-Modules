@@ -14,6 +14,7 @@ return {
 	-- Usage: Other Match detail pop up icons
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
+	veto = 'fas fa-times',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',

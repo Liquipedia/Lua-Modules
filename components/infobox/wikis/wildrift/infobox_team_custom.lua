@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -58,15 +57,6 @@ function CustomInjector:addCustomCells(id, widgets)
 	end
 
 	return widgets
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
 end
 
 return CustomTeam

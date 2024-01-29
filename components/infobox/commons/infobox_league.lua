@@ -19,7 +19,6 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
@@ -46,8 +45,6 @@ local Chronology = Widgets.Chronology
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
-
-League.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -230,8 +227,6 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:build(widgets)
-
 	if self:shouldStore(args) then
 		self.infobox:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
@@ -239,8 +234,7 @@ function League:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
-		:node(WarningBox.displayAll(League.warnings))
+		:node(self.infobox:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
@@ -376,11 +370,12 @@ function League:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.infobox.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 
@@ -638,7 +633,7 @@ function League:getIcons(iconArgs)
 	}
 
 	if String.isNotEmpty(trackingCategory) then
-		table.insert(self.warnings, 'Missing icon while icondark is set.')
+		table.insert(self.infobox.warnings, 'Missing icon while icondark is set.')
 	end
 
 	return icon, iconDark, display
