@@ -14,11 +14,9 @@ return {
 		['north america'] = 'na',
 		['northern america'] = 'na',
 
-		la = 'sa',
 		sam = 'sa',
 		['south america'] = 'sa',
 		['southern america'] = 'sa',
-		['latin america'] = 'sa',
 
 		['middle america'] = 'central america',
 
@@ -44,6 +42,7 @@ return {
 
 		['latin america north'] = 'latam north',
 		['latin america south'] = 'latam south',
+		la = 'latin america',
 
 		['apacn'] = 'apac north',
 		['asia pacific north'] = 'apac north',
