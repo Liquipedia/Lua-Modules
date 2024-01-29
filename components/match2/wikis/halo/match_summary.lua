@@ -19,8 +19,8 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '0000-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
