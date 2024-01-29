@@ -82,6 +82,35 @@ function Team:createInfobox()
 
 	self.region = self:createRegion(args.region)
 
+	local earliestGameTimestamp = Team._parseDate(args.created) or Date.maxTimestamp
+
+	local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
+		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
+		if #splitInput ~= 2 then
+			-- Legacy Input
+			return creation
+		end
+
+		local icon
+		local game, date = unpack(splitInput)
+
+		if game:lower() == 'org' then
+			icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
+			icon = icon and '[[File:' .. icon .. ']]' or nil
+		else
+			local timestamp = Team._parseDate(date)
+			if timestamp and timestamp < earliestGameTimestamp then
+				earliestGameTimestamp = timestamp
+			end
+
+			icon = Game.icon{game = game, useDefault = false}
+		end
+
+		return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
+	end)
+
+	args.created = earliestGameTimestamp ~= Date.maxTimestamp and Date.toYmdInUtc(earliestGameTimestamp) or nil
+
 	--- Display
 	local widgets = {
 		Header{
@@ -159,35 +188,6 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						local earliestGameTimestamp = Team._parseDate(args.created) or Date.maxTimestamp
-
-						local created = Array.map(self:getAllArgsForBase(args, 'created'), function (creation)
-							local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
-							if #splitInput ~= 2 then
-								-- Legacy Input
-								return creation
-							end
-
-							local icon
-							local game, date = unpack(splitInput)
-
-							if game:lower() == 'org' then
-								icon = self:_getTeamIcon(ReferenceCleaner.clean(date))
-								icon = icon and '[[File:' .. icon .. ']]' or nil
-							else
-								local timestamp = Team._parseDate(date)
-								if timestamp and timestamp < earliestGameTimestamp then
-									earliestGameTimestamp = timestamp
-								end
-
-								icon = Game.icon{game = game, useDefault = false}
-							end
-
-							return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
-						end)
-
-						args.created = earliestGameTimestamp ~= Date.maxTimestamp and Date.toYmdInUtc(earliestGameTimestamp) or nil
-
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
 								Title{name = 'History'},
@@ -240,7 +240,7 @@ function Team:_getTeamIcon(date)
 end
 
 function Team._isValidDate(date)
-	return date and date:match('%d%d%d%d%-[%d%?]?[%d%?]?%-[%d%?]?[%d%?]?')
+	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
 end
 
 function Team._parseDate(date)
