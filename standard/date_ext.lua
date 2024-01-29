@@ -123,7 +123,7 @@ end
 ---@param offsetString string?
 ---@return integer # default `0`
 function DateExt.getOffsetSeconds(offsetString)
-	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '0000-01-01T00:00:00' .. (offsetString or '')))
+	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
 end
 
 return DateExt
