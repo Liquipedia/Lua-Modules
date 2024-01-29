@@ -61,7 +61,7 @@ function Mission:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 return Mission

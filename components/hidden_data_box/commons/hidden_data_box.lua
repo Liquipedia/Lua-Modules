@@ -31,7 +31,7 @@ local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
----@return string
+---@return Html
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)

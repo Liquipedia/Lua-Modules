@@ -17,7 +17,6 @@ local Namespace = require('Module:Namespace')
 local MatchTicker = require('Module:MatchTicker/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -48,8 +47,6 @@ local Status = {
 	ACTIVE = 'active',
 	DISBANDED = 'disbanded',
 }
-
-Team.warnings = {}
 
 ---@param frame Frame
 ---@return Html
@@ -196,9 +193,7 @@ function Team:createInfobox()
 		self:_definePageVariables(args)
 	end
 
-	return mw.html.create()
-		:node(infobox:build(widgets))
-		:node(WarningBox.displayAll(self.warnings))
+	return infobox:build(widgets)
 end
 
 ---@param region string?
@@ -252,7 +247,7 @@ function Team:getStandardLocationValue(location)
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
 		return
