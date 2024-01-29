@@ -9,7 +9,7 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local _EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
