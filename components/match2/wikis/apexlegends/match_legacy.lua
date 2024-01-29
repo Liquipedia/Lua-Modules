@@ -10,6 +10,7 @@ local MatchLegacy = {}
 
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 
@@ -27,6 +28,7 @@ function MatchLegacy._storeMatch1(match2)
 		match.date = game2.date
 		match.vod = game2.vod
 		match.dateexact = g2extradata.dateexact
+		match.finished = String.isNotEmpty(game2.winner)
 		match.staticid = match2.match2id .. '_' .. gameIndex
 
 		-- Handle extradata fields
