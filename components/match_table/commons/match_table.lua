@@ -326,6 +326,7 @@ end
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
+		:add{ConditionNode(ColumnName('resulttype'), Comparator.neq, 'np')}
 	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
@@ -662,7 +663,7 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 			opponent = opponent,
 			flip = flipped,
 			overflow = 'wrap',
-			teamStyle = 'short'
+			teamStyle = 'short',
 		})
 end
 
