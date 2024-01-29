@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local EPOCH_TIME = '0000-01-01 00:00:00'
+local EPOCH_TIME_EXTENDED = '0000-01-01T00:00:00+00:00'
 
 local htmlCreate = mw.html.create
 
