@@ -8,28 +8,36 @@
 
 local WarningBox = {}
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 
 ---@param text string|number
 ---@return Html
 function WarningBox.display(text)
-	local div = mw.html.create('div'):addClass('show-when-logged-in navigation-not-searchable ambox-wrapper'
-		.. 'ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red')
 	local tbl = mw.html.create('table')
-	tbl:tag('tr')
-		:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
-		:tag('td'):addClass('ambox-text'):wikitext(text)
-	return div:node(tbl)
+		:tag('tr')
+			:tag('td'):addClass('ambox-image'):wikitext('[[File:Emblem-important.svg|40px|link=]]'):done()
+			:tag('td'):addClass('ambox-text'):wikitext(text):allDone()
+
+	return mw.html.create('div')
+		:addClass('show-when-logged-in')
+		:addClass('navigation-not-searchable')
+		:addClass('ambox-wrapper')
+		:addClass('ambox')
+		:addClass('wiki-bordercolor-dark')
+		:addClass('wiki-backgroundcolor-light')
+		:addClass('ambox-red')
+		:node(tbl)
 end
 
----@param tbl (string|number)[]
----@return string
-function WarningBox.displayAll(tbl)
-	local display = ''
-	for _, text in pairs(tbl) do
-		display = display .. tostring(WarningBox.display(text))
-	end
-	return display
+---@param arr (string|number)[]
+---@return Html
+function WarningBox.displayAll(arr)
+	local wrapper = mw.html.create()
+	Array.forEach(arr, function(text)
+		wrapper:node(WarningBox.display(text))
+	end)
+	return wrapper
 end
 
 return Class.export(WarningBox)
