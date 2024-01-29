@@ -23,7 +23,7 @@ DateExt.minTimestamp = -62167219200
 DateExt.maxTimestamp = 253402300799
 
 -- 0000-01-01 00:00:00
-DateExt.minTimestamp = 0
+DateExt.epochZero = 0
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
