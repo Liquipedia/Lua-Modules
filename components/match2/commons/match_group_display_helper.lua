@@ -77,7 +77,7 @@ components.
 ]]
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
-		or (match.timestamp and match.timestamp ~= DateExt.minTimestamp)
+		or (match.timestamp and match.timestamp ~= DateExt.epochZero)
 		or match.vod
 		or not Table.isEmpty(match.links)
 		or match.comment
