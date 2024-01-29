@@ -23,7 +23,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
-local _NOT_PLAYED = {'skip', 'np'}
+local NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_VODGAMES = 20
 local FIRST_PICK_CONVERSION = {
@@ -268,6 +268,7 @@ end
 function matchFunctions._setPlacementsAndWinner(opponents, match)
 	local counter = 0
 	local lastScore
+	local lastStatus
 	local lastPlacement
 
 	match.winner = tonumber(match.winner)
@@ -278,12 +279,13 @@ function matchFunctions._setPlacementsAndWinner(opponents, match)
 		if not match.winner then
 			match.winner = opponentIndex
 		end
-		if lastScore == score then
+		if lastScore == score and lastStatus == opponent.status then
 			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or lastPlacement
 		else
 			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or counter
 			lastPlacement = counter
 			lastScore = score or nil
+			lastStatus = opponent.status or nil
 		end
 	end
 end
@@ -294,9 +296,10 @@ end
 function matchFunctions._checkDraw(opponents, firstTo, match)
 	local finished = Logic.readBool(match.finished)
 	local score1 = opponents[1].score
+	local status1 = opponents[1].status
 	local isDraw = Array.all(opponents, function(opponent)
 		return opponent.score == firstTo
-			or finished and opponent.score == score1
+			or finished and opponent.score == score1 and opponent.status == status1
 	end)
 
 	if not isDraw then return end
@@ -341,7 +344,7 @@ function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1 or '')
 	map.score2 = tonumber(map.score2 or '')
 	map.scores = { map.score1, map.score2 }
-	if Table.includes(_NOT_PLAYED, string.lower(map.winner or '')) then
+	if Table.includes(NOT_PLAYED, string.lower(map.winner or '')) then
 		map.winner = 0
 		map.resulttype = 'np'
 	elseif Logic.isNumeric(map.winner) then
