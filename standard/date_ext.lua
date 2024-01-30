@@ -22,14 +22,7 @@ DateExt.minTimestamp = -62167219200
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
--- default dateTime used in LPDB
-DateExt.defaultTimestamp = 0
-DateExt.defaultDateTime = '1970-01-01 00:00:00'
-DateExt.defaultDateTimeExtended = '1970-01-01T00:00:00+00:00'
-DateExt.defaultDate = '1970-01-01'
-DateExt.deaultYear = '1970'
-
----@deprecated just here until any usage (outside of git) has been resolved
+-- 1970-01-01 00:00:00
 DateExt.epochZero = 0
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
