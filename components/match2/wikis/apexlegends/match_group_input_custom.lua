@@ -359,8 +359,8 @@ end
 ---@param statusSettings table
 ---@return table
 function MatchFunctions.setBgForOpponents(opponents, statusSettings)
-	Array.forEach(opponents, function(opponent, index)
-		opponent.extradata = {bg = statusSettings[index]}
+	Array.forEach(opponents, function(opponent)
+		opponent.extradata = {bg = statusSettings[opponent.placement]}
 	end)
 	return opponents
 end
