@@ -64,13 +64,14 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'earnings' then
-		local displayEarnings = function(value)
-			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
+		local displayEarnings = function(earningsData)
+			local totalEarnings = Math.sum(Array.extractValues(earningsData or {}))
+			return totalEarnings > 0 and '$' .. mw.language.new('en'):formatNum(totalEarnings) or nil
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings.total)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings.total)}},
+			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()

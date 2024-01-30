@@ -410,6 +410,8 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
 	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
 	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
+	obj.patch = Logic.emptyOr(obj.patch, parent.patch, Variables.varDefault('tournament_patch'))
+	obj.date = Logic.emptyOr(obj.date, parent.date)
 
 	return obj
 end
