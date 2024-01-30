@@ -44,6 +44,8 @@ return {
 
 		['latin america north'] = 'latam north',
 		['latin america south'] = 'latam south',
+		lan = ['latam north'],
+		las = ['latam south'],
 
 		['apacn'] = 'apac north',
 		['asia pacific north'] = 'apac north',
