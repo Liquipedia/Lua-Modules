@@ -80,8 +80,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
@@ -233,7 +233,7 @@ function MatchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = DateExt.defaultDateTime,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 			timestamp = DateExt.defaultTimestamp,
 		}

@@ -72,7 +72,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date ~= DateExt.defaultDateTime and date or DateExt.getContextualDateOrNow()
+	local teamTemplateDate = date ~= DateExt.defaultDateTimeExtended and date or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -269,7 +269,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = DateExt.defaultDateTime,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end

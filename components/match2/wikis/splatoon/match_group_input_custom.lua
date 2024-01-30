@@ -328,7 +328,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = DateExt.defaultDateTime,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 			timestamp = DateExt.defaultTimestamp,
 		}

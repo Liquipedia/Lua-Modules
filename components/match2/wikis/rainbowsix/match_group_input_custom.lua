@@ -293,7 +293,7 @@ function matchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = DateExt.defaultDateTime,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 			timestamp = DateExt.defaultTimestamp,
 		}
