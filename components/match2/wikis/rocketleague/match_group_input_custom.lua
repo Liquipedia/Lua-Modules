@@ -40,7 +40,6 @@ local globalVars = PageVariableNamespace()
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
@@ -271,15 +270,6 @@ function matchFunctions.getOpponents(args)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, args.date)
 
-			-- Retrieve icon and legacy name for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
-				if not opponent.icon then
-					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
-				end
-				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
-			end
-
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
 				opponent.status = _STATUS_HAS_SCORE
@@ -497,39 +487,6 @@ function mapFunctions.getParticipantsData(map)
 
 	map.participants = participants
 	return map
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
-end
-
---the following 2 functions are a fallback
---they are only useful if the team template doesn't exist
---in the team template extension
-function opponentFunctions.getLegacyTeamName(template)
-	local team = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	team = team:gsub('%&', '')
-	team = String.split(team, 'link=')[2]
-	team = String.split(team, ']]')[1]
-	return team
-end
-
-function opponentFunctions.getLegacyTeamIcon(template)
-	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	iconTemplate = iconTemplate:gsub('%&', '')
-	local icon = String.split(iconTemplate, 'File:')[2]
-	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
-	icon = String.split(icon, '|')[1]
-	iconDark = String.split(iconDark, '|')[1]
-	return icon, iconDark
 end
 
 return CustomMatchGroupInput

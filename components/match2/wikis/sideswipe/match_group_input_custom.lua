@@ -35,7 +35,6 @@ local globalVars = PageVariableNamespace()
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
@@ -181,13 +180,6 @@ function matchFunctions.getOpponents(args)
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, args.date)
-
-			-- Retrieve icon and legacy name for team
-			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
-				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
-			end
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -385,14 +377,6 @@ function mapFunctions.getParticipantsData(map)
 
 	map.participants = participants
 	return map
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return CustomMatchGroupInput

@@ -271,7 +271,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
 	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
 	end
 
@@ -492,15 +491,6 @@ function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
 
 	if not displayNameFoundTwice then
 		return displayNameIndex
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 

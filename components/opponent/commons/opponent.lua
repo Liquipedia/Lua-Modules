@@ -301,6 +301,7 @@ function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
+		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then

@@ -53,7 +53,6 @@ local _CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -455,11 +454,6 @@ function matchFunctions.getOpponents(match)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
-			end
-
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
 			if Logic.isNumeric(opponent.score) then
@@ -624,18 +618,6 @@ function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
 	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
 	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

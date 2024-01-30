@@ -48,7 +48,6 @@ local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local MatchFunctions = {}
 local MapFunctions = {}
-local OpponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -293,11 +292,6 @@ function MatchFunctions.getOpponents(match)
 		if Logic.isNotEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = OpponentFunctions.getIcon(opponent.template)
-			end
-
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
 			if Logic.isNumeric(opponent.score) then
@@ -478,21 +472,6 @@ end
 function MapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
----@param template string
----@return string?
----@return string?
-function OpponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

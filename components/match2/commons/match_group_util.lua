@@ -144,6 +144,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field advanceBg string?
 ---@field advances boolean?
 ---@field icon string?
+---@field icondark string?
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
