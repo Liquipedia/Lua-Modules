@@ -74,7 +74,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
+	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -296,7 +296,7 @@ function matchFunctions.readDate(matchArgs)
 		return {
 			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
-			timestamp = DateExt.epochZero,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
@@ -393,7 +393,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true

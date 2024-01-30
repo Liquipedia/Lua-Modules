@@ -28,7 +28,7 @@ DateExt.defaultDate = '1970-01-01'
 DateExt.maxTimestamp = 253402300799
 
 -- 1970-01-01 00:00:00
-DateExt.epochZero = 0
+DateExt.defaultTimestamp = 0
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.

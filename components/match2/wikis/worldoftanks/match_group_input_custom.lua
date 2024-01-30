@@ -371,7 +371,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
