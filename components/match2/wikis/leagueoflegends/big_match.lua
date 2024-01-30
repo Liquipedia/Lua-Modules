@@ -92,7 +92,7 @@ function BigMatch.run(frame)
 	local model = BigMatch._match2Director(args)
 
 	model.isBestOfOne = #model.games == 1
-	model.dateCountdown = model.timestamp ~= DateExt.defaultTimestamp and DisplayHelper.MatchCountdownBlock(model) or nil
+	model.dateCountdown = model.timestamp ~= DateExt.defaultDateTimestamp and DisplayHelper.MatchCountdownBlock(model) or nil
 
 	-- Create an object array for links
 	model.links = Array.extractValues(Table.map(model.links, function (site, link)

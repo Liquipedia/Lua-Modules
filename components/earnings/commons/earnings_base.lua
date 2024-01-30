@@ -190,7 +190,7 @@ end
 ---@param mode string?
 ---@return string
 function Earnings._buildConditions(conditions, year, mode)
-	conditions = '[[date::!' .. DateExt.defaultTime .. ']] AND [[prizemoney::>0]] AND ' .. conditions
+	conditions = '[[date::!' .. DateExt.defaultDateTime .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if Logic.isNotEmpty(year) then
 		conditions = conditions .. ' AND ([[date_year::' .. year .. ']])'
 	end

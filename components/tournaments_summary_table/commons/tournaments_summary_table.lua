@@ -316,7 +316,7 @@ end
 ---@return string
 function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
-	local defaultYear, defaultMonth, defaultDay = DateExt.defaultTime:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
+	local defaultYear, defaultMonth, defaultDay = DateExt.defaultDateTime:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 
 	-- create time
 	local date = os.time{

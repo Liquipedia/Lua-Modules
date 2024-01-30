@@ -635,7 +635,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 end
 
 function Import._removeDefaultDate(entry)
-	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.defaultTimestamp and
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.defaultDateTimestamp and
 		entry.date or nil
 
 	return entry

@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 
 local AgeCalculation = {}
 
-local DEFAULT_DATE = os.date('*t', DateExt.defaultTimestamp)
+local DEFAULT_DATE = os.date('*t', DateExt.defaultDateTimestamp)
 local DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
 local MAXIMUM_DAYS_IN_FEBRUARY = 29
 local MONTH_DECEMBER = 12

@@ -505,9 +505,9 @@ function League:_setLpdbData(args, links)
 			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = self.data.startDate or self.data.endDate or DateExt.defaultTime,
-		enddate = self.data.endDate or DateExt.defaultTime,
-		sortdate = self.data.endDate or DateExt.defaultTime,
+		startdate = self.data.startDate or self.data.endDate or DateExt.defaultDateTime,
+		enddate = self.data.endDate or DateExt.defaultDateTime,
+		sortdate = self.data.endDate or DateExt.defaultDateTime,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,

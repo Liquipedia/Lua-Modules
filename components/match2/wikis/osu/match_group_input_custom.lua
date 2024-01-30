@@ -72,7 +72,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date ~= DateExt.defaultTime and date or DateExt.getContextualDateOrNow()
+	local teamTemplateDate = date ~= DateExt.defaultDateTime and date or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -269,7 +269,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = DateExt.defaultTime,
+			date = DateExt.defaultDateTime,
 			dateexact = false,
 		}
 	end
@@ -373,7 +373,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultDateTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true

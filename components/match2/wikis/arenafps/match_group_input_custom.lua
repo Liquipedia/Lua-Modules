@@ -74,11 +74,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
-	if teamTemplateDate == DateExt.defaultTime then
+	if teamTemplateDate == DateExt.defaultDateTime then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			DateExt.defaultTime
+			DateExt.defaultDateTime
 		)
 	end
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -271,7 +271,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = DateExt.defaultTime,
+			date = DateExt.defaultDateTime,
 			dateexact = false,
 		}
 	end

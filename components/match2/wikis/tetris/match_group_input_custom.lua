@@ -67,7 +67,7 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		return {
 			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
+			timestamp = DateExt.defaultDateTimestamp,
 		}
 	end
 end
@@ -193,7 +193,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.defaultTimestamp then
+	if not match.finished and match.timestamp > DateExt.defaultDateTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -280,7 +280,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.defaultTimestamp then
+	if teamTemplateDate == DateExt.defaultDateTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
