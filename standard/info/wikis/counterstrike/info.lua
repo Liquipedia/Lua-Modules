@@ -83,6 +83,7 @@ local infoData = {
 		},
 		csgocs2 = {
 			order = 6,
+			unlisted = true,
 			abbreviation = 'CS:GO/CS2',
 			name = 'CS:GO / CS2',
 			link = 'Counter-Strike 2',
@@ -129,6 +130,7 @@ local infoData = {
 		cscz = 'CS default darkmode.png',
 		cs2 = 'Counter-Strike 2 default lightmode.png',
 	}, ---@deprecated
+	match2 = 2,
 }
 
 infoData.games.cs16 = infoData.games.cs1

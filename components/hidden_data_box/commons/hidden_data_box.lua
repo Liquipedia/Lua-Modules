@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Game = require('Module:Game')
 local Namespace = require('Module:Namespace')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -25,11 +26,12 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
-local Opponent = Lua.import('Module:OpponentLibraries', {requireDevIfEnabled = true}).Opponent
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
----@return string
+---@return Html
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
@@ -46,9 +48,9 @@ function HiddenDataBox.run(args)
 		queryResult = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parent .. ']]',
 			limit = 1,
-		})
+		})[1] or {}
 
-		if not queryResult[1] and Namespace.isMain() then
+		if Table.isEmpty(queryResult) and Namespace.isMain() then
 			table.insert(warnings, String.interpolate(INVALID_PARENT, {parent = parent}))
 		else
 			local date = HiddenDataBox.cleanDate(args.date, args.sdate) or queryResult.startdate or
@@ -59,8 +61,6 @@ function HiddenDataBox.run(args)
 				HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 			end)
 		end
-
-		queryResult = queryResult[1] or {}
 	end
 
 	HiddenDataBox.checkAndAssign('tournament_name', TextSanitizer.stripHTML(args.name), queryResult.name)
@@ -86,7 +86,7 @@ function HiddenDataBox.run(args)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
-	HiddenDataBox.checkAndAssign('tournament_game', args.game, queryResult.game)
+	HiddenDataBox.checkAndAssign('tournament_game', Game.toIdentifier{game = args.game}, queryResult.game)
 	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
@@ -123,12 +123,12 @@ end
 
 ---Fetches participant information from the parent page
 ---@param parent string
----@return {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}[]
+---@return placement[]
 function HiddenDataBox._fetchPlacements(parent)
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = '[[pagename::' .. parent .. ']] AND [[opponenttype::!' .. Opponent.literal .. ']]',
 		limit = 1000,
-		query = 'opponentplayers, opponentname, opponenttype',
+		query = 'opponentplayers, opponentname, opponenttype, extradata',
 	})
 
 	return Array.filter(placements, function(placement)
@@ -142,7 +142,7 @@ end
 function HiddenDataBox.addCustomVariables(args, queryResult)
 end
 
----@param placement {opponentname: string, opponenttype: OpponentType, opponentplayers: table<string, string>}
+---@param placement placement
 ---@param date string
 function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	if Opponent.typeIsParty(placement.opponenttype) then
@@ -155,8 +155,14 @@ function HiddenDataBox._setWikiVariablesFromPlacement(placement, date)
 	-- Would need a rework for the function that does it however
 	local participant = placement.opponentname
 	local participantResolved = mw.ext.TeamLiquidIntegration.resolve_redirect(participant)
-	Table.iter.forEachPair(placement.opponentplayers, function(key, value)
-		HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+	Table.iter.forEachPair(placement.opponentplayers or {}, function(key, value)
+		if Table.isNotEmpty((placement.extradata or {}).opponentaliases) then
+			Array.forEach(placement.extradata.opponentaliases, function(alias)
+				HiddenDataBox._setWikiVariableForParticipantKey(alias, participantResolved, key, value)
+			end)
+		else
+			HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+		end
 	end)
 end
 

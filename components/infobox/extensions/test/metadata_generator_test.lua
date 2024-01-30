@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local Arguments = require('Module:Arguments')
-local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
+local MetadataGenerator = Lua.import('Module:MetadataGenerator')
 
 local suite = ScribuntoUnit:new()
 

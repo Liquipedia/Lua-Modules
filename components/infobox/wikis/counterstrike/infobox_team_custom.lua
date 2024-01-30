@@ -12,103 +12,95 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
-local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+---@class CounterstrikeInfoboxTeam: InfoboxTeam
+---@field gamesList string[]
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
-local _team
-
 function CustomTeam.run(frame)
-	local team = Team(frame)
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
-
-	team.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	team.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return team.args[gameIdentifier]
 		end)
-
-	_team = team
 
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
 	if id == 'staff' then
 		return {
-			Cell{name = 'Founders',	content = {_team.args.founders}},
-			Cell{name = 'CEO', content = {_team.args.ceo}},
-			Cell{name = 'Gaming Director', content = {_team.args['gaming director']}},
+			Cell{name = 'Founders',	content = {args.founders}},
+			Cell{name = 'CEO', content = {args.ceo}},
+			Cell{name = 'Gaming Director', content = {args['gaming director']}},
 			widgets[4], -- Manager
 			widgets[5], -- Captain
-			Cell{name = 'In-Game Leader', content = {_team.args.igl}},
+			Cell{name = 'In-Game Leader', content = {args.igl}},
 			widgets[1], -- Coaches
-			Cell{name = 'Analysts', content = {_team.args.analysts}},
+			Cell{name = 'Analysts', content = {args.analysts}},
 		}
-	elseif id == 'earningscell' then
+	elseif id == 'earnings' then
+		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
+	elseif id == 'custom' then
+		return {Cell {
+			name = 'Games',
+			content = Array.map(self.caller.gamesList, function (gameIdentifier)
+					return Game.text{game = gameIdentifier}
+				end)
+		}}
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell {
-			name = 'Games',
-			content = Array.map(_team.args.gamesList, function (gameIdentifier)
-					return Game.text{game = gameIdentifier}
-				end)
-		}
-	}
-end
-
+---@return string?
 function CustomTeam:createBottomContent()
-	if not _team.args.disbanded and mw.ext.TeamTemplate.teamexists(_team.pagename) then
-		local teamPage = mw.ext.TeamTemplate.teampage(_team.pagename)
+	if not self.args.disbanded and mw.ext.TeamTemplate.teamexists(self.pagename) then
+		local teamPage = mw.ext.TeamTemplate.teampage(self.pagename)
 
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.lpdbname or teamPage}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = _team.lpdbname or teamPage}
+			{team = self.args.lpdbname or teamPage}
 		)
 	end
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
 	lpdbData.extradata.ismixteam = tostring(String.isNotEmpty(args.mixteam))
 	lpdbData.extradata.isnationalteam = tostring(String.isNotEmpty(args.nationalteam))
 
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 
-	Array.forEach(_team.args.gamesList, function (gameIdentifier)
+	Array.forEach(self.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' Teams')
 		end)
 
-	if Table.isEmpty(_team.args.gamesList) then
+	if Table.isEmpty(self.gamesList) then
 		table.insert(categories, 'Gameless Teams')
 	end
 

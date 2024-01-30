@@ -9,39 +9,36 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomPlayer = Class.new()
-
+---@class TrackmaniaInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
-	_args = player.args
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	_args['trackmania-io'] = _args.trackmania_id
-
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
+	player.args['trackmania-io'] = player.args.trackmania_id
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	if id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {_args.years_active}})
+		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {self.caller.args.years_active}})
 	end
 
 	return widgets
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
 end
 
 return CustomPlayer

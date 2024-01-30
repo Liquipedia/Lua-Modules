@@ -8,53 +8,47 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+---@class ApexlegendsInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
-local _team
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
+
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
-end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'In-Game Leader',
-		content = {_team.args.igl}
-	})
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'In-Game Leader', content = {args.igl}})
+	end
+
 	return widgets
 end
 
+---@return string?
 function CustomTeam:createBottomContent()
 	return Template.expandTemplate(
 		mw.getCurrentFrame(),
 		'Upcoming and ongoing tournaments of',
-		{team = _team.name or _team.pagename}
+		{team = self.name or self.pagename}
 	)
-end
-
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
 end
 
 return CustomTeam

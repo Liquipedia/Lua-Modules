@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget', {requireDevIfEnabled = true})
+local Widget = Lua.import('Module:Infobox/Widget')
 
 ---@class BreakdownWidget: Widget
 ---@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget

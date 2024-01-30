@@ -8,16 +8,19 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
+local WarningBox = require('Module:WarningBox')
 
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory', {requireDevIfEnabled = true})
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class Infobox
 ---@field frame Frame?
 ---@field root Html?
 ---@field adbox Html?
 ---@field content Html?
+---@field warnings string[]
 ---@field injector WidgetInjector?
 local Infobox = Class.new()
 
@@ -29,16 +32,20 @@ local Infobox = Class.new()
 function Infobox:create(frame, gameName, forceDarkMode)
 	self.frame = frame
 	self.root = mw.html.create('div')
-	self.adbox = mw.html.create('div')	:addClass('fo-nttax-infobox-adbox')
-										:node(self.frame:preprocess('<adbox />'))
-	self.content = mw.html.create('div')	:addClass('fo-nttax-infobox')
-	self.root	:addClass('fo-nttax-infobox-wrapper')
-				:addClass('infobox-' .. gameName:lower())
+		:addClass('fo-nttax-infobox-wrapper')
+		:addClass('infobox-' .. gameName:lower())
+	self.adbox = mw.html.create('div')
+		:addClass('fo-nttax-infobox-adbox')
+		:node(self.frame:preprocess('<adbox />'))
+	self.content = mw.html.create('div')
+		:addClass('fo-nttax-infobox')
 	if forceDarkMode then
 		self.root:addClass('infobox-darkmodeforced')
 	end
 
 	self.injector = nil
+	self.warnings = {}
+
 	return self
 end
 
@@ -58,11 +65,15 @@ function Infobox:widgetInjector(injector)
 	return self
 end
 
----Adds a custom widgets to the bottom of the infobox
+---Adds custom components after the end the infobox
 ---@param wikitext string|number|Html|nil
 ---@return self
 function Infobox:bottom(wikitext)
-	self.bottomContent = wikitext
+	if Logic.isEmpty(wikitext) then
+		return self
+	end
+
+	self.bottomContent = (self.bottomContent or mw.html.create()):node(wikitext)
 	return self
 end
 
@@ -90,11 +101,11 @@ function Infobox:build(widgets)
 		self.root:node(self.adbox)
 		Variables.varDefine('is_first_infobox', 'false')
 	end
-	if self.bottomContent ~= nil then
-		self.root:node(self.bottomContent)
-	end
+	self.root:node(self.bottomContent)
 
-	return self.root
+	return mw.html.create()
+		:node(self.root)
+		:node(WarningBox.displayAll(self.warnings))
 end
 
 return Infobox

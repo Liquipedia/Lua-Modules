@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('logic', function()
+describe('opponent', function()
 	local Config = require('test_assets.opponent_test_config')
 	local Opponent = require('Module:Opponent')
 

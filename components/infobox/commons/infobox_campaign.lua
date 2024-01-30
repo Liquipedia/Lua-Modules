@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
@@ -42,7 +42,7 @@ function Campaign:createInfobox()
 
 	infobox:categories('Campaign')
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 

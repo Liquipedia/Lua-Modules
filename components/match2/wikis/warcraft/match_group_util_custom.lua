@@ -15,9 +15,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
@@ -25,7 +25,7 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
+CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
@@ -70,7 +70,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
----@field headToHead boolean
 ---@field isFfa boolean
 ---@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
@@ -122,7 +121,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.casters = Table.extract(extradata, 'casters')
 

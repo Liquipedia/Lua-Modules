@@ -6,63 +6,62 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local Locale = Lua.import('Module:Locale')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local _GAME_MODE = mw.loadData('Module:GameMode')
-local _EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
+local GAME_MODE = mw.loadData('Module:GameMode')
+local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 
-local CustomLeague = Class.new()
+---@class ApexlegendsLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_args = league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	_args.liquipediatiertype = _args.liquipediatiertype or _args.tiertype
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
-	league.addToLpdb = CustomLeague.addToLpdb
-	league.getWikiCategories = CustomLeague.getWikiCategories
-	league.liquipediaTierHighlighted = CustomLeague.liquipediaTierHighlighted
-	league.appendLiquipediatierDisplay = CustomLeague.appendLiquipediatierDisplay
+	league.args.liquipediatiertype = league.args.liquipediatiertype or league.args.tiertype
 
 	return league:createInfobox()
 end
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game mode', content = {
-					CustomLeague._getGameMode()
-				}})
-		table.insert(widgets, Cell{name = 'Platform', content = {
-					CustomLeague._getPlatform()
-				}})
-		return widgets
+	local args = self.caller.args
+
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Teams', content = {args.team_number}},
+			Cell{name = 'Number of players', content = {args.player_number}}
+		)
+	elseif id == 'gamesettings' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game mode', content = {self.caller:_getGameMode()}},
+			Cell{name = 'Platform', content = {self.caller:_getPlatform()}}
+		)
 	elseif id == 'liquipediatier' then
-		local algsTier = _args.algstier
+		local algsTier = args.algstier
 		if String.isNotEmpty(algsTier) then
 			table.insert(widgets, 1, Cell{
 				name = 'ALGS circuit tier',
@@ -72,48 +71,46 @@ function CustomInjector:parse(id, widgets)
 		end
 		table.insert(widgets, Cell{
 			name = 'EA tier',
-			content = {Tier['ea'][string.lower(_args.eatier or '')]},
+			content = {Tier['ea'][string.lower(args.eatier or '')]},
 			classes = {'tournament-highlighted-bg'}
 		})
-		return widgets
 	elseif id == 'customcontent' then
 		--maps
-		if String.isNotEmpty(_args.map1) then
-			table.insert(widgets, Title{name = _args.maptitle or 'Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('map')})
-		elseif String.isNotEmpty(_args['2map1']) then
-			table.insert(widgets, Title{name = _args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = CustomLeague:_makeBasedListFromArgs('2map')})
+		if String.isNotEmpty(args.map1) then
+			table.insert(widgets, Title{name = args.maptitle or 'Maps'})
+			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('map')})
+		elseif String.isNotEmpty(args['2map1']) then
+			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('2map')})
 		end
 	end
 	return widgets
 end
 
 
+---@param args table
+---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return String.isNotEmpty(args['ea-sponsored'])
 end
 
+---@param args table
+---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	return Logic.readBool(args['ea-sponsored']) and _EA_ICON or ''
+	return Logic.readBool(args['ea-sponsored']) and EA_ICON or ''
 end
 
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{name = 'Teams', content = {_args.team_number}})
-	table.insert(widgets, Cell{name = 'Number of players', content = {_args.player_number}})
-
-	return widgets
-end
-
+---@param base string
+---@return string[]
 function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = _args[base .. '1']
+	local firstArg = self.args[base .. '1']
 	local foundArgs = {Page.makeInternalLink({}, firstArg)}
 	local index = 2
 
-	while String.isNotEmpty(_args[base .. index]) do
-		local currentArg = _args[base .. index]
+	while String.isNotEmpty(self.args[base .. index]) do
+		local currentArg = self.args[base .. index]
 		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(CustomLeague:_createNoWrappingSpan(
+			tostring(self:_createNoWrappingSpan(
 				Page.makeInternalLink({}, currentArg)
 			))
 		)
@@ -123,6 +120,20 @@ function CustomLeague:_makeBasedListFromArgs(base)
 	return foundArgs
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.isIndividual = String.isNotEmpty(args.player_number) and 'true' or ''
+
+	local eaTier = string.lower(args.eatier or '')
+	local algsTier = string.lower(args.algstier or '')
+	self.data.publishertier = Logic.emptyOr(
+		args.eaMajor,
+		eaTier ~= 'online' and eaTier or nil,
+		algsTier ~= 'online' and algsTier or ''
+	)
+end
+
+---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
@@ -130,48 +141,29 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
 
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 
 	--Apexs specific vars
 	Variables.varDefine('tournament_gamemode', string.lower(args.mode or ''))
 	Variables.varDefine('tournament_series2', args.series2 or '')
 	Variables.varDefine('tournament_publisher', args['ea-sponsored'] or '')
 	Variables.varDefine('tournament_pro_circuit_tier', args.pctier or '')
+	Variables.varDefine('tournament_individual', self.data.isIndividual)
 
-	local isIndividual = ''
-	if String.isNotEmpty(args.player_number) then
-		isIndividual = 'true'
-	end
-	Variables.varDefine('tournament_individual', isIndividual)
-
-	local eaMajor = args.eamajor
-	if String.isEmpty(eaMajor) then
-		local eaTier = string.lower(args.eatier or '')
-		if String.isNotEmpty(eaTier) and eaTier ~= 'online' then
-			eaMajor = eaTier
-		else
-			local algsTier = string.lower(args.algstier or '')
-			if String.isNotEmpty(algsTier) and algsTier ~= 'online' then
-				eaMajor = algsTier
-			else
-				eaMajor = ''
-			end
-		end
-	end
-	Variables.varDefine('tournament_publishertier', eaMajor)
 	local regionData = Locale.formatLocations(args)
 	Variables.varDefine('tournament_location_region', regionData.region1 or args.country)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.extradata.individual = Variables.varDefault('tournament_individual', '')
+	lpdbData.extradata.individual = self.data.isIndividual
 	lpdbData.extradata.platform = string.lower(args.platform or 'pc')
 
 	--retrieve sponsors from args.sponsors if sponsorX, X=1,...,3, is empty
@@ -181,17 +173,17 @@ function CustomLeague:addToLpdb(lpdbData, args)
 		String.isEmpty(args.sponsor3) and
 		String.isNotEmpty(args.sponsor)
 	then
-		lpdbData.sponsors = {}
-		local sponsors = mw.text.split(args.sponsor, '<br>', true)
-		for key, item in pairs(sponsors) do
-			lpdbData.sponsors['sponsor' .. key] = item
-		end
-		lpdbData.sponsors = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.sponsors)
+		local sponsors = Table.map(mw.text.split(args.sponsor, '<br>', true), function(index, value)
+			return 'sponsor' .. index, value
+		end)
+		lpdbData.sponsors = mw.ext.LiquipediaDB.lpdb_create_json(sponsors)
 	end
 
 	return lpdbData
 end
 
+---@param content Html|string|number|nil
+---@return Html
 function CustomLeague:_createNoWrappingSpan(content)
 	local span = mw.html.create('span')
 	span:css('white-space', 'nowrap')
@@ -199,17 +191,19 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return span
 end
 
-function CustomLeague._getGameMode()
-	local gameMode = _args.mode
+---@return string?
+function CustomLeague:_getGameMode()
+	local gameMode = self.args.mode
 	if String.isEmpty(gameMode) then
 		return nil
 	end
 	gameMode = string.lower(gameMode)
-	return _GAME_MODE[gameMode] or _GAME_MODE['default']
+	return GAME_MODE[gameMode] or GAME_MODE['default']
 end
 
-function CustomLeague._getPlatform()
-	local platform = string.lower(_args.platform or 'pc')
+---@return string?
+function CustomLeague:_getPlatform()
+	local platform = string.lower(self.args.platform or 'pc')
 	if platform == 'pc' then
 		return '[[PC Competitions|PC]][[Category:PC Competitions]]'
 	elseif platform == 'console' then
@@ -217,6 +211,8 @@ function CustomLeague._getPlatform()
 	end
 end
 
+---@param args table
+---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 	if String.isNotEmpty(args.algstier) then

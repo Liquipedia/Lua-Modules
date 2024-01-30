@@ -15,8 +15,8 @@ local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 local HeroNames = mw.loadData('Module:HeroNames')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local _STATUS_SCORE = 'S'
 local _STATUS_DRAW = 'D'
@@ -382,10 +382,11 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		featured = Logic.emptyOr(
+		featured = tostring(Logic.emptyOr(
 			match.featured,
-			matchFunctions.isFeatured(match)
-		),
+			matchFunctions.isFeatured(match),
+			''
+		)),
 		mvp = MatchGroupInput.readMvp(match),
 		headtohead = match.headtohead,
 	}

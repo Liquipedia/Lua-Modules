@@ -15,7 +15,6 @@ local Logic = require('Module:Logic')
 local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
@@ -50,8 +49,8 @@ function LegacyMatchMaps.solo(frame)
 		width = args.width,
 		collapsed = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
 		attached = Logic.nilOr(Logic.readBoolOrNil(args.hide), true),
-		store = not store,
-		noDuplicateCheck = store,
+		store = store,
+		noDuplicateCheck = not store,
 	}
 
 	for _, matchInput, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
@@ -121,7 +120,9 @@ function LegacyMatchMaps._readMaps(args)
 
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'map' .. mapIndex
-		local map = Table.filterByKey(args, function(key) return String.startsWith(key, prefix) end)
+		local map = Table.filterByKey(args, function(key)
+			return key == prefix or string.find(key, '^' .. prefix .. '[^%d]')
+		end)
 		map = Table.map(map, function(key, value)
 			args[key] = nil
 

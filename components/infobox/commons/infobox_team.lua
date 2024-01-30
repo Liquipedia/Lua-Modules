@@ -9,21 +9,23 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local String = require('Module:StringUtils')
-local WarningBox = require('Module:WarningBox')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Earnings = Lua.import('Module:Earnings', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Earnings = Lua.import('Module:Earnings')
+local Flags = Lua.import('Module:Flags')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Region = Lua.import('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -33,12 +35,12 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
+---@class InfoboxTeam : BasicInfobox
 local Team = Class.new(BasicInfobox)
 
-local _LINK_VARIANT = 'team'
+local LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
-local _defaultEarningsFunctionUsed = false
 
 ---@enum statuses
 local Status = {
@@ -46,13 +48,14 @@ local Status = {
 	DISBANDED = 'disbanded',
 }
 
-local _warnings = {}
-
+---@param frame Frame
+---@return Html
 function Team.run(frame)
 	local team = Team(frame)
 	return team:createInfobox()
 end
 
+---@return Html
 function Team:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
@@ -60,6 +63,9 @@ function Team:createInfobox()
 	--- Transform data
 	-- Links
 	local links = Links.transform(args)
+
+	-- Earnings
+	self.totalEarnings, self.yearlyEarnings = self:calculateEarnings(args)
 
 	-- Team Information
 	local team = args.teamtemplate or self.pagename
@@ -70,7 +76,9 @@ function Team:createInfobox()
 	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
 	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
 
-	-- Display
+	self.region = self:createRegion(args.region)
+
+	--- Display
 	local widgets = {
 		Header{
 			name = args.name,
@@ -93,12 +101,7 @@ function Team:createInfobox()
 		Customizable{
 			id = 'region',
 			children = {
-				Cell{
-					name = 'Region',
-					content = {
-						self:_createRegion(args.region)
-					}
-				},
+				Cell{name = 'Region', content = {self.region.display}},
 			}
 		},
 		Customizable{
@@ -114,32 +117,11 @@ function Team:createInfobox()
 		Customizable{
 			id = 'earnings',
 			children = {
-				Builder{
-					builder = function()
-						_defaultEarningsFunctionUsed = true
-						self.totalEarnings, self.earnings = Earnings.calculateForTeam{
-							team = self.pagename or self.name,
-							perYear = true,
-							queryHistorical = args.queryEarningsHistorical,
-							doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
-						}
-						local totalEarningsDisplay
-						if self.totalEarnings > 0 then
-							totalEarningsDisplay = '$' .. Language:formatNum(self.totalEarnings)
-						end
-						return {
-							Customizable{id = 'earningscell',
-								children = {
-									Cell{name = Abbreviation.make(
-										'Approx. Total Winnings',
-										'Includes individual player earnings won&#10;while representing this team'
-									),
-									content = {totalEarningsDisplay}}
-								}
-							}
-						}
-					end
-				}
+				Cell{name = Abbreviation.make(
+					'Approx. Total Winnings',
+					'Includes individual player earnings won&#10;while representing this team'
+				),
+				content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -148,7 +130,7 @@ function Team:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = _LINK_VARIANT}
+						Widgets.Links{content = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -196,6 +178,7 @@ function Team:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{content = {args.footnotes}},
 	}
+	infobox:bottom(self:_createUpcomingMatches())
 	infobox:bottom(self:createBottomContent())
 
 	-- Categories
@@ -204,25 +187,25 @@ function Team:createInfobox()
 		infobox:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		self:defineCustomPageVariables(args)
+		self:_definePageVariables(args)
 	end
 
-	return tostring(builtInfobox) .. WarningBox.displayAll(_warnings)
+	return infobox:build(widgets)
 end
 
-function Team:_createRegion(region)
-	if String.isEmpty(region) then
-		return
-	end
+---@param region string?
+---@return {display: string?, region: string?}
+function Team:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
 
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	return Region.run{region = region, linkToCategory = true} or {}
 end
 
+---@param location string?
+---@return string?
 function Team:_createLocation(location)
 	if String.isEmpty(location)then
 		return
@@ -245,6 +228,16 @@ function Team:_createLocation(location)
 			(locationDisplay or '')
 end
 
+---@return Html?
+function Team:_createUpcomingMatches()
+	if self:shouldStore(self.args) and Info.match2 > 0 then
+		local frame = {short = true} ---@type Frame
+		return MatchTicker.team(frame)
+	end
+end
+
+---@param location string?
+---@return string?
 function Team:getStandardLocationValue(location)
 	if String.isEmpty(location) then
 		return
@@ -254,7 +247,7 @@ function Team:getStandardLocationValue(location)
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
-			_warnings,
+			self.infobox.warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
 		return
@@ -263,22 +256,23 @@ function Team:getStandardLocationValue(location)
 	return locationToStore
 end
 
+---@param args table
+---@param links table
 function Team:_setLpdbData(args, links)
 	local name = args.romanized_name or self.name
-	local earnings = self.totalEarnings
 
 	local lpdbData = {
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
-		region = args.region,
+		region = self.region.region,
 		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark,
 		textlesslogo = args.teamcardimage,
 		textlesslogodark = args.teamcardimagedark,
-		earnings = earnings,
-		earningsbyyear = {},
+		earnings = self.totalEarnings,
+		earningsbyyear = self.yearlyEarnings or {},
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
@@ -291,34 +285,52 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(self.earnings or {}) do
+	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
 		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	if String.isEmpty(lpdbData.earnings) and not _defaultEarningsFunctionUsed then
-		error('Since your wiki uses a customized earnings function you ' ..
-			'have to set the LPDB earnings storage in the custom module')
-	end
-
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	lpdbData.earningsbyyear = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.earningsbyyear or {})
-	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality
+---@param args table
+function Team:_definePageVariables(args)
+	Variables.varDefine('region', self.region.region)
+
+	self:defineCustomPageVariables(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
 function Team:defineCustomPageVariables(args)
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function Team:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return boolean
 function Team:shouldStore(args)
 	return Namespace.isMain() and
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
+end
+
+---@param args table
+---@return number
+---@return table<integer, number?>?
+function Team:calculateEarnings(args)
+	return Earnings.calculateForTeam{
+		team = self.pagename or self.name,
+		perYear = true,
+		queryHistorical = args.queryEarningsHistorical,
+		doNotIncludePlayerEarnings = args.doNotIncludePlayerEarnings,
+	}
 end
 
 return Team

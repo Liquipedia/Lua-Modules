@@ -10,51 +10,51 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomMap = Class.new()
-
+---@class Formula1MapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	_args = customMap.args
-	return customMap:createInfobox()
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
+
+	return map:createInfobox()
 end
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	return Array.appendWith(widgets,
-		Cell{name = 'Architect', content = {_args.architect}},
-		Cell{name = 'Capacity', content = {_args.capacity}},
-		Cell{name = 'Location', content = {_args.circuitlocation}},
-		Cell{name = 'Opened', content = {_args.opened}},
-		Cell{name = 'Turns', content = {_args.turns}},
-		Cell{name = 'Laps', content = {_args.laps}},
-		Cell{name = 'Direction', content = {_args.direction}},
-		Cell{name = 'Length', content = {_args.length}},
-		Cell{name = 'Debut', content = {_args.debut}},
-		Cell{name = 'Last Race', content = {_args.lastrace}},
-		Cell{name = 'Most wins (drivers)', content = {_args.driverwin}},
-		Cell{name = 'Most wins (teams)', content = {_args.teamwin}},
-		Cell{name = 'Lap Record', content = {_args.laprecord}},
-		Cell{name = 'Span', content = {_args.span}}
-	)
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		return Array.appendWith(widgets,
+			Cell{name = 'Architect', content = {args.architect}},
+			Cell{name = 'Capacity', content = {args.capacity}},
+			Cell{name = 'Location', content = {args.circuitlocation}},
+			Cell{name = 'Opened', content = {args.opened}},
+			Cell{name = 'Turns', content = {args.turns}},
+			Cell{name = 'Laps', content = {args.laps}},
+			Cell{name = 'Direction', content = {args.direction}},
+			Cell{name = 'Length', content = {args.length}},
+			Cell{name = 'Debut', content = {args.debut}},
+			Cell{name = 'Last Race', content = {args.lastrace}},
+			Cell{name = 'Most wins (drivers)', content = {args.driverwin}},
+			Cell{name = 'Most wins (teams)', content = {args.teamwin}},
+			Cell{name = 'Lap Record', content = {args.laprecord}},
+			Cell{name = 'Span', content = {args.span}}
+		)
+	end
+
+	return widgets
 end
 
 return CustomMap

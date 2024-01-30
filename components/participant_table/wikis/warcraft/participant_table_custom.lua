@@ -34,7 +34,7 @@ local Variables = require('Module:Variables')
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
-local ParticipantTable = Lua.import('Module:ParticipantTable/Base', {requireDevIfEnabled = true})
+local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -204,7 +204,7 @@ function CustomParticipantTable:_getFactionNumbers()
 	end)
 
 	local factionNumbers = {}
-	for _, faction in pairs(Faction.factions) do
+	for _, faction in pairs(Faction.getFactions()) do
 		factionNumbers[faction] = calculatedNumbers[faction] or 0
 		factionNumbers[faction .. 'Display'] = self.config.manualFactionCounts[faction] or
 			(factionNumbers[faction] - (calculatedNumbers[faction .. 'Dq'] or 0))

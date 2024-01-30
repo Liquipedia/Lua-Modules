@@ -1,6 +1,6 @@
 {
 	"extends": [
-		"wikimedia/client",
+		"wikimedia/client-es6",
 		"wikimedia/jquery",
 		"wikimedia/mediawiki"
 	],
@@ -28,7 +28,7 @@
 		"max-len": ["warn", { "code": 120 }]
 	},
 	"parserOptions": {
-		"ecmaVersion": 2017
+		"ecmaVersion": 2020
 	},
 	"env": {
 		"es6": true

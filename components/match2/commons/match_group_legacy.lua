@@ -8,28 +8,30 @@
 
 local Legacy = {}
 
+local Arguments = require('Module:Arguments')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchGroup = require('Module:MatchGroup')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local getArgs = require('Module:Arguments').getArgs
-local getDefaultMapping = require('Module:MatchGroup/Legacy/Default').get
-local json = require('Module:Json')
 
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
-local MatchSubobjects = Lua.import('Module:Match/Subobjects', {requireDevIfEnabled = true})
+local MatchGroupLegacyDefault = Lua.import('Module:MatchGroup/Legacy/Default')
+local MatchSubobjects = Lua.import('Module:Match/Subobjects')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local _IS_USERSPACE = false
-local _NAMESPACE_USER = 2
-local _RESET_MATCH = 'RxMBR'
-local _THIRD_PLACE_MATCH = 'RxMTP'
+local IS_USERSPACE = false
+local NAMESPACE_USER = 2
+local RESET_MATCH = 'RxMBR'
+local THIRD_PLACE_MATCH = 'RxMTP'
 local _args
 local _type
 
+---@param frame Frame
+---@return string
 function Legacy.get(frame)
-	_args = getArgs(frame)
+	_args = Arguments.getArgs(frame)
 	mw.addWarning('You are editing a page that uses a Legacy Bracket. '
 		.. 'Please use the new Bracket System on new pages.')
 	local nameSpaceNumber = mw.title.getCurrentTitle().namespace
@@ -39,9 +41,9 @@ function Legacy.get(frame)
 		storage = (Variables.varDefault('disable_LPDB_storage') == 'true')
 			and 'false' or nil
 	end
-	if (storage or '') ~= 'true' and nameSpaceNumber == _NAMESPACE_USER then
+	if (storage or '') ~= 'true' and nameSpaceNumber == NAMESPACE_USER then
 		storage = 'false'
-		_IS_USERSPACE = true
+		IS_USERSPACE = true
 	end
 
 	local bracketid = _args['id']
@@ -77,8 +79,10 @@ function Legacy.get(frame)
 	return MatchGroup.TemplateBracket(newArgs)
 end
 
+---@param frame Frame
+---@return string
 function Legacy.getTemplate(frame)
-	_args = getArgs(frame)
+	_args = Arguments.getArgs(frame)
 
 	local templateid = _args['template']
 	if Logic.isEmpty(templateid) then
@@ -97,7 +101,7 @@ function Legacy.getTemplate(frame)
 
 	local mapping = Legacy._getMapping(templateid)
 
-	local out = json.stringify(mapping, {pretty = true})
+	local out = Json.stringify(mapping, {pretty = true})
 		:gsub('"([^\n:"]-)":', '%1 = ')
 		:gsub('type =', '["type"] =')
 		:gsub(' = %[(.-)%]', ' = { %1 }')
@@ -111,6 +115,8 @@ function Legacy.getTemplate(frame)
 	return out .. '</pre>'
 end
 
+---@param mapping table
+---@return table
 function Legacy._convert(mapping)
 	local newArgs = {}
 	for source, target in pairs(mapping) do
@@ -122,7 +128,7 @@ function Legacy._convert(mapping)
 			for _, flattensource in ipairs(flatten) do
 				local toFlatten = _args[flattensource] or {}
 				if type(toFlatten) == 'string' then
-					toFlatten = json.parse(toFlatten)
+					toFlatten = Json.parse(toFlatten)
 				end
 				for key, val in pairs(toFlatten) do
 					flattened[key] = val
@@ -143,7 +149,7 @@ function Legacy._convert(mapping)
 			end
 
 			if not Logic.isEmpty(nested) then
-				if source ~= _RESET_MATCH and source ~= _THIRD_PLACE_MATCH then
+				if source ~= RESET_MATCH and source ~= THIRD_PLACE_MATCH then
 					if not nested.opponent1 then
 						nested.opponent1 = {type = 'team', template = 'TBD', icon = WikiSpecific.defaultIcon, name = 'TBD'}
 						mw.log('Missing Opponent entry')
@@ -171,10 +177,17 @@ function Legacy._convert(mapping)
 	return newArgs
 end
 
+---@param realKey string
+---@param val string|table
+---@param match table
+---@param mapping table
+---@param flattened table?
+---@param source string
+---@return table
 function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 	flattened = flattened or _args
 	local noSkip = not String.startsWith(realKey, '$$')
-	if source == _RESET_MATCH and String.startsWith(realKey, 'opponent') then
+	if source == RESET_MATCH and String.startsWith(realKey, 'opponent') then
 		local score2 = _args[val.score] or ''
 		if score2 == '' then
 			noSkip = false
@@ -192,7 +205,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 				end)
 		end
 
-		if _IS_USERSPACE then
+		if IS_USERSPACE then
 			--the following allows allow empty matches in the conversion
 			if String.startsWith(realKey, 'opponent') and
 				Logic.isEmpty(_args[val['$notEmpty$']] or flattened[val['$notEmpty$']]) then
@@ -214,6 +227,7 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 			end
 		end
 	elseif noSkip then
+		---@cast val string
 		local options = String.split(val, '|')
 		if Table.size(options) > 1 then
 			for _, option in ipairs(options) do
@@ -230,13 +244,16 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 	return match
 end
 
+---@param templateid string
+---@param oldTemplateid string?
+---@return table
 function Legacy._getMapping(templateid, oldTemplateid)
 	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. templateid) then
 		mw.log('Module:MatchGroup/Legacy/' .. templateid .. 'exists')
 		return (require('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
-			or getDefaultMapping(templateid, _type)
+			or MatchGroupLegacyDefault.get(templateid, _type)
 	else
-		return getDefaultMapping(templateid, _type)
+		return MatchGroupLegacyDefault.get(templateid, _type)
 	end
 end
 

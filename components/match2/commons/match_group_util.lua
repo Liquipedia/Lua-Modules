@@ -16,8 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 

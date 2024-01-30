@@ -17,7 +17,7 @@ local Variables = require('Module:Variables')
 local json = require('Module:Json')
 local utils = require('Module:LuaUtils')--only needed for utils.log
 
-local Match = Lua.import('Module:Match', {requireDevIfEnabled = true})
+local Match = Lua.import('Module:Match')
 
 -- store match to a var to later store them to LPDB
 function TemplateMatch.storeVar(args)

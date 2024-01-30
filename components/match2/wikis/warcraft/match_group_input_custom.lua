@@ -19,8 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Streams = Lua.import('Module:Links/Stream')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -30,7 +30,7 @@ local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap', 'lrthread'}
+local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap'}
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local NEUTRAL_HERO_FACTION = 'neutral'
@@ -106,8 +106,6 @@ end
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
-	Variables.varDefine('headtohead', match.headtohead)
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', match.bestof)
@@ -127,7 +125,6 @@ end
 function CustomMatchGroupInput._getExtraData(match)
 	match.extradata = {
 		casters = MatchGroupInput.readCasters(match),
-		headtohead = match.headtohead,
 		ffa = 'false',
 	}
 

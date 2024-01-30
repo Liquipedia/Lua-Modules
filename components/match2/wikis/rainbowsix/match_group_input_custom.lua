@@ -16,8 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -306,7 +306,6 @@ function matchFunctions.getVodStuff(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.links = {
-		preview = match.preview,
 		stats = match.stats,
 		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
 		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,

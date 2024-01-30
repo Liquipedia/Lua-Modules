@@ -8,6 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -17,20 +19,20 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local MetadataGenerator = Lua.import('Module:MetadataGenerator', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
-local TextSanitizer = Lua.import('Module:TextSanitizer', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local MetadataGenerator = Lua.import('Module:MetadataGenerator')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
+local DEFAULT_DATE = '1970-01-01'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -41,9 +43,8 @@ local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
+---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
-
-League.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -55,28 +56,8 @@ end
 ---@return Html
 function League:createInfobox()
 	local args = self.args
-	args.abbreviation = self:_fetchAbbreviation()
-	local links
+	self:_parseArgs()
 
-	-- Split venue from legacy format to new format.
-	-- Legacy format is a wiki-code string that can include an external link
-	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
-	-- This should be removed once there's been a bot run to change this.
-	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
-		-- Remove [[]] and split on `|`
-		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
-		args.venue = splitVenue[1]
-		args.venuename = splitVenue[2]
-	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
-		-- Remove [] and split on space
-		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
-		args.venuelink = splitVenue[1]
-		table.remove(splitVenue, 1)
-		args.venue = table.concat(splitVenue, ' ')
-	end
-
-	-- set Variables here already so they are available in functions
-	-- we call from here on, e.g. _createPrizepool
 	self:_definePageVariables(args)
 
 	local widgets = {
@@ -91,21 +72,17 @@ function League:createInfobox()
 		Cell{
 			name = 'Series',
 			content = {
-				self:_createSeries(
-					{
-						shouldSetVariable = true,
-						displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
-					},
-					args.series,
-					args.abbreviation,
-					args.icon,
-					args.icondark or args.icondarkmode
-				),
-				self:_createSeries(
-					{shouldSetVariable = false},
-					args.series2,
-					args.abbreviation2
-				)
+				self:createSeriesDisplay({
+					displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
+					series = args.series,
+					abbreviation = args.abbreviation,
+					icon = args.icon,
+					iconDark = args.icondark or args.icondarkmode,
+				}, self.iconDisplay),
+				self:createSeriesDisplay{
+					series = args.series2,
+					abbreviation = args.abbreviation2,
+				},
 			}
 		},
 		Customizable{
@@ -196,7 +173,7 @@ function League:createInfobox()
 		Customizable{id = 'prizepool', children = {
 				Cell{
 					name = 'Prize Pool',
-					content = {self:_createPrizepool(args)},
+					content = {self.prizepoolDisplay},
 				},
 			},
 		},
@@ -217,11 +194,10 @@ function League:createInfobox()
 		},
 		Builder{
 			builder = function()
-				links = Links.transform(args)
-				if not Table.isEmpty(links) then
+				if Table.isNotEmpty(self.links) then
 					return {
 						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Widgets.Links{content = self.links}
 					}
 				end
 			end
@@ -235,12 +211,9 @@ function League:createInfobox()
 							return {
 								Title{name = 'Chronology'},
 								Chronology{
-									content = {
-										previous = args.previous,
-										next = args.next,
-										previous2 = args.previous2,
-										next2 = args.next2,
-									}
+									content = Table.filterByKey(args, function(key)
+										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
+									end)
 								}
 							}
 						end
@@ -254,18 +227,107 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if self:shouldStore(args) then
 		self.infobox:categories(unpack(self:_getCategories(args)))
-		self:_setLpdbData(args, links)
+		self:_setLpdbData(args, self.links)
 		self:_setSeoTags(args)
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
-		:node(WarningBox.displayAll(League.warnings))
+		:node(self.infobox:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
+end
+
+function League:_parseArgs()
+	local args = self.args
+
+	args.abbreviation = self:_fetchAbbreviation()
+
+	-- Split venue from legacy format to new format.
+	-- Legacy format is a wiki-code string that can include an external link
+	-- New format has |venue=, |venuename= and |venuelink= as different parameters.
+	-- This should be removed once there's been a bot run to change this.
+	if not args.venuename and args.venue and args.venue:sub(1, 2) == '[[' then
+		-- Remove [[]] and split on `|`
+		local splitVenue = mw.text.split(args.venue:gsub('%[%[', ''):gsub('%]%]', ''), '|')
+		args.venue = splitVenue[1]
+		args.venuename = splitVenue[2]
+	elseif not args.venuelink and args.venue and args.venue:sub(1, 1) == '[' then
+		-- Remove [] and split on space
+		local splitVenue = mw.text.split(args.venue:gsub('%[', ''):gsub('%]', ''), ' ')
+		args.venuelink = splitVenue[1]
+		table.remove(splitVenue, 1)
+		args.venue = table.concat(splitVenue, ' ')
+	end
+
+	local data = {
+		name = TextSanitizer.stripHTML(args.name),
+		shortName = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
+		tickerName = TextSanitizer.stripHTML(args.tickername),
+		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
+		--might be set before infobox
+		status = args.status or Variables.varDefault('tournament_status'),
+		game = Game.toIdentifier{game = args.game},
+		-- If no parent is available, set pagename instead to ease querying
+		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
+		startDate = self:_cleanDate(args.sdate) or self:_cleanDate(args.date),
+		endDate = self:_cleanDate(args.edate) or self:_cleanDate(args.date),
+		mode = args.mode,
+		patch = args.patch,
+		endPatch = args.endpatch or args.epatch or args.patch,
+	}
+
+	data.liquipediatier, data.liquipediatiertype =
+		Tier.toValue(args.liquipediatier, args.liquipediatiertype)
+
+	self.data = data
+
+	self:_parsePrizePool(args)
+
+	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
+		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
+		series = args.series,
+		abbreviation = args.abbreviation,
+		icon = args.icon,
+		iconDark = args.icondark or args.icondarkmode,
+	}
+
+	self.links = Links.transform(args)
+
+	self:customParseArguments(args)
+end
+
+---@param args table
+function League:_parsePrizePool(args)
+	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
+		return
+	end
+
+	--need to get the display here since it sets variables we want/need to get the clean values
+	--overwritable since sometimes display is supposed to look a bit different
+	local display = self:displayPrizePool(args)
+
+	self.prizepoolDisplay = display
+	self.data.prizepoolUsd = tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0
+	self.data.localCurrency = Variables.varDefault('tournament_currency', args.localcurrency)
+end
+
+---@param args table
+---@return number|string?
+function League:displayPrizePool(args)
+	return InfoboxPrizePool.display{
+		prizepool = args.prizepool,
+		prizepoolusd = args.prizepoolusd,
+		currency = args.localcurrency,
+		rate = args.currency_rate,
+		date = Logic.emptyOr(args.currency_date, self.data.endDate),
+		displayRoundPrecision = args.currencyDispPrecision,
+		varRoundPrecision = args.currencyVarPrecision
+	}
+end
+
+---@param args table
+function League:customParseArguments(args)
 end
 
 ---@param args table
@@ -308,11 +370,12 @@ function League:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.infobox.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 
@@ -374,42 +437,22 @@ function League:createLiquipediaTierDisplay(args)
 end
 
 ---@param args table
----@return string?
-function League:_createPrizepool(args)
-	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
-		return nil
-	end
-	local date
-	if String.isNotEmpty(args.currency_rate) then
-		date = args.currency_date
-	end
-
-	return InfoboxPrizePool.display{
-		prizepool = args.prizepool,
-		prizepoolusd = args.prizepoolusd,
-		currency = args.localcurrency,
-		rate = args.currency_rate,
-		date = date or Variables.varDefault('tournament_enddate'),
-		displayRoundPrecision = args.currencyDispPrecision,
-		varRoundPrecision = args.currencyVarPrecision
-	}
-end
-
----@param args table
 function League:_definePageVariables(args)
-	Variables.varDefine('tournament_name', TextSanitizer.stripHTML(args.name))
-	Variables.varDefine('tournament_shortname', TextSanitizer.stripHTML(args.shortname or args.abbreviation))
-	Variables.varDefine('tournament_tickername', TextSanitizer.stripHTML(args.tickername))
-	Variables.varDefine('tournament_icon', args.icon)
-	Variables.varDefine('tournament_icondark', args.icondark or args.icondarkmode)
-	Variables.varDefine('tournament_series', mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''))
+	Variables.varDefine('tournament_name', self.data.name)
+	Variables.varDefine('tournament_shortname', self.data.shortName)
+	Variables.varDefine('tournament_tickername', self.data.tickerName)
+	Variables.varDefine('tournament_series', self.data.series)
 
-	local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
-	Variables.varDefine('tournament_liquipediatier', tier)
-	Variables.varDefine('tournament_liquipediatiertype', tierType)
+	Variables.varDefine('tournament_icon', self.data.icon)
+	Variables.varDefine('tournament_icondark', self.data.iconDark)
+
+	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
+	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
+	Variables.varDefine('tournament_publishertier', self.data.publishertier)
 
 	Variables.varDefine('tournament_type', args.type)
-	Variables.varDefine('tournament_status', args.status or Variables.varDefault('tournament_status'))
+	Variables.varDefine('tournament_mode', self.data.mode)
+	Variables.varDefine('tournament_status', self.data.status)
 
 	Variables.varDefine('tournament_region', args.region)
 	Variables.varDefine('tournament_country', args.country)
@@ -417,24 +460,19 @@ function League:_definePageVariables(args)
 	Variables.varDefine('tournament_location2', args.location2 or args.city2)
 	Variables.varDefine('tournament_venue', args.venue)
 
-	Variables.varDefine('tournament_game', string.lower(args.game or ''))
+	Variables.varDefine('tournament_game', self.data.game)
 
-	-- If no parent is available, set pagename instead to ease querying
-	local parent = args.parent or mw.title.getCurrentTitle().prefixedText
-	parent = string.gsub(parent, ' ', '_')
-	Variables.varDefine('tournament_parent', parent)
+	Variables.varDefine('tournament_parent', self.data.parent)
 	Variables.varDefine('tournament_parentname', args.parentname)
 	Variables.varDefine('tournament_subpage', args.subpage)
 
-	Variables.varDefine('tournament_startdate',
-	self:_cleanDate(args.sdate) or self:_cleanDate(args.date))
-	Variables.varDefine('tournament_enddate',
-	self:_cleanDate(args.edate) or self:_cleanDate(args.date))
+	Variables.varDefine('tournament_startdate', self.data.startDate)
+	Variables.varDefine('tournament_enddate', self.data.endDate)
 
-	-- gets overwritten by the League:_createPrizepool call if args.prizepool
-	-- or args.prizepoolusd is a valid input
-	-- if wikis want it unset they can unset it via the defineCustomPageVariables() call
-	Variables.varDefine('tournament_currency', args.localcurrency or '')
+	Variables.varDefine('tournament_patch', self.data.patch)
+	Variables.varDefine('tournament_endpatch ', self.data.endPatch)
+
+	Variables.varDefine('tournament_currency', self.data.localCurrency or '')
 
 	Variables.varDefine('tournament_summary', self:seoText(args))
 
@@ -446,52 +484,46 @@ end
 function League:_setLpdbData(args, links)
 	local lpdbData = {
 		name = self.name,
-		tickername = TextSanitizer.stripHTML(args.tickername),
-		shortname = TextSanitizer.stripHTML(args.shortname or args.abbreviation),
+		tickername = self.data.tickerName,
+		shortname = self.data.shortName,
 		banner = args.image,
 		bannerdark = args.imagedark or args.imagedarkmode,
-		icon = Variables.varDefault('tournament_icon'),
-		icondark = Variables.varDefault('tournament_icondark'),
+		icon = self.data.icon,
+		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
-		previous = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous)),
-		previous2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.previous2)),
-		next = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next)),
-		next2 = mw.ext.TeamLiquidIntegration.resolve_redirect(self:_getPageNameFromChronology(args.next2)),
-		game = string.lower(args.game or ''),
-		mode = Variables.varDefault('tournament_mode', ''),
-		patch = args.patch,
-		endpatch = args.endpatch or args.epatch,
+		previous = self:_getPageNameFromChronology(args.previous),
+		previous2 = self:_getPageNameFromChronology(args.previous2),
+		next = self:_getPageNameFromChronology(args.next),
+		next2 = self:_getPageNameFromChronology(args.next2),
+		game = self.data.game,
+		mode = self.data.mode,
+		patch = self.data.patch,
+		endpatch = self.data.endPatch,
 		type = args.type,
-		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
-			Table.mapValues(
-				League:_getNamedTableofAllArgsForBase(args, 'organizer'),
-				mw.ext.TeamLiquidIntegration.resolve_redirect
-			)
+		organizers = Table.mapValues(
+			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
+			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
-		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+		startdate = self.data.startDate or self.data.endDate or DEFAULT_DATE,
+		enddate = self.data.endDate or DEFAULT_DATE,
+		sortdate = self.data.endDate or DEFAULT_DATE,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
 		locations = Locale.formatLocations(args),
-		prizepool = Variables.varDefault('tournament_prizepoolusd', 0),
-		liquipediatier = Variables.varDefault('tournament_liquipediatier'),
-		liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
-		publishertier = Variables.varDefault('tournament_publishertier'),
+		prizepool = self.data.prizepoolUsd,
+		liquipediatier = self.data.liquipediatier,
+		liquipediatiertype = self.data.liquipediatiertype,
+		publishertier = self.data.publishertier,
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)
 			or -1,
-		status = Variables.varDefault('tournament_status'),
+		status = self.data.status,
 		format = TextSanitizer.stripHTML(args.format),
-		sponsors = mw.ext.LiquipediaDB.lpdb_create_json(
-			League:_getNamedTableofAllArgsForBase(args, 'sponsor')
-		),
-		links = mw.ext.LiquipediaDB.lpdb_create_json(
-			Links.makeFullLinksForTableItems(links or {})
-		),
+		sponsors = League:_getNamedTableofAllArgsForBase(args, 'sponsor'),
+		links = Links.makeFullLinksForTableItems(links or {}),
 		summary = self:seoText(args),
 		extradata = {
 			series2 = args.series2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2) or nil,
@@ -499,8 +531,7 @@ function League:_setLpdbData(args, links)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata)
-	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param args table
@@ -563,72 +594,70 @@ function League:_createLocation(args)
 	return table.concat(display)
 end
 
----@param options table?
----@param series string?
----@param abbreviation string?
----@param icon string?
----@param iconDark string?
+---@param seriesArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
+---@param iconDisplay string?
 ---@return string?
-function League:_createSeries(options, series, abbreviation, icon, iconDark)
-	if String.isEmpty(series) then
+function League:createSeriesDisplay(seriesArgs, iconDisplay)
+	if String.isEmpty(seriesArgs.series) then
 		return nil
 	end
-	---@cast series -nil
-	options = options or {}
 
-	local seriesPageExists = Page.exists(series)
+	iconDisplay = iconDisplay or self:_createSeriesIcon(seriesArgs)
 
-	local output = LeagueIcon.display{
-		icon = options.displayManualIcons and icon or nil,
-		iconDark = options.displayManualIcons and iconDark or nil,
-		series = series,
-		abbreviation = abbreviation,
-		date = Variables.varDefault('tournament_enddate'),
-		options = { noLink = not seriesPageExists }
-	}
-
-	if output == LeagueIcon.display{} then
-		output = ''
-	else
-		output = output .. ' '
-		if options.shouldSetVariable then
-			League:_setIconVariable(output, icon, iconDark)
-		end
+	if String.isNotEmpty(iconDisplay) then
+		iconDisplay = iconDisplay .. ' '
 	end
 
-	if not seriesPageExists then
-		if String.isEmpty(abbreviation) then
-			output = output .. series
-		else
-			output = output .. abbreviation
-		end
-	elseif String.isEmpty(abbreviation) then
-		output = output .. '[[' .. series .. '|' .. series .. ']]'
-	else
-		output = output .. '[[' .. series .. '|' .. abbreviation .. ']]'
-	end
+	local abbreviation = Logic.emptyOr(seriesArgs.abbreviation, seriesArgs.series)
+	local pageDisplay = Page.makeInternalLink({onlyIfExists = true}, abbreviation, seriesArgs.series)
+		or abbreviation
 
-	return output
+	return iconDisplay .. pageDisplay
 end
 
----@param iconSmallTemplate string?
----@param manualIcon string?
----@param manualIconDark string?
-function League:_setIconVariable(iconSmallTemplate, manualIcon, manualIconDark)
+---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
+---@return string?
+---@return string?
+---@return string?
+function League:getIcons(iconArgs)
+	local display = self:_createSeriesIcon(iconArgs)
+
+	if not display then
+		return iconArgs.icon, iconArgs.iconDark, nil
+	end
+
 	local icon, iconDark, trackingCategory = LeagueIcon.getIconFromTemplate{
-		icon = manualIcon,
-		iconDark = manualIconDark,
-		stringOfExpandedTemplate = iconSmallTemplate
+		icon = iconArgs.icon,
+		iconDark = iconArgs.iconDark,
+		stringOfExpandedTemplate = display
 	}
-	Variables.varDefine('tournament_icon', icon)
-	Variables.varDefine('tournament_icondark', iconDark)
 
 	if String.isNotEmpty(trackingCategory) then
-		table.insert(
-			self.warnings,
-			'Missing icon while icondark is set.'
-		)
+		table.insert(self.infobox.warnings, 'Missing icon while icondark is set.')
 	end
+
+	return icon, iconDark, display
+end
+
+---@param iconArgs {displayManualIcons:boolean, series:string?, abbreviation:string?, icon:string?, iconDark:string?}
+---@return string?
+function League:_createSeriesIcon(iconArgs)
+	if String.isEmpty(iconArgs.series) then
+		return ''
+	end
+	local series = iconArgs.series
+	---@cast series -nil
+
+	local output = LeagueIcon.display{
+		icon = iconArgs.displayManualIcons and iconArgs.icon or nil,
+		iconDark = iconArgs.displayManualIcons and iconArgs.iconDark or nil,
+		series = series,
+		abbreviation = iconArgs.abbreviation,
+		date = self.data.endDate,
+		options = {noLink = not Page.exists(series)}
+	}
+
+	return output == LeagueIcon.display{} and '' or output
 end
 
 ---@param id string?
@@ -710,13 +739,11 @@ end
 
 -- Given the format `pagename|displayname`, returns pagename or the parameter, otherwise
 ---@param item string?
----@return string
+---@return string?
 function League:_getPageNameFromChronology(item)
-	if item == nil then
-		return ''
-	end
+	if item == nil then return end
 
-	return mw.text.split(item, '|')[1]
+	return mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(item, '|')[1])
 end
 
 -- Given a series, query its abbreviation if abbreviation is not set manually

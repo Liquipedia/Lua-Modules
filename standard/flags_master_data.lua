@@ -1341,6 +1341,11 @@ local data = {
 		localised = 'African',
 		name = 'Africa',
 	},
+	['americas'] = {
+		flag = 'File:Americas flag hd.png',
+		localised = 'Americas',
+		name = 'Americas',
+	},
 	['arabia'] = {
 		flag = 'File:gcc hd.png',
 		localised = 'Arabian',
@@ -2077,7 +2082,6 @@ local aliases = {
 	-- Other
 	['alandislands'] = 'aland',
 	['america'] = 'unitedstates',
-	['americas'] = 'northamerica',
 	['arabianpeninsula'] = 'arabia',
 	['arabstatesofthepersiangulf'] = 'arabia',
 	['apac'] = 'asiapacific',

@@ -6,65 +6,59 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _args
-local _league
-
-local CustomLeague = Class.new()
+---@class MagicLeagueInfobox: InfoboxLeague
+local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+---@param frame Frame
+---@return Html
 function CustomLeague.run(frame)
-	local league = League(frame)
-	_league = league
-	_args = _league.args
+	local league = CustomLeague(frame)
+	league:setWidgetInjector(CustomInjector(league))
 
-	if _args.game == 'arena' then
-		_args.game = 'mtga'
+	if league.args.game == 'arena' then
+		league.args.game = 'mtga'
 	end
-	_args.game = Game.name{game = _args.game}
-	_args.player_number = _args.participants_number
-
-	league.createWidgetInjector = CustomLeague.createWidgetInjector
-	league.defineCustomPageVariables = CustomLeague.defineCustomPageVariables
+	league.args.game = Game.name{game = league.args.game}
+	league.args.player_number = league.args.participants_number
 
 	return league:createInfobox()
 end
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-function CustomLeague:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Game',
-		content = {_args.game}
-	})
-	table.insert(widgets, Cell{
-		name = 'Players',
-		content = {_args.player_number}
-	})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Game', content = {args.game}},
+			Cell{name = 'Players', content = {args.player_number}}
+		)
+	end
 
 	return widgets
 end
 
-function CustomLeague:defineCustomPageVariables()
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
 	--Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
 return CustomLeague

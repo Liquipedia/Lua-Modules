@@ -28,7 +28,7 @@ local BACKGROUND_CLASSES = {
 	banned = 'cinnabar-bg',
 }
 
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local CustomPortalPlayers = {}
 

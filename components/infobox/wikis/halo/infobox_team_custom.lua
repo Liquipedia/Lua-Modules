@@ -10,52 +10,23 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
-local Cell = Widgets.Cell
+---@class HaloInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 
-local CustomTeam = Class.new()
-
-local _region
-
-local CustomInjector = Class.new(Injector)
-
-local _team
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
+	local team = CustomTeam(frame)
+
 	return team:createInfobox()
 end
 
-function CustomInjector:parse(id, widgets)
-	if id == 'region' then
-		return {
-			Cell{name = 'Region', content = {CustomTeam:_createRegion(_team.args.region, _team.args.location)}}
-		}
-	end
-	return widgets
-end
-
-function CustomTeam:_createRegion(region, location)
-	region = Region.run({region = region, country = Team:getStandardLocationValue(location)})
-	_region = region.region
-
-	return region.display
-end
-
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = _region
-
-	return lpdbData
-end
-
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	return Region.run({region = region, country = self:getStandardLocationValue(self.args.location)})
 end
 
 return CustomTeam

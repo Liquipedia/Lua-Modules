@@ -7,71 +7,87 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
+local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Region = Lua.import('Module:Region')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local CustomTeam = Class.new()
+local REGION_REMAPPINGS = {
+	['south america'] = 'latin america',
+	['asia-pacific'] = 'pacific',
+	['asia'] = 'pacific',
+	['taiwan'] = 'pacific',
+	['southeast asia'] = 'pacific',
+}
+
+---@class LeagueoflegendsInfoboxTeam: InfoboxTeam
+local CustomTeam = Class.new(Team)
 local CustomInjector = Class.new(Injector)
 
-local _args
-local _team
-
+---@param frame Frame
+---@return Html
 function CustomTeam.run(frame)
-	local team = Team(frame)
-	_team = team
-	_args = _team.args
+	local team = CustomTeam(frame)
+	team:setWidgetInjector(CustomInjector(team))
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
 	team.args.manager = RoleOf.get{role = 'Manager'}
 	team.args.captain = RoleOf.get{role = 'Captain'}
 
-
-	team.createWidgetInjector = CustomTeam.createWidgetInjector
-	team.createBottomContent = CustomTeam.createBottomContent
-	team.addToLpdb = CustomTeam.addToLpdb
-	team.getWikiCategories = CustomTeam.getWikiCategories
 	return team:createInfobox()
 end
 
-function CustomTeam:createWidgetInjector()
-	return CustomInjector()
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
+
+	local regionData = Region.run{region = region} or {}
+	local remappedRegion = regionData.region and REGION_REMAPPINGS[(regionData.region or ''):lower()]
+
+	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
+---@return string?
 function CustomTeam:createBottomContent()
 	return Template.expandTemplate(
 		mw.getCurrentFrame(),
-		'Upcoming and ongoing matches of',
-		{team = _team.name}
-	) .. Template.expandTemplate(
-		mw.getCurrentFrame(),
 		'Upcoming and ongoing tournaments of',
-		{team = _team.name}
+		{team = self.name}
 	)
 end
 
-function CustomInjector:addCustomCells(widgets)
-	local args = _args
-	table.insert(widgets, Cell{
-		name = 'Abbreviation',
-		content = {args.abbreviation}
-	})
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		return {
+			Cell{name = 'Abbreviation', content = {args.abbreviation}},
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
+		}
+	end
 
 	return widgets
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	if String.isNotEmpty(args.league) then
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end
@@ -82,6 +98,8 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
 function CustomTeam:getWikiCategories(args)
 	local categories = {}
 

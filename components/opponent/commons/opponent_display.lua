@@ -15,12 +15,13 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local PlayerDisplay = Lua.import('Module:Player/Display', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Opponent = Lua.import('Module:Opponent')
+local PlayerDisplay = Lua.import('Module:Player/Display')
 
 local zeroWidthSpace = '&#8203;'
 
+---@class OpponentDisplay
 local OpponentDisplay = {propTypes = {}, types = {}}
 
 OpponentDisplay.types.TeamStyle = TypeUtil.literalUnion('standard', 'short', 'bracket', 'hybrid', 'icon')

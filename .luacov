@@ -1,0 +1,8 @@
+return {
+	configfile = '.luacov',
+	includeuntestedfiles = {'standard'},
+	include = {'standard/*'},
+	exclude = {'wikis/*'},
+	runreport = false, -- Don't work properly for some reason, have to do a manual `luacov` call afterwards
+	deletestats = true,
+}

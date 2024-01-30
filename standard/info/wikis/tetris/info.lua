@@ -445,4 +445,5 @@ return {
 
 	defaultTeamLogo = 'Tetris default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Tetris default allmode.png', ---@deprecated
+	match2 = 2,
 }
