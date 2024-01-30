@@ -188,7 +188,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultDateTimestamp then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
