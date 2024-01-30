@@ -42,7 +42,7 @@ return {
 
 		['latin america north'] = 'latam north',
 		['latin america south'] = 'latam south',
-
+		la = 'latin america',
 		lan = 'latam north',
 		las = 'latam south',
 
