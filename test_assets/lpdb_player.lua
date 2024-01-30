@@ -12,13 +12,11 @@
 
 -- luacheck: ignore
 
-local DateExt = require('Module:Date/Ext')
-
 return {
 	{
 		['alternateid'] = 'suprmane, supr2turnt, suprSayian, suprWRLD',
 		['birthdate'] = '1989-03-16',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '74410',
 		['extradata'] = {
 			['earningsin2017'] = 900,
@@ -63,7 +61,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1993-05-07',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '18038',
 		['extradata'] = {
 			['earningsin2017'] = 10988,
@@ -101,7 +99,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1999-08-03',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '225491',
 		['extradata'] = {
 			['earningsin2017'] = 1352,
@@ -144,7 +142,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1999-05-08',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '222124',
 		['extradata'] = {
 			['earningsin2017'] = 3524,
@@ -190,7 +188,7 @@ return {
 	{
 		['alternateid'] = 'BBooAF',
 		['birthdate'] = '1997-02-21',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '56737',
 		['extradata'] = {
 			['earningsin2016'] = 4750,
@@ -233,7 +231,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1995-05-09',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '354870',
 		['extradata'] = {
 			['earningsin2016'] = 1750,
@@ -276,7 +274,7 @@ return {
 	{
 		['alternateid'] = 'Psycho0',
 		['birthdate'] = '1999-02-02',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '392682',
 		['extradata'] = {
 			['earningsin2017'] = 12481,
@@ -322,8 +320,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '39346',
 		['extradata'] = {
 			['earningsin2017'] = 12481,
@@ -363,8 +361,8 @@ return {
 	},
 	{
 		['alternateid'] = 'wagao, waaaaaaaag',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '39316',
 		['extradata'] = {
 			['earningsin2017'] = 9618,
@@ -402,8 +400,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '5645',
 		['extradata'] = {
 			['earningsin2017'] = 5645,
@@ -435,8 +433,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '9796',
 		['extradata'] = {
 			['earningsin2017'] = 3446,
@@ -474,7 +472,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1997-11-22',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '261091',
 		['extradata'] = {
 			['earningsin2016'] = 4750,
@@ -517,8 +515,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '23573',
 		['extradata'] = {
 			['earningsin2016'] = 4750,
@@ -556,7 +554,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1995-04-01',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '31509',
 		['extradata'] = {
 			['earningsin2016'] = 3000,
@@ -594,7 +592,7 @@ return {
 	{
 		['alternateid'] = '',
 		['birthdate'] = '1994-02-19',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '19179',
 		['extradata'] = {
 			['earningsin2017'] = 2416,
@@ -634,8 +632,8 @@ return {
 	},
 	{
 		['alternateid'] = '',
-		['birthdate'] = DateExt.defaultDate,
-		['deathdate'] = DateExt.defaultDate,
+		['birthdate'] = '1970-01-01',
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '9661',
 		['extradata'] = {
 			['earningsin2017'] = 2111,
@@ -672,7 +670,7 @@ return {
 	{
 		['alternateid'] = 'Faker, fk',
 		['birthdate'] = '1998-11-28',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '8861',
 		['extradata'] = {
 			['earningsin2017'] = 2361,
@@ -708,7 +706,7 @@ return {
 	{
 		['alternateid'] = 'geoolicious, geoo, sleepygeo, senpapigeo, geoometrics, geonidas',
 		['birthdate'] = '1995-08-10',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '396760',
 		['extradata'] = {
 			['earningsin2017'] = 2500,
@@ -752,7 +750,7 @@ return {
 	{
 		['alternateid'] = 'ShuttleAK, ShuttleMK, Shutt',
 		['birthdate'] = '1999-06-11',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '74140',
 		['extradata'] = {
 			['earningsin2017'] = 6900,
@@ -792,7 +790,7 @@ return {
 	{
 		['alternateid'] = 'Whiteshark, Wshark',
 		['birthdate'] = '1994-08-30',
-		['deathdate'] = DateExt.defaultDate,
+		['deathdate'] = '1970-01-01',
 		['earnings'] = '7095',
 		['extradata'] = {
 			['earningsin2017'] = 116,
