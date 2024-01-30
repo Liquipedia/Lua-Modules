@@ -14,12 +14,13 @@ Generates the list of upcoming/ongoing/recent tournaments needed for the Tournam
 
 local TournamentsSummaryTable = {}
 
-local Class = require('Module:Class')
-local Table = require('Module:Table')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
-local Template = require('Module:Template')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
@@ -315,20 +316,15 @@ end
 ---@return string
 function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
-	-- fallback
-	if String.isEmpty(year) then
-		year = 1970
-	end
-	-- defaults
-	if String.isEmpty(month) then
-		month = 1
-	end
-	if String.isEmpty(day) then
-		day = 1
-	end
+	local defaultYear, defaultMonth, defaultDay = DateExt.defaultTime:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 
 	-- create time
-	local date = os.time{year=year, month=month, day=day, hour=0}
+	local date = os.time{
+		year = Logic.emptyOr(year, defaultYear),
+		month = Logic.emptyOr(month, defaultMonth),
+		day = Logic.emptyOr(day, defaultDay),
+		hour = 0
+	}
 
 	-- return date display
 	return os.date('%b %d', date) --[[@as string]]
