@@ -29,7 +29,6 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local BYE = 'bye'
 local MAX_NUM_MAPS = 30
@@ -65,7 +64,7 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTime,
 			dateexact = false,
 			timestamp = DateExt.defaultDateTimestamp,
 		}
