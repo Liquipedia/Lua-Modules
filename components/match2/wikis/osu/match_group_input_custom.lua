@@ -136,7 +136,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	--set it as finished if we have a winner
-	if not Logic.isEmpty(data.winner) then
+	if Logic.isNotEmpty(data.winner) then
 		data.finished = true
 	end
 
