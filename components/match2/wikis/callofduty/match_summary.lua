@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
@@ -14,9 +15,6 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -53,9 +51,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))

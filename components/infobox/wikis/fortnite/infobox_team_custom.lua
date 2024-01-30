@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
@@ -81,7 +82,7 @@ function CustomTeam:calculateEarnings()
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),

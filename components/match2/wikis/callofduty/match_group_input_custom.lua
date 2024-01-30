@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -24,8 +25,6 @@ local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -263,7 +262,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', EPOCH_TIME),
+			date = mw.getContentLanguage():formatDate('c', DateExt.defaultDateTime),
 			dateexact = false,
 		}
 	end

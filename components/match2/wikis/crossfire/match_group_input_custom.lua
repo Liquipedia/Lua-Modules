@@ -25,7 +25,6 @@ local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local GAME = mw.loadData('Module:GameVersion')
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
@@ -75,7 +74,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
+	local teamTemplateDate = date ~= DateExt.defaultDateTimeExtended and date or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -272,7 +271,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
