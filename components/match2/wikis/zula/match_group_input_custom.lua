@@ -95,7 +95,8 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	-- If date is default date, resolve using tournament dates instead
 	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not default date
-	teamTemplateDate = teamTemplateDate ~= DateExt.defaultDateTimeExtended and teamTemplateDate or DateExt.getContextualDateOrNow()
+	teamTemplateDate = teamTemplateDate ~= DateExt.defaultDateTimeExtended and teamTemplateDate or
+		DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
