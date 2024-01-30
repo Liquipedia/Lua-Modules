@@ -41,7 +41,6 @@ local DEFAULT_GAME = ''
 local NO_SCORE = -99
 local DUMMY_MAP = 'default'
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
@@ -113,7 +112,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local teamTemplateDate = timestamp
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	-- In order to get correct child team template, we will use an approximately date and not default date
 	if teamTemplateDate == DateExt.defaultDateTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
@@ -329,7 +328,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTime,
 			dateexact = false,
 			timestamp = DateExt.defaultDateTimestamp,
 		}
