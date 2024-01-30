@@ -15,7 +15,6 @@ local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local getIconName = require('Module:IconName').luaGet
