@@ -10,8 +10,8 @@ local Lua = require('Module:Lua')
 local ScribuntoUnit = require('Module:ScribuntoUnit')
 
 local HDB = Lua.import('Module:HiddenDataBox')
+local Logic = Lua.import('Module:Logic')
 local LpdbMock = Lua.import('Module:Mock/Lpdb')
-local String = Lua.import('Module:StringUtils')
 local Variables = Lua.import('Module:Variables')
 local WarningBox = Lua.import('Module:WarningBox')
 
@@ -54,7 +54,7 @@ function suite:testComplete()
 
 	local warning = HDB.run{parent = 'Six_Lounge_Series/4'}
 	-- Check empty warning
-	self:assertTrue(String.isEmpty(warning))
+	self:assertTrue(Logic.isEmpty(warning))
 
 	-- Check tournament wiki variables
 	self:assertEquals('Six_Lounge_Series/4', Variables.varDefault('tournament_parent'))
