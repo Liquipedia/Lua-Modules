@@ -19,6 +19,11 @@ local DateExt = {}
 -- 0000-01-01 00:00:00
 DateExt.minTimestamp = -62167219200
 
+-- default dateTime used in LPDB
+DateExt.defaultTimestamp = 0
+DateExt.defaultTime = '1970-01-01 00:00:00'
+DateExt.defaultDate = '1970-01-01'
+
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
