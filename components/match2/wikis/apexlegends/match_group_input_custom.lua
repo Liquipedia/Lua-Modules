@@ -40,7 +40,6 @@ local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_SCORE = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
@@ -83,7 +82,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local teamTemplateDate = timestamp
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
+	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
@@ -234,7 +233,7 @@ function MatchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = EPOCH_TIME,
+			date = DateExt.defaultTime,
 			dateexact = false,
 			timestamp = DateExt.defaultTimestamp,
 		}
