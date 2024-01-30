@@ -29,7 +29,7 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Stormgate default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Stormgate default darkmode.png', ---@deprecated
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
+	opponentLibrary = 'Opponent/Custom',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,
 }
