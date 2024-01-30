@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -192,14 +193,21 @@ function MatchFunctions.parseSetting(match)
 		return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 	end))
 
-	-- Up/Down colors and status
-	match.statusSettings = {
-		advTitle = match.advtitle,
-		outTitle = match.outtitle,
-		advCount = match.advteams,
-		advColor = match.advcolor,
-		outColor = match.outcolor,
-	}
+	-- Up/Down colors
+	local function splitAndTrim(s, pattern)
+		if not s then
+			return {}
+		end
+		return Array.map(mw.text.split(s, pattern), String.trim)
+	end
+
+	match.statusSettings = Array.flatMap(splitAndTrim(match.bg, ','), function (status)
+		local placements, color = unpack(splitAndTrim(status, '='))
+		local pStart, pEnd = unpack(splitAndTrim(placements, '-'))
+		return Array.map(Array.range(tonumber(pStart), tonumber(pEnd)), function()
+			return color
+		end)
+	end)
 
 	return match
 end
@@ -335,12 +343,26 @@ function MatchFunctions.getOpponents(match)
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
+	if match.finished then
+		opponents = MatchFunctions.setBgForOpponents(opponents, match.statusSettings)
+	end
+
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
 	end
 
 	return match
+end
+
+---@param opponents table
+---@param statusSettings table
+---@return table
+function MatchFunctions.setBgForOpponents(opponents, statusSettings)
+	Array.forEach(opponents, function(opponent, index)
+		opponent.extradata = {bg = statusSettings[index]}
+	end)
+	return opponents
 end
 
 --
