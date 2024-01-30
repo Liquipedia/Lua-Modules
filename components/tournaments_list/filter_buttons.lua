@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:FilterButtons
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
@@ -35,11 +43,11 @@ function FilterButtons.get(categories)
 
 	local div = mw.html.create('div')
 
-	for index, category in ipairs(categories) do
+	Array.forEach(categories, function(category)
 		-- Variable used to pass default values on to other modules using these.
 		Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
 		div:node(FilterButtons.getButtonRow(category))
-	end
+	end)
 
 	return div
 end
