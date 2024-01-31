@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -38,7 +39,6 @@ local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -300,7 +300,7 @@ function matchFunctions.readDate(matchArgs)
 		local suggestedDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME
+			DateExt.defaultDateTime
 		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),

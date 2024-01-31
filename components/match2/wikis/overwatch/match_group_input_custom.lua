@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -23,7 +24,6 @@ local _MAX_NUM_MAPS = 9
 local _DEFAULT_BESTOF = 3
 local _NO_SCORE = -99
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d', os.time())
 
 -- containers for process helper functions
@@ -71,10 +71,10 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == EPOCH_TIME_EXTENDED then
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	if teamTemplateDate == DateExt.defaultDateTimeExtended then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -274,7 +274,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
