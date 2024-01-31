@@ -88,6 +88,6 @@ describe('prize pool', function()
 	end)
 
 	it('prize pool looks correctly', function()
-		GoldenTest('prize pool looks correctly', tostring(PrizePool(prizePoolArgs):create():build()))
+		GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
 	end)
 end)
