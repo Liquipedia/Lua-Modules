@@ -424,6 +424,7 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
 	obj.patch = Logic.emptyOr(obj.patch, parent.patch, Variables.varDefault('tournament_patch'))
 	obj.date = Logic.emptyOr(obj.date, parent.date)
+	obj.mode = Logic.emptyOr(obj.mode, parent.mode)
 
 	return obj
 end
