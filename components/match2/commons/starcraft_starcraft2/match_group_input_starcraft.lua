@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
@@ -82,7 +83,7 @@ function StarcraftMatchGroupInput._readDate(matchArgs)
 			'Match_date',
 			'tournament_startdate',
 			'tournament_enddate',
-			'1970-01-01'
+			DateExt.defaultDate
 		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
