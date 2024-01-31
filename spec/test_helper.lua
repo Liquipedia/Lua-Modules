@@ -28,6 +28,13 @@ local function setupForTesting()
 	package.path = '?.lua;' ..
 			'standard/?.lua;' .. -- Load std folder
 			'components/match2/commons/?.lua;' .. -- Load m2 folder
+			'components/prize_pool/commons/?.lua;' .. -- Load ppt folder
+			'components/infobox/commons/?.lua;' .. -- Load infobox folder
+			'components/opponent/commons/?.lua;' .. -- Load opponent folder
+			'standard/info/commons/?.lua;' .. -- Load info folder
+			'standard/region/commons/?.lua;' .. -- Load region folder
+			'standard/tier/commons/?.lua;' .. -- Load tier folder
+			'components/widget/?.lua;' .. -- Load widget folder
 			package.path
 
 	local require_original = require
@@ -41,30 +48,6 @@ local function setupForTesting()
 
 		if fileExists(newName) then
 			return require_original(newName)
-		end
-
-		if newName == 'info' then
-			return require_original('info.commons.info')
-		end
-
-		if newName == 'region' or newName == 'region_data' then
-			return require_original('region.commons.' .. newName)
-		end
-
-		if newName == 'opponent' then
-			return require_original('components.opponent.commons.opponent')
-		end
-
-		if newName == 'tier_utils' or newName == 'tier_data' then
-			return require_original('tier.commons.' .. newName)
-		end
-
-		if newName == 'opponent_display' then
-			return require('components.opponent.commons.opponent_display')
-		end
-
-		if newName == 'player_display' then
-			return require('components.opponent.commons.player_display')
 		end
 
 		if newName == 'feature_flag_config' then
@@ -84,6 +67,10 @@ local function setupForTesting()
 			}
 		end
 
+		if newName == 'points_data' then
+			return {points = {title = 'Points'}}
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
@@ -94,6 +81,27 @@ local function setupForTesting()
 
 		return mocked_import
 	end
+end
+
+local function writeGolden(filename, data)
+	local file = assert(io.open(filename, 'w+'))
+	file:write(data)
+end
+
+function GoldenTest(testname, actual)
+	local filename = 'spec/golden_masters/' .. testname .. '.txt'
+	local file = io.open(filename, 'r')
+
+	---@diagnostic disable-next-line: undefined-field
+	if not file or _G.updategolden == true then
+		writeGolden(filename, actual)
+		return
+	end
+
+	local expected = file:read('*a')
+	file:close()
+
+	require('luassert').are_same(expected, actual)
 end
 
 require('busted').subscribe({'suite', 'start'}, setupForTesting)
