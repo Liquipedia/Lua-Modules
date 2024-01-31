@@ -11,12 +11,13 @@ local Lua = require('Module:Lua')
 
 local Patch = Lua.import('Module:Infobox/Patch')
 
-local CustomPatch = Class.new()
+---@class CustomPatchInfobox: PatchInfobox
+local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
 ---@return Html
 function CustomPatch.run(frame)
-	local customPatch = Patch(frame)
+	local customPatch = CustomPatch(frame)
 	return customPatch:createInfobox()
 end
 
