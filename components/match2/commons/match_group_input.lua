@@ -41,6 +41,18 @@ local VALID_GSL_GROUP_STYLES = {
 	'losersfirst',
 }
 
+function MatchGroupInput._applyTournamentVarsToMaps(match)
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
+end
+
+function MatchGroupInput._processMatch(matchArgs)
+	local match = WikiSpecific.processMatch(matchArgs)
+	MatchGroupInput._applyTournamentVarsToMaps(match)
+	return match
+end
+
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
 
@@ -64,7 +76,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = WikiSpecific.processMatch(matchArgs)
+			local match = MatchGroupInput._processMatch(matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -135,7 +147,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = WikiSpecific.processMatch(matchArgs)
+		local match = MatchGroupInput._processMatch(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
