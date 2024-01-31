@@ -26,7 +26,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
@@ -73,7 +72,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
+	local teamTemplateDate = date ~= DateExt.defaultDateTime and date or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -137,7 +136,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	--set it as finished if we have a winner
-	if not String.isEmpty(data.winner) then
+	if Logic.isNotEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -270,7 +269,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -371,7 +370,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true

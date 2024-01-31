@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local HeroData = mw.loadData('Module:HeroData')
@@ -79,7 +80,7 @@ function CustomMatchGroupInput._readDate(matchArgs)
 	suggestedDate = suggestedDate or Variables.varDefaultMulti(
 		'tournament_startdate',
 		'tournament_enddate',
-		'1970-01-01'
+		DateExt.defaultDate
 	)
 
 	return {
