@@ -48,7 +48,6 @@ function CustomMatchGroupInput.processMatch(match)
 	)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
-	matchFunctions.applyTournamentVarsToMaps(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
 
@@ -387,14 +386,6 @@ function matchFunctions.getOpponents(match)
 		match['opponent' .. opponentIndex] = opponent
 	end
 	return match
-end
-
--- Apply Tournament Variables to map
-function matchFunctions.applyTournamentVarsToMaps(match)
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		map.mode = Logic.emptyOr(map.mode, match.mode)
-		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
-	end
 end
 
 --

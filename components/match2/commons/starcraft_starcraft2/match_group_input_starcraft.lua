@@ -686,13 +686,6 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		server = map.server,
 	}
 
-	-- inherit stuff from match data
-	map.type = match.type
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = match.game
-	map.date = match.date
-
 	-- determine score, resulttype, walkover and winner
 	map = StarcraftMatchGroupInput._mapWinnerProcessing(map)
 

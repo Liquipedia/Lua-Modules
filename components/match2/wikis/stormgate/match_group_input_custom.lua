@@ -453,9 +453,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		displayname = map.mapDisplayName,
 	}
 
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
-
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
 

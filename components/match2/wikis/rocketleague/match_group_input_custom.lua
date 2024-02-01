@@ -61,7 +61,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
 	return map
@@ -452,11 +451,6 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 		elseif Table.includes(ALLOWED_STATUSES, op2.status) then return true
 		else return true end
 	end
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '3v3'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)
