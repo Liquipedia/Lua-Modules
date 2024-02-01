@@ -329,10 +329,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		comment = map.comment,
 	}
 
-	-- inherit stuff from match data
-	MatchGroupInput.getCommonTournamentVars(map, match)
-	map.date = Logic.emptyOr(map.date, match.date)
-
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
 

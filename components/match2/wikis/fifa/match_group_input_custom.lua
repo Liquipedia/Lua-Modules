@@ -357,9 +357,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(match, map),
 	}
 
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
-
 	-- determine score, resulttype, walkover and winner
 	CustomMatchGroupInput._mapWinnerProcessing(map)
 

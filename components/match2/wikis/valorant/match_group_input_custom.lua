@@ -357,14 +357,8 @@ function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.patch = Logic.emptyOr(match.patch, Variables.varDefault('patch'))
-	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	--inherit from match to maps
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
-	end
-
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 ---@param match table

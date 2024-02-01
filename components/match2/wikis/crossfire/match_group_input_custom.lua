@@ -400,9 +400,6 @@ function mapFunctions.getScoresAndWinner(map)
 end
 
 function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-
-	map = MatchGroupInput.getCommonTournamentVars(map)
 	map.game = GAME[map.game]
 
 	return map

@@ -55,7 +55,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = CustomMatchGroupInput.getTournamentVars(map)
 
 	return map
 end
