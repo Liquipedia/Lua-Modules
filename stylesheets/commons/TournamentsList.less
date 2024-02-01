@@ -128,6 +128,44 @@ html.theme--dark .tournaments-list-tag > * {
 	color: rgba( 0, 0, 0, 0.8 );
 }
 
+@tournament-tag-colors: {
+	@tier1: {
+		@background-color: var( --tournament-tag-tier1-background-color, #31519c );
+		@border-color: var( --tournament-tag-tier1-border-color, #31519c );
+		@chip-background-color: var( --tournament-tag-tier1-chip-background-color, #31519c );
+	}
+	@tier2: {
+		@background-color: var( --tournament-tag-tier2-background-color, #e5f4c6 );
+		@border-color: var( --tournament-tag-tier2-border-color, #e5f4c6 );
+		@chip-background-color: var( --tournament-tag-tier2-chip-background-color, #e5f4c6 );
+	}
+	@tier3: {
+		@background-color: var( --tournament-tag-tier3-background-color, #f9f0c7 );
+		@border-color: var( --tournament-tag-tier3-border-color, #f9f0c7 );
+		@chip-background-color: var( --tournament-tag-tier3-chip-background-color, #f9f0c7 );
+	}
+	@tier4: {
+		@background-color: var( --tournament-tag-tier4-background-color, #f9dec7 );
+		@border-color: var( --tournament-tag-tier4-border-color, #f9dec7 );
+		@chip-background-color: var( --tournament-tag-tier4-chip-background-color, #f9dec7 );
+	}
+	@tier5: {
+		@background-color: var( --tournament-tag-tier5-background-color, #dbeded );
+		@border-color: var( --tournament-tag-tier5-border-color, #dbeded );
+		@chip-background-color: var( --tournament-tag-tier5-chip-background-color, #dbeded );
+	}
+	@misc: {
+		@background-color: var( --tournament-tag-misc-background-color, #e5f4c6 );
+		@border-color: var( --tournament-tag-misc-border-color, #e5f4c6 );
+		@chip-background-color: var( --tournament-tag-misc-chip-background-color, #e5f4c6 );
+	}
+	@qualifier: {
+		@background-color: var( --tournament-tag-qualifier-background-color, #f4ddea );
+		@border-color: var( --tournament-tag-qualifier-border-color, #f4ddea );
+		@chip-background-color: var( --tournament-tag-qualifier-chip-background-color, #f4ddea );
+	}
+}
+
 .tournament-badge {
 	height: 1.25rem;
 	width: 3.75rem;
@@ -138,28 +176,31 @@ html.theme--dark .tournaments-list-tag > * {
 	justify-content: center;
 	align-items: center;
 
-	&__text {}
-
-	&__ chip {}
-
-	&--tier1 {
-        background-color: var( --tournament-tag-tier1-badge-background-color, #998000 );
+	.badge--tier1 {
+		background-color: var( --tournament-tag-tier1-badge-background-color, #998000 );
 		border-color: var( --tournament-tag-tier1-badge-border-color, #665400 );
 	}
 
-	&--tier2 {
-        background-color: var( --tournament-tag-tier2-badge-background-color, #998000 );
-		border-color: var( --tournament-tag-tier2-badge-border-color, #665400 );
-    }
+	.badge--tier2 {
+		background-color: var( --tournament-tag-tier2-badge-background-color, #557177 );
+		border-color: var( --tournament-tag-tier2-badge-border-color, #06282D );
+	}
 
-	&--tier3 {
-        background-color: var( --tournament-tag-tier3-badge-background-color, #998000 );
-		border-color: var( --tournament-tag-tier3-badge-border-color, #665400 );
-    }
-}
+	.badge--tier3 {
+		background-color: var( --tournament-tag-tier3-badge-background-color, #80704C );
+		border-color: var( --tournament-tag-tier3-badge-border-color, #2E2205 );
+	}
 
-.tournament-chip {
-    &--tier1 {
-        background-color: var( --tournament-tag-tier1-chip-background-color, #998000 );
-    }
+	&__chip {
+
+		.chip--tier1 {
+			background-color: var( --tournament-badge-tier1-chip-background-color, #998000 );
+		}
+
+		.chip--tier2 {
+			background-color: var( --tournament-badge-tier2-chip-background-color, #998000 );
+		}
+	}
+
+	&__text {}
 }
