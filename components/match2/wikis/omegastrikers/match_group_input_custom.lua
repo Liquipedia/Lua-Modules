@@ -70,7 +70,6 @@ function CustomMatchGroupInput.processMap(map)
 
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
 	return map
@@ -121,11 +120,6 @@ function matchFunctions.readDate(matchArgs)
 	return matchArgs.date
 		and MatchGroupInput.readDate(matchArgs.date)
 		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
-end
-
-function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getVodStuff(match)

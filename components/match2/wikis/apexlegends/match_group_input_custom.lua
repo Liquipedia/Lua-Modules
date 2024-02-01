@@ -167,7 +167,6 @@ function MatchFunctions.adjustMapData(match)
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
-		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
 
 		if map.map == DUMMY_MAP_NAME then
@@ -470,13 +469,6 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map, indexedScores
-end
-
----@param map table
----@return table
-function MapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 --
