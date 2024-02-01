@@ -22,7 +22,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
-local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
