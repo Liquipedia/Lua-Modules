@@ -78,7 +78,7 @@ function Company:createInfobox()
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
-							name = 'Cumulative Prize Pool',
+							name = 'Awarded Prize Pools',
 							content = {self:_getOrganizerPrizepools()}
 						}
 					}
