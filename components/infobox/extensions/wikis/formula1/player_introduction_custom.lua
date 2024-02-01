@@ -23,7 +23,7 @@ local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_DRIVER = 'driver'
 local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
-local DEFAULT_DATE = '1970-01-01'
+local DEFAULT_DATE = 'DateExt.defaultDate'
 
 ---@class playerIntroArgsValues
 ---@field [1] string?
