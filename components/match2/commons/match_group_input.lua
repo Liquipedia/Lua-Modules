@@ -371,6 +371,8 @@ Using the team template extension, the opponent struct is standardised and not u
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
+		record.icon = opponent.icon or record.icon
+		record.icondark = opponent.icondark or record.icondark
 
 	elseif Opponent.typeIsParty(opponent.type) then
 		record.match2players = record.match2players
