@@ -26,7 +26,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
@@ -48,7 +47,6 @@ function CustomMatchGroupInput.processMatch(match)
 	)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
-	matchFunctions.applyTournamentVarsToMaps(match)
 	match = matchFunctions.getVodStuff(match)
 	match = matchFunctions.getExtraData(match)
 
@@ -72,7 +70,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date ~= EPOCH_TIME_EXTENDED and date or DateExt.getContextualDateOrNow()
+	local teamTemplateDate = date ~= DateExt.defaultDateTime and date or DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -269,7 +267,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -365,7 +363,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -382,14 +380,6 @@ function matchFunctions.getOpponents(match)
 		match['opponent' .. opponentIndex] = opponent
 	end
 	return match
-end
-
--- Apply Tournament Variables to map
-function matchFunctions.applyTournamentVarsToMaps(match)
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		map.mode = Logic.emptyOr(map.mode, match.mode)
-		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
-	end
 end
 
 --

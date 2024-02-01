@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -40,7 +41,6 @@ local _DEFAULT_GAME = 'dota2'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -98,7 +98,6 @@ function CustomMatchGroupInput.processMap(map)
 		map.map = nil
 	end
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -113,14 +112,14 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	-- If date if default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	if teamTemplateDate == DateExt.defaultDateTimeExtended then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			DateExt.defaultDateTimeExtended
 		)
 	end
 
@@ -322,7 +321,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -400,7 +399,7 @@ function matchFunctions.isFeatured(match)
 
 	local opponent1, opponent2 = match.opponent1, match.opponent2
 	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
-	if year == '1970' then
+	if year == DateExt.deaultYear then
 		return false
 	end
 	if tonumber(month) < 3 then
@@ -612,12 +611,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	map.game = Logic.emptyOr(map.game, Variables.varDefault('tournament_game', _DEFAULT_GAME))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 return CustomMatchGroupInput

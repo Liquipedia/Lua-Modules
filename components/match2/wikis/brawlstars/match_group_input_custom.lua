@@ -56,7 +56,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
 	return map
@@ -349,11 +348,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)

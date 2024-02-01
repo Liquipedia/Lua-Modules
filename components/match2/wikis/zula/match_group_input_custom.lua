@@ -46,8 +46,6 @@ local MAX_NUM_OPPONENTS = 2
 local DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
@@ -76,7 +74,6 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 
@@ -93,10 +90,11 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	teamTemplateDate = teamTemplateDate ~= EPOCH_TIME_EXTENDED and teamTemplateDate or DateExt.getContextualDateOrNow()
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	teamTemplateDate = teamTemplateDate ~= DateExt.defaultDateTimeExtended and teamTemplateDate or
+		DateExt.getContextualDateOrNow()
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -321,7 +319,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -536,11 +534,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 return CustomMatchGroupInput

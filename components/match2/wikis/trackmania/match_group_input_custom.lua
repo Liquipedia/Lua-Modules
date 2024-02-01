@@ -50,7 +50,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -353,11 +352,6 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	if op1norm and op2norm then
 		return tonumber(op1.score) > tonumber(op2.score)
 	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 return CustomMatchGroupInput

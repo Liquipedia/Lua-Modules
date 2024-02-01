@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -24,8 +25,6 @@ local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local MATCH_BYE = {'bye', 'BYE'}
-
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -56,7 +55,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -71,14 +69,14 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
+	-- If date if default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	if teamTemplateDate == DateExt.defaultDateTimeExtended then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
+			DateExt.defaultDateTimeExtended
 		)
 	end
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -273,7 +271,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = _EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -437,11 +435,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 return CustomMatchGroupInput

@@ -10,6 +10,7 @@ local AnOrA = require('Module:A or an')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -23,7 +24,6 @@ local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_PLAYER = 'player'
 local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
-local DEFAULT_DATE = '1970-01-01'
 
 ---@class playerIntroArgsValues
 ---@field [1] string?
@@ -211,8 +211,8 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, playerInfo.extradata.game, args.defaultGame),
 		id = Logic.emptyOr(args.id, playerInfo.id),
-		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate, DEFAULT_DATE),
-		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate, DEFAULT_DATE),
+		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate, DateExt.defaultDate),
+		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate, DateExt.defaultDate),
 		nationality = Logic.emptyOr(args.nationality, playerInfo.nationality),
 		nationality2 = Logic.emptyOr(args.nationality2, playerInfo.nationality2),
 		nationality3 = Logic.emptyOr(args.nationality3, playerInfo.nationality3),
@@ -396,7 +396,7 @@ function PlayerIntroduction:create()
 		return ''
 	end
 
-	local isDeceased = self.playerInfo.deathDate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
+	local isDeceased = self.playerInfo.deathDate ~= DateExt.defaultDate or self.playerInfo.status == 'passed away'
 
 	local statusDisplay = self:_statusDisplay(isDeceased)
 	local nationalityDisplay = self:_nationalityDisplay()
@@ -453,7 +453,7 @@ end
 ---@param isDeceased boolean
 ---@return string
 function PlayerIntroduction:_bornDisplay(isDeceased)
-	if self.playerInfo.birthDate == DEFAULT_DATE then
+	if self.playerInfo.birthDate == DateExt.defaultDate then
 		return ''
 	end
 
@@ -463,7 +463,7 @@ function PlayerIntroduction:_bornDisplay(isDeceased)
 
 	if not isDeceased then
 		return ' (born ' .. displayDate(self.playerInfo.birthDate) .. ')'
-	elseif self.playerInfo.deathDate ~= DEFAULT_DATE then
+	elseif self.playerInfo.deathDate ~= DateExt.defaultDate then
 		return ' ('
 			.. displayDate(self.playerInfo.birthDate)
 			.. ' – '
@@ -566,6 +566,8 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 end
 
+---@param isCurrentTense boolean
+---@return string
 function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
@@ -588,6 +590,9 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 	return ' playing for'
 end
 
+---@param team string
+---@param date string
+---@return string
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 

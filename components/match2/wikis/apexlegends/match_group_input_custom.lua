@@ -41,7 +41,6 @@ local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_SCORE = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
@@ -81,10 +80,10 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
@@ -167,7 +166,6 @@ function MatchFunctions.adjustMapData(match)
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
-		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
 
 		if map.map == DUMMY_MAP_NAME then
@@ -241,9 +239,9 @@ function MatchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = EPOCH_TIME,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
-			timestamp = DateExt.epochZero,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
@@ -324,7 +322,7 @@ function MatchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT or SECONDS_UNTIL_FINISHED_NOT_EXACT
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -465,13 +463,6 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map, indexedScores
-end
-
----@param map table
----@return table
-function MapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 return CustomMatchGroupInput

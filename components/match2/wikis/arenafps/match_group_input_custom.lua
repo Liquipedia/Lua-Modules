@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -25,8 +26,6 @@ local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
 local MATCH_BYE = 'bye'
-
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -73,12 +72,12 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	local teamTemplateDate = date
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == EPOCH_TIME_EXTENDED then
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultDateTimeExtended then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			EPOCH_TIME_EXTENDED
+			DateExt.defaultDateTimeExtended
 		)
 	end
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -271,7 +270,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -414,7 +413,7 @@ end
 
 function mapFunctions.getTournamentVars(map)
 	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
+	return map
 end
 
 return CustomMatchGroupInput

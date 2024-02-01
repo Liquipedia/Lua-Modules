@@ -9,9 +9,29 @@ liquipedia.battleRoyale = {
 	ICON_SORT: 'fa-arrows-alt-v',
 	ICON_SORT_UP: 'fa-long-arrow-alt-up',
 	ICON_SORT_DOWN: 'fa-long-arrow-alt-down',
+	instancesLoaded: {},
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
+
+	implementOnElementResize: function( instanceId ) {
+		this.instancesLoaded[ instanceId ] = false;
+
+		// eslint-disable-next-line compat/compat
+		const obs = new ResizeObserver( ( entries ) => {
+			for ( const entry of entries ) {
+				if ( entry.borderBoxSize[ 0 ].blockSize > 0 && !this.instancesLoaded[ instanceId ] ) {
+					this.instancesLoaded[ instanceId ] = true;
+					this.battleRoyaleInstances[ instanceId ]
+						.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
+						.forEach( ( tableEl ) => {
+							this.recheckSideScrollButtonStates( tableEl );
+						} );
+				}
+			}
+		} );
+		obs.observe( document.querySelector( `[data-js-battle-royale-id=${ instanceId }]` ) );
+	},
 
 	implementOnWindowResize: function( instanceId ) {
 		window.addEventListener( 'resize', () => {
@@ -395,6 +415,7 @@ liquipedia.battleRoyale = {
 
 			this.implementScrollendEvent( instanceId );
 			this.implementOnWindowResize( instanceId );
+			this.implementOnElementResize( instanceId );
 			this.implementScrollWheelEvent();
 
 		}.bind( this ) );

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local MathUtil = require('Module:MathUtil')
@@ -29,7 +30,6 @@ local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local TODAY = os.date('%Y-%m-%d')
 
 -- containers for process helper functions
@@ -76,10 +76,10 @@ function CustomMatchGroupInput.processOpponent(record, date)
 	end
 
 	local teamTemplateDate = date
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == EPOCH_TIME_EXTENDED then
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	if teamTemplateDate == DateExt.defaultDateTimeExtended then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -318,7 +318,7 @@ function matchFunctions.readDate(matchArgs)
 		return dateProps
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
 		}
 	end
@@ -328,14 +328,8 @@ function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
 	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	--inherit from match to maps
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
-	end
-
-	return match
+	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
 function matchFunctions.getLinks(match)
