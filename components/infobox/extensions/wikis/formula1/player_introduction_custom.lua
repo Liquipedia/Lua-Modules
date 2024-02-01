@@ -10,6 +10,7 @@ local AnOrA = require('Module:A or an')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -20,10 +21,9 @@ local DEFAULT_DATAPOINT_LEAVE_DATE = '2999-01-01'
 local TRANSFER_STATUS_FORMER = 'former'
 local TRANSFER_STATUS_LOAN = 'loan'
 local TRANSFER_STATUS_CURRENT = 'current'
-local TYPE_DRIVER = 'driver'
+local TYPE_Driver = 'driver'
 local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
-local DEFAULT_DATE = 'DateExt.defaultDate'
 
 ---@class playerIntroArgsValues
 ---@field [1] string?
@@ -82,16 +82,6 @@ end
 ---@return string
 function DriverIntroduction.run(args)
 	return DriverIntroduction(args):queryDriverInfo():queryTransferData(true):adjustData():create()
-end
-
--- template entry point for DriverTeamAuto
----@param frame Frame
----@return string
-function DriverIntroduction.templateDriverTeamAuto(frame)
-	local args = Arguments.getArgs(frame)
-	local team, team2 = DriverIntroduction.DriverTeamAuto(args)
-
-	return args.team == 'team2' and (team2 or '') or team or ''
 end
 
 -- module entry point for DriverTeamAuto
@@ -211,8 +201,8 @@ function DriverIntroduction:_parseDriverInfo(args, driverInfo)
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, driverInfo.extradata.game, args.defaultGame),
 		id = Logic.emptyOr(args.id, driverInfo.id),
-		birthDate = Logic.emptyOr(args.birthdate, driverInfo.birthdate, DEFAULT_DATE),
-		deathDate = Logic.emptyOr(args.deathdate, driverInfo.deathdate, DEFAULT_DATE),
+		birthDate = Logic.emptyOr(args.birthdate, driverInfo.birthdate, DateExt.defaultDate),
+		deathDate = Logic.emptyOr(args.deathdate, driverInfo.deathdate, DateExt.defaultDate),
 		nationality = Logic.emptyOr(args.nationality, driverInfo.nationality),
 		nationality2 = Logic.emptyOr(args.nationality2, driverInfo.nationality2),
 		nationality3 = Logic.emptyOr(args.nationality3, driverInfo.nationality3),
@@ -453,7 +443,7 @@ end
 ---@param isDeceased boolean
 ---@return string
 function DriverIntroduction:_bornDisplay(isDeceased)
-	if self.driverInfo.birthDate == DEFAULT_DATE then
+	if self.driverInfo.birthDate == DateExt.defaultDate then
 		return ''
 	end
 
@@ -463,7 +453,7 @@ function DriverIntroduction:_bornDisplay(isDeceased)
 
 	if not isDeceased then
 		return ' (born ' .. displayDate(self.driverInfo.birthDate) .. ')'
-	elseif self.driverInfo.deathDate ~= DEFAULT_DATE then
+	elseif self.driverInfo.deathDate ~= DateExt.defaultDate then
 		return ' ('
 			.. displayDate(self.driverInfo.birthDate)
 			.. ' – '
@@ -614,4 +604,4 @@ function DriverIntroduction._addConcatText(text, delimiter, suffix)
 		or (delimiter .. text)
 end
 
-return DriverIntroduction
+return PlayerIntroduction
