@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -40,7 +41,6 @@ local DEFAULT_MODE = 'team'
 local NO_SCORE = -99
 local DUMMY_MAP = 'default'
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local EPOCH_TIME = '1970-01-01 00:00:00'
 local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
@@ -301,7 +301,7 @@ function matchFunctions.readDate(matchArgs)
 		local suggestedDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			EPOCH_TIME
+			DateExt.defaultDateTime
 		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),

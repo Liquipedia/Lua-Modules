@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -18,9 +19,6 @@ local StrikerIcon = require('Module:StrikerIcon')
 local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local ICONS = {
 	check = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
@@ -126,9 +124,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))

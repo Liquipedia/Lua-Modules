@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -110,7 +111,7 @@ function MatchesTable:buildConditions()
 	local config = self.config
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, '1970-01-01')}
+		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
 
 	local pageConditions = ConditionTree(BooleanOperator.any)
 	for _, page in pairs(config.pages --[[@as string[] ]]) do

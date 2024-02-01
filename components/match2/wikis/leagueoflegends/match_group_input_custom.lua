@@ -40,7 +40,6 @@ local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -119,8 +118,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local teamTemplateDate = timestamp
 	-- If date if epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -334,9 +333,9 @@ function matchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = EPOCH_TIME_EXTENDED,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
-			timestamp = DateExt.epochZero,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
@@ -486,7 +485,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	if isScoreSet and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
 			or SECONDS_UNTIL_FINISHED_NOT_EXACT
 		if match.timestamp + threshold < CURRENT_TIME_UNIX then
