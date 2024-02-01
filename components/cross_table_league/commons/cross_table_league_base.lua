@@ -181,7 +181,7 @@ function CrossTableLeague:query()
 	end
 
 	if not config.dateLess then
-		table.insert(conditions, '([[date::!1970-01-01 00:00:00]] OR [[finished::1]])')
+		table.insert(conditions, '([[date::!' .. DateExt.defaultDateTime .. ']] OR [[finished::1]])')
 	end
 
 	self.matches = self:_filterAndSortMatches(mw.ext.LiquipediaDB.lpdb('match2', {
