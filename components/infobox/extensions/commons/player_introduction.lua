@@ -566,6 +566,8 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 end
 
+---@param isCurrentTense boolean
+---@return string
 function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
@@ -588,6 +590,9 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 	return ' playing for'
 end
 
+---@param team string
+---@param date string
+---@return string
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 
