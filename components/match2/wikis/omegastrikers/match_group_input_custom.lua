@@ -122,6 +122,11 @@ function matchFunctions.readDate(matchArgs)
 		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
 end
 
+function matchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	return MatchGroupInput.getCommonTournamentVars(match)
+end
+
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -311,11 +316,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
 end
 
 function mapFunctions.getParticipantsData(map)
