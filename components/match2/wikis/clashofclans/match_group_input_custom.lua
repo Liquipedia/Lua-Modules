@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -26,15 +27,11 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 local NO_SCORE = -99
-local SECONDS_UNTIL_FINISHED_EXACT = 30800
-local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -89,7 +86,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
@@ -185,7 +182,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 				end
 			end
 			if last.score == score and last.time == opp.time and last.percentage == opp.percentage then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or lastPlacement
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or last.placement
 			else
 				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
 				last = {
@@ -305,13 +302,12 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
+		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = mw.getContentLanguage():formatDate('c', EPOCH_TIME),
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
@@ -327,9 +323,6 @@ function matchFunctions.getVodStuff(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
 	match.links = {}
-	local links = match.links
-	if match.reddit then links.reddit = 'https://redd.it/' .. match.reddit end
-	if match.cdl then links.cdl = 'https://callofdutyleague.com/en-us/match/' .. match.cdl end
 
 	return match
 end
@@ -369,10 +362,6 @@ function matchFunctions.getOpponents(match)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
-			end
 			-- apply status
 			if Logic.isNumeric(opponent.score) then
 				opponent.status = 'S'
@@ -412,13 +401,9 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdate]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
-			or SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < currentUnixTime then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
+		local threshold = match.dateexact and 30800 or 86400
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
@@ -474,7 +459,7 @@ function mapFunctions.readPercentages(map)
 	for _, percentage in Table.iter.pairsByPrefix(map, 'percent') do
 		table.insert(percentages, tonumber(percentage) or 0)
 	end
-	
+
 	return percentages
 end
 
@@ -492,7 +477,7 @@ function mapFunctions.readTimes(map)
 
 		table.insert(timesInSeconds, MathUtil.sum(timeFragments))
 	end
-	
+
 	return timesInSeconds
 end
 
@@ -524,23 +509,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

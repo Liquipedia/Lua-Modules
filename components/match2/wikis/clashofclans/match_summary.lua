@@ -7,28 +7,17 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Date = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local SCORE_STATUS = 'S'
-
-local LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	cdl = {icon = 'File:Call of Duty League Logo Small.png', text = 'Call of Duty League matchpage'},
-	reddit = {icon = 'File:Reddit-icon.png', text = 'Reddit stats'},
-}
 
 local CustomMatchSummary = {}
 
@@ -42,9 +31,7 @@ end
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(MatchLinks, match.links)
+	return MatchSummary.addVodsToFooter(match, footer)
 end
 
 function CustomMatchSummary.createHeader(match)
@@ -60,7 +47,7 @@ function CustomMatchSummary.createHeader(match)
 		opponentLeft = Table.merge(match.opponents[1], {score = (match.games[1].scores or {})[1] or 0})
 		opponentRight = Table.merge(match.opponents[2], {score = (match.games[1].scores or {})[2] or 0})
 	end
-	
+
 
 	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:leftScore(header:createScore(opponentLeft))
@@ -73,7 +60,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= Date.defaultDateTimeExtended and match.date ~= Date.defaultDateTime) then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
