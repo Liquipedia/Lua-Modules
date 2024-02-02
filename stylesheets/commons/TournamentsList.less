@@ -128,67 +128,45 @@ html.theme--dark .tournaments-list-tag > * {
 	color: rgba( 0, 0, 0, 0.8 );
 }
 
-@tournament-tag-colors: {
-	@tier1: {
-		@background-color: var( --tournament-tag-tier1-background-color, #998000 );
-		@border-color: var( --tournament-tag-tier1-border-color, #665400 );
-		@chip-background-color: var( --tournament-tag-tier1-chip-background-color, #998000 );
-	}
-	@tier2: {
-		@background-color: var( --tournament-tag-tier2-background-color, #557177 );
-		@border-color: var( --tournament-tag-tier2-border-color, #06282D );
-		@chip-background-color: var( --tournament-tag-tier2-chip-background-color, #557177 );
-	}
-	@tier3: {
-		@background-color: var( --tournament-tag-tier3-background-color, #80704C );
-		@border-color: var( --tournament-tag-tier3-border-color, #2E2205 );
-		@chip-background-color: var( --tournament-tag-tier3-chip-background-color, #80704C );
-	}
-	@tier4: {
-		@background-color: var( --tournament-tag-tier4-background-color, #CC7800 );
-		@border-color: var( --tournament-tag-tier4-border-color, #331A00 );
-		@chip-background-color: var( --tournament-tag-tier4-chip-background-color, #CC7800 );
-	}
-	@tier5: {
-		@background-color: var( --tournament-tag-tier5-background-color, #646464 );
-		@border-color: var( --tournament-tag-tier5-border-color, #282828 );
-		@chip-background-color: var( --tournament-tag-tier5-chip-background-color, #646464 );
-	}
-	@misc: {
-		@background-color: var( --tournament-tag-misc-background-color, #646464 );
-		@border-color: var( --tournament-tag-misc-border-color, #282828 );
-		@chip-background-color: var( --tournament-tag-misc-chip-background-color, #646464 );
-	}
-	@qualifier: {
-		@background-color: var( --tournament-tag-qualifier-background-color, rgba(191, 13, 117, 0.24) );
-		@border-color: var( --tournament-tag-qualifier-border-color, #33001D );
-	}
-	@monthly: {
-		@background-color: var( --tournament-tag-monthly-background-color, rgba(126, 13, 191, 0.24) );
-		@border-color: var( --tournament-tag-monthly-border-color, #200033 );
-	}
-	@weekly: {
-		@background-color: var( --tournament-tag-weekly-background-color, rgba(52, 13, 191, 0.24) );
-		@border-color: var( --tournament-tag-weekly-border-color, #200033 );
-	}
-	@showmatch: {
-		@background-color: var( --tournament-tag-showmatch-background-color, rgba(13, 113, 191, 0.24) );
-		@border-color: var( --tournament-tag-showmatch-border-color, #001933 );
-	}
-}
+@tier1-background-color: var( --tournament-tag-tier1-background-color, #998000 );
+@tier1-border-color: var( --tournament-tag-tier1-border-color, #665400 );
+@tier1-chip-background-color: var( --tournament-tag-tier1-chip-background-color, #998000 );
 
-each(@tournament-tag-colors, .(@key, @value) {
-	.badge--@{key} {
-		background-color: @value[@background-color];
-		border-color: @value[@border-color];
-	}
+@tier2-background-color: var( --tournament-tag-tier2-background-color, #557177 );
+@tier2-border-color: var( --tournament-tag-tier2-border-color, #06282D );
+@tier2-chip-background-color: var( --tournament-tag-tier2-chip-background-color, #557177 );
 
-	& when (iscolor(@value[@chip-background-color])) {
-		.chip--@{key} {
-			background-color: @value[@chip-background-color];
-		}
-	}
-});
+@tier3-background-color: var( --tournament-tag-tier3-background-color, #80704C );
+@tier3-border-color: var( --tournament-tag-tier3-border-color, #2E2205 );
+@tier3-chip-background-color: var( --tournament-tag-tier3-chip-background-color, #80704C );
+
+@tier4-background-color: var( --tournament-tag-tier4-background-color, #CC7800 );
+@tier4-border-color: var( --tournament-tag-tier4-border-color, #331A00 );
+@tier4-chip-background-color: var( --tournament-tag-tier4-chip-background-color, #CC7800 );
+
+@tier5-background-color: var( --tournament-tag-tier5-background-color, #646464 );
+@tier5-border-color: var( --tournament-tag-tier5-border-color, #282828 );
+@tier5-chip-background-color: var( --tournament-tag-tier5-chip-background-color, #646464 );
+
+@misc-background-color: var( --tournament-tag-misc-background-color, #646464 );
+@misc-border-color: var( --tournament-tag-misc-border-color, #282828 );
+@misc-chip-background-color: var( --tournament-tag-misc-chip-background-color, #646464 );
+
+@qualifier-background-color: var( --tournament-tag-qualifier-background-color, rgba(191, 13, 117, 0.24) );
+@qualifier-border-color: var( --tournament-tag-qualifier-border-color, #33001D );
+@qualifier-chip-background-color: var( --tournament-tag-qualifier-background-color, rgba(191, 13, 117, 0.24) );
+
+@monthly-background-color: var( --tournament-tag-monthly-background-color, rgba(126, 13, 191, 0.24) );
+@monthly-border-color: var( --tournament-tag-monthly-border-color, #200033 );
+@monthly-chip-background-color: var( --tournament-tag-monthly-background-color, rgba(126, 13, 191, 0.24) );
+
+@weekly-background-color: var( --tournament-tag-weekly-background-color, rgba(52, 13, 191, 0.24) );
+@weekly-border-color: var( --tournament-tag-weekly-border-color, #200033 );
+@weekly-chip-background-color: var( --tournament-tag-weekly-background-color, rgba(52, 13, 191, 0.24) );
+
+@showmatch-background-color: var( --tournament-tag-showmatch-background-color, rgba(13, 113, 191, 0.24) );
+@showmatch-border-color: var( --tournament-tag-showmatch-border-color, #001933 );
+@showmatch-chip-background-color: var( --tournament-tag-showmatch-background-color, rgba(13, 113, 191, 0.24) );
 
 .tournament-badge {
 	height: 1.25rem;
@@ -215,14 +193,80 @@ each(@tournament-tag-colors, .(@key, @value) {
 		border-color: var( --tournament-tag-tier3-badge-border-color, #2E2205 );
 	}
 
-	&__chip {
+	.badge--tier4 {
+		background-color: var( --tournament-tag-tier4-badge-background-color, #CC7800 );
+		border-color: var( --tournament-tag-tier4-badge-border-color, #331A00 );
+	}
 
+	.badge--tier5 {
+		background-color: var( --tournament-tag-tier5-badge-background-color, #646464 );
+		border-color: var( --tournament-tag-tier5-badge-border-color, #282828 );
+	}
+
+	.badge--misc {
+		background-color: var( --tournament-tag-misc-badge-background-color, #646464 );
+		border-color: var( --tournament-tag-misc-badge-border-color, #282828 );
+	}
+
+	.badge--qualifier {
+		background-color: var( --tournament-tag-qualifier-badge-background-color, rgba(191, 13, 117, 0.24) );
+		border-color: var( --tournament-tag-qualifier-badge-border-color, #33001D );
+	}
+
+	.badge--monthly {
+		background-color: var( --tournament-tag-monthly-badge-background-color, rgba(126, 13, 191, 0.24) );
+		border-color: var( --tournament-tag-monthly-badge-border-color, #200033 );
+	}
+
+	.badge--weekly {
+		background-color: var( --tournament-tag-weekly-badge-background-color, rgba(52, 13, 191, 0.24) );
+		border-color: var( --tournament-tag-weekly-badge-border-color, #200033 );
+	}
+
+	.badge--showmatch {
+		background-color: var( --tournament-tag-showmatch-badge-background-color, rgba(13, 113, 191, 0.24) );
+		border-color: var( --tournament-tag-showmatch-badge-border-color, #001933 );
+	}
+
+	&__chip {
 		.chip--tier1 {
 			background-color: var( --tournament-badge-tier1-chip-background-color, #998000 );
 		}
 
 		.chip--tier2 {
 			background-color: var( --tournament-badge-tier2-chip-background-color, #998000 );
+		}
+
+		.chip--tier3 {
+			background-color: var( --tournament-badge-tier3-chip-background-color, #80704C );
+		}
+
+		.chip--tier4 {
+			background-color: var( --tournament-badge-tier4-chip-background-color, #CC7800 );
+		}
+
+		.chip--tier5 {
+			background-color: var( --tournament-badge-tier5-chip-background-color, #646464 );
+		}
+
+		.chip--misc {
+			background-color: var( --tournament-badge-misc-chip-background-color, #646464 );
+		}
+
+		.chip--qualifier {
+			background-color: var( --tournament-badge-qualifier-chip-background-color, rgba(191, 13, 117, 0.24) );
+		}
+
+		.chip--monthly {
+			background-color: var( --tournament-badge-monthly-chip-background-color, rgba(126, 13, 191, 0.24) );
+		}
+
+		.chip--weekly {
+			background-color: var( --tournament-badge-weekly-chip-background-color, rgba(52, 13, 191, 0.24) );
+		}
+
+		.chip--showmatch {
+			background-color: var( --tournament-badge-showmatch-chip-background-color, rgba(13, 113, 191, 0.24) );
 		}
 	}
 
