@@ -206,7 +206,7 @@ end
 ---@return string|number|nil # storage date
 ---@return string[] # display elements
 function Team:processCreateDates()
-	local earliestGameTimestamp = Team._parseDate(self.args.created) or Date.maxTimestamp
+	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean(self.args.created)) or Date.maxTimestamp
 
 	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
 		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
@@ -221,7 +221,7 @@ function Team:processCreateDates()
 
 		if game:lower() == 'org' then
 			icon = self:_getTeamIcon(cleanDate)
-			icon = icon and '[[File:' .. icon .. ']]' or nil
+			icon = String.isNotEmpty(icon) and '[[File:' .. icon .. ']]' or nil
 		else
 			local timestamp = Team._parseDate(cleanDate)
 			if timestamp and timestamp < earliestGameTimestamp then
@@ -263,7 +263,7 @@ function Team._parseDate(date)
 		return
 	end
 
-	return Date.readTimestamp(date)
+	return Date.readTimestampOrNil(date)
 end
 
 ---@param region string?
