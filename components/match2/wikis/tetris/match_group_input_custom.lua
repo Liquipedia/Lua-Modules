@@ -47,20 +47,13 @@ function CustomMatchGroupInput.processMatch(match)
 		error('Unexpected number of opponents in a non-FFA match')
 	end
 
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
 	match = CustomMatchGroupInput._getVodStuff(match)
 
 	return match
-end
-
-function CustomMatchGroupInput._readDate(matchArgs)
-	return MatchGroupInput.readDate(matchArgs.date)
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)

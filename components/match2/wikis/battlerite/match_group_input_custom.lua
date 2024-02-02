@@ -51,10 +51,7 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
@@ -288,10 +285,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	end
 
 	return match
-end
-
-function matchFunctions.readDate(matchArgs)
-	return MatchGroupInput.readDate(matchArgs.date)
 end
 
 function matchFunctions.getTournamentVars(match)

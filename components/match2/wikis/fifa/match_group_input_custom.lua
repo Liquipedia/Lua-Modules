@@ -41,20 +41,14 @@ local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match)
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+
 	CustomMatchGroupInput._getExtraData(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._getVodStuff(match)
 
 	return match
-end
-
-function CustomMatchGroupInput._readDate(matchArgs)
-	return MatchGroupInput.readDate(matchArgs.date)
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
