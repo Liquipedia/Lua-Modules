@@ -58,7 +58,7 @@ return {
 		},
 		{
 			value = '7',
-			sort= 'B4',
+			sort= 'A10',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Events',
@@ -66,7 +66,7 @@ return {
 		},
 		[''] = {
 			value = nil,
-			sort = 'B2',
+			sort = 'B4',
 			name = 'Undefined',
 			short = '?',
 		},
@@ -99,7 +99,7 @@ return {
 		},
 		misc = {
 			value = 'Misc',
-			sort = 'A10',
+			sort = 'B1',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Tournaments',
@@ -107,7 +107,7 @@ return {
 		},
 		showmatch = {
 			value = 'Showmatch',
-			sort = 'B1',
+			sort = 'B2',
 			name = 'Showmatch',
 			short = 'Showm.',
 			link = 'Showmatches',
