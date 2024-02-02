@@ -69,10 +69,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 function matchFunctions.adjustMapData(match)
-	local mapIndex = 1
-	while match['map'..mapIndex] do
-		match['map'..mapIndex] = mapFunctions.getExtraData(match['map'..mapIndex])
-		mapIndex = mapIndex + 1
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		match[key] = mapFunctions.getExtraData(map)
 	end
 
 	return match
