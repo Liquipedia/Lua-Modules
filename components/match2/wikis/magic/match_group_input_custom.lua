@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
---local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -19,7 +18,8 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Streams = Lua.import('Module:Links/Stream')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local UNKNOWN_REASON_LOSS_STATUS = 'L'
 local DEFAULT_WIN_STATUS = 'W'
@@ -29,12 +29,9 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t'))
---local MAX_NUM_PLAYERS_PER_MAP = 2
---local TBD = 'tbd'
---local TBA = 'tba'
-local BYE = 'bye'
+local EPOCH_TIME_EXTENDED = DateExt.defaultDateTimeExtended
+local NOW = os.time(os.date('!*t')--[[@as osdateparam]])
+local BYE = 'BYE'
 local MAX_NUM_MAPS = 30
 
 local CustomMatchGroupInput = {}
@@ -70,14 +67,13 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		return {
 			date = EPOCH_TIME_EXTENDED,
 			dateexact = false,
-			timestamp = DateExt.epochZero,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -89,18 +85,7 @@ function CustomMatchGroupInput._getVodStuff(match)
 end
 
 function CustomMatchGroupInput._getExtraData(match)
-	local casters = {}
-	for key, name in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, CustomMatchGroupInput._getCasterInformation(
-			name,
-			match[key .. 'flag'],
-			match[key .. 'name']
-		))
-	end
-
-	match.extradata = {
-		casters = Table.isNotEmpty(casters) and Json.stringify(casters) or nil
-	}
+	match.extradata = {}
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'subgroup' .. subGroupIndex
@@ -132,11 +117,7 @@ function CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._setPlacements(match)
 
 	if CustomMatchGroupInput._hasTeamOpponent(match) then
-		error('Team opponents are currently not yet supported on tetris wiki')
-		-- todo (sep PR):
-		-- Each set contains various 1v1 matches with different players, when a team wins 3 1v1s matches they win the set
-		-- First team to get 2 set, wins the complete series
-		-- match = CustomMatchGroupInput._subMatchStructure(match)
+		error('Team opponents are currently not yet supported on Magic wiki')
 	end
 
 	if Logic.isNumeric(match.winner) then
@@ -159,7 +140,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 
 		-- set the score either from manual input or sumscore
 		opponent.score = Table.includes(ALLOWED_STATUSES, string.upper(opponent.score or ''))
-			and opponent.score:upper()
+			and string.upper(opponent.score)
 			or tonumber(opponent.score) or tonumber(opponent.sumscore) or NO_SCORE
 
 		return opponent.score
@@ -211,7 +192,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.epochZero then
+	if not match.finished and match.timestamp > DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -262,11 +243,9 @@ function CustomMatchGroupInput._opponentInput(match)
 		opponent = Json.parseIfString(opponent) or Opponent.blank()
 
 		-- Convert byes to literals
-		if
-			string.lower(opponent.template or '') == BYE
-			or string.lower(opponent.name or '') == BYE
+		if Opponent.isBye(opponent)
 		then
-			opponent = {type = Opponent.literal, name = BYE:upper()}
+			opponent = {type = Opponent.literal, name = BYE}
 		end
 
 		--process input
@@ -298,7 +277,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	-- If date is epoch, resolve using tournament dates instead
 	-- Epoch indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
+	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
@@ -318,12 +297,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		record.name = record.name:gsub(' ', '_')
 	end
 
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		-- todo in sep pr:
-		--record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
-	end
-
 	return record
 end
 
@@ -340,20 +313,13 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		return match, subGroupIndex
 	end
 
-	-- Tetris has no map names, use generic one instead
+	-- Magic has no map names, use generic one instead
 	map.map = 'Game ' .. mapIndex
 
 	-- set initial extradata for maps
 	map.extradata = {
 		comment = map.comment,
 	}
-
-	-- inherit stuff from match data
-	map.type = Logic.emptyOr(map.type, match.type)
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = Logic.emptyOr(map.game, match.game)
-	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -362,10 +328,10 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	-- set sumscore to 0 if it isn't a number
-	if String.isEmpty(match.opponent1.sumscore) then
+	if Logic.isEmpty(match.opponent1.sumscore) then
 		match.opponent1.sumscore = 0
 	end
-	if String.isEmpty(match.opponent2.sumscore) then
+	if Logic.isEmpty(match.opponent2.sumscore) then
 		match.opponent2.sumscore = 0
 	end
 
@@ -433,15 +399,7 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 				participants
 			)
 		elseif opponent.type == Opponent.team then
-			error('Team opponents are currently not yet supported on tetris wiki')
-			--[[ todo in a sep PR:
-			CustomMatchGroupInput._processTeamPlayerMapData(
-				opponent.match2players or {},
-				opponentIndex,
-				map,
-				participants
-			)
-			]]
+			error('Team opponents are currently not yet supported on magic wiki')
 		end
 	end
 
@@ -457,15 +415,6 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			played = true,
 		}
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 
