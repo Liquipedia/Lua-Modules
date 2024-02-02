@@ -343,7 +343,7 @@ function Team:_setLpdbData(args, links)
 		textlesslogodark = args.teamcardimagedark,
 		earnings = self.totalEarnings,
 		earningsbyyear = self.yearlyEarnings or {},
-		createdate = ReferenceCleaner.clean(args.created),
+		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
 		coach = args.coaches or args.coach,
 		manager = args.manager,
