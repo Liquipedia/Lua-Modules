@@ -26,7 +26,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
+	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
 	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
 	noCheck = '[[File:NoCheck.png|link=]]',

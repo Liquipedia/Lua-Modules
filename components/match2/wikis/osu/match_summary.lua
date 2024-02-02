@@ -28,7 +28,7 @@ local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@enum OsuMatchIcons
 local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 

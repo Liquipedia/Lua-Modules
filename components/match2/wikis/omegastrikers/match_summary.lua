@@ -24,7 +24,7 @@ local EPOCH_TIME = '1970-01-01 00:00:00'
 local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local ICONS = {
-	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
+	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
 

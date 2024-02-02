@@ -26,7 +26,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local MATCH_STATUS_TO_ICON = {
-	finished = Icon.makeIcon{iconName = 'winner', color = 'icon--green', size = 'initial'},
+	finished = Icon.makeIcon{iconName = 'winner', color = 'icon--green', size = '110%'},
 	live = 'fas fa-circle icon--red',
 	upcoming = 'fas fa-clock',
 }
