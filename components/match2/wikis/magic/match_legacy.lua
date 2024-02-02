@@ -13,14 +13,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 function MatchLegacy.storeMatch(match2, options)
-	local match, doStore = MatchLegacy.convertParameters(match2)
-
-	if options.storeMatch1 and doStore then
-		return
-	end
+	MatchLegacy.storeMatch1(match2)
 end
 
-function MatchLegacy.convertParameters(match2)
+function MatchLegacy.storeMatch1(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
