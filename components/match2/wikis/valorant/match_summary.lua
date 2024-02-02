@@ -121,7 +121,7 @@ end
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.top:node(roundScore)
@@ -134,21 +134,11 @@ end
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
-end
-
----@param side string
----@return string?
-function Score:_getSideColor(side)
-	if side == 'atk' then
-		return '#c04845'
-	elseif side == 'def' then
-		return '#46b09c'
-	end
 end
 
 ---@return Html
