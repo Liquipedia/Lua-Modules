@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=dota2
+-- wiki=battlerite
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -377,17 +377,6 @@ function matchFunctions.getOpponents(match)
 		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
-	end
-
-	-- see if match should actually be finished if bestof limit was reached
-	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.floor(match.bestof / 2)
-		for _, item in pairs(opponents) do
-			if tonumber(item.score or 0) > firstTo then
-				match.finished = true
-				break
-			end
-		end
 	end
 
 	-- see if match should actually be finished if score is set
