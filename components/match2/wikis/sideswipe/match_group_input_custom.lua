@@ -10,7 +10,6 @@ local CustomMatchGroupInput = {}
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -29,8 +28,6 @@ local _MAX_NUM_PLAYERS = 10
 local _RESULT_TYPE_DRAW = 'draw'
 local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
-
-local globalVars = PageVariableNamespace()
 
 -- containers for process helper functions
 local matchFunctions = {}
