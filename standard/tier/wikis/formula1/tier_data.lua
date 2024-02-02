@@ -56,6 +56,14 @@ return {
 			link = 'Karting Tournaments',
 			category = 'Karting Tournaments',
 		},
+		{
+			value = '7',
+			sort= 'B4',
+			name = 'Misc',
+			short = 'Misc',
+			link = 'Miscellaneous Events',
+			category = 'Miscellaneous Events',
+		},
 		[''] = {
 			value = nil,
 			sort = 'B2',
