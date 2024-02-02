@@ -288,28 +288,45 @@ function MatchGroupInput._inheritedHeader(headerInput)
 	return inheritedHeader
 end
 
-function MatchGroupInput.readDate(dateString)
-	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
-	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local timezoneId = dateString:match('>(%a-)<')
-	local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
-	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
-	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {
-		date = date,
-		dateexact = isDateExact,
-		timezoneId = timezoneId,
-		timezoneOffset = timezoneOffset,
-		timestamp = DateExt.readTimestamp(dateString),
-	}
-end
 
-function MatchGroupInput.getInexactDate(suggestedDate)
-	suggestedDate = suggestedDate or globalVars:get('tournament_date')
-	local missingDateCount = globalVars:get('num_missing_dates') or 0
-	globalVars:set('num_missing_dates', missingDateCount + 1)
-	local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
-	return getContentLanguage():formatDate('c', inexactDateString)
+---@param dateString string?
+---@param dateFallbacks string[]?
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+function MatchGroupInput.readDate(dateString, dateFallbacks)
+	if dateString then
+		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
+		local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+		local timezoneId = dateString:match('>(%a-)<')
+		local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
+		local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
+		local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
+		return {
+			date = date,
+			dateexact = isDateExact,
+			timezoneId = timezoneId,
+			timezoneOffset = timezoneOffset,
+			timestamp = DateExt.readTimestamp(dateString),
+		}
+
+	elseif dateFallbacks then
+		local suggestedDate = Variables.varDefaultMulti(unpack(dateFallbacks))
+		local missingDateCount = globalVars:get('num_missing_dates') or 0
+		globalVars:set('num_missing_dates', missingDateCount + 1)
+		local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
+		local date = getContentLanguage():formatDate('c', inexactDateString)
+		return {
+			date = date,
+			dateexact = false,
+			timestamp = DateExt.readTimestampOrNil(date),
+		}
+
+	else
+		return {
+			date = DateExt.defaultDateTimeExtended,
+			dateexact = false,
+			timestamp = DateExt.defaultTimestamp,
+		}
+	end
 end
 
 --[[

@@ -53,7 +53,7 @@ function DateExt.readTimestamp(dateString)
 end
 
 --- Same as DateExt.readTimestamp, except that it returns nil upon failure.
----@param dateString string
+---@param dateString string|number
 ---@return integer?
 function DateExt.readTimestampOrNil(dateString)
 	local success, timestamp = pcall(DateExt.readTimestamp, dateString)

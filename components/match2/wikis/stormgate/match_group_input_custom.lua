@@ -75,16 +75,12 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		return dateProps
 	end
 
-	suggestedDate = suggestedDate or Variables.varDefaultMulti(
+	return MatchGroupInput.readDate(nil, {
+		'matchDate',
 		'tournament_startdate',
 		'tournament_enddate',
 		DateExt.defaultDate
-	)
-
-	return {
-		date = MatchGroupInput.getInexactDate(suggestedDate),
-		dateexact = false,
-	}
+	})
 end
 
 ---@param match table

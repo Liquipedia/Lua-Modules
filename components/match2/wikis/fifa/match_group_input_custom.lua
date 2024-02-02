@@ -54,15 +54,7 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
+	return MatchGroupInput.readDate(matchArgs.date)
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)

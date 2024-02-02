@@ -254,16 +254,12 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.hasDate = true
-		return dateProps
-	else
-		return {
-			date = mw.getContentLanguage():formatDate('c', DateExt.defaultDateTime),
-			dateexact = false,
-		}
 	end
+
+	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)

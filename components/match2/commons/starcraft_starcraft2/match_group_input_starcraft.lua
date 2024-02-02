@@ -72,24 +72,18 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 end
 
 function StarcraftMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.dateexact = Logic.nilOr(Logic.readBoolOrNil(matchArgs.dateexact), dateProps.dateexact)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'matchDate',
+		'Match_date',
+		'tournament_startdate',
+		'tournament_enddate',
+		DateExt.defaultDate
+	})
+	dateProps.dateexact = Logic.nilOr(Logic.readBoolOrNil(matchArgs.dateexact), dateProps.dateexact)
+	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
-	else
-		local suggestedDate = Variables.varDefaultMulti(
-			'matchDate',
-			'Match_date',
-			'tournament_startdate',
-			'tournament_enddate',
-			DateExt.defaultDate
-		)
-		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
-			dateexact = false,
-		}
 	end
+	return dateProps
 end
 
 function StarcraftMatchGroupInput._checkFinished(match)

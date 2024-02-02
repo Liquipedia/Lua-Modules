@@ -287,15 +287,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
+	return MatchGroupInput.readDate(matchArgs.date)
 end
 
 function matchFunctions.getVodStuff(match)
