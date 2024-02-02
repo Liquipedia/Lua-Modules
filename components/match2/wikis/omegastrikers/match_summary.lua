@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,7 +22,7 @@ local Table = require('Module:Table')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local ICONS = {
-	check = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
 

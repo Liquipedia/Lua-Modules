@@ -7,6 +7,7 @@
 --
 
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
@@ -17,8 +18,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 ---@enum CrossFireMatchIcons
-local Icon = {
-	CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+local Icons = {
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
@@ -116,13 +117,13 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icon.CHECK))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icon.CHECK))
+		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -163,7 +164,7 @@ function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	if showIcon then
 		return container:node(iconType)
 	end
-	return container:node(Icon.EMPTY)
+	return container:node(Icons.EMPTY)
 end
 
 return CustomMatchSummary

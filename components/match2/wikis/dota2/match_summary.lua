@@ -10,6 +10,7 @@ local CustomMatchSummary = {}
 
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local HeroIcon = require('Module:HeroIcon')
@@ -25,7 +26,7 @@ local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local SIZE_HERO = '57x32px'
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
 local LINK_DATA = {

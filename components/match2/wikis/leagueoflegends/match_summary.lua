@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local HeroIcon = require('Module:ChampionIcon')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
@@ -26,7 +27,7 @@ local Opponent = Lua.import('Module:Opponent')
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 -- Hero Ban Class
