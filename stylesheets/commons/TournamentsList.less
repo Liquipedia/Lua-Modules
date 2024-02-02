@@ -177,6 +177,19 @@ html.theme--dark .tournaments-list-tag > * {
 	}
 }
 
+each(@tournament-tag-colors, .(@key, @value) {
+	.badge--@{key} {
+		background-color: @value[@background-color];
+		border-color: @value[@border-color];
+	}
+
+	& when (iscolor(@value[@chip-background-color])) {
+		.chip--@{key} {
+			background-color: @value[@chip-background-color];
+		}
+	}
+});
+
 .tournament-badge {
 	height: 1.25rem;
 	width: 3.75rem;
