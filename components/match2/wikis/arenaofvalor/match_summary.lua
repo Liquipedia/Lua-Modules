@@ -10,12 +10,13 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local ExternalLinks = require('Module:ExternalLinks')
 local ChampionIcon = require('Module:HeroIcon')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -26,9 +27,6 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 -- Champion Ban Class
 ---@class AovChampionBan: MatchSummaryRowInterface
@@ -103,9 +101,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))

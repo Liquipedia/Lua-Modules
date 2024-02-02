@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
@@ -85,7 +84,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
 	lpdbData.extradata.ismixteam = tostring(String.isNotEmpty(args.mixteam))
 	lpdbData.extradata.isnationalteam = tostring(String.isNotEmpty(args.nationalteam))
 

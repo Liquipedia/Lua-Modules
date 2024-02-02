@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -38,7 +39,6 @@ local _DEFAULT_MODE = 'team'
 local _NO_SCORE = -99
 local _DUMMY_MAP = 'default'
 local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local _EPOCH_TIME = '1970-01-01 00:00:00'
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
@@ -48,7 +48,6 @@ local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -94,7 +93,6 @@ function CustomMatchGroupInput.processMap(map)
 		map.map = nil
 	end
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -300,7 +298,7 @@ function matchFunctions.readDate(matchArgs)
 		local suggestedDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			_EPOCH_TIME
+			DateExt.defaultDateTime
 		)
 		return {
 			date = MatchGroupInput.getInexactDate(suggestedDate),
@@ -343,11 +341,6 @@ function matchFunctions.getOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
-
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getIcon(opponent.template)
-			end
 
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
@@ -537,19 +530,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', _DEFAULT_MODE))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return CustomMatchGroupInput

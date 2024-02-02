@@ -42,7 +42,7 @@ function Campaign:createInfobox()
 
 	infobox:categories('Campaign')
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 

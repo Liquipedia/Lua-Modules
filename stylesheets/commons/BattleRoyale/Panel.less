@@ -25,14 +25,25 @@ Author(s): Elysienna
 		color: #404040;
 		flex: 0 0 auto;
 		cursor: pointer;
+		border: 0.0625rem solid transparent;
+		border-bottom-color: rgba( 0, 0, 0, 0.2 );
+		transition: background-color 0.2s linear;
 
 		&.is--active {
 			background-color: #ffffff;
 			color: #282828;
+			border-color: rgba( 0, 0, 0, 0.2 );
+			border-bottom-color: transparent;
 		}
 
 		&:not( :first-child ) {
 			margin-left: 0.25rem;
+		}
+
+		@media ( hover: hover ) {
+			&:hover:not( .is--active ) {
+				background-color: rgba( 0, 0, 0, 0.08 );
+			}
 		}
 	}
 
@@ -54,17 +65,25 @@ Author(s): Elysienna
 }
 
 .panel-content {
+	border: 0.0625rem solid rgba( 0, 0, 0, 0.2 );
+	border-top: 0;
+	box-shadow: 0 -0.0625rem 0 0 rgba( 0, 0, 0, 0.2 );
+
 	&.is--hidden {
 		display: none;
 	}
 
-	&__collapsible.is--collapsed {
-		.panel-content__container {
-			max-height: 0;
-		}
+	&__collapsible {
+		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 
-		.panel-content__button-icon {
-			transform: rotate( -180deg );
+		&.is--collapsed {
+			.panel-content__container {
+				max-height: 0;
+			}
+
+			.panel-content__button-icon {
+				transform: rotate( -180deg );
+			}
 		}
 	}
 
@@ -82,8 +101,6 @@ Author(s): Elysienna
 		padding: 0;
 		display: flex;
 		align-items: center;
-		border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		cursor: pointer;
 		transition: background-color 0.2s linear;
 
@@ -110,6 +127,11 @@ Author(s): Elysienna
 			margin: 0;
 			display: flex;
 			align-items: center;
+
+			@media ( max-width: 767px ) {
+				flex-wrap: wrap;
+				margin-bottom: 0.5rem;
+			}
 		}
 
 		&__icon {
@@ -131,13 +153,31 @@ Author(s): Elysienna
 			margin-right: 0.25rem;
 		}
 
-		div&__countdown {
+		.match-countdown-block {
 			padding: 0;
 			font-size: unset;
 			display: flex;
+			text-align: initial;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 100%;
+				margin-bottom: 0.5rem;
+			}
 
 			.vodlink {
 				margin-left: 0.25rem;
+			}
+
+			.timer-object {
+				display: inline-flex;
+
+				@media ( max-width: 767px ) {
+					flex-wrap: wrap;
+				}
+			}
+
+			.timer-object-date {
+				margin-right: 1rem;
 			}
 		}
 	}
@@ -188,8 +228,6 @@ Author(s): Elysienna
 
 	&__bottom-navigation {
 		height: 3.125rem;
-		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-top: 0;
 		display: flex;
 		align-items: center;
 

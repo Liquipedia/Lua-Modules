@@ -8,6 +8,7 @@
 
 local AgentIcon = require('Module:AgentIcon')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -15,9 +16,6 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
@@ -124,7 +122,7 @@ end
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.top:node(roundScore)
@@ -137,21 +135,11 @@ end
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
-end
-
----@param side string
----@return string?
-function Score:_getSideColor(side)
-	if side == 'atk' then
-		return '#c04845'
-	elseif side == 'def' then
-		return '#46b09c'
-	end
 end
 
 ---@return Html
@@ -308,9 +296,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))

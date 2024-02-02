@@ -21,6 +21,7 @@ local getArgs = require('Module:Arguments').getArgs
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {loadData = true})
 
+---@class Match2CopyPaste
 local copyPaste = {}
 
 function copyPaste.generateID()

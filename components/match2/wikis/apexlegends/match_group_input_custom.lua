@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -40,12 +41,12 @@ local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_SCORE = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-local EPOCH_TIME = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local MatchFunctions = {}
 local MapFunctions = {}
-local OpponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -79,10 +80,10 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
@@ -165,8 +166,11 @@ function MatchFunctions.adjustMapData(match)
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
-		map = MapFunctions.getTournamentVars(map)
 		map = MapFunctions.getExtraData(map, scores)
+
+		if map.map == DUMMY_MAP_NAME then
+			map.map = ''
+		end
 
 		match[key] = map
 	end
@@ -186,14 +190,21 @@ function MatchFunctions.parseSetting(match)
 		return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 	end))
 
-	-- Up/Down colors and status
-	match.statusSettings = {
-		advTitle = match.advtitle,
-		outTitle = match.outtitle,
-		advCount = match.advteams,
-		advColor = match.advcolor,
-		outColor = match.outcolor,
-	}
+	-- Up/Down colors
+	local function splitAndTrim(s, pattern)
+		if not s then
+			return {}
+		end
+		return Array.map(mw.text.split(s, pattern), String.trim)
+	end
+
+	match.statusSettings = Array.flatMap(splitAndTrim(match.bg, ','), function (status)
+		local placements, color = unpack(splitAndTrim(status, '='))
+		local pStart, pEnd = unpack(splitAndTrim(placements, '-'))
+		return Array.map(Array.range(tonumber(pStart), tonumber(pEnd)), function()
+			return color
+		end)
+	end)
 
 	return match
 end
@@ -228,9 +239,9 @@ function MatchFunctions.readDate(matchArgs)
 		return MatchGroupInput.readDate(matchArgs.date)
 	else
 		return {
-			date = EPOCH_TIME,
+			date = DateExt.defaultDateTimeExtended,
 			dateexact = false,
-			timestamp = DateExt.epochZero,
+			timestamp = DateExt.defaultTimestamp,
 		}
 	end
 end
@@ -279,11 +290,6 @@ function MatchFunctions.getOpponents(match)
 		if Logic.isNotEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = OpponentFunctions.getIcon(opponent.template)
-			end
-
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
 			if Logic.isNumeric(opponent.score) then
@@ -316,7 +322,7 @@ function MatchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.epochZero then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT or SECONDS_UNTIL_FINISHED_NOT_EXACT
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -329,12 +335,26 @@ function MatchFunctions.getOpponents(match)
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
+	if match.finished then
+		opponents = MatchFunctions.setBgForOpponents(opponents, match.statusSettings)
+	end
+
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
 	end
 
 	return match
+end
+
+---@param opponents table
+---@param statusSettings table
+---@return table
+function MatchFunctions.setBgForOpponents(opponents, statusSettings)
+	Array.forEach(opponents, function(opponent)
+		opponent.extradata = {bg = statusSettings[opponent.placement]}
+	end)
+	return opponents
 end
 
 --
@@ -347,6 +367,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(map, scores)
 	map.extradata = {
+		dateexact = map.dateexact,
 		comment = map.comment,
 		opponents = scores,
 	}
@@ -442,28 +463,6 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map, indexedScores
-end
-
----@param map table
----@return table
-function MapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
----@param template string
----@return string?
----@return string?
-function OpponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

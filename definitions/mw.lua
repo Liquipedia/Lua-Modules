@@ -634,7 +634,9 @@ function mw.title.compare(a, b) end
 
 ---Returns the title object for the current page.
 ---@return Title
-function mw.title.getCurrentTitle() end
+function mw.title.getCurrentTitle()
+	return setmetatable(mw.title, {})
+end
 
 ---Creates a new title object. This function is expensive when called with an ID.
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
@@ -907,5 +909,10 @@ mw.ext.TeamLiquidIntegration = {}
 ---@param name string
 ---@param sortName string?
 function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
+
+---Follows page redirects
+---@param name string
+---@return string
+function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
 
 return mw

@@ -16,14 +16,13 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
-local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -37,8 +36,6 @@ local Customizable = Widgets.Customizable
 ---@class Person: BasicInfobox
 ---@field locations string[]
 local Person = Class.new(BasicInfobox)
-
-Person.warnings = {}
 
 local Language = mw.language.new('en')
 local LINK_VARIANT = 'player'
@@ -244,9 +241,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return mw.html.create()
-		:node(infobox:build(widgets))
-		:node(WarningBox.displayAll(self.warnings))
+	return infobox:build(widgets)
 end
 
 ---@param args table
@@ -328,7 +323,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		return nil

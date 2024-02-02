@@ -31,7 +31,6 @@ local WINNER_FIRST_OPPONENT = '0'
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
@@ -51,7 +50,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -182,11 +180,6 @@ function matchFunctions.readOpponents(match)
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
-
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
-			end
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -359,23 +352,6 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	if op1norm and op2norm then
 		return tonumber(op1.score) > tonumber(op2.score)
 	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

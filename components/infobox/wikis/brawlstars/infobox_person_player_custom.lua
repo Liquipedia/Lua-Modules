@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction')
+local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -175,7 +175,7 @@ end
 
 ---@param role string?
 ---@return {category: string, variable: string, isplayer: boolean?, personType: string}?
-function CustomPlayer:_getRoleData(role)
+function CustomPlayer._getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
