@@ -48,7 +48,6 @@ local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -343,11 +342,6 @@ function matchFunctions.getOpponents(match)
 		if not Logic.isEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.date)
 
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getIcon(opponent.template)
-			end
-
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
 			if Logic.isNumeric(opponent.score) then
@@ -536,14 +530,6 @@ function mapFunctions.getScoresAndWinner(map)
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return CustomMatchGroupInput

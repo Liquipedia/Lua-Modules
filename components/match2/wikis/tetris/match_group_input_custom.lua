@@ -299,12 +299,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		record.name = record.name:gsub(' ', '_')
 	end
 
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		-- todo in sep pr:
-		--record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
-	end
-
 	return record
 end
 
@@ -431,15 +425,6 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			played = true,
 		}
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 
