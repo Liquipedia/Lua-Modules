@@ -69,10 +69,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 function matchFunctions.adjustMapData(match)
-	local opponents = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		opponents[opponentIndex] = match['opponent' .. opponentIndex]
-	end
 	local mapIndex = 1
 	while match['map'..mapIndex] do
 		match['map'..mapIndex] = mapFunctions.getExtraData(match['map'..mapIndex])
