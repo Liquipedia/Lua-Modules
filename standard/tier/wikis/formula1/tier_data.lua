@@ -58,7 +58,7 @@ return {
 		},
 		{
 			value = '7',
-			sort= 'A7',
+			sort = 'A7',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Events',
