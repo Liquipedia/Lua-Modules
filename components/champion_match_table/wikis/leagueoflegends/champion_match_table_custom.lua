@@ -80,7 +80,7 @@ function CustomChampionMatchTable:buildOpponentCell(opponent, oppIndex, game, fl
 		:css('flex-direction', flipped and 'row-reverse' or nil)
 
 	wrapper:node(championWrapper)
-	wrapper:node(self:_getOpponentDiplay(opponent, flipped))
+	wrapper:node(self:getOpponentDiplay(opponent, flipped))
 
 	return mw.html.create('td')
 		:node(wrapper)

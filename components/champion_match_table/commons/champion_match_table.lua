@@ -37,6 +37,7 @@ local INVALID_TIER_SORT = 'ZZ'
 ---@field limit number
 ---@field showType boolean
 ---@field showMap boolean
+---@field showLength boolean
 
 ---@class GameRecord
 ---@field date string
@@ -85,7 +86,8 @@ function ChampionMatchTable:readConfig()
 	self.config = {
 		limit = tonumber(args.limit) or 200,
 		showType = Logic.readBool(args.showType),
-		showMap = Logic.readBool(args.showMap)
+		showMap = Logic.readBool(args.showMap),
+		showLength = Logic.readBool(args.showLength)
 	}
 end
 
@@ -98,7 +100,7 @@ end
 
 ---@param record table
 ---@return GameRecord?
-function ChampionMatchTable:_gameFromRecord(record)
+function ChampionMatchTable:getGameFromRecord(record)
 	local pickedBy = self:findWhoPickedChampion(record)
 	if pickedBy == CHAMPION_NOT_FOUND then
 		return nil
@@ -123,7 +125,7 @@ end
 
 ---@param record table
 ---@return MatchRecord
-function ChampionMatchTable:_matchFromRecord(record)
+function ChampionMatchTable:getMatchFromRecord(record)
 	record.extradata = record.extradata or {}
 
 	local matchRecord = {
@@ -142,7 +144,7 @@ function ChampionMatchTable:_matchFromRecord(record)
 	}
 
 	Array.forEach(record.match2games, function (game)
-		table.insert(matchRecord.games, self:_gameFromRecord(game))
+		table.insert(matchRecord.games, self:getGameFromRecord(game))
 	end)
 
 	return matchRecord
@@ -164,7 +166,7 @@ function ChampionMatchTable:buildGameConditions()
 end
 
 ---@return string
-function ChampionMatchTable:_buildMatchConditions()
+function ChampionMatchTable:buildMatchConditions()
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('match2game', {
 		conditions = self:buildGameConditions(),
 		query = 'match2id',
@@ -182,7 +184,7 @@ function ChampionMatchTable:_buildMatchConditions()
 end
 
 function ChampionMatchTable:query()
-	local matchConditions = self:_buildMatchConditions()
+	local matchConditions = self:buildMatchConditions()
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = matchConditions,
 		query = 'match2opponents, match2games, date, icon, icondark, liquipediatier, game, type, '
@@ -192,14 +194,14 @@ function ChampionMatchTable:query()
 	})
 
 	Array.forEach(lpdbData, function (match)
-		table.insert(self.matches, self:_matchFromRecord(match))
+		table.insert(self.matches, self:getMatchFromRecord(match))
 	end)
 end
 
 ---@param text string?
 ---@param width string?
 ---@return Html
-function ChampionMatchTable:_buildHeaderCell(text, width)
+function ChampionMatchTable:buildHeaderCell(text, width)
 	return mw.html.create('th')
 		:css(text and 'max-width' or 'width', width)
 		:node(text)
@@ -207,23 +209,24 @@ end
 
 function ChampionMatchTable:buildHeaderRow()
 	local header = mw.html.create('tr')
-		:node(self:_buildHeaderCell('Date', '100px'))
-		:node(self:_buildHeaderCell('Tier', '70px'))
-		:node(self.config.showType and self:_buildHeaderCell('Type', '50px') or nil)
-		:node(self:_buildHeaderCell(nil, '25px'):addClass('unsortable'))
-		:node(self:_buildHeaderCell('Tournament'))
-		:node(self.config.showMap and self:_buildHeaderCell('Map', '80px') or nil)
-		:node(self:_buildHeaderCell('Team'))
-		:node(self:_buildHeaderCell('Score'))
-		:node(self:_buildHeaderCell('vs. Team'))
-		:node(self:_buildHeaderCell('Vod'))
+		:node(self:buildHeaderCell('Date', '100px'))
+		:node(self:buildHeaderCell('Tier', '70px'))
+		:node(self.config.showType and self:buildHeaderCell('Type', '50px') or nil)
+		:node(self:buildHeaderCell(nil, '25px'):addClass('unsortable'))
+		:node(self:buildHeaderCell('Tournament'))
+		:node(self.config.showMap and self:buildHeaderCell('Map', '80px') or nil)
+		:node(self:buildHeaderCell('Team'))
+		:node(self:buildHeaderCell('Score'))
+		:node(self:buildHeaderCell('vs. Team'))
+		:node(self.config.showLength and self:buildHeaderCell('Length') or nil)
+		:node(self:buildHeaderCell('Vod'))
 
 	return header
 end
 
 ---@param game GameRecord
 ---@return string
-function ChampionMatchTable:_getBackgroundClass(game)
+function ChampionMatchTable:getBackgroundClass(game)
 	if game.winner == 0 then
 		return 'bg-draw'
 	end
@@ -233,7 +236,7 @@ end
 
 ---@param match MatchRecord
 ---@return Html
-function ChampionMatchTable:_buildDateCell(match)
+function ChampionMatchTable:buildDateCell(match)
 	return mw.html.create('td')
 		:css('text-align', 'left')
 		:node(DateExt.formatTimestamp('Y-m-d', match.timestamp or ''))
@@ -241,7 +244,7 @@ end
 
 ---@param match MatchRecord
 ---@return Html
-function ChampionMatchTable:_buildTierCell(match)
+function ChampionMatchTable:buildTierCell(match)
 	local tier, tierType, options = Tier.parseFromQueryData(match)
 	options.link = true
 	options.onlyTierTypeIfBoth = true
@@ -259,7 +262,7 @@ end
 
 ---@param match MatchRecord
 ---@return Html?
-function ChampionMatchTable:_buildTypeCell(match)
+function ChampionMatchTable:buildTypeCell(match)
 	if not self.config.showType then
 		return nil
 	end
@@ -270,7 +273,7 @@ end
 
 ---@param match MatchRecord
 ---@return Html
-function ChampionMatchTable:_buildIconCell(match)
+function ChampionMatchTable:buildIconCell(match)
 	return mw.html.create('td')
 		:node(LeagueIcon.display{
 			icon = match.icon,
@@ -283,7 +286,7 @@ end
 
 ---@param match MatchRecord
 ---@return Html
-function ChampionMatchTable:_buildTournamentCell(match)
+function ChampionMatchTable:buildTournamentCell(match)
 	return mw.html.create('td')
 		:css('text-align', 'left')
 		:css('max-width', '400px')
@@ -292,7 +295,7 @@ end
 
 ---@param game GameRecord
 ---@return Html?
-function ChampionMatchTable:_buildMapCell(game)
+function ChampionMatchTable:buildMapCell(game)
 	if not self.config.showMap then
 		return nil
 	end
@@ -304,7 +307,7 @@ end
 ---@param opponentRecord match2opponent
 ---@param flipped boolean?
 ---@return Html|string
-function ChampionMatchTable:_getOpponentDiplay(opponentRecord, flipped)
+function ChampionMatchTable:getOpponentDiplay(opponentRecord, flipped)
 	local opponent = Opponent.fromMatch2Record(opponentRecord)
 
 	if Logic.isEmpty(opponent) then
@@ -317,6 +320,17 @@ function ChampionMatchTable:_getOpponentDiplay(opponentRecord, flipped)
 		overflow = 'wrap',
 		teamStyle = 'icon',
 	}
+end
+
+---@param game GameRecord
+---@return Html?
+function ChampionMatchTable:buildLengthCell(game)
+	if not self.config.showLength then
+		return nil
+	end
+
+	return mw.html.create('td')
+		:wikitext(game.length)
 end
 
 ---@param opponent match2opponent
@@ -336,7 +350,7 @@ end
 
 ---@param vod string?
 ---@return Html
-function ChampionMatchTable:_buildVodCell(vod)
+function ChampionMatchTable:buildVodCell(vod)
 	local cell = mw.html.create('td')
 
 	if Logic.isEmpty(vod) then
@@ -352,17 +366,18 @@ function ChampionMatchTable:buildRow(match, game)
 	local vsIndex = game.pickedBy == 1 and 2 or 1
 
 	local row = mw.html.create('tr')
-		:addClass(self:_getBackgroundClass(game))
-		:node(self:_buildDateCell(match))
-		:node(self:_buildTierCell(match))
-		:node(self:_buildTypeCell(match))
-		:node(self:_buildIconCell(match))
-		:node(self:_buildTournamentCell(match))
-		:node(self:_buildMapCell(game))
+		:addClass(self:getBackgroundClass(game))
+		:node(self:buildDateCell(match))
+		:node(self:buildTierCell(match))
+		:node(self:buildTypeCell(match))
+		:node(self:buildIconCell(match))
+		:node(self:buildTournamentCell(match))
+		:node(self:buildMapCell(game))
 		:node(self:buildOpponentCell(match.opponents[game.pickedBy], game.pickedBy, game))
 		:node(self:buildScoreCell(game))
 		:node(self:buildOpponentCell(match.opponents[vsIndex], vsIndex, game, true))
-		:node(self:_buildVodCell(Logic.emptyOr(game.vod, match.vod)))
+		:node(self:buildLengthCell(game))
+		:node(self:buildVodCell(Logic.emptyOr(game.vod, match.vod)))
 
 	return row
 end
