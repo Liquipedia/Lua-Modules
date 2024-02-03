@@ -784,6 +784,7 @@ return {
         aoe1 = factionPropsAoE1,
         aoe2 = factionPropsAoE2,
         aoe3 = factionPropsAoE3,
+        aoe4 = factionPropsAoE4,
 		aom = factionPropsAoM,
 		aoeo = factionPropsAoEO,
     },
