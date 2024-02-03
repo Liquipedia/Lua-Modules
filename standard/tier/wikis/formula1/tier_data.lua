@@ -57,7 +57,7 @@ return {
 			category = 'Karting Tournaments',
 		},
 		{
-			value = '7',
+			value = '-1',
 			sort = 'A7',
 			name = 'Misc',
 			short = 'Misc',
