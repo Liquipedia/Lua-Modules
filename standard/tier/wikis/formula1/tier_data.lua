@@ -58,7 +58,7 @@ return {
 		},
 		{
 			value = '7',
-			sort= 'A10',
+			sort= 'A7',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Events',
@@ -75,7 +75,7 @@ return {
 	tierTypes = {
 		grandprix = {
 			value = 'Grand Prix',
-			sort = 'A7',
+			sort = 'A8',
 			name = 'Grand Prix',
 			short = 'GPs',
 			link = 'Grands Prix',
@@ -83,7 +83,7 @@ return {
 		},
 		test = {
 			value = 'Test',
-			sort = 'A8',
+			sort = 'A9',
 			name = 'Test',
 			short = 'Tests',
 			link = 'Test Sessions',
@@ -91,19 +91,11 @@ return {
 		},
 		nonchampionship = {
 			value = 'Non-Championship',
-			sort = 'A9',
+			sort = 'B1',
 			name = 'Non-Championship',
 			short = 'Non-Champs',
 			link = 'Non-Championship Events',
 			category = 'Non-Championship Events',
-		},
-		misc = {
-			value = 'Misc',
-			sort = 'B1',
-			name = 'Misc',
-			short = 'Misc',
-			link = 'Miscellaneous Tournaments',
-			category = 'Miscellaneous Tournaments',
 		},
 		showmatch = {
 			value = 'Showmatch',
