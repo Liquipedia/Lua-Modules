@@ -660,7 +660,7 @@ local factionPropsAoM = {
 	},
 	nuwa = {
 		index = 12,
-		name = 'Nü wa',
+		name = 'Nü Wa',
 		faction = 'nuwa',
 	},
 	odin = {
