@@ -20,21 +20,46 @@ local Data = Lua.requireIfExists('Module:CharacterIcon/Data', {loadData = true})
 ---@field class string?
 ---@field date string?
 
+---@class CharacterIconInfo
+---@field file string
+---@field link string?
+---@field display string?
+---@field startDate string?
+---@field endDate string?
+
 local CharacterIcon = {}
 
----@param images table
+---@param icons CharacterIconInfo[]
 ---@param date string?
----@return string
-function CharacterIcon._getImageFromTable(images, date)
+---@return CharacterIconInfo
+function CharacterIcon._getCharacterIconInfo(icons, date)
 	date = date or DateExt.getContextualDateOrNow()
 	local timeStamp = DateExt.readTimestamp(date)
-	local image = Array.find(images, function (c)
-		local startDate = DateExt.readTimestamp(c[1]) or DateExt.minTimestamp
-		local endDate = DateExt.readTimestamp(c[2]) or DateExt.maxTimestamp
+	local info = Array.find(icons, function (icon)
+		local startDate = DateExt.readTimestamp(icon.startDate) or DateExt.minTimestamp
+		local endDate = DateExt.readTimestamp(icon.endDate) or DateExt.maxTimestamp
 		return timeStamp >= startDate and timeStamp < endDate
 	end)
-	return image and image[3] or ''
+	return info
 end
+
+---@param info CharacterIconInfo
+---@param size string?
+---@param class string?
+---@return string
+function CharacterIcon._makeImage(info, size, class)
+	local imageOptions = {
+		info.file,
+	}
+	table.insert(imageOptions, info.display)
+	table.insert(imageOptions, size)
+	table.insert(imageOptions, Logic.isNotEmpty(info.link) and 'link=' .. info.link or nil)
+	table.insert(imageOptions, Logic.isNotEmpty(class) and 'class=' .. class or nil)
+
+	return '[[File:' .. table.concat(imageOptions, '|') .. ']]'
+end
+
+---
 
 ---@param args IconArguments
 ---@return string
@@ -42,23 +67,16 @@ function CharacterIcon.Icon(args)
 	if args.character == nil then
 		return ''
 	end
-	local characterData = Data[args.character:lower()]
 
-	if Logic.isEmpty(characterData) then
+	local characterIcons = Data[args.character:lower()]
+
+	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date)
+
+	if Logic.isEmpty(iconInfo.file) then
 		return ''
 	end
 
-	local image
-	if type(characterData) == 'table' then
-		image = CharacterIcon._getImageFromTable(characterData, args.date)
-	else
-		image = characterData
-	end
-
-	image = string.gsub(image, '|<SIZE>', Logic.isNotEmpty(args.size) and '|' .. args.size or '')
-	image = string.gsub(image, '|<CLASS>', Logic.isNotEmpty(args.class) and '|class=' .. args.class or '')
-
-	return image
+	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
 end
 
 return Class.export(CharacterIcon)
