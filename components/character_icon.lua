@@ -35,12 +35,11 @@ local CharacterIcon = {}
 function CharacterIcon._getCharacterIconInfo(icons, date)
 	date = date or DateExt.getContextualDateOrNow()
 	local timeStamp = DateExt.readTimestamp(date)
-	local info = Array.find(icons, function (icon)
+	return Array.find(icons, function (icon)
 		local startDate = DateExt.readTimestamp(icon.startDate) or DateExt.minTimestamp
 		local endDate = DateExt.readTimestamp(icon.endDate) or DateExt.maxTimestamp
 		return timeStamp >= startDate and timeStamp < endDate
 	end)
-	return info
 end
 
 ---@param info CharacterIconInfo
@@ -62,19 +61,17 @@ end
 ---
 
 ---@param args IconArguments
----@return string
+---@return string?
 function CharacterIcon.Icon(args)
-	if args.character == nil then
-		return ''
+	if Logic.isEmpty(args.character) then
+		return nil
 	end
 
 	local characterIcons = Data[args.character:lower()]
 
 	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date)
 
-	if Logic.isEmpty(iconInfo.file) then
-		return ''
-	end
+	assert(iconInfo.file, '"' .. args.character .. '" as no file set')
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
 end
