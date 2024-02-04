@@ -119,6 +119,7 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
+			deathlocation = args.death_location,
 		})
 	if not ageCalculationSuccess then
 		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
@@ -138,6 +139,7 @@ function Person:createInfobox()
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Cell{name = 'Name', content = {args.name}},
 		Cell{name = 'Romanized Name', content = {args.romanized_name}},
+		Cell{name = 'Abbreviations', content = {args.abbreviations}},
 		Customizable{id = 'nationality', children = {
 				Cell{name = 'Nationality', content = self:displayLocations()}
 			}
@@ -270,6 +272,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		name = args.romanized_name or args.name,
 		romanizedname = args.romanized_name or args.name,
 		localizedname = String.isNotEmpty(args.romanized_name) and args.name or nil,
+		abbreviations = args.abbreviations,
 		nationality = args.country, -- already standardized above
 		nationality2 = self:getStandardNationalityValue(args.country2 or args.nationality2),
 		nationality3 = self:getStandardNationalityValue(args.country3 or args.nationality3),
