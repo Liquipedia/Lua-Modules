@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Table = require('Module:Table')
+local Opponent = require('Module:Opponent')
 
 --[[
 
@@ -19,9 +20,9 @@ local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Bas
 
 --allowed opponent types on the wiki
 local MODES = {
-	['solo'] = 'solo',
-	['team'] = 'team',
-	['literal'] = 'literal',
+	solo = 'solo',
+	team = 'team',
+	literal = 'literal',
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
@@ -93,11 +94,11 @@ end
 function WikiCopyPaste._getOpponent(mode, score)
 	local out
 
-	if mode == 'solo' then
+	if mode == Opponent.solo then
 		out = '{{SoloOpponent||flag=' .. (score or '') .. '}}'
-	elseif mode == 'team' then
+	elseif mode == Opponent.team then
 		out = '{{TeamOpponent|' .. (score or '') .. '}}'
-	elseif mode == 'literal' then
+	elseif mode == Opponent.literal then
 		out = '{{Literal|}}'
 	end
 
