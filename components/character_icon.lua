@@ -69,9 +69,11 @@ function CharacterIcon.Icon(args)
 
 	local characterIcons = Data[args.character:lower()]
 
+	assert(characterIcons, 'Character:"' .. args.character .. '" was not found')
+
 	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date)
 
-	assert(iconInfo.file, '"' .. args.character .. '" as no file set')
+	assert(iconInfo.file, 'Character:"' .. args.character .. '" as no file set')
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
 end
