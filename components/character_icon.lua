@@ -47,13 +47,13 @@ end
 ---@param class string?
 ---@return string
 function CharacterIcon._makeImage(info, size, class)
-	local imageOptions = {
+	local imageOptions = Array.append({},
 		info.file,
-	}
-	table.insert(imageOptions, info.display)
-	table.insert(imageOptions, size)
-	table.insert(imageOptions, Logic.isNotEmpty(info.link) and 'link=' .. info.link or nil)
-	table.insert(imageOptions, Logic.isNotEmpty(class) and 'class=' .. class or nil)
+		info.display,
+		size,
+		Logic.isNotEmpty(info.link) and 'link=' .. info.link or nil,
+		Logic.isNotEmpty(class) and 'class=' .. class or nil
+	)
 
 	return '[[File:' .. table.concat(imageOptions, '|') .. ']]'
 end
