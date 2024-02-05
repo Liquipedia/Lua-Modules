@@ -8,7 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local CardIcon = require('Module:CardIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -26,6 +26,7 @@ local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
 local CARD_COLOR_2 = 'red'
 local DEFAULT_CARD = 'transparent'
+local TRANSPARENT_CARD = '[[File:Transparent_icon.png|link=]]'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
@@ -383,7 +384,10 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				:addClass('brkts-popup-side-color-' .. color)
 				:addClass('brkts-champion-icon')
 				:css('float', flip and 'right' or 'left')
-				:node(CardIcon._getImage{card, date = date})
+				:node(card == DEFAULT_CARD and TRANSPARENT_CARD or CharacterIcon.Icon{
+					character = card,
+					date = date
+				})
 			)
 		end
 
