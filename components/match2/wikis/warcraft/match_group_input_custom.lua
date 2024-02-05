@@ -81,7 +81,6 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		'matchDate',
 		'tournament_startdate',
 		'tournament_enddate',
-		DateExt.defaultDate
 	})
 end
 

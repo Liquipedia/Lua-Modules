@@ -309,7 +309,7 @@ function MatchGroupInput.readDate(dateString, dateFallbacks)
 		}
 
 	elseif dateFallbacks then
-		local suggestedDate = Variables.varDefaultMulti(unpack(dateFallbacks))
+		local suggestedDate = Variables.varDefaultMulti(unpack(dateFallbacks), DateExt.defaultDate)
 		local missingDateCount = globalVars:get('num_missing_dates') or 0
 		globalVars:set('num_missing_dates', missingDateCount + 1)
 		local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'

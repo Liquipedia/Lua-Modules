@@ -294,7 +294,6 @@ function matchFunctions.readDate(matchArgs)
 	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
 		'tournament_enddate',
 		'tournament_startdate',
-		DateExt.defaultDateTime
 	})
 	if matchArgs.date then
 		dateProps.hasDate = true
