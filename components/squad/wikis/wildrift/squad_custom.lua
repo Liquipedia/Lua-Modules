@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -19,6 +20,8 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
+---@param self Squad
+---@return Squad
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -37,10 +40,10 @@ function CustomSquad.header(self)
 		:node(makeHeader('Name'))
 		:node(makeHeader('Position'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_FORMER then
+	if self.type == Squad.SquadTypes.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == Squad.TYPE_INACTIVE then
+	elseif self.type == Squad.SquadTypes.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 
@@ -49,8 +52,11 @@ function CustomSquad.header(self)
 	return self
 end
 
+---@class WildriftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
+---@param args any
+---@return self
 function ExtendedSquadRow:position(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Position')
@@ -76,6 +82,8 @@ function ExtendedSquadRow:position(args)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 
@@ -86,18 +94,20 @@ function CustomSquad.run(frame)
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local index = 1
-	while args['p' .. index] or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+	local players = Array.mapIndexes(function(index)
+		return Json.parseIfString(args['p' .. index] or args[index])
+	end)
 
+	Array.forEach(players, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end
 
+---@param playerList table[]
+---@param squadType integer
+---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
 	if Table.isEmpty(playerList) then
 		return
@@ -111,7 +121,7 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad.header = CustomSquad.header
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
+	Array.forEach(playerList, function(player)
 		--Get Reference(s)
 		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
 		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -131,11 +141,14 @@ function CustomSquad.runAuto(playerList, squadType)
 		player.newteamdate = player.newTeam.date
 
 		squad:row(CustomSquad._playerRow(player, squad.type))
-	end
+	end)
 
 	return squad:create()
 end
 
+---@param player table
+---@param squadType integer
+---@return Html
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 
@@ -153,7 +166,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:position{role = player.role, position = player.position}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_FORMER then
+	if squadType == Squad.SquadTypes.FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
@@ -161,7 +174,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == Squad.TYPE_INACTIVE then
+	elseif squadType == Squad.SquadTypes.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
