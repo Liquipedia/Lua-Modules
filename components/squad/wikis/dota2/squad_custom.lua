@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
@@ -19,6 +21,8 @@ local CustomSquad = {}
 
 local LANG = mw.getContentLanguage()
 
+---@param self Squad
+---@return Squad
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -37,15 +41,15 @@ function CustomSquad.header(self)
 		:node(makeHeader('Name'))
 		:node(makeHeader('Position'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE then
+	if self.type == Squad.SquadTypes.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 			:node(makeHeader('Active Team'))
 	end
-	if self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadTypes.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 			:node(makeHeader('Last Active Team'))
 	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadTypes.FORMER or self.type == Squad.SquadTypes.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -55,8 +59,11 @@ function CustomSquad.header(self)
 	return self
 end
 
+---@class Dota2SquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
+---@param args table
+---@return self
 function ExtendedSquadRow:position(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Position')
@@ -82,6 +89,8 @@ function ExtendedSquadRow:position(args)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 
@@ -89,25 +98,24 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	if squad.type == Squad.TYPE_FORMER then
-		local index = 1
-		while args['p' .. index] ~= nil or args[index] do
-			local player = Json.parseIfString(args['p' .. index] or args[index])
-			if player.inactivedate then
-				squad.type = Squad.TYPE_FORMER_INACTIVE
-				break
-			end
+	local players = Array.mapIndexes(function(index)
+		return Json.parseIfString(args['p' .. index] or args[index])
+	end)
 
-			index = index + 1
-		end
+	---@param player table
+	---@return boolean
+	local hasInactive = function(player)
+		return Logic.isNotEmpty(player.inactivedate)
+	end
+
+	if squad.type == Squad.SquadTypes.FORMER and Array.any(players, hasInactive) then
+		squad.type = Squad.SquadTypes.FORMER_INACTIVE
 	end
 
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local index = 1
-	while args['p' .. index] ~= nil or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
 		row:status(squad.type)
 		row:id{
@@ -124,7 +132,7 @@ function CustomSquad.run(frame)
 			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
+		if squad.type == Squad.SquadTypes.INACTIVE or squad.type == Squad.SquadTypes.FORMER_INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			row:newteam{
 				newteam = player.activeteam,
@@ -132,7 +140,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.inactivedate
 			}
 		end
-		if squad.type == Squad.TYPE_FORMER or squad.type == Squad.TYPE_FORMER_INACTIVE then
+		if squad.type == Squad.SquadTypes.FORMER or squad.type == Squad.SquadTypes.FORMER_INACTIVE then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -150,9 +158,7 @@ function CustomSquad.run(frame)
 			.. (player.role and '_' .. player.role or '')
 			.. '_' .. squad.type
 		))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end
