@@ -7,8 +7,9 @@
 --
 
 local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Json = require('Module:Json')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -29,13 +30,13 @@ local Attack = {}
 ---@field bonusDps number?
 ---@field range number?
 
----@param args table?
+---@param argsJson string
 ---@param attackIndex integer
 ---@param faction string
 ---@return Widget[]?
-function Attack.run(args, attackIndex, faction)
-	if Table.isEmpty(args) then return end
-	---@cast args -nil
+function Attack.run(argsJson, attackIndex, faction)
+	local args = Json.parseIfTable(argsJson)
+	if not args then return end
 	assert(args.name, 'Please specify a name for attack ' .. attackIndex)
 	assert(faction, 'Faction needs to be specified')
 
