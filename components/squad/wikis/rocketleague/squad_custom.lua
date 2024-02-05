@@ -25,7 +25,7 @@ function CustomSquad.run(frame)
 	local args = squad.args
 
 	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args['p' .. index] or args[index])
+		return Json.parseIfString(args[index])
 	end)
 
 	Array.forEach(players, function(player)
@@ -44,7 +44,7 @@ function CustomSquad.run(frame)
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadTypes.FORMER then
+		if squad.type == Squad.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam({
 				newteam = player.newteam,
@@ -52,7 +52,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			})
-		elseif squad.type == Squad.SquadTypes.INACTIVE then
+		elseif squad.type == Squad.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 

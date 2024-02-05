@@ -33,10 +33,10 @@ function CustomSquad.header(self)
 		:node(makeHeader(''))
 		:node(makeHeader('Main'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadTypes.INACTIVE or self.type == Squad.SquadTypes.FORMER_INACTIVE then
+	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
-	if self.type == Squad.SquadTypes.FORMER or self.type == Squad.SquadTypes.FORMER_INACTIVE then
+	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -98,7 +98,7 @@ function CustomSquad.run(frame)
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadTypes.FORMER then
+		if squad.type == Squad.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -106,7 +106,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.SquadTypes.INACTIVE then
+		elseif squad.type == Squad.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 

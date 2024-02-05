@@ -25,10 +25,10 @@ local VALID_TYPES = {'player', 'staff'}
 local DEFAULT_TYPE = 'player'
 
 local STATUS_MAPPING = {
-	[Squad.SquadTypes.ACTIVE] = 'active',
-	[Squad.SquadTypes.INACTIVE] = 'inactive',
-	[Squad.SquadTypes.FORMER] = 'former',
-	[Squad.SquadTypes.FORMER_INACTIVE] = 'former',
+	[Squad.SquadType.ACTIVE] = 'active',
+	[Squad.SquadType.INACTIVE] = 'inactive',
+	[Squad.SquadType.FORMER] = 'former',
+	[Squad.SquadType.FORMER_INACTIVE] = 'former',
 }
 
 local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
@@ -49,14 +49,12 @@ local SquadRow = Class.new(
 	end
 )
 
----@enum SquadRowSpecialTeams
-local specialTeams = {
+SquadRow.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
 	['passed away'] = 'Team/passed away',
 	military = 'Team/military',
 }
-SquadRow.specialTeamsTemplateMapping = specialTeams
 
 ---@param args table
 ---@return self

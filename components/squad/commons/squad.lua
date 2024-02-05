@@ -19,14 +19,14 @@ local String = require('Module:StringUtils')
 ---@field type integer
 local Squad = Class.new()
 
----@enum SquadTypes
-local SquadTypes = {
+---@enum SquadType
+local SquadType = {
 	ACTIVE = 0,
 	INACTIVE = 1,
 	FORMER = 2,
 	FORMER_INACTIVE = 3,
 }
-Squad.SquadTypes = SquadTypes
+Squad.SquadType = SquadType
 
 ---@param frame Frame
 ---@return self
@@ -49,7 +49,7 @@ function Squad:init(frame)
 
 	local status = (self.args.status or 'active'):upper()
 
-	self.type = SquadTypes[status] or SquadTypes.ACTIVE
+	self.type = SquadType[status] or SquadType.ACTIVE
 
 	return self
 end
@@ -57,9 +57,9 @@ end
 ---@return Squad
 function Squad:title()
 	local defaultTitle
-	if self.type == SquadTypes.FORMER then
+	if self.type == SquadType.FORMER then
 		defaultTitle = 'Former Squad'
-	elseif self.type == SquadTypes.INACTIVE then
+	elseif self.type == SquadType.INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
@@ -105,10 +105,10 @@ function Squad:header()
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == SquadTypes.FORMER then
+	if self.type == SquadType.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == SquadTypes.INACTIVE then
+	elseif self.type == SquadType.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 

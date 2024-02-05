@@ -47,10 +47,10 @@ function CustomSquad.header(self)
 	headerRow:node(makeHeader('Name'))
 		:node(makeHeader('Position'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadTypes.FORMER then
+	if self.type == Squad.SquadType.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == Squad.SquadTypes.INACTIVE then
+	elseif self.type == Squad.SquadType.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 
@@ -118,7 +118,7 @@ function CustomSquad.run(frame)
 	local args = squad.args
 
 	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+		local player = Json.parseIfString(args[index])
 		if player.number then
 			HAS_NUMBER = true
 		end
@@ -199,7 +199,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:position{role = player.role, position = player.position}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadTypes.FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
@@ -207,7 +207,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == Squad.SquadTypes.INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 

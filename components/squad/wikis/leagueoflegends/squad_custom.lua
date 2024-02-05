@@ -63,7 +63,7 @@ function CustomSquad.run(frame)
 	squad:header()
 
 	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args['p' .. index] or args[index])
+		return Json.parseIfString(args[index])
 	end)
 
 	Array.forEach(players, function(player)
@@ -133,7 +133,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:position{role = player.role, position = player.position}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadTypes.FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
@@ -141,7 +141,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == Squad.SquadTypes.INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 

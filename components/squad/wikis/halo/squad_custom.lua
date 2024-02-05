@@ -68,7 +68,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:role({role = player.thisTeam.role})
 	row:date(joinText, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadTypes.FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		row:date(leaveText, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam({
 			newteam = player.newTeam.team,
@@ -76,7 +76,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newTeam.date,
 			leavedate = player.newTeam.date
 		})
-	elseif squadType == Squad.SquadTypes.INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 

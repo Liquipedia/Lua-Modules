@@ -39,10 +39,10 @@ function CustomSquad.header(self)
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadTypes.INACTIVE or self.type == Squad.SquadTypes.FORMER_INACTIVE then
+	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
-	if self.type == Squad.SquadTypes.FORMER or self.type == Squad.SquadTypes.FORMER_INACTIVE then
+	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -62,15 +62,15 @@ function CustomSquad.run(frame)
 	local args = squad.args
 
 	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args['p' .. index] or args[index])
+		return Json.parseIfString(args[index])
 	end)
 
 	local hasInactive = function(player)
 		return Logic.isNotEmpty(player.inactivedate)
 	end
 
-	if squad.type == Squad.SquadTypes.FORMER and Array.any(players, hasInactive) then
-		squad.type = Squad.SquadTypes.FORMER_INACTIVE
+	if squad.type == Squad.SquadType.FORMER and Array.any(players, hasInactive) then
+		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 
 	squad.header = CustomSquad.header
@@ -143,11 +143,11 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadTypes.INACTIVE or squadType == Squad.SquadTypes.FORMER_INACTIVE then
+	if squadType == Squad.SquadType.INACTIVE or squadType == Squad.SquadType.FORMER_INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	if squadType == Squad.SquadTypes.FORMER or squadType == Squad.SquadTypes.FORMER_INACTIVE then
+	if squadType == Squad.SquadType.FORMER or squadType == Squad.SquadType.FORMER_INACTIVE then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,

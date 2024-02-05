@@ -103,7 +103,7 @@ function CustomSquad.run(frame)
 			row:role{role = player.role}
 			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-			if squad.type == Squad.SquadTypes.FORMER then
+			if squad.type == Squad.SquadType.FORMER then
 				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 				row:newteam{
 					newteam = player.newteam,
@@ -111,7 +111,7 @@ function CustomSquad.run(frame)
 					newteamdate = player.newteamdate,
 					leavedate = player.leavedate
 				}
-			elseif squad.type == Squad.SquadTypes.INACTIVE then
+			elseif squad.type == Squad.SquadType.INACTIVE then
 				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			end
 		end

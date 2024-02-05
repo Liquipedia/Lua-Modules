@@ -30,8 +30,8 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	local isFormer = squad.type == Squad.SquadTypes.FORMER
-	local isInactive = squad.type == Squad.SquadTypes.INACTIVE
+	local isFormer = squad.type == Squad.SquadType.FORMER
+	local isInactive = squad.type == Squad.SquadType.INACTIVE
 	local isMainSquad = Logic.readBool(args.main)
 	local squadName = args.squad or mw.title.getCurrentTitle().prefixedText
 	local status = (isFormer and 'former')
@@ -40,7 +40,7 @@ function CustomSquad.run(frame)
 		or 'active'
 
 	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+		local player = Json.parseIfString(args[index])
 		if not player then return player end
 		player.faction = Faction.read(player.race)
 		if isFormer then
