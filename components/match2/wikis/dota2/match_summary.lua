@@ -8,12 +8,12 @@
 
 local CustomMatchSummary = {}
 
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local HeroIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
@@ -26,6 +26,7 @@ local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local SIZE_HERO = '57x32px'
+local NO_HERO = '[[File:No Hero.png|link=|57x32px]]'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
@@ -299,12 +300,13 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	local color = opponentHeroesData.side or ''
 
 	for index = 1, numberOfHeroes do
+		local hero = opponentHeroesData[index]
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
-			:node(HeroIcon._getImage{
-				hero = opponentHeroesData[index],
+			:node(Logic.isEmpty(hero) and NO_HERO or CharacterIcon.Icon{
+				character = hero,
 				size = SIZE_HERO,
 			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
