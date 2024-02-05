@@ -8,13 +8,13 @@
 
 local CustomMatchSummary = {}
 
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ChampionIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
@@ -259,8 +259,8 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
 		:css('float', flip and 'right' or 'left')
-		:node(ChampionIcon._getImage{
-			champ = opponentChampionsData[index],
+		:node(CharacterIcon.Icon{
+			character = opponentChampionsData[index],
 			class = 'brkts-champion-icon',
 			date = date,
 		})
