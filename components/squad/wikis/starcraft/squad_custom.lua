@@ -19,7 +19,9 @@ local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
-function CustomSquad:headerTlpd()
+---@param self Squad
+---@return self
+function CustomSquad.headerTlpd(self)
 	local makeHeader = function(wikiText)
 		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
 	end
@@ -37,7 +39,11 @@ function CustomSquad:headerTlpd()
 	return self
 end
 
+---@class StarcraftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
+
+---@param args table
+---@return self
 function ExtendedSquadRow:elo(args)
 	self.content:node(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
 	self.content:node(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
@@ -45,6 +51,8 @@ function ExtendedSquadRow:elo(args)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 	squad:init(frame)
@@ -95,7 +103,7 @@ function CustomSquad.run(frame)
 			row:role{role = player.role}
 			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-			if squad.type == Squad.TYPE_FORMER then
+			if squad.type == Squad.SquadTypes.FORMER then
 				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 				row:newteam{
 					newteam = player.newteam,
@@ -103,7 +111,7 @@ function CustomSquad.run(frame)
 					newteamdate = player.newteamdate,
 					leavedate = player.leavedate
 				}
-			elseif squad.type == Squad.TYPE_INACTIVE then
+			elseif squad.type == Squad.SquadTypes.INACTIVE then
 				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			end
 		end
@@ -119,6 +127,9 @@ function CustomSquad.run(frame)
 	return squad:create()
 end
 
+---@param id number?
+---@param value string
+---@return string?
 function CustomSquad._queryTLPD(id, value)
 	if not Logic.isNumeric(id) then
 		return
