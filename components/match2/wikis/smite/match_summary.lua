@@ -8,92 +8,81 @@
 
 local CustomMatchSummary = {}
 
+local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Json = require('Module:Json')
+local HeroIcon = require('Module:GodIcon')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ChampionIcon = require('Module:GodIcon')
-local Table = require('Module:Table')
-local ExternalLinks = require('Module:ExternalLinks')
 local String = require('Module:StringUtils')
-local Array = require('Module:Array')
+local Table = require('Module:Table')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local Opponent = Lua.import('Module:Opponent')
 
-local MAX_NUM_BANS = 5
-local NUM_CHAMPIONS_PICK = 5
-
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local MAX_NUM_BANS = 7
+local NUM_HEROES_PICK_TEAM = 5
+local NUM_HEROES_PICK_SOLO = 1
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
--- Champion Ban Class
----@class SMITEChampionBan: MatchSummaryRowInterface
----@operator call: SMITEChampionBan
+-- Hero Ban Class
+---@class SmiteBan: MatchSummaryRowInterface
+---@operator call: SmiteHeroBan
 ---@field root Html
 ---@field table Html
-local ChampionBan = Class.new(
-	function(self)
+---@field date string
+local HeroBan = Class.new(
+	function(self, date)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
+		self.date = date
 		self:createHeader()
 	end
 )
 
 ---@return self
-function ChampionBan:createHeader()
+function HeroBan:createHeader()
 	self.table:tag('tr')
-		:tag('th'):css('width','40%'):wikitext(''):done()
-		:tag('th'):css('width','20%'):wikitext('Bans'):done()
-		:tag('th'):css('width','40%'):wikitext(''):done()
+		:tag('th'):css('width', '40%'):wikitext(''):done()
+		:tag('th'):css('width', '20%'):wikitext('Bans'):done()
+		:tag('th'):css('width', '40%'):wikitext(''):done()
 	return self
 end
 
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
 ---@param numberOfBans integer
----@param date string
 ---@return self
-function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
+function HeroBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
-		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
-		:tag('td')
-			:node(mw.html.create('div')
-				:wikitext(CustomMatchSummary._createAbbreviation{
-					title = 'Bans in game ' .. gameNumber,
-					text = 'Game ' .. gameNumber,
-				})
-			)
-		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
+		:tag('td'):css('float', 'left')
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], numberOfBans, true, self.date))
+		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
+			:wikitext(Abbreviation.make(
+				'Game ' .. gameNumber,
+				'Bans in game ' .. gameNumber
+			))
+		)
+		:tag('td'):css('float', 'right')
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], numberOfBans, true, self.date))
 	return self
 end
 
+
 ---@return Html
-function ChampionBan:create()
+function HeroBan:create()
 	return self.root
 end
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if Table.isNotEmpty(match.links) then
-		footer:addElement(ExternalLinks.print(match.links))
-	end
-
-	return footer
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
@@ -101,9 +90,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
+		-- if match is not epoch=0, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
@@ -112,24 +101,7 @@ function CustomMatchSummary.createBody(match)
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
 		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
-		if rowDisplay then
-			body:addRow(rowDisplay)
-		end
-	end
-
-	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+		body:addRow(rowDisplay)
 	end
 
 	-- casters
@@ -143,8 +115,8 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(casterRow)
 	end
 
-	-- Pre-Process Champion Ban Data
-	local championBanData = {}
+	-- Pre-Process Hero Ban Data
+	local showGameBans = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
@@ -161,22 +133,25 @@ function CustomMatchSummary.createBody(match)
 		end
 
 		if numberOfBans > 0 then
-			banData[1].color = extradata.team1side
-			banData[2].color = extradata.team2side
+			banData[1].side = extradata.team1side
+			banData[2].side = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			championBanData[gameIndex] = banData
+			showGameBans[gameIndex] = banData
 		end
 	end
 
-	-- Add the Champion Bans
-	if not Table.isEmpty(championBanData) then
-		local championBan = ChampionBan()
+	-- Add the Hero Bans
+	if not Table.isEmpty(showGameBans) then
+		local heroBan = HeroBan(match.date)
 
-		for gameIndex, banData in ipairs(championBanData) do
-			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+		for gameIndex in ipairs(match.games) do
+			local banData = showGameBans[gameIndex]
+			if banData then
+				heroBan:banRow(banData, gameIndex, banData.numberOfBans)
+			end
 		end
 
-		body:addRow(championBan)
+		body:addRow(heroBan)
 	end
 
 	return body
@@ -185,55 +160,50 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return MatchSummaryRow?
+---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local championsData = {{}, {}}
-	local championsDataIsEmpty = true
-	for champIndex = 1, NUM_CHAMPIONS_PICK do
-		if String.isNotEmpty(extradata['team1champion' .. champIndex]) then
-			championsData[1][champIndex] = extradata['team1champion' .. champIndex]
-			championsDataIsEmpty = false
-		end
-		if String.isNotEmpty(extradata['team2champion' .. champIndex]) then
-			championsData[2][champIndex] = extradata['team2champion' .. champIndex]
-			championsDataIsEmpty = false
-		end
-		championsData[1].color = extradata.team1side
-		championsData[2].color = extradata.team2side
+	local numberOfHeroes = NUM_HEROES_PICK_TEAM
+	if game.mode == Opponent.solo then
+		numberOfHeroes = NUM_HEROES_PICK_SOLO
 	end
 
-	if
-		Logic.isEmpty(game.length) and
-		Logic.isEmpty(game.winner) and
-		championsDataIsEmpty
-	then
-		return nil
+	local heroesData = {{}, {}}
+	for heroIndex = 1, numberOfHeroes do
+		if String.isNotEmpty(extradata['team1champion' .. heroIndex]) then
+			heroesData[1][heroIndex] = extradata['team1champion' .. heroIndex]
+		end
+		if String.isNotEmpty(extradata['team2champion' .. heroIndex]) then
+			heroesData[2][heroIndex] = extradata['team2champion' .. heroIndex]
+		end
+		heroesData[1].side = extradata.team1side
+		heroesData[2].side = extradata.team2side
 	end
 
-	row	:addClass('brkts-popup-body-game')
-		:css('font-size', '85%')
-		:css('overflow', 'hidden')
+	row:addClass('brkts-popup-body-game')
+		:css('font-size', '80%')
+		:css('padding', '4px')
+		:css('min-height', '32px')
 
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], NUM_CHAMPIONS_PICK, date, false))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false, date))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext(CustomMatchSummary._createAbbreviation{
-			title = Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
-			text = Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
-		})
-	)
+		:wikitext(Abbreviation.make(
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'			
+			))
+		)	
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
+	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
 		local comment = mw.html.create('div')
-		comment :wikitext(game.comment)
+		comment:wikitext(game.comment)
 				:css('margin', 'auto')
 		row:addElement(comment)
 	end
@@ -245,12 +215,12 @@ end
 ---@return Html
 function CustomMatchSummary._createCheckMark(isWinner)
 	local container = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '27px')
-		:css('margin-left', '3%')
-		:css('margin-right', '3%')
+		:addClass('brkts-popup-body-element-vertical-centered')
+		:css('line-height', '17px')
+		:css('margin-left', '1%')
+		:css('margin-right', '1%')
 
-	if isWinner then
+	if Logic.readBool(isWinner) then
 		container:node(GREEN_CHECK)
 	else
 		container:node(NO_CHECK)
@@ -259,50 +229,39 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
----@param args table
----@return string
-function CustomMatchSummary._createAbbreviation(args)
-	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
-end
-
----@param opponentChampionsData table
----@param numberOfChampions integer
----@param date string
+---@param opponentHeroesData table
+---@param numberOfHeroes integer
 ---@param flip boolean?
----@param isBan boolean?
+---@param date string
 ---@return Html
-function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
-	local opponentChampionsDisplay = {}
-	local color = opponentChampionsData.color or ''
-	opponentChampionsData.color = nil
+function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfHeroes, flip, date)
+	local opponentHeroesDisplay = {}
+	local color = opponentHeroesData.side or ''
 
-	for index = 1, numberOfChampions do
-		local champDisplay = mw.html.create('div')
-		:addClass('brkts-popup-side-color-' .. color)
-		:css('float', flip and 'right' or 'left')
-		:node(ChampionIcon._getImage{
-			champ = opponentChampionsData[index],
-			class = 'brkts-champion-icon',
-			date = date,
-		})
-		if index == 1 then
-			champDisplay:css('padding-left', '2px')
-		elseif index == numberOfChampions then
-			champDisplay:css('padding-right', '2px')
+	for index = 1, numberOfHeroes do
+		local heroDisplay = mw.html.create('div')
+			:addClass('brkts-popup-side-color-' .. color)
+			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
+		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
+			if flip then
+				heroDisplay:css('margin-right', '70px')
+			else
+				heroDisplay:css('margin-left', '70px')
+			end
 		end
-		table.insert(opponentChampionsDisplay, champDisplay)
+		table.insert(opponentHeroesDisplay, heroDisplay)
 	end
 
 	if flip then
-		opponentChampionsDisplay = Array.reverse(opponentChampionsDisplay)
+		opponentHeroesDisplay = Array.reverse(opponentHeroesDisplay)
 	end
 
 	local display = mw.html.create('div')
-	if isBan then
-		display:addClass('brkts-popup-side-shade-out' .. (flip and '-flipped' or ''))
-	end
+		:addClass('brkts-popup-body-element-thumbs')
+		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
+		:addClass('brkts-champion-icon')
 
-	for _, item in ipairs(opponentChampionsDisplay) do
+	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
 	end
 
