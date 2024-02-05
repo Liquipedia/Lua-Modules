@@ -99,7 +99,7 @@ end
 
 --Same as CustomPlayerExt.syncPlayer, except it does not save the player's flag to page variables.
 function CustomPlayerExt.populatePlayer(player, options)
-	return PlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
+	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
 function CustomPlayerExt.saveToPageVars(player)
