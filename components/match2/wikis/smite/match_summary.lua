@@ -14,6 +14,7 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local HeroIcon = require('Module:GodIcon')
 local Icon = require('Module:Icon')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -193,9 +194,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(Abbreviation.make(
 			Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
-			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'			
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'
 			))
-		)	
+		)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
