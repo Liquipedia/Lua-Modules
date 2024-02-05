@@ -56,7 +56,7 @@ return {
 			link = 'Karting Tournaments',
 			category = 'Karting Tournaments',
 		},
-		{
+		[-1] = {
 			value = '-1',
 			sort = 'A7',
 			name = 'Misc',
