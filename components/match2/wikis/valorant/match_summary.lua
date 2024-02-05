@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AgentIcon = require('Module:AgentIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
@@ -62,7 +62,10 @@ function Agents:add(agent)
 		return self
 	end
 
-	self.text = self.text .. AgentIcon._getBracketIcon{agent}
+	self.text = self.text .. CharacterIcon.Icon{
+		character = agent,
+		size = '20px'
+	}
 	return self
 end
 
