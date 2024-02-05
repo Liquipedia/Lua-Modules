@@ -61,26 +61,17 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate')
-
-	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
-
-	if matchArgs.date or (not suggestedDate and tournamentStartTime) then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date or tournamentStartTime)
-		dateProps.dateexact = Logic.nilOr(
-			Logic.readBoolOrNil(matchArgs.dateexact),
-			matchArgs.date and dateProps.dateexact or false
-		)
-		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
-	end
-
-	return MatchGroupInput.readDate(nil, {
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
 		'matchDate',
 		'tournament_startdate',
-		'tournament_enddate',
-		DateExt.defaultDate
+		'tournament_enddate'
 	})
+
+	if dateProps.dateexact then
+		Variables.varDefine('matchDate', dateProps.date)
+	end
+
+	return dateProps
 end
 
 ---@param match table

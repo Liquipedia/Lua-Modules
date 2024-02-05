@@ -79,7 +79,6 @@ function StarcraftMatchGroupInput._readDate(matchArgs)
 		'tournament_enddate',
 		DateExt.defaultDate
 	})
-	dateProps.dateexact = Logic.nilOr(Logic.readBoolOrNil(matchArgs.dateexact), dateProps.dateexact)
 	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
 	end

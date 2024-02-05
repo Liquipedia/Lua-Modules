@@ -321,7 +321,9 @@ end
 
 function matchFunctions.readDate(matchArgs)
 	local dateProps = MatchGroupInput.readDate(matchArgs.date)
-	dateProps.hasDate = true
+	if dateProps.dateexact then
+		dateProps.hasDate = true
+	end
 	return dateProps
 end
 

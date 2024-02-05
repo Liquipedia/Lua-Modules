@@ -63,7 +63,7 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate') or Variables.varDefault('Match_date')
+	local suggestedDate = Variables.varDefault('matchDate')
 
 	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
 
@@ -79,7 +79,6 @@ function CustomMatchGroupInput._readDate(matchArgs)
 
 	return MatchGroupInput.readDate(nil, {
 		'matchDate',
-		'Match_date',
 		'tournament_startdate',
 		'tournament_enddate',
 		DateExt.defaultDate
