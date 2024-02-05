@@ -41,6 +41,7 @@ function CustomSquad.run(frame)
 
 	local players = Array.mapIndexes(function(index)
 		local player = Json.parseIfString(args['p' .. index] or args[index])
+		if not player then return player end
 		player.faction = Faction.read(player.race)
 		if isFormer then
 			player.newteam = String.nilIfEmpty(player.newteam) or
