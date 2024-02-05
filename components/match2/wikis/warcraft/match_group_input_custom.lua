@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local HeroData = mw.loadData('Module:HeroData')
