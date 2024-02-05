@@ -20,7 +20,9 @@ local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
-function CustomSquad:header()
+---@param self Squad
+---@return Squad
+function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
 	end
@@ -31,10 +33,10 @@ function CustomSquad:header()
 		:node(makeHeader(''))
 		:node(makeHeader('Main'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadTypes.INACTIVE or self.type == Squad.SquadTypes.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadTypes.FORMER or self.type == Squad.SquadTypes.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -43,8 +45,11 @@ function CustomSquad:header()
 
 	return self
 end
-
+---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
+
+---@param args table
+---@return self
 function ExtendedSquadRow:mains(args)
 	local cell = mw.html.create('td')
 	cell:css('text-align', 'center')
@@ -57,6 +62,8 @@ function ExtendedSquadRow:mains(args)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 	squad:init(frame):title()
@@ -91,7 +98,7 @@ function CustomSquad.run(frame)
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_FORMER then
+		if squad.type == Squad.SquadTypes.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -99,7 +106,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.TYPE_INACTIVE then
+		elseif squad.type == Squad.SquadTypes.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
