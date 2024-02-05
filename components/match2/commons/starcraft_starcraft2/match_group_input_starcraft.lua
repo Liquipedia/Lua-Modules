@@ -73,7 +73,6 @@ end
 function StarcraftMatchGroupInput._readDate(matchArgs)
 	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
 		'matchDate',
-		'Match_date',
 		'tournament_startdate',
 		'tournament_enddate',
 	})
