@@ -9,7 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:ChampionIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -184,7 +184,10 @@ function BigMatch.run(frame)
 		if type(self) == 'table' then
 			champion = self.champion
 		end
-		return HeroIcon._getImage{champion, date = model.date}
+		return CharacterIcon.Icon{
+			character = champion --[[@as string]],
+			date = model.date
+		}
 	end
 
 	return BigMatch.render(model)

@@ -9,9 +9,9 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:ChampionIcon')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -268,7 +268,10 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
-			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
+			:node(CharacterIcon.Icon{
+				character = opponentHeroesData[index],
+				date = date
+			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
