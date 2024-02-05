@@ -17,6 +17,8 @@ local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 	squad:init(frame):title():header()
@@ -44,7 +46,7 @@ function CustomSquad.run(frame)
 		row:role{role = player.role}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_FORMER then
+		if squad.type == Squad.SquadTypes.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -52,7 +54,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.TYPE_INACTIVE then
+		elseif squad.type == Squad.SquadTypes.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
