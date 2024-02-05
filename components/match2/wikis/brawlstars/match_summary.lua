@@ -6,18 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local MapTypeIcon = require('Module:MapType')
-local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local BrawlerIcon = require('Module:BrawlerIcon')
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local MapTypeIcon = require('Module:MapType')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
@@ -114,8 +114,8 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 		local brawlerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
-			:node(BrawlerIcon._getImage{
-				brawler = brawlerData[index],
+			:node(CharacterIcon.Icon{
+				character = brawlerData[index],
 				class = 'brkts-champion-icon',
 				date = date,
 			})
