@@ -20,7 +20,7 @@ local SquadRow = Lua.import('Module:Squad/Row')
 local CustomSquad = {}
 
 ---@param self Squad
----@return self
+---@return Squad
 function CustomSquad.headerTlpd(self)
 	local makeHeader = function(wikiText)
 		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
