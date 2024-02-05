@@ -97,6 +97,11 @@ function CustomPlayerExt.syncPlayer(player, options)
 	return player
 end
 
+--Same as CustomPlayerExt.syncPlayer, except it does not save the player's flag to page variables.
+function CustomPlayerExt.populatePlayer(player, options)
+	return PlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
+end
+
 function CustomPlayerExt.saveToPageVars(player)
 	if player.faction and player.faction ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_faction', player.faction)
