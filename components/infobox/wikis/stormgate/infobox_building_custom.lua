@@ -74,8 +74,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = CustomBuilding._readCommaSeparatedList(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = CustomBuilding._readCommaSeparatedList(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', content = CustomBuilding._readCommaSeparatedList(args.tech_requirement, Page.makeInternalLink)},
+			Cell{name = 'Building Requirements', content = CustomBuilding._readCommaSeparatedList(args.building_requirement, Page.makeInternalLink)},
 		}
 	elseif id == 'hotkey' then
 		return {
@@ -84,11 +84,11 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = CustomBuilding._readCommaSeparatedList(args.builds)},
+			Cell{name = 'Builds', content = CustomBuilding._readCommaSeparatedList(args.builds, Page.makeInternalLink)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = CustomBuilding._readCommaSeparatedList(args.unlocks)},
+			Cell{name = 'Unlocks', content = CustomBuilding._readCommaSeparatedList(args.unlocks, Page.makeInternalLink)},
 			Cell{name = 'Passive', content = CustomBuilding._readCommaSeparatedList(args.passive)},
 		}
 	elseif id == 'defense' then
@@ -171,18 +171,19 @@ function CustomBuilding:setLpdbData(args)
 end
 
 ---@param inputString string?
+---@param fun function?
 ---@return string[]
-function CustomBuilding._readCommaSeparatedList(inputString)
+function CustomBuilding._readCommaSeparatedList(inputString, fun)
 	if String.isEmpty(inputString) then return {} end
 	---@cast inputString -nil
-	return Array.map(mw.text.split(inputString, ','), String.trim)
+	local values Array.map(mw.text.split(inputString, ','), String.trim)
+	if not fun then return values end
+	return Array.map(values, fun)
 end
 
 ---@return string[]
 function CustomBuilding:_getArmorDisplay()
-	local armorTypes = Array.map(CustomBuilding._readCommaSeparatedList(self.args.armor_type), function(armorType)
-		return Page.makeInternalLink(armorType)
-	end)
+	local armorTypes = CustomBuilding._readCommaSeparatedList(self.args.armor_type, Page.makeInternalLink)
 
 	return Array.append({},
 		self.args.armor and (ICON_ARMOR .. self.args.armor) or nil,
