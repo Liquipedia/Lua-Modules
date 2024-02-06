@@ -25,10 +25,9 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
 local CARD_COLOR_2 = 'red'
-local DEFAULT_CARD = 'transparent'
-local TRANSPARENT_CARD = '[[File:Transparent_icon.png|link=]]'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local DEFAULT_CARD = 'default'
 -- Normal links, from input/lpdb
 local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
@@ -384,7 +383,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				:addClass('brkts-popup-side-color-' .. color)
 				:addClass('brkts-champion-icon')
 				:css('float', flip and 'right' or 'left')
-				:node(card == DEFAULT_CARD and TRANSPARENT_CARD or CharacterIcon.Icon{
+				:node(CharacterIcon.Icon{
 					character = card,
 					date = date
 				})

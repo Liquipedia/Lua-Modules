@@ -30,6 +30,7 @@ local ICONS = {
 	check = GREEN_CHECK,
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 local LINK_DATA = {}
 
 local CustomMatchSummary = {}
@@ -115,7 +116,7 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
-				character = brawlerData[index],
+				character = brawlerData[index] or NO_CHARACTER,
 				class = 'brkts-champion-icon',
 				date = date,
 			})
