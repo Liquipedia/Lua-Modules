@@ -287,12 +287,12 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		if Logic.isNotEmpty(match.extradata.status) then
 			match.stream = {rawdatetime = true}
 		end
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
