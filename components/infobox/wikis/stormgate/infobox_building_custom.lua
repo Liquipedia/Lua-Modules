@@ -63,8 +63,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
 				faction = caller.faction,
-				luminite = args.min,
-				luminiteTotal = args.totalmin,
+				luminite = args.luminite,
+				luminiteTotal = args.totalluminite,
 				luminiteForced = true,
 				therium = args.therium,
 				theriumTotal = args.totaltherium,
