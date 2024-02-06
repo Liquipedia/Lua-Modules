@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Sight', content = {args.sight}},
+			Cell{name = 'Sight', content = {args.sight}}
 			--todo: energy/energy_rate
 		)
 	elseif id == 'cost' then
@@ -164,6 +164,8 @@ function CustomBuilding:setLpdbData(args)
 			macrokey2 = args.macro_key2,
 			health = args.health,
 			armor = args.sight,
+			energy = args.energy,
+			energyrate = args.energy_rate,
 		},
 	})
 end
