@@ -120,7 +120,7 @@ function MatchTable:readConfig()
 		showVod = Logic.readBool(args.vod),
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == Opponent.solo),
-		queryHistoricalAliases = not Logic.readBool(args.doNotQueryHistoricalAliases),
+		queryHistoricalAliases = not Logic.readBool(args.skipQueryingHistoricalAliases),
 	}
 
 	Array.forEach(opponents, function(opponent)
