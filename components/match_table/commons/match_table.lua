@@ -495,7 +495,7 @@ function MatchTable:build()
 
 	if Table.isEmpty(self.matches) then
 		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
-			.. ' has not played any matches under the specified conditions.'
+			.. ' has not played any matches yet.'
 
 		return mw.html.create('tr')
 			:tag('td')
@@ -725,7 +725,7 @@ function MatchTable:displayStats()
 
 	---@param data {w: number, d: number, l: number}
 	---@param statsType string
-	---@return Html?
+	---@return string?
 	local displayScores = function(data, statsType)
 		local sum = data.w + data.d + data.l
 		if sum == 0 then return end
@@ -745,8 +745,7 @@ function MatchTable:displayStats()
 			statsType,
 		}
 
-		return mw.html.create('div')
-			:wikitext(table.concat(parts, ' '))
+		return table.concat(parts, ' ')
 	end
 
 	local startDate = DateExt.formatTimestamp('F j, Y', startTimeStamp)
@@ -757,10 +756,17 @@ function MatchTable:displayStats()
 		:css('font-weight', 'bold')
 		:wikitext(titleText)
 
+	local stats = Array.append({},
+		displayScores(self.stats.matches, 'matches'),
+		displayScores(self.stats.games, 'games')
+	)
+
 	return mw.html.create('div')
 		:node(titleNode)
-		:node(displayScores(self.stats.matches, 'matches'))
-		:node(displayScores(self.stats.games, 'games'))
+		:tag('div')
+			:wikitext(table.concat(stats, ' and '))
+			:wikitext()
+			:done()
 end
 
 return MatchTable
