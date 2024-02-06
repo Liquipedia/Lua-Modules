@@ -37,7 +37,6 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 15
 local MAX_NUM_GAMES = 7
 local DEFAULT_MODE = 'team'
-local DEFAULT_GAME = ''
 local NO_SCORE = -99
 local DUMMY_MAP = 'default'
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
@@ -56,10 +55,7 @@ local CustomMatchGroupInput = {}
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
@@ -319,17 +315,9 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date)
-	if dateProps.date then
-		dateProps.hasDate = true
-	end
-	return dateProps
-end
-
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game', DEFAULT_GAME))
+	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end

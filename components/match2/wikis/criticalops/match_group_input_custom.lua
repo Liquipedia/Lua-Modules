@@ -39,15 +39,13 @@ local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_RESULT_TYPE = 'np'
 local DRAW_RESULT_TYPE = 'draw'
-local NOW = os.time(os.date('!*t'))
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
-
-local TODAY = os.date('%Y-%m-%d')
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -64,10 +62,7 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getExtraData(match)
@@ -100,7 +95,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			TODAY
+			NOW
 		)
 	end
 
@@ -320,15 +315,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date)
-	if matchArgs.date then
-		dateProps.hasDate = true
-	end
-
-	return dateProps
-end
-
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	return MatchGroupInput.getCommonTournamentVars(match)
@@ -426,7 +412,7 @@ function matchFunctions.getOpponents(match)
 		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
-		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+		if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 			local threshold = match.dateexact and 30800 or 86400
 			if match.timestamp + threshold < NOW then
 				match.finished = true

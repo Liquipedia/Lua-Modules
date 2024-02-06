@@ -30,7 +30,7 @@ local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
-local TODAY = os.date('%Y-%m-%d')
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -47,10 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getExtraData(match)
@@ -83,7 +80,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		teamTemplateDate = Variables.varDefaultMulti(
 			'tournament_enddate',
 			'tournament_startdate',
-			TODAY
+			NOW
 		)
 	end
 
@@ -311,15 +308,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date)
-	if matchArgs.date then
-		dateProps.hasDate = true
-	end
-
-	return dateProps
-end
-
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
@@ -404,7 +392,7 @@ function matchFunctions.isFeatured(match)
 		return true
 	end
 
-	if not match.hasDate then
+	if match.timestamp == DateExt.defaultTimestamp then
 		return false
 	end
 
@@ -507,12 +495,9 @@ function matchFunctions.getOpponents(match)
 		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
-		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-			local currentUnixTime = os.time( --[[@as osdateparam]])
-			local lang = mw.getContentLanguage()
-			local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+		if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 			local threshold = match.dateexact and 30800 or 86400
-			if matchUnixTime + threshold < currentUnixTime then
+			if match.timestamp + threshold < NOW then
 				match.finished = true
 			end
 		end
