@@ -8,12 +8,12 @@
 
 local CustomMatchSummary = {}
 
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local HeroIcon = require('Module:HeroIcon')
 local Table = require('Module:Table')
 local String = require('Module:StringUtils')
 local Array = require('Module:Array')
@@ -28,6 +28,7 @@ local NUM_HEROES_PICK_SOLO = 1
 local SIZE_HERO = '57x32px'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 -- Normal links, from input/lpdb
 local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
@@ -303,8 +304,8 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 			:addClass('brkts-popup-side-color-' .. color)
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
-			:node(HeroIcon._getImage{
-				hero = opponentHeroesData[index],
+			:node(CharacterIcon.Icon{
+				character = opponentHeroesData[index] or NO_CHARACTER,
 				size = SIZE_HERO,
 			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then

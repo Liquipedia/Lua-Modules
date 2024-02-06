@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
@@ -16,7 +17,6 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local StrikerIcon = require('Module:StrikerIcon')
 local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -25,6 +25,7 @@ local ICONS = {
 	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
+local NO_CHARACTER = 'default'
 
 local CustomMatchSummary = {}
 
@@ -75,8 +76,8 @@ function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, da
 		local strikerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
-			:node(StrikerIcon._getImage{
-				striker = strikerData[index],
+			:node(CharacterIcon.Icon{
+				character = strikerData[index] or NO_CHARACTER,
 				class = 'brkts-champion-icon',
 				date = date,
 			})

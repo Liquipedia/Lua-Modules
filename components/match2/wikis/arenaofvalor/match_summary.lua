@@ -9,11 +9,11 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local ExternalLinks = require('Module:ExternalLinks')
-local HeroIcon = require('Module:HeroIcon')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -27,6 +27,7 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 -- Champion Ban Class
 ---@class AovChampionBan: MatchSummaryRowInterface
@@ -269,8 +270,8 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
 		:css('float', flip and 'right' or 'left')
-		:node(HeroIcon._getImage{
-			champ = opponentChampionsData[index],
+		:node(CharacterIcon.Icon{
+			character = opponentChampionsData[index] or NO_CHARACTER,
 			class = 'brkts-champion-icon',
 			date = date,
 		})

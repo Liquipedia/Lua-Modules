@@ -10,7 +10,7 @@ local CustomMatchSummary = {}
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local ChampionIcon = require('Module:HeroIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
@@ -29,6 +29,7 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK  = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
@@ -423,8 +424,8 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 		local champDisplay = mw.html.create('div')
 		:addClass('brkts-popup-side-color-' .. color)
 		:css('float', flip and 'right' or 'left')
-		:node(ChampionIcon._getImage{
-			champ = opponentChampionsData[index],
+		:node(CharacterIcon.Icon{
+			character = opponentChampionsData[index] or NO_CHARACTER,
 			class = 'brkts-champion-icon',
 			date = date,
 		})

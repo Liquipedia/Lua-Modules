@@ -9,9 +9,9 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:ChampionIcon')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -29,6 +29,7 @@ local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 -- Hero Ban Class
 ---@class LeagueoOfLegendsHeroBan: MatchSummaryRowInterface
@@ -268,7 +269,10 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
-			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
+			:node(CharacterIcon.Icon{
+				character = opponentHeroesData[index] or NO_CHARACTER,
+				date = date
+			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
