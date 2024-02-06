@@ -10,9 +10,9 @@ local CustomMatchSummary = {}
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:GodIcon')
 local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -194,9 +194,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(Abbreviation.make(
 			Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
-			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'			
 			))
-		)
+		)	
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
@@ -242,7 +242,10 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	for index = 1, numberOfHeroes do
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
-			:node(HeroIcon._getImage{opponentHeroesData[index], date = date})
+			:node(CharacterIcon.Icon{
+				character = opponentHeroesData[index],
+				date = date
+			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
 			if flip then
 				heroDisplay:css('margin-right', '70px')
