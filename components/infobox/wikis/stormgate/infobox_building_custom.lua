@@ -197,7 +197,9 @@ end
 function CustomBuilding:_readCommaSeparatedList(inputString, makeLink)
 	if String.isEmpty(inputString) then return {} end
 	---@cast inputString -nil
-	local values = Array.map(mw.text.split(inputString, ','), String.trim)
+	local values = Array.map(Array.map(mw.text.split(inputString, ','), String.trim), function(value)
+		return mw.getContentLanguage():ucfirst(value)
+	end)
 	if not makeLink then return values end
 	return Array.map(values, Page.makeInternalLink)
 end
