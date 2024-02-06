@@ -19,6 +19,7 @@ local Math = require('Module:MathUtil')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Timezone = require('Module:Timezone')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 local VodLink = require('Module:VodLink')
@@ -37,7 +38,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
-local UTC_ABBREVIATION = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC+0)">UTC</abbr>'
 local DRAW = 'draw'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
@@ -65,7 +65,6 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@class MatchTableMatch
 ---@field timestamp number
 ---@field timeIsExact boolean
----@field timeZone string
 ---@field liquipediatier string?
 ---@field liquipediatiertype string?
 ---@field displayName string
@@ -373,7 +372,6 @@ function MatchTable:matchFromRecord(record)
 	return {
 		timestamp = record.extradata.timestamp,
 		timeIsExact = Logic.readBool(record.dateexact),
-		timeZone = record.extradata.timezoneid or UTC,
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
@@ -384,8 +382,18 @@ function MatchTable:matchFromRecord(record)
 		type = record.type,
 		result = result,
 		game = record.game,
-		dateTime = DateExt.formatTimestamp('M j, Y - H:i', record.extradata.timestamp or '') .. ' ' .. UTC_ABBREVIATION,
+		dateTime = MatchTable._calculateDateTimeString(record.extradata.timezoneid or UTC, record.extradata.timestamp),
 	}
+end
+
+---@param timeZone string
+---@param timestamp number
+---@return string
+function MatchTable._calculateDateTimeString(timeZone, timestamp)
+	local offset = Timezone.getOffset(timeZone) or 0
+
+	return DateExt.formatTimestamp('M j, Y - H:i', timestamp + offset) ..
+		' ' .. Timezone.getTimezoneString(timeZone)
 end
 
 ---@param record table
