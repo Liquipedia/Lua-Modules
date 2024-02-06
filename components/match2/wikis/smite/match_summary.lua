@@ -29,6 +29,7 @@ local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 -- Hero Ban Class
 ---@class SmiteBan: MatchSummaryRowInterface
@@ -243,7 +244,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:node(CharacterIcon.Icon{
-				character = opponentHeroesData[index],
+				character = opponentHeroesData[index] or NO_CHARACTER,
 				date = date
 			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
