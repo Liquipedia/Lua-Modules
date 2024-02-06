@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 local Opponent = require('Module:Opponent')
 
@@ -37,17 +38,17 @@ end
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '    '
 
-	if bestof == 0 and args.score ~= 'false' then
-		args.score = 'true'
+	if bestof == 0 and Logic.readBoolOrNil(args.score) ~= false then
+		args.score = true
 	end
-	local score = args.score == 'true' and '|score=' or nil
-	local bans = args.bans == 'true'
+	local score = Logic.readBool(args.score) and '|score=' or nil
+	local bans = Logic.readBool(args.bans)
 
 	local lines = Array.extend(
 		'{{Match',
 		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|youtube='} or {}
+		args.hasDate == 'true' and {indent .. '|date=', indent .. '|youtube=|twitch='} or {}
 	)
 
 	for i = 1, opponents do
@@ -59,7 +60,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			Array.appendWith(lines,
 				indent .. '|map' .. i .. '={{Map',
 				indent .. indent .. '|team1side=|team2side=|length=|winner=',
-				indent .. indent .. '|caster1=|caster2=|mvp=',
 				indent .. indent .. '<!-- Gods picks -->',
 				indent .. indent .. '|t1g1=|t1g2=|t1g3=|t1g4=|t1g5=',
 				indent .. indent .. '|t2g1=|t2g2=|t2g3=|t2g4=|t2g5='
