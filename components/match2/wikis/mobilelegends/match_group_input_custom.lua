@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -291,21 +290,15 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'tournament_enddate',
+		'tournament_startdate',
+	})
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.hasDate = true
-		return dateProps
-	else
-		local suggestedDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			DateExt.defaultDateTime
-		)
-		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
-			dateexact = false,
-		}
 	end
+
+	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)

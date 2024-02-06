@@ -320,17 +320,11 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date)
+	if dateProps.date then
 		dateProps.hasDate = true
-		return dateProps
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
 	end
+	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)

@@ -58,10 +58,8 @@ local CustomMatchGroupInput = {}
 function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
@@ -324,18 +322,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	end
 
 	return match
-end
-
-function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
 end
 
 function matchFunctions.getTournamentVars(match)
