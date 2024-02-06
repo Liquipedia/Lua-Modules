@@ -42,6 +42,8 @@ function CustomUnit.run(frame)
 
 	unit.faction = Faction.read(unit.args.faction)
 	unit.args.informationType = unit.args.informationType or 'Unit'
+	--remove description from infobox
+	unit.args.description = nil
 
 	return unit:createInfobox()
 end
