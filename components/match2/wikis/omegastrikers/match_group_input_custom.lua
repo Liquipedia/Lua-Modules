@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -25,6 +26,7 @@ local STATUS_TO_WALKOVER = {FF = 'ff', DQ = 'dq', L = 'l'}
 local NOT_PLAYED = {'skip', 'np'}
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -74,7 +76,7 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -83,7 +85,16 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -152,7 +163,7 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
+			CustomMatchGroupInput.processOpponent(opponent, args.timestamp)
 
 			opponent.score = opponent.score or sumscores[opponentIndex]
 
@@ -207,11 +218,8 @@ function matchFunctions.getOpponents(args)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if args.timestamp + threshold < NOW then
 			args.finished = true
 		end
 	end

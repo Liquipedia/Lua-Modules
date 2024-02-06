@@ -63,20 +63,17 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)

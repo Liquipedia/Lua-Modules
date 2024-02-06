@@ -34,6 +34,7 @@ local DEFAULT_BEST_OF = 99
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local DEFAULT_HERO_FACTION = HeroData.default.faction
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -82,10 +83,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-	local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = matchUnixTime + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table

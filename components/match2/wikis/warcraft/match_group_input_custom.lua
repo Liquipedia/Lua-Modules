@@ -34,6 +34,7 @@ local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local NEUTRAL_HERO_FACTION = 'neutral'
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -92,10 +93,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-	local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = matchUnixTime + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table

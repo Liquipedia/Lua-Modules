@@ -44,7 +44,7 @@ local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -99,20 +99,17 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not default date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			CURRENT_TIME_UNIX
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -292,7 +289,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local setScores = false
 
 	-- If the match has started, we want to use the automatic calculations
-	if match.dateexact and match.timestamp <= CURRENT_TIME_UNIX then
+	if match.dateexact and match.timestamp <= NOW then
 		setScores = true
 	end
 
@@ -379,7 +376,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- apply status
 			opponent.score = string.upper(opponent.score or '')
@@ -474,7 +471,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
-		if match.timestamp + threshold < CURRENT_TIME_UNIX then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
