@@ -72,13 +72,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 					indent .. indent .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
 				)
 			end
-			if kda then
-				Array.appendWith(lines,
-					indent .. indent .. '<!-- KDA -->',
-					indent .. indent .. '|t1kda1=|t1kda2=|t1kda3=|t1kda4=|t1kda5=',
-					indent .. indent .. '|t2kda1=|t2kda2=|t2kda3=|t2kda4=|t2kda5='
-				)
-			end
 			Array.appendWith(lines,
 				indent .. '}}'
 			)
