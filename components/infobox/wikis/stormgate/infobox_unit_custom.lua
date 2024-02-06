@@ -42,8 +42,6 @@ function CustomUnit.run(frame)
 
 	unit.faction = Faction.read(unit.args.faction)
 	unit.args.informationType = unit.args.informationType or 'Unit'
-	--remove description from infobox
-	unit.args.description = nil
 
 	return unit:createInfobox()
 end
@@ -66,6 +64,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirement', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
+			Cell{name = 'Building Requirement', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
 		}
 	elseif id == 'cost' then
 		return {
@@ -182,6 +181,7 @@ function CustomUnit:setLpdbData(args)
 			type = self:_readCommaSeparatedList(args.type),
 			builtfrom = args.built_link or args.built,
 			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
+			buildingrequirement = self:_readCommaSeparatedList(args.building_requirement),
 			luminite = tonumber(args.luminite),
 			totalluminite = tonumber(args.totalluminite),
 			therium = tonumber(args.therium),
@@ -248,7 +248,7 @@ function CustomUnit:_readCommaSeparatedList(inputString, makeLink)
 		return mw.getContentLanguage():ucfirst(value)
 	end)
 	if not makeLink then return values end
-	return Array.map(values, Page.makeInternalLink)
+	return Array.map(values, function(value) return Page.makeInternalLink(value) end)
 end
 
 return CustomUnit
