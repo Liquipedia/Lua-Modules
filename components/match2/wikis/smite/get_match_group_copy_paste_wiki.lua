@@ -42,7 +42,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 	local score = args.score == 'true' and '|score=' or nil
 	local bans = args.bans == 'true'
-	local kda = args.kda == 'true'
 
 	local lines = Array.extend(
 		'{{Match',
