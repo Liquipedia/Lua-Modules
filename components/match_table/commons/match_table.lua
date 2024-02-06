@@ -36,8 +36,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local PLAYER_MODE = 'player'
-local TEAM_MODE = 'team'
 local UTC = 'UTC'
 local DRAW = 'draw'
 local INVALID_TIER_DISPLAY = 'Undefined'
@@ -45,7 +43,7 @@ local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
----@alias MatchTableMode `PLAYER_MODE` | `TEAM_MODE`
+---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
 
 ---@class MatchTableConfig
 ---@field mode MatchTableMode
@@ -61,6 +59,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showVod boolean
 ---@field showStats boolean
 ---@field showOpponent boolean
+---@field queryHistoricalAliases boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -76,6 +75,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field type string
 ---@field result MatchTableMatchResult
 ---@field game string?
+---@field dateTime string
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -102,7 +102,7 @@ function MatchTable:readConfig()
 	local args = self.args
 
 	local mode = args.tableMode
-	assert(mode == PLAYER_MODE or mode == TEAM_MODE, 'Unsupported "|tableMode=" input')
+	assert(mode == Opponent.solo or mode == Opponent.team, 'Unsupported "|tableMode=" input')
 
 	local opponents = self:_readOpponents(mode)
 
@@ -119,7 +119,8 @@ function MatchTable:readConfig()
 		showIcon = not Logic.readBool(args.hide_icon),
 		showVod = Logic.readBool(args.vod),
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
-		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == PLAYER_MODE),
+		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == Opponent.solo),
+		queryHistoricalAliases = not Logic.readBool(args.doNotQueryHistoricalAliases),
 	}
 
 	Array.forEach(opponents, function(opponent)
@@ -127,7 +128,7 @@ function MatchTable:readConfig()
 	end)
 
 	local vsMode = args.vsMode or mode
-	assert(vsMode == PLAYER_MODE or vsMode == TEAM_MODE, 'Unsupported "|vsMode=" input')
+	assert(vsMode == Opponent.solo or vsMode == Opponent.team, 'Unsupported "|vsMode=" input')
 
 	Array.forEach(self:_readVsOpponents(mode), function(opponent)
 		Table.mergeInto(self.config.vs, self:getOpponentAliases(mode, opponent))
@@ -139,7 +140,7 @@ end
 ---@param mode MatchTableMode
 ---@return standardOpponent[]
 function MatchTable:_readOpponents(mode)
-	local base = mode == PLAYER_MODE and 'player' or 'team'
+	local base = mode == Opponent.solo and 'player' or 'team'
 	local inputs = self:_readOpponentInputsFromBase(base)
 
 	if Logic.isEmpty(inputs) then
@@ -153,7 +154,7 @@ end
 ---@param mode MatchTableMode
 ---@return standardOpponent[]
 function MatchTable:_readVsOpponents(mode)
-	local inputs = self:_readOpponentInputsFromBase('vs' .. (mode == PLAYER_MODE and 'player' or 'team'))
+	local inputs = self:_readOpponentInputsFromBase('vs' .. (mode == Opponent.solo and 'player' or 'team'))
 
 	return Array.map(inputs, function(input) return self:_readOpponent(mode, input) end)
 end
@@ -174,7 +175,7 @@ end
 ---@param input string
 ---@return standardOpponent
 function MatchTable:_readOpponent(mode, input)
-	if mode == PLAYER_MODE then
+	if mode == Opponent.solo then
 		local player = {pageName = input}
 		PlayerExt.populatePageName(player)
 		return {type = 'solo', players = {player}}
@@ -187,9 +188,12 @@ end
 ---@return string[]
 function MatchTable:readAliases(mode)
 	local aliases = {}
-	Array.mapIndexes(function(aliasIndex)
-		if not self.args['alias' .. aliasIndex] then return end
-		local alias = self.args['alias' .. aliasIndex]:gsub(' ', '_')
+	if String.isEmpty(self.args.aliases) then return aliases end
+
+	local aliasInput = Array.map(mw.text.split(self.args.aliases, ','), String.trim)
+
+	Array.forEach(aliasInput, function(alias)
+		alias = alias:gsub(' ', '_')
 		local aliasWithSpaces = alias:gsub('_', ' ')
 		aliases[alias] = true
 		aliases[aliasWithSpaces] = true
@@ -202,7 +206,7 @@ end
 ---@param opponent standardOpponent
 ---@return string[]
 function MatchTable:getOpponentAliases(mode, opponent)
-	if mode == PLAYER_MODE then
+	if mode == Opponent.solo then
 		local name = opponent.players[1].pageName:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
 
@@ -214,7 +218,9 @@ function MatchTable:getOpponentAliases(mode, opponent)
 
 	local aliases = {}
 	--for teams also query pagenames from team template
-	local opponentNames = Team.queryHistoricalNames(opponent.template)
+	local opponentNames = self.config.queryHistoricalAliases and Team.queryHistoricalNames(opponent.template) or
+		{opponent.template}
+
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
@@ -261,7 +267,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, parent, pagename, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, vod, winner, walkover, resulttype, extradata',
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -301,7 +307,7 @@ end
 
 ---@return ConditionTree
 function MatchTable:buildOpponentConditions()
-	local columnName = self.config.mode == PLAYER_MODE and 'player' or 'opponent'
+	local columnName = self.config.mode == Opponent.solo and 'player' or 'opponent'
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
 	Array.forEach(Array.extractKeys(self.config.aliases), function(alias)
@@ -364,7 +370,7 @@ function MatchTable:matchFromRecord(record)
 	record.extradata = record.extradata or {}
 
 	return {
-		timestamp = record.extradata.timestamp or DateExt.readTimestamp(record.date),
+		timestamp = record.extradata.timestamp,
 		timeIsExact = Logic.readBool(record.dateexact),
 		timeZone = record.extradata.timezoneid or UTC,
 		liquipediatier = record.liquipediatier,
@@ -372,11 +378,12 @@ function MatchTable:matchFromRecord(record)
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
 		icon = String.nilIfEmpty(record.icon),
 		iconDark = String.nilIfEmpty(record.icondark),
-		pageName = String.nilIfEmpty(record.parent) or String.nilIfEmpty(record.pagename),
+		pageName = record.pagename,
 		vods = self:vodsFromRecord(record),
 		type = record.type,
 		result = result,
 		game = record.game,
+		dateTime = DateExt.toCountdownArg(record.extradata.timestamp)
 	}
 end
 
@@ -412,7 +419,7 @@ function MatchTable:resultFromRecord(record)
 			countGames = true
 			return true
 		end
-		return self.config.mode == PLAYER_MODE and Array.any(opponentRecord.match2players, function(player)
+		return self.config.mode == Opponent.solo and Array.any(opponentRecord.match2players, function(player)
 			return aliases[player.name] or false
 		end)
 	end
@@ -487,7 +494,7 @@ function MatchTable:build()
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
-		local text = 'This ' .. (self.config.mode == PLAYER_MODE and PLAYER_MODE or TEAM_MODE)
+		local text = 'This ' .. (self.config.mode == Opponent.solo and Opponent.solo or Opponent.team)
 			.. ' has not played any matches under the specified conditions.'
 
 		return mw.html.create('tr')
@@ -540,7 +547,7 @@ function MatchTable:headerRow()
 		:node(makeHeaderCell('Tournament'))
 		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '80px') or nil)
 		:node(config.showResult and makeHeaderCell('Score', '40px'):addClass('unsortable') or nil)
-		:node(config.showResult and makeHeaderCell('Vs', '80px') or nil)
+		:node(config.showResult and makeHeaderCell('vs. Opponent', '80px') or nil)
 		:node(config.showVod and makeHeaderCell('VOD', '60px') or nil)
 end
 
@@ -569,7 +576,9 @@ function MatchTable:_displayDate(match)
 	end
 
 	return cell:node(Countdown._create{
-		timestamp = match.timestamp
+		timestamp = match.timestamp,
+		finished = true,
+		date = match.dateTime,
 	})
 end
 
@@ -688,7 +697,10 @@ function MatchTable:__displayVods(match)
 	if not self.config.showVod then return end
 
 	local vodsNode = mw.html.create('td')
-	Array.forEach(match.vods, function(vod)
+	Array.forEach(match.vods, function(vod, vodIndex)
+		if vodIndex ~= 1 then
+			vodsNode:node(' ')
+		end
 		vodsNode:node(VodLink.display{vod = vod.link, gamenum = vod.index ~= 0 and vod.index or nil})
 	end)
 
@@ -698,9 +710,9 @@ end
 ---@param winner any
 ---@return string?
 function MatchTable:_getBackgroundClass(winner)
-	return winner == 1 and 'bg-up' or
-		winner == 0 and 'bg-draw' or
-		winner == 2 and 'bg-down' or
+	return winner == 1 and 'recent-matches-bg-win' or
+		winner == 0 and 'recent-matches-bg-tie' or
+		winner == 2 and 'recent-matches-bg-lose' or
 		nil
 end
 
@@ -728,7 +740,7 @@ function MatchTable:displayStats()
 
 		local parts = {
 			scoreText,
-			'(' .. percentage .. '%)',
+			'(' .. percentage .. '1)',
 			'in',
 			statsType,
 		}
@@ -737,9 +749,9 @@ function MatchTable:displayStats()
 			:wikitext(table.concat(parts, ' '))
 	end
 
-	--TODO: decide if we should format timestamps differently here???
-	local titleText = 'For matches between ' .. DateExt.toYmdInUtc(startTimeStamp) ..
-		' and ' .. DateExt.toYmdInUtc(endTimeStamp) .. ':'
+	local startDate = DateExt.formatTimestamp('F j, Y', startTimeStamp)
+	local endDate = DateExt.formatTimestamp('F j, Y', endTimeStamp)
+	local titleText = 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 
 	local titleNode = mw.html.create('div')
 		:css('font-weight', 'bold')
