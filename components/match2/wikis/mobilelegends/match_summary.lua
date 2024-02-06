@@ -28,6 +28,7 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 -- Champion Ban Class
 ---@class MobileLegendsChampionBan: MatchSummaryRowInterface
@@ -282,7 +283,7 @@ function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, num
 		:addClass('brkts-popup-side-color-' .. color)
 		:css('float', flip and 'right' or 'left')
 		:node(CharacterIcon.Icon{
-			character = opponentChampionsData[index],
+			character = opponentChampionsData[index] or NO_CHARACTER,
 			class = 'brkts-champion-icon',
 			date = date
 		})

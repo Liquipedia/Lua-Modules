@@ -29,6 +29,8 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Template = Lua.import('Module:BigMatch/Template')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
+local NO_CHARACTER = 'default'
+
 local BigMatch = {}
 
 local KEYSTONES = Table.map({
@@ -183,9 +185,10 @@ function BigMatch.run(frame)
 		local champion = self
 		if type(self) == 'table' then
 			champion = self.champion
+			---@cast champion -table
 		end
 		return CharacterIcon.Icon{
-			character = champion --[[@as string]],
+			character = champion or NO_CHARACTER,
 			date = model.date
 		}
 	end

@@ -26,9 +26,9 @@ local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local SIZE_HERO = '57x32px'
-local NO_HERO = '[[File:No Hero.png|link=|57x32px]]'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 -- Normal links, from input/lpdb
 local LINK_DATA = {
 	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
@@ -300,13 +300,12 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	local color = opponentHeroesData.side or ''
 
 	for index = 1, numberOfHeroes do
-		local hero = opponentHeroesData[index]
 		local heroDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:addClass('brkts-popup-side-hero')
 			:addClass('brkts-popup-side-hero-hover')
-			:node(Logic.isEmpty(hero) and NO_HERO or CharacterIcon.Icon{
-				character = hero,
+			:node(CharacterIcon.Icon{
+				character = opponentHeroesData[index] or NO_CHARACTER,
 				size = SIZE_HERO,
 			})
 		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
