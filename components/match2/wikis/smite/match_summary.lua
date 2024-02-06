@@ -24,7 +24,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Opponent = Lua.import('Module:Opponent')
 
-local MAX_NUM_BANS = 7
+local MAX_NUM_BANS = 5
 local NUM_HEROES_PICK_TEAM = 5
 local NUM_HEROES_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
@@ -117,7 +117,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Pre-Process Hero Ban Data
-	local showGameBans = {}
+	local heroBans = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
@@ -137,16 +137,16 @@ function CustomMatchSummary.createBody(match)
 			banData[1].side = extradata.team1side
 			banData[2].side = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			showGameBans[gameIndex] = banData
+			heroBans[gameIndex] = banData
 		end
 	end
 
 	-- Add the Hero Bans
-	if not Table.isEmpty(showGameBans) then
+	if not Table.isEmpty(heroBans) then
 		local heroBan = HeroBan(match.date)
 
 		for gameIndex in ipairs(match.games) do
-			local banData = showGameBans[gameIndex]
+			local banData = heroBans[gameIndex]
 			if banData then
 				heroBan:banRow(banData, gameIndex, banData.numberOfBans)
 			end
@@ -173,11 +173,11 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	local heroesData = {{}, {}}
 	for heroIndex = 1, numberOfHeroes do
-		if String.isNotEmpty(extradata['team1champion' .. heroIndex]) then
-			heroesData[1][heroIndex] = extradata['team1champion' .. heroIndex]
+		if String.isNotEmpty(extradata['team1hero' .. heroIndex]) then
+			heroesData[1][heroIndex] = extradata['team1hero' .. heroIndex]
 		end
-		if String.isNotEmpty(extradata['team2champion' .. heroIndex]) then
-			heroesData[2][heroIndex] = extradata['team2champion' .. heroIndex]
+		if String.isNotEmpty(extradata['team2hero' .. heroIndex]) then
+			heroesData[2][heroIndex] = extradata['team2hero' .. heroIndex]
 		end
 		heroesData[1].side = extradata.team1side
 		heroesData[2].side = extradata.team2side
@@ -194,9 +194,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(Abbreviation.make(
 			Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
-			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'
+			Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length'			
 			))
-		)
+		)	
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
 
@@ -263,7 +263,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
 		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
-		:addClass('brkts-champion-icon')
+		:addClass('brkts-hero-icon')
 
 	for _, item in ipairs(opponentHeroesDisplay) do
 		display:node(item)
