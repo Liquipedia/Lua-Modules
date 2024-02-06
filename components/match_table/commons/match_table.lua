@@ -37,6 +37,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
+local UTC_ABBREVIATION = '<abbr data-tz="+0:00" title="Coordinated Universal Time (UTC+0)">UTC</abbr>'
 local DRAW = 'draw'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
@@ -383,7 +384,7 @@ function MatchTable:matchFromRecord(record)
 		type = record.type,
 		result = result,
 		game = record.game,
-		dateTime = DateExt.toCountdownArg(record.extradata.timestamp)
+		dateTime = DateExt.formatTimestamp('M j, Y - H:i', record.extradata.timestamp or '') .. ' ' .. UTC_ABBREVIATION,
 	}
 end
 
@@ -572,7 +573,7 @@ function MatchTable:_displayDate(match)
 		:css('text-align', 'left')
 
 	if not match.timeIsExact then
-		return cell:node(DateExt.formatTimestamp('F j, Y', match.timestamp or ''))
+		return cell:node(DateExt.formatTimestamp('M j, Y', match.timestamp or ''))
 	end
 
 	return cell:node(Countdown._create{
@@ -749,8 +750,8 @@ function MatchTable:displayStats()
 		return table.concat(parts, ' ')
 	end
 
-	local startDate = DateExt.formatTimestamp('F j, Y', startTimeStamp)
-	local endDate = DateExt.formatTimestamp('F j, Y', endTimeStamp)
+	local startDate = DateExt.formatTimestamp('M j, Y', startTimeStamp)
+	local endDate = DateExt.formatTimestamp('M j, Y', endTimeStamp)
 	local titleText = 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 
 	local titleNode = mw.html.create('div')
