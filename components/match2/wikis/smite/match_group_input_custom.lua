@@ -45,7 +45,7 @@ local NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -54,19 +54,16 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
-function CustomMatchGroupInput.processMatch(match, options)
-	options = options or {}
+---@param match table
+---@return table
+function CustomMatchGroupInput.processMatch(match)
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getExtraData(match)
 
 	-- Adjust map data, especially set participants data
 	match = matchFunctions.adjustMapData(match)
@@ -89,31 +86,32 @@ function matchFunctions.adjustMapData(match)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getScoresAndWinner(map)
 
 	return map
 end
 
+---@param record table
+---@param date string
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			CURRENT_TIME_UNIX
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -121,6 +119,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
@@ -186,12 +186,12 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 end
 
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
-	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
+	if specialType == STATUS_DRAW then
+		for key in pairs(opponents) do
 			opponents[key].placement = 1
 		end
 	elseif specialType == DEFAULT_RESULT_TYPE then
-		for key, _ in pairs(opponents) do
+		for key in pairs(opponents) do
 			if key == winner then
 				opponents[key].placement = 1
 			else
@@ -205,15 +205,15 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score)
 			counter = counter + 1
-			if counter == 1 and (winner or '') == '' then
+			if counter == 1 and String.isEmpty(winner) then
 				if finished then
 					winner = scoreIndex
 				end
 			end
 			if lastScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or lastPlacement
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or lastPlacement
 			else
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or counter
 				lastPlacement = counter
 				lastScore = score or NO_SCORE
 			end
@@ -267,19 +267,7 @@ end
 -- match related functions
 --
 function matchFunctions.getBestOf(match)
-	if tonumber(match.bestof) then
-		match.bestof = tonumber(match.bestof)
-	else
-		local mapCount = 0
-		for i = 1, MAX_NUM_GAMES do
-			if match['map'..i] then
-				mapCount = mapCount + 1
-			else
-				break
-			end
-		end
-		match.bestof = mapCount
-	end
+		match.bestof = #Array.filter(Array.range(1, MAX_NUM_GAMES), function(idx) return match['map'.. idx] end)
 	return match
 end
 
@@ -293,7 +281,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
-		if match.timestamp <= CURRENT_TIME_UNIX then
+		if match.timestamp <= NOW then
 			setScores = true
 		end
 	end
@@ -317,18 +305,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
-end
-
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
@@ -337,24 +313,6 @@ end
 
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
-
-	for index = 1, MAX_NUM_GAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
-	end
-
-	return match
-end
-
-function matchFunctions.getExtraData(match)
-	match.extradata = {
-		casters = MatchGroupInput.readCasters(match, {noSort = true}),
-	}
-
 	return match
 end
 
@@ -441,28 +399,18 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 		match.finished = true
 	end
 
-	-- Check if all/enough games have been played. If they have, mark as finished
-	if isScoreSet then
-		local firstTo = math.floor(match.bestof / 2)
-		local scoreSum = 0
-		for _, item in pairs(opponents) do
-			local score = tonumber(item.score or 0)
-			if score > firstTo then
-				match.finished = true
-				break
-			end
-			scoreSum = scoreSum + score
-		end
-		if scoreSum >= match.bestof then
-			match.finished = true
-		end
-	end
+	-- see if match should actually be finished if bestof limit was reached
+	match.finished = Logic.readBool(match.finished)
+		or isScoreSet and (
+			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
+			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)
+		)
 
 	-- If enough time has passed since match started, it should be marked as finished
 	if isScoreSet and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
 			or SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if match.timestamp + threshold < CURRENT_TIME_UNIX then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
@@ -471,7 +419,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 end
 
 function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
-	for index, _ in pairs(opponents) do
+	for index in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
 	end
@@ -496,26 +444,18 @@ function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local teamShort = 't' .. opponentIndex
-		local team = 'team' .. opponentIndex
-		if not map[team] then
-			local picks, bans = {}, {}
-			for playerIndex = 1, MAX_NUM_PLAYERS do
-				table.insert(picks, map[teamShort .. 'g' .. playerIndex])
-			end
-
-			for _, ban in Table.iter.pairsByPrefix(map, teamShort .. 'b') do
-				table.insert(bans, ban)
-			end
-			map[team] = {pick = picks, ban = bans}
+		for playerIndex = 1, MAX_NUM_PLAYERS do
+			local hero = map['t' .. opponentIndex .. 'g' .. playerIndex]
+			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
 		end
 
-		Array.forEach(map[team].pick, function (hero, idx)
-			heroData[team .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
-		end)
-		Array.forEach(map[team].ban, function (hero, idx)
-			heroData[team .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
-		end)
+		local banIndex = 1
+		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+		while nextBan do
+			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
+			banIndex = banIndex + 1
+			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+		end
 	end
 
 	map.extradata = heroData
