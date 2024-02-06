@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local HeroData = mw.loadData('Module:HeroData')
@@ -61,30 +60,17 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate')
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'matchDate',
+		'tournament_startdate',
+		'tournament_enddate'
+	})
 
-	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
-
-	if matchArgs.date or (not suggestedDate and tournamentStartTime) then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date or tournamentStartTime)
-		dateProps.dateexact = Logic.nilOr(
-			Logic.readBoolOrNil(matchArgs.dateexact),
-			matchArgs.date and dateProps.dateexact or false
-		)
+	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
 	end
 
-	suggestedDate = suggestedDate or Variables.varDefaultMulti(
-		'tournament_startdate',
-		'tournament_enddate',
-		DateExt.defaultDate
-	)
-
-	return {
-		date = MatchGroupInput.getInexactDate(suggestedDate),
-		dateexact = false,
-	}
+	return dateProps
 end
 
 ---@param match table

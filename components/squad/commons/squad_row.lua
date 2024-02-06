@@ -25,34 +25,42 @@ local VALID_TYPES = {'player', 'staff'}
 local DEFAULT_TYPE = 'player'
 
 local STATUS_MAPPING = {
-	[Squad.TYPE_ACTIVE] = 'active',
-	[Squad.TYPE_INACTIVE] = 'inactive',
-	[Squad.TYPE_FORMER] = 'former',
-	[Squad.TYPE_FORMER_INACTIVE] = 'former',
+	[Squad.SquadType.ACTIVE] = 'active',
+	[Squad.SquadType.INACTIVE] = 'inactive',
+	[Squad.SquadType.FORMER] = 'former',
+	[Squad.SquadType.FORMER_INACTIVE] = 'former',
 }
 
 local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
 	.. '|class=player-role-icon]]'
 local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
+---@class SquadRow
+---@operator call(table): SquadRow
+---@field content Html
+---@field options {useTemplatesForSpecialTeams: boolean?}
+---@field lpdbData table
 local SquadRow = Class.new(
 	function(self, options)
 		self.content = mw.html.create('tr'):addClass('Player')
 		self.options = options or {}
 
 		self.lpdbData = {type = DEFAULT_TYPE}
-	end)
+	end
+)
 
 SquadRow.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
 	['passed away'] = 'Team/passed away',
+	military = 'Team/military',
 }
 
-
+---@param args table
+---@return self
 function SquadRow:id(args)
 	if String.isEmpty(args[1]) then
-		return error('Something is off with your input!')
+		error('Something is off with your input!')
 	end
 
 	local cell = mw.html.create('td')
@@ -99,6 +107,8 @@ function SquadRow:id(args)
 	return self
 end
 
+---@param args table
+---@return self
 function SquadRow:name(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Name')
@@ -112,6 +122,8 @@ function SquadRow:name(args)
 	return self
 end
 
+---@param args table
+---@return self
 function SquadRow:role(args)
 	local cell = mw.html.create('td')
 	-- The CSS class has this name, not a typo.
@@ -139,6 +151,10 @@ function SquadRow:role(args)
 	return self
 end
 
+---@param dateValue string?
+---@param cellTitle string?
+---@param lpdbColumn string
+---@return self
 function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	local cell = mw.html.create('td')
 	cell:addClass('Date')
@@ -154,6 +170,8 @@ function SquadRow:date(dateValue, cellTitle, lpdbColumn)
 	return self
 end
 
+---@param args table
+---@return self
 function SquadRow:newteam(args)
 	local cell = mw.html.create('td')
 	cell:addClass('NewTeam')
@@ -191,6 +209,8 @@ function SquadRow:newteam(args)
 	return self
 end
 
+---@param type string
+---@return self
 function SquadRow:setType(type)
 	type = type:lower()
 	if Table.includes(VALID_TYPES, type) then
@@ -199,16 +219,22 @@ function SquadRow:setType(type)
 	return self
 end
 
+---@param status integer
+---@return self
 function SquadRow:status(status)
 	self.lpdbData.status = STATUS_MAPPING[status]
 	return self
 end
 
+---@param extradata table
+---@return self
 function SquadRow:setExtradata(extradata)
 	self.lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata)
 	return self
 end
 
+---@param objectName string
+---@return Html
 function SquadRow:create(objectName)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)

@@ -123,7 +123,7 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -315,16 +315,12 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date)
 	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
 		dateProps.hasDate = true
-		return dateProps
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-		}
 	end
+
+	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)

@@ -25,6 +25,7 @@ local VodLink = require('Module:VodLink')
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Template = Lua.import('Module:BigMatch/Template')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
@@ -275,6 +276,9 @@ function BigMatch._match2Director(args)
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
 
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
 
 	local bracketId, matchId = BigMatch._getId()
 	match.bracketid, match.matchid = 'MATCH_' .. bracketId, matchId
