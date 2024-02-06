@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -510,7 +509,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		timestamp = DateExt.readTimestamp(record.date),
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
