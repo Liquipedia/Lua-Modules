@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -41,8 +42,7 @@ local _NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local _DEFAULT_RESULT_TYPE = 'default'
 local _NOT_PLAYED_SCORE = -1
 local _NO_WINNER = -1
-local _SECONDS_UNTIL_FINISHED_EXACT = 30800
-local _SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -289,15 +289,10 @@ function matchFunctions.getScoreFromMapWinners(match)
 end
 
 function matchFunctions.readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+	return MatchGroupInput.readDate(matchArgs.date, {
 		'tournament_enddate',
 		'tournament_startdate',
 	})
-	if matchArgs.date then
-		dateProps.hasDate = true
-	end
-
-	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)
@@ -392,13 +387,9 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
-		local threshold = match.dateexact and _SECONDS_UNTIL_FINISHED_EXACT
-			or _SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if matchUnixTime + threshold < currentUnixTime then
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
+		local threshold = match.dateexact and 30800 or 86400
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end

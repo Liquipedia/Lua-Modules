@@ -41,10 +41,7 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -258,14 +255,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	end
 
 	return match
-end
-
-function matchFunctions.readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date)
-	if matchArgs.date then
-		dateProps.hasDate = true
-	end
-	return dateProps
 end
 
 function matchFunctions.getTournamentVars(match)
