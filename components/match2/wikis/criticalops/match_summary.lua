@@ -258,7 +258,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		if Logic.isNotEmpty(match.extradata.status) then
 			match.stream = {rawdatetime = true}
 		end
