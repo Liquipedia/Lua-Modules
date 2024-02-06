@@ -579,6 +579,7 @@ function MatchTable:_displayDate(match)
 		timestamp = match.timestamp,
 		finished = true,
 		date = match.dateTime,
+		rawdatetime = true,
 	})
 end
 
