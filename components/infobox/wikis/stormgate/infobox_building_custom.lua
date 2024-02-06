@@ -90,6 +90,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Unlocks', content = CustomBuilding._readCommaSeparatedList(args.unlocks, Page.makeInternalLink)},
 			Cell{name = 'Passive', content = CustomBuilding._readCommaSeparatedList(args.passive)},
+			Cell{name = 'Supply Gained', content = CustomBuilding._readCommaSeparatedList(args.supply)},
 		}
 	elseif id == 'defense' then
 		return {
@@ -166,6 +167,7 @@ function CustomBuilding:setLpdbData(args)
 			armor = args.sight,
 			energy = args.energy,
 			energyrate = args.energy_rate,
+			supply = args.supply,
 		},
 	})
 end
