@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Attack = require('Module:Infobox/Extension/Attack')
 local Class = require('Module:Class')
@@ -31,6 +32,7 @@ local CustomInjector = Class.new(Injector)
 
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
+local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 
 ---@param frame Frame
 ---@return Html
@@ -54,8 +56,8 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Sight', content = {args.sight}}
-			--todo: energy/energy_rate
+			Cell{name = 'Sight', content = {args.sight}},
+			Cell{name = 'Energy', content = {caller:_energyDisplay()}}
 		)
 	elseif id == 'cost' then
 		return {
@@ -95,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Health', content = {args.health and (ICON_HP .. args.health) or nil}},
+			Cell{name = 'Health', content = {args.health and (ICON_HP .. ' ' .. args.health) or nil}},
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
 	elseif id == 'attack' then
@@ -126,6 +128,21 @@ function CustomBuilding._hotkeys(hotkey1, hotkey2)
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
 end
 
+---@return string?
+function CustomBuilding:_energyDisplay()
+	local energy = tonumber(self.args.energy) or 0
+	local maxEnergy = tonumber(self.args.max_energy) or 0
+	if energy == 0 and maxEnergy == 0 then return end
+
+	local gainRate = tonumber(self.args.energy_rate)
+
+	return table.concat({
+		ICON_ENERGY .. ' ' .. energy,
+		'/' .. (maxEnergy == 0 and '?' or maxEnergy),
+		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make('+ varies', self.args.energy_desc),
+	})
+end
+
 ---@param args table
 ---@return string[]
 function CustomBuilding:getWikiCategories(args)
@@ -145,16 +162,16 @@ function CustomBuilding:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			size = args.size,
-			sight = args.sight,
-			luminite = args.luminite,
-			totalluminite = args.totalluminite,
-			therium = args.therium,
-			totaltherium = args.totaltherium,
-			buildtime = args.buildtime,
-			totalbuildtime = args.totalbuildtime,
-			animus = args.animus,
-			totalanimus = args.totalanimus,
+			size = tonumber(args.size),
+			sight = tonumber(args.sight),
+			luminite = tonumber(args.luminite),
+			totalluminite = tonumber(args.totalluminite),
+			therium = tonumber(args.therium),
+			totaltherium = tonumber(args.totaltherium),
+			buildtime = tonumber(args.buildtime),
+			totalbuildtime = tonumber(args.totalbuildtime),
+			animus = tonumber(args.animus),
+			totalanimus = tonumber(args.totalanimus),
 			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
 			builds = self:_readCommaSeparatedList(args.builds),
 			unlocks = self:_readCommaSeparatedList(args.unlocks),
@@ -164,10 +181,11 @@ function CustomBuilding:setLpdbData(args)
 			hotkey2 = args.hotkey2,
 			macrokey = args.macro_key,
 			macrokey2 = args.macro_key2,
-			health = args.health,
-			armor = args.sight,
-			energy = args.energy,
-			energyrate = args.energy_rate,
+			health = tonumber(args.health),
+			armor = tonumber(args.armor),
+			energy = tonumber(args.energy),
+			energyrate = tonumber(args.energy_rate),
+			energydesc = args.energy_desc,
 			supply = args.supply,
 		},
 	})
@@ -189,7 +207,7 @@ function CustomBuilding:_getArmorDisplay()
 	local armorTypes = self:_readCommaSeparatedList(self.args.armor_type, true)
 
 	return Array.append({},
-		self.args.armor and (ICON_ARMOR .. self.args.armor) or nil,
+		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
 		String.nilIfEmpty(table.concat(armorTypes, ', '))
 	)
 end
