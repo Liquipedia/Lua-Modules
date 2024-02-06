@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=stormgate
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -102,7 +102,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		if Logic.isEmpty(player.newteam) then
 			if Logic.readBool(player.retired) then
 				player.newteam = 'retired'
@@ -118,7 +118,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate,
 		}
-	elseif squadType == Squad.TYPE_INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
