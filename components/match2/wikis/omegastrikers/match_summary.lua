@@ -25,6 +25,7 @@ local ICONS = {
 	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
+local NO_CHARACTER = 'default'
 
 local CustomMatchSummary = {}
 
@@ -76,7 +77,7 @@ function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, da
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
-				character = strikerData[index],
+				character = strikerData[index] or NO_CHARACTER,
 				class = 'brkts-champion-icon',
 				date = date,
 			})
