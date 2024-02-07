@@ -45,7 +45,7 @@ function Skill:createInfobox()
 
 	local widgets = {
 		Header{
-			name = args.name,
+			name = self:nameDisplay(args),
 			image = args.image,
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
@@ -90,6 +90,12 @@ function Skill:createInfobox()
 	end
 
 	return infobox:build(widgets)
+end
+
+---@param args table
+---@return string?
+function Skill:nameDisplay(args)
+	return args.name
 end
 
 --- Allows for overriding this functionality
