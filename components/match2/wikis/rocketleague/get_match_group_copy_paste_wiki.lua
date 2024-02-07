@@ -7,10 +7,12 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 --allowed opponent types on the wiki
 local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
@@ -20,13 +22,13 @@ local indent = '    '
 local DefaultMode = 'team'
 
 --returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
+function WikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DefaultMode
 end
 
 --subfunction used to generate the code for the Map template
 --sets up as many maps as specified via the bestoff param
-wikiCopyPaste._getMaps = FnUtil.memoize(function(bestof)
+WikiCopyPaste._getMaps = FnUtil.memoize(function(bestof)
 	local map = table.concat({
 		'{{Map',
 		indent .. indent .. '|map=',
@@ -51,12 +53,12 @@ end)
 
 --returns the Code for a Match, depending on the input
 --for more customization please change stuff here^^
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
 	if out == '⧼BracketConfigMatchTemplate⧽' then
 		local opponentLines = {}
 		for i = 1, opponents do
-			table.insert(opponentLines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode))
+			table.insert(opponentLines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode))
 		end
 
 		local lines = Array.extend({
@@ -72,15 +74,15 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		out = out:gsub('<nowiki>', '')
 		out = out:gsub('</nowiki>', '')
 		for i = 1, opponents do
-			out = out:gsub('[ \t]*|opponent' .. i .. '=' , indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode))
+			out = out:gsub('[ \t]*|opponent' .. i .. '=' , indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode))
 		end
 
 		out = out:gsub('[ \t]*|map1=.*\n' , '<<maps>>')
 			:gsub('[ \t]*|map%d+=.*\n' , '')
-			:gsub('<<maps>>' , wikiCopyPaste._getMaps(bestof))
+			:gsub('<<maps>>' , WikiCopyPaste._getMaps(bestof))
 
 		return out .. '\n'
 	end
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
