@@ -7,126 +7,117 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
---[[
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
-]]--
+--WikiSpecific Code for MatchList and Bracket Code Generators
 
-local WikiCopyPaste = {}
+---@class Starcraftt2Match2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
+
+local INDENT = WikiCopyPaste.Indent
 
 --allowed opponent types on the wiki (archon and 2v2 both are of type
 --"duo", but they need different code, hence them both being available here)
 local MODES = {
-	['1v1'] = '1v1',
-	['2v2'] = '2v2',
-	['3v3'] = '3v3',
-	['4v4'] = '4v4',
-	['archon'] = 'archon',
-	['team'] = 'team',
-	['literal'] = 'literal',
-	['1'] = '1v1',
-	['2'] = '2v2',
-	['3'] = '3v3',
-	['4'] = '4v4',
+	archon = 'archon',
+	team = Opponent.team,
+	literal = Opponent.literal,
+	['1v1'] = Opponent.solo,
+	['2v2'] = Opponent.duo,
+	['3v3'] = Opponent.trio,
+	['4v4'] = Opponent.quad,
+	['1'] = Opponent.solo,
+	['2'] = Opponent.duo,
+	['3'] = Opponent.trio,
+	['4'] = Opponent.quad,
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = '1v1'
+local DefaultMode = Opponent.solo
 
---returns the cleaned opponent type
+---returns the cleaned opponent type
+---@param mode string?
+---@return string
 function WikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DefaultMode
 end
 
---returns the Code for a Match, depending on the input
+---returns the Code for a Match, depending on the input
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
+	local scoreDisplay = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0) and '|score=' or ''
 
-	if bestof == 0 and args.score ~= 'false' then
-		args.score = 'true'
-	end
+	local hasSubmatch = Logic.isNumeric(args.submatch) or Logic.readBool(args.submatch)
 
-	local score = args.score == 'true' and '|score=' or nil
 	local lines = Array.extend(
 		'{{Match',
-		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|twitch='} or {}
+		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		args.needsWinner == 'true' and INDENT .. '|winner=' or nil,
+		args.hasDate == 'true' and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, scoreDisplay)
+		end),
+		Array.map(Array.range(1, bestof),function (mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '=' ..
+				WikiCopyPaste._getMapCode(mode, mapIndex, hasSubmatch, tonumber(args.submatch))
+		end),
+		'}}'
 	)
-
-	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score or ''))
-	end
-
-	if bestof ~= 0 then
-		if mode == 'team' and tonumber(args.submatch or '') then
-			local submatchBo = tonumber(args.submatch)
-			for i = 1, bestof do
-				local submatchNumber = math.floor((i - 1) / submatchBo) + 1
-				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=' .. submatchNumber .. '}}')
-			end
-		elseif mode == 'team' and args.submatch == 'true' then
-			for i = 1, bestof do
-				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=|subgroup=}}')
-			end
-		elseif mode == 'team' then
-			for i = 1, bestof do
-				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=|t1p1=|t2p1=}}')
-			end
-		else
-			for i = 1, bestof do
-				table.insert(lines, indent .. '|map' .. i .. '={{Map|map=|winner=}}')
-			end
-		end
-	end
-
-	table.insert(lines, '}}')
 
 	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function WikiCopyPaste._getOpponent(mode, score)
-	local out
-
-	if mode == '1v1' then
-		out = '{{1v1Opponent|p1=' .. score .. '}}'
-	elseif mode == '2v2' then
-		out = '{{2v2Opponent|p1=|p2=' .. score .. '}}'
-	elseif mode == '3v3' then
-		out = '{{3v3Opponent|p1=|p2=|p3=' .. score .. '}}'
-	elseif mode == '4v4' then
-		out = '{{4v4Opponent|p1=|p2=|p3=|p4=' .. score .. '}}'
-	elseif mode == 'archon' then
-		out = '{{Archon|p1=|p2=|race=' .. score .. '}}'
-	elseif mode == 'team' then
-		out = '{{TeamOpponent|template=' .. score .. '}}'
-	elseif mode == 'literal' then
-		out = '{{Literal|}}'
+---@param mode string
+---@param mapIndex integer
+---@param hasSubmatch boolean
+---@param submatchBestof integer?
+---@return string
+function WikiCopyPaste._getMapCode(mode, mapIndex, hasSubmatch, submatchBestof)
+	if mode ~= Opponent.team then
+		return '{{Map|map=|winner=}}'
+	elseif not hasSubmatch then
+		return '{{Map|map=|winner=|t1p1=|t2p1=}}'
 	end
 
-	return out
+	local subMatchNumber = submatchBestof and (math.floor((mapIndex - 1) / submatchBestof) + 1) or ''
+	return '{{Map|map=|winner=|t1p1=|t2p1=|subgroup=' .. subMatchNumber .. '}}'
 end
 
---function that sets the text that starts the invoke of the MatchGroup Moduiles,
---contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
---on sc2 also used to link to the documentation pages about the new bracket/match system
-function WikiCopyPaste.getStart(template, id, modus, args)
-	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') ..
-		' For more information on Bracket parameters see Liquipedia:Brackets ' ..
-		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') ..
-		' For Opponent Copy-Paste-Code see Liquipedia:Brackets/Opponents#Copy-Paste ' ..
-		mw.text.nowiki('-->')) or ''
-	local out = '{{' .. (
-		(modus == 'bracket' and
-			('Bracket|Bracket/' .. template)
-		) or (modus == 'singlematch' and 'SingleMatch')
-		or 'Matchlist') ..
-		'|id=' .. id .. tooltip
+--subfunction used to generate the code for the Opponent template, depending on the type of opponent
+---@param mode string
+---@param score string
+---@return string
+function WikiCopyPaste.getOpponent(mode, score)
+	local partySize = Opponent.partySize(mode)
+	if partySize then
+		local parts = {'{{' .. mw.getContentLanguage():ucfirst(mode) .. 'Opponent'}
+		Array.forEach(Array.range(1, partySize), function(playerIndex)
+			table.insert(parts, '|p' .. playerIndex .. '=')
+		end)
+		return table.concat(Array.append(parts, score .. '}}'))
+	end
 
-	return out, args
+	if mode == 'archon' then
+		return '{{Archon|p1=|p2=|race=' .. score .. '}}'
+	elseif mode == Opponent.team then
+		return '{{TeamOpponent|template=' .. score .. '}}'
+	elseif mode == Opponent.literal then
+		return '{{Literal|}}'
+	end
+
+	return ''
 end
 
 return WikiCopyPaste

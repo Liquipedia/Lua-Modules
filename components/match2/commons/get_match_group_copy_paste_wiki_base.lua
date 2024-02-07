@@ -9,21 +9,25 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 ---Base-WikiSpecific Code for MatchList and Bracket Code Generators
----@class Match2CopyPasteBase:Match2CopyPaste
+---@class Match2CopyPasteBase: Match2CopyPaste
 local WikiCopyPaste = Class.new()
 
 local INDENT = '    '
+WikiCopyPaste.Indent = INDENT
 
 --allowed opponent types on the wiki
 local MODES = {
-	['solo'] = 'solo',
-	['team'] = 'team',
-	['literal'] = 'literal',
+	solo = Opponent.solo,
+	team = Opponent.team,
+	literal = Opponent.literal,
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'team'
+local DefaultMode = Opponent.team
 
 ---returns the cleaned opponent type
 ---@param mode string?
@@ -47,49 +51,33 @@ end
 
 ---returns the Code for a Match, depending on the input
 ---@param bestof integer
----@param mode string?
+---@param mode string
 ---@param index integer
 ---@param opponents integer
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
-	local opponent = WikiCopyPaste._getOpponent(WikiCopyPaste.getMode(mode))
+	local opponent = WikiCopyPaste.getOpponent(mode)
 
-	if out == '⧼BracketConfigMatchTemplate⧽' then
-		local lines = {'{{Match\n' .. INDENT}
-		Array.extendWith(lines,
-			Array.map(Array.range(1, opponents), function(opponentIndex)
-				return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
-			end),
-			'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|tournament=\n' .. INDENT .. '}}'
-		)
-		return table.concat(lines)
-	end
-
-	out = out:gsub('<nowiki>', ''):gsub('</nowiki>', '')
-	Array.forEach(Array.range(1, opponents), function(opponentIndex)
-		local opponentKey = '|opponent' .. opponentIndex .. '='
-		out = out:gsub(opponentKey, opponentKey .. opponent)
-	end)
-
-	out = out
-		:gsub('|map1=.*\n' , '<<maps>>')
-		:gsub('|map%d+=.*\n' , '')
-		:gsub('<<maps>>' , WikiCopyPaste._getMaps(bestof))
-
-	return out
+	local lines = {'{{Match\n' .. INDENT}
+	Array.extendWith(lines,
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
+		end),
+		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|tournament=\n' .. INDENT .. '}}'
+	)
+	return table.concat(lines)
 end
 
 ---subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
 ---@return string
-function WikiCopyPaste._getOpponent(mode)
-	if mode == 'solo' then
+function WikiCopyPaste.getOpponent(mode)
+	if mode == Opponent.solo then
 		return '{{SoloOpponent||flag=|team=|score=}}'
-	elseif mode == 'team' then
+	elseif mode == Opponent.team then
 		return '{{TeamOpponent||score=}}'
-	elseif mode == 'literal' then
+	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end
 
@@ -105,24 +93,9 @@ end
 ---@return string
 ---@return table
 function WikiCopyPaste.getStart(template, id, modus, args)
-	local out = tostring(mw.message.new('BracketConfigBracketTemplate'))
 	local matchGroupTypeCopyPaste = WikiCopyPaste.getMatchGroupTypeCopyPaste(modus, template)
 
-	if out == '⧼BracketConfigBracketTemplate⧽' then
-		out = '{{' .. matchGroupTypeCopyPaste .. '|id=' .. id
-
-		return out, args
-	end
-
-	out = out
-		:gsub('<nowiki>', '')
-		:gsub('</nowiki>', '')
-		:gsub('<<matches>>.*', '')
-		:gsub('<<bracketid>>', id)
-		:gsub('^{{#invoke:[mM]atchGroup|[bB]racket', 'Bracket')
-		:gsub('[Bb]racket|<<templatename>>', matchGroupTypeCopyPaste)
-
-	return out, args
+	return '{{' .. matchGroupTypeCopyPaste .. '|id=' .. id, args
 end
 
 ---@param modus string
