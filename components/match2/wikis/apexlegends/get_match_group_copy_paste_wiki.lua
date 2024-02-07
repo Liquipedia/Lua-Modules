@@ -12,7 +12,7 @@ local BaseCopyPaste = require('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 
 -- WikiSpecific Code for MatchList and Bracket Code Generators
----@class ArenaFPSMatchCopyPaste: MatchCopyPaste
+---@class ArenaFPSMatchCopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Table.copy(BaseCopyPaste)
 
 --allowed opponent types on the wiki

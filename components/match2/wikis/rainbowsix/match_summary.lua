@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,7 +22,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local POSITION_LEFT = 1
 local POSITION_RIGHT = 2
 
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local ROUND_ICONS = {
 	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',

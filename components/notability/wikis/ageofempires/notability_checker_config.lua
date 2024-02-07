@@ -35,7 +35,7 @@ Config.PLACEMENT_QUERY =
 	'liquipediatiertype, players, extradata, mode'
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 800
+Config.NOTABILITY_THRESHOLD_MIN = 1600 -- Essentially disabled since NOTABILITY_THRESHOLD_NOTABLE is checked first
 Config.NOTABILITY_THRESHOLD_NOTABLE = 1600
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
@@ -65,7 +65,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 50,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -97,7 +97,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 50,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -129,7 +129,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 50,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -161,7 +161,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 50,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
@@ -193,7 +193,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_SHOWMATCH,
-				points = 50,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,

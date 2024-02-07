@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local HeroData = mw.loadData('Module:HeroData')
@@ -35,6 +34,7 @@ local DEFAULT_BEST_OF = 99
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local DEFAULT_HERO_FACTION = HeroData.default.faction
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -61,30 +61,17 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate')
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'matchDate',
+		'tournament_startdate',
+		'tournament_enddate'
+	})
 
-	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
-
-	if matchArgs.date or (not suggestedDate and tournamentStartTime) then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date or tournamentStartTime)
-		dateProps.dateexact = Logic.nilOr(
-			Logic.readBoolOrNil(matchArgs.dateexact),
-			matchArgs.date and dateProps.dateexact or false
-		)
+	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
 	end
 
-	suggestedDate = suggestedDate or Variables.varDefaultMulti(
-		'tournament_startdate',
-		'tournament_enddate',
-		DateExt.defaultDate
-	)
-
-	return {
-		date = MatchGroupInput.getInexactDate(suggestedDate),
-		dateexact = false,
-	}
+	return dateProps
 end
 
 ---@param match table
@@ -96,10 +83,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-	local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = matchUnixTime + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table
@@ -452,9 +437,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		header = map.header,
 		displayname = map.mapDisplayName,
 	}
-
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)

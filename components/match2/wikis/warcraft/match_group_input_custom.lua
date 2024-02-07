@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local HeroData = mw.loadData('Module:HeroData')
@@ -35,6 +34,7 @@ local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local NEUTRAL_HERO_FACTION = 'neutral'
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -63,7 +63,7 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate') or Variables.varDefault('Match_date')
+	local suggestedDate = Variables.varDefault('matchDate')
 
 	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
 
@@ -77,16 +77,11 @@ function CustomMatchGroupInput._readDate(matchArgs)
 		return dateProps
 	end
 
-	suggestedDate = suggestedDate or Variables.varDefaultMulti(
+	return MatchGroupInput.readDate(nil, {
+		'matchDate',
 		'tournament_startdate',
 		'tournament_enddate',
-		DateExt.defaultDate
-	)
-
-	return {
-		date = MatchGroupInput.getInexactDate(suggestedDate),
-		dateexact = false,
-	}
+	})
 end
 
 ---@param match table
@@ -98,10 +93,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-	local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = matchUnixTime + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table
@@ -506,11 +499,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		comment = map.comment or '',
 		header = map.header or '',
 	}
-
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
-	map.date = map.date or match.date
-	map.patch = match.patch
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)

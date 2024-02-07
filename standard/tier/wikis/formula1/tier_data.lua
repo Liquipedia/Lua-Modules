@@ -56,9 +56,17 @@ return {
 			link = 'Karting Tournaments',
 			category = 'Karting Tournaments',
 		},
+		[-1] = {
+			value = '-1',
+			sort = 'A7',
+			name = 'Misc',
+			short = 'Misc',
+			link = 'Miscellaneous Events',
+			category = 'Miscellaneous Events',
+		},
 		[''] = {
 			value = nil,
-			sort = 'B2',
+			sort = 'B4',
 			name = 'Undefined',
 			short = '?',
 		},
@@ -67,7 +75,7 @@ return {
 	tierTypes = {
 		grandprix = {
 			value = 'Grand Prix',
-			sort = 'A7',
+			sort = 'A8',
 			name = 'Grand Prix',
 			short = 'GPs',
 			link = 'Grands Prix',
@@ -75,7 +83,7 @@ return {
 		},
 		test = {
 			value = 'Test',
-			sort = 'A8',
+			sort = 'A9',
 			name = 'Test',
 			short = 'Tests',
 			link = 'Test Sessions',
@@ -83,23 +91,15 @@ return {
 		},
 		nonchampionship = {
 			value = 'Non-Championship',
-			sort = 'A9',
+			sort = 'B1',
 			name = 'Non-Championship',
 			short = 'Non-Champs',
 			link = 'Non-Championship Events',
 			category = 'Non-Championship Events',
 		},
-		misc = {
-			value = 'Misc',
-			sort = 'A10',
-			name = 'Misc',
-			short = 'Misc',
-			link = 'Miscellaneous Tournaments',
-			category = 'Miscellaneous Tournaments',
-		},
 		showmatch = {
 			value = 'Showmatch',
-			sort = 'B1',
+			sort = 'B2',
 			name = 'Showmatch',
 			short = 'Showm.',
 			link = 'Showmatches',

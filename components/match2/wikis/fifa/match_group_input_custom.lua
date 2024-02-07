@@ -41,28 +41,14 @@ local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match)
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+
 	CustomMatchGroupInput._getExtraData(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._adjustData(match)
 	CustomMatchGroupInput._getVodStuff(match)
 
 	return match
-end
-
-function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
@@ -253,16 +239,13 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
+	---@type number|string
 	local teamTemplateDate = timestamp
 	-- If date is default date, resolve using tournament dates instead
 	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
@@ -270,7 +253,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
 	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
 	end
 
@@ -356,9 +338,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(match, map),
 	}
-
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
 
 	-- determine score, resulttype, walkover and winner
 	CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -491,15 +470,6 @@ function CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
 
 	if not displayNameFoundTwice then
 		return displayNameIndex
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 

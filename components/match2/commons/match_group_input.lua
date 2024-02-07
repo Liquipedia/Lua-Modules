@@ -41,6 +41,18 @@ local VALID_GSL_GROUP_STYLES = {
 	'losersfirst',
 }
 
+function MatchGroupInput._applyTournamentVarsToMaps(match)
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
+end
+
+function MatchGroupInput._processMatch(matchArgs)
+	local match = WikiSpecific.processMatch(matchArgs)
+	MatchGroupInput._applyTournamentVarsToMaps(match)
+	return match
+end
+
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
 
@@ -64,7 +76,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			matchArgs.bracketid = bracketId
 			matchArgs.matchid = matchId
-			local match = WikiSpecific.processMatch(matchArgs)
+			local match = MatchGroupInput._processMatch(matchArgs)
 
 			-- Add more fields to bracket data
 			match.bracketdata = match.bracketdata or {}
@@ -135,7 +147,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = WikiSpecific.processMatch(matchArgs)
+		local match = MatchGroupInput._processMatch(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -276,28 +288,45 @@ function MatchGroupInput._inheritedHeader(headerInput)
 	return inheritedHeader
 end
 
-function MatchGroupInput.readDate(dateString)
-	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
-	local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local timezoneId = dateString:match('>(%a-)<')
-	local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
-	local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
-	local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
-	return {
-		date = date,
-		dateexact = isDateExact,
-		timezoneId = timezoneId,
-		timezoneOffset = timezoneOffset,
-		timestamp = DateExt.readTimestamp(dateString),
-	}
-end
 
-function MatchGroupInput.getInexactDate(suggestedDate)
-	suggestedDate = suggestedDate or globalVars:get('tournament_date')
-	local missingDateCount = globalVars:get('num_missing_dates') or 0
-	globalVars:set('num_missing_dates', missingDateCount + 1)
-	local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
-	return getContentLanguage():formatDate('c', inexactDateString)
+---@param dateString string?
+---@param dateFallbacks string[]?
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+function MatchGroupInput.readDate(dateString, dateFallbacks)
+	if dateString then
+		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
+		local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+		local timezoneId = dateString:match('>(%a-)<')
+		local matchDate = mw.text.split(dateString, '<', true)[1]:gsub('-', '')
+		local isDateExact = String.contains(matchDate .. (timezoneOffset or ''), '[%+%-]')
+		local date = getContentLanguage():formatDate('c', matchDate .. (timezoneOffset or ''))
+		return {
+			date = date,
+			dateexact = isDateExact,
+			timezoneId = timezoneId,
+			timezoneOffset = timezoneOffset,
+			timestamp = DateExt.readTimestamp(dateString),
+		}
+
+	elseif dateFallbacks then
+		local suggestedDate = Variables.varDefaultMulti(unpack(dateFallbacks), DateExt.defaultDate)
+		local missingDateCount = globalVars:get('num_missing_dates') or 0
+		globalVars:set('num_missing_dates', missingDateCount + 1)
+		local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
+		local date = getContentLanguage():formatDate('c', inexactDateString)
+		return {
+			date = date,
+			dateexact = false,
+			timestamp = DateExt.readTimestampOrNil(date),
+		}
+
+	else
+		return {
+			date = DateExt.defaultDateTimeExtended,
+			dateexact = false,
+			timestamp = DateExt.defaultTimestamp,
+		}
+	end
 end
 
 --[[
@@ -371,6 +400,8 @@ Using the team template extension, the opponent struct is standardised and not u
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
+		record.icon = opponent.icon or record.icon
+		record.icondark = opponent.icondark or record.icondark
 
 	elseif Opponent.typeIsParty(opponent.type) then
 		record.match2players = record.match2players
@@ -412,6 +443,7 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
 	obj.patch = Logic.emptyOr(obj.patch, parent.patch, Variables.varDefault('tournament_patch'))
 	obj.date = Logic.emptyOr(obj.date, parent.date)
+	obj.mode = Logic.emptyOr(obj.mode, parent.mode)
 
 	return obj
 end

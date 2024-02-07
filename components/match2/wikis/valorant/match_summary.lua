@@ -6,9 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AgentIcon = require('Module:AgentIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -19,7 +20,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
@@ -61,7 +62,10 @@ function Agents:add(agent)
 		return self
 	end
 
-	self.text = self.text .. AgentIcon._getBracketIcon{agent}
+	self.text = self.text .. CharacterIcon.Icon{
+		character = agent,
+		size = '20px'
+	}
 	return self
 end
 
@@ -121,7 +125,7 @@ end
 function Score:addTopRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.top:node(roundScore)
@@ -134,21 +138,11 @@ end
 function Score:addBottomRoundScore(side, score)
 	local roundScore = mw.html.create('td')
 	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:css('color', self:_getSideColor(side))
+				:addClass('brkts-valorant-score-color-' .. side)
 				:css('width', '12px')
 				:wikitext(score)
 	self.bottom:node(roundScore)
 	return self
-end
-
----@param side string
----@return string?
-function Score:_getSideColor(side)
-	if side == 'atk' then
-		return '#c04845'
-	elseif side == 'def' then
-		return '#46b09c'
-	end
 end
 
 ---@return Html
@@ -305,7 +299,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(

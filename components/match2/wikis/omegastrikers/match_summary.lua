@@ -8,22 +8,24 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local StrikerIcon = require('Module:StrikerIcon')
 local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local ICONS = {
-	check = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
+local NO_CHARACTER = 'default'
 
 local CustomMatchSummary = {}
 
@@ -74,8 +76,8 @@ function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, da
 		local strikerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
-			:node(StrikerIcon._getImage{
-				striker = strikerData[index],
+			:node(CharacterIcon.Icon{
+				character = strikerData[index] or NO_CHARACTER,
 				class = 'brkts-champion-icon',
 				date = date,
 			})
@@ -124,7 +126,7 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= DateExt.defaultDateTimeExtended and match.date ~= DateExt.defaultDateTime) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
 		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(

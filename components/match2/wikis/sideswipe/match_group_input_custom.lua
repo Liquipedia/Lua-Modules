@@ -8,9 +8,9 @@
 
 local CustomMatchGroupInput = {}
 
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -29,13 +29,11 @@ local _MAX_NUM_PLAYERS = 10
 local _RESULT_TYPE_DRAW = 'draw'
 local _EARNINGS_LIMIT_FOR_FEATURED = 10000
 local _CURRENT_YEAR = os.date('%Y')
-
-local globalVars = PageVariableNamespace()
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 -- called from Module:MatchGroup
 function CustomMatchGroupInput.processMatch(match, options)
@@ -55,23 +53,31 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
 
 -- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, date)
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -106,12 +112,7 @@ end
 -- match related functions
 --
 function matchFunctions.readDate(matchArgs)
-	return matchArgs.date
-		and MatchGroupInput.readDate(matchArgs.date)
-		or {
-			date = MatchGroupInput.getInexactDate(globalVars:get('tournament_enddate')),
-			dateexact = false,
-		}
+	return MatchGroupInput.readDate(matchArgs.date, {'tournament_enddate'})
 end
 
 function matchFunctions.getTournamentVars(match)
@@ -180,14 +181,7 @@ function matchFunctions.getOpponents(args)
 		-- read opponent
 		local opponent = args['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
-
-			-- Retrieve icon and legacy name for team
-			if opponent.type == Opponent.team then
-				opponent.icon = opponentFunctions.getTeamIcon(opponent.template)
-					or opponentFunctions.getLegacyTeamIcon(opponent.template)
-				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
-			end
+			CustomMatchGroupInput.processOpponent(opponent, args.timestamp)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -218,11 +212,8 @@ function matchFunctions.getOpponents(args)
 	local autofinished = String.isNotEmpty(args.autofinished) and args.autofinished or true
 	-- see if match should actually be finished if score is set
 	if isScoreSet and Logic.readBool(autofinished) and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time( --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
 		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if args.timestamp + threshold < NOW then
 			args.finished = true
 		end
 	end
@@ -342,11 +333,6 @@ function mapFunctions.mapWinnerSortFunction(op1, op2)
 	end
 end
 
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', '2v2'))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 
@@ -385,14 +371,6 @@ function mapFunctions.getParticipantsData(map)
 
 	map.participants = participants
 	return map
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	return raw and Logic.emptyOr(raw.image, raw.legacyimage)
 end
 
 return CustomMatchGroupInput

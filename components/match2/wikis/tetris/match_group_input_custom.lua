@@ -47,28 +47,13 @@ function CustomMatchGroupInput.processMatch(match)
 		error('Unexpected number of opponents in a non-FFA match')
 	end
 
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
 	match = CustomMatchGroupInput._getVodStuff(match)
 
 	return match
-end
-
-function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = DateExt.defaultDateTimeExtended,
-			dateexact = false,
-			timestamp = DateExt.defaultTimestamp,
-		}
-	end
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
@@ -275,16 +260,13 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
+	---@type number|string
 	local teamTemplateDate = timestamp
 	-- If date is default date, resolve using tournament dates instead
 	-- default date indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not default date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -297,12 +279,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	if record.name then
 		record.name = record.name:gsub(' ', '_')
-	end
-
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		-- todo in sep pr:
-		--record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
 	end
 
 	return record
@@ -328,10 +304,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 	}
-
-	-- inherit stuff from match data
-	MatchGroupInput.getCommonTournamentVars(map, match)
-	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -435,15 +407,6 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			played = true,
 		}
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 

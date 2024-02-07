@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -15,10 +16,14 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
+---@param frame Frame
 function CustomSquad.run(frame)
 	error('R6 wiki doesn\'t support manual Squad Tables')
 end
 
+---@param playerList table[]
+---@param squadType integer
+---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
 	if Table.isEmpty(playerList) then
 		return
@@ -31,13 +36,16 @@ function CustomSquad.runAuto(playerList, squadType)
 
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
+	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
-	end
+	end)
 
 	return squad:create()
 end
 
+---@param player table
+---@param squadType integer
+---@return Html
 function CustomSquad._playerRow(player, squadType)
 	--Get Reference(s)
 	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
@@ -61,7 +69,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:role({role = player.thisTeam.role})
 	row:date(joinText, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		row:date(leaveText, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam({
 			newteam = player.newTeam.team,
@@ -69,7 +77,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newTeam.date,
 			leavedate = player.newTeam.date
 		})
-	elseif squadType == Squad.TYPE_INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 

@@ -7,7 +7,9 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -41,6 +43,8 @@ local Team = Class.new(BasicInfobox)
 local LINK_VARIANT = 'team'
 
 local Language = mw.language.new('en')
+
+local CREATED_STRING = '<span class="icon-16px">${icon}</span> ${date}'
 
 ---@enum statuses
 local Status = {
@@ -77,6 +81,9 @@ function Team:createInfobox()
 	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
 
 	self.region = self:createRegion(args.region)
+
+	local created
+	args.created, created = self:processCreateDates()
 
 	--- Display
 	local widgets = {
@@ -155,10 +162,10 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.created or args.disbanded then
+						if Table.isNotEmpty(created) or args.disbanded then
 							return {
 								Title{name = 'History'},
-								Cell{name = 'Created', content = {args.created}},
+								Cell{name = 'Created', content = created},
 								Cell{name = 'Disbanded', content = {args.disbanded}}
 							}
 						end
@@ -194,6 +201,69 @@ function Team:createInfobox()
 	end
 
 	return infobox:build(widgets)
+end
+
+---@return string|number|nil # storage date
+---@return string[] # display elements
+function Team:processCreateDates()
+	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean(self.args.created)) or Date.maxTimestamp
+
+	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
+		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
+		if #splitInput ~= 2 then
+			-- Legacy Input
+			return creation
+		end
+
+		local icon
+		local game, date = unpack(splitInput)
+		local cleanDate = ReferenceCleaner.clean(date)
+
+		if game:lower() == 'org' then
+			icon = self:_getTeamIcon(cleanDate)
+			icon = String.isNotEmpty(icon) and '[[File:' .. icon .. ']]' or nil
+		else
+			local timestamp = Team._parseDate(cleanDate)
+			if timestamp and timestamp < earliestGameTimestamp then
+				earliestGameTimestamp = timestamp
+			end
+
+			icon = Game.icon{game = game, useDefault = false}
+		end
+
+		return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
+	end)
+
+	local storageDate = earliestGameTimestamp ~= Date.maxTimestamp and Date.toYmdInUtc(earliestGameTimestamp) or nil
+	return storageDate, created
+end
+
+---@param date? string
+---@return string?
+function Team:_getTeamIcon(date)
+	if not self.teamTemplate then
+		return
+	end
+
+	return self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
+		or self.teamTemplate.image
+end
+
+---@param date? string
+---@return boolean
+function Team._isValidDate(date)
+	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
+end
+
+---@param date string
+---@return integer?
+function Team._parseDate(date)
+	if not Team._isValidDate(date) then
+		return
+	end
+
+	return Date.readTimestampOrNil(date)
 end
 
 ---@param region string?

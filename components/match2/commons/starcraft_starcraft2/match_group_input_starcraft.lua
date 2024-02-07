@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
@@ -40,6 +39,7 @@ local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
 	team = 'team',
 	literal = 'literal',
 }
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local getStarcraftFfaInputModule = FnUtil.memoize(function()
 	return Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
@@ -72,24 +72,15 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 end
 
 function StarcraftMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.dateexact = Logic.nilOr(Logic.readBoolOrNil(matchArgs.dateexact), dateProps.dateexact)
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'matchDate',
+		'tournament_startdate',
+		'tournament_enddate',
+	})
+	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
-	else
-		local suggestedDate = Variables.varDefaultMulti(
-			'matchDate',
-			'Match_date',
-			'tournament_startdate',
-			'tournament_enddate',
-			DateExt.defaultDate
-		)
-		return {
-			date = MatchGroupInput.getInexactDate(suggestedDate),
-			dateexact = false,
-		}
 	end
+	return dateProps
 end
 
 function StarcraftMatchGroupInput._checkFinished(match)
@@ -104,10 +95,8 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
 	if match.finished ~= true then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
@@ -685,13 +674,6 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		header = map.header,
 		server = map.server,
 	}
-
-	-- inherit stuff from match data
-	map.type = match.type
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = match.game
-	map.date = match.date
 
 	-- determine score, resulttype, walkover and winner
 	map = StarcraftMatchGroupInput._mapWinnerProcessing(map)
