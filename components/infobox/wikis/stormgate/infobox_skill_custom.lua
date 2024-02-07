@@ -75,6 +75,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		local damagePercentage = tonumber(args.damage_percentage)
 		local damage = damagePercentage and (damagePercentage .. '%') or tonumber(args.damage)
+		local castingTime = tonumber(args.casting_time)
 		Array.appendWith(widgets,
 			Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
 			Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
@@ -82,6 +83,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Target', content = caller:_readCommaSeparatedList(args.target, true)},
 			Cell{name = 'Damage', content = {damage}},
 			Cell{name = 'DPS', content = {tonumber(args.dps)}},
+			Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
 			args.effect and Title{name = 'Effect'} or nil,
 			args.effect and Center{content = {args.effect}} or nil
 		)
@@ -131,6 +133,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		range = tonumber(args.range),
 		radius = tonumber(args.radius),
 		cooldown = tonumber(args.cooldown),
+		castingtime = tonumber(args.casting_time),
 	}
 
 	return lpdbData
