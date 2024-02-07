@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -57,7 +58,8 @@ end
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local opponent = WikiCopyPaste.getOpponent(mode)
+	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
+	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
 	local lines = {'{{Match\n' .. INDENT}
 	Array.extendWith(lines,
@@ -71,12 +73,14 @@ end
 
 ---subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
+---@param showScore boolean
 ---@return string
-function WikiCopyPaste.getOpponent(mode)
+function WikiCopyPaste.getOpponent(mode, showScore)
+	local score = showScore and '|score=' or ''
 	if mode == Opponent.solo then
-		return '{{SoloOpponent||flag=|team=|score=}}'
+		return '{{SoloOpponent||flag=' .. score .. '}}'
 	elseif mode == Opponent.team then
-		return '{{TeamOpponent||score=}}'
+		return '{{TeamOpponent|' .. score .. '}}'
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end

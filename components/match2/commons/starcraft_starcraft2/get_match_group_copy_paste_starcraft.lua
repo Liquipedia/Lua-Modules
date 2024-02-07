@@ -57,7 +57,7 @@ end
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local scoreDisplay = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0) and '|score=' or ''
+	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
 
 	local hasSubmatch = Logic.isNumeric(args.submatch) or Logic.readBool(args.submatch)
 
@@ -67,7 +67,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		args.needsWinner == 'true' and INDENT .. '|winner=' or nil,
 		args.hasDate == 'true' and {INDENT .. '|date=', INDENT .. '|twitch='} or {},
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, scoreDisplay)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof),function (mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '=' ..
@@ -97,22 +97,23 @@ end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
----@param score string
+---@param showScore boolean
 ---@return string
-function WikiCopyPaste.getOpponent(mode, score)
+function WikiCopyPaste.getOpponent(mode, showScore)
+	local scoreDisplay = showScore and '|score=' or ''
 	local partySize = Opponent.partySize(mode)
 	if partySize then
 		local parts = {'{{' .. mw.getContentLanguage():ucfirst(mode) .. 'Opponent'}
 		Array.forEach(Array.range(1, partySize), function(playerIndex)
 			table.insert(parts, '|p' .. playerIndex .. '=')
 		end)
-		return table.concat(Array.append(parts, score .. '}}'))
+		return table.concat(Array.append(parts, scoreDisplay .. '}}'))
 	end
 
 	if mode == 'archon' then
-		return '{{Archon|p1=|p2=|race=' .. score .. '}}'
+		return '{{Archon|p1=|p2=|race=' .. scoreDisplay .. '}}'
 	elseif mode == Opponent.team then
-		return '{{TeamOpponent|template=' .. score .. '}}'
+		return '{{TeamOpponent|template=' .. scoreDisplay .. '}}'
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end
