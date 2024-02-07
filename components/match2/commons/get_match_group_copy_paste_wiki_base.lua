@@ -66,7 +66,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|tournament=\n' .. INDENT .. '}}'
+		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|date=\n' .. INDENT .. '}}'
 	)
 	return table.concat(lines)
 end
