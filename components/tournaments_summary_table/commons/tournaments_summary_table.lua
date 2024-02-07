@@ -282,18 +282,12 @@ function TournamentsSummaryTable.row(eventInformation, type)
 
 	local iconFile = ''
 	if String.isNotEmpty(eventInformation.icon) then
-		local iconInput = string.gsub(eventInformation.icon, 'File:', '')
-		if (mw.title.new('Media:' .. iconInput) or {}).exists then
-			iconFile = 'File:' .. iconInput
-		end
+		iconFile = 'File:' .. string.gsub(eventInformation.icon, 'File:', '')
 	end
 
 	local iconDarkFile
 	if String.isNotEmpty(eventInformation.icondark) then
-		local iconInput = string.gsub(eventInformation.icondark, 'File:', '')
-		if (mw.title.new('Media:' .. iconInput) or {}).exists then
-			iconDarkFile = 'File:' .. iconInput
-		end
+		iconDarkFile = 'File:' .. string.gsub(eventInformation.icondark, 'File:', '')
 	end
 
 	local rowComponents = {
