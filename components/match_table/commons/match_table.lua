@@ -61,6 +61,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showStats boolean
 ---@field showOpponent boolean
 ---@field queryHistoricalAliases boolean
+---@field showType boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -72,7 +73,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field iconDark string?
 ---@field pageName string
 ---@field vods {index: number, link: string}[]
----@field type string
+---@field type string?
 ---@field result MatchTableMatchResult
 ---@field game string?
 ---@field dateTime string
@@ -121,6 +122,7 @@ function MatchTable:readConfig()
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == Opponent.solo),
 		queryHistoricalAliases = not Logic.readBool(args.skipQueryingHistoricalAliases),
+		showType = Logic.readBool(args.showType),
 	}
 
 	Array.forEach(opponents, function(opponent)
@@ -392,7 +394,7 @@ end
 function MatchTable._calculateDateTimeString(timeZone, timestamp)
 	local offset = Timezone.getOffset(timeZone) or 0
 
-	return DateExt.formatTimestamp('M j, Y - H:i', timestamp + offset) ..
+	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
 		' ' .. Timezone.getTimezoneString(timeZone)
 end
 
@@ -551,6 +553,7 @@ function MatchTable:headerRow()
 	return mw.html.create('tr')
 		:node(makeHeaderCell('Date', '100px'))
 		:node(config.showTier and makeHeaderCell('Tier', '70px') or nil)
+		:node(config.showType and makeHeaderCell('Type', '70px') or nil)
 		:node(config.displayGameIcons and makeHeaderCell(nil, '25px') or nil)
 		:node(config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil)
 		:node(makeHeaderCell('Tournament'))
@@ -567,6 +570,7 @@ function MatchTable:matchRow(match)
 		:addClass(self:_getBackgroundClass(match.result.winner))
 		:node(self:_displayDate(match))
 		:node(self:_dispalyTier(match))
+		:node(self:_dispalyType(match))
 		:node(self:_displayGameIcon(match))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
@@ -581,7 +585,7 @@ function MatchTable:_displayDate(match)
 		:css('text-align', 'left')
 
 	if not match.timeIsExact then
-		return cell:node(DateExt.formatTimestamp('M j, Y', match.timestamp or ''))
+		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp or ''))
 	end
 
 	return cell:node(Countdown._create{
@@ -614,6 +618,15 @@ end
 
 ---@param match MatchTableMatch
 ---@return Html?
+function MatchTable:_dispalyType(match)
+	if not self.config.showType then return end
+
+	return mw.html.create('td')
+		:wikitext(match.type and mw.getContentLanguage():ucfirst(match.type) or nil)
+end
+
+---@param match MatchTableMatch
+---@return Html?
 function MatchTable:_displayGameIcon(match)
 	if not self.config.displayGameIcons then return end
 
@@ -641,7 +654,7 @@ end
 function MatchTable:_displayTournament(match)
 	return mw.html.create('td')
 		:css('text-align', 'left')
-		:css('max-width', '400px')
+		:css('max-width', '420px')
 		:wikitext(Page.makeInternalLink(match.displayName, match.pageName))
 end
 
@@ -758,8 +771,8 @@ function MatchTable:displayStats()
 		return table.concat(parts, ' ')
 	end
 
-	local startDate = DateExt.formatTimestamp('M j, Y', startTimeStamp)
-	local endDate = DateExt.formatTimestamp('M j, Y', endTimeStamp)
+	local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
+	local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
 	local titleText = 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 
 	local titleNode = mw.html.create('div')
