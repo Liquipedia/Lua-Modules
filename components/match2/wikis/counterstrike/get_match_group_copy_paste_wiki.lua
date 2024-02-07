@@ -7,27 +7,29 @@
 --
 
 local Logic = require('Module:Logic')
+local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 local Opponent = Lua.import('Module:Opponent')
-local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base'))
+
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
 local GSL_WINNERS = 'winners'
 local GSL_LOSERS = 'losers'
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local streams = Logic.readBool(args.streams)
 	local showScore = Logic.readBool(args.score)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local hltv = Logic.readBool(args.hltv)
-	local mapStats = args.mapStats and wikiCopyPaste._ipairsSet(mw.text.split(args.mapStats, ', ')) or {}
+	local mapStats = args.mapStats and WikiCopyPaste._ipairsSet(mw.text.split(args.mapStats, ', ')) or {}
 	local matchMatchpages = args.matchMatchpages and
-								wikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
+								WikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
 	local out = '{{Match'
 
 	if hltv then
@@ -37,7 +39,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	out = out .. '\n\t'
 	for i = 1, opponents do
-		out = out .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
+		out = out .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, showScore)
 	end
 
 	out = out .. '\n\t|date= |finished='
@@ -79,7 +81,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, showScore)
+function WikiCopyPaste._getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''
 
 	if mode == Opponent.solo then
@@ -91,7 +93,7 @@ function wikiCopyPaste._getOpponent(mode, showScore)
 	end
 end
 
-function wikiCopyPaste._ipairsSet(tbl)
+function WikiCopyPaste._ipairsSet(tbl)
 	local valuesSet = {}
 	local array = {}
 
@@ -105,7 +107,7 @@ function wikiCopyPaste._ipairsSet(tbl)
 	return array
 end
 
-function wikiCopyPaste.getStart(template, id, modus, args)
+function WikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
 	args.headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 	local out = '{{' .. (
@@ -135,4 +137,4 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 	return out, args
 end
 
-return wikiCopyPaste
+return WikiCopyPaste

@@ -6,9 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+
+--[[
+
+WikiSpecific Code for MatchList, Bracket and SingleMatch Code Generators
+
+]]--
 
 local _CONVERT_PICK_BAN_ENTRY = {
 	none = {},
@@ -31,18 +40,11 @@ local _LIMIT_OF_PARAM = {
 	player = 3,
 }
 
---[[
-
-WikiSpecific Code for MatchList, Bracket and SingleMatch Code Generators
-
-]]--
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local indent = '    '
-
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
-
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
 		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
@@ -51,10 +53,10 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local score = args.score == 'true' and '|score=' or nil
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score or ''))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score or ''))
 	end
 
-	lines = wikiCopyPaste._getMaps(lines, bestof, args, index, opponents)
+	lines = WikiCopyPaste._getMaps(lines, bestof, args, index, opponents)
 
 	table.insert(lines, '}}')
 
@@ -62,7 +64,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == 'solo' then
@@ -78,14 +80,14 @@ end
 
 --subfunction used to generate the code for the Map template
 --sets up as many maps as specified via the bestoff param
-function wikiCopyPaste._getMaps(lines, bestof, args, matchIndex, numberOfOpponents)
+function WikiCopyPaste._getMaps(lines, bestof, args, matchIndex, numberOfOpponents)
 	if bestof > 0 then
 		local map = '{{Map'
 			.. '\n' .. indent .. indent .. '|map=|maptype=|firstpick='
 			.. '\n' .. indent .. indent .. '|score1=|score2='
 
 		for _, item in ipairs(_CONVERT_PICK_BAN_ENTRY[args.pickBan or ''] or {}) do
-			map = map .. wikiCopyPaste._pickBanParams(item, numberOfOpponents)
+			map = map .. WikiCopyPaste._pickBanParams(item, numberOfOpponents)
 		end
 
 		for mapIndex = 1, bestof do
@@ -102,7 +104,7 @@ function wikiCopyPaste._getMaps(lines, bestof, args, matchIndex, numberOfOpponen
 	return lines
 end
 
-function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
+function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	local shortKey = _PARAM_TO_SHORT[key]
 	local limit = _LIMIT_OF_PARAM[key]
 	local display = ''
@@ -117,4 +119,4 @@ function wikiCopyPaste._pickBanParams(key, numberOfOpponents)
 	return display
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
