@@ -74,26 +74,23 @@ function CustomMatchGroupInput.processMap(map)
 end
 
 ---@param record table
----@param date string
-function CustomMatchGroupInput.processOpponent(record, date)
+---@param timestamp number
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
+	---@type number|string
+	local teamTemplateDate = timestamp
 	-- If date is default date, resolve using tournament dates instead
 	-- default date indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not default date
-	if teamTemplateDate == DateExt.defaultDateTimeExtended then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			DateExt.defaultDateTimeExtended
-		)
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -408,7 +405,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then

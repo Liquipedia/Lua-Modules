@@ -46,7 +46,7 @@ local _NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
-local CURRENT_TIME_UNIX = os.time(os.date('!*t') --[[@as osdateparam]])
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -107,20 +107,17 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date if epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			CURRENT_TIME_UNIX
-		)
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -300,7 +297,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 
 	-- If the match has started, we want to use the automatic calculations
 	if match.dateexact then
-		if match.timestamp <= CURRENT_TIME_UNIX then
+		if match.timestamp <= NOW then
 			setScores = true
 		end
 	end
@@ -467,7 +464,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	if isScoreSet and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
 			or SECONDS_UNTIL_FINISHED_NOT_EXACT
-		if match.timestamp + threshold < CURRENT_TIME_UNIX then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
