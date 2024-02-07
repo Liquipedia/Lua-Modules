@@ -7,7 +7,7 @@
 --
 
 local ChampionNames = mw.loadData('Module:ChampionNames')
-local DateExt = require('Module:DateExt')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
