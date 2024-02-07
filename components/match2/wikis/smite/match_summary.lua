@@ -205,8 +205,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	if not Logic.isEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
 		local comment = mw.html.create('div')
-		comment:wikitext(game.comment)
-				:css('margin', 'auto')
+		comment:wikitext(game.comment):css('margin', 'auto')
 		row:addElement(comment)
 	end
 
