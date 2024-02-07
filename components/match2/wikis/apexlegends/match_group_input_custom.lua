@@ -162,7 +162,7 @@ function MatchFunctions.adjustMapData(match)
 	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local scores
-		Table.mergeInto(map, MatchFunctions.readDate(map))
+		Table.mergeInto(map, MatchGroupInput.readDate(map.date))
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
