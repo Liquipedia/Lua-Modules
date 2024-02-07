@@ -29,6 +29,7 @@ local MODE_CONVERSION = {
 }
 MODE_CONVERSION.default = MODE_CONVERSION['1v1']
 
+---@class WarcraftMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 ---Returns the cleaned opponent type
