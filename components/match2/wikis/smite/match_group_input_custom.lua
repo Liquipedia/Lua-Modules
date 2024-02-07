@@ -73,18 +73,13 @@ end
 
 function matchFunctions.adjustMapData(match)
 	local opponents = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		opponents[opponentIndex] = match['opponent' .. opponentIndex]
-	end
-	local mapIndex = 1
-	while match['map'..mapIndex] do
-		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
-		mapIndex = mapIndex + 1
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		mapFunctions.getParticipants(map, opponents)
+		mapFunctions.getAdditionalExtraData(map)
 	end
 
 	return match
 end
-
 -- called from Module:Match/Subobjects
 ---@param map table
 ---@return table
@@ -158,7 +153,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, STATUS_DRAW)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
