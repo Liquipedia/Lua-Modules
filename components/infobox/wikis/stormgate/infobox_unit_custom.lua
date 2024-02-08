@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = {Page.makeInternalLink(args.built, args.built_link)}},
+			Cell{name = 'Built From', content = caller:_readCommaSeparatedList(args.built, true)},
 		}
 	elseif id == 'requirements' then
 		return {
@@ -180,7 +180,7 @@ function CustomUnit:setLpdbData(args)
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			type = self:_readCommaSeparatedList(args.type),
-			builtfrom = args.built_link or args.built,
+			builtfrom = self:_readCommaSeparatedList(args.built),
 			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
 			buildingrequirement = self:_readCommaSeparatedList(args.building_requirement),
 			luminite = tonumber(args.luminite),
@@ -224,7 +224,7 @@ function CustomUnit:getWikiCategories(args)
 	end
 
 	return Array.append(categories,
-		faction .. unitType
+		faction .. ' ' .. unitType
 	)
 end
 

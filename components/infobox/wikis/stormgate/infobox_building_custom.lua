@@ -96,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'unlocks' then
 		return {
 			Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
-			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive)},
+			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)},
 			Cell{name = 'Supply Gained', content = caller:_readCommaSeparatedList(args.supply)},
 		}
 	elseif id == 'defense' then
