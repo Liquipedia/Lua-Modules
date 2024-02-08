@@ -717,6 +717,13 @@ liquipedia.tracker = {
 				} );
 			} );
 		}
+		if ( mw.config.get( 'skin' ) === 'lakesideview' ) {
+			if ( window.localStorage.getItem( 'LiquipediaDarkMode' ) === 'true' ) {
+				liquipedia.tracker.track( 'Page view with dark theme enabled' );
+			} else {
+				liquipedia.tracker.track( 'Page view with dark theme disabled' );
+			}
+		}
 	}
 };
 liquipedia.core.modules.push( 'tracker' );
