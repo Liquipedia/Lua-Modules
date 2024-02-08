@@ -569,7 +569,7 @@ function MatchTable:matchRow(match)
 	return mw.html.create('tr')
 		:addClass(self:_getBackgroundClass(match.result.winner))
 		:node(self:_displayDate(match))
-		:node(self:_dispalyTier(match))
+		:node(self:_displayTier(match))
 		:node(self:_dispalyType(match))
 		:node(self:_displayGameIcon(match))
 		:node(self:_displayIcon(match))
@@ -598,7 +598,7 @@ end
 
 ---@param match MatchTableMatch
 ---@return Html?
-function MatchTable:_dispalyTier(match)
+function MatchTable:_displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
