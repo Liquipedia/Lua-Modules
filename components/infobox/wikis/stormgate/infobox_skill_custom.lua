@@ -33,6 +33,7 @@ local INFORMATIONTYPE_TO_CATEGORY = {
 	spell = 'Spells',
 	ability = 'Abilities',
 	upgrade = 'Upgrades',
+	effect = 'Effect',
 }
 
 ---@param frame Frame
@@ -45,6 +46,9 @@ function CustomSkill.run(frame)
 	skill:setWidgetInjector(CustomInjector(skill))
 
 	skill.faction = Faction.read(skill.args.faction)
+
+	skill:_calculateDamageHealTotalAndDps('damage')
+	skill:_calculateDamageHealTotalAndDps('heal')
 
 	return skill:createInfobox()
 end
@@ -79,24 +83,59 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Macrokeys', content = {CustomSkill._hotkeys(args.macro_key, args.macro_key2)}},
 		}
 	elseif id == 'custom' then
-		local damagePercentage = tonumber(args.damage_percentage)
-		local damage = damagePercentage and (damagePercentage .. '%') or tonumber(args.damage)
 		local castingTime = tonumber(args.casting_time)
-		Array.appendWith(widgets,
-			Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
-			Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
-			Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
-			Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
-			Cell{name = 'Target', content = caller:_readCommaSeparatedList(args.target, true)},
-			Cell{name = 'Damage', content = {damage}},
-			Cell{name = 'DPS', content = {tonumber(args.dps)}},
-			Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
-			args.effect and Title{name = 'Effect'} or nil,
-			args.effect and Center{content = {args.effect}} or nil
+		Array.extendWith(widgets, {
+				Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
+				Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
+				Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
+				Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
+				Cell{name = 'Target', content = caller:_readCommaSeparatedList(args.target, true)},
+				Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
+				Cell{name = 'Effect', content = caller:_readCommaSeparatedList(args.effect, true)},
+				Cell{name = 'Trigger', content = {args.trigger}},
+				Cell{name = 'Invulnerable', content = caller:_readCommaSeparatedList(args.invulnerable, true)},
+			},
+			caller:_damageHealDisplay('damage'),
+			caller:_damageHealDisplay('heal')
 		)
 	end
 
 	return widgets
+end
+
+---@param prefix string
+function CustomSkill:_calculateDamageHealTotalAndDps(prefix)
+	self.args[prefix] = tonumber(self.args[prefix])
+	local value = self.args[prefix] or 0
+	self.args[prefix .. '_over_time'] = tonumber(self.args[prefix .. '_over_time'])
+	local overTime = self.args[prefix .. '_over_time'] or 0
+	self.args.duration = tonumber(self.args.duration)
+	local duration = self.args.duration or 0
+
+	self.args[prefix .. 'Total'] = value + overTime * duration
+	self.args[prefix .. 'Dps'] = duration > 0 and (self.args[prefix .. 'Total'] / duration) or 0
+end
+
+---@param prefix string
+---@return Widget[]
+function CustomSkill:_damageHealDisplay(prefix)
+	local value = self.args[prefix]
+	local overTime = self.args[prefix .. '_over_time']
+	local percentage = tonumber(self.args[prefix .. '_percentage'])
+	local total = self.args[prefix .. 'Total']
+	local dps = self.args[prefix .. 'Dps']
+
+	local valueText = percentage and (percentage .. '%') or table.concat(Array.append({},
+		value,
+		overTime and (overTime .. '/s') or nil
+	), ' +')
+
+	local textPrefix = mw.getContentLanguage():ucfirst(prefix)
+	return {
+		Cell{name = textPrefix, content = {valueText}},
+		Cell{name = 'Total ' .. textPrefix, content = {total ~= 0 and total or nil}},
+		Cell{name = textPrefix .. ' per second', content = {dps ~= 0 and dps or nil}},
+	}
 end
 
 ---@param args table
@@ -135,15 +174,25 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		macrokey2 = args.macro_key2,
 		energy = tonumber(args.energy),
 		duration = tonumber(args.duration),
-		damagepercentage = tonumber(args.damage_percentage),
-		damage = tonumber(args.damage),
 		from = args.from,
-		dps = tonumber(args.dps),
 		range = tonumber(args.range),
 		radius = tonumber(args.radius),
 		cooldown = tonumber(args.cooldown),
 		castingtime = tonumber(args.casting_time),
 		unlocks = self:_readCommaSeparatedList(args.unlocks),
+		effect = self:_readCommaSeparatedList(args.effect),
+		trigger = args.trigger,
+		invulnerable = self:_readCommaSeparatedList(args.invulnerable),
+		damage = args.damage,
+		damagepercentage = args.damage_percentage,
+		damagetotal = args.damageTotal,
+		damagedps = args.damageDps,
+		damageovertime = args.damage_over_time,
+		health = args.health,
+		healthpercentage = args.health_percentage,
+		healthtotal = args.healthTotal,
+		healthdps = args.healthDps,
+		healthovertime = args.health_over_time,
 	}
 
 	return lpdbData
