@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
+local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -72,6 +73,11 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Duration', content = {args.duration and (args.duration .. 's') or nil}},
 		}
+	elseif id == 'hotkey' then
+		return {
+			Cell{name = 'Hotkeys', content = {CustomSkill._hotkeys(args.hotkey, args.hotkey2)}},
+			Cell{name = 'Macrokeys', content = {CustomSkill._hotkeys(args.macro_key, args.macro_key2)}},
+		}
 	elseif id == 'custom' then
 		local damagePercentage = tonumber(args.damage_percentage)
 		local damage = damagePercentage and (damagePercentage .. '%') or tonumber(args.damage)
@@ -80,6 +86,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
 			Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
 			Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
+			Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
 			Cell{name = 'Target', content = caller:_readCommaSeparatedList(args.target, true)},
 			Cell{name = 'Damage', content = {damage}},
 			Cell{name = 'DPS', content = {tonumber(args.dps)}},
@@ -124,6 +131,8 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		casters = self:getAllArgsForBase(args, 'caster'),
 		hotkey = args.hotkey,
 		hotkey2 = args.hotkey2,
+		macrokey = args.macro_key,
+		macrokey2 = args.macro_key2,
 		energy = tonumber(args.energy),
 		duration = tonumber(args.duration),
 		damagepercentage = tonumber(args.damage_percentage),
@@ -134,6 +143,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		radius = tonumber(args.radius),
 		cooldown = tonumber(args.cooldown),
 		castingtime = tonumber(args.casting_time),
+		unlocks = self:_readCommaSeparatedList(args.unlocks),
 	}
 
 	return lpdbData
@@ -141,9 +151,9 @@ end
 
 function CustomSkill:_costDisplay()
 	local args = self.args
-	local energy = tonumber(args.energy)
+	local energy = tonumber(args.energy) or 0
 
-	return table.concat({
+	return table.concat(Array.append({},
 		CostDisplay.run{
 			faction = self.faction,
 			luminite = args.luminite,
@@ -155,8 +165,8 @@ function CustomSkill:_costDisplay()
 			buildTime = args.buildtime,
 			buildTimeTotal = args.totalbuildtime,
 		},
-		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil,
-	}, '&nbsp;')
+		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil
+	), '&nbsp;')
 end
 
 ---@param inputString string?
@@ -168,6 +178,17 @@ function CustomSkill:_readCommaSeparatedList(inputString, makeLink)
 	local values = Array.map(mw.text.split(inputString, ','), String.trim)
 	if not makeLink then return values end
 	return Array.map(values, function(value) return Page.makeInternalLink(value) end)
+end
+
+---@param hotkey1 string?
+---@param hotkey2 string?
+---@return string?
+function CustomSkill._hotkeys(hotkey1, hotkey2)
+	if String.isEmpty(hotkey1) then return end
+	if String.isEmpty(hotkey2) then
+		return Hotkeys.hotkey(hotkey1)
+	end
+	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
 end
 
 return CustomSkill
