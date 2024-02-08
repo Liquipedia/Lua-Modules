@@ -281,14 +281,12 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	end
 
-	local mapIndex = 1
-	for _, key in Table.iter.pairsByPrefix(match, 'map') do
-		local winner = tonumber(match['map'..mapIndex].winner)
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		local winner = tonumber(map.winner)
 		if winner and winner > 0 and winner <= MAX_NUM_OPPONENTS then
 			setScores = true
 			newScores[winner] = (newScores[winner] or 0) + 1
 		end
-		mapIndex = mapIndex + 1
 	end
 
 	for index = 1, MAX_NUM_OPPONENTS do
@@ -446,7 +444,6 @@ function mapFunctions.getParticipants(map, opponents)
 
 		local banIndex = 1
 		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-
 		while nextBan do
 			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
 			banIndex = banIndex + 1
