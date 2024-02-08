@@ -29,6 +29,10 @@ Author(s): Elysienna
 		border-bottom-color: rgba( 0, 0, 0, 0.2 );
 		transition: background-color 0.2s linear;
 
+		@media ( max-width: 767px ) {
+			font-size: 0.75rem;
+		}
+
 		&.is--active {
 			background-color: #ffffff;
 			color: #282828;
@@ -68,6 +72,10 @@ Author(s): Elysienna
 	border: 0.0625rem solid rgba( 0, 0, 0, 0.2 );
 	border-top: 0;
 	box-shadow: 0 -0.0625rem 0 0 rgba( 0, 0, 0, 0.2 );
+
+	@media ( max-width: 767px ) {
+		font-size: 0.75rem;
+	}
 
 	&.is--hidden {
 		display: none;
@@ -134,6 +142,15 @@ Author(s): Elysienna
 			}
 		}
 
+		&__container {
+			display: flex;
+			align-items: center;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 100%;
+			}
+		}
+
 		&__icon {
 			margin: 0 0.5rem;
 			font-size: 0.75rem;
@@ -157,12 +174,8 @@ Author(s): Elysienna
 			padding: 0;
 			font-size: unset;
 			display: flex;
+			align-items: center;
 			text-align: initial;
-
-			@media ( max-width: 767px ) {
-				flex-basis: 100%;
-				margin-bottom: 0.5rem;
-			}
 
 			.vodlink {
 				margin-left: 0.25rem;
