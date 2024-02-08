@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
@@ -63,8 +62,7 @@ function CustomMap:addToLpdb(lpdbData, args)
 		if not value then return end
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
 	end
-	lpdbData.extradata.creator = resolveIfExists(args.creator)
-	lpdbData.extradata.creator2 = resolveIfExists(args.creator2)
+	lpdbData.extradata.mode = args.mode
 
 	return lpdbData
 end
