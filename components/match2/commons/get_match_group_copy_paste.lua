@@ -14,7 +14,7 @@ bracket finder (and code generator) / matchlist code generator
 
 local Arguments = require('Module:Arguments')
 local BracketAlias = mw.loadData('Module:BracketAlias')
-local Class = mw.loadData('Module:Class')
+local Class = require('Module:Class')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
