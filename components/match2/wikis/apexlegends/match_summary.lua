@@ -44,6 +44,14 @@ local TROPHY_COLOR = {
 	'icon--copper',
 }
 
+local STATUS_ICONS = {
+	up = 'fas fa-chevron-double-up',
+	stayup = 'fas fa-chevron-up',
+	stay = 'fas fa-equals',
+	staydown = 'fas fa-chevron-down',
+	down = 'fas fa-skull',
+}
+
 local MATCH_STANDING_COLUMNS = {
 	{
 		sortable = true,
@@ -61,7 +69,7 @@ local MATCH_STANDING_COLUMNS = {
 		row = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
-				local icon, color = CustomMatchSummary._getIcon(place)
+				local icon, color = CustomMatchSummary._getTrophy(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
 						:tag('span'):wikitext(CustomMatchSummary._displayRank(place)):done()
@@ -118,7 +126,7 @@ local MATCH_STANDING_COLUMNS = {
 					return PLACEMENT_BG[opponent.placement]
 				end,
 				value = function (opponent)
-					local icon, color = CustomMatchSummary._getIcon(opponent.placement)
+					local icon, color = CustomMatchSummary._getTrophy(opponent.placement)
 					return mw.html.create()
 							:tag('i')
 								:addClass('panel-table__cell-icon')
@@ -162,7 +170,7 @@ local GAME_STANDINGS_COLUMNS = {
 		row = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
-				local icon, color = CustomMatchSummary._getIcon(place)
+				local icon, color = CustomMatchSummary._getTrophy(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
 						:tag('span'):wikitext(CustomMatchSummary._displayRank(place)):done()
@@ -412,7 +420,7 @@ function CustomMatchSummary._createPointsDistributionTable(match)
 
 	Array.forEach(match.scoringTable.placement, function (slot)
 		local title = CustomMatchSummary._displayRank(slot.rangeStart, slot.rangeEnd)
-		local icon, iconColor = CustomMatchSummary._getIcon(slot.rangeStart)
+		local icon, iconColor = CustomMatchSummary._getTrophy(slot.rangeStart)
 
 		pointsList:node(createItem(icon, iconColor, title, slot.score, 'placement'))
 	end)
@@ -621,6 +629,7 @@ function CustomMatchSummary._createMatchStandings(match)
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
 					:addClass('bg-' .. (opponentMatch.advanceBg or ''))
+					:node(CustomMatchSummary._getStatusIcon(opponentMatch.advanceBg))
 		end
 
 		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
@@ -781,9 +790,17 @@ end
 ---@param place integer
 ---@return string? icon
 ---@return string? iconColor
-function CustomMatchSummary._getIcon(place)
+function CustomMatchSummary._getTrophy(place)
 	if TROPHY_COLOR[place] then
 		return 'fas fa-trophy', TROPHY_COLOR[place]
+	end
+end
+
+---@param status string?
+---@return string?
+function CustomMatchSummary._getStatusIcon(status)
+	if STATUS_ICONS[status] then
+		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
 	end
 end
 
