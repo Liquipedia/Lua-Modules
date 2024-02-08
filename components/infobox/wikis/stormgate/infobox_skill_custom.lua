@@ -20,8 +20,6 @@ local Skill = Lua.import('Module:Infobox/Skill')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Title = Widgets.Title
 
 ---@class StormgateSkillInfobox: SkillInfobox
 ---@field faction string?
