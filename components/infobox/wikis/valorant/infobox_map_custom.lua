@@ -58,7 +58,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-
 	lpdbData.extradata.mode = args.mode
 
 	return lpdbData
