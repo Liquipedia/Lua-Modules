@@ -59,6 +59,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}}
 		)
+		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
+		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
+			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
+		end
 	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {CostDisplay.run{
@@ -92,7 +96,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'unlocks' then
 		return {
 			Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
-			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive)},
+			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)},
 			Cell{name = 'Supply Gained', content = caller:_readCommaSeparatedList(args.supply)},
 		}
 	elseif id == 'defense' then
@@ -100,10 +104,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Health', content = {args.health and (ICON_HP .. ' ' .. args.health) or nil}},
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
-	elseif id == 'attack' then
-		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
-			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
-		end
+	elseif id == 'attack' then return {}
 	end
 	return widgets
 end
