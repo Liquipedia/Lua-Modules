@@ -58,10 +58,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	local resolveIfExists = function(value)
-		if not value then return end
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
-	end
+
 	lpdbData.extradata.mode = args.mode
 
 	return lpdbData
