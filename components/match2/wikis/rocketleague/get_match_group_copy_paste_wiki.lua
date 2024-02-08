@@ -41,7 +41,7 @@ end
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local lines = Array.extend({
+	local lines = Array.extend(
 		'{{Match',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
@@ -51,7 +51,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		'}}',
 		''
-	})
+	)
 
 	return table.concat(lines, '\n')
 end

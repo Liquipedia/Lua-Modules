@@ -71,7 +71,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapStatsLine = buildListLine(mapStats, 2)
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
-		Array.appendWIth(lines,
+		Array.appendWith(lines,
 			INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. (mapDetails and '' or '|score1=|score2=') .. '|finished=',
 			mapDetails and (INDENT .. INDENT .. '|t1firstside=|t1t=|t1ct=|t2t=|t2ct=') or nil,
 			mapDetails and mapDetailsOT and (INDENT .. INDENT .. '|o1t1firstside=|o1t1t=|o1t1ct=|o1t2t=|o1t2ct=') or nil,
@@ -79,7 +79,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		)
 	end)
 
-	Array.appendWIth(lines,
+	Array.appendWith(lines,
 		buildListLine(matchMatchpages, 1),
 		INDENT .. '}}'
 	)

@@ -16,7 +16,7 @@ local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 ---@class RainbowsixMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-local INDENT = '\n'
+local INDENT = '\t'
 
 local VETOES = {
 	[0] = '',
@@ -69,25 +69,31 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	local score = showScore and '|score1=|score2=' or ''
-	Array.extendWith(lines, Array.map(Array.range(1, bestof), function(mapIndex)
+	local atkDefParams = function(opponentIndex)
+		local prefix = '|t' .. opponentIndex
+		return table.concat(Array.extend(
+			INDENT .. INDENT .. prefix .. 'atk=' .. prefix .. 'def=',
+			mapDetailsOT and (prefix .. 'otatk=' .. prefix .. 'otdef=') or nil
+		))
+	end
+
+	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score  .. '|finished='
 		if not mapDetails then
-			return firstMapLine .. '}}'
+			Array.appendWith(lines, firstMapLine .. '}}')
+			return
 		end
 
-		return Array.extend(
+		Array.appendWith(lines,
 			firstMapLine,
 			INDENT .. INDENT .. '|t1ban1=|t1ban2=',
 			INDENT .. INDENT .. '|t2ban1=|t2ban2=',
-			INDENT .. INDENT .. '|t1firstside=',
-			mapDetailsOT and (INDENT .. INDENT .. '|t1firstsideot=') or nil,
-			INDENT .. INDENT .. '|t1atk=|t1def=',
-			mapDetailsOT and (INDENT .. INDENT .. '|t1otatk=|t1otdef=') or nil,
-			INDENT .. INDENT .. '|t2atk=|t2def=',
-			mapDetailsOT and (INDENT .. INDENT .. '|t2otatk=|t2otdef=') or nil,
+			INDENT .. INDENT .. '|t1firstside=' .. (mapDetailsOT and '|t1firstsideot=' or ''),
+			atkDefParams(1),
+			atkDefParams(2),
 			INDENT .. '}}'
 		)
-	end))
+	end)
 
 	Array.appendWith(lines, INDENT .. '}}')
 

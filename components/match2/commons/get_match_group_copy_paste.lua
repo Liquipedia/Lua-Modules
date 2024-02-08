@@ -8,7 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local BracketAlias = mw.loadData('Module:BracketAlias')
-local Class = mw.loadData('Module:Class')
+local Class = require('Module:Class')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -104,7 +104,8 @@ function CopyPaste._getHeader(headerCode, customHeader)
 	local headerCodeArray = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
 	local index = Logic.isEmpty(headerCodeArray[1]) and 2 or 1
 
-	local headerMessage = mw.message.new('brkts-header-' .. headerCode[index]):params(headerCode[index + 1] or ''):plain()
+	local headerMessage = mw.message.new('brkts-header-' .. headerCodeArray[index])
+		:params(headerCodeArray[index + 1] or ''):plain()
 	local header = mw.text.split(headerMessage, ',')[1]
 	header = '\n' .. '<!-- ' .. header .. ' -->'
 
@@ -139,7 +140,7 @@ function CopyPaste.bracket(frame, args)
 		local matchKey = bracketData.matchKey
 
 		if not Logic.readBool(args.extra) and (matchKey == 'RxMTP' or matchKey == 'RxMBR') then
-			return
+			return nil
 		end
 
 		local header, hasHeaderEntryParam
