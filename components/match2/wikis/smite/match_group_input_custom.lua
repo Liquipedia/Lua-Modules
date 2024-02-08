@@ -468,12 +468,8 @@ function mapFunctions.getParticipants(map, opponents)
 			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
 		end
 
-		local banIndex = 1
-		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while nextBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
-			banIndex = banIndex + 1
-			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+		for _, ban, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[ban]
 		end
 	end
 
