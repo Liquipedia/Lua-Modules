@@ -113,8 +113,10 @@ Author(s): Elysienna
 		transition: background-color 0.2s linear;
 
 		@media ( hover: hover ) {
-			&:hover {
-				background-color: rgba( 0, 0, 0, 0.08 );
+			.panel-content__collapsible.is--collapsed & {
+				&:hover {
+					background-color: rgba( 0, 0, 0, 0.08 );
+				}
 			}
 		}
 
