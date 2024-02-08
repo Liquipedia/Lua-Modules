@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = {Page.makeInternalLink(args.built, args.built_link)}},
+			Cell{name = 'Built From', content = caller:_readCommaSeparatedList(args.built, true)},
 		}
 	elseif id == 'requirements' then
 		return {
@@ -82,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 				animus = args.animus,
 				animusTotal = args.totalanimus,
 			}}},
-			Cell{name = 'Build Time', content = {args.build_time and (args.build_time .. 's') or nil}},
+			Cell{name = 'Build Time', content = {args.buildtime and (args.buildtime .. 's') or nil}},
 			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'hotkey' then
@@ -90,22 +90,23 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Hotkeys', content = {CustomUnit._hotkeys(args.hotkey, args.hotkey2)}},
 			Cell{name = 'Macrokeys', content = {CustomUnit._hotkeys(args.macro_key, args.macro_key2)}},
 		}
-	elseif id == 'attack' then
-		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
-			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
-		end
+	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
 			Cell{name = 'Health', content = {caller:_getHealthDisplay()}},
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
 	elseif id == 'custom' then
-		return {
+		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)},
-		}
+			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)}
+		)
+		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
+		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
+			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
+		end
 	end
 
 	return widgets
@@ -179,7 +180,7 @@ function CustomUnit:setLpdbData(args)
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			type = self:_readCommaSeparatedList(args.type),
-			builtfrom = args.built_link or args.built,
+			builtfrom = self:_readCommaSeparatedList(args.built),
 			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
 			buildingrequirement = self:_readCommaSeparatedList(args.building_requirement),
 			luminite = tonumber(args.luminite),
@@ -190,7 +191,7 @@ function CustomUnit:setLpdbData(args)
 			totalsupply = tonumber(args.totalsupply),
 			animus = tonumber(args.animus),
 			totalanimus = tonumber(args.totalanimus),
-			buildtime = tonumber(args.build_time),
+			buildtime = tonumber(args.buildtime),
 			rechargetime = tonumber(args.charge_time),
 			sight = tonumber(args.sight),
 			speed = tonumber(args.speed),
@@ -223,7 +224,7 @@ function CustomUnit:getWikiCategories(args)
 	end
 
 	return Array.append(categories,
-		faction .. unitType
+		faction .. ' ' .. unitType
 	)
 end
 
