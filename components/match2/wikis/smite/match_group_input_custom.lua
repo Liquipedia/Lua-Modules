@@ -282,7 +282,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	end
 
 	local mapIndex = 1
-	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+	for _, key in Table.iter.pairsByPrefix(match, 'map') do
 		local winner = tonumber(match['map'..mapIndex].winner)
 		if winner and winner > 0 and winner <= MAX_NUM_OPPONENTS then
 			setScores = true
