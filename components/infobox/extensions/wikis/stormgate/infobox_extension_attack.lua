@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -22,7 +23,7 @@ local Attack = {}
 ---@field targets string[]?
 ---@field damage number?
 ---@field damagePercentage string
----@field effect string
+---@field effect string[]
 ---@field speed number?
 ---@field dps number?
 ---@field bonus string
@@ -48,7 +49,7 @@ function Attack.run(argsJson, attackIndex, faction)
 		Title{name = 'Attack' .. attackIndex .. ': ' .. args.name},
 		Cell{name = 'Target', content = data.targets},
 		Cell{name = 'Damage', content = {data.damagePercentage and (data.damagePercentage .. '%') or data.damage}},
-		Cell{name = 'Effect', content = {data.effect}},
+		Cell{name = 'Effect', content = Array.map(data.effect, function(effect) return Page.makeInternalLink(effect) end)},
 		Cell{name = 'Attack Speed', content = {data.speed}},
 		Cell{name = 'DPS', content = {data.dps}},
 		Cell{name = 'Bonus vs', content = {data.bonus}},
@@ -67,7 +68,7 @@ function Attack._parse(args)
 		end),
 		damage = tonumber(args.damage),
 		damagePercentage = tonumber(args.damage_percentage),
-		effect = args.effect,
+		effect = Attack._readCommaSeparatedList(args.effect),
 		speed = tonumber(args.speed),
 		dps = tonumber(args.dps),
 		bonus = args.bonus,
@@ -75,6 +76,15 @@ function Attack._parse(args)
 		bonusDps = tonumber(args.bonus_dps),
 		range = tonumber(args.range),
 	}
+end
+
+---@param inputString string?
+---@param makeLink boolean?
+---@return string[]
+function Attack._readCommaSeparatedList(inputString, makeLink)
+	if String.isEmpty(inputString) then return {} end
+	---@cast inputString -nil
+	return Array.map(mw.text.split(inputString, ','), String.trim)
 end
 
 ---@param data StormgateAttackData
