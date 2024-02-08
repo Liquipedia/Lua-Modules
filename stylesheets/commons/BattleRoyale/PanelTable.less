@@ -295,6 +295,10 @@ Author(s): Elysienna
 			flex-basis: 15rem;
 			flex-grow: 0;
 			overflow: hidden;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9rem;
+			}
 		}
 
 		&--total-points {
@@ -307,11 +311,19 @@ Author(s): Elysienna
 		&--placements {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9.375rem;
+			}
 		}
 
 		&--kills {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 7rem;
+			}
 		}
 
 		&--button {
