@@ -42,7 +42,7 @@ local Team = Class.new(BasicInfobox)
 
 local LINK_VARIANT = 'team'
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 
 local CREATED_STRING = '<span class="icon-16px">${icon}</span> ${date}'
 

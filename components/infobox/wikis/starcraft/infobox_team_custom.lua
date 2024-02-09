@@ -73,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
 	elseif id == 'earnings' then
 		local displayEarnings = function(value)
-			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
+			return value > 0 and '$' .. mw.getContentLanguage():formatNum(value) or nil
 		end
 
 		return {

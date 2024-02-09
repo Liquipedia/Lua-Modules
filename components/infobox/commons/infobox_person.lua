@@ -37,7 +37,7 @@ local Customizable = Widgets.Customizable
 ---@field locations string[]
 local Person = Class.new(BasicInfobox)
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 local LINK_VARIANT = 'player'
 local COUNTRIES_EASTERN_NAME_ORDER = {
 	'China',
