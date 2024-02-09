@@ -44,6 +44,7 @@ local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
+local DUMMY_MAP = 'default'
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
@@ -84,6 +85,9 @@ end
 ---@param map table
 ---@return table
 function CustomMatchGroupInput.processMap(map)
+	if map.map == DUMMY_MAP then
+		map.map = nil
+	end
 	map = mapFunctions.getScoresAndWinner(map)
 
 	return map
