@@ -26,15 +26,16 @@ local function setupForTesting()
 	require('definitions.mw')
 
 	package.path = '?.lua;' ..
-			'standard/?.lua;' .. -- Load std folder
-			'components/match2/commons/?.lua;' .. -- Load m2 folder
-			'components/prize_pool/commons/?.lua;' .. -- Load ppt folder
-			'components/infobox/commons/?.lua;' .. -- Load infobox folder
-			'components/opponent/commons/?.lua;' .. -- Load opponent folder
-			'standard/info/commons/?.lua;' .. -- Load info folder
-			'standard/region/commons/?.lua;' .. -- Load region folder
-			'standard/tier/commons/?.lua;' .. -- Load tier folder
-			'components/widget/?.lua;' .. -- Load widget folder
+			'standard/?.lua;' ..
+			'components/match2/commons/?.lua;' ..
+			'components/prize_pool/commons/?.lua;' ..
+			'components/infobox/commons/?.lua;' ..
+			'components/opponent/commons/?.lua;' ..
+			'components/hidden_data_box/commons/?.lua;' ..
+			'standard/info/commons/?.lua;' ..
+			'standard/region/commons/?.lua;' ..
+			'standard/tier/commons/?.lua;' ..
+			'components/widget/?.lua;' ..
 			package.path
 
 	local require_original = require
@@ -105,4 +106,4 @@ function GoldenTest(testname, actual)
 end
 
 require('busted').subscribe({'suite', 'start'}, setupForTesting)
-require('busted').subscribe({'test', 'start'}, resetMediawiki)
+require('busted').subscribe({'test', 'end'}, resetMediawiki)

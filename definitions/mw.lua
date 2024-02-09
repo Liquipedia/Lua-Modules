@@ -665,7 +665,12 @@ function mw.title:isSubpageOf(title2) end
 ---Whether this title is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.title:inNamespace(ns) end
+function mw.title:inNamespace(ns)
+	if ns == 0 then
+		return true
+	end
+	return false
+end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
