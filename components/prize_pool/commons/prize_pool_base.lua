@@ -831,12 +831,13 @@ function BasePrizePool:storeData()
 
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
+		local objectName = Table.extract(lpdbEntry, 'objectName')
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(objectName, lpdbEntry)
 		end
 
-		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
+		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
 	end
 
 	return self

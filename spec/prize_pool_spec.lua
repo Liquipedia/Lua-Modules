@@ -2,17 +2,21 @@
 describe('prize pool', function()
 	local PrizePool = require('Module:PrizePool')
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
+	local Table = require('Module:Table')
+	local Variables = require('Module:Variables')
 	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
+
+	local LpdbPlacementStub
 
 	before_each(function()
 		InfoboxLeague.run(tournamentData)
-		stub(mw.ext.LiquipediaDB, "lpdb_placement")
+		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
 		stub(mw.ext.LiquipediaDB, "lpdb", {})
 	end)
 
 	after_each(function ()
-		---@diagnostic disable: undefined-field
-		mw.ext.LiquipediaDB.lpdb_placement:revert()
+		LpdbPlacementStub:revert()
+		---@diagnostic disable-next-line: undefined-field
 		mw.ext.LiquipediaDB.lpdb:revert()
 	end)
 
@@ -87,7 +91,62 @@ describe('prize pool', function()
 		)
 	end)
 
-	it('prize pool looks correctly', function()
-		GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
+	describe('prize pool is correct', function()
+		it('display', function()
+			GoldenTest('prize_pool', tostring(PrizePool(prizePoolArgs):create():build()))
+		end)
+
+		it('lpdb storage', function()
+			PrizePool(prizePoolArgs):create():build()
+			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Rathoz', {
+				date = '2024-02-09',
+				individualprizemoney = 970.97276906869001323,
+				opponentname = 'Rathoz',
+				opponenttype = 'solo',
+				participant = 'Rathoz', -- Legacy
+				participantflag = 'Sweden', -- Legacy
+				participantlink = 'Rathoz', -- Legacy
+				placement = 1,
+				prizemoney = 970.97276906869001323,
+				prizepoolindex = 1,
+			})
+		end)
+	end)
+
+	describe('enabling/disabling lpdb storage', function()
+		it('normal behavior', function()
+			PrizePool(prizePoolArgs):create():build()
+			assert.stub(LpdbPlacementStub).called(1)
+		end)
+
+		it('disabled', function()
+			PrizePool(Table.merge(prizePoolArgs, {storelpdb = false})):create():build()
+			assert.stub(LpdbPlacementStub).called(0)
+		end)
+
+		it('wiki-var enabled', function()
+			Variables.varDefine('disable_LPDB_storage', 'false')
+			PrizePool(prizePoolArgs):create():build()
+			assert.stub(LpdbPlacementStub).called(1)
+		end)
+
+		it('wiki-var enabled with override', function()
+			Variables.varDefine('disable_LPDB_storage', 'false')
+			PrizePool(Table.merge(prizePoolArgs, {storelpdb = false})):create():build()
+			assert.stub(LpdbPlacementStub).called(0)
+		end)
+
+
+		it('wiki-var disable with override', function()
+			Variables.varDefine('disable_LPDB_storage', 'true')
+			PrizePool(Table.merge(prizePoolArgs, {storelpdb = true})):create():build()
+			assert.stub(LpdbPlacementStub).called(1)
+		end)
+
+		it('wiki-var disable without override', function()
+			Variables.varDefine('disable_LPDB_storage', 'true')
+			PrizePool(prizePoolArgs):create():build()
+			assert.stub(LpdbPlacementStub).called(0)
+		end)
 	end)
 end)
