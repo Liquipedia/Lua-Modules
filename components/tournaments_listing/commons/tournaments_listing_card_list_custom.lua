@@ -11,17 +11,19 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
+local TournamentsListingTable = Lua.import('Module:TournamentsListing/Display/Table')
 
 local CustomTournamentsListing = Class.new()
 
 ---@param frame Frame
 ---@return Html?
 function CustomTournamentsListing.run(frame)
-	local tournamentsListing = TournamentsListing(Arguments.getArgs(frame))
+	local args = Arguments.getArgs(frame)
+	local tournamentsListing = TournamentsListing(args)
 
 	-- you can overwrite certain functions here
 
-	return tournamentsListing:create():build()
+	return TournamentsListingTable(tournamentsListing:create(), args):build()
 end
 
 return CustomTournamentsListing
