@@ -7,18 +7,20 @@
 --
 
 local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 --[[
 
 WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '  '
 
 	if bestof == 0 and args.score ~= 'false' then
@@ -33,7 +35,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, displayScore))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, displayScore))
 	end
 
 	if args.hasDate == 'true' then
@@ -85,7 +87,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, displayScore)
+function WikiCopyPaste._getOpponent(mode, displayScore)
 	local scoreText = displayScore and '|score=' or ''
 
 	if mode == 'solo' then
@@ -97,4 +99,4 @@ function wikiCopyPaste._getOpponent(mode, displayScore)
 	end
 end
 
-return wikiCopyPaste
+return WikiCopyPaste

@@ -12,25 +12,26 @@ bracket finder (and code generator) / matchlist code generator
 
 ]]--
 
+local Arguments = require('Module:Arguments')
+local BracketAlias = mw.loadData('Module:BracketAlias')
+local Class = require('Module:Class')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
-local getArgs = require('Module:Arguments').getArgs
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {loadData = true})
+local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
 
 ---@class Match2CopyPaste
-local copyPaste = {}
+local CopyPaste = Class.new()
 
-function copyPaste.generateID()
+function CopyPaste.generateID()
 	--initiate the rnd generator
 	math.randomseed(os.time())
-	return copyPaste._generateID()
+	return CopyPaste._generateID()
 end
 
-function copyPaste._generateID()
+function CopyPaste._generateID()
 	local id = ''
 
 	for _ = 1, 10 do
@@ -45,13 +46,13 @@ function copyPaste._generateID()
 	end
 
 	if mw.ext.Brackets.checkBracketDuplicate(id) ~= 'ok' then
-		id = copyPaste._generateID()
+		id = CopyPaste._generateID()
 	end
 
 	return id
 end
 
-function copyPaste._getBracketData(templateid)
+function CopyPaste._getBracketData(templateid)
 	templateid = 'Bracket/' .. templateid
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
 	assert(type(matches) == 'table')
@@ -88,7 +89,7 @@ function copyPaste._getBracketData(templateid)
 	return bracketDataList
 end
 
-function copyPaste._getHeader(headerCode, customHeader)
+function CopyPaste._getHeader(headerCode, customHeader)
 	local header = ''
 
 	if not headerCode then
@@ -109,9 +110,9 @@ function copyPaste._getHeader(headerCode, customHeader)
 	return header, customHeader
 end
 
-function copyPaste.bracket(frame, args)
+function CopyPaste.bracket(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
 	local out
 
@@ -119,7 +120,7 @@ function copyPaste.bracket(frame, args)
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	out, args = WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
+	out, args = WikiSpecific.getStart(templateid, CopyPaste.generateID(), 'bracket', args)
 
 	local empty = Logic.readBool(args.empty)
 	local customHeader = Logic.readBool(args.customHeader)
@@ -128,7 +129,7 @@ function copyPaste.bracket(frame, args)
 	local mode = WikiSpecific.getMode(args.mode)
 	local headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 
-	local bracketDataList = copyPaste._getBracketData(templateid)
+	local bracketDataList = CopyPaste._getBracketData(templateid)
 
 	local matchOut = ''
 	for index, bracketData in ipairs(bracketDataList) do
@@ -141,7 +142,7 @@ function copyPaste.bracket(frame, args)
 				header = '\n\n' .. '<!-- Third Place Match -->'
 			end
 		elseif matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR' then
-			header, hasHeaderEntryParam = copyPaste._getHeader(bracketData.header, customHeader)
+			header, hasHeaderEntryParam = CopyPaste._getHeader(bracketData.header, customHeader)
 		end
 
 		if Logic.readBool(args.extra) or (matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR') then
@@ -164,13 +165,13 @@ function copyPaste.bracket(frame, args)
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
-function copyPaste.matchlist(frame, args)
+function CopyPaste.matchlist(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
 	local out
 
-	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
+	out, args = WikiSpecific.getStart(nil, CopyPaste.generateID(), 'matchlist', args)
 
 	local empty = Logic.readBool(args.empty)
 	local customHeader = Logic.readBool(args.customHeader)
@@ -197,13 +198,13 @@ function copyPaste.matchlist(frame, args)
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
-function copyPaste.singleMatch(frame, args)
+function CopyPaste.singleMatch(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
 
 	local out
-	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'singlematch', args)
+	out, args = WikiSpecific.getStart(nil, CopyPaste.generateID(), 'singlematch', args)
 
 	local bestof = tonumber(args.bestof) or 3
 	local opponents = tonumber(args.opponents) or 2
@@ -215,4 +216,4 @@ function copyPaste.singleMatch(frame, args)
 	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
 end
 
-return copyPaste
+return CopyPaste

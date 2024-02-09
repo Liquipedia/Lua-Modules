@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+local Class = require('Module:Class')
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local VETOES = {
 	[0] = '',
@@ -22,7 +24,7 @@ local VETOES = {
 }
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '  '
 	local showScore = args.score == 'true'
 	local mapDetails = args.detailedMap == 'true'
@@ -38,7 +40,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, showScore))
 	end
 
 	if mapVeto and VETOES[bestof] then
@@ -77,7 +79,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, showScore)
+function WikiCopyPaste._getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''
 
 	if mode == 'team' then
@@ -87,4 +89,4 @@ function wikiCopyPaste._getOpponent(mode, showScore)
 	end
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
