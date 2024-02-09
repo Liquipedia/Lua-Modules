@@ -16,7 +16,7 @@ local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 ---@class RainbowsixMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-local INDENT = '\t'
+local INDENT = WikiCopyPaste.Indent
 
 local VETOES = {
 	[0] = '',

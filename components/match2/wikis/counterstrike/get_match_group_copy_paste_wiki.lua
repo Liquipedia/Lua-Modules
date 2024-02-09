@@ -18,10 +18,11 @@ local Opponent = Lua.import('Module:Opponent')
 ---@class CounterstrikeMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
+local INDENT = WikiCopyPaste.Indent
+
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
 local GSL_WINNERS = 'winners'
 local GSL_LOSERS = 'losers'
-local INDENT = '\t'
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer

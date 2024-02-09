@@ -14,7 +14,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 ---Base-WikiSpecific Code for MatchList and Bracket Code Generators
----@class Match2CopyPasteBase: Match2CopyPaste
+---@class Match2CopyPasteBase
 local WikiCopyPaste = Class.new()
 
 local INDENT = '    '
