@@ -267,6 +267,7 @@ function Placement:_getLpdbData(...)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
+		lpdbData.players = lpdbData.players or lpdbData.opponentplayers
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then

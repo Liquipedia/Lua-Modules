@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
 		if currentYearEarnings then
 			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
 		return {

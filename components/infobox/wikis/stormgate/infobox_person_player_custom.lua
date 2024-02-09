@@ -77,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.language.new('en'):formatNum(currentYearEarnings)) or nil}
+				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
 				name = Abbreviation.make('Years Active', 'Years active as a player'),

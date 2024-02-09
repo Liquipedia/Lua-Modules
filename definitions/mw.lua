@@ -404,6 +404,7 @@ function mw.message.getDefaultLanguage() end
 ---@param ... string|number
 ---@return self
 ---@overload fun(self, params: table):self
+---@overload fun(self, param: string|number):self
 function mw.message:params(...) end
 
 ---Like :params(), but has the effect of passing all the parameters through mw.message.rawParam() first.
@@ -665,7 +666,12 @@ function mw.title:isSubpageOf(title2) end
 ---Whether this title is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.title:inNamespace(ns) end
+function mw.title:inNamespace(ns)
+	if ns == 0 then
+		return true
+	end
+	return false
+end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number

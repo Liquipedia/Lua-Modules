@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local displayEarnings = function(earningsData)
 			local totalEarnings = Math.sum(Array.extractValues(earningsData or {}))
-			return totalEarnings > 0 and '$' .. mw.language.new('en'):formatNum(totalEarnings) or nil
+			return totalEarnings > 0 and '$' .. mw.getContentLanguage():formatNum(totalEarnings) or nil
 		end
 
 		return {
