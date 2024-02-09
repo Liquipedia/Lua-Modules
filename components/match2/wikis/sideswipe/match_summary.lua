@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -18,7 +19,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
@@ -284,7 +285,7 @@ function CustomMatchSummary._goalDisaplay(goalesValue, side)
 			:node(goalsDisplay)
 end
 
----@param icon string
+---@param icon string?
 ---@param shouldDisplay boolean?
 ---@param additionalElement number|string|Html|nil
 ---@param side integer?

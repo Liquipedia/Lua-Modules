@@ -14,7 +14,7 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
-local wikiCopyPaste = {}
+local WikiCopyPaste = {}
 
 --allowed opponent types on the wiki (archon and 2v2 both are of type
 --"duo", but they need different code, hence them both being available here)
@@ -36,12 +36,12 @@ local MODES = {
 local DefaultMode = '1v1'
 
 --returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
+function WikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DefaultMode
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local indent = '    '
 
 	if bestof == 0 and args.score ~= 'false' then
@@ -57,7 +57,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score or ''))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score or ''))
 	end
 
 	if bestof ~= 0 then
@@ -88,7 +88,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == '1v1' then
@@ -113,7 +113,7 @@ end
 --function that sets the text that starts the invoke of the MatchGroup Moduiles,
 --contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
 --on sc2 also used to link to the documentation pages about the new bracket/match system
-function wikiCopyPaste.getStart(template, id, modus, args)
+function WikiCopyPaste.getStart(template, id, modus, args)
 	local tooltip = args.tooltip == 'true' and ('\n' .. mw.text.nowiki('<!--') ..
 		' For more information on Bracket parameters see Liquipedia:Brackets ' ..
 		mw.text.nowiki('-->') .. '\n' .. mw.text.nowiki('<!--') ..
@@ -129,4 +129,4 @@ function wikiCopyPaste.getStart(template, id, modus, args)
 	return out, args
 end
 
-return wikiCopyPaste
+return WikiCopyPaste

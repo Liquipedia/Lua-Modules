@@ -144,6 +144,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field advanceBg string?
 ---@field advances boolean?
 ---@field icon string?
+---@field icondark string?
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
@@ -508,7 +509,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -19,7 +20,6 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
@@ -33,7 +33,6 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local DEFAULT_DATE = '1970-01-01'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -46,8 +45,6 @@ local Chronology = Widgets.Chronology
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
-
-League.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -230,8 +227,6 @@ function League:createInfobox()
 
 	self.infobox:bottom(self:createBottomContent())
 
-	local builtInfobox = self.infobox:build(widgets)
-
 	if self:shouldStore(args) then
 		self.infobox:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
@@ -239,8 +234,7 @@ function League:createInfobox()
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
-		:node(WarningBox.displayAll(League.warnings))
+		:node(self.infobox:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
@@ -376,11 +370,12 @@ function League:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.infobox.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 
@@ -510,9 +505,9 @@ function League:_setLpdbData(args, links)
 			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = self.data.startDate or self.data.endDate or DEFAULT_DATE,
-		enddate = self.data.endDate or DEFAULT_DATE,
-		sortdate = self.data.endDate or DEFAULT_DATE,
+		startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
+		enddate = self.data.endDate or DateExt.defaultDate,
+		sortdate = self.data.endDate or DateExt.defaultDate,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
@@ -638,7 +633,7 @@ function League:getIcons(iconArgs)
 	}
 
 	if String.isNotEmpty(trackingCategory) then
-		table.insert(self.warnings, 'Missing icon while icondark is set.')
+		table.insert(self.infobox.warnings, 'Missing icon while icondark is set.')
 	end
 
 	return icon, iconDark, display

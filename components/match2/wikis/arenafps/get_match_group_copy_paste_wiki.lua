@@ -7,17 +7,19 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
-local Table = require('Module:Table')
 
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 --[[
 
 WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
----@class ArenaFPSMatchCopyPaste: MatchCopyPaste
-local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+---@class ArenaFPSMatchCopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 --allowed opponent types on the wiki
 local MODES = {

@@ -22,8 +22,12 @@ DateExt.minTimestamp = -62167219200
 -- 9999-12-31 23:59:59
 DateExt.maxTimestamp = 253402300799
 
--- 1970-01-01 00:00:00
-DateExt.epochZero = 0
+-- default dateTime used in LPDB
+DateExt.defaultTimestamp = -62167219200
+DateExt.defaultDateTime = '0000-01-01 00:00:00'
+DateExt.defaultDateTimeExtended = '0000-01-01T00:00:00+00:00'
+DateExt.defaultDate = '0000-01-01'
+DateExt.deaultYear = '0000'
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
@@ -46,7 +50,7 @@ function DateExt.readTimestamp(dateString)
 end
 
 --- Same as DateExt.readTimestamp, except that it returns nil upon failure.
----@param dateString string
+---@param dateString string|number
 ---@return integer?
 function DateExt.readTimestampOrNil(dateString)
 	local success, timestamp = pcall(DateExt.readTimestamp, dateString)

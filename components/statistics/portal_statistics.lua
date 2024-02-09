@@ -40,7 +40,6 @@ local Count = Lua.import('Module:Count')
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
-local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
@@ -745,8 +744,8 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, EPOCH_DATE)}
-		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, EPOCH_DATE)}
+		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate)}
+		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate)}
 		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings)}
 
 	if Logic.readBool(args.isActive) then
@@ -776,7 +775,7 @@ function StatisticsPortal.playerAgeTable(args)
 	for _, player in ipairs(playerData) do
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
-		local yearAge = age.year - 1970
+		local yearAge = age.year - tonumber(DateExt.deaultYear)
 		local dayAge = age.yday - 1
 
 		tbl:tag('tr')
@@ -946,7 +945,7 @@ end
 function StatisticsPortal._cacheModeEarningsData(config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
-		:add{ConditionNode(ColumnName('date'), Comparator.neq, EPOCH_DATE)}
+		:add{ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate)}
 		:add{ConditionNode(ColumnName('date'), Comparator.lt, DATE)}
 
 	if String.isNotEmpty(config.startYear) then

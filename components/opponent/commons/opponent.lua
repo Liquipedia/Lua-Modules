@@ -301,6 +301,7 @@ function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
+		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
@@ -351,7 +352,7 @@ Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
 ---@param args table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize(args.type)
 
@@ -390,6 +391,7 @@ function Opponent.readOpponentArgs(args)
 		return {type = Opponent.literal, name = args.name or args[1] or ''}
 
 	end
+	error("Unknown opponent type: " .. args.type)
 end
 
 --[[
@@ -400,7 +402,7 @@ Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
 ---@param record table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.fromMatch2Record(record)
 	if record.type == Opponent.team then
 		return {type = Opponent.team, template = record.template}
@@ -420,9 +422,8 @@ function Opponent.fromMatch2Record(record)
 	elseif record.type == Opponent.literal then
 		return {type = Opponent.literal, name = record.name or ''}
 
-	else
-		return nil
 	end
+	error("Unknown opponent type: " .. record.type)
 end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
@@ -458,7 +459,7 @@ end
 
 ---Reads a standings or placement lpdb structure and builds an opponent struct from it
 ---@param storageStruct table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then
@@ -488,6 +489,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 			type = Opponent.literal,
 		}
 	end
+	error("Unknown opponent type: " .. storageStruct.type)
 end
 
 return Opponent

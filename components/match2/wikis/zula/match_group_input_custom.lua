@@ -39,19 +39,16 @@ local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_RESULT_TYPE = 'np'
 local DRAW_RESULT_TYPE = 'draw'
-local NOW = os.time(os.date('!*t'))
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local NOT_PLAYED_SCORE = -1
 local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_RESULT_TYPE = 'default'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
-local opponentFunctions = {}
 
 local CustomMatchGroupInput = {}
 
@@ -64,10 +61,7 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 
 	-- process match
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getExtraData(match)
@@ -77,14 +71,13 @@ end
 
 -- called from Module:Match/Subobjects
 function CustomMatchGroupInput.processMap(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
 
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -93,11 +86,14 @@ function CustomMatchGroupInput.processOpponent(record, date)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	teamTemplateDate = teamTemplateDate ~= EPOCH_TIME_EXTENDED and teamTemplateDate or DateExt.getContextualDateOrNow()
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -315,19 +311,6 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
-	else
-		return {
-			date = EPOCH_TIME_EXTENDED,
-			dateexact = false,
-		}
-	end
-end
-
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	return MatchGroupInput.getCommonTournamentVars(match)
@@ -394,12 +377,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
-
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
-			end
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -425,7 +403,7 @@ function matchFunctions.getOpponents(match)
 		match.dateexact = false
 	else
 		-- see if match should actually be finished if score is set
-		if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
+		if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 			local threshold = match.dateexact and 30800 or 86400
 			if match.timestamp + threshold < NOW then
 				match.finished = true
@@ -542,23 +520,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
 end
 
 return CustomMatchGroupInput

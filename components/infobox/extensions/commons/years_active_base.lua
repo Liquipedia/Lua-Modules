@@ -9,12 +9,13 @@
 local ActiveYears = {}
 
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Logic = require('Module:Logic')
+local DateExt = require('Module:Date/Ext')
 local Info = mw.loadData('Module:Info')
+local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Set = require('Module:Set')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -23,7 +24,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local DEFAULT_DATE = '1970-01-01 00:00:00'
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
@@ -86,7 +86,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
-		ConditionNode(ColumnName('date'), Comparator.neq, DEFAULT_DATE),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
 			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),

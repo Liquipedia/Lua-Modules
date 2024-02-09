@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
@@ -17,6 +19,8 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
+---@param self Squad
+---@return Squad
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -35,10 +39,10 @@ function CustomSquad.header(self)
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -48,6 +52,8 @@ function CustomSquad.header(self)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 
@@ -55,34 +61,31 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	if squad.type == Squad.TYPE_FORMER then
-		local index = 1
-		while args['p' .. index] or args[index] do
-			local player = Json.parseIfString(args['p' .. index] or args[index])
-			if player.inactivedate then
-				squad.type = Squad.TYPE_FORMER_INACTIVE
-				break
-			end
+	local players = Array.mapIndexes(function(index)
+		return Json.parseIfString(args[index])
+	end)
 
-			index = index + 1
-		end
+	local hasInactive = function(player)
+		return Logic.isNotEmpty(player.inactivedate)
+	end
+
+	if squad.type == Squad.SquadType.FORMER and Array.any(players, hasInactive) then
+		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local index = 1
-	while args['p' .. index] or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
-
+	Array.forEach(players, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end
 
+---@param playerList table[]
+---@param squadType integer
+---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
 	if Table.isEmpty(playerList) then
 		return
@@ -95,7 +98,7 @@ function CustomSquad.runAuto(playerList, squadType)
 
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
+	Array.forEach(playerList, function(player)
 		--Get Reference(s)
 		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
 		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
@@ -114,11 +117,14 @@ function CustomSquad.runAuto(playerList, squadType)
 		player.newteamdate = player.newTeam.date
 
 		squad:row(CustomSquad._playerRow(player, squad.type))
-	end
+	end)
 
 	return squad:create()
 end
 
+---@param player table
+---@param squadType integer
+---@return Html
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 
@@ -137,11 +143,11 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_INACTIVE or squadType == Squad.TYPE_FORMER_INACTIVE then
+	if squadType == Squad.SquadType.INACTIVE or squadType == Squad.SquadType.FORMER_INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	if squadType == Squad.TYPE_FORMER or squadType == Squad.TYPE_FORMER_INACTIVE then
+	if squadType == Squad.SquadType.FORMER or squadType == Squad.SquadType.FORMER_INACTIVE then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,

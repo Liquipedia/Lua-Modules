@@ -417,6 +417,7 @@ Match.gameFields = Table.map({
 	'mode',
 	'parent',
 	'participants',
+	'patch',
 	'resulttype',
 	'rounds',
 	'scores',

@@ -29,5 +29,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Apex Legends default lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Apex Legends default darkmode.png', ---@deprecated
-	match2 = 0,
+	match2 = 1,
 }

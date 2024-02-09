@@ -7,17 +7,28 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
+local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+
+local REGION_REMAPPINGS = {
+	['south america'] = 'latin america',
+	['asia-pacific'] = 'pacific',
+	['asia'] = 'pacific',
+	['taiwan'] = 'pacific',
+	['southeast asia'] = 'pacific',
+}
 
 ---@class LeagueoflegendsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -37,6 +48,17 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
+
+	local regionData = Region.run{region = region} or {}
+	local remappedRegion = regionData.region and REGION_REMAPPINGS[(regionData.region or ''):lower()]
+
+	return remappedRegion and self:createRegion(remappedRegion) or regionData
+end
+
 ---@return string?
 function CustomTeam:createBottomContent()
 	return Template.expandTemplate(
@@ -54,7 +76,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
 			Cell{name = 'Abbreviation', content = {args.abbreviation}},
-			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {args.affiliate and Team.team(args.affiliate) or nil}}
+			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
+				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
 		}
 	end
 
@@ -65,8 +88,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	if String.isNotEmpty(args.league) then
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end

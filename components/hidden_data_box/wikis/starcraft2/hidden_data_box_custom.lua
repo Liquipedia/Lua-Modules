@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -16,7 +17,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.game = Game.toIdentifier{game = args.game}
@@ -65,9 +66,9 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 			series = mw.ext.TeamLiquidIntegration.resolve_redirect(Variables.varDefault('tournament_series', '')),
 			game = string.lower(Variables.varDefault('tournament_game', '')),
 			type = Variables.varDefault('tournament_type'),
-			startdate = Variables.varDefault('tournament_startdate', '1970-01-01'),
-			enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-			sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+			startdate = Variables.varDefault('tournament_startdate', DateExt.defaultDate),
+			enddate = Variables.varDefault('tournament_enddate', DateExt.defaultDate),
+			sortdate = Variables.varDefault('tournament_enddate', DateExt.defaultDate),
 			liquipediatier = Variables.varDefault('tournament_liquipediatier'),
 			liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype'),
 			status = Variables.varDefault('tournament_status'),

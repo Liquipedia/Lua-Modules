@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 
@@ -15,6 +17,8 @@ local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
+---@param self Squad
+---@return Squad
 function CustomSquad.header(self)
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -33,10 +37,10 @@ function CustomSquad.header(self)
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
+	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
 	end
@@ -46,6 +50,8 @@ function CustomSquad.header(self)
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 
@@ -53,25 +59,24 @@ function CustomSquad.run(frame)
 
 	local args = squad.args
 
-	if squad.type == Squad.TYPE_FORMER then
-		local index = 1
-		while args['p' .. index] ~= nil or args[index] do
-			local player = Json.parseIfString(args['p' .. index] or args[index])
-			if player.inactivedate then
-				squad.type = Squad.TYPE_FORMER_INACTIVE
-				break
-			end
+	local players = Array.mapIndexes(function(index)
+		return Json.parseIfString(args[index])
+	end)
 
-			index = index + 1
-		end
+	---@param player table
+	---@return boolean
+	local hasInactive = function(player)
+		return Logic.isNotEmpty(player.inactivedate)
+	end
+
+	if squad.type == Squad.SquadType.FORMER and Array.any(players, hasInactive) then
+		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local index = 1
-	while args['p' .. index] ~= nil or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+	Array.forEach(players, function(player)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id{
@@ -88,10 +93,10 @@ function CustomSquad.run(frame)
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
+		if squad.type == Squad.SquadType.INACTIVE or squad.type == Squad.SquadType.FORMER_INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
-		if squad.type == Squad.TYPE_FORMER or squad.type == Squad.TYPE_FORMER_INACTIVE then
+		if squad.type == Squad.SquadType.FORMER or squad.type == Squad.SquadType.FORMER_INACTIVE then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -108,9 +113,7 @@ function CustomSquad.run(frame)
 			.. (player.role and '_' .. player.role or '')
 			.. '_' .. squad.type
 		))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end
