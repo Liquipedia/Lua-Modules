@@ -77,6 +77,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			mapDetails and mapDetailsOT and (INDENT .. INDENT .. '|o1t1firstside=|o1t1t=|o1t1ct=|o1t2t=|o1t2ct=') or nil,
 			mapStatsLine
 		)
+		lines[#lines] = lines[#lines] .. '}}'
 	end)
 
 	Array.appendWith(lines,
