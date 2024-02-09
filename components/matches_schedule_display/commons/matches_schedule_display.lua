@@ -192,7 +192,7 @@ function MatchesTable:dateDisplay(match)
 			:wikitext('To be announced')
 	end
 
-	return dateCell:wikitext(mw.language.new('en'):formatDate('F j, Y', match.date))
+	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
 end
 
 ---@param match table

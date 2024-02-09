@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 		local playerEarnings = self.caller.totalPlayerEarnings
 		table.insert(widgets, Cell{
 			name = PLAYER_EARNINGS_ABBREVIATION,
-			content = {playerEarnings ~= 0 and ('$' .. mw.language.new('en'):formatNum(Math.round(playerEarnings))) or nil}
+			content = {playerEarnings ~= 0 and ('$' .. mw.getContentLanguage():formatNum(Math.round(playerEarnings))) or nil}
 		})
 	end
 

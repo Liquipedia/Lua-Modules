@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.language.new('en'):formatNum(currentYearEarnings)) or nil}
+				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
 			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
