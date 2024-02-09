@@ -53,6 +53,15 @@ Author(s): Elysienna
 				& .panel-table__cell__game-placement {
 					background-color: inherit;
 				}
+
+				& .cell--game-container {
+					align-items: flex-start;
+					height: 100%;
+				}
+
+				& .cell--game {
+					height: 100%;
+				}
 			}
 
 			&--navigate {
@@ -105,6 +114,7 @@ Author(s): Elysienna
 				flex: 1 1 100%;
 				padding: 0.75rem 1rem;
 				text-align: right;
+				align-self: flex-start;
 			}
 
 			&-details {
@@ -126,9 +136,9 @@ Author(s): Elysienna
 				font-style: italic;
 				margin: 0;
 				min-height: 1.5rem;
-				display: flex;
 				justify-content: right;
 				align-items: center;
+				display: none;
 			}
 
 			&-placement {
@@ -351,5 +361,7 @@ Author(s): Elysienna
 		font-size: unset;
 		font-weight: normal;
 		font-style: italic;
+		text-align: right;
+		margin-top: 0.25rem;
 	}
 }
