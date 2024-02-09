@@ -265,6 +265,7 @@ end
 ---@return self
 function MatchTable:query()
 	self.matches = {}
+
 	Lpdb.executeMassQuery('match2', {
 		conditions = self:buildConditions(),
 		order = 'date desc',
@@ -289,9 +290,13 @@ function MatchTable:buildConditions()
 		:toString()
 end
 
----@return ConditionTree
+---@return ConditionTree?
 function MatchTable:buildDateConditions()
 	local timeRange = self.config.timeRange
+
+	if timeRange.startDate == DateExt.minTimestamp and timeRange.endDate == DateExt.maxTimestamp then
+		return
+	end
 
 	local conditions = ConditionTree(BooleanOperator.all)
 
