@@ -570,7 +570,7 @@ function MatchTable:matchRow(match)
 		:addClass(self:_getBackgroundClass(match.result.winner))
 		:node(self:_displayDate(match))
 		:node(self:_displayTier(match))
-		:node(self:_dispalyType(match))
+		:node(self:_displayType(match))
 		:node(self:_displayGameIcon(match))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
@@ -618,7 +618,7 @@ end
 
 ---@param match MatchTableMatch
 ---@return Html?
-function MatchTable:_dispalyType(match)
+function MatchTable:_displayType(match)
 	if not self.config.showType then return end
 
 	return mw.html.create('td')
