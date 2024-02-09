@@ -38,7 +38,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMapCode(mapIndex, bans, kda)
+			return WikiCopyPaste._getMapCode(mapIndex, bans)
 		end),
 		'}}'
 	)
@@ -49,7 +49,7 @@ end
 ---@param mapIndex integer
 ---@param bans boolean
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, bans, kda)
+function WikiCopyPaste._getMapCode(mapIndex, bans)
 	local lines = {
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=|team2side=|length=|winner=',
