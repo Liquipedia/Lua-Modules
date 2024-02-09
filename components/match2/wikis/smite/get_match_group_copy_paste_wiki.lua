@@ -7,94 +7,68 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Table = require('Module:Table')
-local Opponent = require('Module:Opponent')
+local Lua = require('Module:Lua')
 
---[[
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+---@class SmiteMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-]]--
-
-local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
-
---allowed opponent types on the wiki
-local MODES = {
-	solo = 'solo',
-	team = 'team',
-	literal = 'literal',
-}
-
---default opponent type (used if the entered mode is not found in the above table)
-local DEFAULT_MODE = 'team'
-
---returns the cleaned opponent type
-function WikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DEFAULT_MODE
-end
+local INDENT = WikiCopyPaste.Indent
 
 --returns the Code for a Match, depending on the input
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
-
-	if bestof == 0 and Logic.readBoolOrNil(args.score) ~= false then
-		args.score = true
-	end
-	local score = Logic.readBool(args.score) and '|score=' or nil
+	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
 	local bans = Logic.readBool(args.bans)
 
 	local lines = Array.extend(
 		'{{Match',
-		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		Logic.readBool(args.needsWinner) and indent .. '|winner=' or nil,
-		Logic.readBool(args.hasDate) and {indent .. '|date=', indent .. '|twitch='} or {}
+		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
+		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {},
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
+		end),
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return WikiCopyPaste._getMapCode(mapIndex, bans, kda)
+		end),
+		'}}'
 	)
-
-	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score))
-	end
-
-	if bestof ~= 0 then
-		for i = 1, bestof do
-			Array.appendWith(lines,
-				indent .. '|map' .. i .. '={{Map',
-				indent .. indent .. '|team1side=|team2side=|length=|winner=',
-				indent .. indent .. '<!-- Gods picks -->',
-				indent .. indent .. '|t1g1=|t1g2=|t1g3=|t1g4=|t1g5=',
-				indent .. indent .. '|t2g1=|t2g2=|t2g3=|t2g4=|t2g5='
-			)
-			if bans then
-				Array.appendWith(lines,
-					indent .. indent .. '<!-- Gods bans -->',
-					indent .. indent .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5=',
-					indent .. indent .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
-				)
-			end
-			Array.appendWith(lines,
-				indent .. '}}'
-			)
-		end
-	end
-
-	table.insert(lines, '}}')
 
 	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function WikiCopyPaste._getOpponent(mode, score)
-	local out
+---@param mapIndex integer
+---@param bans boolean
+---@return string
+function WikiCopyPaste._getMapCode(mapIndex, bans, kda)
+	local lines = {
+		INDENT .. '|map' .. mapIndex .. '={{Map',
+		INDENT .. INDENT .. '|team1side=|team2side=|length=|winner=',
+		INDENT .. INDENT .. '<!-- Character picks -->',
+		INDENT .. INDENT .. '|t1g1=|t1g2=|t1g3=|t1g4=|t1g5=',
+		INDENT .. INDENT .. '|t2g1=|t2g2=|t2g3=|t2g4=|t2g5=',
+	}
 
-	if mode == Opponent.solo then
-		out = '{{SoloOpponent||flag=' .. (score or '') .. '}}'
-	elseif mode == Opponent.team then
-		out = '{{TeamOpponent|' .. (score or '') .. '}}'
-	elseif mode == Opponent.literal then
-		out = '{{Literal|}}'
+	if bans then
+		Array.appendWith(lines,
+			INDENT .. INDENT .. '<!-- Character bans -->',
+			INDENT .. INDENT .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5=',
+			INDENT .. INDENT .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
+		)
 	end
+	Array.appendWith(lines, INDENT .. '}}')
 
-	return out
+	return table.concat(lines, '\n')
+
 end
 
 return WikiCopyPaste
