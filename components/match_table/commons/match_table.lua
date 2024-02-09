@@ -706,12 +706,15 @@ function MatchTable:_displayScore(result)
 	---@return unknown
 	local toScore = function(opponentRecord)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		return opponentRecord.status == SCORE_STATUS and (opponentRecord.score or '–') or opponentRecord.status
+		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
+			:wikitext(opponentRecord.status == SCORE_STATUS and (opponentRecord.score or '–') or opponentRecord.status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
-		:wikitext(table.concat({toScore(result.opponent), toScore(result.vs)}, SCORE_CONCAT))
+		:node(toScore(result.opponent))
+		:node(SCORE_CONCAT)
+		:node(toScore(result.vs))
 end
 
 ---@param match MatchTableMatch
