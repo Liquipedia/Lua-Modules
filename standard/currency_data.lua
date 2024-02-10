@@ -400,7 +400,7 @@ return {
 		symbol = {
 			hasSpace = true,
 			isAfter = true,
-			text = '<u>С</u>',
+			text = '⃀',
 		},
 	},
 	khr = {
