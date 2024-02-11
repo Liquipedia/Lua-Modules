@@ -14,6 +14,7 @@ local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
@@ -27,11 +28,11 @@ local CustomSkill = Class.new(Skill)
 local CustomInjector = Class.new(Injector)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
-local INFORMATIONTYPE_TO_CATEGORY = {
-	spell = 'Spells',
-	ability = 'Abilities',
-	upgrade = 'Upgrades',
-	effect = 'Effect',
+local VALID_SKILLS = {
+	'Spell',
+	'Ability',
+	'Upgrade',
+	'Effect',
 }
 
 ---@param frame Frame
@@ -39,7 +40,7 @@ local INFORMATIONTYPE_TO_CATEGORY = {
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
-	assert(INFORMATIONTYPE_TO_CATEGORY[(skill.args.informationType or ''):lower()], 'Missing or invalid "informationType"')
+	assert(Table.includes(VALID_SKILLS, skill.args.informationType), 'Missing or invalid "informationType"')
 
 	skill:setWidgetInjector(CustomInjector(skill))
 
@@ -84,6 +85,7 @@ function CustomInjector:parse(id, widgets)
 		local castingTime = tonumber(args.casting_time)
 		Array.extendWith(widgets, {
 				Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
+				Cell{name = 'Upgrade Target', content = caller:_readCommaSeparatedList(args.upgrade_target, true)},
 				Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
 				Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
 				Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
@@ -139,10 +141,9 @@ end
 ---@param args table
 ---@return string[]
 function CustomSkill:getCategories(args)
-	local skill = INFORMATIONTYPE_TO_CATEGORY[(args.informationType or ''):lower()]
 	local categories = {skill}
 	if self.faction then
-		table.insert(categories, self.faction .. ' ' .. skill)
+		table.insert(categories, self.faction .. ' ' .. args.informationType)
 	end
 
 	return categories
@@ -173,6 +174,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		energy = tonumber(args.energy),
 		duration = tonumber(args.duration),
 		from = args.from,
+		upgradetarget = self:_readCommaSeparatedList(args.upgrade_target),
 		range = tonumber(args.range),
 		radius = tonumber(args.radius),
 		cooldown = tonumber(args.cooldown),
