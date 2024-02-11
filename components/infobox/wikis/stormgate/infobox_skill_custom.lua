@@ -134,7 +134,7 @@ function CustomSkill:_damageHealDisplay(prefix)
 	return {
 		Cell{name = textPrefix, content = {valueText}},
 		Cell{name = 'Total ' .. textPrefix, content = {total ~= 0 and total or nil}},
-		Cell{name = textPrefix .. ' per second', content = {dps ~= 0 and dps or nil}},
+		Cell{name = textPrefix .. ' per second', content = {dps ~= 0 and dps ~= overTime and dps or nil}},
 	}
 end
 
