@@ -90,19 +90,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 25,
+				points = 20,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 25,
+				points = 20,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 25,
+				points = 20,
 			},
 			{
 				name = Config.TIER_TYPE_CAMPAIGN,
-				points = 25,
+				points = 20,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -184,7 +184,7 @@ Config.weights = {
 				name = Config.TIER_TYPE_SHOW_MATCH,
 				points = 0,
 			},
-			{ 
+			{
 				name = Config.TIER_TYPE_MISC,
 				points = 0,
 			},
