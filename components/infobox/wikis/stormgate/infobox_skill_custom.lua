@@ -193,6 +193,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		healthtotal = args.healthTotal,
 		healthdps = args.healthDps,
 		healthovertime = args.health_over_time,
+		specialcost = args.special_cost
 	}
 
 	return lpdbData
@@ -214,7 +215,8 @@ function CustomSkill:_costDisplay()
 			buildTime = args.buildtime,
 			buildTimeTotal = args.totalbuildtime,
 		},
-		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil
+		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil,
+		args.special_cost
 	), '&nbsp;')
 end
 
