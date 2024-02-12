@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Faction = require('Module:Faction')
+local Icon = require('Module:Icon')
 local Table = require('Module:Table')
 
 local CostDisplay = {}
@@ -22,8 +23,7 @@ local ICONS = {
 		default = Abbreviation.make('The', 'Therium'),
 	},
 	buildTime = {
-		--expect to get different ones per faction
-		default = '[[File:Buildtime_terran.gif|baseline|link=Game Speed]]',
+		default = Icon.makeIcon{iconName = 'time', size = '100%'},
 	},
 	supply = {
 		--expect to get different ones per faction
