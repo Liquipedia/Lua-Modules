@@ -71,7 +71,7 @@ return {
 		label = 'Matchpage and Stats on SLTV',
 	},
 	{
-		name = 'lpl-legacy',
+		name = 'lpl-old',
 		icon = 'LPL Play icon.png',
 		prefixLink = 'https://old.letsplay.live/match/',
 		label = 'Matchpage on LPL Play',
