@@ -100,7 +100,7 @@ end
 --- String must start with the YYYY. Text is allowed after after the DD.
 --- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
 ---@param str string
----@return osdate
+---@return osdateparam
 ---@overload fun():nil
 function DateExt.parseIsoDate(str)
 	if not str then
