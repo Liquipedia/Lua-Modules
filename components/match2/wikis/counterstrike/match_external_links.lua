@@ -83,10 +83,17 @@ return {
 		label = 'Matchpage on epic.LAN',
 	},
 	{
-		name = 'pinger',
+		name = 'pinger-csgo',
 		icon = 'Pinger icon lightmode.png',
 		iconDark = 'Pinger icon darkmode.png',
 		prefixLink = 'https://pinger.kz/matches/csgo/',
+		label = 'Matchpage and Stats on Pinger',
+	},
+	{
+		name = 'pinger',
+		icon = 'Pinger icon lightmode.png',
+		iconDark = 'Pinger icon darkmode.png',
+		prefixLink = 'https://pinger.kz/tournaments/cs2/event/matches/',
 		label = 'Matchpage and Stats on Pinger',
 	},
 	{
