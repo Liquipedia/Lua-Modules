@@ -31,7 +31,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extend(
 		'{{Match',
-		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {},
 		Array.map(Array.range(1, opponents), function(opponentIndex)
@@ -49,18 +48,18 @@ end
 ---@param mapIndex integer
 ---@param bans boolean
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, bans)
+function WikiCopyPaste._getMapCode(mapIndex, bans, kda)
 	local lines = {
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=|team2side=|length=|winner=',
-		INDENT .. INDENT .. '<!-- Character picks -->',
+		INDENT .. INDENT .. '<!-- God picks -->',
 		INDENT .. INDENT .. '|t1g1=|t1g2=|t1g3=|t1g4=|t1g5=',
 		INDENT .. INDENT .. '|t2g1=|t2g2=|t2g3=|t2g4=|t2g5=',
 	}
 
 	if bans then
 		Array.appendWith(lines,
-			INDENT .. INDENT .. '<!-- Character bans -->',
+			INDENT .. INDENT .. '<!-- God bans -->',
 			INDENT .. INDENT .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5=',
 			INDENT .. INDENT .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
 		)
