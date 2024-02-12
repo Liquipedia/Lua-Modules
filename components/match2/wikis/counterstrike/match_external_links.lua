@@ -71,10 +71,17 @@ return {
 		label = 'Matchpage and Stats on SLTV',
 	},
 	{
-		name = 'lpl',
+		name = 'lpl-legacy',
 		icon = 'LPL Play icon.png',
 		prefixLink = 'https://old.letsplay.live/match/',
 		label = 'Matchpage on LPL Play',
+	},
+	{
+		name = 'lpl',
+		icon = 'letsplay.live 2024 icon lightmode.png',
+		iconDarl = 'letsplay.live 2024 icon darkmode.png',
+		prefixLink = 'https://gg.letsplay.live/report-score/',
+		label = 'Matchpage on letsplay.live',
 	},
 	{
 		name = 'epiclan',
