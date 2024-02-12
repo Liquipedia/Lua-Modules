@@ -26,7 +26,7 @@ local STATUS_DEFAULT_WIN = 'W'
 local STATUS_FORFEIT = 'FF'
 local STATUS_DISQUALIFIED = 'DQ'
 local STATUS_DEFAULT_LOSS = 'L'
-local _ALLOWED_STATUSES = {
+local ALLOWED_STATUSES = {
 	STATUS_DRAW,
 	STATUS_DEFAULT_WIN,
 	STATUS_FORFEIT,
@@ -66,21 +66,9 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
 
-	-- Adjust map data, especially set participants data
-	match = matchFunctions.adjustMapData(match)
-
 	return match
 end
 
-function matchFunctions.adjustMapData(match)
-	local opponents = {}
-	for _, map in Table.iter.pairsByPrefix(match, 'map') do
-		mapFunctions.getParticipants(map, opponents)
-		mapFunctions.getAdditionalExtraData(map)
-	end
-
-	return match
-end
 -- called from Module:Match/Subobjects
 ---@param map table
 ---@return table
@@ -89,12 +77,14 @@ function CustomMatchGroupInput.processMap(map)
 		map.map = nil
 	end
 	map = mapFunctions.getScoresAndWinner(map)
+	map = mapFunctions.getPicksAndBans(map)
+	map = mapFunctions.getAdditionalExtraData(map)
 
 	return map
 end
 
 ---@param record table
----@param date string
+---@param timestamp number
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -181,7 +171,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	-- set it as finished if we have a winner
-	if not Logic.isEmpty(data.winner) then
+	if Logic.isNotEmpty(data.winner) then
 		data.finished = true
 	end
 
@@ -349,7 +339,7 @@ function matchFunctions.getOpponents(match)
 				opponent.score = tonumber(opponent.score)
 				opponent.status = STATUS_SCORE
 				isScoreSet = true
-			elseif Table.includes(_ALLOWED_STATUSES, opponent.score) then
+			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
 				opponent.status = opponent.score
 				opponent.score = NOT_PLAYED_SCORE
 			end
@@ -381,7 +371,7 @@ function matchFunctions.getOpponents(match)
 		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, STATUS_DEFAULT_LOSS)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
-	elseif Logic.isNumeric(match.winner) and Table.includes(_ALLOWED_STATUSES, match.walkover) then
+	elseif Logic.isNumeric(match.winner) and Table.includes(ALLOWED_STATUSES, match.walkover) then
 		local winnerIndex = tonumber(match.winner)
 		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
@@ -460,56 +450,29 @@ function mapFunctions.getAdditionalExtraData(map)
 	return map
 end
 
--- Parse participant information
 ---@param map table
 ---@return table
-function mapFunctions.getParticipants(map, opponents)
-	local participants = {}
+function mapFunctions.getPicksAndBans(map)
 	local heroData = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			local hero = map['t' .. opponentIndex .. 'g' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
-		end
+			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero and hero:lower()]
 
-		for _, ban, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[ban]
+			local ban = map['t' .. opponentIndex .. 'b' .. playerIndex]
+			heroData['team' .. opponentIndex .. 'ban' .. playerIndex] = HeroNames[ban and ban:lower()]
 		end
 	end
-
 	map.extradata = heroData
-	map.participants = participants
-	return mapFunctions.getAdditionalExtraData(map)
+	return map
 end
 
 -- Calculate Score and Winner of the map
----@param map table
----@return table
 function mapFunctions.getScoresAndWinner(map)
-	map.scores = {}
-	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
-		-- read scores
-		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
-		local obj = {}
-		if not Logic.isEmpty(score) then
-			if Logic.isNumeric(score) then
-				obj.status = STATUS_SCORE
-				score = tonumber(score)
-				map['score' .. scoreIndex] = score
-				obj.score = score
-			elseif Table.includes(_ALLOWED_STATUSES, score) then
-				obj.status = score
-				obj.score = NOT_PLAYED_SCORE
-			end
-			table.insert(map.scores, score)
-			indexedScores[scoreIndex] = obj
-		else
-			break
-		end
+	if Logic.isNumeric(map.winner) then
+		map.winner = tonumber(map.winner)
+		map.finished = true
 	end
-
-	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 
 	return map
 end
