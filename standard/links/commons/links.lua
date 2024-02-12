@@ -273,7 +273,6 @@ local ICON_KEYS_TO_RENAME = {
 	['faceit-c2'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
-	['letsplaylive-old'] = 'lpl-play',
 	matcherinolink = 'matcherino',
 	playlist = 'music',
 	privsteam = 'steam',
