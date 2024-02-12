@@ -33,7 +33,7 @@ describe('prize pool', function()
 		qualifies1name = 'A Display',
 		freetext = 'A title',
 		import = false,
-		[1] = {localprize = '1,000', [1] = {'Rathoz', flag='se'}},
+		[1] = {localprize = '1,000', [1] = {'Rathoz', flag='se', date='2024-02-09'}},
 	}
 
 	it('parameters are correctly parsed', function()
