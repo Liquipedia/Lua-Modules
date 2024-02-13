@@ -33,7 +33,7 @@ function Wrapper.table(frame)
 	end
 
 	args.roundcount = 1
-	return StandingsStorage.fromTemplateHeader(args)
+	StandingsStorage.fromTemplateHeader(args)
 end
 
 ---@param frame Frame
@@ -138,6 +138,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
 end
 
+---@param args table
 ---@return boolean
 function Wrapper._shouldStore(args)
 	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))
