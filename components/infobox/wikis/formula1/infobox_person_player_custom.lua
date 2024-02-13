@@ -102,7 +102,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.abbreviations = args.abbreviations
 	lpdbData.extradata.role = Role.run{role = args.role, useDefault = true}.role
 	lpdbData.extradata.role2 = Role.run{role = args.role2}.role
 	return lpdbData
