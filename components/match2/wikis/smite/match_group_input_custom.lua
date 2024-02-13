@@ -396,7 +396,7 @@ function matchFunctions.getOpponents(match)
 end
 
 ---@param match table
----@return boolean
+---@return table
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
 	if Logic.isNotEmpty(match.winner) then
