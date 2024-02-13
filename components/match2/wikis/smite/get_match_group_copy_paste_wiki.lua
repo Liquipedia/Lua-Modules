@@ -48,7 +48,7 @@ end
 ---@param mapIndex integer
 ---@param bans boolean
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, bans, kda)
+function WikiCopyPaste._getMapCode(mapIndex, bans)
 	local lines = {
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=|team2side=|length=|winner=',
