@@ -309,7 +309,7 @@ end
 function PlayerIntroduction._readTransferFromTransfers(player)
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = '([[player::' .. player .. ']] OR [[player::' .. player:gsub('_', ' ') .. ']]) AND '
-			.. '[[date::>' .. DateExt.defaultDate .. ']]',
+			.. '[[date::!' .. DateExt.defaultDate .. ']]',
 		order = 'date desc',
 		limit = 1,
 		query = 'fromteam, toteam, role2, date, extradata'
