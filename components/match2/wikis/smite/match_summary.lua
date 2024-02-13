@@ -32,7 +32,7 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
 
 -- Hero Ban Class
----@class SmiteBan: MatchSummaryRowInterface
+---@class SmiteHeroBan: MatchSummaryRowInterface
 ---@operator call: SmiteHeroBan
 ---@field root Html
 ---@field table Html
