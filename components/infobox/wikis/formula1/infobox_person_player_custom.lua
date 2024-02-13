@@ -46,7 +46,6 @@ function CustomInjector:parse(id, widgets)
 
 	elseif id == 'name' then 
 		table.insert(widgets, Cell{name = 'Abbrevitions', content = {args.abbreviations}})
-		
 	elseif id == 'history' then
 		return {
 			Title{name = 'History'},
