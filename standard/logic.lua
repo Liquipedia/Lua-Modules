@@ -13,7 +13,7 @@ local Logic = {}
 ---@param val1 A?
 ---@param val2 B?
 ---@param default C?
----@return A|B|C
+---@return A|B|C|nil
 function Logic.emptyOr(val1, val2, default)
 	if not Logic.isEmpty(val1) then
 		return val1
