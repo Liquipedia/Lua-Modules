@@ -71,6 +71,17 @@ local function setupForTesting()
 			return {points = {title = 'Points'}}
 		end
 
+		if newName == 'a or an' then
+			return {_main = function(params)
+				-- Simplified implemenation for mocking
+				local firstChar = string.sub(params[1], 1, 1):lower()
+				if firstChar == 'a' or firstChar == 'e' or firstChar == 'i' or firstChar == 'o' or firstChar == 'u' then
+					return 'an '
+				end
+				return 'a '
+			end}
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
