@@ -137,7 +137,7 @@ function Person:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
-		Customizable{id = 'name', children = {
+		Customizable{id = 'names', children = {
 				Cell{name = 'Name', content = {args.name}},
 				Cell{name = 'Romanized Name', content = {args.romanized_name}},
 			}
