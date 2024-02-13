@@ -275,9 +275,8 @@ function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
 
 	for prefix, displayName in Table.iter.pairsByPrefix(playerData, 'p') do
 		local name = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
-			playerData[prefix .. 'link'],
-			displayName
-		)):gsub(' ', '_')
+			playerData[prefix .. 'link']
+		) or displayName):gsub(' ', '_')
 
 		table.insert(players, {
 			name = name,

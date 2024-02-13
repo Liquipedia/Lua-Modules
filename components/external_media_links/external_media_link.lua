@@ -88,7 +88,7 @@ function ExternalMediaLink._store(args)
 		translator = args.translator,
 		event = args.event,
 		event_link = mw.ext.TeamLiquidIntegration.resolve_redirect(
-			Logic.emptyOr(args['event-link'], args.event, '')
+			Logic.emptyOr(args['event-link'], args.event) or ''
 		),
 		subject_organization = args.subject_organization1, --legacy
 	}
