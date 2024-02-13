@@ -53,10 +53,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end
-	
+
 	if not (String.isEmpty(args.btmin) and String.isEmpty(args.btmax)) then
 		table.insert(widgets, Cell{
-			name = 'Battle Tier', 
+			name = 'Battle Tier',
 			content = {(args.btmin or '') .. '-' .. (args.btmax or '')}
 		})
 	end
