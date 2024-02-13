@@ -36,6 +36,7 @@ return {
 		'gamersclub',
 		'halodatahive',
 		'letsplaylive',
+		'letsplaylive-old',
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
