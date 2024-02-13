@@ -192,11 +192,11 @@ end
 -- Placement related functions
 --
 -- function to check for draws
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function placementFunctions.isDraw(table)
+function placementFunctions.isDraw(tbl)
 	local last
-	for _, scoreInfo in pairs(table) do
+	for _, scoreInfo in pairs(tbl) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
 			return false
 		end
@@ -211,38 +211,38 @@ function placementFunctions.isDraw(table)
 end
 
 -- Check if any team has a none-standard status
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function placementFunctions.isSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+function placementFunctions.isSpecialStatus(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function placementFunctions.isForfeit(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+function placementFunctions.isForfeit(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
 
 -- function to check for DQ's
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function placementFunctions.isDisqualified(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+function placementFunctions.isDisqualified(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
 end
 
 -- function to check for W/L
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function placementFunctions.isWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+function placementFunctions.isWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
 end
 
 -- Get the winner when resulttype=default
----@param table table[]
+---@param tbl table[]
 ---@return number
-function placementFunctions.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+function placementFunctions.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == 'W' then
 			return index
 		end

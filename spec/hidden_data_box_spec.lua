@@ -51,12 +51,12 @@ describe('hidden data box', function()
 	describe('test fetching and wiki var storing', function()
 		local origLpdb = mw.ext.LiquipediaDB.lpdb
 		before_each(function ()
-			mw.ext.LiquipediaDB.lpdb = function(table)
-				if table == 'tournament' then
+			mw.ext.LiquipediaDB.lpdb = function(tbl)
+				if tbl == 'tournament' then
 					return {
 						require('test_assets.lpdb_tournament')[2]
 					}
-				elseif table == 'placement' then
+				elseif tbl == 'placement' then
 					return {
 						require('test_assets.lpdb_placement')[18]
 					}
