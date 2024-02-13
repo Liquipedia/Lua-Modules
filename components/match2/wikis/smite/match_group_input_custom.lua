@@ -117,6 +117,8 @@ end
 --
 -- function to check for draws
 --
+---@param scoreTable table[]
+---@return boolean
 function CustomMatchGroupInput.placementCheckDraw(scoreTable)
 	local last
 	for _, scoreInfo in pairs(scoreTable) do
@@ -216,15 +218,21 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 	return opponents, winner
 end
 
-function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local value1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
-	local value2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
+--- @param tbl table
+--- @param key1 string
+--- @param key2 string
+--- @return boolean
+function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
+	local value1 = tonumber(tbl[key1].score or NO_SCORE) or NO_SCORE
+	local value2 = tonumber(tbl[key2].score or NO_SCORE) or NO_SCORE
 	return value1 > value2
 end
 
 -- Check if any opponent has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table,
+---@param tbl table[]
+---@return boolean
+function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
+	return Table.any(tbl,
 		function (_, scoreinfo)
 			return scoreinfo.status ~= STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
 		end
@@ -232,31 +240,31 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(table)
 end
 
 -- function to check for forfeits
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function CustomMatchGroupInput.placementCheckFF(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == STATUS_FORFEIT end)
+function CustomMatchGroupInput.placementCheckFF(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function CustomMatchGroupInput.placementCheckDQ(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
+function CustomMatchGroupInput.placementCheckDQ(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
----@param table table[]
+---@param tbl table[]
 ---@return boolean
-function CustomMatchGroupInput.placementCheckWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == STATUS_DEFAULT_LOSS end)
+function CustomMatchGroupInput.placementCheckWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
----@param table table[]
+---@param tbl table[]
 ---@return number
-function CustomMatchGroupInput.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+function CustomMatchGroupInput.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == STATUS_DEFAULT_WIN then
 			return index
 		end
@@ -270,7 +278,7 @@ end
 ---@param match table
 ---@return table
 function matchFunctions.getBestOf(match)
-		match.bestof = #Array.filter(Array.range(1, MAX_NUM_GAMES), function(idx) return match['map'.. idx] end)
+	match.bestof = #Array.filter(Array.range(1, MAX_NUM_GAMES), function(idx) return match['map'.. idx] end)
 	return match
 end
 
@@ -278,6 +286,8 @@ end
 -- Only update an opponents result if it's
 -- 1) Not manually added
 -- 2) At least one map has a winner
+---@param match table
+---@return table
 function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local setScores = false
@@ -396,6 +406,8 @@ function matchFunctions.getOpponents(match)
 end
 
 ---@param match table
+---@param opponents table
+---@param isScoreSet boolean
 ---@return table
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
@@ -427,6 +439,9 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	return match
 end
 
+---@param opponents table
+---@param walkoverType string
+---@return table
 function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	for index in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
@@ -468,6 +483,8 @@ function mapFunctions.getPicksAndBans(map)
 end
 
 -- Calculate Score and Winner of the map
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	if Logic.isNumeric(map.winner) then
 		map.winner = tonumber(map.winner)
