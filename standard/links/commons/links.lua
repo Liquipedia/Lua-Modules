@@ -116,10 +116,15 @@ local PREFIXES = {
 	instagram = {'https://www.instagram.com/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
-	letsplaylive = {
+	['letsplaylive-old'] = {
 		'https://old.letsplay.live/event/',
 		team = 'https://old.letsplay.live/team/',
 		player = 'https://old.letsplay.live/profile/',
+	},
+	letsplaylive = {
+		'https://gg.letsplay.live/tournament/',
+		team = 'https://gg.letsplay.live/view-team/',
+		player = 'https://gg.letsplay.live/profile/view-stats/',
 	},
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
@@ -252,7 +257,7 @@ local ALIASES = {
 	['facebook-gaming'] = {'fbgg'},
 	home = {'website', 'web', 'site', 'url'},
 	huyatv = {'huya'},
-	letsplaylive = {'cybergamer'},
+	['letsplaylive-old'] = {'cybergamer'},
 	replay = {'replays'},
 	rules = {'rulebook'},
 	['start-gg'] = {'startgg', 'smashgg'},
