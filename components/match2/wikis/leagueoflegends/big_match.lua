@@ -83,7 +83,7 @@ local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == 0 or match.timestamp > BIG_MATCH_START_TIME)
+			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > BIG_MATCH_START_TIME)
 end
 
 function BigMatch.run(frame)
