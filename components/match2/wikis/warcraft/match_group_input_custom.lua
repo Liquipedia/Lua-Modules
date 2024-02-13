@@ -430,9 +430,8 @@ function CustomMatchGroupInput.processPartyOpponentInput(opponent, partySize)
 		local name = Logic.emptyOr(opponent['p' .. playerIndex], opponent[playerIndex]) or ''
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 				opponent['p' .. playerIndex .. 'link'],
-				Variables.varDefault(name .. '_page'),
-				name
-			)):gsub(' ', '_')
+				Variables.varDefault(name .. '_page')
+			) or name):gsub(' ', '_')
 		table.insert(links, link)
 
 		table.insert(players, {
@@ -702,7 +701,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
 		else
-			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page'), playerInput)
+			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page')) or playerInput
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
 
 			playerData[link] = {
