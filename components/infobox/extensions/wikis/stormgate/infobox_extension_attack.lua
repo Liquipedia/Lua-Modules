@@ -68,7 +68,7 @@ function Attack._parse(args)
 		end),
 		damage = tonumber(args.damage),
 		damagePercentage = tonumber(args.damage_percentage),
-		effect = Array.readCommaSeparatedList(args.effect),
+		effect = Array.parseCommaSeparatedString(args.effect),
 		speed = tonumber(args.speed),
 		dps = tonumber(args.dps),
 		bonus = args.bonus,

@@ -15,6 +15,7 @@ local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -54,17 +55,16 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = Array.readCommaSeparatedList(args.type, {makeLink = true})},
+			Cell{name = 'Type', content = caller:_displayCommaSeparatedString(args.type)},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = Array.readCommaSeparatedList(args.built, {makeLink = true})},
+			Cell{name = 'Built From', content = caller:_displayCommaSeparatedString(args.built)},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = Array.readCommaSeparatedList(args.tech_requirement, {makeLink = true})},
-			Cell{name = 'Building Requirement',
-				content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
+			Cell{name = 'Tech. Requirement', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
+			Cell{name = 'Building Requirement', content = caller:_displayCommaSeparatedString(args.building_requirement)},
 		}
 	elseif id == 'cost' then
 		return {
@@ -101,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Passive', content = Array.readCommaSeparatedList(args.passive, {makeLink = true})}
+			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
@@ -124,7 +124,7 @@ end
 
 ---@return string[]
 function CustomUnit:_getArmorDisplay()
-	local armorTypes = Array.readCommaSeparatedList(self.args.armor_type, {makeLink = true})
+	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
 
 	return Array.append({},
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
@@ -179,10 +179,10 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			type = Array.readCommaSeparatedList(args.type),
-			builtfrom = Array.readCommaSeparatedList(args.built),
-			techrequirement = Array.readCommaSeparatedList(args.tech_requirement),
-			buildingrequirement = Array.readCommaSeparatedList(args.building_requirement),
+			type = Array.parseCommaSeparatedString(args.type),
+			builtfrom = Array.parseCommaSeparatedString(args.built),
+			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
+			buildingrequirement = Array.parseCommaSeparatedString(args.building_requirement),
 			luminite = tonumber(args.luminite),
 			totalluminite = tonumber(args.totalluminite),
 			therium = tonumber(args.therium),
@@ -206,8 +206,8 @@ function CustomUnit:setLpdbData(args)
 			macrokey = args.macro_key,
 			macrokey2 = args.macro_key2,
 			energydesc = args.energy_desc,
-			passive = Array.readCommaSeparatedList(args.passive),
-			armortypes = Array.readCommaSeparatedList(args.armor_type),
+			passive = Array.parseCommaSeparatedString(args.passive),
+			armortypes = Array.parseCommaSeparatedString(args.armor_type),
 		},
 	})
 end
@@ -237,6 +237,14 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 		return Hotkeys.hotkey(hotkey1)
 	end
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+end
+
+---@param inputString string?
+---@return string[]
+function CustomUnit:_displayCommaSeparatedString(inputString)
+	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+		return Page.makeInternalLink({}, value)
+	end)
 end
 
 return CustomUnit
