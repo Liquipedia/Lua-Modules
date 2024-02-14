@@ -180,6 +180,11 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	return data, indexedScores
 end
 
+---@param opponents table[]
+---@param winner nil
+---@param specialType nil
+---@param finished nil
+---@return table[], nil
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == STATUS_DRAW then
 		for key in pairs(opponents) do
