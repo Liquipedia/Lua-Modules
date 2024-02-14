@@ -119,6 +119,7 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
+			deathlocation = args.death_location,
 		})
 	if not ageCalculationSuccess then
 		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
@@ -136,8 +137,11 @@ function Person:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
-		Cell{name = 'Name', content = {args.name}},
-		Cell{name = 'Romanized Name', content = {args.romanized_name}},
+		Customizable{id = 'names', children = {
+				Cell{name = 'Name', content = {args.name}},
+				Cell{name = 'Romanized Name', content = {args.romanized_name}},
+			}
+		},
 		Customizable{id = 'nationality', children = {
 				Cell{name = 'Nationality', content = self:displayLocations()}
 			}

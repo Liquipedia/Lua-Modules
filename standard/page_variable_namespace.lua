@@ -36,9 +36,9 @@ end
 ---@class PageVariableNamespaceCachedTable
 ---@field results table
 ---@field table table
-local CachedTable = Class.new(function(self, table)
+local CachedTable = Class.new(function(self, tbl)
 	self.results = {}
-	self.table = table
+	self.table = tbl
 end)
 
 ---@param key string|number

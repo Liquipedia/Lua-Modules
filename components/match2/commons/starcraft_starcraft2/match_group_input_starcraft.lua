@@ -418,9 +418,9 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	local name = Logic.emptyOr(
 		opponent.name,
 		opponent.p1,
-		opponent[1] or ''
-	)
-	local link = Logic.emptyOr(opponent.link, Variables.varDefault(name .. '_page'), name)
+		opponent[1]
+	) or ''
+	local link = Logic.emptyOr(opponent.link, Variables.varDefault(name .. '_page')) or name
 	link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
 	local race = Logic.emptyOr(opponent.race, Variables.varDefault(name .. '_race'), '')
 	local players = {}
@@ -446,14 +446,12 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 	opponent.p2 = opponent.p2 or ''
 	opponent.link1 = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 			opponent.p1link,
-			Variables.varDefault(opponent.p1 .. '_page'),
-			opponent.p1
-		)):gsub(' ', '_')
+			Variables.varDefault(opponent.p1 .. '_page')
+		) or opponent.p1):gsub(' ', '_')
 	opponent.link2 = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 			opponent.p2link,
-			Variables.varDefault(opponent.p2 .. '_page'),
-			opponent.p2
-		)):gsub(' ', '_')
+			Variables.varDefault(opponent.p2 .. '_page')
+		) or opponent.p2):gsub(' ', '_')
 	if Logic.readBool(opponent.extradata.isarchon) then
 		opponent.p1race = Faction.read(opponent.race) or Faction.defaultFaction
 		opponent.p2race = opponent.p1race
@@ -501,9 +499,8 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 		local playerName = opponent['p' .. playerIndex] or ''
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 				opponent['p' .. playerIndex .. 'link'],
-				Variables.varDefault(playerName .. '_page'),
-				playerName
-			)):gsub(' ', '_')
+				Variables.varDefault(playerName .. '_page')
+			) or playerName):gsub(' ', '_')
 		local race = Logic.emptyOr(
 			opponent['p' .. playerIndex .. 'race'],
 			Variables.varDefault(playerName .. '_race'),
@@ -563,9 +560,8 @@ function StarcraftMatchGroupInput._getManuallyEnteredPlayers(playerData)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		local name = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 				playerData['p' .. playerIndex .. 'link'],
-				playerData['p' .. playerIndex],
-				''
-			)):gsub(' ', '_')
+				playerData['p' .. playerIndex]
+			) or ''):gsub(' ', '_')
 		if String.isNotEmpty(name) then
 			players[playerIndex] = {
 				name = name,
@@ -973,9 +969,9 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 end
 
 -- function to sort out winner/placements
-function StarcraftMatchGroupInput._placementSortFunction(table, key1, key2)
-	local opponent1 = table[key1]
-	local opponent2 = table[key2]
+function StarcraftMatchGroupInput._placementSortFunction(tbl, key1, key2)
+	local opponent1 = tbl[key1]
+	local opponent2 = tbl[key2]
 	local opponent1Norm = opponent1.status == 'S'
 	local opponent2Norm = opponent2.status == 'S'
 	if opponent1Norm then

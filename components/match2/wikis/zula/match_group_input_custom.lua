@@ -107,13 +107,13 @@ end
 --
 --
 -- function to check for draws
-function CustomMatchGroupInput.placementCheckDraw(table)
-	if #table < MAX_NUM_OPPONENTS then
+function CustomMatchGroupInput.placementCheckDraw(tbl)
+	if #tbl < MAX_NUM_OPPONENTS then
 		return false
 	end
 
 	local last
-	for _, scoreInfo in pairs(table) do
+	for _, scoreInfo in pairs(tbl) do
 		if scoreInfo.status ~= STATUS_SCORE and scoreInfo.status ~= STATUS_DRAW then
 			return false
 		end
@@ -211,8 +211,8 @@ end
 
 
 -- Check if any team has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table,
+function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
+	return Table.any(tbl,
 		function (_, scoreinfo)
 			return scoreinfo.status ~= STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
 		end
@@ -220,23 +220,23 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(table)
 end
 
 -- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ==  STATUS_FORFEIT end)
+function CustomMatchGroupInput.placementCheckFF(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ==  STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
+function CustomMatchGroupInput.placementCheckDQ(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ==  STATUS_DEFAULT_LOSS end)
+function CustomMatchGroupInput.placementCheckWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ==  STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+function CustomMatchGroupInput.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == STATUS_DEFAULT_WIN then
 			return index
 		end
@@ -244,8 +244,8 @@ function CustomMatchGroupInput.getDefaultWinner(table)
 	return NO_WINNER
 end
 
-function CustomMatchGroupInput.placementCheckScoresSet(table)
-	return Table.all(table, function (_, scoreinfo) return scoreinfo.status == STATUS_SCORE end)
+function CustomMatchGroupInput.placementCheckScoresSet(tbl)
+	return Table.all(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_SCORE end)
 end
 
 --
