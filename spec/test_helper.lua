@@ -32,6 +32,7 @@ local function setupForTesting()
 			'components/infobox/commons/?.lua;' ..
 			'components/opponent/commons/?.lua;' ..
 			'components/hidden_data_box/commons/?.lua;' ..
+			'components/squad/commons/?.lua;' ..
 			'standard/info/commons/?.lua;' ..
 			'standard/region/commons/?.lua;' ..
 			'standard/tier/commons/?.lua;' ..
