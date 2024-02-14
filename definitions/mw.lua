@@ -321,10 +321,25 @@ end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
----@param timestamp string|osdate?
+---@param timestamp string|osdateparam?
 ---@param localTime boolean?
 ---@return number|string
-function mw.language:formatDate(format, timestamp, localTime) end
+function mw.language:formatDate(format, timestamp, localTime)
+	if format == 'U' then
+		if not timestamp then
+			return os.time(os.date("!*t"))
+		end
+		if type(timestamp) ~= 'string' then
+			return os.time(timestamp)
+		end
+		-- Only supports YYYY-MM-DD so far
+		local pattern = "(%d%d%d%d)-?(%d%d)-?(%d%d)"
+		local year, month, day = timestamp:match(pattern)
+
+		return os.time({year = year, month = month or 1, day = day or 1})
+	end
+	return ''
+end
 
 ---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.
 ---@param seconds number
