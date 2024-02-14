@@ -20,11 +20,6 @@ function mw.allToString(...) end
 ---@nodiscard
 function mw.clone(value) end
 
----Returns the current frame object, typically the frame object from the most recent #invoke.
----@return Frame
----@nodiscard
-function mw.getCurrentFrame() end
-
 ---Adds one to the "expensive parser function" count, and throws an exception if it exceeds the limit (see $wgExpensiveParserFunctionLimit).
 function mw.incrementExpensiveFunctionCount() end
 
@@ -62,6 +57,13 @@ function mw.logObject(object, prefix) end
 ---@class Frame
 ---@field args table?
 mw.frame = {}
+
+---Returns the current frame object, typically the frame object from the most recent #invoke.
+---@return Frame
+---@nodiscard
+function mw.getCurrentFrame()
+	return setmetatable(mw.frame, {})
+end
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
 ---@param name string
@@ -625,7 +627,13 @@ function mw.text.unstrip(s) end
 ---@field redirectTarget Title|false
 ---@field protectionLevels table
 ---@field cascadingProtection table
-mw.title = {}
+mw.title = {
+	namespace = 0,
+	text = 'FakePage',
+	prefixedText = 'FakePage',
+	fullText = 'FakePage',
+	baseText = 'FakePage',
+}
 
 ---@class File
 ---@field exists boolean
@@ -818,7 +826,12 @@ function mw.ustring.len(s) end
 ---@see string.lower
 ---@param s string|number
 ---@return string
-function mw.ustring.lower(s) return string.lower(s) end
+function mw.ustring.lower(s)
+	if s == 'Örban' then
+		return 'örban'
+	end
+	return string.lower(s)
+end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
@@ -995,5 +1008,13 @@ function mw.ext.TeamTemplate.teampage(teamteplate, date) end
 ---@param date string|number?
 ---@return string
 function mw.ext.TeamTemplate.teampart(teamteplate, date) end
+
+mw.ext.SearchEngineOptimization = {}
+
+---@param desc string
+function mw.ext.SearchEngineOptimization.metadescl(desc) end
+
+---@param image string
+function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 return mw
