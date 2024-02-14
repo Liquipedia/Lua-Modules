@@ -109,9 +109,9 @@ describe('prize pool', function()
 				opponentname = 'Rathoz',
 				opponenttype = 'solo',
 				parent = 'FakePage',
-				participant = 'Rathoz',
-				participantflag = 'Sweden',
-				participantlink = 'Rathoz',
+				participant = 'Rathoz', -- Legacy
+				participantflag = 'Sweden', -- Legacy
+				participantlink = 'Rathoz', -- Legacy
 				placement = 1,
 				prizemoney = 970.97276906869001323,
 				prizepoolindex = 1,
