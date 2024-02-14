@@ -206,13 +206,11 @@ describe('array', function()
 		end)
 	end)
 
-	describe('ReadCommaSeparatedList', function()
+	describe('ParseCommaSeparatedString', function()
 		it('check', function()
-			local s = 'test1, test2,test3'
-			assert.are_same({'test1', 'test2', 'test3'}, Array.readCommaSeparatedList(s))
-			assert.are_same({'test1', 'test2', 'test3'}, Array.readCommaSeparatedList(s, {}))
-			assert.are_same({'[[test1|test1]]', '[[test2|test2]]', '[[test3|test3]]'},
-				Array.readCommaSeparatedList(s, {makeLink = true}))
+			local a = {'test1', 'test2', 'test3'}
+			assert.are_same(a, Array.parseCommaSeparatedString('test1, test2,test3'))
+			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
 		end)
 	end)
 end)

@@ -626,15 +626,12 @@ function Array.unique(elements)
 end
 
 ---@param inputString string?
----@param options {makeLink: boolean?}?
+---@param sep string?
 ---@return string[]
-function Array.readCommaSeparatedList(inputString, options)
+function Array.parseCommaSeparatedString(inputString, sep)
 	if Logic.isEmpty(inputString) then return {} end
-	options = options or {}
 	---@cast inputString -nil
-	local values = Array.map(mw.text.split(inputString, ','), String.trim)
-	if not options.makeLink then return values end
-	return Array.map(values, function(value) return Page.makeInternalLink({}, value) end)
+	return Array.map(mw.text.split(inputString, sep or ','), String.trim)
 end
 
 return Array
