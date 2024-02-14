@@ -327,7 +327,7 @@ end
 function mw.language:formatDate(format, timestamp, localTime)
 	if format == 'U' then
 		if not timestamp then
-			return 0 -- TODO timestamp of now
+			return os.time(os.date("!*t"))
 		end
 		if type(timestamp) ~= 'string' then
 			return os.time(timestamp)
