@@ -8,9 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
-local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -52,6 +51,11 @@ function CustomSquad.header(self)
 	return self
 end
 
+---@param frame Frame
+function CustomSquad.run(frame)
+	error('SMITE wiki doesn\'t support manual Squad Tables')
+end
+
 ---@class SmiteSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
@@ -80,29 +84,6 @@ function ExtendedSquadRow:position(args)
 	self.lpdbData.role = args.role or self.lpdbData.role
 
 	return self
-end
-
----@param frame Frame
----@return Html
-function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
-
-	local args = squad.args
-
-	squad.header = CustomSquad.header
-	squad:header()
-
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	Array.forEach(players, function(player)
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
 end
 
 ---@param playerList table[]
