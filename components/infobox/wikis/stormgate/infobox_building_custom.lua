@@ -14,7 +14,6 @@ local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Hotkeys = require('Module:Hotkey')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -82,7 +81,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirements', content = Array.readCommaSeparatedList(args.tech_requirement, {makeLink = true})},
-			Cell{name = 'Building Requirements', content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
+			Cell{name = 'Building Requirements',
+				content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
 		}
 	elseif id == 'hotkey' then
 		return {

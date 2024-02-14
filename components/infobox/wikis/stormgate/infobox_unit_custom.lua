@@ -15,7 +15,6 @@ local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -64,7 +63,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirement', content = Array.readCommaSeparatedList(args.tech_requirement, {makeLink = true})},
-			Cell{name = 'Building Requirement', content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
+			Cell{name = 'Building Requirement',
+				content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
 		}
 	elseif id == 'cost' then
 		return {
