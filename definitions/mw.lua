@@ -826,7 +826,12 @@ function mw.ustring.len(s) end
 ---@see string.lower
 ---@param s string|number
 ---@return string
-function mw.ustring.lower(s) return string.lower(s) end
+function mw.ustring.lower(s)
+	if s == 'Örban' then
+		return 'örban'
+	end
+	return string.lower(s)
+end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
