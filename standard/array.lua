@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
 local Logic = require('Module:Logic')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 --
 -- Array functions. Arrays are tables with numeric indexes that does not
@@ -621,6 +623,18 @@ function Array.unique(elements)
 		end
 	end
 	return uniqueElements
+end
+
+---@param inputString string?
+---@param options {makeLink: boolean?}?
+---@return string[]
+function Array.readCommaSeparatedList(inputString, options)
+	if Logic.isEmpty(inputString) then return {} end
+	options = options or {}
+	---@cast inputString -nil
+	local values = Array.map(mw.text.split(inputString, ','), String.trim)
+	if not options.makeLink then return values end
+	return Array.map(values, function(value) return Page.makeInternalLink({}, value) end)
 end
 
 return Array

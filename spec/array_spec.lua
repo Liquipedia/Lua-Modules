@@ -205,4 +205,13 @@ describe('array', function()
 			assert.are_same({'i', 'j', 'k', 'z'}, extractedKeys)
 		end)
 	end)
+
+	describe('ReadCommaSeparatedList', function()
+		it('check', function()
+			local s = 'test1, test2,test3'
+			assert.are_same({'test1', 'test2', 'test3'}, Array.readCommaSeparatedList(s))
+			assert.are_same({'test1', 'test2', 'test3'}, Array.readCommaSeparatedList(s, {}))
+			assert.are_same({'[[test1|test1]]', '[[test2|test2]]', '[[test3|test3]]'}, Array.readCommaSeparatedList(s, {makeLink = true}))
+		end)
+	end)
 end)
