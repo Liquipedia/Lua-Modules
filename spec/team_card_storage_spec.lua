@@ -4,8 +4,9 @@ describe('Team Card Storage', function()
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
 
 	it('standard fields', function()
-		stub(mw.ext.LiquipediaDB, "lpdb", {})
-		stub(mw.ext.LiquipediaDB, "lpdb_tournament", {})
+		local stubLpdb = stub(mw.ext.LiquipediaDB, "lpdb", {})
+		local stubLpdbTournament = stub(mw.ext.LiquipediaDB, "lpdb_tournament")
+
 		local tournamentDatas = require('test_assets.tournaments')
 		local tournamentData = tournamentDatas.dummy
 		InfoboxLeague.run(tournamentData)
@@ -33,8 +34,8 @@ describe('Team Card Storage', function()
 			extradata = {}
 		}
 		assert.are_same(expectedData, actualData)
-		mw.ext.LiquipediaDB.lpdb:revert()
-		mw.ext.LiquipediaDB.lpdb_tournament:revert()
+		stubLpdb:revert()
+		stubLpdbTournament:revert()
 	end)
 
 	it('object name', function()
