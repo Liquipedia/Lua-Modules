@@ -68,7 +68,7 @@ function Attack._parse(args)
 		end),
 		damage = tonumber(args.damage),
 		damagePercentage = tonumber(args.damage_percentage),
-		effect = Attack._readCommaSeparatedList(args.effect),
+		effect = Array.parseCommaSeparatedString(args.effect),
 		speed = tonumber(args.speed),
 		dps = tonumber(args.dps),
 		bonus = args.bonus,
@@ -76,15 +76,6 @@ function Attack._parse(args)
 		bonusDps = tonumber(args.bonus_dps),
 		range = tonumber(args.range),
 	}
-end
-
----@param inputString string?
----@param makeLink boolean?
----@return string[]
-function Attack._readCommaSeparatedList(inputString, makeLink)
-	if String.isEmpty(inputString) then return {} end
-	---@cast inputString -nil
-	return Array.map(mw.text.split(inputString, ','), String.trim)
 end
 
 ---@param data StormgateAttackData
