@@ -141,7 +141,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomSkill:getCategories(args)
-	local categories = {skill}
+	local categories = {args.informationType}
 	if self.faction then
 		table.insert(categories, self.faction .. ' ' .. args.informationType)
 	end
