@@ -55,16 +55,16 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = caller:_readCommaSeparatedList(args.type, true)},
+			Cell{name = 'Type', content = Array.readCommaSeparatedList(args.type, {makeLink = true})},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = caller:_readCommaSeparatedList(args.built, true)},
+			Cell{name = 'Built From', content = Array.readCommaSeparatedList(args.built, {makeLink = true})},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
-			Cell{name = 'Building Requirement', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
+			Cell{name = 'Tech. Requirement', content = Array.readCommaSeparatedList(args.tech_requirement, {makeLink = true})},
+			Cell{name = 'Building Requirement', content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
 		}
 	elseif id == 'cost' then
 		return {
@@ -101,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)}
+			Cell{name = 'Passive', content = Array.readCommaSeparatedList(args.passive, {makeLink = true})}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
@@ -124,7 +124,7 @@ end
 
 ---@return string[]
 function CustomUnit:_getArmorDisplay()
-	local armorTypes = self:_readCommaSeparatedList(self.args.armor_type, true)
+	local armorTypes = Array.readCommaSeparatedList(self.args.armor_type, {makeLink = true})
 
 	return Array.append({},
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
@@ -179,10 +179,10 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			type = self:_readCommaSeparatedList(args.type),
-			builtfrom = self:_readCommaSeparatedList(args.built),
-			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
-			buildingrequirement = self:_readCommaSeparatedList(args.building_requirement),
+			type = Array.readCommaSeparatedList(args.type),
+			builtfrom = Array.readCommaSeparatedList(args.built),
+			techrequirement = Array.readCommaSeparatedList(args.tech_requirement),
+			buildingrequirement = Array.readCommaSeparatedList(args.building_requirement),
 			luminite = tonumber(args.luminite),
 			totalluminite = tonumber(args.totalluminite),
 			therium = tonumber(args.therium),
@@ -206,8 +206,8 @@ function CustomUnit:setLpdbData(args)
 			macrokey = args.macro_key,
 			macrokey2 = args.macro_key2,
 			energydesc = args.energy_desc,
-			passive = self:_readCommaSeparatedList(args.passive),
-			armortypes = self:_readCommaSeparatedList(args.armor_type),
+			passive = Array.readCommaSeparatedList(args.passive),
+			armortypes = Array.readCommaSeparatedList(args.armor_type),
 		},
 	})
 end
@@ -237,19 +237,6 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 		return Hotkeys.hotkey(hotkey1)
 	end
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
-end
-
----@param inputString string?
----@param makeLink boolean?
----@return string[]
-function CustomUnit:_readCommaSeparatedList(inputString, makeLink)
-	if String.isEmpty(inputString) then return {} end
-	---@cast inputString -nil
-	local values = Array.map(Array.map(mw.text.split(inputString, ','), String.trim), function(value)
-		return mw.getContentLanguage():ucfirst(value)
-	end)
-	if not makeLink then return values end
-	return Array.map(values, function(value) return Page.makeInternalLink(value) end)
 end
 
 return CustomUnit
