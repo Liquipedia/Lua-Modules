@@ -159,9 +159,9 @@ function StarcraftFfaInput.getExtraData(match)
 end
 
 -- function to sort out placements
-function StarcraftFfaInput._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
+function StarcraftFfaInput._placementSortFunction(tbl, key1, key2)
+	local op1 = tbl[key1]
+	local op2 = tbl[key2]
 	return tonumber(op1) > tonumber(op2)
 end
 

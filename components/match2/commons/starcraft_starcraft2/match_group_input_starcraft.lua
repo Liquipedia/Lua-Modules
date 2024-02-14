@@ -969,9 +969,9 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 end
 
 -- function to sort out winner/placements
-function StarcraftMatchGroupInput._placementSortFunction(table, key1, key2)
-	local opponent1 = table[key1]
-	local opponent2 = table[key2]
+function StarcraftMatchGroupInput._placementSortFunction(tbl, key1, key2)
+	local opponent1 = tbl[key1]
+	local opponent2 = tbl[key2]
 	local opponent1Norm = opponent1.status == 'S'
 	local opponent2Norm = opponent2.status == 'S'
 	if opponent1Norm then
