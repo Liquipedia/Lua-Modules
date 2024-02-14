@@ -4,14 +4,15 @@ describe('prize pool', function()
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
 	local Table = require('Module:Table')
 	local Variables = require('Module:Variables')
-	local tournamentData = mw.loadData('Module:TestAssets/Tournaments').dummy
+	local tournamentData = require('test_assets.tournaments').dummy
 
 	local LpdbPlacementStub
 
 	before_each(function()
-		InfoboxLeague.run(tournamentData)
-		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
 		stub(mw.ext.LiquipediaDB, "lpdb", {})
+		stub(mw.ext.LiquipediaDB, "lpdb_tournament")
+		LpdbPlacementStub = stub(mw.ext.LiquipediaDB, "lpdb_placement")
+		InfoboxLeague.run(tournamentData)
 	end)
 
 	after_each(function ()
@@ -33,7 +34,7 @@ describe('prize pool', function()
 		qualifies1name = 'A Display',
 		freetext = 'A title',
 		import = false,
-		[1] = {localprize = '1,000', [1] = {'Rathoz', flag='se', date='2024-02-09'}},
+		[1] = {localprize = '1,000', [1] = {'Rathoz', flag='se'}},
 	}
 
 	it('parameters are correctly parsed', function()
@@ -99,16 +100,26 @@ describe('prize pool', function()
 		it('lpdb storage', function()
 			PrizePool(prizePoolArgs):create():build()
 			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Rathoz', {
-				date = '2024-02-09',
+				date = '2022-10-15',
+				icon = 'test.png',
+				icondark = 'test dark.png',
 				individualprizemoney = 970.97276906869001323,
+				liquipediatier = '1',
+				liquipediatiertype = 'Qualifier',
 				opponentname = 'Rathoz',
 				opponenttype = 'solo',
+				parent = 'FakePage',
 				participant = 'Rathoz', -- Legacy
 				participantflag = 'Sweden', -- Legacy
 				participantlink = 'Rathoz', -- Legacy
 				placement = 1,
 				prizemoney = 970.97276906869001323,
 				prizepoolindex = 1,
+				series = 'Test Series',
+				shortname = 'Test Tourney',
+				startdate = '2022-10-13',
+				tournament = 'Test Tournament',
+				type = 'Offline',
 			})
 		end)
 	end)
