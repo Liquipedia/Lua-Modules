@@ -4,6 +4,8 @@ describe('Team Card Storage', function()
 	local InfoboxLeague = require('Module:Infobox/League/Custom')
 
 	it('standard fields', function()
+		stub(mw.ext.LiquipediaDB, "lpdb", {})
+		stub(mw.ext.LiquipediaDB, "lpdb_tournament", {})
 		local tournamentDatas = require('test_assets.tournaments')
 		local tournamentData = tournamentDatas.dummy
 		InfoboxLeague.run(tournamentData)
@@ -12,22 +14,27 @@ describe('Team Card Storage', function()
 		local actualData = TCStorage._addStandardLpdbFields({}, 'Team Liquid', args, 'prefix')
 
 		local expectedData = {
+			objectName = 'ranking_prefix_team liquid',
 			tournament = tournamentData.name,
 			series = tournamentData.series,
-			parent = 'Module_talk:TeamCard/Storage/testcases',
+			parent = 'FakePage',
 			startdate = tournamentData.sdate,
 			date = tournamentData.edate,
 			image = args.image1,
 			imagedark = args.imagedark1,
 			mode = 'team',
+			participant = 'Team Liquid',
 			publishertier = nil,
 			icon = tournamentData.icon,
 			icondark = tournamentData.icondark,
 			game = string.lower(tournamentData.game),
 			liquipediatier = tournamentData.liquipediatier,
 			liquipediatiertype = tournamentData.liquipediatiertype,
+			extradata = {}
 		}
 		assert.are_same(expectedData, actualData)
+		mw.ext.LiquipediaDB.lpdb:revert()
+		mw.ext.LiquipediaDB.lpdb_tournament:revert()
 	end)
 
 	it('object name', function()
