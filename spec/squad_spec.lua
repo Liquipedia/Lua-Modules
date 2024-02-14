@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('Variables', function()
+describe('Squad', function()
 	local Squad = require('Module:Squad')
 	local SquadRow = require('Module:Squad/Row')
 
