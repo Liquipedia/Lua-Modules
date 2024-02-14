@@ -85,15 +85,15 @@ function CustomInjector:parse(id, widgets)
 		local castingTime = tonumber(args.casting_time)
 		Array.extendWith(widgets, {
 				Cell{name = 'Researched From', content = {Page.makeInternalLink(args.from)}},
-				Cell{name = 'Upgrade Target', content = caller:_readCommaSeparatedList(args.upgrade_target, true)},
-				Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
-				Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
-				Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
-				Cell{name = 'Target', content = caller:_readCommaSeparatedList(args.target, true)},
+				Cell{name = 'Upgrade Target', content = Array.readCommaSeparatedList(args.upgrade_target, {makeLink = true})},
+				Cell{name = 'Tech. Requirements', content = Array.readCommaSeparatedList(args.tech_requirement, {makeLink = true})},
+				Cell{name = 'Building Requirements', content = Array.readCommaSeparatedList(args.building_requirement, {makeLink = true})},
+				Cell{name = 'Unlocks', content = Array.readCommaSeparatedList(args.unlocks, {makeLink = true})},
+				Cell{name = 'Target', content = Array.readCommaSeparatedList(args.target, {makeLink = true})},
 				Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
-				Cell{name = 'Effect', content = caller:_readCommaSeparatedList(args.effect, true)},
+				Cell{name = 'Effect', content = Array.readCommaSeparatedList(args.effect, {makeLink = true})},
 				Cell{name = 'Trigger', content = {args.trigger}},
-				Cell{name = 'Invulnerable', content = caller:_readCommaSeparatedList(args.invulnerable, true)},
+				Cell{name = 'Invulnerable', content = Array.readCommaSeparatedList(args.invulnerable, {makeLink = true})},
 			},
 			caller:_damageHealDisplay('damage'),
 			caller:_damageHealDisplay('heal')
@@ -163,9 +163,9 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		totalbuildtime = tonumber(args.totalbuildtime),
 		animus = tonumber(args.animus),
 		totalanimus = tonumber(args.totalanimus),
-		techrequirements = self:_readCommaSeparatedList(args.tech_requirement),
-		buildingrequirements = self:_readCommaSeparatedList(args.building_requirement),
-		targets = self:_readCommaSeparatedList(args.target),
+		techrequirements = Array.readCommaSeparatedList(args.tech_requirement),
+		buildingrequirements = Array.readCommaSeparatedList(args.building_requirement),
+		targets = Array.readCommaSeparatedList(args.target),
 		casters = self:getAllArgsForBase(args, 'caster'),
 		hotkey = args.hotkey,
 		hotkey2 = args.hotkey2,
@@ -174,15 +174,15 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		energy = tonumber(args.energy),
 		duration = tonumber(args.duration),
 		from = args.from,
-		upgradetarget = self:_readCommaSeparatedList(args.upgrade_target),
+		upgradetarget = Array.readCommaSeparatedList(args.upgrade_target),
 		range = tonumber(args.range),
 		radius = tonumber(args.radius),
 		cooldown = tonumber(args.cooldown),
 		castingtime = tonumber(args.casting_time),
-		unlocks = self:_readCommaSeparatedList(args.unlocks),
-		effect = self:_readCommaSeparatedList(args.effect),
+		unlocks = Array.readCommaSeparatedList(args.unlocks),
+		effect = Array.readCommaSeparatedList(args.effect),
 		trigger = args.trigger,
-		invulnerable = self:_readCommaSeparatedList(args.invulnerable),
+		invulnerable = Array.readCommaSeparatedList(args.invulnerable),
 		damage = args.damage,
 		damagepercentage = args.damage_percentage,
 		damagetotal = args.damageTotal,
@@ -218,17 +218,6 @@ function CustomSkill:_costDisplay()
 		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil,
 		args.special_cost
 	), '&nbsp;')
-end
-
----@param inputString string?
----@param makeLink boolean?
----@return string[]
-function CustomSkill:_readCommaSeparatedList(inputString, makeLink)
-	if String.isEmpty(inputString) then return {} end
-	---@cast inputString -nil
-	local values = Array.map(mw.text.split(inputString, ','), String.trim)
-	if not makeLink then return values end
-	return Array.map(values, function(value) return Page.makeInternalLink(value) end)
 end
 
 ---@param hotkey1 string?
