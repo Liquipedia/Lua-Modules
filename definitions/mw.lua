@@ -327,7 +327,7 @@ end
 function mw.language:formatDate(format, timestamp, localTime)
 	if format == 'U' then
 		if not timestamp then
-			return os.time(os.date("!*t"))
+			return os.time(os.date("!*t") --[[@as osdateparam]])
 		end
 		if type(timestamp) ~= 'string' then
 			return os.time(timestamp)
@@ -935,5 +935,65 @@ function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
 ---@param name string
 ---@return string
 function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
+
+mw.ext.TeamTemplate = {}
+
+---@param teamteplate string
+---@param date string|number?
+---@return table
+function mw.ext.TeamTemplate.raw(teamteplate, date) end
+
+---@param teamteplate string
+---@return table
+function mw.ext.TeamTemplate.raw_historical(teamteplate) end
+
+---@param teamteplate string
+---@return boolean
+function mw.ext.TeamTemplate.teamexists(teamteplate) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team2(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamshort(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team2short(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teambracket(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamicon(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamimage(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teampage(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teampart(teamteplate, date) end
 
 return mw
