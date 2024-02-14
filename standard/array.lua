@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
