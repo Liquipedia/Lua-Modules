@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -101,27 +101,9 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad.header = CustomSquad.header
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.position = player.thisTeam.position
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
+	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
-	end
+	end)
 
 	return squad:create()
 end
@@ -132,35 +114,43 @@ end
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 
+	--Get Reference(s)
+	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
+	local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
+
+	local joinText = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
+	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
+
+	local row = SquadRow()
 	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
 		flag = player.flag,
-		link = player.link,
+		link = player.page,
 		captain = player.captain,
-		role = player.role,
-		team = player.team,
+		role = player.thisTeam.role,
+		team = player.thisTeam.role == 'Loan' and player.oldTeam.team,
 		date = player.leavedate or player.inactivedate or player.leavedate,
 	})
-	row:name{name = player.name}
-	row:position{role = player.role, position = player.position}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	row:name({name = player.name})
+	row:position{role = player.thisTeam.role, position = player.thisTeam.position}
+	row:date(joinText, 'Join Date:&nbsp;', 'joindate')
 
 	if squadType == Squad.SquadType.FORMER then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
+		row:date(leaveText, 'Leave Date:&nbsp;', 'leavedate')
+		row:newteam({
+			newteam = player.newTeam.team,
+			newteamrole = player.newTeam.role,
+			newteamdate = player.newTeam.date,
+			leavedate = player.newTeam.date
+		})
 	elseif squadType == Squad.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
 	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-		.. (player.role and '_' .. player.role or '')
+		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_'
+		.. player.joindate .. (player.role and '_' .. player.role or '')
 		.. '_' .. squadType
 	)
 end
