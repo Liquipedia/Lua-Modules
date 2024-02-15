@@ -45,7 +45,7 @@ function CustomInjector:parse(id, widgets)
 		self.caller:addCustomCells(widgets)
 
 	elseif id == 'names' then
-		table.insert(widgets, Cell{name = 'Abbrevitions', content = {args.abbreviations}})
+		table.insert(widgets, Cell{name = 'Abbreviations', content = {args.abbreviations}})
 	elseif id == 'history' then
 		return {
 			Title{name = 'History'},
