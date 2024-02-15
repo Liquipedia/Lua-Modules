@@ -224,7 +224,7 @@ function Team:processCreateDates()
 			local toIcon = function(iconFile, mode)
 				if String.isEmpty(iconFile) then return '' end
 				return '[[File:' .. iconFile .. '|class=show-when-' .. mode .. '-mode]]'
-			end				
+			end
 			icon = toIcon(teamIcon, 'light') .. toIcon(teamIconDark, 'dark')
 		else
 			local timestamp = Team._parseDate(cleanDate)
