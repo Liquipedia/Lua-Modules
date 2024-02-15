@@ -38,7 +38,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.appendWith(
-		widgets,
+			widgets,
 			Cell{name = 'Role', content = {args.role}},
 			Cell{name = 'Real Name', content = {args.realname}},
 			Cell{name = 'Age', content = {args.age}},
@@ -58,11 +58,9 @@ end
 ---@return string[]
 function CustomUnit:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
-	local categories = {'Heroes'}
-	if String.isEmpty(args.role) then
-		return categories
-	end
-	return Array.append(categories, args.role .. ' Heroes')
+	return Array.append({'Heroes'},
+		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil
+	)
 end
 
 ---@param args table
@@ -76,7 +74,7 @@ function CustomUnit:setLpdbData(args)
 			role = args.role,
 		})
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.heroname or self.pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.name or self.pagename), lpdbData)
 end
 
 return CustomUnit
