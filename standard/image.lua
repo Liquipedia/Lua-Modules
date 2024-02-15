@@ -35,7 +35,7 @@ function Image.display(image, imageDark, options)
 	end
 	if String.isEmpty(image) and String.isEmpty(imageDark) then
 		return
-	elseif String.isEmpty(image) or String.isEmpty(imageDark) then
+	elseif String.isEmpty(image) or String.isEmpty(imageDark) or image == imageDark then
 		return Image._make(String.nilIfEmpty(image) or imageDark, options)
 	end
 
