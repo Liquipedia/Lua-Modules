@@ -221,7 +221,6 @@ function Team:processCreateDates()
 		local cleanDate = ReferenceCleaner.clean(date)
 
 		if game:lower() == 'org' then
-			local teamIcon, teamIconDark = self:_getTeamIcon(cleanDate)
 			icon = Image.display(self:_getTeamIcon(cleanDate))
 		else
 			local timestamp = Team._parseDate(cleanDate)
