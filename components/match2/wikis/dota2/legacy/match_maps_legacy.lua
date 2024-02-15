@@ -170,7 +170,7 @@ function MatchMapsLegacy._handleOpponents(args)
 			opponent = {
 				['type'] = 'literal',
 				template = TBD,
-				name = args['opponent' .. opponentIndex .. 'dota']
+				name = Table.extract(args, 'team' .. opponentIndex .. 'dota')
 			}
 		end
 		args['opponent' .. opponentIndex] = opponent
