@@ -12,15 +12,12 @@ local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Breakdown = Widgets.Breakdown
 
 ---@class OverwatchHeroInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
