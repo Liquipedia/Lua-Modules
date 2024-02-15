@@ -207,7 +207,7 @@ function Faction.Icon(props)
 
 	return '[['
 		.. iconName
-		.. '|link=' .. (props.showLink and factionProps.pageName or factionProps.name or '')
+		.. '|link=' .. (props.showLink and (factionProps.pageName or factionProps.name) or '')
 		.. '|' .. size
 		.. (props.showTitle ~= false and '|' .. (props.title or factionProps.name) or '')
 		.. ']]'
