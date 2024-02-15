@@ -377,7 +377,7 @@ function matchFunctions.isFeatured(match)
 
 	local opponent1, opponent2 = match.opponent1, match.opponent2
 	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
-	if year == DateExt.deaultYear then
+	if year == DateExt.defaultYear then
 		return false
 	end
 	if tonumber(month) < 3 then

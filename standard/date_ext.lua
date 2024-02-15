@@ -27,6 +27,7 @@ DateExt.defaultTimestamp = -62167219200
 DateExt.defaultDateTime = '0000-01-01 00:00:00'
 DateExt.defaultDateTimeExtended = '0000-01-01T00:00:00+00:00'
 DateExt.defaultDate = '0000-01-01'
+DateExt.defaultYear = '0000'
 DateExt.deaultYear = '0000'
 
 --- Parses a date string into a timestamp, returning the number of seconds since UNIX epoch.
