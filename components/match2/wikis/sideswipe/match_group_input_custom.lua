@@ -89,9 +89,9 @@ end
 --
 --
 -- function to sort out winner/placements
-function matchFunctions._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
+function matchFunctions._placementSortFunction(tbl, key1, key2)
+	local op1 = tbl[key1]
+	local op2 = tbl[key2]
 	local op1norm = op1.status == _STATUS_HAS_SCORE
 	local op2norm = op2.status == _STATUS_HAS_SCORE
 	if op1norm then

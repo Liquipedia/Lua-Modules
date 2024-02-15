@@ -12,8 +12,8 @@ local Attack = require('Module:Infobox/Extension/Attack')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
-local Lua = require('Module:Lua')
 local Hotkeys = require('Module:Hotkey')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -81,8 +81,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_readCommaSeparatedList(args.tech_requirement, true)},
-			Cell{name = 'Building Requirements', content = caller:_readCommaSeparatedList(args.building_requirement, true)},
+			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
+			Cell{name = 'Building Requirements', content = caller:_displayCommaSeparatedString(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		return {
@@ -91,13 +91,13 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_readCommaSeparatedList(args.builds, true)},
+			Cell{name = 'Builds', content = caller:_displayCommaSeparatedString(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_readCommaSeparatedList(args.unlocks, true)},
-			Cell{name = 'Passive', content = caller:_readCommaSeparatedList(args.passive, true)},
-			Cell{name = 'Supply Gained', content = caller:_readCommaSeparatedList(args.supply)},
+			Cell{name = 'Unlocks', content = caller:_displayCommaSeparatedString(args.unlocks)},
+			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
+			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply)},
 		}
 	elseif id == 'defense' then
 		return {
@@ -173,11 +173,11 @@ function CustomBuilding:setLpdbData(args)
 			totalbuildtime = tonumber(args.totalbuildtime),
 			animus = tonumber(args.animus),
 			totalanimus = tonumber(args.totalanimus),
-			techrequirement = self:_readCommaSeparatedList(args.tech_requirement),
-			builds = self:_readCommaSeparatedList(args.builds),
-			unlocks = self:_readCommaSeparatedList(args.unlocks),
-			passive = self:_readCommaSeparatedList(args.passive),
-			armortypes = self:_readCommaSeparatedList(args.armor_types),
+			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
+			builds = Array.parseCommaSeparatedString(args.builds),
+			unlocks = Array.parseCommaSeparatedString(args.unlocks),
+			passive = Array.parseCommaSeparatedString(args.passive),
+			armortypes = Array.parseCommaSeparatedString(args.armor_types),
 			hotkey = args.hotkey,
 			hotkey2 = args.hotkey2,
 			macrokey = args.macro_key,
@@ -192,25 +192,22 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
----@param inputString string?
----@param makeLink boolean?
----@return string[]
-function CustomBuilding:_readCommaSeparatedList(inputString, makeLink)
-	if String.isEmpty(inputString) then return {} end
-	---@cast inputString -nil
-	local values = Array.map(mw.text.split(inputString, ','), String.trim)
-	if not makeLink then return values end
-	return Array.map(values, function(value) return Page.makeInternalLink(value) end)
-end
-
 ---@return string[]
 function CustomBuilding:_getArmorDisplay()
-	local armorTypes = self:_readCommaSeparatedList(self.args.armor_type, true)
+	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
 
 	return Array.append({},
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
 		String.nilIfEmpty(table.concat(armorTypes, ', '))
 	)
+end
+
+---@param inputString string?
+---@return string[]
+function CustomBuilding:_displayCommaSeparatedString(inputString)
+	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+		return Page.makeInternalLink({}, value)
+	end)
 end
 
 return CustomBuilding

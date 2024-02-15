@@ -293,9 +293,9 @@ function CustomPlayer._getYearsActive(years)
 	return yearsActive
 end
 
----@param table table<string, table<string, table<string, number>>>
-function CustomPlayer._setVarsForVS(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, table<string, number>>>
+function CustomPlayer._setVarsForVS(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			for key3, item3 in pairs(item2) do
 				Variables.varDefine(key1 .. '_vs_' .. key2 .. '_' .. key3, item3)
@@ -460,9 +460,9 @@ function CustomPlayer:_addPlacementToMedals(medals, data)
 	return medals
 end
 
----@param table table<string, table<string, number>>
-function CustomPlayer._setVarsFromTable(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, number>>
+function CustomPlayer._setVarsFromTable(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			Variables.varDefine(key1 .. '_' .. key2, item2)
 		end

@@ -226,7 +226,8 @@ end
 function AgeCalculation.run(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
-	local deathDate = DeathDate(args.deathdate)
+	local deathLocation = args.deathlocation
+	local deathDate = DeathDate(args.deathdate, deathLocation)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
 

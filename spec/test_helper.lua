@@ -30,8 +30,12 @@ local function setupForTesting()
 			'components/match2/commons/?.lua;' ..
 			'components/prize_pool/commons/?.lua;' ..
 			'components/infobox/commons/?.lua;' ..
+			'components/infobox/commons/custom/?.lua;' ..
 			'components/opponent/commons/?.lua;' ..
 			'components/hidden_data_box/commons/?.lua;' ..
+			'components/squad/commons/?.lua;' ..
+			'components/standings/commons/?.lua;' ..
+			'components/team_card/?.lua;' ..
 			'standard/info/commons/?.lua;' ..
 			'standard/region/commons/?.lua;' ..
 			'standard/tier/commons/?.lua;' ..
@@ -70,6 +74,17 @@ local function setupForTesting()
 
 		if newName == 'points_data' then
 			return {points = {title = 'Points'}}
+		end
+
+		if newName == 'a or an' then
+			return {_main = function(params)
+				-- Simplified implemenation for mocking
+				local firstChar = string.sub(params[1], 1, 1):lower()
+				if firstChar == 'a' or firstChar == 'e' or firstChar == 'i' or firstChar == 'o' or firstChar == 'u' then
+					return 'an '
+				end
+				return 'a '
+			end}
 		end
 
 		-- Just apply a fake function that returns the first input, as something

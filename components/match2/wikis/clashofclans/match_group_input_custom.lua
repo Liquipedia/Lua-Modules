@@ -109,9 +109,9 @@ end
 --
 --
 -- function to check for draws
-function CustomMatchGroupInput.placementCheckDraw(table)
+function CustomMatchGroupInput.placementCheckDraw(tbl)
 	local last
-	for _, scoreInfo in pairs(table) do
+	for _, scoreInfo in pairs(tbl) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
 			return false
 		end
@@ -205,23 +205,23 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 	return opponents, winner
 end
 
-function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
-	local score1 = tonumber(table[key1].score or NO_SCORE) or NO_SCORE
-	local score2 = tonumber(table[key2].score or NO_SCORE) or NO_SCORE
+function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
+	local score1 = tonumber(tbl[key1].score or NO_SCORE) or NO_SCORE
+	local score2 = tonumber(tbl[key2].score or NO_SCORE) or NO_SCORE
 
 	if score1 ~= score2 then
 		return score1 > score2
 	end
 
-	local percentage1 = table[key1].percentage
-	local percentage2 = table[key2].percentage
+	local percentage1 = tbl[key1].percentage
+	local percentage2 = tbl[key2].percentage
 
 	if percentage1 ~= percentage2 then
 		return percentage1 > percentage2
 	end
 
-	local time1 = table[key1].time
-	local time2 = table[key2].time
+	local time1 = tbl[key1].time
+	local time2 = tbl[key2].time
 
 	if time1 == time2 or time2 and not time1 then
 		return false
@@ -233,28 +233,28 @@ function CustomMatchGroupInput.placementSortFunction(table, key1, key2)
 end
 
 -- Check if any team has a none-standard status
-function CustomMatchGroupInput.placementCheckSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+function CustomMatchGroupInput.placementCheckFF(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
 
 -- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+function CustomMatchGroupInput.placementCheckDQ(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
 end
 
 -- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+function CustomMatchGroupInput.placementCheckWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
 end
 
 -- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+function CustomMatchGroupInput.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == 'W' then
 			return index
 		end
