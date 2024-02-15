@@ -121,7 +121,6 @@ function CustomSquad._playerRow(player, squadType)
 	local joinText = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
 	local leaveText = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 
-	local row = SquadRow()
 	row:status(squadType)
 	row:id({
 		(player.idleavedate or player.id),
