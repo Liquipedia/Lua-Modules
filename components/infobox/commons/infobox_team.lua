@@ -254,7 +254,6 @@ function Team:_getTeamIcon(date)
 	local iconDark = self.teamTemplate.historicaltemplate
 		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
 		or self.teamTemplate.imagedark
-		or icon
 
 	return icon, iconDark
 end
