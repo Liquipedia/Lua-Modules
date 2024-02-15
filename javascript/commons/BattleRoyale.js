@@ -43,12 +43,22 @@ liquipedia.battleRoyale = {
 	},
 
 	implementScrollWheelEvent: function() {
+		const handleWheelEvent = ( e, table ) => {
+			e.preventDefault();
+			const delta = e.deltaY || e.detail || e.wheelDelta;
+			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
+			this.handleTableSideScroll( table, dir );
+		};
+
 		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
-			el.addEventListener( 'wheel', ( e ) => {
-				e.preventDefault();
-				const delta = e.deltaY || e.detail || e.wheelDelta;
-				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
-				this.handleTableSideScroll( el.closest( '[data-js-battle-royale="table"]' ), dir );
+			const table = el.closest( '[data-js-battle-royale="table"]' );
+			const gameContainerElements = table.querySelectorAll(
+				'[data-js-battle-royale="row"] > [data-js-battle-royale="game-container"]'
+			);
+
+			el.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
+			gameContainerElements.forEach( ( gameContainer ) => {
+				gameContainer.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
 			} );
 		} );
 	},
