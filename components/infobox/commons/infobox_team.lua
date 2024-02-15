@@ -220,8 +220,12 @@ function Team:processCreateDates()
 		local cleanDate = ReferenceCleaner.clean(date)
 
 		if game:lower() == 'org' then
-			icon = self:_getTeamIcon(cleanDate)
-			icon = String.isNotEmpty(icon) and '[[File:' .. icon .. ']]' or nil
+			local teamIcon, teamIconDark = self:_getTeamIcon(cleanDate)
+			local toIcon = function(iconFile, mode)
+				if String.isEmpty(iconFile) then return '' end
+				return '[[File:' .. iconFile .. '|class=show-when-' .. mode .. '-mode]]'
+			end				
+			icon = toIcon(teamIcon, 'light') .. toIcon(teamIconDark, 'dark')
 		else
 			local timestamp = Team._parseDate(cleanDate)
 			if timestamp and timestamp < earliestGameTimestamp then
@@ -240,20 +244,28 @@ end
 
 ---@param date? string
 ---@return string?
+---@return string?
 function Team:_getTeamIcon(date)
 	if not self.teamTemplate then
 		return
 	end
 
-	return self.teamTemplate.historicaltemplate
+	local icon = self.teamTemplate.historicaltemplate
 		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
 		or self.teamTemplate.image
+
+	local iconDark = self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
+		or self.teamTemplate.imagedark
+		or icon
+
+	return icon, iconDark
 end
 
 ---@param date? string
 ---@return boolean
 function Team._isValidDate(date)
-	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
+	return date and date:match('%d%d%d%d%-?[%d%?]?[%d%?]?%-?[%d%?]?[%d%?]?')
 end
 
 ---@param date string
