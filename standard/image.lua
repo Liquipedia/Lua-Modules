@@ -24,23 +24,23 @@ local Image = {}
 ---@field location string?
 
 ---generates an image display for a given lightmode and darkmode file
----@param image string?
----@param imageDark string?
+---@param imageLightMode string?
+---@param imageDarkMode string?
 ---@param options ImageOptions?
 ---@return string?
-function Image.display(image, imageDark, options)
+function Image.display(imageLightMode, imageDarkMode, options)
 	options = options or {}
 	if Logic.isNumeric(options.size) then
 		options.size = options.size .. 'px'
 	end
-	if String.isEmpty(image) and String.isEmpty(imageDark) then
+	if String.isEmpty(imageLightMode) and String.isEmpty(imageDarkMode) then
 		return
-	elseif String.isEmpty(image) or String.isEmpty(imageDark) or image == imageDark then
-		return Image._make(String.nilIfEmpty(image) or imageDark, options)
+	elseif String.isEmpty(imageLightMode) or String.isEmpty(imageDarkMode) or imageLightMode == imageDarkMode then
+		return Image._make(String.nilIfEmpty(imageLightMode) or imageDarkMode, options)
 	end
 
-	return Image._make(image, options, 'show-when-light-mode')
-		.. Image._make(imageDark, options, 'show-when-dark-mode')
+	return Image._make(imageLightMode, options, 'show-when-light-mode')
+		.. Image._make(imageDarkMode, options, 'show-when-dark-mode')
 end
 
 ---@param image string?
