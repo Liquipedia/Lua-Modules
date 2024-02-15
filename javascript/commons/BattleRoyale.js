@@ -26,6 +26,7 @@ liquipedia.battleRoyale = {
 						.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 						.forEach( ( tableEl ) => {
 							this.recheckSideScrollButtonStates( tableEl );
+							this.recheckSideScrollHintElements( tableEl.closest('[data-js-battle-royale="table"]') );
 						} );
 				}
 			}
@@ -38,6 +39,7 @@ liquipedia.battleRoyale = {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 				.forEach( ( tableEl ) => {
 					this.recheckSideScrollButtonStates( tableEl );
+					this.recheckSideScrollHintElements( tableEl.closest('[data-js-battle-royale="table"]') );
 				} );
 		} );
 	},
@@ -245,6 +247,56 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
+	createScrollHintElement: function( dir ) {
+		const element = document.createElement( 'div' );
+		element.classList.add( 'panel-table__swipe-hint', `swipe-hint--${ dir }`, 'd-none' );
+		element.setAttribute( 'data-js-battle-royale', 'swipe-hint-' + dir );
+
+		const icon = document.createElement( 'i' );
+		icon.classList.add( 'fas', `fa-chevron-${ dir }` );
+		element.append( icon );
+		return element;
+	},
+
+	makeTableScrollHint: function( instanceId ) {
+		this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
+			console.log('table', table);
+			const swipeHintLeft = this.createScrollHintElement( this.DIRECTION_LEFT );
+			const swipeHintRight = this.createScrollHintElement( this.DIRECTION_RIGHT );
+			table.prepend( swipeHintLeft, swipeHintRight );
+
+			table.addEventListener('scroll', () => {
+				this.recheckSideScrollHintElements( table );
+			});
+			this.recheckSideScrollHintElements( table );
+		});
+	},
+
+	recheckSideScrollHintElements: function(table ) {
+		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
+		const swipeHintRight = table.querySelector( '[data-js-battle-royale="swipe-hint-right"]' );
+
+		if(table.scrollLeft > 0) {
+			if (swipeHintLeft.classList.contains('d-none')) {
+				swipeHintLeft.classList.remove('d-none');
+			}
+		} else {
+			if (!swipeHintLeft.classList.contains('d-none')) {
+				swipeHintLeft.classList.add('d-none');
+			}
+		}
+		if(table.scrollLeft >= table.scrollWidth - table.offsetWidth) {
+			if (!swipeHintRight.classList.contains('d-none')) {
+				swipeHintRight.classList.add('d-none');
+			}
+		} else {
+			swipeHintRight.style.right = (table.scrollLeft * -1) + 'px';
+			if (swipeHintRight.classList.contains('d-none')) {
+				swipeHintRight.classList.remove('d-none');
+			}
+		}
+	},
+
 	createNavigationElement: function( dir ) {
 		const element = document.createElement( 'div' );
 		element.classList.add( 'panel-table__navigate', 'navigate--' + dir );
@@ -405,12 +457,14 @@ liquipedia.battleRoyale = {
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
 			this.makeSideScrollElements( instanceId );
+			this.makeTableScrollHint( instanceId );
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
+				// const tables = this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="table"]' );
 
 				if ( target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
@@ -420,6 +474,10 @@ liquipedia.battleRoyale = {
 				panels.forEach( ( panel, index ) => {
 					this.createBottomNav( instanceId, target, index );
 				} );
+
+				// tables.forEach( ( table ) => {
+				// 	this.handleTableScrollHint( table );
+				// } );
 
 			} );
 

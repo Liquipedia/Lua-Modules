@@ -8,6 +8,38 @@ Author(s): Elysienna
 	flex-direction: column;
 	width: 100%;
 	overflow-x: auto;
+	position: relative;
+
+	&__swipe-container {
+		width: 100%;
+		z-index: 1;
+		position: absolute;
+		display: inherit;
+		height: 100%;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		pointer-events: none;
+	}
+
+	&__swipe-hint {
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		height: 100%;
+		width: 20px;
+		background: linear-gradient( 90deg, transparent, rgba( 0, 0, 0, 0.1 ) );
+		pointer-events: none;
+
+		&.swipe-hint--left {
+			left: 0;
+		}
+
+		&.swipe-hint--right {
+			right: 0;
+		}
+	}
 
 	&__sort {
 		margin-left: 0.25rem;
@@ -21,7 +53,7 @@ Author(s): Elysienna
 		position: absolute;
 		padding: 12px;
 		height: 100%;
-		background-color: #f5f5f5;
+		background-color: rgba( 245, 245, 245, 0.9 );
 		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		display: flex;
 		align-items: center;
@@ -61,6 +93,10 @@ Author(s): Elysienna
 
 				& .cell--game {
 					height: 100%;
+				}
+
+				& .cell--game-container-nav-holder {
+					min-width: 15.875rem;
 				}
 			}
 
