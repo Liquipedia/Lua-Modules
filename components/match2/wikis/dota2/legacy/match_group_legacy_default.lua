@@ -30,10 +30,10 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 																						bracketType, lowerHeader)
 	end
 
-	for n = 1, lastRound do
-		bracketData['R' .. n .. 'M1header'] = 'R' .. n
-		if lowerHeader[n] then
-			bracketData['R' .. n .. 'M' .. lowerHeader[n] .. 'header'] = 'L' .. n
+	for round = 1, lastRound do
+		bracketData['R' .. round .. 'M1header'] = 'R' .. round
+		if lowerHeader[round] then
+			bracketData['R' .. round .. 'M' .. lowerHeader[round] .. 'header'] = 'L' .. round
 		end
 	end
 
