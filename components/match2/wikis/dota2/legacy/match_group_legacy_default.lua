@@ -63,7 +63,6 @@ end
 function MatchGroupLegacyDefault._readOpponent(prefix, scoreKey, bracketType)
 	return {
 		['type'] = 'type',
-		prefix,
 		template = prefix .. 'team',
 		score = prefix .. scoreKey,
 		name = prefix,
