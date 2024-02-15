@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Image = require('Module:Image')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -221,11 +222,7 @@ function Team:processCreateDates()
 
 		if game:lower() == 'org' then
 			local teamIcon, teamIconDark = self:_getTeamIcon(cleanDate)
-			local toIcon = function(iconFile, mode)
-				if String.isEmpty(iconFile) then return '' end
-				return '[[File:' .. iconFile .. '|class=show-when-' .. mode .. '-mode]]'
-			end
-			icon = toIcon(teamIcon, 'light') .. toIcon(teamIconDark, 'dark')
+			icon = Image.display(self:_getTeamIcon(cleanDate))
 		else
 			local timestamp = Team._parseDate(cleanDate)
 			if timestamp and timestamp < earliestGameTimestamp then
