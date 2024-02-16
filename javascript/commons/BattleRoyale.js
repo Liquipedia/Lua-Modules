@@ -44,12 +44,21 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
+	hasVisibleSideScrollButtons: function( table ) {
+		const el = table.querySelector(
+			'[data-js-battle-royale="game-nav-holder"] > [data-js-battle-royale="game-container"]'
+		);
+		return el.scrollWidth > el.offsetWidth;
+	},
+
 	implementScrollWheelEvent: function() {
 		const handleWheelEvent = ( e, table ) => {
-			e.preventDefault();
-			const delta = e.deltaY || e.detail || e.wheelDelta;
-			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
-			this.handleTableSideScroll( table, dir );
+			if ( this.hasVisibleSideScrollButtons( table ) ) {
+				e.preventDefault();
+				const delta = e.deltaY || e.detail || e.wheelDelta;
+				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
+				this.handleTableSideScroll( table, dir );
+			}
 		};
 
 		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
@@ -261,18 +270,18 @@ liquipedia.battleRoyale = {
 	makeTableScrollHint: function( instanceId ) {
 		this.battleRoyaleInstances[ instanceId ]
 			.querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
-			const swipeHintLeft = this.createScrollHintElement( this.DIRECTION_LEFT );
-			const swipeHintRight = this.createScrollHintElement( this.DIRECTION_RIGHT );
-			table.prepend( swipeHintLeft, swipeHintRight );
+				const swipeHintLeft = this.createScrollHintElement( this.DIRECTION_LEFT );
+				const swipeHintRight = this.createScrollHintElement( this.DIRECTION_RIGHT );
+				table.prepend( swipeHintLeft, swipeHintRight );
 
-			table.addEventListener( 'scroll', () => {
+				table.addEventListener( 'scroll', () => {
+					this.recheckSideScrollHintElements( table );
+				} );
 				this.recheckSideScrollHintElements( table );
 			} );
-			this.recheckSideScrollHintElements( table );
-		} );
 	},
 
-	recheckSideScrollHintElements: function(table ) {
+	recheckSideScrollHintElements: function( table ) {
 		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
 		const swipeHintRight = table.querySelector( '[data-js-battle-royale="swipe-hint-right"]' );
 
