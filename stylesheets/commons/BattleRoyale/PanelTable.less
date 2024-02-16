@@ -28,16 +28,21 @@ Author(s): Elysienna
 		z-index: 1;
 		top: 0;
 		height: 100%;
-		width: 20px;
-		background: linear-gradient( 90deg, transparent, rgba( 0, 0, 0, 0.1 ) );
+		width: 1rem;
 		pointer-events: none;
+		color: var( --clr-wiki-on-primary );
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
 		&.swipe-hint--left {
 			left: 0;
+			background: linear-gradient( 90deg, rgba( 0, 0, 0, 0.1 ), transparent );
 		}
 
 		&.swipe-hint--right {
 			right: 0;
+			background: linear-gradient( 90deg, transparent, rgba( 0, 0, 0, 0.1 ) );
 		}
 	}
 
