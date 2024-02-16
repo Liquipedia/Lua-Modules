@@ -39,7 +39,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'location' and not (String.isEmpty(args.location)) then
+	if id == 'location' and String.isNotEmpty(args.location) then
 		return {
 			Cell{
 				name = 'Location',
@@ -49,9 +49,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		return Array.append(widgets,
 			Cell{name = 'Map Season', content = {args.season}},
-			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
-			Cell{name = 'Battle Tier', content = {String.isEmpty(args.btmin) and
-					String.isEmpty(args.btmax) and '' or args.btmin .. '-' .. args.btmax}
+			Cell{name = 'Size', content = {(args.width or '') .. ' x ' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', content = {String.isEmpty(args.btmin) and 
+					String.isEmpty(args.btmax) and '' or args.btmin .. ' - ' .. args.btmax}
 			},
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
@@ -102,7 +102,7 @@ function CustomMap:getWikiCategories(args)
 	if String.isNotEmpty(args.location) then
 		table.insert(categories, 'Maps located in ' .. args.location)
 	end
-
+	
 	return categories
 end
 
