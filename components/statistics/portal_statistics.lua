@@ -40,6 +40,7 @@ local Count = Lua.import('Module:Count')
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
+local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
@@ -775,7 +776,7 @@ function StatisticsPortal.playerAgeTable(args)
 	for _, player in ipairs(playerData) do
 		local birthdate = DateExt.readTimestamp(player.birthdate) --[[@as integer]]
 		local age = os.date('*t', os.difftime(TIMESTAMP, birthdate))
-		local yearAge = age.year - tonumber(DateExt.defaultYear)
+		local yearAge = age.year - 1970
 		local dayAge = age.yday - 1
 
 		tbl:tag('tr')
