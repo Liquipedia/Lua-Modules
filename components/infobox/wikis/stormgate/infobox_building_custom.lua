@@ -57,7 +57,8 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Sight', content = {args.sight}},
-			Cell{name = 'Energy', content = {caller:_energyDisplay()}}
+			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
+			Cell{name = 'Upgrades To', content = Array.parseCommaSeparatedString(args.upgrades_to)}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
@@ -178,6 +179,7 @@ function CustomBuilding:setLpdbData(args)
 			unlocks = Array.parseCommaSeparatedString(args.unlocks),
 			passive = Array.parseCommaSeparatedString(args.passive),
 			armortypes = Array.parseCommaSeparatedString(args.armor_types),
+			upgradesto = Array.parseCommaSeparatedString(args.upgrades_to),
 			hotkey = args.hotkey,
 			hotkey2 = args.hotkey2,
 			macrokey = args.macro_key,
