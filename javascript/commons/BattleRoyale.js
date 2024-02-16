@@ -26,7 +26,7 @@ liquipedia.battleRoyale = {
 						.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 						.forEach( ( tableEl ) => {
 							this.recheckSideScrollButtonStates( tableEl );
-							this.recheckSideScrollHintElements( tableEl.closest('[data-js-battle-royale="table"]') );
+							this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
 						} );
 				}
 			}
@@ -39,7 +39,7 @@ liquipedia.battleRoyale = {
 			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 				.forEach( ( tableEl ) => {
 					this.recheckSideScrollButtonStates( tableEl );
-					this.recheckSideScrollHintElements( tableEl.closest('[data-js-battle-royale="table"]') );
+					this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
 				} );
 		} );
 	},
@@ -259,40 +259,42 @@ liquipedia.battleRoyale = {
 	},
 
 	makeTableScrollHint: function( instanceId ) {
-		this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
-			console.log('table', table);
+		this.battleRoyaleInstances[ instanceId ]
+			.querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
 			const swipeHintLeft = this.createScrollHintElement( this.DIRECTION_LEFT );
 			const swipeHintRight = this.createScrollHintElement( this.DIRECTION_RIGHT );
 			table.prepend( swipeHintLeft, swipeHintRight );
 
-			table.addEventListener('scroll', () => {
+			table.addEventListener( 'scroll', () => {
 				this.recheckSideScrollHintElements( table );
-			});
+			} );
 			this.recheckSideScrollHintElements( table );
-		});
+		} );
 	},
 
 	recheckSideScrollHintElements: function(table ) {
 		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
 		const swipeHintRight = table.querySelector( '[data-js-battle-royale="swipe-hint-right"]' );
 
-		if(table.scrollLeft > 0) {
-			if (swipeHintLeft.classList.contains('d-none')) {
-				swipeHintLeft.classList.remove('d-none');
+		// Added a padding of 5px to prevent rounding errors
+		if ( table.scrollLeft > 5 ) {
+			swipeHintLeft.style.left = table.scrollLeft + 'px';
+			if ( swipeHintLeft.classList.contains( 'd-none' ) ) {
+				swipeHintLeft.classList.remove( 'd-none' );
 			}
 		} else {
-			if (!swipeHintLeft.classList.contains('d-none')) {
-				swipeHintLeft.classList.add('d-none');
+			if ( !swipeHintLeft.classList.contains( 'd-none' ) ) {
+				swipeHintLeft.classList.add( 'd-none' );
 			}
 		}
-		if(table.scrollLeft >= table.scrollWidth - table.offsetWidth) {
-			if (!swipeHintRight.classList.contains('d-none')) {
-				swipeHintRight.classList.add('d-none');
+		if ( table.scrollLeft >= table.scrollWidth - table.offsetWidth - 5 ) {
+			if ( !swipeHintRight.classList.contains( 'd-none' ) ) {
+				swipeHintRight.classList.add( 'd-none' );
 			}
 		} else {
-			swipeHintRight.style.right = (table.scrollLeft * -1) + 'px';
-			if (swipeHintRight.classList.contains('d-none')) {
-				swipeHintRight.classList.remove('d-none');
+			swipeHintRight.style.right = ( table.scrollLeft * -1 ) + 'px';
+			if ( swipeHintRight.classList.contains( 'd-none' ) ) {
+				swipeHintRight.classList.remove( 'd-none' );
 			}
 		}
 	},
@@ -464,7 +466,6 @@ liquipedia.battleRoyale = {
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
-				// const tables = this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="table"]' );
 
 				if ( target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
@@ -474,11 +475,6 @@ liquipedia.battleRoyale = {
 				panels.forEach( ( panel, index ) => {
 					this.createBottomNav( instanceId, target, index );
 				} );
-
-				// tables.forEach( ( table ) => {
-				// 	this.handleTableScrollHint( table );
-				// } );
-
 			} );
 
 			this.implementScrollendEvent( instanceId );
