@@ -67,7 +67,7 @@ end
 function CustomUnit:setLpdbData(args)
 	local lpdbData = {
 		type = 'hero',
-		name = args.heroname or self.pagename,
+		name = args.name or self.pagename,
 		image = args.image,
 		date = args.releasedate,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
