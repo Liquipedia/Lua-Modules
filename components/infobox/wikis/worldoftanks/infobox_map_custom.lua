@@ -50,8 +50,8 @@ function CustomInjector:parse(id, widgets)
 		return Array.append(widgets,
 			Cell{name = 'Map Season', content = {args.season}},
 			Cell{name = 'Size', content = {(args.width or '') .. ' x ' .. (args.height or '')}},
-			Cell{name = 'Battle Tier', content = {String.isEmpty(args.btmin) and
-					String.isEmpty(args.btmax) and '' or args.btmin .. ' - ' .. args.btmax}
+			Cell{name = 'Battle Tier', content = {String.isNotEmpty(args.btmin) and
+				String.isNotEmpty(args.btmax) and (args.btmin .. ' - ' .. args.btmax) or nil}
 			},
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
