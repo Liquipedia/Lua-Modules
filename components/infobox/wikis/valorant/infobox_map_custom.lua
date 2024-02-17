@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
@@ -36,7 +37,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'location' then
+	if id == 'location' and String.isNotEmpty(args.location) then
 		return {
 			Cell{
 				name = 'Location',
