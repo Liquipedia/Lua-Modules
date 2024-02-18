@@ -63,6 +63,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showOpponent boolean
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
+---@field showYearHeaders boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -77,6 +78,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field type string?
 ---@field result MatchTableMatchResult
 ---@field game string?
+---@field date string
 ---@field dateTime string
 
 ---@class MatchTableMatchResult
@@ -124,6 +126,7 @@ function MatchTable:readConfig()
 		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == Opponent.solo),
 		queryHistoricalAliases = not Logic.readBool(args.skipQueryingHistoricalAliases),
 		showType = Logic.readBool(args.showType),
+		showYearHeaders = Logic.readBool(args.showYearHeaders),
 	}
 
 	Array.forEach(opponents, function(opponent)
@@ -390,6 +393,7 @@ function MatchTable:matchFromRecord(record)
 		type = record.type,
 		result = result,
 		game = record.game,
+		date = record.date,
 		dateTime = MatchTable._calculateDateTimeString(record.extradata.timezoneid or UTC, record.extradata.timestamp),
 	}
 end
@@ -508,7 +512,7 @@ function MatchTable:build()
 	local display = mw.html.create('table')
 		:addClass('wikitable wikitable-striped sortable')
 		:css('text-align', 'center')
-		:node(self.config.title and self:_titleRow())
+		:node(self:_titleRow(self.config.title))
 		:node(self:headerRow())
 
 	if Table.isEmpty(self.matches) then
@@ -523,7 +527,13 @@ function MatchTable:build()
 				:done()
 	end
 
+	local currentYear
 	Array.forEach(self.matches, function(match)
+		local year = tonumber(match.date:sub(1, 4))
+		if self.config.showYearHeaders and year ~= currentYear then
+			currentYear = year
+			display:node(self:_titleRow(year))
+		end
 		display:node(self:matchRow(match))
 	end)
 
@@ -538,14 +548,15 @@ function MatchTable:build()
 
 end
 
+---@param title string|number?
 ---@return Html?
-function MatchTable:_titleRow()
-	if not self.config.title then return end
+function MatchTable:_titleRow(title)
+	if not title then return end
 	return mw.html.create('tr')
 		:tag('th')
 			:attr('colspan', '100')
 			:addClass('unsortable')
-			:wikitext(self.config.title)
+			:wikitext(title)
 			:done()
 end
 
@@ -567,7 +578,7 @@ function MatchTable:headerRow()
 		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '80px') or nil)
 		:node(config.showResult and makeHeaderCell('Score', '40px'):addClass('unsortable') or nil)
 		:node(config.showResult and makeHeaderCell('vs. Opponent', '80px') or nil)
-		:node(config.showVod and makeHeaderCell('VOD', '60px') or nil)
+		:node(config.showVod and makeHeaderCell('VOD', '80px') or nil)
 end
 
 ---@param match MatchTableMatch
