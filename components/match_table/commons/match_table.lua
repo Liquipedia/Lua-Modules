@@ -578,7 +578,7 @@ function MatchTable:headerRow()
 		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '80px') or nil)
 		:node(config.showResult and makeHeaderCell('Score', '40px'):addClass('unsortable') or nil)
 		:node(config.showResult and makeHeaderCell('vs. Opponent', '80px') or nil)
-		:node(config.showVod and makeHeaderCell('VOD', '80px') or nil)
+		:node(config.showVod and makeHeaderCell('VOD(s)', '80px') or nil)
 end
 
 ---@param match MatchTableMatch
