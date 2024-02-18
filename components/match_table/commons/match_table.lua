@@ -532,7 +532,7 @@ function MatchTable:build()
 		local year = tonumber(match.date:sub(1, 4))
 		if self.config.showYearHeaders and year ~= currentYear then
 			currentYear = year
-			display:node(self:_titleRow(year))
+			display:node(self:_yearRow(year))
 		end
 		display:node(self:matchRow(match))
 	end)
@@ -545,18 +545,28 @@ function MatchTable:build()
 	return mw.html.create('div')
 		:node(self:displayStats())
 		:node(wrappedTableNode)
-
 end
 
----@param title string|number?
+---@param title string
 ---@return Html?
 function MatchTable:_titleRow(title)
 	if not title then return end
 	return mw.html.create('tr')
 		:tag('th')
 			:attr('colspan', '100')
-			:addClass('unsortable')
 			:wikitext(title)
+			:done()
+end
+
+---@param year number?
+---@return Html?
+function MatchTable:_yearRow(year)
+	if not year then return end
+	return mw.html.create('tr')
+		:addClass('sortbottom')
+		:tag('td')
+			:attr('colspan', '100')
+			:wikitext(year)
 			:done()
 end
 
@@ -575,9 +585,9 @@ function MatchTable:headerRow()
 		:node(config.displayGameIcons and makeHeaderCell(nil, '25px') or nil)
 		:node(config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil)
 		:node(makeHeaderCell('Tournament'))
-		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '80px') or nil)
-		:node(config.showResult and makeHeaderCell('Score', '40px'):addClass('unsortable') or nil)
-		:node(config.showResult and makeHeaderCell('vs. Opponent', '80px') or nil)
+		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '120px') or nil)
+		:node(config.showResult and makeHeaderCell('Score', '68px'):addClass('unsortable') or nil)
+		:node(config.showResult and makeHeaderCell('vs. Opponent', '120px') or nil)
 		:node(config.showVod and makeHeaderCell('VOD(s)', '80px') or nil)
 end
 
@@ -601,6 +611,7 @@ end
 function MatchTable:_displayDate(match)
 	local cell = mw.html.create('td')
 		:css('text-align', 'left')
+		:attr('data-sort-value', match.timestamp)
 
 	if not match.timeIsExact then
 		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp or ''))
