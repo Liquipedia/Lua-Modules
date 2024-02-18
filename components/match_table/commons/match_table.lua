@@ -39,6 +39,7 @@ local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
 local DRAW = 'draw'
+local RESULT_TYPE_DEFAULT = 'default'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
@@ -480,8 +481,9 @@ function MatchTable:statsFromMatches()
 	end
 
 	Array.forEach(self.matches, function(match)
-		---TODO: decide if we want default wins to count towards this
-		if match.result.resultType == DRAW then
+		if match.result.resultType == RESULT_TYPE_DEFAULT then
+			return
+		elseif match.result.resultType == DRAW then
 			totalMatches.d = totalMatches.d + 1
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
