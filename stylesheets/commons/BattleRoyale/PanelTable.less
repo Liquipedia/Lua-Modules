@@ -8,6 +8,43 @@ Author(s): Elysienna
 	flex-direction: column;
 	width: 100%;
 	overflow-x: auto;
+	position: relative;
+
+	&__swipe-container {
+		width: 100%;
+		z-index: 1;
+		position: absolute;
+		display: inherit;
+		height: 100%;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		pointer-events: none;
+	}
+
+	&__swipe-hint {
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		height: 100%;
+		width: 1rem;
+		pointer-events: none;
+		color: var( --clr-wiki-on-primary );
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&.swipe-hint--left {
+			left: 0;
+			background: linear-gradient( 90deg, rgba( 0, 0, 0, 0.1 ), transparent );
+		}
+
+		&.swipe-hint--right {
+			right: 0;
+			background: linear-gradient( 90deg, transparent, rgba( 0, 0, 0, 0.1 ) );
+		}
+	}
 
 	&__sort {
 		margin-left: 0.25rem;
@@ -21,7 +58,7 @@ Author(s): Elysienna
 		position: absolute;
 		padding: 12px;
 		height: 100%;
-		background-color: #f5f5f5;
+		background-color: rgba( 245, 245, 245, 0.9 );
 		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		display: flex;
 		align-items: center;
@@ -61,6 +98,10 @@ Author(s): Elysienna
 
 				& .cell--game {
 					height: 100%;
+				}
+
+				& .cell--game-container-nav-holder {
+					min-width: 15.875rem;
 				}
 			}
 
@@ -305,6 +346,10 @@ Author(s): Elysienna
 			flex-basis: 15rem;
 			flex-grow: 0;
 			overflow: hidden;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9rem;
+			}
 		}
 
 		&--total-points {
@@ -317,11 +362,19 @@ Author(s): Elysienna
 		&--placements {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9.375rem;
+			}
 		}
 
 		&--kills {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 7rem;
+			}
 		}
 
 		&--button {
@@ -353,6 +406,7 @@ Author(s): Elysienna
 			scroll-behavior: smooth;
 			border: 0;
 			align-items: unset;
+			min-width: 15.875rem;
 		}
 	}
 
