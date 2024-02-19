@@ -464,6 +464,7 @@ function Person:_createTeam(team, link)
 	if String.isEmpty(link) then
 		return nil
 	end
+	---@cast link -nil
 
 	if mw.ext.TeamTemplate.teamexists(link) then
 		local data = mw.ext.TeamTemplate.raw(link)
