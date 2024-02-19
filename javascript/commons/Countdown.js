@@ -179,6 +179,7 @@ liquipedia.countdown = {
 		[ 'Australian Eastern Daylight Time', 'AEDT' ],
 		[ 'Australian Eastern Standard Time', 'AEST' ],
 		[ 'Australian Western Standard Time', 'AWST' ],
+		[ 'Aqtobe Time', 'AQTT' ],
 		[ 'Azerbaijan Summer Time', 'AZST' ],
 		[ 'Azerbaijan Time', 'AZT' ],
 		[ 'Azores Summer Time', 'AZOST' ],
