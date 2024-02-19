@@ -247,7 +247,7 @@ function Config.placementDropOffFunction(tier, tierType)
 				if ((tier == 1 or tier == 2 or tier == 3) and placement == 1) then
 					return score
 				end
-			
+
 			else
 				if (tier == 1 and placement <= 16)
 					or ((tier == 2 or tier == 3 or tier == 4 or tier == 5) and placement == 1)
