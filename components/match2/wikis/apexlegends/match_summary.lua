@@ -613,8 +613,6 @@ function CustomMatchSummary._createMatchStandings(match)
 								:wikitext('Game ', idx)
 								:done()
 						:done()
-				:tag('p')
-						:addClass('panel-table__cell__game-date')
 						:node(CustomMatchSummary._gameCountdown(game))
 						:done()
 
