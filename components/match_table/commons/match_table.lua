@@ -566,6 +566,7 @@ function MatchTable:_yearRow(year)
 		:addClass('sortbottom')
 		:tag('td')
 			:attr('colspan', '100')
+			:addClass('match-table-year-header')
 			:wikitext(year)
 			:done()
 end
@@ -588,7 +589,7 @@ function MatchTable:headerRow()
 		:node(config.showResult and config.showOpponent and makeHeaderCell('Participant', '120px') or nil)
 		:node(config.showResult and makeHeaderCell('Score', '68px'):addClass('unsortable') or nil)
 		:node(config.showResult and makeHeaderCell('vs. Opponent', '120px') or nil)
-		:node(config.showVod and makeHeaderCell('VOD(s)', '80px') or nil)
+		:node(config.showVod and makeHeaderCell('VOD(s)', '80px'):addClass('unsortable') or nil)
 end
 
 ---@param match MatchTableMatch
