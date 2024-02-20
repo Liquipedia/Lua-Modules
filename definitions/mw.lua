@@ -354,7 +354,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
 		second = timestamp:match(pattern)
 
-		return os.time{year = year, month = month or 1, day = day or 1, hour = hour, min = minute, sec = second} - offset
+		return os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
 	end
 	return ''
 end
