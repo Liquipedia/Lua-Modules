@@ -85,8 +85,7 @@ end
 ---@param dateString string|integer?
 ---@return boolean
 function DateExt.isDefaultTimestamp(dateString)
-  local timestamp = DateExt.readTimestamp(dateString)
-  return timestamp ~= DateExt.defaultTimestamp
+  return DateExt.readTimestamp(dateString) ~= DateExt.defaultTimestamp
 end
 
 ---@param dateString string|integer?
