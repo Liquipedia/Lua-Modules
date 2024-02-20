@@ -57,7 +57,7 @@ liquipedia.filterButtons = {
 				const button = {
 					element: buttonElement,
 					filter: filterOn,
-					active: true,
+					active: true
 				};
 				if ( filterOn === 'all' ) {
 					allButton = button;
@@ -75,7 +75,7 @@ liquipedia.filterButtons = {
 				allButton: allButton,
 				alwaysActive: ( typeof alwaysActiveFilters === 'string' ) ? alwaysActiveFilters.split( ',' ) : [],
 				filterStates: filterStates,
-				filterableItems: [],
+				filterableItems: []
 			};
 		}, this );
 
@@ -85,7 +85,7 @@ liquipedia.filterButtons = {
 			filterGroup.filterableItems.push( {
 				element: filterableItem,
 				value: filterableItem.dataset.filterCategory,
-				hidden: false,
+				hidden: false
 			} );
 		}, this );
 
@@ -117,9 +117,9 @@ liquipedia.filterButtons = {
 			}
 		};
 
-		Object.values( this.filterGroups ).forEach( filterGroup => {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 
-			Object.values( filterGroup.buttons ).forEach( button => {
+			Object.values( filterGroup.buttons ).forEach( ( button ) => {
 				button.element.addEventListener( 'click', handleClick.bind( this, button, filterGroup ) );
 				button.element.addEventListener( 'keypress', handleClick.bind( this, button, filterGroup ) );
 			} );
@@ -131,17 +131,17 @@ liquipedia.filterButtons = {
 	},
 
 	updateFromFilterStates: function() {
-		Object.values( this.filterGroups ).forEach( filterGroup => {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 
 			let allState = true;
-			Object.values( filterGroup.buttons ).forEach( button => {
+			Object.values( filterGroup.buttons ).forEach( ( button ) => {
 				button.active = filterGroup.filterStates[ button.filter ];
 				allState = allState && button.active;
 			} );
 
 			filterGroup.allButton.active = allState;
 
-			filterGroup.filterableItems.forEach( filterableItem => {
+			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
 			} );
 
@@ -149,11 +149,15 @@ liquipedia.filterButtons = {
 	},
 
 	updateDOM: function() {
-		Object.values( this.filterGroups ).forEach( filterGroup => {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 
-			filterGroup.allButton.active ? filterGroup.allButton.element.classList.add( this.activeButtonClass ) : filterGroup.allButton.element.classList.remove( this.activeButtonClass );
+			if ( filterGroup.allButton.active ) {
+				filterGroup.allButton.element.classList.add( this.activeButtonClass );
+			} else {
+				filterGroup.allButton.element.classList.remove( this.activeButtonClass );
+			}
 
-			Object.values( filterGroup.buttons ).forEach( button => {
+			Object.values( filterGroup.buttons ).forEach( ( button ) => {
 				if ( button.active ) {
 					button.element.classList.add( this.activeButtonClass );
 				} else {
@@ -161,7 +165,7 @@ liquipedia.filterButtons = {
 				}
 			}, this );
 
-			filterGroup.filterableItems.forEach( filterableItem => {
+			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
 					filterableItem.element.classList.add( this.hiddenCategoryClass );
 				} else {
@@ -187,11 +191,11 @@ liquipedia.filterButtons = {
 
 	setLocalStorage: function() {
 		const filterGroups = {};
-		Object.values( this.filterGroups ).forEach( filterGroup => {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates };
 		} );
 		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
-	},
+	}
 };
 
 liquipedia.core.modules.push( 'filterButtons' );
