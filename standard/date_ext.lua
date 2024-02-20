@@ -82,6 +82,19 @@ function DateExt.toYmdInUtc(dateOrTimestamp)
 	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
+---@param dateString string|integer?
+---@return boolean
+function DateExt.isDefaultTimestamp(dateString)
+  local timestamp = DateExt.readTimestamp(dateString)
+  return timestamp ~= DateExt.defaultTimestamp
+end
+
+---@param dateString string|integer?
+---@return string|integer?
+function DateExt.nilIfDefaultTimestamp(dateString)
+  return DateExt.isDefaultTimestamp(dateString) and dateString or nil
+end
+
 --- Fetches contextualDate on a tournament page.
 ---@return string?
 function DateExt.getContextualDate()
