@@ -334,11 +334,27 @@ function mw.language:formatDate(format, timestamp, localTime)
 		if type(timestamp) ~= 'string' then
 			return os.time(timestamp)
 		end
-		-- Only supports YYYY-MM-DD so far
-		local pattern = "(%d%d%d%d)-?(%d%d)-?(%d%d)"
-		local year, month, day = timestamp:match(pattern)
+		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
+		local offset = 0
+		if tzHour then
+			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
+		end
 
-		return os.time({year = year, month = month or 1, day = day or 1})
+		local year, month, day, hour, minute, second
+
+		local pattern = '(%d%d%d%d)-?(%d%d)-?(%d%d)'
+		year, month, day = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)'
+		hour = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?(%d%d)'
+		minute = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
+		second = timestamp:match(pattern)
+
+		return os.time{year = year, month = month or 1, day = day or 1, hour = hour, min = minute, sec = second} - offset
 	end
 	return ''
 end
