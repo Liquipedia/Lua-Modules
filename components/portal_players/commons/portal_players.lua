@@ -8,6 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
@@ -15,6 +16,8 @@ local Links = require('Module:Links')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+
+local AgeCalculation = require('Module:AgeCalculation')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -28,6 +31,7 @@ local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
 	banned = 'cinnabar-bg',
+	['passed away'] = 'gray-bg',
 }
 
 --- @class PortalPlayers
@@ -53,7 +57,7 @@ function PortalPlayers:init(args)
 	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
 	self.queryOnlyByRegion = Logic.readBool(args.queryOnlyByRegion)
 	self.playerType = args.playerType or DEFAULT_PLAYER_TYPE
-	self.width = args.width or '720px'
+	self.width = args.width or '1100px'
 
 	return self
 end
@@ -232,16 +236,17 @@ function PortalPlayers:header(args)
 
 	local header = mw.html.create('tr')
 		:tag('th')
-			:attr('colspan', 4)
+			:attr('colspan', 5)
 			:css('padding-left', '1em')
 			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
 			:done()
 
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
-		:tag('th'):css('width', '175px'):wikitext(' Real Name'):done()
-		:tag('th'):css('width', '250px'):wikitext(teamText):done()
-		:tag('th'):css('width', '120px'):wikitext(' Links'):done()
+		:tag('th'):css('width', '200px'):wikitext(' Real Name'):done()
+		:tag('th'):css('width', '215px'):wikitext(' Age'):done()
+		:tag('th'):css('width', '215px'):wikitext(teamText):done()
+		:tag('th'):css('width', '100px'):wikitext(' Links'):done()
 
 	return mw.html.create()
 		:node(header)
@@ -268,6 +273,7 @@ function PortalPlayers:row(player, isPlayer)
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
 	end
+	row:tag('td'):node(PortalPlayers._getAge(player))
 	row:tag('td'):wikitext(' ' .. teamText)
 
 	local links = Array.extractValues(Table.map(player.links or {}, function(key, link)
@@ -282,6 +288,26 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(table.concat(links))
 
 	return row
+end
+
+---Builds the age display
+---@param player table
+---@return string
+function PortalPlayers._getAge(player)
+	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
+		birthdate = DateExt.nilIfDefaultTimestamp(player.birthdate),
+		deathdate = DateExt.nilIfDefaultTimestamp(player.deathdate),
+	})
+
+	if not ageCalculationSuccess then
+		return age --[[@as string]]
+	end
+
+	if age.death then
+		return age.birth .. '<br>' .. age.death
+	end
+
+	return age.birth
 end
 
 ---Converts the queried data int a readable format by OpponnetDisplay
