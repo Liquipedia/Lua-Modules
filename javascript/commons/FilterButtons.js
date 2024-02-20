@@ -1,6 +1,6 @@
 /*******************************************************************************
  Template(s): Filter buttons
- Author(s): Elysienna
+ Author(s): Elysienna (original), iMarbot (refactor)
  *******************************************************************************/
 /**
  * Usage of module:
