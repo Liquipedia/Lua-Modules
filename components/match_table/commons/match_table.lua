@@ -604,7 +604,7 @@ function MatchTable:matchRow(match)
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
 		:node(self:_displayMatch(match))
-		:node(self:__displayVods(match))
+		:node(self:_displayVods(match))
 end
 
 ---@param match MatchTableMatch
@@ -750,7 +750,7 @@ end
 
 ---@param match MatchTableMatch
 ---@return Html?
-function MatchTable:__displayVods(match)
+function MatchTable:_displayVods(match)
 	if not self.config.showVod then return end
 
 	local vodsNode = mw.html.create('td'):css('text-align', 'left')
