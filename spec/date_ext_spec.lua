@@ -76,7 +76,7 @@ describe('Variables', function()
 			assert.is_false(DateExt.isDefaultTimestamp(0))
 			assert.is_true(DateExt.isDefaultTimestamp(DateExt.defaultTimestamp))
 
-			assert.are_same('aaa', DateExt.readTimestamp(DateExt.defaultDateTime))
+			assert.are_same('aaa', DateExt.readTimestamp(DateExt.defaultDate))
 
 			assert.is_true(DateExt.isDefaultTimestamp(DateExt.defaultDateTime))
 			assert.is_true(DateExt.isDefaultTimestamp(DateExt.defaultDateTimeExtended))
