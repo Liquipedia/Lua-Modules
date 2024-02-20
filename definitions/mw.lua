@@ -327,6 +327,14 @@ end
 ---@param localTime boolean?
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime)
+	local function localTimezoneOffset(ts)
+		local utcDt   = os.date("!*t", ts)
+		local localDt = os.date("*t", ts)
+		localDt.isdst = false
+		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+	end
+
+
 	if format == 'U' then
 		if not timestamp then
 			return os.time(os.date("!*t") --[[@as osdateparam]])
@@ -358,7 +366,9 @@ function mw.language:formatDate(format, timestamp, localTime)
 		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
 		second = timestamp:match(pattern)
 
-		return os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
+		local ts = os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
+
+		return ts + localTimezoneOffset(ts)
 	end
 	return ''
 end
