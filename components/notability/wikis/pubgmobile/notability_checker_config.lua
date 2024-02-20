@@ -243,7 +243,7 @@ Config.weights = {
 function Config.placementDropOffFunction(tier, tierType)
 
 		return function(score, placement)
-			if (tierType == 'qualifier') then
+			if (tierType == Config.TIER_TYPE_QUALIFIER) then
 				if ((tier == 1 or tier == 2 or tier == 3) and placement == 1) then
 					return score
 				end
