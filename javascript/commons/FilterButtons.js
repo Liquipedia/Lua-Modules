@@ -46,7 +46,11 @@ liquipedia.filterButtons = {
 
 		const filterGroups = {};
 
-		document.querySelectorAll( '.filter-buttons[data-filter]' ).forEach( ( /** @type HTMLElement */ buttonsDiv ) => {
+		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
+		if ( filterButtonGroups.length === 0 ) {
+			return;
+		}
+		filterButtonGroups.forEach( ( /** @type HTMLElement */ buttonsDiv ) => {
 			const filterGroup = buttonsDiv.dataset.filterGroup || this.fallbackFilterGroup;
 			const filterStates = ( localStorage[ filterGroup ] || {} ).filterStates || {};
 			const alwaysActiveFilters = buttonsDiv.dataset.filterAlwaysActive;
