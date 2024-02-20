@@ -244,7 +244,7 @@ function PortalPlayers:header(args)
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
 		:tag('th'):css('width', '200px'):wikitext(' Name'):done()
-		:tag('th'):css('width', '215px'):wikitext(' Born'):done()
+		:tag('th'):css('width', '215px'):wikitext(' Age'):done()
 		:tag('th'):css('width', '215px'):wikitext(teamText):done()
 		:tag('th'):css('width', '100px'):wikitext(' Links'):done()
 
