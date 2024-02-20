@@ -345,6 +345,10 @@ function mw.language:formatDate(format, timestamp, localTime)
 		local pattern = '(%d%d%d%d)-?(%d%d)-?(%d%d)'
 		year, month, day = timestamp:match(pattern)
 
+		if not year then
+			return ''
+		end
+
 		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)'
 		hour = timestamp:match(pattern)
 
