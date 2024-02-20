@@ -727,6 +727,7 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 			overflow = 'wrap',
 			teamStyle = 'short',
 		})
+		:attr('data-sort-value', opponent.name)
 end
 
 ---@param result MatchTableMatchResult
@@ -752,7 +753,7 @@ end
 function MatchTable:__displayVods(match)
 	if not self.config.showVod then return end
 
-	local vodsNode = mw.html.create('td')
+	local vodsNode = mw.html.create('td'):css('text-align', 'left')
 	Array.forEach(match.vods, function(vod, vodIndex)
 		if vodIndex ~= 1 then
 			vodsNode:node(' ')
