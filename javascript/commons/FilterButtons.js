@@ -74,10 +74,10 @@ liquipedia.filterButtons = {
 
 			filterGroups[ filterGroup ] = {
 				name: filterGroup,
-				effect: buttonsDiv.dataset.filterEffect || this.fallbackFilterEffect,
 				buttons: buttons,
 				allButton: allButton,
 				alwaysActive: ( typeof alwaysActiveFilters === 'string' ) ? alwaysActiveFilters.split( ',' ) : [],
+				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect || this.fallbackFilterEffect ),
 				filterStates: filterStates,
 				filterableItems: []
 			};
@@ -85,7 +85,6 @@ liquipedia.filterButtons = {
 
 		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
 			const filterGroup = filterGroups[ filterableItem.dataset.filterGroup || this.fallbackFilterGroup ];
-			filterableItem.classList.add( 'filter-effect-' + filterGroup.effect );
 			filterGroup.filterableItems.push( {
 				element: filterableItem,
 				value: filterableItem.dataset.filterCategory,
@@ -171,9 +170,9 @@ liquipedia.filterButtons = {
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
-					filterableItem.element.classList.add( this.hiddenCategoryClass );
+					filterableItem.element.className = this.hiddenCategoryClass;
 				} else {
-					filterableItem.element.classList.remove( this.hiddenCategoryClass );
+					filterableItem.element.className = filterGroup.effectClass;
 				}
 			}, this );
 
