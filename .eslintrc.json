@@ -1,8 +1,9 @@
 {
 	"extends": [
-		"wikimedia/client-es6",
-		"wikimedia/jquery",
-		"wikimedia/mediawiki"
+		"wikimedia/mediawiki",
+		"wikimedia/client/common",
+		"wikimedia/language/es2020",
+		"wikimedia/jquery"
 	],
 	"globals": {
 		"liquipedia": "readonly",
@@ -27,11 +28,7 @@
 		"es-x/no-property-shorthands": "off",
 		"max-len": ["warn", { "code": 120 }]
 	},
-	"parserOptions": {
-		"ecmaVersion": 2020
-	},
 	"env": {
-		"es6": true
+		"jquery": true
 	}
 }
-

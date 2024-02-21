@@ -54,7 +54,7 @@ liquipedia.bracket = {
 			} );
 			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
 				element.addEventListener( 'mouseover', function() {
-					if ( liquipedia.bracket.highlighting.filteredSelectors.indexOf( element.dataset.highlightingkey ) === -1 ) {
+					if ( !liquipedia.bracket.highlighting.filteredSelectors.includes( element.dataset.highlightingkey ) ) {
 						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( function( node ) {
 							node.classList.add( 'bracket-hover' );
 							if ( typeof node.dataset.backgroundColorHover !== 'undefined' ) {
@@ -77,7 +77,7 @@ liquipedia.bracket = {
 			const urlparts = url.split( '/' );
 			let value = urlparts[ urlparts.length - 1 ];
 			value.replace( '-icon', '_std' );
-			if ( value.indexOf( '-' ) !== -1 ) {
+			if ( value.includes( '-' ) ) {
 				value = value.replace( '-logo', '' ).replace( '-std', '' );
 				value = value.split( '-' );
 				value = value[ value.length - 1 ];
@@ -110,7 +110,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					fromselector = liquipedia.bracket.highlighting.getImageSelector( fromteamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( fromselector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( fromselector ) ) {
 						fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
 					}
 				}
@@ -122,7 +122,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					toselector = liquipedia.bracket.highlighting.getImageSelector( toteamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( toselector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( toselector ) ) {
 						toselector = liquipedia.bracket.highlighting.getTextSelector( to );
 					}
 				}
@@ -168,7 +168,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					selector = liquipedia.bracket.highlighting.getImageSelector( teamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( selector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( selector ) ) {
 						selector = liquipedia.bracket.highlighting.getTextSelector( element );
 					}
 				}

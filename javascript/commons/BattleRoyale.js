@@ -403,7 +403,6 @@ liquipedia.battleRoyale = {
 	},
 
 	createBottomNav( instanceId, navigationTab, currentPanelIndex ) {
-		// eslint-disable-next-line es-x/no-object-values
 		const contentPanel = Object.values(
 			this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ navigationTab ]
 		)[ currentPanelIndex ];
