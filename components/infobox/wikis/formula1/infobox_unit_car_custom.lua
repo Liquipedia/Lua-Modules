@@ -80,8 +80,8 @@ function CustomUnit:setLpdbData(args)
 		type = 'car',
 		manufacturer = args.manufacturer
 		engine provider = args.engine
-		season(s) = args.season
-		team(s) = args.team
+		season = args.season
+		team = args.team
 		deasigner = args.designer
 		image = args.image,
 		date = args.released,
