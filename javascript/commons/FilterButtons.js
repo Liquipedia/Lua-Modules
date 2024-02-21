@@ -123,12 +123,14 @@ liquipedia.filterButtons = {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
 
 			Object.values( filterGroup.buttons ).forEach( ( button ) => {
-				button.element.addEventListener( 'click', handleClick.bind( this, button, filterGroup ) );
-				button.element.addEventListener( 'keypress', handleClick.bind( this, button, filterGroup ) );
+				const buttonEventHandler = handleClick.bind( this, button, filterGroup );
+				button.element.addEventListener( 'click', buttonEventHandler );
+				button.element.addEventListener( 'keypress', buttonEventHandler );
 			} );
 
-			filterGroup.allButton.element.addEventListener( 'click', handleClick.bind( this, filterGroup.allButton, filterGroup ) );
-			filterGroup.allButton.element.addEventListener( 'keypress', handleClick.bind( this, filterGroup.allButton, filterGroup ) );
+			const allEventHandler = handleClick.bind( this, filterGroup.allButton, filterGroup );
+			filterGroup.allButton.element.addEventListener( 'click', allEventHandler );
+			filterGroup.allButton.element.addEventListener( 'keypress', allEventHandler );
 
 		} );
 	},
