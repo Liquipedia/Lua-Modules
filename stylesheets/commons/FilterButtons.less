@@ -3,7 +3,14 @@ Template(s): Filter buttons
 Author(s): Elysienna
 *******************************************************************************/
 .filter-category--hidden {
-	display: none;
+	clip: rect( 0 0 0 0 );
+	clip-path: inset( 50% );
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	white-space: nowrap;
+	width: 1px;
+	opacity: 0;
 }
 
 .filter-buttons {
