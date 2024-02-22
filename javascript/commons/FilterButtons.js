@@ -97,12 +97,6 @@ liquipedia.filterButtons = {
 		this.performUpdate();
 	},
 
-	performUpdate: function() {
-		this.updateFromFilterStates();
-		this.setLocalStorage();
-		this.updateDOM();
-	},
-
 	initalizeButtons: function() {
 		const handleClick = function( button, filterGroup, event ) {
 			if ( ( event.type === 'click' ) || ( event.type === 'keypress' && event.key === 'Enter' ) ) {
@@ -133,6 +127,12 @@ liquipedia.filterButtons = {
 			filterGroup.allButton.element.addEventListener( 'keypress', allEventHandler );
 
 		} );
+	},
+
+	performUpdate: function() {
+		this.updateFromFilterStates();
+		this.setLocalStorage();
+		this.updateDOM();
 	},
 
 	updateFromFilterStates: function() {
