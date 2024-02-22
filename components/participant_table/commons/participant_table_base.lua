@@ -164,7 +164,7 @@ function ParticipantTable:readSection(args)
 	local section = {config = config}
 
 	local entriesByName = {}
-	Table.mapArgumentsByPrefix(args, {'p', 'player', 'team'}, function(key, index)
+	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
