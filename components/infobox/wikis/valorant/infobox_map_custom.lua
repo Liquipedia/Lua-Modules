@@ -40,7 +40,10 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Location',
-				content = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. args.country},
+				content = {
+					args.country and (Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. args.country)
+					or nil
+				},
 			},
 		}
 	elseif id == 'custom' then
