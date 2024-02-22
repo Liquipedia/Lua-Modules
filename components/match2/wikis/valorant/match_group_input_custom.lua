@@ -349,6 +349,7 @@ function matchFunctions.getVodStuff(match)
 
 	match.links = {}
 	if match.vlr then match.links.vlr = 'https://vlr.gg/' .. match.vlr end
+	if match.rib then match.links.rib = 'https://rib.gg/series/' .. match.rib end
 
 	return match
 end
