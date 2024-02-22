@@ -25,7 +25,7 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
-	rib = {icon = 'File:RIB icon.png', text = 'Matchpage and Stats on RIB'},
+	rib = {icon = 'File:RIB icon lightmode.png', text = 'Matchpage and Stats on RIB'},
 }
 
 ---@class ValorantAgents
