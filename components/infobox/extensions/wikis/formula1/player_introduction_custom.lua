@@ -50,7 +50,7 @@ function CustomPlayerIntroduction:playedOrWorked(isCurrentTense)
 	elseif not isCurrentTense then
 		return 'drove for'
 	elseif transferInfo.role == INACTIVE_ROLE and transferInfo.type == TRANSFER_STATUS_CURRENT then
-		return 'on the inactive roster of'
+		return 'is an inactive driver for'
 	elseif self.options.showRole and role == 'streamer' or role == 'content creator' then
 		return AnOrA.main{role} .. ' for'
 	elseif self.options.showRole and String.isNotEmpty(role) then
