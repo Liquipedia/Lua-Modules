@@ -78,11 +78,6 @@ function CustomUnit:setLpdbData(args)
 	local lpdbData = {
 		name = args.name,
 		type = 'car',
-		manufacturer = args.manufacturer
-		engine provider = args.engine
-		season = args.season
-		team = args.team
-		deasigner = args.designer
 		image = args.image,
 		date = args.released,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{},
