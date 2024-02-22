@@ -164,7 +164,7 @@ function ParticipantTable:readSection(args)
 	local section = {config = config}
 
 	local entriesByName = {}
-	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
+	Table.mapArgumentsByPrefix(args, {'p', 'player', 'team'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
@@ -216,8 +216,7 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 		note = valueFromArgs('note'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
+	assert(Opponent.isType(opponentArgs.type), 'Invalid opponent type for "' .. sectionArgs[key] .. '"')
 
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
