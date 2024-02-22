@@ -28,7 +28,7 @@ end
 ---@param entry ParticipantTableEntry
 ---@param config ParticipantTableConfig
 function CustomParticipantTable:adjustLpdbData(lpdbData, entry, config)
-    lpdbData.qualifier = TextSanitizer.stripHTML(config.title)
+	lpdbData.qualifier = TextSanitizer.stripHTML(config.title)
 	lpdbData.extradata.status = Variables.varDefault('tournament_status', '')
 end
 
