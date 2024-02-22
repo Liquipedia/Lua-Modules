@@ -88,7 +88,7 @@ liquipedia.filterButtons = {
 				filterStates: filterStates,
 				filterableItems: []
 			};
-		}, this );
+		} );
 
 		return true;
 	},
@@ -101,7 +101,7 @@ liquipedia.filterButtons = {
 				value: filterableItem.dataset.filterCategory,
 				hidden: false
 			} );
-		}, this );
+		} );
 	},
 
 	initalizeButtons: function() {
@@ -175,7 +175,7 @@ liquipedia.filterButtons = {
 				} else {
 					button.element.classList.remove( this.activeButtonClass );
 				}
-			}, this );
+			} );
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
@@ -183,9 +183,9 @@ liquipedia.filterButtons = {
 				} else {
 					filterableItem.element.className = filterGroup.effectClass;
 				}
-			}, this );
+			} );
 
-		}, this );
+		} );
 	},
 
 	buildLocalStorageKey: function() {
