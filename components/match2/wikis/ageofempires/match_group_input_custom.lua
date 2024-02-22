@@ -75,6 +75,8 @@ function CustomMatchGroupInput._getTournamentVars(match)
 		end
 	end
 
+	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
+
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -301,6 +303,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		displayname = map.mapDisplayName,
 	}
 	map.game = match.game
+	map.mode = match.mode
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
