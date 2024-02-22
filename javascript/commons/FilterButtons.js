@@ -41,15 +41,22 @@ liquipedia.filterButtons = {
 
 	init: function() {
 		this.localStorageKey = this.buildLocalStorageKey();
+		if ( !this.generateFilterGroups() ) {
+			return;
+		}
+		this.generateFilterableItems();
+		this.initalizeButtons();
+		this.performUpdate();
+	},
 
+	generateFilterGroups: function() {
 		const localStorage = this.getLocalStorage();
-
-		const filterGroups = {};
 
 		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
 		if ( filterButtonGroups.length === 0 ) {
-			return;
+			return false;
 		}
+
 		filterButtonGroups.forEach( ( /** @type HTMLElement */ buttonsDiv ) => {
 			const filterGroup = buttonsDiv.dataset.filterGroup || this.fallbackFilterGroup;
 			const filterStates = ( localStorage[ filterGroup ] || {} ).filterStates || {};
@@ -72,7 +79,7 @@ liquipedia.filterButtons = {
 				buttonElement.setAttribute( 'tabindex', '0' );
 			} );
 
-			filterGroups[ filterGroup ] = {
+			this.filterGroups[ filterGroup ] = {
 				name: filterGroup,
 				buttons: buttons,
 				allButton: allButton,
@@ -83,18 +90,18 @@ liquipedia.filterButtons = {
 			};
 		}, this );
 
+		return true;
+	},
+
+	generateFilterableItems: function() {
 		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
-			const filterGroup = filterGroups[ filterableItem.dataset.filterGroup || this.fallbackFilterGroup ];
+			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup || this.fallbackFilterGroup ];
 			filterGroup.filterableItems.push( {
 				element: filterableItem,
 				value: filterableItem.dataset.filterCategory,
 				hidden: false
 			} );
 		}, this );
-
-		this.filterGroups = filterGroups;
-		this.initalizeButtons();
-		this.performUpdate();
 	},
 
 	initalizeButtons: function() {
