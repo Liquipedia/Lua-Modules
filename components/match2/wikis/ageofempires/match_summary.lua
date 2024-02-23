@@ -79,9 +79,7 @@ function CustomMatchSummary.createBody(match)
 	return body
 end
 
-function CustomMatchSummary.createFooter(match)
-	local footer = MatchSummary.Footer()
-
+function CustomMatchSummary.addToFooter(match, footer)
 	if match.vod then
 		footer:addElement(VodLink.display{
 			vod = match.vod,
