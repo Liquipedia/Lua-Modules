@@ -452,13 +452,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- handle subgroup stuff if team match
 	if match.isTeamMatch then
-		map.subgroup = tonumber(map.subgroup)
-		if map.subgroup then
-			subGroupIndex = map.subgroup --[[@as integer]]
-		else
-			subGroupIndex = subGroupIndex + 1
-			map.subgroup = subGroupIndex
-		end
+		map.subgroup = tonumber(map.subgroup) or (subGroupIndex + 1)
+		subGroupIndex = map.subgroup
 	end
 
 	match['map' .. mapIndex] = map
@@ -493,22 +488,22 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		end
 	end
 
-	local winnerInput = tonumber(map.winner)
-	map.winner = winnerInput
+	local winner = tonumber(map.winner)
 	if Logic.isNotEmpty(map.walkover) then
 		local walkoverInput = tonumber(map.walkover)
 		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
-			map.winner = walkoverInput
+			winner = walkoverInput
 		end
 		map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
 		map.scores = {-1, -1}
 		map.resulttype = 'default'
+		map.winner = winner
 
 		return map
 	end
 
 	if hasManualScores then
-		map.winner = tonumber(map.winner) or CustomMatchGroupInput._getWinner(indexedScores)
+		map.winner = winner or CustomMatchGroupInput._getWinner(indexedScores)
 
 		return map
 	end
@@ -516,14 +511,16 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {-1, -1}
 		map.resulttype = RESULT_TYPE_NOT_PLAYED
-	elseif winnerInput == 1 then
+	elseif winner == 1 then
 		map.scores = {1, 0}
-	elseif winnerInput == 2 then
+	elseif winner == 2 then
 		map.scores = {0, 1}
-	elseif winnerInput == 0 or map.winner == 'draw' then
+	elseif winner == 0 or map.winner == 'draw' then
 		map.scores = {0.5, 0.5}
 		map.resulttype = 'draw'
 	end
+
+	map.winner = winner
 
 	return map
 end
