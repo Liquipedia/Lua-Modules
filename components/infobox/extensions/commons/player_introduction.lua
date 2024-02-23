@@ -402,11 +402,11 @@ function PlayerIntroduction:create()
 	local nationalityDisplay = self:_nationalityDisplay()
 	local gameDisplay = self:_gameDisplay()
 	local factionDisplay = self:_factionDisplay()
-	local typeDisplay = self:_typeDisplay()
+	local typeDisplay = self:typeDisplay()
 
 	return String.interpolate('${name}${born} ${tense} ${a}${status}${nationality}${game}'
 		.. '${faction}${type}${team}${subText}.${freeText}', {
-			name = self:_nameDisplay(),
+			name = self:nameDisplay(),
 			born = self:_bornDisplay(isDeceased),
 			tense = isDeceased and 'was' or 'is',
 			a = AnOrA._main{
@@ -427,7 +427,7 @@ end
 
 --- builds the name display
 ---@return string
-function PlayerIntroduction:_nameDisplay()
+function PlayerIntroduction:nameDisplay()
 	local nameQuotes = String.isNotEmpty(self.playerInfo.name) and '"' or ''
 
 	local nameDisplay = self._addConcatText(self.playerInfo.firstName, nil, true)
@@ -528,7 +528,7 @@ end
 
 --- builds the type display
 ---@return string?
-function PlayerIntroduction:_typeDisplay()
+function PlayerIntroduction:typeDisplay()
 	return self._addConcatText(self.playerInfo.type)
 		.. self._addConcatText(
 			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2 or nil,
@@ -556,7 +556,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
-		playedOrWorked = self:_playedOrWorked(isCurrentTense),
+		playedOrWorked = self:playedOrWorked(isCurrentTense),
 		team = PlayerIntroduction._displayTeam(isCurrentTense and playerInfo.team or transferInfo.team, transferInfo.date),
 		team2 = shouldDisplayTeam2
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
@@ -568,7 +568,7 @@ end
 
 ---@param isCurrentTense boolean
 ---@return string
-function PlayerIntroduction:_playedOrWorked(isCurrentTense)
+function PlayerIntroduction:playedOrWorked(isCurrentTense)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
 	local role = self.transferInfo.standardizedRole
