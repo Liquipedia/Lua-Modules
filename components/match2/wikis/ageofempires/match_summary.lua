@@ -120,7 +120,7 @@ function CustomMatchSummary._isSolo(match)
 	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
 		return false
 	end
- 	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
+	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
 end
 
 function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)

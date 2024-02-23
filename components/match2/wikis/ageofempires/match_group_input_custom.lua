@@ -11,7 +11,6 @@ local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -32,7 +31,6 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	mw.logObject(match, 'Match')
 	Table.mergeInto(match, CustomMatchGroupInput._readDate(match))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
@@ -43,7 +41,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	CustomMatchGroupInput._getLinks(match)
 	CustomMatchGroupInput._getVod(match)
 	CustomMatchGroupInput._getExtraData(match)
-	mw.logObject(match, 'ProcessedMatch')
 	return match
 end
 
