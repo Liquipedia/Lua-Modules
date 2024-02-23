@@ -31,7 +31,7 @@ local INDENT = WikiCopyPaste.Indent
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
-		INDENT .. '|date= |finished=',
+		INDENT .. '|date=',
 		INDENT .. '|bestof=' .. bestof,
 		INDENT .. '|twitch=|vod=',
 		INDENT .. '|civdraft=|mapdraft=',
@@ -52,7 +52,7 @@ end
 ---@return string
 function WikiCopyPaste._getOpponent(mode)
 	if mode == Opponent.solo then
-		return '{{SoloOpponent||flag=}}'
+		return '{{SoloOpponent|}}'
 	elseif mode == Opponent.team then
 		return '{{TeamOpponent|}}'
 	elseif mode == Opponent.literal then
