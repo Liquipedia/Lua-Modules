@@ -320,8 +320,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
-
-	if map.scores[1] and map.scores[2] then
+	if Logic.isEmpty(map.resulttype) and map.scores[1] and map.scores[2] then
 		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
 		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]
 	end
@@ -361,7 +360,6 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	end
 
 	local winnerInput = tonumber(map.winner)
-	map.winner = winnerInput
 	if Logic.isNotEmpty(map.walkover) then
 		local walkoverInput = tonumber(map.walkover)
 		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
