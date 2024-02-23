@@ -21,6 +21,9 @@ local Opponent = OpponentLibraries.Opponent
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
 
+	match.opponent1 = match.opponent1:gsub(' ', '_')
+	match.opponent2 = match.opponent2:gsub(' ', '_')
+
 	if options.storeMatch1 then
 		match.games = MatchLegacy.storeGames(match, match2)
 		return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
