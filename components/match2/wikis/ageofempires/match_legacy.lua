@@ -19,13 +19,12 @@ local Opponent = OpponentLibraries.Opponent
 
 
 function MatchLegacy.storeMatch(match2, options)
-	local match = MatchLegacy._convertParameters(match2)
-
-	match.opponent1 = match.opponent1:gsub(' ', '_')
-	match.opponent2 = match.opponent2:gsub(' ', '_')
 
 	if options.storeMatch1 then
+		local match = MatchLegacy._convertParameters(match2)
+
 		match.games = MatchLegacy.storeGames(match, match2)
+
 		return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
 	end
 end
@@ -106,7 +105,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
+			match[prefix] = player.name:gsub(' ', '_')
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'name'] = player.displayname
