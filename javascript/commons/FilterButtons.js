@@ -40,24 +40,25 @@ liquipedia.filterButtons = {
 	filterGroups: {},
 
 	init: function() {
-		this.localStorageKey = this.buildLocalStorageKey();
-		if ( !this.generateFilterGroups() ) {
+		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
+		if ( filterButtonGroups.length === 0 ) {
 			return;
 		}
+
+		this.localStorageKey = this.buildLocalStorageKey();
+		this.generateFilterGroups( filterButtonGroups );
 		this.generateFilterableItems();
 		this.initalizeButtons();
 		this.performUpdate();
 	},
 
-	generateFilterGroups: function() {
+	/**
+	 * @param {NodeListOf<HTMLElement>} filterButtonGroups
+	 */
+	generateFilterGroups: function( filterButtonGroups ) {
 		const localStorage = this.getLocalStorage();
 
-		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
-		if ( filterButtonGroups.length === 0 ) {
-			return false;
-		}
-
-		filterButtonGroups.forEach( ( /** @type HTMLElement */ buttonsDiv ) => {
+		filterButtonGroups.forEach( ( buttonsDiv ) => {
 			const filterGroup = buttonsDiv.dataset.filterGroup || this.fallbackFilterGroup;
 			const filterStates = ( localStorage[ filterGroup ] || {} ).filterStates || {};
 			const alwaysActiveFilters = buttonsDiv.dataset.filterAlwaysActive;
@@ -89,8 +90,6 @@ liquipedia.filterButtons = {
 				filterableItems: []
 			};
 		} );
-
-		return true;
 	},
 
 	generateFilterableItems: function() {
