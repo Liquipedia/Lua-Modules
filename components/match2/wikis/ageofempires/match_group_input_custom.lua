@@ -321,9 +321,9 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
 
-	local winnerIdx = tonumber(map.winner)
-	if winnerIdx and winnerIdx > 0 then
-		match['opponent' .. winnerIdx].autoscore = (match['opponent' .. winnerIdx].autoscore or 0) + 1
+	if map.scores[1] and map.scores[2] then
+		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
+		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]
 	end
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
