@@ -31,15 +31,17 @@ function MatchLegacy.storeGames(match, match2)
 	local games = {}
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
-		local participants = Json.parseIfString(game2.participants)
+		local participants = Json.parseIfString(game2.participants) or {}
+		local player1 = participants['1_1'] or {}
+		local player2 = participants['2_1'] or {}
 		-- Extradata
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		game.extradata.mapmode = ''
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
-		game.extradata.opponent1civ = participants['1_1'].civ
-		game.extradata.opponent2civ = participants['2_1'].civ
+		game.extradata.opponent1civ = player1.civ
+		game.extradata.opponent2civ = player2.civ
 		game.extradata.winnerciv =
 				(tonumber(game.winner) == 1 and game.extradata.opponent1civ) or
 				(tonumber(game.winner) == 2 and game.extradata.opponent2civ) or
@@ -48,8 +50,8 @@ function MatchLegacy.storeGames(match, match2)
 				(tonumber(game.winner) == 2 and game.extradata.opponent1civ) or
 				(tonumber(game.winner) == 1 and game.extradata.opponent2civ) or
 				''
-		game.extradata.opponent1name = participants['1_1'].player
-		game.extradata.opponent2name = participants['2_1'].player
+		game.extradata.opponent1name = player1.player
+		game.extradata.opponent2name = player2.player
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2

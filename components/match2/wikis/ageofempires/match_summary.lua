@@ -117,7 +117,24 @@ function CustomMatchSummary.createFooter(match)
 end
 
 function CustomMatchSummary._isSolo(match)
-	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
+	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
+		return false
+	end
+ 	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
+end
+
+function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)
+	if not game then
+		return
+	end
+	if not game.participants then
+		return
+	end
+	local player = game.participants[opponentIndex .. '_' .. playerIndex]
+	if not player then
+		return
+	end
+	return player.civ
 end
 
 -- SoloOpponents only
@@ -125,14 +142,14 @@ function CustomMatchSummary._createGame(row, game, props)
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.mapDisplayName = (game.extradata or {}).displayname
 	row
-			:addElement(CustomMatchSummary._createFactionIcon(game.participants['1_1'].civ, normGame))
+			:addElement(CustomMatchSummary._createFactionIcon(CustomMatchSummary._getCivForPlayer(game, 1, 1), normGame))
 			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 			:addElement(mw.html.create('div')
 				:addClass('brkts-popup-body-element-vertical-centered')
 				:wikitext(DisplayHelper.MapAndStatus(game))
 			)
 			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-			:addElement(CustomMatchSummary._createFactionIcon(game.participants['2_1'].civ, normGame))
+			:addElement(CustomMatchSummary._createFactionIcon(CustomMatchSummary._getCivForPlayer(game, 2, 1), normGame))
 end
 
 function CustomMatchSummary._createFactionIcon(civ, game)

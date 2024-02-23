@@ -57,27 +57,43 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
-	local failure
-	match.mapsInfo, failure = Json.parse(Variables.varDefault('tournament_maps'))
+	match = MatchGroupInput.getCommonTournamentVars(match)
+
+	match.mapsInfo = CustomMatchGroupInput._retrieveMaps()
+	match.game = match.game or CustomMatchGroupInput._retrieveGame()
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
-	Variables.varDefine('bestof', match.bestof)
-
-	if failure or Logic.isEmpty(match.mapsInfo) or String.isEmpty(match.game) then
-		-- likely in preview. Fetch from LPDB
-		local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = '[[pagename::' ..
-				mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-			query = 'game, maps'
-		})
-		if type(data[1]) == 'table' then
-			match.game = data[1].game
-			match.mapsInfo = data[1].maps
-		end
-	end
-
 	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
 
-	return MatchGroupInput.getCommonTournamentVars(match)
+	Variables.varDefine('bestof', match.bestof)
+end
+
+---@return table
+function CustomMatchGroupInput._retrieveMaps()
+	local mapsInfo, parseFailure = Json.parse(Variables.varDefault('tournament_maps'))
+
+	if not parseFailure and Logic.isNotEmpty(mapsInfo) then
+		return mapsInfo
+	end
+
+	-- likely in preview. Fetch from LPDB
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' ..
+			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
+		query = 'maps'
+	})[1] or {}
+
+	return (Json.parse(data.maps))
+end
+
+---@return string
+function CustomMatchGroupInput._retrieveGame()
+	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' ..
+			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
+		query = 'game'
+	})[1] or {}
+
+	return data.game
 end
 
 ---@param match table
