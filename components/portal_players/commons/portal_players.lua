@@ -303,7 +303,7 @@ function PortalPlayers._getAge(player)
 		return age --[[@as string]]
 	end
 
-	return table.concat({age.birth, age.death}, '<br>')
+	return table.concat(Array.append({}, age.birth, age.death), '<br>')
 end
 
 ---Converts the queried data int a readable format by OpponnetDisplay
