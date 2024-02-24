@@ -644,6 +644,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'noheroescheck']),
 				playedRandom = Logic.readBool(map[prefix .. 'random']),
+				displayName = playerInput,
 			}
 		end
 	end
@@ -666,7 +667,33 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				),
 				random = currentPlayer.playedRandom,
 			}
+
+			playerData[player.name] = nil
 		end
+	end
+
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	for playerLink, player in pairs(playerData) do
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction}
+		})
+		participants[opponentIndex .. '_' .. #players] = {
+			faction = faction,
+			player = player.name,
+			position = player.position,
+			flag = Flags.CountryName(player.flag),
+			heroes = CustomMatchGroupInput._readHeroes(
+				player.heroes,
+				faction,
+				player.name,
+				player.heroesCheckDisabled
+			),
+			random = player.playedRandom,
+		}
 	end
 
 	for tbdIndex = 1, amountOfTbds do
