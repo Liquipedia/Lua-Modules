@@ -649,24 +649,28 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 		end
 	end
 
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
+			heroes = CustomMatchGroupInput._readHeroes(
+				currentPlayer.heroes,
+				faction,
+				player.name,
+				currentPlayer.heroesCheckDisabled
+			),
+			random = currentPlayer.playedRandom,
+		}
+	end
+
 	for playerIndex, player in pairs(players) do
 		local currentPlayer = playerData[player.name]
 		if currentPlayer then
-			local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
-
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = currentPlayer.position,
-				flag = Flags.CountryName(player.flag),
-				heroes = CustomMatchGroupInput._readHeroes(
-					currentPlayer.heroes,
-					faction,
-					player.name,
-					currentPlayer.heroesCheckDisabled
-				),
-				random = currentPlayer.playedRandom,
-			}
+			addToParticipants(currentPlayer, player, playerIndex)
 
 			playerData[player.name] = nil
 		end
@@ -681,19 +685,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 			displayname = player.displayName,
 			extradata = {faction = faction}
 		})
-		participants[opponentIndex .. '_' .. #players] = {
-			faction = faction,
-			player = player.name,
-			position = player.position,
-			flag = Flags.CountryName(player.flag),
-			heroes = CustomMatchGroupInput._readHeroes(
-				player.heroes,
-				faction,
-				player.name,
-				player.heroesCheckDisabled
-			),
-			random = player.playedRandom,
-		}
+		addToParticipants(player, {}, #players)
 	end
 
 	for tbdIndex = 1, amountOfTbds do
