@@ -667,33 +667,33 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 		}
 	end
 
-	for playerIndex, player in pairs(players) do
+	Array.forEach(players, function(player, playerIndex)
 		local currentPlayer = playerData[player.name]
-		if currentPlayer then
-			addToParticipants(currentPlayer, player, playerIndex)
+		if not currentPlayer then return end
 
-			playerData[player.name] = nil
-		end
-	end
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
 
 	-- if we have players not already in the match2players insert them
 	-- this is to break conditional data loops between match2 and teamCard/HDB
-	for playerLink, player in pairs(playerData) do
+	Table.iter.forEachPair(playerData, function(playerLink, player)
 		local faction = player.faction or Faction.defaultFaction
 		table.insert(players, {
 			name = playerLink,
 			displayname = player.displayName,
-			extradata = {faction = faction}
+			extradata = {faction = faction},
 		})
-		addToParticipants(player, {}, #players)
-	end
+		addToParticipants(player, players[#players], #players)
+		numberOfPlayers = numberOfPlayers + 1
+	end)
 
-	for tbdIndex = 1, amountOfTbds do
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
 			faction = Faction.defaultFaction,
 			player = TBD:upper(),
 		}
-	end
+	end)
 
 	map.participants = participants
 
