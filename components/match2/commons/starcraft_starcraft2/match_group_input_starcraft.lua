@@ -40,6 +40,8 @@ local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
 	literal = 'literal',
 }
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+local TBD = 'tbd'
+local TBA = 'tba'
 
 local getStarcraftFfaInputModule = FnUtil.memoize(function()
 	return Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
@@ -898,74 +900,74 @@ function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, oppone
 	local amountOfTbds = 0
 	local playerData = {}
 
-	for playerIndex = 1, 4 do
-		local playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
-		if Logic.isNotEmpty(map[playerKey]) then
-			if map[playerKey] ~= 'TBD' and map[playerKey] ~= 'TBA' then
-				-- allows fetching the link of the player from preset wiki vars
-				local mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(
-					map[playerKey .. 'link'] or
-					Variables.varDefault(map[playerKey] .. '_page') or
-					map[playerKey]
-				):gsub(' ', '_')
-				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
-					playerData[mapPlayer] = {
-						faction = Faction.read(Logic.emptyOr(
-								map['t' .. opponentIndex .. 'race'],
-								map['opponent' .. opponentIndex .. 'race'],
-								map[playerKey .. 'race']
-							)) or Faction.defaultFaction,
-						position = playerIndex
-					}
-				else
-					playerData[mapPlayer] = {
-						faction = Faction.read(map[playerKey .. 'race']),
-						position = playerIndex
-					}
-				end
-			else
-				amountOfTbds = amountOfTbds + 1
-			end
+	local numberOfPlayers = 0
+	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+		numberOfPlayers = numberOfPlayers + 1
+		if playerInput:lower() == TBD or playerInput:lower() == TBA then
+			amountOfTbds = amountOfTbds + 1
 		else
-			break
+			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page')) or playerInput
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
+
+			local faction = Logic.readBool(map['opponent' .. opponentIndex .. 'archon'])
+				and Logic.emptyOr(map['t' .. opponentIndex .. 'race'], map['opponent' .. opponentIndex .. 'race'])
+				or map[prefix .. 'race']
+
+			playerData[link] = {
+				faction = Faction.read(faction),
+				position = playerIndex,
+				displayName = playerInput,
+			}
 		end
 	end
 
-	local numberOfParticipants = 0
-	for playerIndex, player in pairs(players) do
-		if player and playerData[player.name] then
-			numberOfParticipants = numberOfParticipants + 1
-			local faction = playerData[player.name].faction
-				or player.extradata.faction or Faction.defaultFaction
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = playerData[player.name].position,
-				flag = Flags.CountryName(player.flag),
-			}
-			end
-	end
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
 
-	numberOfParticipants = numberOfParticipants + amountOfTbds
-	for tbdIndex = 1, amountOfTbds do
-		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
-			faction = Faction.defaultFaction,
-			player = 'TBD'
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
 		}
 	end
 
-	local opponentMapMode
-	if numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
-		opponentMapMode = 'Archon'
-	elseif numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
-		opponentMapMode = '2S'
-	elseif numberOfParticipants == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
-		opponentMapMode = '4S'
-	else
-		opponentMapMode = numberOfParticipants
+	Array.forEach(players, function(player, playerIndex)
+		local currentPlayer = playerData[player.name]
+		if not currentPlayer then return end
+
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
+
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	Table.iter.forEachPair(playerData, function(playerLink, player)
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction},
+		})
+		addToParticipants(player, players[#players], #players)
+	end)
+
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
+		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
+			faction = Faction.defaultFaction,
+			player = TBD:upper(),
+		}
+	end)
+
+	if numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
+		return participants, 'Archon'
+	elseif numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
+		return participants, '2S'
+	elseif numberOfPlayers == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
+		return participants, '4S'
 	end
 
-	return participants, opponentMapMode
+	return participants, numberOfPlayers
 end
 
 -- function to sort out winner/placements
