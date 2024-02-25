@@ -20,17 +20,15 @@ local PlayerExt = Lua.import('Module:Player/Ext')
 
 local globalVars = PlayerExt.globalVars
 
-local StarcraftPlayerExt = {}
+---@class StarcraftPlayerExt: PlayerExt
+local StarcraftPlayerExt = Table.copy(PlayerExt)
+StarcraftPlayerExt.globalVars = globalVars
 
----@deprecated
----Use PlayerExt.extractFromLink instead
-StarcraftPlayerExt.extractFromLink = PlayerExt.extractFromLink
-
---[[
-Asks LPDB for the race and flag of a player using the player record.
-
-For specific uses only.
-]]
+---Asks LPDB for the race and flag of a player using the player record.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return {flag: string?, race: string?, raceHistory: table[]?}?
 StarcraftPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -51,9 +49,10 @@ StarcraftPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	end
 end)
 
---[[
-For specific uses only.
-]]
+---For specific uses only.
+---@param resolvedPageName string
+---@param date string?
+---@return string?
 function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
@@ -65,19 +64,19 @@ function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	end
 end
 
---[[
-For specific uses only.
-]]
+---For specific uses only.
+---@param resolvedPageName string
+---@return string?
 function StarcraftPlayerExt.fetchPlayerFlag(resolvedPageName)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName(lpdbPlayer.flag))
 end
 
---[[
-Asks LPDB for the historical races of a player using the playerrace data point.
-
-For specific uses only.
-]]
+---Asks LPDB for the historical races of a player using the playerrace data point.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return table[]
 function StarcraftPlayerExt.fetchRaceHistory(resolvedPageName)
 	local conditions = {
 		'[[type::playerrace]]',
@@ -99,37 +98,11 @@ function StarcraftPlayerExt.fetchRaceHistory(resolvedPageName)
 	return raceHistory
 end
 
---[[
-Asks LPDB for the flag and race of a non-notable player using the
-LowTierPlayerInfo data point.
-
-For specific uses only.
-]]
-StarcraftPlayerExt.fetchNonNotable = FnUtil.memoize(function(resolvedPageName)
-	local conditions = {
-		'[[type::LowTierPlayerInfo]]',
-		'[[namespace::136]]', -- Data: namespace
-		'[[name::' .. resolvedPageName .. ']]',
-	}
-	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = table.concat(conditions, ' and '),
-		query = 'extradata',
-	})
-	local record = records[1]
-	return record
-		and {
-			flag = String.nilIfEmpty(Flags.CountryName(record.extradata.flag)),
-			race = record.extradata.race,
-		}
-		or nil
-end)
-
---[[
-Asks LPDB for the flag and race of a player using an arbitary sample of
-match2player records.
-
-For specific uses only.
-]]
+---Asks LPDB for the flag and race of a player using an arbitary sample of match2player records.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return {flag: string?, race: string}
 StarcraftPlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 	local conditions = {
 		'[[name::' .. resolvedPageName .. ']]',
@@ -178,18 +151,14 @@ so it does not need to be resolved again.
 options.date: Needed if the player used a different race in the past. Defaults
 to the tournament end date or now.
 options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
-options.fetchNonNotable: Whether to use LPDB records from Data:LowTierPlayerInfo. Disabled by default.
 options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
+---@param player StarcraftStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.syncPlayer(player, options)
 	options = options or {}
-
-	local function nonNotable()
-		return options.fetchNonNotable
-			and StarcraftPlayerExt.fetchNonNotable(player.pageName)
-			or nil
-	end
 
 	local function match2Player()
 		return options.fetchMatch2Player
@@ -202,13 +171,11 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 	player.flag = player.flag
 		or String.nilIfEmpty(Flags.CountryName(globalVars:get(player.displayName .. '_flag')))
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerFlag(player.pageName)
-		or nonNotable() and nonNotable().flag
 		or match2Player() and match2Player().flag
 
 	player.race = player.race
 		or globalVars:get(player.displayName .. '_race')
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerRace(player.pageName, options.date)
-		or nonNotable() and nonNotable().race
 		or match2Player() and match2Player().race
 		or Faction.defaultFaction
 
@@ -219,18 +186,17 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 	return player
 end
 
---[[
-Same as StarcraftPlayerExt.syncPlayer, except it does not save the player's
-flag and race to page variables.
-]]
+---Same as StarcraftPlayerExt.syncPlayer, except it does not save the player's flag and race to page variables.
+---@param player StarcraftStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.populatePlayer(player, options)
 	return StarcraftPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
---[[
-Saves the pageName, flag, and race of a player to page variables, so that
-editors do not have to duplicate the same info later on.
-]]
+---Saves the pageName, flag, and race of a player to page variables,
+---so that editors do not have to duplicate the same info later on.
+---@param player StarcraftStandardPlayer
 function StarcraftPlayerExt.saveToPageVars(player)
 	if player.pageName then
 		globalVars:set(player.displayName .. '_page', player.pageName)

@@ -20,6 +20,7 @@ local TeamTemplate = require('Module:TeamTemplate')
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 
+---@class PlayerExt
 local PlayerExt = {globalVars = globalVars}
 
 --[===[
@@ -156,7 +157,7 @@ options.fetchMatch2Player: Whether to use the player's recent matches. Disabled 
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
 ---@param player standardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean}?
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
 ---@return standardPlayer
 function PlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -183,7 +184,7 @@ end
 
 ---Same as PlayerExt.syncPlayer, except it does not save the player's flag to page variables.
 ---@param player standardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean}?
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
 ---@return standardPlayer
 function PlayerExt.populatePlayer(player, options)
 	return PlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
