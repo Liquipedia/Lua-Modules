@@ -13,11 +13,9 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
