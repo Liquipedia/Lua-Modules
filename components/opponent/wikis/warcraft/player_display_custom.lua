@@ -84,27 +84,6 @@ function CustomPlayerDisplay.BlockPlayer(props)
 		:node(teamNode)
 end
 
-CustomPlayerDisplay.propTypes.InlinePlayerContainer = {
-	date = 'string?',
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = 'table',
-	savePageVar = 'boolean?',
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showRace = 'boolean?',
-}
-
-function CustomPlayerDisplay.InlinePlayerContainer(props)
-	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.InlinePlayerContainer)
-	PlayerExt.syncPlayer(props.player, {
-		date = props.date,
-		savePageVar = props.savePageVar,
-	})
-
-	return CustomPlayerDisplay.InlinePlayer(props)
-end
-
 CustomPlayerDisplay.propTypes.InlinePlayer = {
 	dq = 'boolean?',
 	flip = 'boolean?',
