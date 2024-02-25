@@ -26,17 +26,23 @@ local SUB_SECTIONS = {'high', 'mid', 'low'}
 
 local globalVars = PageVariableNamespace()
 
+---@class MatchStorage
 local MatchStorage = {}
 
+---@param frame Frame
 function MatchStorage.storeFromArgs(frame)
 	MatchStorage.store(Arguments.getArgs(frame))
 end
 
+---@param frame Frame
+---@return string
 function MatchStorage.toEncodedJson(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchStorage.makeEncodedJson(args)
 end
 
+---@param matchArgs table
+---@return string
 function MatchStorage.makeEncodedJson(matchArgs)
 	-- handle tbd and literals for opponents
 	for opponentIndex = 1, matchArgs[1] or 2 do
@@ -64,6 +70,8 @@ function MatchStorage.makeEncodedJson(matchArgs)
 	return Json.stringify(matchArgs)
 end
 
+---@param matchRecords table[]
+---@param options {bracketId: string?, storeMatch1: string?, storeMatch2: string?, storePageVar: string?}?
 function MatchStorage.storeMatchGroup(matchRecords, options)
 	options = options or {}
 	options = {
@@ -114,9 +122,9 @@ function MatchStorage.storeMatchGroup(matchRecords, options)
 	end
 end
 
---[[
-Stores a single match from a match group. Used by standalone match pages.
-]]
+---Stores a single match from a match group. Used by standalone match pages.
+---@param match table[]
+---@param options {bracketId: string?, storeMatch1: string?, storeMatch2: string?, storePageVar: string?}?
 function MatchStorage.store(match, options)
 	MatchStorage.storeMatchGroup({match}, type(options) == 'table' and options or nil)
 end
@@ -138,16 +146,18 @@ opponent.playerX
 
 After Match.normalizeSubobjectReferences only the starred fields (*) will be present.
 ]]
+---@param match table
+---@return table
 function MatchStorage.normalizeSubobjectReferences(match)
 	local records = MatchStorage.splitRecordsByType(match)
 	MatchStorage.populateSubobjectReferences(records)
 	return records.matchRecord
 end
 
---[[
-Groups subobjects by type (game, opponent, player), and removes direct
-references between a match record and its subobject records.
-]]
+---Groups subobjects by type (game, opponent, player),
+---and removes direct references between a match record and its subobject records.
+---@param match table
+---@return {matchRecord: table, gameRecords: table[], opponentRecords: table[], playerRecords: table[]}
 function MatchStorage.splitRecordsByType(match)
 	if match == nil or type(match) ~= 'table' then
 		return {}
@@ -196,10 +206,12 @@ function MatchStorage.splitRecordsByType(match)
 	}
 end
 
---[[
-	Moves the records found by iterating through `match` by `typePrefix`
-	to `list`. Sets the original location (so in `match`) to `nil`.
-]]
+---Moves the records found by iterating through `match` by `typePrefix`
+---to `list`. Sets the original location (so in `match`) to `nil`.
+---@param match table
+---@param list table[]
+---@param typePrefix any
+---@return table[]
 function MatchStorage._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
@@ -217,6 +229,7 @@ matchRecord.match2opponents
 matchRecord.match2games
 opponentRecord.match2players
 ]]
+---@param records table
 function MatchStorage.populateSubobjectReferences(records)
 	local matchRecord = records.matchRecord
 	matchRecord.match2opponents = records.opponentRecords
@@ -233,6 +246,8 @@ subobject records, while copying the other objects like match.match2bracketdata
 and opponent.extradata by reference. Assumes that subobject references have
 been normalized (in Match.normalizeSubobjectReferences).
 ]]
+---@param matchRecord any
+---@return table
 function MatchStorage.copyRecords(matchRecord)
 	return Table.merge(matchRecord, {
 		match2opponents = Array.map(matchRecord.match2opponents, function(opponentRecord)
@@ -244,6 +259,7 @@ function MatchStorage.copyRecords(matchRecord)
 	})
 end
 
+---@param matchRecord table
 function MatchStorage.encodeJson(matchRecord)
 	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata, {asArray = true})
 	matchRecord.stream = Json.stringify(matchRecord.stream)
@@ -263,6 +279,7 @@ function MatchStorage.encodeJson(matchRecord)
 	end
 end
 
+---@param unsplitMatchRecord table
 function MatchStorage._storeMatch2InLpdb(unsplitMatchRecord)
 	local records = MatchStorage.splitRecordsByType(unsplitMatchRecord)
 	local matchRecord = records.matchRecord
@@ -295,9 +312,8 @@ function MatchStorage._storeMatch2InLpdb(unsplitMatchRecord)
 	Lpdb.Match2:new(matchRecord):save()
 end
 
---[[
-Final processing of records before being stored to LPDB.
-]]
+---Final processing of records before being stored to LPDB.
+---@param records table
 function MatchStorage._prepareRecordsForStore(records)
 	MatchStorage._prepareMatchRecordForStore(records.matchRecord)
 	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
@@ -311,6 +327,7 @@ function MatchStorage._prepareRecordsForStore(records)
 	end
 end
 
+---@param match table
 function MatchStorage._prepareMatchRecordForStore(match)
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
@@ -322,6 +339,8 @@ function MatchStorage._prepareMatchRecordForStore(match)
 	MatchStorage.clampFields(match, MatchStorage.matchFields)
 end
 
+---@param match table
+---@return table
 function MatchStorage._addCommonMatchExtradata(match)
 	local commonExtradata = {
 		comment = match.comment,
@@ -334,11 +353,12 @@ function MatchStorage._addCommonMatchExtradata(match)
 	return Table.merge(commonExtradata, match.extradata or {})
 end
 
-
-
+---@return string
 function MatchStorage._getSection()
+	---@param rawString string
+	---@return string
 	local cleanHtml = function(rawString)
-		return rawString:gsub('<.->', '')
+		return (rawString:gsub('<.->', ''))
 	end
 	local lastHeading = cleanHtml(Variables.varDefault('last_heading', ''))
 	local matchSection = cleanHtml(Variables.varDefault('matchsection', ''))
@@ -348,6 +368,8 @@ function MatchStorage._getSection()
 	return lastHeading
 end
 
+---@param matchRecord any
+---@param gameRecord any
 function MatchStorage._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
@@ -429,6 +451,8 @@ MatchStorage.gameFields = Table.map({
 	'winner',
 }, function(_, field) return field, true end)
 
+---@param record table
+---@param allowedKeys table<string, boolean>
 function MatchStorage.clampFields(record, allowedKeys)
 	for key, _ in pairs(record) do
 		if not allowedKeys[key] then
@@ -437,7 +461,9 @@ function MatchStorage.clampFields(record, allowedKeys)
 	end
 end
 
--- Entry point from Template:TemplateMatch
+---Entry point from Template:TemplateMatch
+---@param frame Frame
+---@return string
 function MatchStorage.templateFromMatchID(frame)
 	local args = Arguments.getArgs(frame)
 	local matchId = args[1] or 'match id is empty'
