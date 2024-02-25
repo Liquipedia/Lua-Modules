@@ -62,8 +62,8 @@ end
 local _ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
 
 if FeatureFlag.get('perf') then
-	local Match = Lua.import('Module:Match')
-	MatchSubobjects.perfConfig = Match.perfConfig
+	local MatchStorage = Lua.import('Module:MatchStorage')
+	MatchSubobjects.perfConfig = MatchStorage.perfConfig
 	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, _ENTRY_POINT_NAMES)
 end
 

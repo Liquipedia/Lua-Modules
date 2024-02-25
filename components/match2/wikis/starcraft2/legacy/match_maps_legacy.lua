@@ -11,8 +11,8 @@ local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Template = require('Module:Template')
-local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
+local MatchStorage = require('Module:MatchStorage')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -134,7 +134,7 @@ function MatchMapsLegacy.close()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist') --[[@as table]]
 
 	for matchIndex, match in ipairs(matches) do
-		matches['M' .. matchIndex] = Match.makeEncodedJson(match)
+		matches['M' .. matchIndex] = MatchStorage.makeEncodedJson(match)
 		matches[matchIndex] = nil
 	end
 

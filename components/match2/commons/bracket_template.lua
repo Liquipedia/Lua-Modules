@@ -13,9 +13,9 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-local Match = Lua.import('Module:Match')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchStorage = Lua.import('Module:MatchStorage')
 
 local BracketTemplate = {}
 
@@ -125,7 +125,7 @@ function BracketTemplate.storeBracket(bracket)
 			matchid = baseMatchId,
 			opponent1 = opponent,
 		}
-		Match.store(match)
+		MatchStorage.store(match)
 	end
 end
 

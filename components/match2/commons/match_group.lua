@@ -15,11 +15,11 @@ local Table = require('Module:Table')
 local WarningBox = require('Module:WarningBox')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local Match = Lua.import('Module:Match')
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchStorage = Lua.import('Module:MatchStorage')
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
@@ -32,7 +32,7 @@ local MatchGroup = {}
 function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
-	Match.storeMatchGroup(matches, options)
+	MatchStorage.storeMatchGroup(matches, options)
 
 	local matchlistNode
 	if options.show then
@@ -55,7 +55,7 @@ end
 function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
-	Match.storeMatchGroup(matches, options)
+	MatchStorage.storeMatchGroup(matches, options)
 
 	local bracketNode
 	if options.show then

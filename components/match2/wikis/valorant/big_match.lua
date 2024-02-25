@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Logic = require('Module:Logic')
-local Match = require('Module:Match')
+local MatchStorage = require('Module:MatchStorage')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
@@ -41,7 +41,7 @@ function BigMatch.run(frame)
 	match['bracketid'] = 'MATCH_' .. identifiers[1]
 	match['matchid'] = identifiers[2]
 	-- Don't store match1 as BigMatch records are not complete
-	Match.store(match, {storeMatch1 = false})
+	MatchStorage.store(match, {storeMatch1 = false})
 
 	-- Attempty to automatically retrieve tournament link from the bracket
 	if String.isEmpty(args.tournamentlink) then
