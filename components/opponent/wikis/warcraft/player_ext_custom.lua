@@ -18,10 +18,14 @@ local Table = require('Module:Table')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
 
-local CustomPlayerExt = Table.deepCopy(PlayerExt)
-
 local globalVars = PlayerExt.globalVars
 
+---@class WarcraftPlayerExt: PlayerExt
+local CustomPlayerExt = Table.deepCopy(PlayerExt)
+CustomPlayerExt.globalVars = globalVars
+
+---@param resolvedPageName string
+---@return {flag: string?, race: string?, raceHistory: table[]?}?
 CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -42,6 +46,9 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	end
 end)
 
+---@param resolvedPageName string
+---@param date string?
+---@return string?
 function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.raceHistory then
@@ -53,11 +60,15 @@ function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	end
 end
 
+---@param resolvedPageName string
+---@return string?
 function CustomPlayerExt.fetchPlayerFlag(resolvedPageName)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName(lpdbPlayer.flag))
 end
 
+---@param resolvedPageName string
+---@return table[]
 function CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 	local conditions = {
 		'[[type::playerrace]]',
@@ -79,11 +90,13 @@ function CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 	return raceHistory
 end
 
-
+---@param player WarcraftStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@return WarcraftStandardPlayer
 function CustomPlayerExt.syncPlayer(player, options)
 	options = options or {}
 
-	player = PlayerExt.syncPlayer(player, options)
+	player = PlayerExt.syncPlayer(player, options) --[[@as WarcraftStandardPlayer]]
 
 	player.race = player.race
 		or globalVars:get(player.displayName .. '_race')
@@ -97,6 +110,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 	return player
 end
 
+---@param player WarcraftStandardPlayer
 function CustomPlayerExt.saveToPageVars(player)
 	if player.race and player.race ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_race', player.race)
