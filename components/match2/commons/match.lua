@@ -34,10 +34,10 @@ end
 
 function Match.toEncodedJson(frame)
 	local args = Arguments.getArgs(frame)
-	return Match._toEncodedJson(args)
+	return Match.makeEncodedJson(args)
 end
 
-function Match._toEncodedJson(matchArgs)
+function Match.makeEncodedJson(matchArgs)
 	-- handle tbd and literals for opponents
 	for opponentIndex = 1, matchArgs[1] or 2 do
 		local opponent = matchArgs['opponent' .. opponentIndex]
