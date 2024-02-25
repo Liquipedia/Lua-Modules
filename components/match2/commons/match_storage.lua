@@ -158,6 +158,7 @@ end
 ---and removes direct references between a match record and its subobject records.
 ---@param match table
 ---@return {matchRecord: table, gameRecords: table[], opponentRecords: table[], playerRecords: table[]}
+---@overload fun(match: any): {}
 function MatchStorage.splitRecordsByType(match)
 	if match == nil or type(match) ~= 'table' then
 		return {}
