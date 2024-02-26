@@ -8,8 +8,8 @@ liquipedia.crosstable = {
 			crosstable.querySelectorAll( 'td, th' ).forEach( function( cell ) {
 				cell.onmouseover = function() {
 					const row = this.closest( 'tr' );
-					crosstable.classList.add( 'row-' + ( row.rowIndex + 1 ) );
-					crosstable.classList.add( 'col-' + ( this.cellIndex + 1 ) );
+					crosstable.classList.add( 'crosstable-row-' + ( row.rowIndex + 1 ) );
+					crosstable.classList.add( 'crosstable-col-' + ( this.cellIndex + 1 ) );
 					let element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {
@@ -31,8 +31,8 @@ liquipedia.crosstable = {
 				};
 				cell.onmouseleave = function() {
 					const row = this.closest( 'tr' );
-					crosstable.classList.remove( 'row-' + ( row.rowIndex + 1 ) );
-					crosstable.classList.remove( 'col-' + ( this.cellIndex + 1 ) );
+					crosstable.classList.remove( 'crosstable-row-' + ( row.rowIndex + 1 ) );
+					crosstable.classList.remove( 'crosstable-col-' + ( this.cellIndex + 1 ) );
 					let element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {

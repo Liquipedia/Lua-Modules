@@ -161,6 +161,7 @@ local PREFIXES = {
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
+	sgworld = {'https://stormgateworld.com/players/'},
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
