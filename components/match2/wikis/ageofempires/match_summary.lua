@@ -43,7 +43,7 @@ end
 
 function CustomMatchSummary.createHeader(match)
 	local header = MatchSummary.Header()
-	
+
 	return header
 			:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 			:leftScore(header:createScore(match.opponents[1]))
