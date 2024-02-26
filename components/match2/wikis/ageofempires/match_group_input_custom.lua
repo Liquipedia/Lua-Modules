@@ -22,6 +22,7 @@ local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
+local DEFAULT_BESTOF = 99
 
 local CustomMatchGroupInput = {}
 
@@ -31,7 +32,7 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	Table.mergeInto(match, CustomMatchGroupInput._readDate(match))
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._processMaps(match)
@@ -42,14 +43,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	CustomMatchGroupInput._getVod(match)
 	CustomMatchGroupInput._getExtraData(match)
 	return match
-end
-
----@param matchArgs table
-function CustomMatchGroupInput._readDate(matchArgs)
-	return MatchGroupInput.readDate(matchArgs.date, {
-		'tournament_startdate',
-		'tournament_enddate',
-	})
 end
 
 ---@param match table
@@ -74,10 +67,13 @@ function CustomMatchGroupInput._retrieveMaps()
 
 	-- likely in preview. Fetch from LPDB
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' ..
+		conditions = '[[parent::' ..
 			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 		query = 'maps'
 	})[1] or {}
+
+	-- Store fetched data for following matches
+	Variables.varDefine('tournament_maps', data.maps)
 
 	return (Json.parse(data.maps))
 end
@@ -85,10 +81,13 @@ end
 ---@return string
 function CustomMatchGroupInput._retrieveGame()
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' ..
+		conditions = '[[parent::' ..
 			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
 		query = 'game'
 	})[1] or {}
+
+	-- Store fetched data for following matches
+	Variables.varDefine('tournament_game', data.game)
 
 	return data.game
 end
@@ -139,67 +138,67 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._calculateWinner(match)
-	local bestof = match.bestof or 99
+	local bestof = match.bestof or DEFAULT_BESTOF
 	local numberOfOpponents = 0
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
-		if Logic.isNotEmpty(opponent) then
-			numberOfOpponents = numberOfOpponents + 1
+		if Logic.isEmpty(opponent) then
+			break
+		end
 
-			if Logic.isNotEmpty(match.walkover) then
-				if Logic.isNumeric(match.walkover) then
-					local walkover = tonumber(match.walkover)
-					if walkover == opponentIndex then
-						match.winner = opponentIndex
-						match.walkover = 'L'
-						opponent.status = 'W'
-					elseif walkover == 0 then
-						match.winner = 0
-						match.walkover = 'L'
-						opponent.status = 'L'
-					else
-						local score = string.upper(opponent.score or '')
-						opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
-					end
-				elseif Table.includes(ALLOWED_STATUSES, string.upper(match.walkover)) then
-					if tonumber(match.winner or 0) == opponentIndex then
-						opponent.status = 'W'
-					else
-						opponent.status = CONVERT_STATUS_INPUT[string.upper(match.walkover)] or 'L'
-					end
+		numberOfOpponents = numberOfOpponents + 1
+
+		if Logic.isNotEmpty(match.walkover) then
+			if Logic.isNumeric(match.walkover) then
+				local walkover = tonumber(match.walkover)
+				if walkover == opponentIndex then
+					match.winner = opponentIndex
+					match.walkover = 'L'
+					opponent.status = 'W'
+				elseif walkover == 0 then
+					match.winner = 0
+					match.walkover = 'L'
+					opponent.status = 'L'
 				else
 					local score = string.upper(opponent.score or '')
 					opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
-					match.walkover = 'L'
 				end
-				opponent.score = -1
-				match.finished = true
-				match.resulttype = 'default'
-			elseif CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
-				if string.upper(opponent.score) == 'W' then
-					match.winner = opponentIndex
-					match.finished = true
-					opponent.score = -1
+			elseif Table.includes(ALLOWED_STATUSES, string.upper(match.walkover)) then
+				if tonumber(match.winner or 0) == opponentIndex then
 					opponent.status = 'W'
 				else
-					local score = string.upper(opponent.score)
-					match.finished = true
-					match.walkover = CONVERT_STATUS_INPUT[score]
-					opponent.status = CONVERT_STATUS_INPUT[score]
-					opponent.score = -1
+					opponent.status = CONVERT_STATUS_INPUT[string.upper(match.walkover)] or 'L'
 				end
-				match.resulttype = 'default'
 			else
-				opponent.status = 'S'
-				opponent.score = tonumber(opponent.score) or tonumber(opponent.autoscore) or -1
-				if opponent.score > bestof / 2 then
-					match.finished = Logic.emptyOr(match.finished, true)
-					match.winner = tonumber(match.winner) or opponentIndex
-				end
+				local score = string.upper(opponent.score or '')
+				opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
+				match.walkover = 'L'
 			end
+			opponent.score = -1
+			match.finished = true
+			match.resulttype = 'default'
+		elseif CONVERT_STATUS_INPUT[string.upper(opponent.score or '')] then
+			if string.upper(opponent.score) == 'W' then
+				match.winner = opponentIndex
+				match.finished = true
+				opponent.score = -1
+				opponent.status = 'W'
+			else
+				local score = string.upper(opponent.score)
+				match.finished = true
+				match.walkover = CONVERT_STATUS_INPUT[score]
+				opponent.status = CONVERT_STATUS_INPUT[score]
+				opponent.score = -1
+			end
+			match.resulttype = 'default'
 		else
-			break
+			opponent.status = 'S'
+			opponent.score = tonumber(opponent.score) or tonumber(opponent.autoscore) or -1
+			if opponent.score > bestof / 2 then
+				match.finished = Logic.emptyOr(match.finished, true)
+				match.winner = tonumber(match.winner) or opponentIndex
+			end
 		end
 	end
 
@@ -294,7 +293,6 @@ end
 function CustomMatchGroupInput._mapInput(match, mapIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
 	if map.map ~= 'TBD' then
-		-- TODO: fetch map information from match.maps
 		if Logic.isNotEmpty(match.mapsInfo) then
 			local info = Array.find(match.mapsInfo, function(m)
 				return m.name == map.map or m.link == map.map
@@ -314,6 +312,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		header = map.header,
 		displayname = map.mapDisplayName,
+		gamemode = map.mode
 	}
 	map.game = match.game
 	map.mode = match.mode
