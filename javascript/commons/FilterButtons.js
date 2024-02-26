@@ -59,13 +59,13 @@ liquipedia.filterButtons = {
 		const localStorage = this.getLocalStorage();
 
 		filterButtonGroups.forEach( ( buttonsDiv ) => {
-			const filterGroup = buttonsDiv.dataset.filterGroup || this.fallbackFilterGroup;
-			const filterStates = ( localStorage[ filterGroup ] || {} ).filterStates || {};
+			const filterGroup = buttonsDiv.dataset.filterGroup ?? this.fallbackFilterGroup;
+			const filterStates = localStorage[ filterGroup ]?.filterStates ?? {};
 			const alwaysActiveFilters = buttonsDiv.dataset.filterAlwaysActive;
 			const buttons = [];
 			let allButton;
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach( ( /** @type HTMLElement */ buttonElement ) => {
-				const filterOn = buttonElement.dataset.filterOn || '';
+				const filterOn = buttonElement.dataset.filterOn ?? '';
 				const button = {
 					element: buttonElement,
 					filter: filterOn,
@@ -85,7 +85,7 @@ liquipedia.filterButtons = {
 				buttons: buttons,
 				allButton: allButton,
 				alwaysActive: ( typeof alwaysActiveFilters === 'string' ) ? alwaysActiveFilters.split( ',' ) : [],
-				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect || this.fallbackFilterEffect ),
+				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
 				filterStates: filterStates,
 				filterableItems: []
 			};
@@ -94,7 +94,7 @@ liquipedia.filterButtons = {
 
 	generateFilterableItems: function() {
 		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
-			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup || this.fallbackFilterGroup ];
+			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
 			filterGroup.filterableItems.push( {
 				element: filterableItem,
 				value: filterableItem.dataset.filterCategory,
