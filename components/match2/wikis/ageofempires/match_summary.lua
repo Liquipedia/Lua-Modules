@@ -6,14 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local MapMode = require('Module:MapMode')
 local Faction = require('Module:Faction')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -44,13 +43,12 @@ end
 
 function CustomMatchSummary.createHeader(match)
 	local header = MatchSummary.Header()
-
-	header:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
+	
+	return header
+			:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 			:leftScore(header:createScore(match.opponents[1]))
 			:rightScore(header:createScore(match.opponents[2]))
 			:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
-
-	return header
 end
 
 function CustomMatchSummary.createBody(match)
@@ -120,7 +118,11 @@ end
 -- SoloOpponents only
 function CustomMatchSummary._createGame(row, game, props)
 	local normGame = Game.abbreviation{game = props.game}:lower()
-	game.mapDisplayName = (game.extradata or {}).displayname
+	game.extradata = game.extradata or {}
+	game.mapDisplayName = game.extradata.displayname or game.map
+	if game.extradata.gamemode then
+		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.gamemode}
+	end
 	row
 			:addElement(CustomMatchSummary._createFactionIcon(CustomMatchSummary._getCivForPlayer(game, 1, 1), normGame))
 			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
