@@ -17,7 +17,7 @@ local Variables = require('Module:Variables')
 local json = require('Module:Json')
 local utils = require('Module:LuaUtils')--only needed for utils.log
 
-local MatchStorage = Lua.import('Module:MatchStorage')
+local Match = Lua.import('Module:Match')
 
 -- store match to a var to later store them to LPDB
 function TemplateMatch.storeVar(args)
@@ -89,7 +89,7 @@ function TemplateMatch.storeVarsToLPDB()
 
 	-- store matches
 	for _, match in pairs(matches) do
-		MatchStorage.store(match)
+		Match.store(match)
 	end
 end
 

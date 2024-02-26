@@ -9,8 +9,8 @@
 local Arguments = require('Module:Arguments')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
-local MatchStorage = require('Module:MatchStorage')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -51,7 +51,7 @@ function MatchMapsLegacy._matchlist(args)
 			local header = string.match(args['match' .. inputIndex], '<tr.-> ?<td.->(.-)</td')
 			matches['M' .. matchIndex .. 'header'] = header
 		else
-			matches['M' .. matchIndex] = MatchStorage.makeEncodedJson(match)
+			matches['M' .. matchIndex] = Match.makeEncodedJson(match)
 			matchIndex = matchIndex + 1
 		end
 

@@ -12,8 +12,8 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Match = require('Module:Match')
 local MatchGroup = require('Module:MatchGroup')
-local MatchStorage = require('Module:MatchStorage')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -78,7 +78,7 @@ function LegacyMatchMaps._readSoloMatch(matchInput)
 	LegacyMatchMaps._readSoloOpponents(args)
 	LegacyMatchMaps._readMaps(args)
 
-	return MatchStorage.makeEncodedJson(args)
+	return Match.makeEncodedJson(args)
 end
 
 ---@param args table
@@ -230,7 +230,7 @@ function LegacyMatchMaps.teamClose()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist')
 
 	Array.forEach(matches, function(match, matchIndex)
-		args['M' .. matchIndex] = MatchStorage.makeEncodedJson(match)
+		args['M' .. matchIndex] = Match.makeEncodedJson(match)
 	end)
 
 	-- generate Display

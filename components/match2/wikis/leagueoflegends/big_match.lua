@@ -14,7 +14,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
-local MatchStorage = require('Module:MatchStorage')
+local Match = require('Module:Match')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -290,7 +290,7 @@ function BigMatch._match2Director(args)
 	match.bracketid, match.matchid = 'MATCH_' .. bracketId, matchId
 
 	-- Don't store match1 as BigMatch records are not complete
-	MatchStorage.store(match, {storeMatch1 = false})
+	Match.store(match, {storeMatch1 = false})
 
 	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
 end
