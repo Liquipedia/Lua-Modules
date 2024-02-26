@@ -16,8 +16,8 @@ return {
 			name = 'Aim Gods',
 			link = 'Aim Gods',
 			logo = {
-				darkMode = 'Aim Gods logo.png',
-				lightMode = 'Aim Gods logo.png',
+				darkMode = 'Aim Gods default allmode.png',
+				lightMode = 'Aim Gods default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Aim Gods default allmode.png',
@@ -55,12 +55,12 @@ return {
 			name = 'Quake III Arena: CPMA',
 			link = 'Quake III Arena: CPMA',
 			logo = {
-				darkMode = 'CPMA logo.png',
-				lightMode = 'CPMA logo.png',
+				darkMode = 'CPMA default allmode.png',
+				lightMode = 'CPMA default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'CPMA logo.png',
-				lightMode = 'CPMA logo.png',
+				darkMode = 'CPMA default allmode.png',
+				lightMode = 'CPMA default allmode.png',
 			},
 		},
 		d16 = {
