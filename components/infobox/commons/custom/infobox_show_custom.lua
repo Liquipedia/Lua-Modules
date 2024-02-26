@@ -9,14 +9,15 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Show = Lua.import('Module:Infobox/Show', {requireDevIfEnabled = true})
+local Show = Lua.import('Module:Infobox/Show')
 
-local CustomShow = Class.new()
+---@class CustomShowInfobox: ShowInfobox
+local CustomShow = Class.new(Show)
 
 ---@param frame Frame
 ---@return Html
 function CustomShow.run(frame)
-	local customShow = Show(frame)
+	local customShow = CustomShow(frame)
 	return customShow:createInfobox()
 end
 

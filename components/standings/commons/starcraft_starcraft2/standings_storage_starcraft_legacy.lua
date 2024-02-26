@@ -15,8 +15,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local StandingsStorage = Lua.import('Module:Standings/Storage', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
+local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local LEAGUE_TYPE = 'league'
 local TYPE_FROM_NUMBER = Table.map(Opponent.partySizes, function(key, code) return code, key end)
@@ -33,7 +33,7 @@ function Wrapper.table(frame)
 	end
 
 	args.roundcount = 1
-	return StandingsStorage.fromTemplateHeader(args)
+	StandingsStorage.fromTemplateHeader(args)
 end
 
 ---@param frame Frame
@@ -138,6 +138,7 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
 end
 
+---@param args table
 ---@return boolean
 function Wrapper._shouldStore(args)
 	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))

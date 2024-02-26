@@ -15,16 +15,15 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
-local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local LeagueIcon = Lua.import('Module:LeagueIcon', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
-local Locale = Lua.import('Module:Locale', {requireDevIfEnabled = true})
-local ReferenceCleaner = Lua.import('Module:ReferenceCleaner', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Links = Lua.import('Module:Links')
+local Locale = Lua.import('Module:Locale')
+local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
@@ -38,8 +37,6 @@ local Builder = Widgets.Builder
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
-
-Series.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -149,7 +146,7 @@ function Series:createInfobox()
 			builder = function()
 				if self.totalSeriesPrizepool then
 					return {Cell{
-						name = 'Total prize money',
+						name = 'Cumulative Prize Pool',
 						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end
@@ -183,9 +180,7 @@ function Series:createInfobox()
 		infobox:categories(unpack(self:_getCategories(args)))
 	end
 
-	return mw.html.create()
-		:node(infobox:widgetInjector():build(widgets))
-		:node(WarningBox.displayAll(self.warnings))
+	return infobox:build(widgets)
 end
 
 ---@param args table
@@ -299,7 +294,7 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 
 	if String.isNotEmpty(trackingCategory) then
 		table.insert(
-			self.warnings,
+			self.infobox.warnings,
 			'Missing icon while icondark is set.' .. trackingCategory
 		)
 	end
@@ -401,11 +396,12 @@ function Series:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.infobox.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 

@@ -12,9 +12,9 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
@@ -42,7 +42,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.publishertier = Variables.varDefault('tournament_hcs_premier', '')
 
 	local team = lpdbData.participant or ''
-	local lpdbPrefix = Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
+	local lpdbPrefix = Variables.varDefault('lpdb_prefix') or ''
 
 	Variables.varDefine('enddate_' .. lpdbPrefix .. team, lpdbData.date)
 	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)

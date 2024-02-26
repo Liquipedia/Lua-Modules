@@ -17,13 +17,13 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _ROLES = {
+local ROLES = {
 	-- Players
 	['baron'] = {category = 'Baron Lane players', variable = 'Baron', isplayer = true},
 	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
@@ -45,141 +45,145 @@ local _ROLES = {
 	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
 	['admin'] = {category = 'Admins', variable = 'Admin', isplayer = false},
 }
-_ROLES['assistant coach'] = _ROLES.coach
-_ROLES['strategic coach'] = _ROLES.coach
-_ROLES['positional coach'] = _ROLES.coach
-_ROLES['head coach'] = _ROLES.coach
-_ROLES['jgl'] = _ROLES.jungle
-_ROLES['solomiddle'] = _ROLES.mid
-_ROLES['carry'] = _ROLES.dragon
-_ROLES['adc'] = _ROLES.dragon
-_ROLES['bot'] = _ROLES.dragon
-_ROLES['ad carry'] = _ROLES.dragon
-_ROLES['sup'] = _ROLES.support
+ROLES['assistant coach'] = ROLES.coach
+ROLES['strategic coach'] = ROLES.coach
+ROLES['positional coach'] = ROLES.coach
+ROLES['head coach'] = ROLES.coach
+ROLES['jgl'] = ROLES.jungle
+ROLES['solomiddle'] = ROLES.mid
+ROLES['carry'] = ROLES.dragon
+ROLES['adc'] = ROLES.dragon
+ROLES['bot'] = ROLES.dragon
+ROLES['ad carry'] = ROLES.dragon
+ROLES['sup'] = ROLES.support
 
-local _SIZE_CHAMPION = '25x25px'
+local SIZE_CHAMPION = '25x25px'
 
-local CustomPlayer = Class.new()
-
+---@class WildriftInfoboxPlayer: Person
+---@field role {category: string, variable: string, isplayer: boolean?}?
+---@field role2 {category: string, variable: string, isplayer: boolean?}?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	if String.isEmpty(player.args.history) then
 		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
 	end
-
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createBottomContent = CustomPlayer.createBottomContent
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-
-	_args = player.args
-	_args.autoTeam = true
+	player.args.autoTeam = true
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
-		local status = _args.status
-		if String.isNotEmpty(status) then
-			status = mw.getContentLanguage():ucfirst(status)
-		end
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
+		-- Signature Champion
+		local championIcons = Array.map(caller:getAllArgsForBase(args, 'champion'), function(champion)
+			return ChampionIcon.getImage{champion, size = SIZE_CHAMPION}
+		end)
+		return {Cell{
+			name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
+			content = {table.concat(championIcons, '&nbsp;')},
+		}}
+	elseif id == 'status' then
+		local status = args.status and mw.getContentLanguage():ucfirst(args.status) or nil
 
 		return {
-			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true},
-						status) or status}},
+			Cell{name = 'Status', content = {Page.makeInternalLink({onlyIfExists = true}, status) or status}},
 		}
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
-				CustomPlayer._createRole('role', _args.role),
-				CustomPlayer._createRole('role2', _args.role2)
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
 			}},
 		}
 	elseif id == 'history' then
-		table.insert(widgets, Cell{
-			name = 'Retired',
-			content = {_args.retired}
-		})
+		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	-- Signature Champion
-	local championIcons = Array.map(Player:getAllArgsForBase(_args, 'champion'),
-		function(champion, _)
-			return ChampionIcon.getImage{champion, size = _SIZE_CHAMPION}
-		end
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
+end
+
+---@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+end
+
+---@param args table
+function CustomPlayer:defineCustomPageVariables(args)
+	Variables.varDefine('role', (self.role or {}).variable)
+	Variables.varDefine('role2', (self.role2 or {}).variable)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
 	)
-	return {Cell{
-		name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
-		content = {
-			table.concat(championIcons, '&nbsp;')
-		}
-	}}
 end
 
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
-function CustomPlayer:adjustLPDB(lpdbData)
-	lpdbData.extradata.role = Variables.varDefault('role')
-	lpdbData.extradata.role2 = Variables.varDefault('role2')
+	lpdbData.extradata.signatureChampion1 = args.champion1 or args.champion
+	lpdbData.extradata.signatureChampion2 = args.champion2
+	lpdbData.extradata.signatureChampion3 = args.champion3
+	lpdbData.extradata.signatureChampion4 = args.champion4
+	lpdbData.extradata.signatureChampion5 = args.champion5
+	lpdbData.type = self:_isPlayerOrStaff()
 
-	lpdbData.extradata.signatureChampion1 = _args.champion1 or _args.champion
-	lpdbData.extradata.signatureChampion2 = _args.champion2
-	lpdbData.extradata.signatureChampion3 = _args.champion3
-	lpdbData.extradata.signatureChampion4 = _args.champion4
-	lpdbData.extradata.signatureChampion5 = _args.champion5
-	lpdbData.type = CustomPlayer._isPlayerOrStaff()
+	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {_args.country})
-
-	if String.isNotEmpty(_args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(_args.team2).page
+	if String.isNotEmpty(args.team2) then
+		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
 	end
 
 	return lpdbData
 end
 
-function CustomPlayer:createBottomContent(infobox)
-	if Player:shouldStoreData(_args) and String.isNotEmpty(_args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),_args.team)
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		return
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
-	end
-
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
-	end
-	if Player:shouldStoreData(_args) then
-		local categoryCoreText = 'Category:' .. roleData.category
-
-		return '[[' .. categoryCoreText .. ']]' .. '[[:' .. categoryCoreText .. '|' ..
-			Variables.varDefineEcho(key or 'role', roleData.variable) .. ']]'
-	else
-		return Variables.varDefineEcho(key or 'role', roleData.variable)
-	end
-end
-
-function CustomPlayer._isPlayerOrStaff()
+---@return string
+function CustomPlayer:_isPlayerOrStaff()
 	local roleData
-	if String.isNotEmpty(_args.role) then
-		roleData = _ROLES[_args.role:lower()]
+	if String.isNotEmpty(self.args.role) then
+		roleData = ROLES[self.args.role:lower()]
 	end
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then

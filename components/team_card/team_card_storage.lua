@@ -12,7 +12,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Custom = Lua.import('Module:TeamCard/Custom', {requireDevIfEnabled = true})
+local Custom = Lua.import('Module:TeamCard/Custom')
 -- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
 local Qualifier = require('Module:TeamCard/Qualifier')
 
@@ -37,8 +37,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		end
 	end
 
-	local lpdbPrefix = args.lpdb_prefix or args.smw_prefix
-		or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
+	local lpdbPrefix = args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or ''
 
 	-- Setup LPDB Data
 	local lpdbData = {}

@@ -16,8 +16,8 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 
@@ -144,6 +144,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field advanceBg string?
 ---@field advances boolean?
 ---@field icon string?
+---@field icondark string?
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
@@ -508,7 +509,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),

@@ -15,9 +15,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local Opponent = Lua.import('Module:Opponent')
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
@@ -25,7 +25,7 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.factions))
+CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',

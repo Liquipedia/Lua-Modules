@@ -12,9 +12,9 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
-local PrizePool = Lua.import('Module:PrizePool', {requireDevIfEnabled = true})
+local PrizePool = Lua.import('Module:PrizePool')
 
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
@@ -44,11 +44,11 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.series2 = Variables.varDefault('tournament_series2', '')
 
 	local redirectedTeam = mw.ext.TeamLiquidIntegration.resolve_redirect(lpdbData.participant)
-	local smwPrefix = Variables.varDefault('smw_prefix')
-	smwPrefix = smwPrefix and (smwPrefix .. '_') or ''
+	local lpdbPrefix = Variables.varDefault('lpdb_prefix')
+	lpdbPrefix = lpdbPrefix and (lpdbPrefix .. '_') or ''
 
-	Variables.varDefine(redirectedTeam .. '_' .. smwPrefix .. 'date', lpdbData.date)
-	Variables.varDefine(smwPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(redirectedTeam .. '_' .. lpdbPrefix .. 'date', lpdbData.date)
+	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
 
 
 	return lpdbData

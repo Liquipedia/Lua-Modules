@@ -8,8 +8,8 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:ChampionIcon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -22,11 +22,14 @@ local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
-local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom', {requireDevIfEnabled = true})
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom', {requireDevIfEnabled = true})
-local Template = Lua.import('Module:BigMatch/Template', {requireDevIfEnabled = true})
-local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific', {requireDevIfEnabled = true})
+local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Template = Lua.import('Module:BigMatch/Template')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
+
+local NO_CHARACTER = 'default'
 
 local BigMatch = {}
 
@@ -80,7 +83,7 @@ local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == 0 or match.timestamp > BIG_MATCH_START_TIME)
+			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > BIG_MATCH_START_TIME)
 end
 
 function BigMatch.run(frame)
@@ -92,7 +95,8 @@ function BigMatch.run(frame)
 	local model = BigMatch._match2Director(args)
 
 	model.isBestOfOne = #model.games == 1
-	model.dateCountdown = model.timestamp ~= DateExt.epochZero and DisplayHelper.MatchCountdownBlock(model) or nil
+	model.dateCountdown = model.timestamp ~= DateExt.defaultTimestamp and
+		DisplayHelper.MatchCountdownBlock(model) or nil
 
 	-- Create an object array for links
 	model.links = Array.extractValues(Table.map(model.links, function (site, link)
@@ -181,8 +185,12 @@ function BigMatch.run(frame)
 		local champion = self
 		if type(self) == 'table' then
 			champion = self.champion
+			---@cast champion -table
 		end
-		return HeroIcon._getImage{champion, date = model.date}
+		return CharacterIcon.Icon{
+			character = champion or NO_CHARACTER,
+			date = model.date
+		}
 	end
 
 	return BigMatch.render(model)
@@ -274,6 +282,9 @@ function BigMatch._match2Director(args)
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
 
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
 
 	local bracketId, matchId = BigMatch._getId()
 	match.bracketid, match.matchid = 'MATCH_' .. bracketId, matchId

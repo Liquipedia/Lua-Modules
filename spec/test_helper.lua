@@ -26,8 +26,20 @@ local function setupForTesting()
 	require('definitions.mw')
 
 	package.path = '?.lua;' ..
-			'standard/?.lua;' .. -- Load std folder
-			'components/match2/commons/?.lua;' .. -- Load m2 folder
+			'standard/?.lua;' ..
+			'components/match2/commons/?.lua;' ..
+			'components/prize_pool/commons/?.lua;' ..
+			'components/infobox/commons/?.lua;' ..
+			'components/infobox/commons/custom/?.lua;' ..
+			'components/opponent/commons/?.lua;' ..
+			'components/hidden_data_box/commons/?.lua;' ..
+			'components/squad/commons/?.lua;' ..
+			'components/standings/commons/?.lua;' ..
+			'components/team_card/?.lua;' ..
+			'standard/info/commons/?.lua;' ..
+			'standard/region/commons/?.lua;' ..
+			'standard/tier/commons/?.lua;' ..
+			'components/widget/?.lua;' ..
 			package.path
 
 	local require_original = require
@@ -41,30 +53,6 @@ local function setupForTesting()
 
 		if fileExists(newName) then
 			return require_original(newName)
-		end
-
-		if newName == 'info' then
-			return require_original('info.commons.info')
-		end
-
-		if newName == 'region' or newName == 'region_data' then
-			return require_original('region.commons.' .. newName)
-		end
-
-		if newName == 'opponent' then
-			return require_original('components.opponent.commons.opponent')
-		end
-
-		if newName == 'tier_utils' or newName == 'tier_data' then
-			return require_original('tier.commons.' .. newName)
-		end
-
-		if newName == 'opponent_display' then
-			return require('components.opponent.commons.opponent_display')
-		end
-
-		if newName == 'player_display' then
-			return require('components.opponent.commons.player_display')
 		end
 
 		if newName == 'feature_flag_config' then
@@ -84,6 +72,21 @@ local function setupForTesting()
 			}
 		end
 
+		if newName == 'points_data' then
+			return {points = {title = 'Points'}}
+		end
+
+		if newName == 'a or an' then
+			return {_main = function(params)
+				-- Simplified implemenation for mocking
+				local firstChar = string.sub(params[1], 1, 1):lower()
+				if firstChar == 'a' or firstChar == 'e' or firstChar == 'i' or firstChar == 'o' or firstChar == 'u' then
+					return 'an '
+				end
+				return 'a '
+			end}
+		end
+
 		-- Just apply a fake function that returns the first input, as something
 		local mocked_import = {}
 		setmetatable(mocked_import, {
@@ -96,5 +99,26 @@ local function setupForTesting()
 	end
 end
 
+local function writeGolden(filename, data)
+	local file = assert(io.open(filename, 'w+'))
+	file:write(data)
+end
+
+function GoldenTest(testname, actual)
+	local filename = 'spec/golden_masters/' .. testname .. '.txt'
+	local file = io.open(filename, 'r')
+
+	---@diagnostic disable-next-line: undefined-field
+	if not file or _G.updategolden == true then
+		writeGolden(filename, actual)
+		return
+	end
+
+	local expected = file:read('*a')
+	file:close()
+
+	require('luassert').are_same(expected, actual)
+end
+
 require('busted').subscribe({'suite', 'start'}, setupForTesting)
-require('busted').subscribe({'test', 'start'}, resetMediawiki)
+require('busted').subscribe({'test', 'end'}, resetMediawiki)

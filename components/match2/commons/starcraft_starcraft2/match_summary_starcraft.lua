@@ -9,24 +9,24 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	greenCheck = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
-	yellowQuestionMark = '[[File:YellowQuestionMark.png|14x14px|link=]]',
 	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
 	noCheck = '[[File:NoCheck.png|link=]]',
 }
@@ -78,7 +78,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
 	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Ffa/Starcraft', {requireDevIfEnabled = true}).FfaMatchSummary{
+		return Lua.import('Module:MatchSummary/Ffa/Starcraft').FfaMatchSummary{
 			match = match,
 			bracketResetMatch = bracketResetMatch,
 			config = args.config

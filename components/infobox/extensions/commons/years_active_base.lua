@@ -9,12 +9,13 @@
 local ActiveYears = {}
 
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Logic = require('Module:Logic')
+local DateExt = require('Module:Date/Ext')
 local Info = mw.loadData('Module:Info')
+local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Set = require('Module:Set')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -23,8 +24,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _DEFAULT_DATE = '1970-01-01 00:00:00'
-local _CURRENT_YEAR = tonumber(os.date('%Y'))
+local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 -- overwritable per wiki
 ActiveYears.startYear = Info.startYear
@@ -86,7 +86,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
-		ConditionNode(ColumnName('date'), Comparator.neq, _DEFAULT_DATE),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionTree(BooleanOperator.any):add({
 			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
 			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
@@ -141,6 +141,8 @@ function ActiveYears._getYears(conditions)
 end
 
 function ActiveYears._groupYears(sortedYears)
+	if Logic.isEmpty(sortedYears) then return {} end
+
 	local startYear
 	local endYear
 	local yearRanges = {}
@@ -155,7 +157,8 @@ function ActiveYears._groupYears(sortedYears)
 		end
 		endYear = year
 	end
-	if endYear >= _CURRENT_YEAR then
+
+	if endYear >= CURRENT_YEAR then
 		table.insert(yearRanges, tostring(startYear) .. ' - ' .. '<b>Present</b>')
 	else
 		yearRanges = ActiveYears._insertYears(startYear, endYear, yearRanges)

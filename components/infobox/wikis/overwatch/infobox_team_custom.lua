@@ -10,9 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class OverwatchInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -38,8 +37,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	lpdbData.extradata.competesin = string.upper(args.league or '')
 
 	return lpdbData

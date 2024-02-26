@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TeamTemplates = require('Module:Team')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -34,6 +34,7 @@ local STATISTICS = {
 	{key = 'points', name = 'Career Points'},
 	{key = 'firstentry', name = 'First entry'},
 	{key = 'firstwin', name = 'First win'},
+	{key = 'lastwin', name = 'Last win'},
 	{key = 'lastentry', name = 'Last entry'},
 }
 

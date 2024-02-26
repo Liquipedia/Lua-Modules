@@ -15,6 +15,8 @@ local Logic = require('Module:Logic')
 ---@param title string|number
 ---@return string
 ---@overload fun(text: string|number):nil
+---@overload fun(text: string|number, title: nil):nil
+---@overload fun(text: nil, title: nil):nil
 ---@overload fun():nil
 function Abbreviation.make(text, title)
 	if Logic.isEmpty(title) or Logic.isEmpty(text) then

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
 local HeroData = mw.loadData('Module:HeroData')
 local Json = require('Module:Json')
@@ -16,18 +17,17 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	greenCheck = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>',
+	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
-	yellowQuestionMark = '<i class="fas fa-question bright-sun-text" style="width: 14px; text-align: center" ></i>',
 	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
 	noCheck = '[[File:NoCheck.png|link=]]',
 }

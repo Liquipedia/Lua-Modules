@@ -20,10 +20,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
-local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
+local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -31,7 +31,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
----@class Starcraft2LeagueInfobox: InfoboxLeagueTemp
+---@class Starcraft2LeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -124,8 +124,8 @@ function CustomLeague:_isFinished(args)
 	end
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']] '
-			.. 'AND [[opponentname::!TBD]] AND [[placement::1]]',
+		conditions = '[[pagename::' .. string.gsub(self.pagename, ' ', '_') .. ']] '
+			.. 'AND [[opponentname::!TBD]] AND [[opponentname::!]] AND [[placement::1]]',
 		query = 'date',
 		order = 'date asc',
 		limit = 1
@@ -328,7 +328,7 @@ end
 ---@param args table
 ---@return {link: string, displayname: string}[]
 function CustomLeague:_getMaps(prefix, args)
-	local mapArgs = self:getAllArgsForBase(args, 'map')
+	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')

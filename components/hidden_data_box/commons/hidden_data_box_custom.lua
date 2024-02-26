@@ -9,13 +9,13 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox', {requireDevIfEnabled = true})
+local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 
 local CustomHiddenDataBox = {}
 
 ---Entry point
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)

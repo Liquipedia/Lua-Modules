@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Team = Lua.import('Module:Infobox/Team')
 
 ---@class TeamfortressInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)

@@ -17,9 +17,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Currency = Lua.import('Module:Currency', {requireDevIfEnabled = true})
-local LpdbInjector = Lua.import('Module:Lpdb/Injector', {requireDevIfEnabled = true})
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
+local Currency = Lua.import('Module:Currency')
+local LpdbInjector = Lua.import('Module:Lpdb/Injector')
+local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -116,7 +116,7 @@ BasePrizePool.config = {
 	lpdbPrefix = {
 		default = '',
 		read = function(args)
-			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
 		end
 	},
 	abbreviateTbd = {
@@ -831,12 +831,13 @@ function BasePrizePool:storeData()
 
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
+		local objectName = Table.extract(lpdbEntry, 'objectName')
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(objectName, lpdbEntry)
 		end
 
-		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
+		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
 	end
 
 	return self

@@ -9,14 +9,15 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Website = Lua.import('Module:Infobox/Website', {requireDevIfEnabled = true})
+local Website = Lua.import('Module:Infobox/Website')
 
-local CustomWebsite = Class.new()
+---@class CustomWebsiteInfobox: WebsiteInfobox
+local CustomWebsite = Class.new(Website)
 
 ---@param frame Frame
 ---@return Html
 function CustomWebsite.run(frame)
-	local website = Website(frame)
+	local website = CustomWebsite(frame)
 	return website:createInfobox()
 end
 

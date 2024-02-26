@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = mw.loadData('Module:Info')
+
 local factionProps = {
 	v = {
 		bgClass = 'stormgate-vanguard',
@@ -36,13 +38,22 @@ local factionProps = {
 }
 
 return {
-	factionProps = factionProps,
+	defaultGame = Info.defaultGame,
+	factionProps = {
+		[Info.defaultGame] = factionProps,
+	},
 	defaultFaction = 'u',
-	factions = {'v', 'i', 'r', 'u'},
+	factions = {
+		[Info.defaultGame] = {'v', 'i', 'r', 'u'},
+	},
 	knownFactions = {'v', 'i', 'r'},
 	coreFactions = {'v', 'i'},
 	aliases = {
-		human = 'v',
-		host = 'i',
-	},
+		[Info.defaultGame] = {
+			human = 'v',
+			van = 'v',
+			host = 'i',
+			inf = 'i',
+		},
+	}
 }

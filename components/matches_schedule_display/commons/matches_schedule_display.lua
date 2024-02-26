@@ -10,12 +10,13 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper', {requireDevIfEnabled = true})
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -110,7 +111,7 @@ function MatchesTable:buildConditions()
 	local config = self.config
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, '1970-01-01')}
+		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
 
 	local pageConditions = ConditionTree(BooleanOperator.any)
 	for _, page in pairs(config.pages --[[@as string[] ]]) do
@@ -191,7 +192,7 @@ function MatchesTable:dateDisplay(match)
 			:wikitext('To be announced')
 	end
 
-	return dateCell:wikitext(mw.language.new('en'):formatDate('F j, Y', match.date))
+	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
 end
 
 ---@param match table

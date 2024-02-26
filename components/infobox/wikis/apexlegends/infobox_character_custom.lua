@@ -6,70 +6,45 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Character = Lua.import('Module:Infobox/Character', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomCharacter = Class.new()
+---@class ApexlegendsCharacterInfobox: CharacterInfobox
+local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomCharacter.run(frame)
-	local character = Character(frame)
-	_args = character.args
-	character.addToLpdb = CustomCharacter.addToLpdb
-	character.createWidgetInjector = CustomCharacter.createWidgetInjector
+	local character = CustomCharacter(frame)
+	character:setWidgetInjector(CustomInjector(character))
 	return character:createInfobox()
 end
-
----@return WidgetInjector
-function CustomCharacter:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	table.insert(widgets, Cell{
-		name = 'Age',
-		content = {_args.age}
-	})
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-	table.insert(widgets, Cell{
-		name = 'Home World',
-		content = {_args.homeworld}
-	})
-
-	table.insert(widgets, Title{name = 'Abilities'})
-
-	table.insert(widgets, Cell{
-		name = 'Legend Type',
-		content = {_args.legendtype}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Passive',
-		content = {'[[File:' .. _args.name .. ' - Passive.png|20px]] ' .. _args.passive}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Tactical',
-		content = {'[[File:' .. _args.name .. ' - Active.png|20px]] ' .. _args.active}
-	})
-
-	table.insert(widgets, Cell{
-		name = 'Ultimate',
-		content = {'[[File:' .. _args.name .. ' - Ultimate.png|20px]] ' .. _args.ultimate}
-	})
+	if id == 'custom' then
+		Array.appendWith(widgets,
+			Cell{name = 'Age', content = {args.age}},
+			Cell{name = 'Home World', content = {args.homeworld}},
+			Title{name = 'Abilities'},
+			Cell{name = 'Legend Type', content = {args.legendtype}},
+			Cell{name = 'Passive', content = {'[[File:' .. args.name .. ' - Passive.png|20px]] ' .. args.passive}},
+			Cell{name = 'Tactical', content = {'[[File:' .. args.name .. ' - Active.png|20px]] ' .. args.active}},
+			Cell{name = 'Ultimate', content = {'[[File:' .. args.name .. ' - Ultimate.png|20px]] ' .. args.ultimate}}
+		)
+	end
 
 	return widgets
 end

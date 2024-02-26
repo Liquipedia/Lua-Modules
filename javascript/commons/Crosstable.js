@@ -7,10 +7,10 @@ liquipedia.crosstable = {
 		document.querySelectorAll( '.crosstable' ).forEach( function( crosstable ) {
 			crosstable.querySelectorAll( 'td, th' ).forEach( function( cell ) {
 				cell.onmouseover = function() {
-					var row = this.closest( 'tr' );
-					crosstable.classList.add( 'row-' + ( row.rowIndex + 1 ) );
-					crosstable.classList.add( 'col-' + ( this.cellIndex + 1 ) );
-					var element;
+					const row = this.closest( 'tr' );
+					crosstable.classList.add( 'crosstable-row-' + ( row.rowIndex + 1 ) );
+					crosstable.classList.add( 'crosstable-col-' + ( this.cellIndex + 1 ) );
+					let element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {
 						element.classList.add( 'crosstable-top-left' );
@@ -30,10 +30,10 @@ liquipedia.crosstable = {
 
 				};
 				cell.onmouseleave = function() {
-					var row = this.closest( 'tr' );
-					crosstable.classList.remove( 'row-' + ( row.rowIndex + 1 ) );
-					crosstable.classList.remove( 'col-' + ( this.cellIndex + 1 ) );
-					var element;
+					const row = this.closest( 'tr' );
+					crosstable.classList.remove( 'crosstable-row-' + ( row.rowIndex + 1 ) );
+					crosstable.classList.remove( 'crosstable-col-' + ( this.cellIndex + 1 ) );
+					let element;
 					element = crosstable.querySelector( 'tr:nth-child(' + row.rowIndex + ') td:nth-child(' + this.cellIndex + ')' );
 					if ( element !== null ) {
 						element.classList.remove( 'crosstable-top-left' );

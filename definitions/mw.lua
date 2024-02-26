@@ -20,11 +20,6 @@ function mw.allToString(...) end
 ---@nodiscard
 function mw.clone(value) end
 
----Returns the current frame object, typically the frame object from the most recent #invoke.
----@return Frame
----@nodiscard
-function mw.getCurrentFrame() end
-
 ---Adds one to the "expensive parser function" count, and throws an exception if it exceeds the limit (see $wgExpensiveParserFunctionLimit).
 function mw.incrementExpensiveFunctionCount() end
 
@@ -62,6 +57,13 @@ function mw.logObject(object, prefix) end
 ---@class Frame
 ---@field args table?
 mw.frame = {}
+
+---Returns the current frame object, typically the frame object from the most recent #invoke.
+---@return Frame
+---@nodiscard
+function mw.getCurrentFrame()
+	return setmetatable(mw.frame, {})
+end
 
 ---Call a parser function, returning an appropriate string. This is preferable to frame:preprocess, but whenever possible, native Lua functions or Scribunto library functions should be preferred to this interface.
 ---@param name string
@@ -321,10 +323,55 @@ end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
 ---@param format string
----@param timestamp string|osdate?
+---@param timestamp string|osdateparam?
 ---@param localTime boolean?
 ---@return number|string
-function mw.language:formatDate(format, timestamp, localTime) end
+function mw.language:formatDate(format, timestamp, localTime)
+	local function localTimezoneOffset(ts)
+		local utcDt   = os.date("!*t", ts)
+		local localDt = os.date("*t", ts)
+		localDt.isdst = false
+		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+	end
+
+
+	if format == 'U' then
+		if not timestamp then
+			return os.time(os.date("!*t") --[[@as osdateparam]])
+		end
+		if type(timestamp) ~= 'string' then
+			return os.time(timestamp)
+		end
+		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
+		local offset = 0
+		if tzHour then
+			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
+		end
+
+		local year, month, day, hour, minute, second
+
+		local pattern = '(%d%d%d%d)-?(%d%d)-?(%d%d)'
+		year, month, day = timestamp:match(pattern)
+
+		if not year then
+			return ''
+		end
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)'
+		hour = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?(%d%d)'
+		minute = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
+		second = timestamp:match(pattern)
+
+		local ts = os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
+
+		return ts + localTimezoneOffset(ts)
+	end
+	return ''
+end
 
 ---Breaks a duration in seconds into more human-readable units, e.g. 12345 to 3 hours, 25 minutes and 45 seconds, returning the result as a string.
 ---@param seconds number
@@ -404,6 +451,7 @@ function mw.message.getDefaultLanguage() end
 ---@param ... string|number
 ---@return self
 ---@overload fun(self, params: table):self
+---@overload fun(self, param: string|number):self
 function mw.message:params(...) end
 
 ---Like :params(), but has the effect of passing all the parameters through mw.message.rawParam() first.
@@ -609,7 +657,13 @@ function mw.text.unstrip(s) end
 ---@field redirectTarget Title|false
 ---@field protectionLevels table
 ---@field cascadingProtection table
-mw.title = {}
+mw.title = {
+	namespace = 0,
+	text = 'FakePage',
+	prefixedText = 'FakePage',
+	fullText = 'FakePage',
+	baseText = 'FakePage',
+}
 
 ---@class File
 ---@field exists boolean
@@ -634,7 +688,9 @@ function mw.title.compare(a, b) end
 
 ---Returns the title object for the current page.
 ---@return Title
-function mw.title.getCurrentTitle() end
+function mw.title.getCurrentTitle()
+	return setmetatable(mw.title, {})
+end
 
 ---Creates a new title object. This function is expensive when called with an ID.
 ---If the text string does not specify a namespace, namespace (which may be any key found in mw.site.namespaces) will be used.
@@ -663,7 +719,12 @@ function mw.title:isSubpageOf(title2) end
 ---Whether this title is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.title:inNamespace(ns) end
+function mw.title:inNamespace(ns)
+	if ns == 0 then
+		return true
+	end
+	return false
+end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
@@ -795,7 +856,12 @@ function mw.ustring.len(s) end
 ---@see string.lower
 ---@param s string|number
 ---@return string
-function mw.ustring.lower(s) return string.lower(s) end
+function mw.ustring.lower(s)
+	if s == 'Örban' then
+		return 'örban'
+	end
+	return string.lower(s)
+end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
@@ -907,5 +973,78 @@ mw.ext.TeamLiquidIntegration = {}
 ---@param name string
 ---@param sortName string?
 function mw.ext.TeamLiquidIntegration.add_category(name, sortName) end
+
+---Follows page redirects
+---@param name string
+---@return string
+function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
+
+mw.ext.TeamTemplate = {}
+
+---@param teamteplate string
+---@param date string|number?
+---@return table
+function mw.ext.TeamTemplate.raw(teamteplate, date) end
+
+---@param teamteplate string
+---@return table
+function mw.ext.TeamTemplate.raw_historical(teamteplate) end
+
+---@param teamteplate string
+---@return boolean
+function mw.ext.TeamTemplate.teamexists(teamteplate) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team2(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamshort(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.team2short(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teambracket(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamicon(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teamimage(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teampage(teamteplate, date) end
+
+---@param teamteplate string
+---@param date string|number?
+---@return string
+function mw.ext.TeamTemplate.teampart(teamteplate, date) end
+
+mw.ext.SearchEngineOptimization = {}
+
+---@param desc string
+function mw.ext.SearchEngineOptimization.metadescl(desc) end
+
+---@param image string
+function mw.ext.SearchEngineOptimization.metaimage(image) end
 
 return mw

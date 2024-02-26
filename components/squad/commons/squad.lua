@@ -8,15 +8,28 @@
 
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
+---@class Squad
+---@field frame Frame
+---@field args table
+---@field root Html
+---@field content Html
+---@field type integer
 local Squad = Class.new()
 
-Squad.TYPE_ACTIVE = 0
-Squad.TYPE_INACTIVE = 1
-Squad.TYPE_FORMER = 2
-Squad.TYPE_FORMER_INACTIVE = 3
+---@enum SquadType
+local SquadType = {
+	ACTIVE = 0,
+	INACTIVE = 1,
+	FORMER = 2,
+	FORMER_INACTIVE = 3,
+}
+Squad.SquadType = SquadType
 
+---@param frame Frame
+---@return self
 function Squad:init(frame)
 	self.frame = frame
 	self.args = Arguments.getArgs(frame)
@@ -34,50 +47,46 @@ function Squad:init(frame)
 		self.args.isLoan = true
 	end
 
-	local status = (self.args.status or 'active'):lower()
+	local status = (self.args.status or 'active'):upper()
 
-	if status == 'inactive' then
-		self.type = Squad.TYPE_INACTIVE
-	elseif status == 'former' then
-		self.type = Squad.TYPE_FORMER
-	else
-		self.type = Squad.TYPE_ACTIVE
-	end
+	self.type = SquadType[status] or SquadType.ACTIVE
 
 	return self
 end
 
+---@return Squad
 function Squad:title()
 	local defaultTitle
-	if self.type == Squad.TYPE_FORMER then
+	if self.type == SquadType.FORMER then
 		defaultTitle = 'Former Squad'
-	elseif self.type == Squad.TYPE_INACTIVE then
-		defaultTitle = 'Inactive Squad'
-	else
-		defaultTitle = 'Active Squad'
+	elseif self.type == SquadType.INACTIVE then
+		defaultTitle = 'Inactive Players'
 	end
 
-	local titleText = String.isEmpty(self.args.title) and defaultTitle or self.args.title
+	local titleText = Logic.emptyOr(self.args.title, defaultTitle)
 
-	local titleContainer = mw.html.create('tr')
+	if String.isNotEmpty(titleText) then
+		local titleContainer = mw.html.create('tr')
 
-	local titleRow = mw.html.create('th')
-	titleRow:addClass('large-only')
-		:attr('colspan', '1')
-		:wikitext(titleText)
+		local titleRow = mw.html.create('th')
+		titleRow:addClass('large-only')
+			:attr('colspan', '1')
+			:wikitext(titleText)
 
-	local titleRow2 = mw.html.create('th')
-	titleRow2:addClass('large-only')
-		:attr('colspan', '10')
-		:addClass('roster-title-row2-border')
-		:wikitext(titleText)
+		local titleRow2 = mw.html.create('th')
+		titleRow2:addClass('large-only')
+			:attr('colspan', '10')
+			:addClass('roster-title-row2-border')
+			:wikitext(titleText)
 
-	titleContainer:node(titleRow):node(titleRow2)
-	self.content:node(titleContainer)
+		titleContainer:node(titleRow):node(titleRow2)
+		self.content:node(titleContainer)
+	end
 
 	return self
 end
 
+---@return self
 function Squad:header()
 	local makeHeader = function(wikiText)
 		local headerCell = mw.html.create('th')
@@ -96,10 +105,10 @@ function Squad:header()
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_FORMER then
+	if self.type == SquadType.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == Squad.TYPE_INACTIVE then
+	elseif self.type == SquadType.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 
@@ -108,15 +117,16 @@ function Squad:header()
 	return self
 end
 
+---@param row Html
+---@return self
 function Squad:row(row)
 	self.content:node(row)
 	return self
 end
 
+---@return Html
 function Squad:create()
-	self.root:node(self.content)
-
-	return self.root
+	return self.root:node(self.content)
 end
 
 return Squad

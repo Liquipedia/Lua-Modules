@@ -25,11 +25,11 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Conditions = Lua.import('Module:TournamentsListing/Conditions', {requireDevIfEnabled = true})
-local HighlightConditions = Lua.import('Module:HighlightConditions', {requireDevIfEnabled = true})
-local Tier = Lua.import('Module:Tier/Custom', {requireDevIfEnabled = true})
+local Conditions = Lua.import('Module:TournamentsListing/Conditions')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Tier = Lua.import('Module:Tier/Custom')
 
-local LANG = mw.language.new('en')
+local LANG = mw.getContentLanguage()
 local NONBREAKING_SPACE = '&nbsp;'
 local POSTPONED = 'postponed'
 local DELAYED = 'delayed'

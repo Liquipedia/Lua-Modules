@@ -17,7 +17,7 @@ local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BasePlacement = Lua.import('Module:PrizePool/Placement/Base', {requireDevIfEnabled = true})
+local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -267,6 +267,7 @@ function Placement:_getLpdbData(...)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
+		lpdbData.players = lpdbData.players or lpdbData.opponentplayers
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then

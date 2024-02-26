@@ -12,8 +12,8 @@ local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 local Json = require('Module:Json')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Links = Lua.import('Module:Links', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Links = Lua.import('Module:Links')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -116,7 +116,7 @@ function Game:createInfobox()
 		self:_setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return infobox:build(widgets)
 end
 
 ---@param args table

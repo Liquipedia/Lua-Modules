@@ -11,10 +11,10 @@ local Placement = require('Module:Placement')
 local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local Table = require('Module:Table')
 
-local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa', {requireDevIfEnabled = true})
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft', {requireDevIfEnabled = true})
-local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft', {requireDevIfEnabled = true})
-local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft', {requireDevIfEnabled = true})
+local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa')
+local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
+local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft')
 
 local CustomFfaMatchSummary = {propTypes = {}}
 

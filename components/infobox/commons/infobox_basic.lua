@@ -12,8 +12,8 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
-local Info = Lua.import('Module:Info', {requireDevIfEnabled = true})
-local Infobox = Lua.import('Module:Infobox', {requireDevIfEnabled = true})
+local Info = Lua.import('Module:Info')
+local Infobox = Lua.import('Module:Infobox')
 
 ---@class BasicInfobox
 ---@operator call(Frame): BasicInfobox
@@ -38,12 +38,6 @@ local BasicInfobox = Class.new(
 function BasicInfobox:setWidgetInjector(injector)
 	self.infobox:widgetInjector(injector)
 	return self
-end
-
----Creates an empty WidgetInjector
----@return WidgetInjector?
-function BasicInfobox:createWidgetInjector()
-	return nil
 end
 
 --- Allows for overriding this functionality

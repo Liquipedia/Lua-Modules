@@ -14,10 +14,10 @@ local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates', {requireDevIfEnabled = true})
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util', {requireDevIfEnabled = true})
-local Placement = Lua.import('Module:PrizePool/Placement', {requireDevIfEnabled = true})
-local TournamentStructure = Lua.import('Module:TournamentStructure', {requireDevIfEnabled = true})
+local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Placement = Lua.import('Module:PrizePool/Placement')
+local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -65,6 +65,7 @@ function Import._getConfig(args, placements)
 	return {
 		ignoreNonScoreEliminations = Logic.readBool(args.ignoreNonScoreEliminations),
 		importLimit = Import._importLimit(args.importLimit, placements, args.placementsExtendImportLimit),
+		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
 		groupElimStatuses = Array.map(
@@ -76,6 +77,12 @@ function Import._getConfig(args, placements)
 		stageImportLimits = Table.mapArguments(
 			args,
 			function(key) return tonumber(string.match(key, '^stage(%d+)importLimit$')) end,
+			function(key) return tonumber(args[key]) end,
+			true
+		),
+		stagePlacementsToSkip = Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)placementsToSkip$')) end,
 			function(key) return tonumber(args[key]) end,
 			true
 		),
@@ -132,8 +139,11 @@ function Import._importPlacements(inputPlacements)
 						groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or
 							Import.config.groupElimStatuses,
 						importLimit = Import.config.stageImportLimits[stageIndex] or 0,
+						placementsToSkip = Import.config.stagePlacementsToSkip[stageIndex],
 					})
 			end))
+
+	placementEntries = Array.sub(placementEntries, 1 + (Import.config.placementsToSkip or 0))
 
 	-- Apply importLimit if set
 	if Import.config.importLimit then
@@ -158,16 +168,22 @@ function Import._computeStagePlacementEntries(stage, options)
 			or Import._computeBracketPlacementEntries(matchGroup, options)
 	end)
 
+	local startingPlacement = 1 + (options.placementsToSkip or 0)
+	local endingPlacement = options.importLimit
+	if options.importLimit > 0 and startingPlacement > 1 then
+		endingPlacement = options.importLimit + options.placementsToSkip
+	end
+
 	local maxPlacementCount = Array.max(Array.map(
 			groupPlacementEntries,
 			function(placementEntries) return #placementEntries end
 		)) or 0
 
-	maxPlacementCount = options.importLimit > 0
-		and math.min(maxPlacementCount, options.importLimit)
+	maxPlacementCount = endingPlacement > 0
+		and math.min(maxPlacementCount, endingPlacement)
 		or maxPlacementCount
 
-	return Array.map(Array.range(1, maxPlacementCount), function(placementIndex)
+	return Array.map(Array.range(startingPlacement, maxPlacementCount), function(placementIndex)
 		return Array.flatten(Array.map(groupPlacementEntries, function(placementEntries)
 			return placementEntries[placementIndex]
 		end))
@@ -434,7 +450,7 @@ end
 
 function Import._mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import._removeEpochZeroDate(Import._mergeEntry(
+		placement.opponents[opponentIndex] = Import._removeDefaultDate(Import._mergeEntry(
 			opponent,
 			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
@@ -618,9 +634,9 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	}
 end
 
-function Import._removeEpochZeroDate(entry)
-	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.epochZero and entry.date
-		or nil
+function Import._removeDefaultDate(entry)
+	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.defaultTimestamp and
+		entry.date or nil
 
 	return entry
 end

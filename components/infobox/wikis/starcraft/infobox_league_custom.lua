@@ -15,9 +15,9 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local League = Lua.import('Module:Infobox/League/temp', {requireDevIfEnabled = true})
-local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local League = Lua.import('Module:Infobox/League')
+local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
@@ -25,7 +25,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
----@class StarcraftLeagueInfobox: InfoboxLeagueTemp
+---@class StarcraftLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
@@ -59,7 +59,7 @@ end
 ---@param args table
 ---@return {link: string, displayname: string}[]
 function CustomLeague:_getMaps(prefix, args)
-	local mapArgs = self:getAllArgsForBase(args, 'map')
+	local mapArgs = self:getAllArgsForBase(args, prefix)
 
 	return Table.map(mapArgs, function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')
@@ -153,9 +153,9 @@ function CustomInjector:parse(id, widgets)
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
 				Title{name = 'Participants'},
-				Cell{name = 'Number of Players', content = {self.data.raceBreakDown.total}},
+				Cell{name = 'Number of Players', content = {self.caller.data.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = self.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{content = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 

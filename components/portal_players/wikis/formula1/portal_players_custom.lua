@@ -16,8 +16,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local AgeCalculation = Lua.import('Module:AgeCalculation')
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -62,8 +62,8 @@ function CustomPortalPlayers:header(args)
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
 		:tag('th'):css('width', '200px'):wikitext(' Full Name'):done()
-		:tag('th'):css('width', '245px'):wikitext(' Age'):done()
-		:tag('th'):css('width', '175px'):wikitext(teamText):done()
+		:tag('th'):css('width', '215px'):wikitext(' Age'):done()
+		:tag('th'):css('width', '215px'):wikitext(teamText):done()
 		:tag('th'):css('width', '100px'):wikitext(' Links'):done()
 
 	return mw.html.create()
@@ -114,12 +114,12 @@ end
 ---@return string
 function CustomPortalPlayers._getAge(player)
 	local birthDate
-	if Date.readTimestamp(player.birthdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.birthdate) ~= Date.defaultTimestamp then
 		birthDate = player.birthdate
 	end
 
 	local deathDate
-	if Date.readTimestamp(player.deathdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.deathdate) ~= Date.defaultTimestamp then
 		deathDate = player.deathdate
 	end
 

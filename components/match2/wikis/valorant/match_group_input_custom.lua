@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -15,8 +16,8 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
@@ -26,30 +27,30 @@ local MAX_NUM_PLAYERS = 10
 local MAX_NUM_MAPS = 9
 local MAX_NUM_ROUNDS = 24
 
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
+
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
 local matchFunctions = {}
 local mapFunctions = {}
 local roundFunctions = {}
-local opponentFunctions = {}
 local placementFunctions = {}
 
 local CustomMatchGroupInput = {}
 
--- called from Module:MatchGroup
+--- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
 	-- Count number of maps, check for empty maps to remove
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.removeUnsetMaps(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
@@ -62,34 +63,34 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 	map = mapFunctions.getParticipantsData(map)
 
 	return map
 end
 
-function CustomMatchGroupInput.processOpponent(record, date)
+---@param record table
+---@param timestamp number
+function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
 	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
+	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	local teamTemplateDate = date
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == _EPOCH_TIME_EXTENDED then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			_EPOCH_TIME_EXTENDED
-		)
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
@@ -97,6 +98,8 @@ function CustomMatchGroupInput.processOpponent(record, date)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
@@ -106,6 +109,11 @@ end
 -- Special cases:
 -- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
 -- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will gt placementLoser
+---@param opponents table[]
+---@param winner number
+---@param placementWinner number
+---@param placementLoser number
+---@return table[]
 function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
 	if opponents and #opponents == 2 then
 		local loserIdx
@@ -138,6 +146,10 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, 
 	return opponents
 end
 
+---@param data table
+---@param indexedScores table[]
+---@return table
+---@return table[]
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if Table.includes(NOT_PLAYED_INPUTS, data.finished) then
@@ -180,9 +192,11 @@ end
 -- Placement related functions
 --
 -- function to check for draws
-function placementFunctions.isDraw(table)
+---@param tbl table[]
+---@return boolean
+function placementFunctions.isDraw(tbl)
 	local last
-	for _, scoreInfo in pairs(table) do
+	for _, scoreInfo in pairs(tbl) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
 			return false
 		end
@@ -197,28 +211,38 @@ function placementFunctions.isDraw(table)
 end
 
 -- Check if any team has a none-standard status
-function placementFunctions.isSpecialStatus(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+---@param tbl table[]
+---@return boolean
+function placementFunctions.isSpecialStatus(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
 end
 
 -- function to check for forfeits
-function placementFunctions.isForfeit(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+---@param tbl table[]
+---@return boolean
+function placementFunctions.isForfeit(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
 end
 
 -- function to check for DQ's
-function placementFunctions.isDisqualified(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+---@param tbl table[]
+---@return boolean
+function placementFunctions.isDisqualified(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
 end
 
 -- function to check for W/L
-function placementFunctions.isWL(table)
-	return Table.any(table, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+---@param tbl table[]
+---@return boolean
+function placementFunctions.isWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
 end
 
 -- Get the winner when resulttype=default
-function placementFunctions.getDefaultWinner(table)
-	for index, scoreInfo in pairs(table) do
+---@param tbl table[]
+---@return number
+function placementFunctions.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == 'W' then
 			return index
 		end
@@ -229,6 +253,8 @@ end
 --
 -- match related functions
 --
+---@param match table
+---@return table
 function matchFunctions.getBestOf(match)
 	local mapCount = 0
 	for i = 1, MAX_NUM_MAPS do
@@ -246,6 +272,8 @@ end
 -- These maps however shouldn't be stored in lpdb, nor displayed
 -- The discardMap function will check if a map should be removed
 -- Remove all maps that should be removed.
+---@param match table
+---@return table
 function matchFunctions.removeUnsetMaps(match)
 	for i = 1, MAX_NUM_MAPS do
 		if match['map'..i] then
@@ -265,6 +293,8 @@ end
 -- Only update a teams result if it's
 -- 1) Not manually added
 -- 2) At least one map has a winner
+---@param match table
+---@return table
 function matchFunctions.getScoreFromMapWinners(match)
 	local opponent1 = match.opponent1
 	local opponent2 = match.opponent2
@@ -301,25 +331,18 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
-function matchFunctions.readDate(matchArgs)
-	if matchArgs.date then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date)
-		dateProps.hasDate = true
-		return dateProps
-	else
-		return {
-			date = _EPOCH_TIME_EXTENDED,
-			dateexact = false,
-		}
-	end
-end
-
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
+	match.patch = Logic.emptyOr(match.patch, Variables.varDefault('patch'))
+
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -330,6 +353,8 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
@@ -339,6 +364,8 @@ function matchFunctions.getExtraData(match)
 end
 
 -- Parse the mapVeto input
+---@param match table
+---@return table?
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
@@ -368,6 +395,8 @@ function matchFunctions.getMapVeto(match)
 	return data
 end
 
+---@param match table
+---@return table
 function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -376,12 +405,7 @@ function matchFunctions.getOpponents(match)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
 		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.date)
-
-			-- Retrieve icon for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getIcon(opponent.template)
-			end
+			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 			-- apply status
 			if TypeUtil.isNumeric(opponent.score) then
@@ -401,12 +425,9 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(match.finished) and match.hasDate then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', match.date))
+	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
+		if match.timestamp + threshold < NOW then
 			match.finished = true
 		end
 	end
@@ -423,6 +444,8 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.mergeWithStandalone(match)
 	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
 	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
@@ -463,6 +486,8 @@ end
 --
 -- Check if a map should be discarded due to being redundant
 -- DUMMY_MAP_NAME needs the match the default value in Template:Map
+---@param map table
+---@return boolean
 function mapFunctions.discardMap(map)
 	if map.map == DUMMY_MAP_NAME then
 		return true
@@ -471,6 +496,8 @@ function mapFunctions.discardMap(map)
 	end
 end
 
+---@param map table
+---@return table
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
@@ -481,6 +508,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
@@ -514,11 +543,8 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
+---@param map table
+---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
 
@@ -566,6 +592,8 @@ function mapFunctions.getParticipantsData(map)
 	return map
 end
 
+---@param round string
+---@return table?
 function roundFunctions.getRoundData(round)
 
 	if round == nil then
@@ -573,13 +601,13 @@ function roundFunctions.getRoundData(round)
 	end
 
 	local participants = {}
-	round = Json.parse(round)
+	local parsedRound = Json.parse(round)
 
 	for o = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
 			local participant = {}
 			local opstring = 'opponent' .. o .. '_p' .. player
-			local stats = round[opstring .. 'stats']
+			local stats = parsedRound[opstring .. 'stats']
 
 			if stats ~= nil then
 				stats = Json.parse(stats)
@@ -603,32 +631,20 @@ function roundFunctions.getRoundData(round)
 		end
 	end
 
-	round.buy = {
-		round.buy1, round.buy2
+	parsedRound.buy = {
+		parsedRound.buy1, parsedRound.buy2
 	}
 
-	round.bank = {
-		round.bank1, round.bank2
+	parsedRound.bank = {
+		parsedRound.bank1, parsedRound.bank2
 	}
 
-	round.kills = {
-		round.kills1, round.kills2
+	parsedRound.kills = {
+		parsedRound.kills1, parsedRound.kills2
 	}
 
-	round.participants = participants
-	return round
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
+	parsedRound.participants = participants
+	return parsedRound
 end
 
 return CustomMatchGroupInput

@@ -7,11 +7,12 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
-local BasicInfobox = Lua.import('Module:Infobox/Basic', {requireDevIfEnabled = true})
-local Flags = Lua.import('Module:Flags', {requireDevIfEnabled = true})
+local BasicInfobox = Lua.import('Module:Infobox/Basic')
+local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -109,13 +110,11 @@ function Weapon:createInfobox()
 	infobox:categories('Weapons')
 	infobox:categories(unpack(self:getWikiCategories(args)))
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return infobox:build(widgets)
 end
 
 ---@param location string?
@@ -158,8 +157,7 @@ function Weapon:setLpdbData(args)
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata = mw.ext.LiquipediaDB.lpdb_create_json(lpdbData.extradata or {})
-	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('weapon_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 ---@param lpdbData table

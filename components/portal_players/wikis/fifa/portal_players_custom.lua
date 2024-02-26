@@ -16,8 +16,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
-local AgeCalculation = Lua.import('Module:AgeCalculation', {requireDevIfEnabled = true})
-local PortalPlayers = Lua.import('Module:PortalPlayers', {requireDevIfEnabled = true})
+local AgeCalculation = Lua.import('Module:AgeCalculation')
+local PortalPlayers = Lua.import('Module:PortalPlayers')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
@@ -114,12 +114,12 @@ end
 ---@return string
 function CustomPortalPlayers._getAge(player)
 	local birthDate
-	if Date.readTimestamp(player.birthdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.birthdate) ~= Date.defaultTimestamp then
 		birthDate = player.birthdate
 	end
 
 	local deathDate
-	if Date.readTimestamp(player.deathdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.deathdate) ~= Date.defaultTimestamp then
 		deathDate = player.deathdate
 	end
 

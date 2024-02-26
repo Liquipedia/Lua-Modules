@@ -7,16 +7,14 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
-local CopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base', {requireDevIfEnabled = true})
-
-local OpponentLibrary = require('Module:OpponentLibraries')
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local INDENT = '\t'
 local MODE_CONVERSION = {
 	['1v1'] = {Opponent.solo},
 	['2v2'] = {Opponent.duo},
@@ -30,7 +28,10 @@ local MODE_CONVERSION = {
 }
 MODE_CONVERSION.default = MODE_CONVERSION['1v1']
 
-local WikiCopyPaste = Table.copy(CopyPaste)
+---@class WarcraftMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
+
+local INDENT = WikiCopyPaste.Indent
 
 ---Returns the cleaned opponent type
 ---@param mode string

@@ -11,8 +11,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Building = Lua.import('Module:Infobox/Building', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Building = Lua.import('Module:Infobox/Building')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -24,56 +24,50 @@ local MODE_AVAILABILITY = {
 	clan 	= {order = 3, name = 'Clan Capital'},
 }
 
----@class ClashOfClansCustomBuildingInfobox: BuildingInfobox
-local CustomBuilding = Class.new()
-
+---@class ClashofclansBuildingInfobox: BuildingInfobox
+local CustomBuilding = Class.new(Building)
 local CustomInjector = Class.new(Injector)
-
-local _args
 
 ---@param frame Frame
 ---@return Html
 function CustomBuilding.run(frame)
-	local building = Building(frame)
-	_args = building.args
-
-	building.setLpdbData = CustomBuilding.setLpdbData
-	building.createWidgetInjector = CustomBuilding.createWidgetInjector
+	local building = CustomBuilding(frame)
+	building:setWidgetInjector(CustomInjector(building))
 
 	return building:createInfobox()
 end
 
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	Array.appendWith(
-		widgets,
-		Cell{name = 'Range', content = {_args.range}},
-		Cell{name = 'Damage Type', content = {_args.damagetype}},
-		Cell{name = 'Target', content = {_args.target}},
-		Cell{name = 'Favorite Target', content = {_args.favtarget}},
-		Cell{name = 'Release Date', content = {_args.releasedate}}
-	)
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
-	if Table.any(_args, function(key) return MODE_AVAILABILITY[key] end) then
-		table.insert(widgets, Title{name = 'Mode Availability'})
-		local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
-		for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
-			table.insert(widgets, Cell{name = item.name, content = {_args[key]}})
+	if id == 'custom' then
+		Array.appendWith(
+			widgets,
+			Cell{name = 'Range', content = {args.range}},
+			Cell{name = 'Damage Type', content = {args.damagetype}},
+			Cell{name = 'Target', content = {args.target}},
+			Cell{name = 'Favorite Target', content = {args.favtarget}},
+			Cell{name = 'Release Date', content = {args.releasedate}}
+		)
+
+		if Table.any(args, function(key) return MODE_AVAILABILITY[key] end) then
+			table.insert(widgets, Title{name = 'Mode Availability'})
+			local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
+			for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
+				table.insert(widgets, Cell{name = item.name, content = {args[key]}})
+			end
 		end
 	end
 
 	return widgets
 end
 
----@return WidgetInjector
-function CustomBuilding:createWidgetInjector()
-	return CustomInjector()
-end
-
 ---@param args table
 function CustomBuilding:setLpdbData(args)
-	local name = args.name or mw.title.getCurrentTitle().text
+	local name = args.name or self.pagename
 	local lpdbData = {
 		type = 'building',
 		name = name,

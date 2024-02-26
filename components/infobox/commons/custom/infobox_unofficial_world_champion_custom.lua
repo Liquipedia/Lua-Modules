@@ -9,14 +9,15 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion', {requireDevIfEnabled = true})
+local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 
-local CustomUnofficialWorldChampion = Class.new()
+---@class CustomUnofficialWorldChampionInfobox: UnofficialWorldChampionInfobox
+local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 
 ---@param frame Frame
 ---@return Html
 function CustomUnofficialWorldChampion.run(frame)
-	local unofficialWorldChampion = UnofficialWorldChampion(frame)
+	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 

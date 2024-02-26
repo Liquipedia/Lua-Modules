@@ -14,15 +14,15 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
-local CustomMap = Class.new()
-
+---@class StormgateMapInfobox: MapInfobox
+local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
@@ -55,19 +55,15 @@ local MapTypes = {
 	MISC = 'Miscellaneous',
 }
 
-local _args
-
 ---@param frame Frame
 ---@return Html
 function CustomMap.run(frame)
-	local customMap = Map(frame)
+	local map = CustomMap(frame)
+	map:setWidgetInjector(CustomInjector(map))
 
-	customMap.createWidgetInjector = CustomMap.createWidgetInjector
-	customMap.addToLpdb = CustomMap.addToLpdb
-	customMap.args = CustomMap._parseArgs(customMap.args)
-	_args = customMap.args
+	map.args = CustomMap._parseArgs(map.args)
 
-	return customMap:createInfobox()
+	return map:createInfobox()
 end
 
 ---@param args table
@@ -107,39 +103,42 @@ function CustomMap._parseArgs(args)
 	return args
 end
 
----@return WidgetInjector
-function CustomMap:createWidgetInjector()
-	return CustomInjector()
-end
-
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(widgets)
-	local typeName = Table.size(_args.types) == 1 and 'Type' or 'Types'
-	local hasCampData = Array.any(CAMPS, function(campData)
-		return _args[campData.key]
-	end)
-	return Array.extend(
-		widgets,
-		{
-			Cell{name = typeName, content = CustomMap._displayTypes(_args.types)},
-			Cell{name = 'Tileset', content = {_args.tileset}},
-			Cell{name = 'Size', content = {CustomMap._getSizeDisplay(_args)}},
-			Cell{name = 'Spawn Positions', content = {CustomMap._getSpawnDisplay(_args)}},
-			Cell{name = 'Versions', content = {_args.versions}},
-			Cell{name = 'Rush distance', content = {_args.rushDistance and (_args.rushDistance .. ' seconds') or nil}},
-			Cell{name = 'Available Resources', content = {CustomMap._resourcesDisplay(_args)}},
-		},
-		CustomMap._addCellsFromDataTable(_args, LADDER_HISTORY),
-		{hasCampData and Title{name = 'Camp Information'} or nil},
-		CustomMap._addCellsFromDataTable(_args, CAMPS)
-	)
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+
+	if id == 'custom' then
+		local typeName = Table.size(args.types) == 1 and 'Type' or 'Types'
+		local hasCampData = Array.any(CAMPS, function(campData)
+			return args[campData.key]
+		end)
+
+		return Array.extend(
+			widgets,
+			{
+				Cell{name = typeName, content = self.caller:_displayTypes(args.types)},
+				Cell{name = 'Tileset', content = {args.tileset}},
+				Cell{name = 'Size', content = {self.caller:_getSizeDisplay(args)}},
+				Cell{name = 'Spawn Positions', content = {self.caller:_getSpawnDisplay(args)}},
+				Cell{name = 'Versions', content = {args.versions}},
+				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
+				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
+			},
+			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
+			{hasCampData and Title{name = 'Camp Information'} or nil},
+			self.caller:_addCellsFromDataTable(args, CAMPS)
+		)
+	end
+
+	return widgets
 end
 
 ---@param args table
 ---@param tbl {key: string, name: string}[]
 ---@return Widget[]
-function CustomMap._addCellsFromDataTable(args, tbl)
+function CustomMap:_addCellsFromDataTable(args, tbl)
 	return Array.map(tbl, function(data)
 		return Cell{name = data.name, content = {args[data.key]}}
 	end)
@@ -147,7 +146,7 @@ end
 
 ---@param args table
 ---@return string
-function CustomMap._resourcesDisplay(args)
+function CustomMap:_resourcesDisplay(args)
 	local toValueWithIcon = function(key)
 		return args[key] and (RESOURCE_ICONS[key] .. ' ' .. args[key]) or nil
 	end
@@ -164,7 +163,7 @@ end
 
 ---@param types string[]
 ---@return string[]
-function CustomMap._displayTypes(types)
+function CustomMap:_displayTypes(types)
 	return Array.map(types, function(mapType)
 		return MapTypes[mapType]
 	end)
@@ -172,14 +171,14 @@ end
 
 ---@param args table
 ---@return string?
-function CustomMap._getSizeDisplay(args)
+function CustomMap:_getSizeDisplay(args)
 	if not args.width or not args.height then return end
 	return args.width .. 'x' .. args.height
 end
 
 ---@param args table
 ---@return string?
-function CustomMap._getSpawnDisplay(args)
+function CustomMap:_getSpawnDisplay(args)
 	return table.concat({args.players, args.positions}, ' at ')
 end
 

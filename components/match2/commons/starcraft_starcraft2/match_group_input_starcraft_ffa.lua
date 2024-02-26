@@ -11,8 +11,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
+local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft')
+local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local ALLOWED_STATUSES2 = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
@@ -159,9 +159,9 @@ function StarcraftFfaInput.getExtraData(match)
 end
 
 -- function to sort out placements
-function StarcraftFfaInput._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
+function StarcraftFfaInput._placementSortFunction(tbl, key1, key2)
+	local op1 = tbl[key1]
+	local op2 = tbl[key2]
 	return tonumber(op1) > tonumber(op2)
 end
 

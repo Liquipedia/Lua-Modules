@@ -11,8 +11,8 @@ local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local Variables = require('Module:Variables')
 
-local Achievements = Lua.import('Module:Infobox/Extension/Achievements', {requireDevIfEnabled = true})
-local Team = Lua.import('Module:Infobox/Team', {requireDevIfEnabled = true})
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
+local Team = Lua.import('Module:Infobox/Team')
 
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Showmatch]]',
@@ -72,8 +72,6 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
 	lpdbData.extradata.teamid = args.teamid
 	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
 	lpdbData.manager = Variables.varDefault('managerid') or args.manager

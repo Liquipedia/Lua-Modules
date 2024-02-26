@@ -8,14 +8,15 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Faction = Lua.import('Module:Faction', {requireDevIfEnabled = true})
-local Opponent = Lua.import('Module:Opponent', {requireDevIfEnabled = true})
-local OpponentDisplay = Lua.import('Module:OpponentDisplay', {requireDevIfEnabled = true})
-local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft', {requireDevIfEnabled = true})
+local Faction = Lua.import('Module:Faction')
+local Opponent = Lua.import('Module:Opponent')
+local OpponentDisplay = Lua.import('Module:OpponentDisplay')
+local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
 
 --Display components for opponents used by the starcraft and starcraft 2 wikis
 ---@class StarcraftOpponentDisplay: OpponentDisplay
@@ -267,7 +268,8 @@ function StarcraftOpponentDisplay.BlockArchon(props)
 		:node(playersNode)
 end
 
-StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
+StarcraftOpponentDisplay.CheckMark =
+	Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', screenReaderHidden = true}
 
 ---Displays a score within the context of an inline element.
 ---@param opponent StarcraftStandardOpponent

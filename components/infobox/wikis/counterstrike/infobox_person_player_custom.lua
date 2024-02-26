@@ -9,21 +9,19 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
-local Game = Lua.import('Module:Game', {requireDevIfEnabled = true})
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Player = Lua.import('Module:Infobox/Person', {requireDevIfEnabled = true})
+local Game = Lua.import('Module:Game')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
-local _BANNED = mw.loadData('Module:Banned')
-local _ROLES = {
+local BANNED = mw.loadData('Module:Banned')
+local ROLES = {
 	-- Players
 	['awper'] = {category = 'AWPers', display = 'AWPer', store = 'awp'},
 	['igl'] = {category = 'In-game leaders', display = 'In-game leader', store = 'igl'},
@@ -48,19 +46,33 @@ local _ROLES = {
 	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport', management = true},
 	['caster'] = {category = 'Casters', display = 'Caster', talent = true},
 }
-_ROLES.awp = _ROLES.awper
-_ROLES.lurk = _ROLES.lurker
-_ROLES.entryfragger = _ROLES.entry
-_ROLES.rifle = _ROLES.rifler
+ROLES.awp = ROLES.awper
+ROLES.lurk = ROLES.lurker
+ROLES.entryfragger = ROLES.entry
+ROLES.rifle = ROLES.rifler
 
-local CustomPlayer = Class.new()
+---@class CounterstrikePersonRoleData
+---@field category string
+---@field category2 string?
+---@field display string
+---@field display2 string?
+---@field store string?
+---@field coach boolean?
+---@field talent boolean?
+---@field management boolean?
 
+---@class CounterstrikeInfoboxPlayer: Person
+---@field gamesList string[]
+---@field role CounterstrikePersonRoleData?
+---@field role2 CounterstrikePersonRoleData?
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
-local _args
-
+---@param frame Frame
+---@return Html
 function CustomPlayer.run(frame)
-	local player = Player(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = player.args.team_history
 
@@ -73,33 +85,44 @@ function CustomPlayer.run(frame)
 
 	player.args.banned = tostring(player.args.banned or '')
 
-	player.adjustLPDB = CustomPlayer.adjustLPDB
-	player.createWidgetInjector = CustomPlayer.createWidgetInjector
-	player.getPersonType = CustomPlayer.getPersonType
-	player.getWikiCategories = CustomPlayer.getWikiCategories
-
-	player.args.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
+	player.gamesList = Array.filter(Game.listGames({ordered = true}), function (gameIdentifier)
 			return player.args[gameIdentifier]
 		end)
 
-	_args = player.args
+	player.role = ROLES[(player.args.role or ''):lower()]
+	player.role2 = ROLES[(player.args.role2 or ''):lower()]
 
 	return player:createInfobox()
 end
 
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'status' then
+	local caller = self.caller
+	local args = caller.args
+
+	if id == 'custom' then
 		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents()},
-			Cell{name = 'Years Active (Player)', content = {_args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {_args.years_active_manage}},
-			Cell{name = 'Years Active (Coach)', content = {_args.years_active_coach}},
-			Cell{name = 'Years Active (Analyst)', content = {_args.years_active_analyst}},
-			Cell{name = 'Years Active (Talent)', content = {_args.years_active_talent}},
+			Cell {
+				name = 'Games',
+				content = Array.map(caller.gamesList, function (gameIdentifier)
+						return Game.text{game = gameIdentifier}
+					end)
+			}
+		}
+	elseif id == 'status' then
+		return {
+			Cell{name = 'Status', content = caller:_getStatusContents(args)},
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Analyst)', content = {args.years_active_analyst}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
 	elseif id == 'role' then
-		local role = CustomPlayer._createRole('role', _args.role)
-		local role2 = CustomPlayer._createRole('role2', _args.role2)
+		local role = CustomPlayer._displayRole(caller.role)
+		local role2 = CustomPlayer._displayRole(caller.role2)
 
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
@@ -111,52 +134,40 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
-function CustomInjector:addCustomCells(widgets)
-	return {
-		Cell {
-			name = 'Games',
-			content = Array.map(_args.gamesList, function (gameIdentifier)
-					return Game.text{game = gameIdentifier}
-				end)
-		}
-	}
-end
-
-function CustomPlayer:createWidgetInjector()
-	return CustomInjector()
-end
-
-function CustomPlayer:adjustLPDB(lpdbData)
-	local normalizeRole = function (role)
-		local roleData = _ROLES[(role or ''):lower()]
-		if roleData then
-			return (roleData.store or roleData.display2 or roleData.display or ''):lower()
-		end
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	local normalizeRole = function(roleData)
+		if not roleData then return end
+		return (roleData.store or roleData.display2 or roleData.display or ''):lower()
 	end
 
-	lpdbData.extradata.role = normalizeRole(_args.role)
-	lpdbData.extradata.role2 = normalizeRole(_args.role2)
+	lpdbData.extradata.role = normalizeRole(self.role)
+	lpdbData.extradata.role2 = normalizeRole(self.role2)
 
 	return lpdbData
 end
 
-function CustomPlayer._getStatusContents()
+---@param args table
+---@return table
+function CustomPlayer:_getStatusContents(args)
 	local statusContents = {}
 
-	if String.isNotEmpty(_args.status) then
-		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, _args.status) or _args.status)
+	if String.isNotEmpty(args.status) then
+		table.insert(statusContents, Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status)
 	end
 
-	if String.isNotEmpty(_args.banned) then
-		local banned = _BANNED[string.lower(_args.banned)]
+	if String.isNotEmpty(args.banned) then
+		local banned = BANNED[string.lower(args.banned)]
 		if not banned then
-			banned = '[[Banned Players|Multiple Bans]]'
-			table.insert(statusContents, banned)
+			table.insert(statusContents, '[[Banned Players|Multiple Bans]]')
 		end
 
-		Array.extendWith(statusContents, Array.map(Player:getAllArgsForBase(_args, 'banned'),
+		Array.extendWith(statusContents, Array.map(self:getAllArgsForBase(args, 'banned'),
 				function(item)
-					return _BANNED[string.lower(item)]
+					return BANNED[string.lower(item)]
 				end
 			))
 	end
@@ -164,68 +175,64 @@ function CustomPlayer._getStatusContents()
 	return statusContents
 end
 
+---@param categories string[]
+---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	local typeCategory = self:getPersonType(_args).category
+	local typeCategory = self:getPersonType(self.args).category
 
-	Array.forEach(_args.gamesList, function (gameIdentifier)
+	Array.forEach(self.gamesList, function (gameIdentifier)
 			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
 			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
 		end)
 
-	if Table.isEmpty(_args.gamesList) then
+	if Table.isEmpty(self.gamesList) then
 		table.insert(categories, 'Gameless Players')
 	end
 
-	return categories
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category,
+		(self.role or {}).category2,
+		(self.role2 or {}).category2
+	)
 end
 
-function CustomPlayer._createRole(key, role)
-	if String.isEmpty(role) then
-		return nil
+---@param roleData CounterstrikePersonRoleData?
+---@return string?
+function CustomPlayer._displayRole(roleData)
+	if not roleData then return end
+
+	---@param postFix string|integer|nil
+	---@return string?
+	local toDisplay = function(postFix)
+		postFix = postFix or ''
+		if not roleData['category' .. postFix] then return end
+		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
 	end
 
-	local roleData = _ROLES[role:lower()]
-	if not roleData then
-		return nil
+	local role1Display = toDisplay()
+	local role2Display = toDisplay(2)
+	if role1Display and role2Display then
+		role2Display = '(' .. role2Display .. ')'
 	end
 
-	local category1 = 'Category:' .. roleData.category
-	local category2 = roleData.category2 and 'Category:' .. roleData.category2 or nil
-
-	Variables.varDefineEcho(key, roleData.variable)
-	local text = '[[:' .. category1 .. '|' .. roleData.display .. ']]'
-
-	if category2 then
-		text = text .. ' ([[:' .. category2 .. '|' .. roleData.display2 .. ']])'
-	end
-
-	if Namespace.isMain() then
-		text = text .. '[[Category:' .. roleData.category ..']]'
-		if category2 then
-			text = text .. '[[Category:' .. roleData.category2 ..']]'
-		end
-	end
-
-	return text
+	return table.concat({role1Display, role2Display}, ' ')
 end
 
-function CustomPlayer._isNotPlayer(role)
-	local roleData = _ROLES[(role or ''):lower()]
-	return roleData and (roleData.talent or roleData.management or roleData.coach)
-end
-
+---@param args table
+---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
-	local roleData = _ROLES[(args.role or ''):lower()]
+	local roleData = self.role
 	if roleData then
 		if roleData.coach then
-			return { store = 'Coach', category = 'Coache' }
+			return {store = 'Coach', category = 'Coache'}
 		elseif roleData.management then
-			return { store = 'Staff', category = 'Manager' }
+			return {store = 'Staff', category = 'Manager'}
 		elseif roleData.talent then
-			return { store = 'Talent', category = 'Talent' }
+			return {store = 'Talent', category = 'Talent'}
 		end
 	end
-	return { store = 'Player', category = 'Player' }
+	return {store = 'Player', category = 'Player'}
 end
 
 return CustomPlayer

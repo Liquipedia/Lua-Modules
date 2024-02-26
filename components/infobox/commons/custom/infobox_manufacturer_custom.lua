@@ -9,14 +9,15 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Manufacturer = Lua.import('Module:Infobox/Manufacturer', {requireDevIfEnabled = true})
+local Manufacturer = Lua.import('Module:Infobox/Manufacturer')
 
-local CustomManufacturer = Class.new()
+---@class CustomManufacturerInfobox: ManufacturerInfobox
+local CustomManufacturer = Class.new(Manufacturer)
 
 ---@param frame Frame
 ---@return Html
 function CustomManufacturer.run(frame)
-	local manufacturer = Manufacturer(frame)
+	local manufacturer = CustomManufacturer(frame)
 
 	-- add custom code here
 

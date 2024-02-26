@@ -15,8 +15,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Streams = Lua.import('Module:Links/Stream')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -29,7 +29,6 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local BYE = 'bye'
 local MAX_NUM_MAPS = 30
@@ -48,28 +47,13 @@ function CustomMatchGroupInput.processMatch(match)
 		error('Unexpected number of opponents in a non-FFA match')
 	end
 
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
 	match = CustomMatchGroupInput._getVodStuff(match)
 
 	return match
-end
-
-function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = EPOCH_TIME_EXTENDED,
-			dateexact = false,
-			timestamp = DateExt.epochZero,
-		}
-	end
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
@@ -193,7 +177,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.epochZero then
+	if not match.finished and match.timestamp > DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -276,16 +260,13 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -298,12 +279,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	if record.name then
 		record.name = record.name:gsub(' ', '_')
-	end
-
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		-- todo in sep pr:
-		--record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
 	end
 
 	return record
@@ -329,10 +304,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 	}
-
-	-- inherit stuff from match data
-	MatchGroupInput.getCommonTournamentVars(map, match)
-	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -436,15 +407,6 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			played = true,
 		}
-	end
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
 	end
 end
 

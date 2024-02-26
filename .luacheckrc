@@ -15,6 +15,8 @@ std = {
 		"package",
 		"pairs",
 		"pcall",
+		"rawget",
+		"rawset",
 		"require",
 		"select",
 		"setmetatable",
@@ -38,3 +40,5 @@ exclude_files = {
 ignore = {
 	"212" -- unused argument
 }
+
+files["spec/*_spec.lua"].read_globals = {"GoldenTest"}

@@ -6,22 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local MapTypeIcon = require('Module:MapType')
-local String = require('Module:StringUtils')
-local Class = require('Module:Class')
-local BrawlerIcon = require('Module:BrawlerIcon')
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local MapTypeIcon = require('Module:MapType')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local MatchSummary = Lua.import('Module:MatchSummary/Base', {requireDevIfEnabled = true})
-
-local _EPOCH_TIME = '1970-01-01 00:00:00'
-local _EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local LEFT_SIDE = 1
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|First pick]]'
@@ -32,6 +30,7 @@ local ICONS = {
 	check = GREEN_CHECK,
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 local LINK_DATA = {}
 
 local CustomMatchSummary = {}
@@ -116,8 +115,8 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 		local brawlerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
 			:css('float', flip and 'right' or 'left')
-			:node(BrawlerIcon._getImage{
-				brawler = brawlerData[index],
+			:node(CharacterIcon.Icon{
+				character = brawlerData[index] or NO_CHARACTER,
 				class = 'brkts-champion-icon',
 				date = date,
 			})
@@ -172,9 +171,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= _EPOCH_TIME_EXTENDED and match.date ~= _EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
