@@ -75,7 +75,7 @@ liquipedia.filterButtons = {
 					allButton = button;
 				} else {
 					buttons[ filterOn ] = button;
-					filterStates[ filterOn ] = filterStates[ filterOn ] || true;
+					filterStates[ filterOn ] = filterStates[ filterOn ] ?? true;
 				}
 				buttonElement.setAttribute( 'tabindex', '0' );
 			} );
