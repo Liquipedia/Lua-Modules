@@ -312,7 +312,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		header = map.header,
 		displayname = map.mapDisplayName,
-		gamemode = map.mode
+		mapmode = map.mode
 	}
 	map.game = match.game
 	map.mode = match.mode

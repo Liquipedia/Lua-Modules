@@ -120,8 +120,8 @@ function CustomMatchSummary._createGame(row, game, props)
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.extradata = game.extradata or {}
 	game.mapDisplayName = game.extradata.displayname or game.map
-	if game.extradata.gamemode then
-		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.gamemode}
+	if game.extradata.mapmode then
+		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.mapmode}
 	end
 	row
 			:addElement(CustomMatchSummary._createFactionIcon(CustomMatchSummary._getCivForPlayer(game, 1, 1), normGame))
