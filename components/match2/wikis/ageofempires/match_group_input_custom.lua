@@ -49,47 +49,42 @@ end
 function CustomMatchGroupInput._getTournamentVars(match)
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match.mapsInfo = CustomMatchGroupInput._retrieveMaps()
-	match.game = match.game or CustomMatchGroupInput._retrieveGame()
+	match = CustomMatchGroupInput._getMapsAndGame(match)
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
 
 	Variables.varDefine('bestof', match.bestof)
 end
 
+---@param match table
 ---@return table
-function CustomMatchGroupInput._retrieveMaps()
-	local mapsInfo, parseFailure = Json.parse(Variables.varDefault('tournament_maps'))
+function CustomMatchGroupInput._getMapsAndGame(match)
+	match.mapsInfo = Json.parse(Variables.varDefault('tournament_maps'))
 
-	if not parseFailure and Logic.isNotEmpty(mapsInfo) then
-		return mapsInfo
+	if Logic.isNotEmpty(match.mapsInfo) and match.game then
+		return match
 	end
 
-	-- likely in preview. Fetch from LPDB
+	-- likely in preview w/o Infobox/HDB. Fetch from LPDB
+	local title = mw.title.getCurrentTitle()
+	local pages = {
+		title.text:gsub(' ', '_'),
+		title.baseText:gsub(' ', '_'),
+		title.rootText:gsub(' ', '_'),
+	}
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[parent::' ..
-			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-		query = 'maps'
-	})[1] or {}
-
-	-- Store fetched data for following matches
-	Variables.varDefine('tournament_maps', data.maps)
-
-	return (Json.parse(data.maps))
-end
-
----@return string
-function CustomMatchGroupInput._retrieveGame()
-	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[parent::' ..
-			mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-		query = 'game'
-	})[1] or {}
+			conditions = '[[pagename::' .. table.concat(pages, ']] OR [[pagename::')  .. ']]',
+			query = 'game, maps'
+		})[1] or {}
 
 	-- Store fetched data for following matches
 	Variables.varDefine('tournament_game', data.game)
+	Variables.varDefine('tournament_maps', data.maps)
 
-	return data.game
+	match.game = match.game or data.game
+	match.mapsInfo = Logic.emptyOr(match.mapsInfo, Json.parse(data.maps))
+
+	return match
 end
 
 ---@param match table
@@ -312,7 +307,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		header = map.header,
 		displayname = map.mapDisplayName,
-		mapmode = map.mode
+		gamemode = map.mode
 	}
 	map.game = match.game
 	map.mode = match.mode
