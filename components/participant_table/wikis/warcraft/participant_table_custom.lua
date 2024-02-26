@@ -106,9 +106,6 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 		race = valueFromArgs('race'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
-
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
