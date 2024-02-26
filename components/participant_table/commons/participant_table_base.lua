@@ -232,7 +232,7 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		name = Opponent.toName(opponent),
+		name = Logic.emptyOr(Opponent.toName(opponent), opponent.template),
 		inputIndex = index,
 	}
 end
