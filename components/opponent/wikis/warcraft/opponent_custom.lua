@@ -127,7 +127,7 @@ function CustomOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
 				local savePageVar = not Opponent.playerIsTbd(player)
-				---@cast date string?
+				---@cast date string|number?
 				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),

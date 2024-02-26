@@ -47,7 +47,7 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 end)
 
 ---@param resolvedPageName string
----@param date string?
+---@param date string|number?
 ---@return string?
 function CustomPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
