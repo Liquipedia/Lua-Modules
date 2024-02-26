@@ -62,17 +62,17 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	if CustomMatchSummary._isSolo(match) then
-		for _, game in ipairs(match.games) do
-			if game.map or game.winner then
-				local row = MatchSummary.Row()
-						:addClass('brkts-popup-body-game')
-						:css('font-size', '84%')
-						:css('padding', '4px')
-						:css('min-height', '24px')
-				CustomMatchSummary._createGame(row, game, {game = match.game})
-				body:addRow(row)
-			end
+	if not CustomMatchSummary._isSolo(match) then return body end
+
+	for _, game in ipairs(match.games) do
+		if game.map or game.winner then
+			local row = MatchSummary.Row()
+					:addClass('brkts-popup-body-game')
+					:css('font-size', '84%')
+					:css('padding', '4px')
+					:css('min-height', '24px')
+			CustomMatchSummary._createGame(row, game, {game = match.game})
+			body:addRow(row)
 		end
 	end
 
@@ -80,22 +80,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 function CustomMatchSummary.addToFooter(match, footer)
-	if match.vod then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
-		})
-	end
-
-	-- Game Vods
-	Array.forEach(match.games, function(game, index)
-		if Logic.isEmpty(game.vod) then
-			return
-		end
-		footer:addElement(VodLink.display{
-			gamenum = index,
-			vod = game.vod,
-		})
-	end)
+	footer = MatchSummary.addVodsToFooter(match, footer)
 
 	footer:addLinks(LINKDATA, match.links)
 
@@ -122,10 +107,7 @@ function CustomMatchSummary._isSolo(match)
 end
 
 function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)
-	if not game then
-		return
-	end
-	if not game.participants then
+	if not game or not game.participants then
 		return
 	end
 	local player = game.participants[opponentIndex .. '_' .. playerIndex]
