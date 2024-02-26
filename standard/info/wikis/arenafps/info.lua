@@ -163,8 +163,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q1 = {
@@ -172,12 +172,12 @@ return {
 			name = 'Quake',
 			link = 'Quake',
 			logo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q2 = {
@@ -189,8 +189,8 @@ return {
 				lightMode = 'Quake 2 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 2 logo.png',
-				lightMode = 'Quake 2 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q3 = {
@@ -202,8 +202,8 @@ return {
 				lightMode = 'Quake 3 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 3 logo.png',
-				lightMode = 'Quake 3 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q4 = {
@@ -215,8 +215,8 @@ return {
 				lightMode = 'Quake 4 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 4 logo.png',
-				lightMode = 'Quake 4 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qc = {
@@ -224,12 +224,12 @@ return {
 			name = 'Quake Champions',
 			link = 'Quake Champions',
 			logo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qcde = {
@@ -241,8 +241,8 @@ return {
 				lightMode = 'QCDoom.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'QCDoom.png',
-				lightMode = 'QCDoom.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		ql = {
@@ -254,8 +254,8 @@ return {
 				lightMode = 'Quake Live logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake Live logo.png',
-				lightMode = 'Quake Live logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qw = {
@@ -267,8 +267,8 @@ return {
 				lightMode = 'QuakeWorld logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'QuakeWorld logo.png',
-				lightMode = 'QuakeWorld logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		ra = {
@@ -293,8 +293,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		sm = {
@@ -358,8 +358,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		ut99 = {
@@ -403,7 +403,7 @@ return {
 		},
 	},
 	defaultGame = 'qc',
-	defaultTeamLogo = 'Quake logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Quake logo.png', ---@deprecated
-	match2 = 0,
+	defaultTeamLogo = 'Quake default lightmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Quake default darkmode.png', ---@deprecated
+	match2 = 1,
 }
