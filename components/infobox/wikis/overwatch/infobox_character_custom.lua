@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=overwatch
--- page=Module:Infobox/Unit/Hero/Custom
+-- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,22 +13,22 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Unit = Lua.import('Module:Infobox/Unit')
+local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class OverwatchHeroInfobox: UnitInfobox
-local CustomUnit = Class.new(Unit)
+---@class OverwatchHeroInfobox: CharacterInfobox
+local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
-function CustomUnit.run(frame)
-	local unit = CustomUnit(frame)
-	unit:setWidgetInjector(CustomInjector(unit))
-	unit.args.informationType = 'Hero'
-	return unit:createInfobox()
+function CustomCharacter.run(frame)
+	local character = CustomCharacter(frame)
+	character:setWidgetInjector(CustomInjector(character))
+	character.args.informationType = 'Hero'
+	return character:createInfobox()
 end
 
 ---@param id string
@@ -39,14 +39,11 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Role', content = {args.role}},
-			Cell{name = 'Real Name', content = {args.realname}},
 			Cell{name = 'Age', content = {args.age}},
 			Cell{name = 'Relations', content = {args.relations}},
 			Cell{name = 'Occupation', content = {args.occupation}},
 			Cell{name = 'Base of Operations', content = {args.baseofoperations}},
 			Cell{name = 'Affiliation', content = {args.affiliation}},
-			Cell{name = 'Release Date', content = {args.releasedate}},
 			Cell{name = 'Voice Actor(s)', content = {args.voiceactor}}
 		)
 	end
@@ -56,25 +53,11 @@ end
 
 ---@param args table
 ---@return string[]
-function CustomUnit:getWikiCategories(args)
+function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 	return Array.append({'Heroes'},
 		String.isNotEmpty(args.role) and (args.role .. ' Heroes') or nil
 	)
 end
 
----@param args table
-function CustomUnit:setLpdbData(args)
-	local lpdbData = {
-		type = 'hero',
-		name = args.name or self.pagename,
-		image = args.image,
-		date = args.releasedate,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			role = args.role,
-		})
-	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.name or self.pagename), lpdbData)
-end
-
-return CustomUnit
+return CustomCharacter
