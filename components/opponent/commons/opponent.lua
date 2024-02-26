@@ -306,7 +306,6 @@ function Opponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
-				---@cast date string|number?
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
 					player.team,

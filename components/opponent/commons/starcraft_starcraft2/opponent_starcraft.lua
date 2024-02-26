@@ -161,7 +161,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local hasRace = String.isNotEmpty(player.race)
 				local savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])
-				---@cast date string|number?
+				---@cast date - osdate
 				StarcraftPlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
