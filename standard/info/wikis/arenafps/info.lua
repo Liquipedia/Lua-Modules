@@ -20,8 +20,8 @@ return {
 				lightMode = 'Aim Gods logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Aim Gods logo.png',
-				lightMode = 'Aim Gods logo.png',
+				darkMode = 'Aim Gods default allmode.png',
+				lightMode = 'Aim Gods default allmode.png',
 			},
 		},
 		aq2 = {
