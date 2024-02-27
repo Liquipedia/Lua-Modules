@@ -195,6 +195,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 ---@field header string?
 ---@field length number?
 ---@field map string?
+---@field mapDisplayName string?
 ---@field mode string?
 ---@field participants table
 ---@field resultType ResultType?
@@ -211,6 +212,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
+	mapDisplayName = 'string?',
 	mode = 'string?',
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
@@ -642,6 +644,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
+		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),

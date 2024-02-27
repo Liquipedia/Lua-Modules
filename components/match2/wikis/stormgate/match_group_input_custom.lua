@@ -434,7 +434,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		displayname = map.mapDisplayName,
 	}
 
 	-- determine score, resulttype, walkover and winner
