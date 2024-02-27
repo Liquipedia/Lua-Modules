@@ -8,7 +8,7 @@
 
 local Class = require('Module:Class')
 
----@class WidgetInjector
+---@class WidgetInjector: BaseClass
 ---@operator call(table?): WidgetInjector
 ---@field caller table?
 local Injector = Class.new(
