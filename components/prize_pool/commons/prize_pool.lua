@@ -22,7 +22,7 @@ local Opponent = OpponentLibrary.Opponent
 local TableCell = require('Module:Widget/Table/Cell')
 local TableRow = require('Module:Widget/Table/Row')
 
----@class PrizePool
+---@class PrizePool: BasePrizePool
 ---@field options table
 ---@field _lpdbInjector LpdbInjector?
 ---@field placements PrizePoolPlacement[]
