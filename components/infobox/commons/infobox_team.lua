@@ -260,7 +260,7 @@ end
 ---@param date? string
 ---@return boolean
 function Team._isValidDate(date)
-	return date and date:match('%d%d%d%d%-?[%d%?]?[%d%?]?%-?[%d%?]?[%d%?]?')
+	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
 end
 
 ---@param date string
