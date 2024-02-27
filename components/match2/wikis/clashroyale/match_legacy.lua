@@ -8,7 +8,7 @@
 
 local MatchLegacy = {}
 
-local json = require('Module:Json')
+local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -35,7 +35,7 @@ function MatchLegacy.convertParameters(match2)
 	end
 
 	match.staticid = match2.match2id
-	match.extradata = json.parseIfString(match.extradata) or {}
+	match.extradata = Json.parseIfString(match.extradata) or {}
 	local opponent1 = match2.match2opponents[1] or {}
 	local opponent1match2players = opponent1.match2players or {}
 	local opponent2 = match2.match2opponents[2] or {}
@@ -50,13 +50,13 @@ function MatchLegacy.convertParameters(match2)
 			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
 			match.opponent1flag = player.flag
 			match.extradata.opponent1name = player.displayname
-			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
 			player = opponent2match2players[1] or {}
 			match.opponent2 = player.name and player.name:gsub('_', ' ') or nil
 			match.opponent2score = (tonumber(opponent2.score) or 0) >= 0 and opponent2.score or 0
 			match.opponent2flag = player.flag
 			match.extradata.opponent2name = player.displayname
-			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
 		elseif opponent1.type == 'team' then
 			match.opponent1 = String.isNotEmpty(opponent1.name) and opponent1.name:gsub('_', ' ') or 'TBD'
 			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
@@ -76,7 +76,7 @@ function MatchLegacy.convertParameters(match2)
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
-		match.extradata = json.stringify(match.extradata)
+		match.extradata = Json.stringify(match.extradata)
 	else
 		doStore = false
 		match = nil
