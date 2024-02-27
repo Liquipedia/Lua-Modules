@@ -37,10 +37,14 @@ local LINKDATA = {
 
 local CustomMatchSummary = {}
 
+---@param args table
+---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '285px'})
 end
 
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryHeader
 function CustomMatchSummary.createHeader(match)
 	local header = MatchSummary.Header()
 
@@ -51,6 +55,8 @@ function CustomMatchSummary.createHeader(match)
 			:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
@@ -77,6 +83,9 @@ function CustomMatchSummary.createBody(match)
 	return body
 end
 
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
@@ -97,6 +106,8 @@ function CustomMatchSummary.addToFooter(match, footer)
 	return footer
 end
 
+---@param match MatchGroupUtilMatch
+---@return boolean
 function CustomMatchSummary._isSolo(match)
 	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
 		return false
@@ -104,6 +115,8 @@ function CustomMatchSummary._isSolo(match)
 	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
 end
 
+---@param game MatchGroupUtilGame
+---@return string?
 function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)
 	if not game or not game.participants then
 		return
@@ -115,11 +128,13 @@ function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)
 	return player.civ
 end
 
--- SoloOpponents only
+---@param row MatchSummaryRow
+---@param game MatchGroupUtilGame
+---@param props {game: string?}
 function CustomMatchSummary._createGame(row, game, props)
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.extradata = game.extradata or {}
-	game.mapDisplayName = game.extradata.displayname or game.map
+	game.mapDisplayName = game.mapDisplayName or game.map
 	if game.extradata.mapmode then
 		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.mapmode}
 	end
@@ -134,6 +149,9 @@ function CustomMatchSummary._createGame(row, game, props)
 			:addElement(CustomMatchSummary._createFactionIcon(CustomMatchSummary._getCivForPlayer(game, 2, 1), normGame))
 end
 
+---@param civ string?
+---@param game string
+---@return Html
 function CustomMatchSummary._createFactionIcon(civ, game)
 	return mw.html.create('span')
 		:addClass('draft faction')
@@ -146,6 +164,9 @@ function CustomMatchSummary._createFactionIcon(civ, game)
 		})
 end
 
+---@param winner integer|string
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 	return mw.html.create('div')
 			:addClass('brkts-popup-spaced')
