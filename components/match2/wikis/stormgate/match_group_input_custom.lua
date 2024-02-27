@@ -641,37 +641,56 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'noheroescheck']),
 				playedRandom = Logic.readBool(map[prefix .. 'random']),
+				displayName = playerInput,
 			}
 		end
 	end
 
-	for playerIndex, player in pairs(players) do
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
+			heroes = CustomMatchGroupInput._readHeroes(
+				currentPlayer.heroes,
+				faction,
+				player.name,
+				currentPlayer.heroesCheckDisabled
+			),
+			random = currentPlayer.playedRandom,
+		}
+	end
+
+	Array.forEach(players, function(player, playerIndex)
 		local currentPlayer = playerData[player.name]
-		if currentPlayer then
-			local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+		if not currentPlayer then return end
 
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = currentPlayer.position,
-				flag = Flags.CountryName(player.flag),
-				heroes = CustomMatchGroupInput._readHeroes(
-					currentPlayer.heroes,
-					faction,
-					player.name,
-					currentPlayer.heroesCheckDisabled
-				),
-				random = currentPlayer.playedRandom,
-			}
-		end
-	end
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
 
-	for tbdIndex = 1, amountOfTbds do
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	Table.iter.forEachPair(playerData, function(playerLink, player)
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction},
+		})
+		addToParticipants(player, players[#players], #players)
+		numberOfPlayers = numberOfPlayers + 1
+	end)
+
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
 			faction = Faction.defaultFaction,
 			player = TBD:upper(),
 		}
-	end
+	end)
 
 	map.participants = participants
 
