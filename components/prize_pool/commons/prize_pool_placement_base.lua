@@ -28,7 +28,7 @@ local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
 --- @field parent BasePrizePool
 --- @field count integer
---- @field opponents table
+--- @field opponents BasePlacementOpponent
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 
 ---@class BasePlacementOpponent
