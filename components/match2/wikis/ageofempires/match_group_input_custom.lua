@@ -73,7 +73,7 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 		title.rootText:gsub(' ', '_'),
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = '[[pagename::' .. table.concat(pages, ']] OR [[pagename::')  .. ']]',
+			conditions = table.concat(Array.map(pages, function(page) return '[[pagename::' .. page .. ']]' end), ' OR '),
 			query = 'game, maps'
 		})[1] or {}
 

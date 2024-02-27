@@ -68,17 +68,16 @@ function CustomMatchSummary.createBody(match)
 
 	if not CustomMatchSummary._isSolo(match) then return body end
 
-	for _, game in ipairs(match.games) do
-		if game.map or game.winner then
-			local row = MatchSummary.Row()
-					:addClass('brkts-popup-body-game')
-					:css('font-size', '84%')
-					:css('padding', '4px')
-					:css('min-height', '24px')
-			CustomMatchSummary._createGame(row, game, {game = match.game})
-			body:addRow(row)
-		end
-	end
+	Array.forEach(match.games, function(game)
+		if not game.map and not game.winner then return end
+		local row = MatchSummary.Row()
+				:addClass('brkts-popup-body-game')
+				:css('font-size', '84%')
+				:css('padding', '4px')
+				:css('min-height', '24px')
+		CustomMatchSummary._createGame(row, game, {game = match.game})
+		body:addRow(row)
+	end)
 
 	return body
 end
@@ -91,19 +90,19 @@ function CustomMatchSummary.addToFooter(match, footer)
 
 	footer:addLinks(LINKDATA, match.links)
 
-	if Logic.readBool(match.extradata.headtohead) and CustomMatchSummary._isSolo(match) then
-		local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
-				string.gsub(match.opponents[2].name, ' ', '_')
-		footer:addElement(
-			'[[File:Match Info Stats.png|link=' ..
-			tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
-			player1 ..
-			'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
-		)
+	if not Logic.readBool(match.extradata.headtohead) or not CustomMatchSummary._isSolo(match) then
+		return footer
 	end
 
-	return footer
+	local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
+			string.gsub(match.opponents[2].name, ' ', '_')
+	return footer:addElement(
+		'[[File:Match Info Stats.png|link=' ..
+		tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
+		player1 ..
+		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
+	)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -112,7 +111,7 @@ function CustomMatchSummary._isSolo(match)
 	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
 		return false
 	end
-	return match.opponents[1].type == Opponent.solo and	match.opponents[2].type == Opponent.solo
+	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
 end
 
 ---@param game MatchGroupUtilGame
@@ -122,10 +121,7 @@ function CustomMatchSummary._getCivForPlayer(game, opponentIndex, playerIndex)
 		return
 	end
 	local player = game.participants[opponentIndex .. '_' .. playerIndex]
-	if not player then
-		return
-	end
-	return player.civ
+	return (player or {}).civ
 end
 
 ---@param row MatchSummaryRow
