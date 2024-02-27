@@ -164,7 +164,7 @@ function BasePlacement:parseOpponentArgs(input, date)
 	elseif type(opponentArgs[1]) ~= 'table' then
 		opponentData = Opponent.readOpponentArgs(opponentArgs)
 	end
-	---@cast opponentData standardOpponent
+	---@cast opponentData standardOpponent?
 
 	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
 		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
