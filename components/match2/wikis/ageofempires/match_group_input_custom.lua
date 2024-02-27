@@ -74,7 +74,8 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	}
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = table.concat(Array.map(pages, function(page) return '[[pagename::' .. page .. ']]' end), ' OR '),
-			query = 'game, maps'
+			query = 'game, maps',
+			order = 'pagename desc'
 		})[1] or {}
 
 	-- Store fetched data for following matches
@@ -305,7 +306,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		comment = map.comment,
 		header = map.header,
 		displayname = map.mapDisplayName,
-		gamemode = map.mode
+		mapmode = map.mode
 	}
 	map.game = match.game
 	map.mode = match.mode

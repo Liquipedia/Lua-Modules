@@ -39,7 +39,7 @@ function MatchLegacy.storeGames(match, match2)
 		-- Extradata
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
-		game.extradata.mapmode = game.extradata.mapmode
+		game.extradata.mapmode = game2.extradata.mapmode
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
 		game.extradata.opponent1civ = player1.civ
