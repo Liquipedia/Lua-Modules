@@ -51,7 +51,7 @@ end)
 
 ---For specific uses only.
 ---@param resolvedPageName string
----@param date string|number?
+---@param date string|number|osdate?
 ---@return string?
 function StarcraftPlayerExt.fetchPlayerRace(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
@@ -155,7 +155,7 @@ options.fetchMatch2Player: Whether to use the player's recent matches. Disabled 
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
 ---@param player StarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string|number?}?
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string|number|osdate?}?
 ---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.syncPlayer(player, options)
 	options = options or {}

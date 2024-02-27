@@ -99,7 +99,7 @@ end)
 ---
 ---For specific uses only.
 ---@param resolvedPageName string
----@param date string|number?
+---@param date string|number|osdate?
 ---@return {joinDate: string, leaveDate: string, template: string}?
 function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	date = date or DateExt.getContextualDateOrNow()
@@ -130,7 +130,7 @@ end
 
 --For specific uses only.
 ---@param resolvedPageName string
----@param date string?
+---@param date string|number|osdate?
 ---@return string?
 function PlayerExt.fetchTeamTemplate(resolvedPageName, date)
 	local entry = PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
@@ -234,7 +234,7 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
----@param options {date: string|number?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
+---@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
 ---@return string?
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
