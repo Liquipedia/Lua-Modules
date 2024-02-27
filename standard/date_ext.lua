@@ -33,17 +33,25 @@ DateExt.defaultYear = '0000'
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
 --- Throws if the input string is non-empty and not a valid date.
----@param dateString string|number|osdate
+---@param dateString string|number|osdate|osdateparam?
 ---@return integer?
 function DateExt.readTimestamp(dateString)
+	-- due to metatable stuff for osdate empty checks do not work properly on it
+	-- hence check if year, month and day are set instead
+	if type(dateString) == 'table' and dateString.year and dateString.month and dateString.day then
+		-- in this case we have osdate really being osdateparam
+		---@cast dateString osdateparam
+		return tonumber(os.time(dateString))
+	end
+
 	if Logic.isEmpty(dateString) then
 		return nil
 	elseif type(dateString) == 'number' then
 		return dateString
 	end
 
-	---since lua allows osdate to be treated as a string we cast it to be a string here
-	dateString = tostring(dateString)
+	-- everything but strings was processed above
+	---@cast dateString string
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local tzTemplateOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
