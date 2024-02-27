@@ -6,10 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = require('Module:Lua')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -37,29 +38,71 @@ local GSL_STYLE_SCORES = {
 }
 local BYE_OPPONENT_NAME = 'bye'
 
-local _parent
-local _last_vs_group_cache = {}
+---@class PrizePoolImport
+local Import = Class.new(function(self, ...) self:init(...) end)
 
-local Import = {}
+---@class PrizePoolImportConfig
+---@field ignoreNonScoreEliminations boolean
+---@field importLimit integer
+---@field placementsToSkip integer
+---@field matchGroupsSpec table
+---@field groupElimStatuses string[]
+---@field groupScoreDelimiter string
+---@field allGroupsUseWdl boolean
+---@field stageImportLimits table<integer, integer>
+---@field stagePlacementsToSkip table<integer, integer>
+---@field stageImportWinners table<integer, boolean>
+---@field stageGroupElimStatuses table<integer, string[]>
 
+---@class PrizePoolImportStageConfig
+---@field importWinners boolean
+---@field groupElimStatuses string[]
+---@field importLimit integer
+---@field placementsToSkip integer?
+
+---@param parent PrizePool
+---@return PrizePoolPlacement[]
 function Import.run(parent)
-	_parent = parent
+	local import = Import(parent)
 
-	Import.config = Import._getConfig(parent.args, parent.placements)
-
-	if Import.config.importLimit == 0 or not Import.config.matchGroupsSpec then
+	if import.config.importLimit == 0 or not import.config.matchGroupsSpec then
 		return parent.placements
 	end
 
-	return Import._importPlacements(parent.placements)
+	return import:_importPlacements(parent.placements)
 end
 
+---@param parent PrizePool
+---@return self
+function Import:init(parent)
+	self.parent = parent
+	self.lastVsGroupCache = {}
+	self.config = Import._getConfig(parent.args, parent.placements)
+	return self
+end
+
+---@param args table
+---@param placements PrizePoolPlacement[]
+---@return PrizePoolImportConfig|{}
 function Import._getConfig(args, placements)
 	if String.isEmpty(args.matchGroupId1) and String.isEmpty(args.tournament1)
 		and String.isEmpty(args.matchGroupId) and String.isEmpty(args.tournament)
 		and not Import._enableImport(args.import) then
 
 		return {}
+	end
+
+	---@generic V
+	---@param config string
+	---@param fun fun(val: string): V
+	---@return table<integer, V>
+	local processStagesConfig = function(config, fun)
+		return Table.mapArguments(
+			args,
+			function(key) return tonumber(string.match(key, '^stage(%d+)' .. config ..'$')) end,
+			function(key) return fun(args[key]) end,
+			true
+		)
 	end
 
 	return {
@@ -74,36 +117,17 @@ function Import._getConfig(args, placements)
 		),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
-		stageImportLimits = Table.mapArguments(
-			args,
-			function(key) return tonumber(string.match(key, '^stage(%d+)importLimit$')) end,
-			function(key) return tonumber(args[key]) end,
-			true
-		),
-		stagePlacementsToSkip = Table.mapArguments(
-			args,
-			function(key) return tonumber(string.match(key, '^stage(%d+)placementsToSkip$')) end,
-			function(key) return tonumber(args[key]) end,
-			true
-		),
-		stageImportWinners = Table.mapArguments(
-			args,
-			function(key) return tonumber(string.match(key, '^stage(%d+)importWinners$')) end,
-			function(key) return Logic.readBoolOrNil(args[key]) end,
-			true
-		),
-		stageGroupElimStatuses = Table.mapArguments(
-			args,
-			function(key) return tonumber(string.match(key, '^stage(%d+)groupElimStatuses$')) end,
-			function(key) return Array.map(
-				mw.text.split(args[key], ','),
-				String.trim
-			) end,
-			true
-		),
+		stageImportLimits = processStagesConfig('importLimit', tonumber),
+		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
+		stageImportWinners = processStagesConfig('importWinners', tonumber),
+		stageGroupElimStatuses = processStagesConfig('importLimit', function(val)
+			return Array.map(mw.text.split(val, ','), String.trim)
+		end),
 	}
 end
 
+---@param importInput boolean?
+---@return boolean
 function Import._enableImport(importInput)
 	local date = DateExt.getContextualDateOrNow()
 	return Logic.nilOr(
@@ -112,6 +136,10 @@ function Import._enableImport(importInput)
 	)
 end
 
+---@param importLimitInput string|integer
+---@param placements PrizePoolPlacement[]
+---@param placementsExtendImportLimit boolean?
+---@return integer?
 function Import._importLimit(importLimitInput, placements, placementsExtendImportLimit)
 	local importLimit = tonumber(importLimitInput)
 
@@ -128,7 +156,9 @@ function Import._importLimit(importLimitInput, placements, placementsExtendImpor
 end
 
 -- fills in placements and opponents using data fetched from LPDB
-function Import._importPlacements(inputPlacements)
+---@param inputPlacements PrizePoolPlacement[]
+---@return PrizePoolPlacement[]
+function Import:_importPlacements(inputPlacements)
 	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
@@ -156,11 +186,14 @@ function Import._importPlacements(inputPlacements)
 		end
 	end
 
-	return Import._mergePlacements(placementEntries, inputPlacements)
+	return self:_mergePlacements(placementEntries, inputPlacements)
 end
 
 -- Compute placements and their entries of all brackets or all group tables in a
 -- tournament stage. The placements are ordered from high placement to low.
+---@param stage table
+---@param options PrizePoolImportStageConfig
+---@return table[][][]
 function Import._computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
 		return TournamentStructure.isGroupTable(matchGroup)
@@ -191,6 +224,9 @@ function Import._computeStagePlacementEntries(stage, options)
 end
 
 -- Compute placements and their entries from a GroupTableLeague record.
+---@param standingRecords table[]
+---@param options PrizePoolImportStageConfig
+---@return table
 function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	local needsLastVs = Import._needsLastVs(standingRecords)
 	local placementEntries = {}
@@ -232,6 +268,8 @@ function Import._computeGroupTablePlacementEntries(standingRecords, options)
 	return placementEntries
 end
 
+---@param standingRecords table[]
+---@return boolean
 function Import._needsLastVs(standingRecords)
 	if Import.config.allGroupsUseWdl then
 		return false
@@ -253,6 +291,9 @@ function Import._needsLastVs(standingRecords)
 end
 
 -- Compute placements and their entries from the match records of a bracket.
+---@param matchRecords table[]
+---@param options PrizePoolImportStageConfig
+---@return table[][]
 function Import._computeBracketPlacementEntries(matchRecords, options)
 	local bracket = MatchGroupUtil.makeBracketFromRecords(matchRecords)
 
@@ -284,6 +325,9 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 	return slots
 end
 
+---@param placementEntry table
+---@param match MatchGroupUtilMatch
+---@return table
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = DateExt.toYmdInUtc(match.date),
@@ -293,8 +337,8 @@ function Import._makeEntryFromMatch(placementEntry, match)
 		local entryOpponentIndex = placementEntry.matchPlacement == 1
 			and match.winner
 			or #match.opponents - match.winner + 1
-		local opponent = match.opponents[entryOpponentIndex]
-		local vsOpponent = match.opponents[#match.opponents - entryOpponentIndex + 1]
+		local opponent = match.opponents[entryOpponentIndex] --[[@as table]]
+		local vsOpponent = match.opponents[#match.opponents - entryOpponentIndex + 1] --[[@as table]]
 		opponent.isResolved = true
 		vsOpponent.isResolved = true
 
@@ -311,6 +355,9 @@ end
 
 -- Computes the placements of a LPDB bracket
 -- @options.importWinners: Whether to include placements for non-eliminated opponents.
+---@param bracket MatchGroupUtilBracket
+---@param options PrizePoolImportStageConfig
+---@return table[][]
 function Import._computeBracketPlacementGroups(bracket, options)
 	local firstDropdownRoundIndexes = Import._findBracketFirstDropdownRounds(bracket)
 	local preTiebreakMatchIds = Import._getPreTiebreakMatchIds(bracket)
@@ -389,13 +436,17 @@ function Import._computeBracketPlacementGroups(bracket, options)
 		)
 	end)
 
-	return Array.groupBy(placementEntries, function(entry)
+	local groups = Array.groupBy(placementEntries, function(entry)
 		return table.concat(entry.groupKey, '.')
 	end)
+
+	return groups
 end
 
 -- Returns the semifinals match IDs of a bracket if the losers also play in a
 -- third place match to determine placement.
+---@param bracket MatchGroupUtilBracket
+---@return table
 function Import._getPreTiebreakMatchIds(bracket)
 	local firstBracketData = bracket.bracketDatasById[bracket.rootMatchIds[1]]
 	local thirdPlaceMatchId = firstBracketData.thirdPlaceMatchId
@@ -412,7 +463,8 @@ end
 -- Gets the first round of each level (section) of a bracket where losers drop to the level below.
 -- Returns empty array if the bracket is single elimination. If no losers drop to a lower level, then
 -- the array will contain `-1` for that level.
----@return number[]
+---@param bracket MatchGroupUtilBracket
+---@return integer[]
 function Import._findBracketFirstDropdownRounds(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 	local roundIndexes = Array.range(1, #bracket.rounds)
@@ -426,31 +478,37 @@ function Import._findBracketFirstDropdownRounds(bracket)
 	end)
 end
 
-function Import._mergePlacements(lpdbEntries, placements)
+---@param lpdbEntries table[]
+---@param placements PrizePoolPlacement[]
+---@return PrizePoolPlacement[]
+function Import:_mergePlacements(lpdbEntries, placements)
 	for placementIndex, lpdbPlacement in ipairs(lpdbEntries) do
-		placements[placementIndex] = Import._mergePlacement(
+		placements[placementIndex] = self:_mergePlacement(
 			lpdbPlacement,
-			placements[placementIndex] or Import._emptyPlacement(placements[placementIndex - 1], #lpdbPlacement)
+			placements[placementIndex] or self:_emptyPlacement(placements[placementIndex - 1], #lpdbPlacement)
 		)
 	end
 
 	return placements
 end
 
-function Import._emptyPlacement(priorPlacement, placementSize)
+function Import:_emptyPlacement(priorPlacement, placementSize)
 	priorPlacement = priorPlacement or {}
 	local placeStart = (priorPlacement.placeEnd or 0) + 1
 	local placeEnd = (priorPlacement.placeEnd or 0) + placementSize
 
 	return Placement(
 		{placeStart = placeStart, placeEnd = placeEnd, count = placementSize},
-		_parent
+		self.parent
 	):create(priorPlacement.placeEnd or 0)
 end
 
-function Import._mergePlacement(lpdbEntries, placement)
+---@param lpdbEntries table
+---@param placement PrizePoolPlacement
+---@return PrizePoolPlacement
+function Import:_mergePlacement(lpdbEntries, placement)
 	for opponentIndex, opponent in ipairs(lpdbEntries) do
-		placement.opponents[opponentIndex] = Import._removeDefaultDate(Import._mergeEntry(
+		placement.opponents[opponentIndex] = Import._removeDefaultDate(self:_mergeEntry(
 			opponent,
 			Table.mergeInto(placement:parseOpponents{{}}[1], placement.opponents[opponentIndex]),
 			placement
@@ -466,7 +524,11 @@ function Import._mergePlacement(lpdbEntries, placement)
 	return placement
 end
 
-function Import._mergeEntry(lpdbEntry, entry, placement)
+---@param lpdbEntry table
+---@param entry BasePlacementOpponent
+---@param placement PrizePoolPlacement
+---@return BasePlacementOpponent
+function Import:_mergeEntry(lpdbEntry, entry, placement)
 	if
 		not Opponent.isTbd(entry.opponentData) -- valid manual input
 		or Table.isEmpty(lpdbEntry.opponent) -- irrelevant lpdbEntry
@@ -477,17 +539,21 @@ function Import._mergeEntry(lpdbEntry, entry, placement)
 
 	entry.opponentData = Import._removeTbdIdentifiers(entry.opponentData)
 
-	lpdbEntry = Import._entryToOpponent(lpdbEntry, placement)
+	lpdbEntry = self:_entryToOpponent(lpdbEntry, placement)
 
 	entry.date = lpdbEntry.date or entry.date
 
 	return Table.deepMergeInto(lpdbEntry, entry)
 end
 
+---@param opponent standardOpponent?
+---@return table
 function Import._removeTbdIdentifiers(opponent)
 	if Table.isEmpty(opponent) then
 		return {}
-	elseif not Opponent.isTbd(opponent) then
+	end
+	---@cast opponent -nil
+	if not Opponent.isTbd(opponent) then
 		return opponent
 	-- Entry is a TBD Opponent, but could contain data (e.g. flag or faction) for party opponents
 	elseif not opponent.type or not Opponent.typeIsParty(opponent.type) then
@@ -506,10 +572,13 @@ function Import._removeTbdIdentifiers(opponent)
 	return opponent
 end
 
-function Import._entryToOpponent(lpdbEntry, placement)
+---@param lpdbEntry table
+---@param placement PrizePoolPlacement
+---@return BasePlacementOpponent
+function Import:_entryToOpponent(lpdbEntry, placement)
 	local additionalData = {}
 	if lpdbEntry.needsLastVs then
-		additionalData = Import._groupLastVsAdditionalData(lpdbEntry)
+		additionalData = self:_groupLastVsAdditionalData(lpdbEntry)
 	end
 
 	local score = additionalData.score or Import._getScore(lpdbEntry.opponent)
@@ -530,6 +599,8 @@ function Import._entryToOpponent(lpdbEntry, placement)
 	}}[1]
 end
 
+---@param opponent table
+---@return table
 function Import._checkIfParsed(opponent)
 	if Table.isNotEmpty(opponent) then
 		opponent.isAlreadyParsed = true
@@ -538,6 +609,8 @@ function Import._checkIfParsed(opponent)
 	return opponent
 end
 
+---@param lpdbEntry table
+---@return string?
 function Import._formatGroupScore(lpdbEntry)
 	if not lpdbEntry.scoreBoard then
 		return
@@ -557,6 +630,8 @@ function Import._formatGroupScore(lpdbEntry)
 	return table.concat(wdl, Import.config.groupScoreDelimiter)
 end
 
+---@param opponentData match2opponent
+---@return string|number?
 function Import._getScore(opponentData)
 	if not opponentData then
 		return
@@ -566,7 +641,9 @@ function Import._getScore(opponentData)
 		or opponentData.status
 end
 
-function Import._groupLastVsAdditionalData(lpdbEntry)
+---@param lpdbEntry table
+---@return table
+function Import:_groupLastVsAdditionalData(lpdbEntry)
 	local opponentName = Opponent.toName(lpdbEntry.opponent)
 	local matchConditions = {}
 	for _, matchId in pairs(lpdbEntry.matches) do
@@ -575,9 +652,9 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 
 	local conditions = table.concat(matchConditions, ' OR ')
 
-	if conditions ~= _last_vs_group_cache.conditions then
-		_last_vs_group_cache.conditions = conditions
-		Import._lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
+	if conditions ~= self.lastVsGroupCache.conditions then
+		self.lastVsGroupCache.conditions = conditions
+		self:_lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
 			conditions = conditions,
 			order = 'date desc, match2id desc',
 			query = 'date, match2opponents, winner',
@@ -585,7 +662,7 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 		}))
 	end
 
-	local matchData = _last_vs_group_cache.data[opponentName]
+	local matchData = self.lastVsGroupCache.data[opponentName]
 
 	if not matchData then
 		return {}
@@ -594,7 +671,8 @@ function Import._groupLastVsAdditionalData(lpdbEntry)
 	return Import._makeAdditionalDataFromMatch(opponentName, matchData)
 end
 
-function Import._lastVsMatchesDataToCache(queryData)
+---@param queryData match2[]
+function Import:_lastVsMatchesDataToCache(queryData)
 	local byOpponent = {}
 
 	for _, match in ipairs(queryData) do
@@ -606,9 +684,12 @@ function Import._lastVsMatchesDataToCache(queryData)
 		end
 	end
 
-	_last_vs_group_cache.data = byOpponent
+	self.lastVsGroupCache.data = byOpponent
 end
 
+---@param opponentName string
+---@param match match2
+---@return table
 function Import._makeAdditionalDataFromMatch(opponentName, match)
 	-- catch unfinished or invalid match
 	local winner = tonumber(match.winner)
@@ -634,9 +715,13 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	}
 end
 
+---@param entry BasePlacementOpponent
+---@return BasePlacementOpponent
 function Import._removeDefaultDate(entry)
-	entry.date = String.isNotEmpty(entry.date) and DateExt.readTimestamp(entry.date) ~= DateExt.defaultTimestamp and
-		entry.date or nil
+	local date = DateExt.nilIfDefaultTimestamp(entry.date)
+	---as input was not integer can not get integer back
+	---@cast date -integer
+	entry.date = date
 
 	return entry
 end
