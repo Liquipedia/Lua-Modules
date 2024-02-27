@@ -159,28 +159,28 @@ end
 ---@param inputPlacements PrizePoolPlacement[]
 ---@return PrizePoolPlacement[]
 function Import:_importPlacements(inputPlacements)
-	local stages = TournamentStructure.fetchStages(Import.config.matchGroupsSpec)
+	local stages = TournamentStructure.fetchStages(self.config.matchGroupsSpec)
 
 	local placementEntries = Array.flatten(Array.map(Array.reverse(stages), function(stage, reverseStageIndex)
 				local stageIndex = #stages + 1 - reverseStageIndex
-				return Import._computeStagePlacementEntries(stage, {
-						importWinners = Import.config.stageImportWinners[stageIndex] or
-							(Import.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
-						groupElimStatuses = Import.config.stageGroupElimStatuses[stageIndex] or
-							Import.config.groupElimStatuses,
-						importLimit = Import.config.stageImportLimits[stageIndex] or 0,
-						placementsToSkip = Import.config.stagePlacementsToSkip[stageIndex],
+				return self:_computeStagePlacementEntries(stage, {
+						importWinners = self.config.stageImportWinners[stageIndex] or
+							(self.config.stageImportWinners[stageIndex] == nil and reverseStageIndex == 1),
+						groupElimStatuses = self.config.stageGroupElimStatuses[stageIndex] or
+							self.config.groupElimStatuses,
+						importLimit = self.config.stageImportLimits[stageIndex] or 0,
+						placementsToSkip = self.config.stagePlacementsToSkip[stageIndex],
 					})
 			end))
 
-	placementEntries = Array.sub(placementEntries, 1 + (Import.config.placementsToSkip or 0))
+	placementEntries = Array.sub(placementEntries, 1 + (self.config.placementsToSkip or 0))
 
 	-- Apply importLimit if set
-	if Import.config.importLimit then
+	if self.config.importLimit then
 		-- array of partial sums of the number of entries until a given placement/slot
 		local importedEntriesSums = MathUtil.partialSums(Array.map(placementEntries, function(entries) return #entries end))
 		-- slotIndex of the slot until which we want to import based on importLimit
-		local slotIndex = Array.indexOf(importedEntriesSums, function(sum) return Import.config.importLimit <= sum end)
+		local slotIndex = Array.indexOf(importedEntriesSums, function(sum) return self.config.importLimit <= sum end)
 		if slotIndex ~= 0 then
 			placementEntries = Array.sub(placementEntries, 1, slotIndex - 1)
 		end
@@ -194,11 +194,11 @@ end
 ---@param stage table
 ---@param options PrizePoolImportStageConfig
 ---@return table[][][]
-function Import._computeStagePlacementEntries(stage, options)
+function Import:_computeStagePlacementEntries(stage, options)
 	local groupPlacementEntries = Array.map(stage, function(matchGroup)
 		return TournamentStructure.isGroupTable(matchGroup)
-			and Import._computeGroupTablePlacementEntries(matchGroup, options)
-			or Import._computeBracketPlacementEntries(matchGroup, options)
+			and self:_computeGroupTablePlacementEntries(matchGroup, options)
+			or self:_computeBracketPlacementEntries(matchGroup, options)
 	end)
 
 	local startingPlacement = 1 + (options.placementsToSkip or 0)
@@ -227,8 +227,8 @@ end
 ---@param standingRecords table[]
 ---@param options PrizePoolImportStageConfig
 ---@return table
-function Import._computeGroupTablePlacementEntries(standingRecords, options)
-	local needsLastVs = Import._needsLastVs(standingRecords)
+function Import:_computeGroupTablePlacementEntries(standingRecords, options)
+	local needsLastVs = self:_needsLastVs(standingRecords)
 	local placementEntries = {}
 	local placementIndexes = {}
 
@@ -270,8 +270,8 @@ end
 
 ---@param standingRecords table[]
 ---@return boolean
-function Import._needsLastVs(standingRecords)
-	if Import.config.allGroupsUseWdl then
+function Import:_needsLastVs(standingRecords)
+	if self.config.allGroupsUseWdl then
 		return false
 	elseif (standingRecords[1] or {}).type == SWISS_GROUP_TYPE then
 		return true
@@ -294,7 +294,7 @@ end
 ---@param matchRecords table[]
 ---@param options PrizePoolImportStageConfig
 ---@return table[][]
-function Import._computeBracketPlacementEntries(matchRecords, options)
+function Import:_computeBracketPlacementEntries(matchRecords, options)
 	local bracket = MatchGroupUtil.makeBracketFromRecords(matchRecords)
 
 	local slots = Array.map(
@@ -318,7 +318,7 @@ function Import._computeBracketPlacementEntries(matchRecords, options)
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
 				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
-			) and (not Import.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
+			) and (not self.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
 
@@ -592,7 +592,7 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 
 	return placement:parseOpponents{{
 		Import._checkIfParsed(Import._removeTbdIdentifiers(lpdbEntry.opponent)),
-		wdl = (not lpdbEntry.needsLastVs) and Import._formatGroupScore(lpdbEntry) or nil,
+		wdl = (not lpdbEntry.needsLastVs) and self:_formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = lastVsScore,
 		date = additionalData.date or lpdbEntry.date,
@@ -611,7 +611,7 @@ end
 
 ---@param lpdbEntry table
 ---@return string?
-function Import._formatGroupScore(lpdbEntry)
+function Import:_formatGroupScore(lpdbEntry)
 	if not lpdbEntry.scoreBoard then
 		return
 	end
@@ -627,7 +627,7 @@ function Import._formatGroupScore(lpdbEntry)
 		table.insert(wdl, #wdl, overtime.l or '')
 	end
 
-	return table.concat(wdl, Import.config.groupScoreDelimiter)
+	return table.concat(wdl, self.config.groupScoreDelimiter)
 end
 
 ---@param opponentData match2opponent
