@@ -211,7 +211,7 @@ function Placement:readAdditionalData(args)
 	return data
 end
 
----@param ... string|number|?
+---@param ... string|number
 ---@return placement[]
 function Placement:_getLpdbData(...)
 	local entries = {}

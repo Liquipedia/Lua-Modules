@@ -100,7 +100,7 @@ end
 
 -- get the lpdbObjectName depending on opponenttype
 ---@param lpdbEntry placement
----@param prizePoolIndex integer|string?
+---@param prizePoolIndex integer|string
 ---@param lpdbPrefix string?
 ---@return string
 function PrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
