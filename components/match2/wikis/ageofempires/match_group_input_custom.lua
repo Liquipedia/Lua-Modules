@@ -247,11 +247,8 @@ function CustomMatchGroupInput._determineWinnerIfMissing(match)
 	end
 end
 
---[[
-	Functions related to Opponents
-]]
---
-
+---@param match table
+---@return table
 function CustomMatchGroupInput._getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -270,6 +267,8 @@ function CustomMatchGroupInput._getOpponents(match)
 	return match
 end
 
+---@param record table
+---@param timestamp number
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record) or Opponent.blank()
 
@@ -282,7 +281,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
---MapInput functions
 ---@param match table
 ---@param mapIndex integer
 function CustomMatchGroupInput._mapInput(match, mapIndex)
