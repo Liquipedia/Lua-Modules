@@ -78,14 +78,17 @@ liquipedia.filterButtons = {
 						filter: filterOn,
 						active: true
 					};
-					if ( filterOn === 'all' || filterOn === 'curated' ) {
-						if ( filterOn === 'curated' ) {
+					switch ( filterOn ) {
+						case 'curated':
 							button.curatedGroups = buttonElement.dataset.curatedGroups?.split( ',' ) ?? [];
-						}
-						filterGroupEntry[ filterOn + 'Button' ] = button;
-					} else {
-						filterGroupEntry.buttons[ filterOn ] = button;
-						filterGroupEntry.filterStates[ filterOn ] = filterGroupEntry.filterStates[ filterOn ] ?? true;
+							// fallthrough intended
+						case 'all':
+							filterGroupEntry[ filterOn + 'Button' ] = button;
+							break;
+						default:
+							filterGroupEntry.buttons[ filterOn ] = button;
+							filterGroupEntry.filterStates[ filterOn ] =
+								filterGroupEntry.filterStates[ filterOn ] ?? true;
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );
 				}
