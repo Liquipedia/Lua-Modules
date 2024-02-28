@@ -68,21 +68,23 @@ liquipedia.filterButtons = {
 				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
 				filterableItems: []
 			};
-			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach( ( /** @type HTMLElement */ buttonElement ) => {
-				const filterOn = buttonElement.dataset.filterOn ?? '';
-				const button = {
-					element: buttonElement,
-					filter: filterOn,
-					active: true
-				};
-				if ( filterOn === 'all' ) {
-					filterGroupEntry.allButton = button;
-				} else {
-					filterGroupEntry.buttons[ filterOn ] = button;
-					filterGroupEntry.filterStates[ filterOn ] = filterGroupEntry.filterStates[ filterOn ] ?? true;
+			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
+				( /** @type HTMLElement */ buttonElement ) => {
+					const filterOn = buttonElement.dataset.filterOn ?? '';
+					const button = {
+						element: buttonElement,
+						filter: filterOn,
+						active: true
+					};
+					if ( filterOn === 'all' ) {
+						filterGroupEntry.allButton = button;
+					} else {
+						filterGroupEntry.buttons[ filterOn ] = button;
+						filterGroupEntry.filterStates[ filterOn ] = filterGroupEntry.filterStates[ filterOn ] ?? true;
+					}
+					buttonElement.setAttribute( 'tabindex', '0' );
 				}
-				buttonElement.setAttribute( 'tabindex', '0' );
-			} );
+			);
 
 			this.filterGroups[ filterGroup ] = filterGroupEntry;
 		} );
