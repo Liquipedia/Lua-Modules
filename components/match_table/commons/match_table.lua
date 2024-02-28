@@ -684,7 +684,6 @@ end
 function MatchTable:_displayTournament(match)
 	return mw.html.create('td')
 		:css('text-align', 'left')
-		:css('max-width', '420px')
 		:wikitext(Page.makeInternalLink(match.displayName, match.pageName))
 end
 
