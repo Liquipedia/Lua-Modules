@@ -167,10 +167,10 @@ liquipedia.filterButtons = {
 				}
 			} );
 
+			filterGroup.allButton.active = allState;
 			if ( filterGroup.curatedButton ) {
 				filterGroup.curatedButton.active = filterGroup.curated;
 			}
-			filterGroup.allButton.active = allState;
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterGroup.curated ) {
