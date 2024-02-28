@@ -226,7 +226,7 @@ liquipedia.filterButtons = {
 	setLocalStorage: function() {
 		const filterGroups = {};
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates };
+			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates, curated: filterGroup.curated };
 		} );
 		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
 	}
