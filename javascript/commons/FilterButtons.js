@@ -120,12 +120,14 @@ liquipedia.filterButtons = {
 								filterGroup.filterStates[ filterState ] = !button.active;
 							}
 						} );
+						filterGroup.curated = false;
 						break;
 					case 'curated':
 						filterGroup.curated = !button.active;
 						break;
 					default:
 						filterGroup.filterStates[ button.filter ] = !button.active;
+						filterGroup.curated = false;
 				}
 				this.performUpdate();
 			}
