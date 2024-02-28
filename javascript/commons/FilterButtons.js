@@ -88,7 +88,8 @@ liquipedia.filterButtons = {
 						default:
 							filterGroupEntry.buttons[ filterOn ] = button;
 							filterGroupEntry.filterStates[ filterOn ] =
-								filterGroupEntry.filterStates[ filterOn ] ?? true;
+								filterGroupEntry.filterStates[ filterOn ] ??
+									!( buttonElement.dataset.filterDefault === 'false' );
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );
 				}
