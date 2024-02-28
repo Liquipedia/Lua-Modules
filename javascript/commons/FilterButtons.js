@@ -80,8 +80,6 @@ liquipedia.filterButtons = {
 					};
 					switch ( filterOn ) {
 						case 'curated':
-							button.curatedGroups = buttonElement.dataset.curatedGroups?.split( ',' ) ?? [];
-							// fallthrough intended
 						case 'all':
 							filterGroupEntry[ filterOn + 'Button' ] = button;
 							break;
@@ -124,9 +122,7 @@ liquipedia.filterButtons = {
 						} );
 						break;
 					case 'curated':
-						button.curatedGroups?.forEach( ( curatableFilterGroup ) => {
-							this.filterGroups[ curatableFilterGroup ].curated = !button.active;
-						} );
+						filterGroup.curated = !button.active;
 						break;
 					default:
 						filterGroup.filterStates[ button.filter ] = !button.active;
