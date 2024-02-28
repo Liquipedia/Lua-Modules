@@ -60,10 +60,14 @@ liquipedia.filterButtons = {
 
 		filterButtonGroups.forEach( ( buttonsDiv ) => {
 			const filterGroup = buttonsDiv.dataset.filterGroup ?? this.fallbackFilterGroup;
-			const filterStates = localStorage[ filterGroup ]?.filterStates ?? {};
-			const alwaysActiveFilters = buttonsDiv.dataset.filterAlwaysActive;
-			const buttons = [];
-			let allButton;
+			const filterGroupEntry = {
+				name: filterGroup,
+				buttons: [],
+				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
+				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
+				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
+				filterableItems: []
+			};
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach( ( /** @type HTMLElement */ buttonElement ) => {
 				const filterOn = buttonElement.dataset.filterOn ?? '';
 				const button = {
@@ -72,23 +76,15 @@ liquipedia.filterButtons = {
 					active: true
 				};
 				if ( filterOn === 'all' ) {
-					allButton = button;
+					filterGroupEntry.allButton = button;
 				} else {
-					buttons[ filterOn ] = button;
-					filterStates[ filterOn ] = filterStates[ filterOn ] ?? true;
+					filterGroupEntry.buttons[ filterOn ] = button;
+					filterGroupEntry.filterStates[ filterOn ] = filterGroupEntry.filterStates[ filterOn ] ?? true;
 				}
 				buttonElement.setAttribute( 'tabindex', '0' );
 			} );
 
-			this.filterGroups[ filterGroup ] = {
-				name: filterGroup,
-				buttons: buttons,
-				allButton: allButton,
-				alwaysActive: ( typeof alwaysActiveFilters === 'string' ) ? alwaysActiveFilters.split( ',' ) : [],
-				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
-				filterStates: filterStates,
-				filterableItems: []
-			};
+			this.filterGroups[ filterGroup ] = filterGroupEntry;
 		} );
 	},
 
