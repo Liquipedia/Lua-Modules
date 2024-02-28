@@ -143,7 +143,6 @@ liquipedia.filterButtons = {
 				button.element.addEventListener( 'click', buttonEventHandler );
 				button.element.addEventListener( 'keypress', buttonEventHandler );
 			} );
-
 		} );
 	},
 
@@ -179,7 +178,6 @@ liquipedia.filterButtons = {
 					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
 				}
 			} );
-
 		} );
 	},
 
@@ -206,7 +204,6 @@ liquipedia.filterButtons = {
 					filterableItem.element.className = filterGroup.effectClass;
 				}
 			} );
-
 		} );
 	},
 
