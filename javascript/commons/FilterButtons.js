@@ -161,14 +161,10 @@ liquipedia.filterButtons = {
 
 	updateDOM: function() {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			const buttons = Object.values( filterGroup.buttons );
+			buttons.push( filterGroup.allButton );
 
-			if ( filterGroup.allButton.active ) {
-				filterGroup.allButton.element.classList.add( this.activeButtonClass );
-			} else {
-				filterGroup.allButton.element.classList.remove( this.activeButtonClass );
-			}
-
-			Object.values( filterGroup.buttons ).forEach( ( button ) => {
+			buttons.forEach( ( button ) => {
 				if ( button.active ) {
 					button.element.classList.add( this.activeButtonClass );
 				} else {
