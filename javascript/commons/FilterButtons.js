@@ -68,6 +68,7 @@ liquipedia.filterButtons = {
 				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
 				filterableItems: []
 			};
+
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
 				( /** @type HTMLElement */ buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
@@ -76,8 +77,8 @@ liquipedia.filterButtons = {
 						filter: filterOn,
 						active: true
 					};
-					if ( filterOn === 'all' ) {
-						filterGroupEntry.allButton = button;
+					if ( filterOn === 'all' || filterOn === 'curated' ) {
+						filterGroupEntry[ filterOn + 'Button' ] = button;
 					} else {
 						filterGroupEntry.buttons[ filterOn ] = button;
 						filterGroupEntry.filterStates[ filterOn ] = filterGroupEntry.filterStates[ filterOn ] ?? true;
