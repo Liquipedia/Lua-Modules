@@ -109,6 +109,8 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'name'] = player.displayname
+		elseif opponent.type == Opponent.team then
+			-- TODO
 		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
 		end
