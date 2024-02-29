@@ -66,7 +66,7 @@ liquipedia.filterButtons = {
 				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
 				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
 				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
-				curated: localStorage[ filterGroup ]?.curated ?? false,
+				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
 				filterableItems: []
 			};
 
