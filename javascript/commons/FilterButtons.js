@@ -201,9 +201,9 @@ liquipedia.filterButtons = {
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
-					filterableItem.element.className = this.hiddenCategoryClass;
-				} else if ( filterableItem.element.classList.contains( this.hiddenCategoryClass ) ) {
-					filterableItem.element.className = filterGroup.effectClass;
+					filterableItem.element.classList.add( this.hiddenCategoryClass );
+				} else {
+					filterableItem.element.classList.replace( this.hiddenCategoryClass, filterGroup.effectClass );
 				}
 			} );
 		} );
