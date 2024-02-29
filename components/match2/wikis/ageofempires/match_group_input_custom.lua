@@ -399,38 +399,15 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 	local participants = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
-		local players = opponent.match2players
-		if opponent.type == Opponent.solo then
-			CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponentIndex, participants)
+		if Opponent.typeIsParty(opponent.type) then
+			local players = opponent.match2players
+			CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex, participants)
 		elseif opponent.type == Opponent.team then
-			error('Team opponents are not yet supported')
+			CustomMatchGroupInput._processTeamMapData(map, opponentIndex, participants)
 		end
 	end
 
 	map.participants = participants
-
-	if numberOfOpponents ~= MAX_NUM_OPPONENTS or map.mode ~= '1v1' then
-		return
-	end
-
-	local playerNameArray = CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
-
-	map.extradata.opponent1 = playerNameArray[1]
-	map.extradata.opponent2 = playerNameArray[2]
-end
-
----@param participants table<string, table>
----@return table<integer, string>
-function CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
-	local playerNameArray = {}
-	for participantKey, participantData in pairs(participants) do
-		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
-		-- opponentIndex can not be nil due to the format of the participants keys
-		---@cast opponentIndex -nil
-		playerNameArray[opponentIndex] = participantData.player
-	end
-
-	return playerNameArray
 end
 
 ---@param players table[]
@@ -438,19 +415,37 @@ end
 ---@param opponentIndex integer
 ---@param participants table<string, table>
 ---@return table<string, table>
-function CustomMatchGroupInput._processPartyPlayerMapData(players, map, opponentIndex, participants)
+function CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex, participants)
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
 	for playerIndex, player in pairs(players) do
-		local civ = Logic.emptyOr(
-			civs[playerIndex],
-			Faction.defaultFaction
-		)
+		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
 		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			civ = civ,
 			player = player.name,
+		}
+	end
+
+	return participants
+end
+
+---@param map table
+---@param opponentIndex integer
+---@param participants table<string, table>
+---@return table<string, table>
+function CustomMatchGroupInput._processTeamMapData(map, opponentIndex, participants)
+	local players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
+	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
+
+	for playerIndex, player in pairs(players) do
+		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
+		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			civ = civ,
+			player = player,
 		}
 	end
 
