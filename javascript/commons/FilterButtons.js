@@ -201,6 +201,7 @@ liquipedia.filterButtons = {
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
+					filterableItem.element.classList.remove( filterGroup.effectClass );
 					filterableItem.element.classList.add( this.hiddenCategoryClass );
 				} else {
 					filterableItem.element.classList.replace( this.hiddenCategoryClass, filterGroup.effectClass );
