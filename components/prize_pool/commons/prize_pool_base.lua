@@ -39,7 +39,7 @@ local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 ---@field index integer
 ---@field data table
 
-local TODAY = os.date('%Y-%m-%d')
+local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
@@ -771,7 +771,7 @@ function BasePrizePool:_currencyExchangeInfo()
 			exchangeDate = TODAY
 		end
 
-		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate --[[@as string]])
+		local exchangeDateText = LANG:formatDate('M j, Y', exchangeDate)
 
 		local wrapper = mw.html.create('small')
 
@@ -850,7 +850,7 @@ function BasePrizePool._getTournamentInfo(pageName)
 end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
----@return string|osdate
+---@return string
 function BasePrizePool._getTournamentDate()
 	return Variables.varDefault('tournament_enddate', TODAY)
 end
