@@ -11,6 +11,7 @@ local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -286,7 +287,7 @@ end
 ---@param mapIndex integer
 function CustomMatchGroupInput._mapInput(match, mapIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
-	if map.map ~= 'TBD' then
+	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
 		if Logic.isNotEmpty(match.mapsInfo) then
 			local info = Array.find(match.mapsInfo, function(m)
 				return m.name == map.map or m.link == map.map
