@@ -15,6 +15,9 @@ local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
 
 local roundData
+---@param templateid string
+---@param bracketType string
+---@return table
 function MatchGroupLegacyDefault.get(templateid, bracketType)
 	local lowerHeader = {}
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
@@ -49,6 +52,10 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 	return bracketData
 end
 
+---@param prefix string
+---@param scoreKey string
+---@param bracketType string
+---@return table
 function MatchGroupLegacyDefault._readOpponent(prefix, scoreKey, bracketType)
 	return {
 		['type'] = 'type',
@@ -65,6 +72,13 @@ end
 --the following variable gets mutaded by each p._getMatchMapping
 --it is needed as a basis for the next call
 local _lastRound
+---@param match table
+---@param bracketData table
+---@param bracketType string
+---@param lowerHeader table
+---@return table
+---@return number
+---@return table
 function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketType, lowerHeader)
 	local id = String.split(match.match2id, '_')[2] or match.match2id
 	--remove 0's and dashes from the match param
@@ -137,6 +151,8 @@ parameter format of the old bracket
 ]]--
 
 --this can be used for custom mappings too
+---@param match table
+---@return table
 function MatchGroupLegacyDefault.addMaps(match)
 	for mapIndex = 1, MAX_NUM_MAPS do
 		match['map' .. mapIndex] = {
@@ -148,14 +164,10 @@ function MatchGroupLegacyDefault.addMaps(match)
 end
 
 --this is for custom mappings
+---@param data {opp1: string, opp2: string, details: string}
+---@param bracketType string
+---@return table
 function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
-	--[[
-	data has the form {
-		opp1, -- e.g. R1D1
-		opp2, -- e.g. R1D20
-		details, -- e.g. R1G5
-	}
-	]]--
 	bracketType = bracketType or 'team'
 
 	local mapping = {
@@ -172,6 +184,8 @@ end
 --this is for custom mappings for Reset finals matches
 --it switches score2 into the place of score
 --and sets flatten to nil
+---@param mapping table
+---@return table
 function MatchGroupLegacyDefault.matchResetMappingFromCustom(mapping)
 	local mappingReset = mw.clone(mapping)
 	mappingReset.opponent1.score = mapping.opponent1.score .. '2'
