@@ -146,12 +146,12 @@ return {
 			name = 'Master Arena',
 			link = 'Master Arena',
 			logo = {
-				darkMode = 'Master Arena logo.png',
-				lightMode = 'Master Arena logo.png',
+				darkMode = 'Master Arena default allmode.png',
+				lightMode = 'Master Arena default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Master Arena logo.png',
-				lightMode = 'Master Arena logo.png',
+				darkMode = 'Master Arena default allmode.png',
+				lightMode = 'Master Arena default allmode.png',
 			},
 		},
 		pk = {
@@ -237,8 +237,8 @@ return {
 			name = 'Quake Champions: DOOM Edition',
 			link = 'Quake Champions: DOOM Edition',
 			logo = {
-				darkMode = 'QCDoom.png',
-				lightMode = 'QCDoom.png',
+				darkMode = 'Quake Champions Doom Edition default allmode.png',
+				lightMode = 'Quake Champions Doom Edition default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Quake default darkmode.png',
@@ -250,8 +250,8 @@ return {
 			name = 'Quake Live',
 			link = 'Quake Live',
 			logo = {
-				darkMode = 'Quake Live logo.png',
-				lightMode = 'Quake Live logo.png',
+				darkMode = 'Quake Live default allmode.png',
+				lightMode = 'Quake Live default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Quake default darkmode.png',
@@ -276,12 +276,12 @@ return {
 			name = 'Rocket Arena',
 			link = 'Rocket Arena',
 			logo = {
-				darkMode = 'Rocket Arena logo.png',
-				lightMode = 'Rocket Arena logo.png',
+				darkMode = 'Rocket Arena default allmode.png',
+				lightMode = 'Rocket Arena default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Rocket Arena logo.png',
-				lightMode = 'Rocket Arena logo.png',
+				darkMode = 'Rocket Arena default allmode.png',
+				lightMode = 'Rocket Arena default allmode.png',
 			},
 		},
 		re = {
@@ -341,12 +341,12 @@ return {
 			name = 'Unreal Tournament 3',
 			link = 'Unreal Tournament 3',
 			logo = {
-				darkMode = 'Unreal Tournament 3 logo.png',
-				lightMode = 'Unreal Tournament 3 logo.png',
+				darkMode = 'Unreal Tournament 3 default allmode.png',
+				lightMode = 'Unreal Tournament 3 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Unreal Tournament 3 logo.png',
-				lightMode = 'Unreal Tournament 3 logo.png',
+				darkMode = 'Unreal Tournament 3 default allmode.png',
+				lightMode = 'Unreal Tournament 3 default allmode.png',
 			},
 		},
 		ut4 = {
@@ -380,12 +380,12 @@ return {
 			name = 'Warsow',
 			link = 'Warsow',
 			logo = {
-				darkMode = 'Warsow logo.png',
-				lightMode = 'Warsow logo.png',
+				darkMode = 'Warsow default allmode.png',
+				lightMode = 'Warsow default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Warsow logo.png',
-				lightMode = 'Warsow logo.png',
+				darkMode = 'Warsow default allmode.png',
+				lightMode = 'Warsow default allmode.png',
 			},
 		},
 		xo = {
