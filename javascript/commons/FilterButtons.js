@@ -48,7 +48,7 @@ liquipedia.filterButtons = {
 		this.localStorageKey = this.buildLocalStorageKey();
 		this.generateFilterGroups( filterButtonGroups );
 		this.generateFilterableItems();
-		this.initalizeButtons();
+		this.initializeButtons();
 		this.performUpdate();
 	},
 
@@ -109,7 +109,7 @@ liquipedia.filterButtons = {
 		} );
 	},
 
-	initalizeButtons: function() {
+	initializeButtons: function() {
 		const handleClick = function( button, filterGroup, event ) {
 			if ( ( event.type === 'click' ) || ( event.type === 'keypress' && event.key === 'Enter' ) ) {
 				liquipedia.tracker.track( 'Filter button clicked: ' + button.element.textContent, true );
