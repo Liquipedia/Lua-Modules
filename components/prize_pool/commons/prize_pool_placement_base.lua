@@ -160,11 +160,10 @@ function BasePlacement:parseOpponentArgs(input, date)
 
 	local opponentData
 	if type(opponentArgs[1]) == 'table' and opponentArgs[1].isAlreadyParsed then
-		opponentData = opponentArgs[1]
+		opponentData = opponentArgs[1] ---@type standardOpponent
 	elseif type(opponentArgs[1]) ~= 'table' then
 		opponentData = Opponent.readOpponentArgs(opponentArgs)
 	end
-	---@cast opponentData standardOpponent?
 
 	if not opponentData or (Opponent.isTbd(opponentData) and opponentData.type ~= Opponent.literal) then
 		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
