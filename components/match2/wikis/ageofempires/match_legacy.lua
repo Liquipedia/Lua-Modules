@@ -110,7 +110,15 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'name'] = player.displayname
 		elseif opponent.type == Opponent.team then
-			-- TODO
+			match[prefix] = opponent.name
+			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			local opponentplayers = {}
+			for i, player in pairs(opponentmatch2players) do
+				opponentplayers['p' .. i] = player.name or ''
+				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
+				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
+			end
+			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
 		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
 		end
