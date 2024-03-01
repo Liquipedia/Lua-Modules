@@ -466,6 +466,7 @@ function Match:create()
 end
 
 ---@class MatchSummary
+---@operator call(string?):MatchSummary
 ---@field Header MatchSummaryHeader
 ---@field Body MatchSummaryBody
 ---@field Comment MatchSummaryComment
@@ -536,7 +537,7 @@ end
 
 ---Default header function
 ---@param match table
----@param options {teamStyle: teamStyle?, width: string?, noScore:boolean?}?
+---@param options {teamStyle: teamStyle?, noScore:boolean?}?
 ---@return MatchSummaryHeader
 function MatchSummary.createDefaultHeader(match, options)
 	options = options or {}
@@ -634,7 +635,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
----@param options {teamStyle: teamStyle?, width: string?, noScore: boolean?}?
+---@param options {teamStyle: teamStyle?, noScore: boolean?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -663,7 +664,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle: teamStyle?, width: string?, noScore:boolean?}?
+---@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
@@ -673,7 +674,12 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	local match, bracketResetMatch = MatchGroupUtil.fetchMatchForBracketDisplay(
 		args.bracketId, args.matchId)
 
-	local matchSummary = MatchSummary():init(options.width)
+	local width = options.width
+	if type(width) == 'function' then
+		width = width(match)
+	end
+
+	local matchSummary = MatchSummary():init(width)
 
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then

@@ -43,7 +43,13 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '285px'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = CustomMatchSummary._determineWidth})
+end
+
+---@param match MatchGroupUtilMatch
+---@return string
+function CustomMatchSummary._determineWidth(match)
+	return CustomMatchSummary._isSolo(match) and '285px' or '500px'
 end
 
 ---@param match MatchGroupUtilMatch
