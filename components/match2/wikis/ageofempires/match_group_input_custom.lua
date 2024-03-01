@@ -22,6 +22,7 @@ local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
 local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
 local MAX_NUM_OPPONENTS = 2
+local MAX_NUM_PLAYERS = 10
 local DEFAULT_BESTOF = 99
 
 local CustomMatchGroupInput = {}
@@ -256,15 +257,20 @@ function CustomMatchGroupInput._getOpponents(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
+		if Logic.isNotEmpty(opponent) then
 			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
+		end
+		match['opponent' .. opponentIndex] = opponent
+
+		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
+			MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+				resolveRedirect = true,
+				applyUnderScores = true,
+				maxNumPlayers = MAX_NUM_PLAYERS,
+			})
 		end
 	end
 
-	-- Update all opponents with new values
-	for opponentIndex, opponent in pairs(opponents) do
-		match['opponent' .. opponentIndex] = opponent
-	end
 	return match
 end
 
@@ -320,7 +326,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
 	--(w/l faction stuff only for 1v1 maps)
-	CustomMatchGroupInput.ProcessPlayerMapData(map, match, 2)
+	CustomMatchGroupInput.processPlayerMapData(map, match, 2)
 
 	match['map' .. mapIndex] = map
 end
@@ -395,7 +401,7 @@ end
 ---@param map table
 ---@param match table
 ---@param numberOfOpponents integer
-function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponents)
+function CustomMatchGroupInput.processPlayerMapData(map, match, numberOfOpponents)
 	local participants = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]

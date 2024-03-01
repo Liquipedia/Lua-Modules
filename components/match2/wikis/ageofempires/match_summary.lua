@@ -43,25 +43,16 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = CustomMatchSummary._determineWidth})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
+		width = CustomMatchSummary._determineWidth,
+		teamStyle = 'bracket',
+	})
 end
 
 ---@param match MatchGroupUtilMatch
 ---@return string
 function CustomMatchSummary._determineWidth(match)
 	return CustomMatchSummary._isSolo(match) and '285px' or '500px'
-end
-
----@param match MatchGroupUtilMatch
----@return MatchSummaryHeader
-function CustomMatchSummary.createHeader(match)
-	local header = MatchSummary.Header()
-
-	return header
-			:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
-			:leftScore(header:createScore(match.opponents[1]))
-			:rightScore(header:createScore(match.opponents[2]))
-			:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
 ---@param match MatchGroupUtilMatch
@@ -83,7 +74,7 @@ function CustomMatchSummary.createBody(match)
 				:css('padding', '4px')
 				:css('min-height', '24px')
 
-		CustomMatchSummary._createGame(row, game, {game = match.game, soloMode = CustomMatchSummary._isSolo(match)})
+		CustomMatchSummary._createGame(row, game, {opponents = match.opponents, game = match.game, soloMode = CustomMatchSummary._isSolo(match)})
 		body:addRow(row)
 	end)
 
@@ -135,7 +126,7 @@ end
 
 ---@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean}
+---@param props {game: string?, soloMode: boolean, opponents: standardOpponent[]}
 function CustomMatchSummary._createGame(row, game, props)
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.extradata = game.extradata or {}
@@ -151,15 +142,26 @@ function CustomMatchSummary._createGame(row, game, props)
 		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1'), normGame)
 		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1'), normGame)
 	else
+		local function findPlayer(participantId, pageName)
+			local opponentId = tonumber(participantId:sub(1, 1))
+			mw.log(opponentId)
+			mw.logObject(props.opponents)
+			for _, player in pairs((props.opponents[opponentId] or {} ).players or {}) do
+				if player.pageName == pageName then
+					return player
+				end
+			end
+			return {pageName = pageName, displayName = pageName}
+		end
 		local function createParticipant(participantId, flipped)
 			local civ, playerName = CustomMatchSummary._getPlayerData(game, participantId)
-			local playerNode = PlayerDisplay.BlockPlayer{player = {pageName = playerName, displayName = playerName}, flip = flipped}
+			local playerNode = PlayerDisplay.BlockPlayer{player = findPlayer(participantId, playerName), flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(civ, normGame)
 			local playerRow = mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
-			return playerRow:node(playerNode):wikitext('&nbsp;'):node(factionNode)
+			return playerRow:node(flipped and playerNode or factionNode):wikitext('&nbsp;'):node(flipped and factionNode or playerNode)
 		end
 		local function createOpponentDisplay(opponentId)
-			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('flex-grow', '1')
+			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
 			for participantId in Table.iter.pairsByPrefix(game.participants, opponentId .. '_') do
 				display:node(createParticipant(participantId, opponentId == 1))
 			end
