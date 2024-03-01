@@ -151,21 +151,23 @@ function CustomMatchSummary._createGame(row, game, props)
 		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1'), normGame)
 		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1'), normGame)
 	else
-		faction1 = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('flex-grow', '1')
-		for participantId in Table.iter.pairsByPrefix(game.participants, '1_') do
+		local function createParticipant(participantId, flipped)
 			local civ, playerName = CustomMatchSummary._getPlayerData(game, participantId)
-			local playerNode = PlayerDisplay.BlockPlayer{player = {pageName = playerName, displayName = playerName}, flip = true}
+			local playerNode = PlayerDisplay.BlockPlayer{player = {pageName = playerName, displayName = playerName}, flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(civ, normGame)
-			faction1:node(mw.html.create('div'):css('display', 'flex'):css('align-self', 'end'):node(playerNode):wikitext('&nbsp;'):node(factionNode))
+			local playerRow = mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
+			return playerRow:node(playerNode):wikitext('&nbsp;'):node(factionNode)
+		end
+		local function createOpponentDisplay(opponentId)
+			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('flex-grow', '1')
+			for participantId in Table.iter.pairsByPrefix(game.participants, opponentId .. '_') do
+				display:node(createParticipant(participantId, opponentId == 1))
+			end
+			return display
 		end
 
-		faction2 = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('flex-grow', '1')
-		for participantId in Table.iter.pairsByPrefix(game.participants, '2_') do
-			local civ, playerName = CustomMatchSummary._getPlayerData(game, participantId)
-			local playerNode = PlayerDisplay.BlockPlayer{player = {pageName = playerName, displayName = playerName}}
-			local factionNode = CustomMatchSummary._createFactionIcon(civ, normGame)
-			faction2:node(mw.html.create('div'):css('display', 'flex'):node(factionNode):wikitext('&nbsp;'):node(playerNode))
-		end
+		faction1 = createOpponentDisplay(1)
+		faction2 = createOpponentDisplay(2)
 	end
 
 	row
