@@ -42,6 +42,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.mapmode = game2.extradata.mapmode
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
+		-- TODO: Team vs Solo based extrdata fields
 		game.extradata.opponent1civ = player1.civ
 		game.extradata.opponent2civ = player2.civ
 		game.extradata.winnerciv =
