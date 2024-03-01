@@ -63,17 +63,30 @@ return {
 				lightMode = 'CPMA default allmode.png',
 			},
 		},
+		doom = {
+			abbreviation = 'doom',
+			name = 'DOOM',
+			link = 'DOOM',
+			logo = {
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
+			},
+		},
 		d16 = {
 			abbreviation = 'd16',
 			name = 'DOOM 2016',
 			link = 'DOOM 2016',
 			logo = {
-				darkMode = 'DOOM 2016 logo.png',
-				lightMode = 'DOOM 2016 logo.png',
+				darkMode = 'DOOM 2016 default darkmode.png',
+				lightMode = 'DOOM 2016 default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM 2016 logo.png',
-				lightMode = 'DOOM 2016 logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		d2 = {
@@ -81,12 +94,12 @@ return {
 			name = 'DOOM II',
 			link = 'DOOM II',
 			logo = {
-				darkMode = 'DOOM II logo.png',
-				lightMode = 'DOOM II logo.png',
+				darkMode = 'DOOM II default allmode.png',
+				lightMode = 'DOOM II default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM II logo.png',
-				lightMode = 'DOOM II logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		d3 = {
@@ -94,12 +107,12 @@ return {
 			name = 'DOOM 3',
 			link = 'DOOM 3',
 			logo = {
-				darkMode = 'DOOM 3 logo.png',
-				lightMode = 'DOOM 3 logo.png',
+				darkMode = 'DOOM 3 default allmode.png',
+				lightMode = 'DOOM 3 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM 3 logo.png',
-				lightMode = 'DOOM 3 logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		dbt = {
@@ -120,25 +133,12 @@ return {
 			name = 'DOOMBRINGER',
 			link = 'DOOMBRINGER',
 			logo = {
-				darkMode = 'Doombringer logo.png',
-				lightMode = 'Doombringer logo.png',
+				darkMode = 'Doombringer default allmode.png',
+				lightMode = 'Doombringer default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Doombringer logo.png',
-				lightMode = 'Doombringer logo.png',
-			},
-		},
-		doom = {
-			abbreviation = 'doom',
-			name = 'DOOM',
-			link = 'DOOM',
-			logo = {
-				darkMode = 'Doom Logo.png',
-				lightMode = 'Doom Logo.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Doom Logo.png',
-				lightMode = 'Doom Logo.png',
+				darkMode = 'Doombringer default allmode.png',
+				lightMode = 'Doombringer default allmode.png',
 			},
 		},
 		ma = {
