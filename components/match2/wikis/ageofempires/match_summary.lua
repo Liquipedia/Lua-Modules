@@ -74,7 +74,11 @@ function CustomMatchSummary.createBody(match)
 				:css('padding', '4px')
 				:css('min-height', '24px')
 
-		CustomMatchSummary._createGame(row, game, {opponents = match.opponents, game = match.game, soloMode = CustomMatchSummary._isSolo(match)})
+		CustomMatchSummary._createGame(row, game, {
+			opponents = match.opponents,
+			game = match.game,
+			soloMode = CustomMatchSummary._isSolo(match)
+		})
 		body:addRow(row)
 	end)
 
@@ -158,7 +162,10 @@ function CustomMatchSummary._createGame(row, game, props)
 			local playerNode = PlayerDisplay.BlockPlayer{player = findPlayer(participantId, playerName), flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(civ, normGame)
 			local playerRow = mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
-			return playerRow:node(flipped and playerNode or factionNode):wikitext('&nbsp;'):node(flipped and factionNode or playerNode)
+			return playerRow
+				:node(flipped and playerNode or factionNode)
+				:wikitext('&nbsp;')
+				:node(flipped and factionNode or playerNode)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')

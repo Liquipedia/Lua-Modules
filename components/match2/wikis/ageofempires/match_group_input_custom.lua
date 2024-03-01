@@ -253,7 +253,6 @@ end
 ---@return table
 function CustomMatchGroupInput._getOpponents(match)
 	-- read opponents and ignore empty ones
-	local opponents = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
