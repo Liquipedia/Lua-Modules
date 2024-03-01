@@ -29,6 +29,7 @@ local CustomInjector = Class.new(Injector)
 local BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
+	owcs = 'Overwatch Champions Series',
 }
 
 ---@param frame Frame
