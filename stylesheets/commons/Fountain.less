@@ -1,0 +1,1589 @@
+/* {{pp-template}} */
+.treeview ul {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.treeview li {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	list-style-image: none;
+}
+
+.treeview li::after {
+	display: block;
+	content: "";
+	clear: both;
+}
+
+.treeview li li {
+	background: url( //static.wikia.nocookie.net/dota2_gamepedia/images/2/25/Treeview_grey_line.png ) no-repeat 0 -2981px;
+	/* @noflip */
+	padding-left: 21px;
+	text-indent: 0.3em;
+}
+
+.treeview li li:last-child {
+	background-position: 0 -5971px;
+}
+/* first line here deals with new situation after RemexHTML switch,
+ * where emptyline cause the first child to become the 2nd child. Such a mess
+ */
+.treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
+.treeview li.emptyline > ul > li:first-child {
+	background-position: 0 9px;
+}
+
+/***************************
+* Used by [[Template:Key]] *
+****************************/
+.key {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.key kbd {
+	padding: 0.1em 0.6em 0.1em 0.6em;
+	margin-right: 2px;
+	font-size: 85%;
+	font-family: inherit;
+	font-style: normal;
+	border-radius: 0.4em;
+}
+
+.keys {
+	border: 1px solid #111111;
+	box-shadow: 0 0.2em rgba( 0, 0, 0, 0.5 );
+	background-color: #505459;
+	background-image: linear-gradient( to bottom, #505459, #282828 );
+	color: #eeeeee;
+}
+
+/******************************
+* End Template:Key coloration *
+*******************************/
+
+/* Recent Changes */
+.mw-rcfilters-ui-changesListWrapperWidget {
+	right: 50px;
+}
+
+.mw-rcfilters-ui-changesListWrapperWidget h4 {
+	padding-left: 50px;
+}
+
+.mw-rcfilters-ui-changesListWrapperWidget-previousChangesIndicator {
+	margin-left: 50px;
+}
+
+/* Infobox styling */
+
+.infobox {
+	float: right;
+	clear: right;
+	margin: 0.5em 0 1em 0.5em;
+	padding: 2px;
+	width: 260px;
+	border: 1px solid #000000;
+	background: #ffffff;
+}
+
+.infobox .section {
+	clear: both;
+	padding: 3px;
+	background: #c0dfff;
+	color: #000000;
+	text-align: center;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.infobox tr {
+	vertical-align: top;
+}
+
+.cosm-inf-setname {
+	background-color: #cccccc;
+}
+
+/* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
+
+.updatetablehead {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	border-top: 1px solid #aaaaaa;
+	border-right: 1px solid #aaaaaa;
+	border-left: 1px solid #aaaaaa;
+	background-color: #ffaea3;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablebody {
+	/* max-height: 300px; */
+	/* overflow-y: scroll; */
+	overflow-x: auto;
+	border: 1px solid #aaaaaa;
+	border-top: 0;
+	background-color: #ebf5ff;
+	/* font-family: mono; */
+}
+
+.updatetablehead #patch,
+.updatetablehead #version,
+.updatetablebody #patch,
+.updatetablebody #version {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 120px;
+	flex: 0 0 120px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablehead #description,
+.updatetablebody #description {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	border-left: 1px solid #aaaaaa;
+}
+
+.updatetablebody #description {
+	padding: 4px 0;
+}
+
+.updatetablebody #entry {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	border-top: 1px solid #aaaaaa;
+}
+
+.updatetablebody ul {
+	margin: 0 0 0 1.6em;
+}
+
+/* Template:GameVersionTableElement */
+.gvt-el-significant {
+	background: #ffffcc !important;
+}
+
+/* Template:Talent table el */
+.tte-right-tal-slot {
+	height: 40px;
+	padding: 0;
+	border-bottom: solid 2px #000000;
+	background: #eff5ff !important;
+}
+
+/* Item Grid Styling on [[Item Grid]] */
+
+ul.shopnav {
+	margin: 0;
+	list-style: none;
+}
+
+ul.shopnav li {
+	margin: 4px;
+	-webkit-box-shadow: 0 0 1px 2px #008000;
+	box-shadow: 0 0 1px 2px #008000;
+}
+
+/* Item List Styling on [[Items]] */
+
+div.itemlist {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	font-weight: 500;
+}
+
+div.itemlist > div {
+	-ms-flex-preferred-size: 400px;
+	flex-basis: 400px;
+	padding: 3px 0;
+}
+
+/* Hero Infostrip */
+
+div.infostripe {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow: hidden;
+	-webkit-box-align: stretch;
+	-ms-flex-align: stretch;
+	align-items: stretch;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	color: #ffffff;
+	vertical-align: top;
+	text-align: center;
+	text-shadow: 0 0 5px #000000;
+	font-size: 20px;
+}
+
+div.infostripe a,
+div.infostripe a:link,
+div.infostripe a:visited,
+div.infostripe a:hover,
+div.infostripe a:active {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.gradient_gameplay {
+	background: -webkit-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	background: -o-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	background: linear-gradient( 15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+}
+
+.gradient_cosmetics {
+	background: -webkit-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	background: -o-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	background: linear-gradient( 15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+}
+
+.gradient_audio {
+	background: -webkit-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	background: -o-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	background: linear-gradient( 15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+}
+
+.gradient_history {
+	background: -webkit-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	background: -o-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	background: linear-gradient( 15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+}
+
+div.infostripe div {
+	margin: 0 -2px;
+	padding: 15px 25px 10px;
+	border-right: 4px solid rgba( 75, 75, 75, 0.5 );
+	border-left: 4px solid rgba( 75, 75, 75, 0.5 );
+}
+
+/* Hero entry - used in hero tables and cosmetic infoboxes */
+
+div.heroentry {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	margin: 1px;
+	width: 110px;
+	height: 62px;
+}
+
+div.heroentry div {
+	position: absolute;
+}
+
+div.heroentrytext {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: end;
+	-ms-flex-align: end;
+	align-items: flex-end;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	margin: 1px 2px;
+	width: 106px;
+	height: 60px;
+	color: #ffffff;
+	text-align: center;
+	text-shadow: -1px 0 0.2em #000000, 0 1px 0.2em #000000, 1px 0 0.2em #000000, 0 -1px 0.2em #000000;
+	font-size: 11px;
+	line-height: 15px;
+	pointer-events: none;
+}
+
+/* Main Page styling */
+
+.mp-content-table {
+	/* Main border color		*/
+	margin: 0.5em 0;
+	width: 100%;
+	/* Body background color	*/
+	border: 1px solid #b44335;
+	background: #fefeff;
+}
+
+.mp-content-header {
+	padding: 0.5em 0;
+	/* Header background color  */
+	border: 0;
+	border-bottom: 1px solid #b44335;
+	background: #b44335;
+	color: #ffffff;
+	font-size: 140%;
+	/* Main border color		*/
+}
+
+.mp-content-body {
+	padding: 0.5em;
+}
+
+/* Don't wordwrap top links on main page */
+
+.mp-content-table ul > li a.external.text,
+.mp-content-table ul > li > b > a {
+	white-space: nowrap;
+}
+
+.mp-content-header-alt,
+.mp-title-gradient {
+	background: #b44335;
+	color: #ffffff;
+}
+
+.mp-content-header-alt {
+	margin: -0.5em -0.5em 0;
+	padding: 0.5em;
+	padding-left: 0.75em;
+	border: 0;
+	border-bottom: 1px solid #b44335;
+	color: #ffffff;
+	/* Main border color		*/
+	text-align: left;
+	font-weight: bold;
+	font-size: 140%;
+}
+
+/* Auto-size main page index icons */
+
+.mp-index-icon {
+	min-width: 64px;
+	max-width: 128px;
+	width: 100%;
+	/* Image sizes.  Re-produce larger? */
+	height: auto;
+}
+
+/* The main page banner */
+
+.giant-banner {
+	margin-bottom: 20px;
+}
+
+.giant-banner img {
+	-o-object-fit: cover;
+	object-fit: cover;
+	-o-object-position: center;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
+
+#mw-js-message,
+.usermessage {
+	margin-bottom: 39px !important;
+}
+
+#mp-layout {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+}
+
+#mp-layout #mp-left {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	margin-right: 1em;
+}
+
+#mp-layout #mp-right {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 500px;
+	flex: 0 0 500px;
+}
+
+#mp-layout .mp-block {
+	margin-bottom: 1em;
+	padding: 1em;
+	border: solid 1px #660000;
+}
+
+#mp-layout .mp-block#battle-pass {
+	padding: 0;
+	border: 0;
+	background: #000000;
+	text-align: center;
+}
+
+#mp-layout .mp-heading {
+	height: 50px;
+	border-bottom: solid 1px #cccccc;
+	color: #660000;
+	text-align: center;
+	font-weight: bold;
+	font-size: 170%;
+}
+
+#mp-layout #heroes .mp-content {
+	text-align: center;
+}
+
+.useful-articles-layout {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+.useful-articles-layout > div {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 33%;
+	flex: 0 0 33%;
+	max-width: 33%;
+	word-wrap: break-word;
+}
+
+.useful-articles-layout > div > div:first-child {
+	text-align: center;
+	font-weight: bold;
+}
+
+/* End Main Page style */
+
+/* wikitable/prettytable class for skinning normal tables */
+
+table.wikitable,
+table.prettytable {
+	border: 1px #000000 solid;
+	background: #fefeff;
+}
+
+table.wikitable th,
+table.wikitable td,
+table.prettytable th,
+table.prettytable td {
+	white-space: inherit;
+}
+
+table.wikitable th,
+table.prettytable th {
+	text-align: center;
+	white-space: inherit;
+}
+
+table.wikitable caption,
+table.prettytable caption {
+	margin-right: inherit;
+	margin-left: inherit;
+	font-weight: bold;
+}
+
+table.wikitable .subheader {
+	background: #c9dcff;
+	color: #000000;
+	text-align: left;
+}
+
+table.cargoTable.wikitable th,
+table.wikitable .header {
+	background-color: #ffaea3;
+	color: #000000;
+}
+
+table.wikitable .border {
+	border: 1px #000000 solid;
+}
+
+table.wikitable .borderless {
+	border: 0;
+}
+
+table.wikitable .borderless td {
+	border: 0;
+}
+
+table.wikitable .borderless th {
+	border: 0;
+}
+
+table.prettytable code,
+table.wikitable code {
+	background-color: transparent;
+}
+
+/* Bring the wikitable cell padding back to what it was before an update */
+
+table.wikitable > tr > th,
+table.wikitable > tr > td,
+table.wikitable > * > tr > th,
+table.wikitable > * > tr > td {
+	padding: 1px 1px;
+}
+
+/* Sidebar */
+
+body {
+	position: relative;
+	min-width: 1000px;
+}
+
+div#bodyContent2 {
+	margin-right: 320px;
+	min-height: 920px;
+	width: auto;
+	font-size: 0.8em;
+	line-height: 1.5em;
+}
+
+/* For positioning icons at top-right, used in some templates */
+
+.skin-vector div.topicon {
+	position: absolute;
+	top: -50px;
+	z-index: 100;
+	display: block !important;
+}
+
+.skin-monobook div.topicon {
+	position: absolute;
+	top: 10px;
+	z-index: 100;
+	display: block !important;
+}
+
+/* Fixing vector/main-ltr.css putting a white background on the Quotation template */
+
+table.quotation {
+	background: transparent !important;
+}
+
+/* Fancy styling for Abilities */
+
+.ico_active,
+.ico_passive,
+.ico_autocast {
+	position: relative;
+	display: inline-block;
+	margin: 3px;
+	width: 128px;
+	height: 128px;
+	vertical-align: top;
+}
+
+.ico_active:before {
+	position: absolute;
+	width: 128px;
+	height: 128px;
+	background: url( https://static.wikia.nocookie.net/dota2_gamepedia/images/1/11/Overlay_active.png/revision/latest ) no-repeat;
+	content: "";
+	pointer-events: none;
+}
+
+.ico_autocast:before {
+	position: absolute;
+	width: 128px;
+	height: 128px;
+	background: url( https://static.wikia.nocookie.net/dota2_gamepedia/images/d/df/Overlay_autocast.png/revision/latest ) no-repeat;
+	content: "";
+	pointer-events: none;
+}
+
+.ico_passive:before {
+	position: absolute;
+	width: 128px;
+	height: 128px;
+	background: url( https://static.wikia.nocookie.net/dota2_gamepedia/images/6/6f/Overlay_passive.png/revision/latest ) no-repeat;
+	content: "";
+	pointer-events: none;
+}
+
+/* Alternating shading of table rows */
+
+.oddrowsgray tr:nth-child( odd ) {
+	background-color: #ededed;
+}
+
+.evenrowsgray tr:nth-child( even ) {
+	background-color: #ededed;
+}
+
+/* Client-side image scaling */
+
+.images40pxwidth img {
+	width: 40px;
+	height: auto;
+}
+
+/* Tournament Bracket Styles */
+
+.tournament-bracket {
+	margin: 1em 2em 1em 1em;
+	border: 0;
+	border-spacing: 0;
+	border-collapse: separate;
+	font-size: 90%;
+}
+
+.tournament-bracket .round-title {
+	border: 1px solid #aaaaaa;
+	background-color: #f2f2f2;
+	text-align: center;
+}
+
+.tournament-bracket .match-bye,
+.tournament-bracket .match-team,
+.tournament-bracket .match-team-top,
+.tournament-bracket .match-team-bottom {
+	border: 1px solid #aaaaaa;
+}
+
+.tournament-bracket .match-bye {
+	background-color: #dddddd;
+}
+
+.tournament-bracket .match-score,
+.tournament-bracket .match-score-top,
+.tournament-bracket .match-score-bottom {
+	border: 1px solid #aaaaaa;
+	background-color: #f2f2f2;
+	text-align: center;
+}
+
+.tournament-bracket .path-top,
+.tournament-bracket .path-right,
+.tournament-bracket .path-bottom,
+.tournament-bracket .path-left {
+	border: 1px none #000000;
+}
+
+.tournament-bracket .path-top {
+	border-top-style: solid;
+}
+
+.tournament-bracket .path-right {
+	border-right-style: solid;
+}
+
+.tournament-bracket .path-bottom {
+	border-bottom-style: solid;
+}
+
+.tournament-bracket .path-left {
+	border-left-style: solid;
+}
+
+#mw-panel.collapsible-nav .portal h3#p-Partners-label {
+	color: #e38800;
+}
+
+/* Cosmetic label styles [[Template:Cosmetic]] */
+
+.cosmetic-label {
+	display: inline-block;
+	margin: 7px 5px 0;
+	vertical-align: top;
+	text-align: center;
+	line-height: normal;
+}
+
+.cosmetic-label > div {
+	margin-bottom: 5px;
+}
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist {
+	width: 100%;
+}
+
+div.skilllist-title {
+	border: 1px solid #aaaaaa;
+	background-color: #ffaea3;
+	color: #000000;
+	text-align: center;
+	font-weight: bold;
+	font-size: 100%;
+}
+
+div.skilllist ul {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow: hidden;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+}
+
+li.skilllist-lite {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 3px;
+	border: 1px solid #aaaaaa;
+	color: #ffffff;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 110%;
+}
+
+li.skilllist-rich {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 3px;
+	border: 1px solid #aaaaaa;
+	background-color: #efefef;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
+}
+
+div.skilllist-rich-head {
+	padding: 3px 5px;
+	border-bottom: 1px solid #000000;
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 110%;
+}
+
+div.skilllist-rich-image {
+	display: inline-block;
+	width: 64px;
+	vertical-align: top;
+}
+
+div.skilllist-rich-desc {
+	display: inline-block;
+	padding: 3px 5px;
+	max-width: calc( 100% - 74px );
+	vertical-align: top;
+}
+
+li.skilllist-lite a,
+li.skilllist-lite a:link,
+li.skilllist-lite a:visited,
+li.skilllist-lite a:hover,
+li.skilllist-lite a:active,
+div.skilllist-rich-head a,
+div.skilllist-rich-head a:link,
+div.skilllist-rich-head a:visited,
+div.skilllist-rich-head a:hover,
+div.skilllist-rich-head a:active {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+/***************************
+* Desktop Specific Styles *
+***************************/
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist-col1 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 100%;
+	flex: 1 0 100%;
+	width: 100%;
+}
+
+div.skilllist-col2 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 50%;
+	flex: 1 0 50%;
+	width: 50%;
+}
+
+div.skilllist-col3 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 calc( 100%/3 );
+	flex: 1 0 calc( 100%/3 );
+	width: calc( 100%/3 );
+}
+
+div.skilllist-col4 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 25%;
+	flex: 1 0 25%;
+	width: 25%;
+}
+
+div.skilllist-col5 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 20%;
+	flex: 1 0 20%;
+	width: 20%;
+}
+
+/******************************************
+* Custom Context Menu for Audio Download *
+*******************************************/
+
+#context-menu {
+	position: absolute;
+	display: none;
+}
+
+#context-menu ul,
+#context-menu li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: #ffaea3;
+}
+
+#context-menu {
+	border: solid 1px #cccccc;
+}
+
+#context-menu li {
+	border-bottom: solid 1px #cccccc;
+}
+
+#context-menu li:last-child {
+	border: 0;
+}
+
+#context-menu li a {
+	display: block;
+	padding: 2px 5px;
+	text-decoration: none;
+	color: #000000;
+	font-family: sans-serif;
+	font-size: 0.875em;
+}
+
+#context-menu li a:hover {
+	background: #b44335;
+	color: #ffffff;
+}
+
+div#mw-panel div.portal li a[href="https://discord.gg/AHt5MXZ"] {
+	background: url( https://discordapp.com/api/guilds/576585892937072640/embed.png ) no-repeat;
+	color: transparent !important;
+	display: inline-block;
+	height: 20px;
+	width: 119px;
+	margin-left: -10px;
+}
+
+.oo-ui-tool-name-editModeVisual {
+	display: none !important;
+}
+
+.ability-description {
+	display: block;
+	float: right;
+	width: 312px;
+}
+
+.ability-description.adItemOrRune {
+	width: 450px;
+}
+
+.aml50 {
+	margin-left: 50px;
+}
+
+.talsymbolbg {
+	display: inline-block;
+	vertical-align: top;
+	background-color: #151515;
+	box-shadow: 1px 1px 1.5px #000000;
+	border-width: 1px;
+	border-radius: 50%;
+	padding: 0 0;
+	margin: 0 0;
+	overflow: hidden;
+}
+
+/**********************
+* Custom Tooltip Menu *
+***********************/
+[ data-tooltip-passive ]::before {
+	/* needed - do not touch */
+	content: attr( data-tooltip-passive );
+	position: absolute;
+	opacity: 0;
+
+	/* customizable */
+	transition: all 0.2s ease;
+	padding: 5px;
+	color: #ffffff;
+	font-weight: bold;
+	text-shadow: 0.7px 0.7px 1.2px #000000;
+	box-shadow: 1px 1px 2px #000000;
+}
+
+[ data-tooltip-passive ]:hover::before {
+	/* needed - do not touch */
+	opacity: 1;
+
+	/* customizable */
+	background: #351d5b;
+	border: 1px solid rgba( 205, 204, 235, 0.3 );
+	font-size: 85%;
+	margin-top: -28px;
+	margin-left: 128px;
+}
+
+[ data-tooltip-passive ]:not( [ data-tooltip-persistent ] )::before {
+	pointer-events: none;
+}
+
+/* Import fonts */
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( "woff" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff ) format( "woff" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff ) format( "woff" );
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff ) format( "woff" );
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf ) format( "truetype" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf ) format( "truetype" );
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf ) format( "truetype" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf ) format( "truetype" );
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+/*
+* === Ability template ===
+*/
+.ability-background {
+	flex: 0 1 460px;
+	margin-right: 15px;
+	vertical-align: top;
+}
+
+/*
+* === Doc ===
+*/
+.doc-background {
+	clear: both;
+	margin-top: 1em;
+	border: 1px solid #aaaaaa;
+	background-color: rgba( 236, 252, 244, 0.2 );
+}
+
+/*
+* === Invoker's invoked abilities ===
+*/
+.invoked-abilities {
+	width: 140px;
+	margin: 5px;
+	border: 3px solid #dfdfdf;
+	background-color: #efefef;
+}
+
+/*
+* === Relics ===
+*/
+.relics {
+	width: 140px;
+	margin: 5px;
+	border: 1px solid #111111;
+	font-size: 80%;
+}
+
+/*
+* === FONTS ===
+*/
+
+@font-face {
+	font-family: "Open Sans Semibold";
+	src: local( "Open Sans Semibold" ), url( /media/hydra/fonts/OpenSans-Semibold.ttf ) format( "truetype" );
+}
+
+/*
+* === GENERAL STYLES ===
+*/
+
+/*
+* Definition (<dfn>) styles
+*/
+
+dfn {
+	font-weight: bold;
+	font-style: normal;
+}
+
+/*
+* Reference (<ref>) styles
+*/
+
+ol.references {
+	font-size: 90%;
+}
+
+.references-small {
+	font-size: 80%;
+}
+
+/* Temporary visual fix for the second square bracket not being part of the link. */
+sup.reference {
+	color: #3f56ad;
+}
+
+/*
+* Userlink styles
+*/
+
+/* User agnostic styling */
+
+.mw-userlink {
+	font-weight: bold;
+}
+
+.burbg,
+.admbg,
+.modbg,
+.locbg {
+	padding: 0 2px;
+	background-color: #70b04a;
+	color: #ffffff;
+	font-size: 0.7em;
+}
+/*
+#pt-userpage a[href='/wiki/User:'],
+.mw-userlink[title='User:'] {
+	text-transform: lowercase;
+}
+*/
+
+/* Admin Lime Color */
+
+.mw-userlink[ title="User:Bu3ny" ] bdi,
+.mw-userlink[ title="User:Elite_stay" ] bdi,
+.mw-userlink[ title="User:Irismus" ] bdi,
+.mw-userlink[ title="User:Medoke" ] bdi,
+.mw-userlink[ title="User:Molldust" ] bdi,
+.mw-userlink[ title="User:Psion1C" ] bdi,
+.mw-userlink[ title="User:Sanhard" ] bdi {
+	color: #52d017 !important;
+}
+
+/* Special Thanks and Honorary Members Color */
+
+.mw-userlink[ title="User:ChocolateWaffle" ],
+.mw-userlink[ title="User:Hefaistus" ],
+.mw-userlink[ title="User:Hybridshiek" ],
+.mw-userlink[ title="User:JanMayen" ],
+.mw-userlink[ title="User:Kroocsiogsi" ],
+.mw-userlink[ title="User:Lagg5302" ],
+.mw-userlink[ title="User:Lancey34" ],
+.mw-userlink[ title="User:Lemoncream" ],
+.mw-userlink[ title="User:LingoSalad" ],
+.mw-userlink[ title="User:Litzsch" ],
+.mw-userlink[ title="User:Mpcovcd" ],
+.mw-userlink[ title="User:Muriloricci" ],
+.mw-userlink[ title="User:Nickoladze" ],
+.mw-userlink[ title="User:Redefining_history" ],
+.mw-userlink[ title="User:SevenFiveSeven" ],
+.mw-userlink[ title="User:Vi3trice" ],
+.mw-userlink[ title="User:WindPowa" ] {
+	color: #880ed4 !important;
+}
+
+/* Bot Purple Color */
+.mw-userlink[ title="User:GuideBot" ],
+.mw-userlink[ title="User:FreemBOT" ],
+.mw-userlink[ title="User:HefBOT" ],
+.mw-userlink[ title="User:KrooBot" ],
+.mw-userlink[ title="User:Litzschbot" ],
+.mw-userlink[ title="User:MedokBOT" ] bdi,
+.mw-userlink[ title="User:Mollborg" ] bdi,
+.mw-userlink[ title="User:RBotson" ],
+.mw-userlink[ title="User:Sanhardbot" ],
+.mw-userlink[ title="User:Staywikibot" ] bdi,
+.mw-userlink[ title="User:WindBOT" ],
+.mw-userlink[ title="User:Bu3ny62646" ] bdi,
+.robot,
+.bot {
+	color: #fe48aa !important;
+}
+
+/*
+* Horizontal list (.hlist) styles
+*/
+
+.hlist ul {
+	margin: 0;
+}
+
+.hlist li {
+	display: inline;
+	margin: 0;
+	white-space: nowrap;
+}
+
+/* Display nested lists inline */
+.hlist ul ul {
+	display: inline;
+}
+
+/* Generate interpuncts */
+.hlist li:after {
+	content: " ·";
+	font-weight: bold;
+}
+
+.hlist li:last-child:after {
+	content: none;
+}
+
+/* Add parens around nested lists */
+.hlist ul ul:before {
+	content: "(";
+}
+
+.hlist ul ul:after {
+	content: ")";
+}
+
+/*
+* Unbulleted (.plainlist) styles
+*/
+
+.plainlist ul {
+	margin: 0;
+	list-style: none none;
+	line-height: inherit;
+}
+
+.plainlist ul li {
+	margin-bottom: 0;
+}
+
+/*
+* Webm autoloop spacing fix
+*/
+
+.autoloop,
+.loop {
+	display: block;
+}
+
+td .autoloop,
+td .loop {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: unset;
+	max-width: 800px !important;
+}
+
+/*
+* Pixel-art images
+*/
+
+img.pixelart {
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
+/*
+* === TEMPLATE STYLES ===
+*/
+
+/*
+* Image links ([[Template:Ability ID]], [[Template:Hero ID]], …)
+*/
+
+.image-link {
+	white-space: nowrap;
+}
+
+/*
+* Ambox styles ([[Template:Ambox]])
+*/
+
+.ambox {
+	width: 80%;
+	display: flex;
+	align-items: center;
+	margin: 0 auto 2px auto;
+	padding: 0.5em;
+	background-color: #eeeeee;
+	border-left: 10px solid #eeeeee;
+	font-size: 95%;
+}
+
+.ambox-image {
+	padding-right: 0.5em;
+	width: 56px;
+	text-align: center;
+}
+
+.ambox-quote {
+	font-style: italic;
+}
+
+.ambox-subject {
+	font-weight: bold;
+}
+
+.ambox-quote,
+.ambox-footnote {
+	font-size: 85%;
+}
+
+/*
+* Animatrion styles ([[Template:Animate]])
+*/
+
+.animated > *:not( .animated-active ),
+.animated-paused > *:not( .animated-active ),
+.animated > .animated-subframe > *:not( .animated-active ),
+.animated-paused > .animated-subframe > *:not( .animated-active ) {
+	display: none;
+}
+
+/*
+* Hero infobox styles ([[Template:Hero infobox]])
+*/
+
+/* Highlight the primary attribute icon */
+#primaryAttribute img {
+	border: 2px solid #ffffff;
+	border-radius: 50%;
+}
+
+/*
+* Cosmetic Item infobox styles ([[Template:Cosmetic item infobox]])
+*/
+
+.buynow_wrapper {
+	height: 24px;
+}
+
+.buynow_wrapper > a {
+	width: 100%;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.buynow_button {
+	display: block;
+	padding-left: 30px;
+	height: 24px;
+	background: linear-gradient( 0deg, #000000 0%, #666666 100% );
+	color: #ffffff;
+	text-align: left;
+	text-decoration: none;
+	font-size: 90%;
+	line-height: 24px;
+}
+
+.buynow_button:hover {
+	background: linear-gradient( 0deg, #000000 0%, #999999 100% );
+}
+
+.buynow_store:before {
+	position: absolute;
+	margin-left: -31px;
+	width: 24px;
+	height: 24px;
+	background: url( https://static.wikia.nocookie.net/dota2_gamepedia/images/7/73/Button_buynow_store.png/revision/latest ) no-repeat;
+	content: "";
+	pointer-events: none;
+}
+
+.buynow_market:before {
+	position: absolute;
+	margin-left: -31px;
+	width: 24px;
+	height: 24px;
+	background: url( https://static.wikia.nocookie.net/dota2_gamepedia/images/a/aa/Button_buynow_market.png/revision/latest ) no-repeat;
+	content: "";
+	pointer-events: none;
+}
+
+/*
+* Navbox styling ([[Template:Navbox]])
+*/
+
+table.notanavbox {
+	clear: both;
+	margin: auto;
+	padding: 1px;
+	width: 100%;
+	/* notanavbox container style */
+	border: 1px solid #b44335;
+	background: #fefeff;
+	text-align: center;
+	font-size: 88%;
+}
+
+table.notanavbox + table.notanavbox {
+	/* Single pixel border between adjacent notanavboxes */
+	margin-top: -1px;
+	/* (doesn't work for IE6, but that's okay)	   */
+}
+
+.notanavbox-title,
+.notanavbox-abovebelow,
+table.notanavbox th {
+	padding-right: 1em;
+	/* Title and above/below styles */
+	padding-left: 1em;
+	text-align: center;
+}
+
+table.notanavbox th a {
+	color: #e4c62e;
+	/* Should make the header links look better */
+}
+
+.notanavbox-group {
+	padding-right: 1em;
+	padding-left: 1em;
+	text-align: right;
+	/* Group style */
+	white-space: nowrap;
+	font-weight: bold;
+}
+
+.notanavbox,
+.notanavbox-subgroup {
+	background: #fefeff;
+	/* Background color */
+}
+
+.notanavbox-list {
+	border-color: #fefeff;
+	/* Must match background color */
+}
+
+.notanavbox-title,
+table.notanavbox th {
+	background: #cd5f51;
+	/* Level 1 color */
+	color: #ffffff;
+	/* text colour */
+}
+
+.notanavbox-abovebelow,
+.notanavbox-group,
+.notanavbox-subgroup .notanavbox-title {
+	background: #fde6e3;
+	/* Level 2 color */
+	color: #2d2723;
+}
+
+.notanavbox-subgroup .notanavbox-group,
+.notanavbox-subgroup .notanavbox-abovebelow {
+	background: #ffe8e5;
+	/* Level 3 color */
+}
+
+.notanavbox tr {
+	background-color: #fefeff;
+	/* Standard cell background */
+}
+
+.notanavbox-even {
+	background: #f2f2f2;
+	/* Even row striping */
+}
+
+.notanavbox-odd {
+	background: transparent;
+	/* Odd row striping */
+}
+
+/*
+* Tabber styles ([[Template:Tabber]])
+*/
+
+.page-tabber {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow-x: auto;
+	margin-bottom: 20px;
+}
+
+.page-tabber-tab {
+	padding: 0.5em;
+	border: solid #93b7d8;
+	white-space: nowrap;
+	line-height: 0.95em;
+}
+
+.page-tabber-tab.active-tab {
+	border-width: 2px 2px 0;
+	font-weight: bold;
+}
+
+.page-tabber-tab.inactive-tab {
+	border-width: 1px 1px 2px;
+	background-color: #dae8f5;
+}
+
+.page-tabber-separator {
+	border-bottom: 2px solid #93b7d8;
+}
+
+.page-tabber-separator.tail {
+	width: 100%;
+}
+
+/*
+* Teambox styles ([[Template:Teambox]], [[Template:TeamEntry]])
+*/
+
+.teambox {
+	width: 200px;
+	text-align: center;
+}
+
+.teambox-image {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 125px;
+	border: 1px solid #cccccc;
+	background: #fcfcfc;
+}
+
+.teambox-name {
+	font-weight: bold;
+}
+
+/*
+* Patch styles ([[Template:Patch layout]])
+*/
+
+.patch-layout {
+	width: 100%;
+	border: 1px solid #aaaaaa;
+	text-align: center;
+}
+
+.patch-layout-last {
+	background: #b2d7e9;
+}
+
+.patch-layout-all {
+	width: 27%;
+	background: #dee8ed;
+}
+
+.patch-layout-background {
+	background-color: #fdfaf8;
+	border: 1px solid #aaaaaa;
+	margin: 0.75em 0;
+	padding: 0.75em 1em;
+	padding-bottom: 1em;
+}
+
+/*
+* Event Currency Colors
+*/
+
+.bp2020 {
+	color: #f0b000;
+}
+
+.bp2019 {
+	color: #8c1bcd;
+}
+
+.bp2018 {
+	color: #3ec415;
+}
+
+.bp2017 {
+	color: #08d8d8;
+}
+
+.bp2016 {
+	color: #e60000;
+}
+
+.dotaplus {
+	color: #d37708;
+}
+
+/*
+* AudioButton extension styles
+* These FontAwesome icons are licensed under the Creative Commons Attribution 4.0 International license: https://fontawesome.com/license
+*/
+
+a.ext-audiobutton:before {
+	display: inline-block;
+	width: 1em;
+	vertical-align: middle;
+}
