@@ -7,10 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
-local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
 ---@class WorldofTanksMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
@@ -64,7 +65,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '}}'
 		)
 	end
-	
+
 	local score = showScore and '|score1=|score2=' or ''
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
