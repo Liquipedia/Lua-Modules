@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local BaseCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
@@ -39,8 +40,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	}
 
 	if streams then
-		table.insert(mapStats, 'vod')
-		table.insert(lines, INDENT .. '|twitch=')
+		table.insert(lines, INDENT .. '|twitch=|vod=')
 	end
 
 	---@param list string[]
@@ -56,15 +56,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		Array.appendWith(lines,
-			INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. (mapDetails and '' or '|score1=|score2=') .. '|finished='
-		)
+			INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=')
 		lines[#lines] = lines[#lines] .. '}}'
 	end)
 
-	Array.appendWith(lines,
-		buildListLine(matchMatchpages, 1),
-		INDENT .. '}}'
-	)
+	table.insert(lines, '}}')
 
 	return table.concat(lines, '\n')
 end
