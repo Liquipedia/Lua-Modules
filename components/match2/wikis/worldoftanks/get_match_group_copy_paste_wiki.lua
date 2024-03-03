@@ -7,96 +7,73 @@
 --
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
---[[
+local WikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+---@class WorldofTanksMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-]]--
+local INDENT = WikiCopyPaste.Indent
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
-
---allowed opponent types on the wiki
-local MODES = {
-	['solo'] = 'solo',
-	['team'] = 'team',
+local VETOES = {
+	[0] = '',
+	[1] = 'ban,ban,ban,ban,decider',
+	[2] = 'ban,ban,ban,pick,ban',
+	[3] = 'ban,ban,pick,ban,decider',
+	[4] = 'ban,ban,pick,pick,ban',
+	[5] = 'ban,pick,ban,pick,decider',
+	[6] = 'ban,ban,pick,pick,ban',
+	[7] = 'ban,pick,pick,pick,decider',
+	[8] = 'pick,pick,pick,pick,ban',
+	[9] = 'pick,pick,pick,pick,decider',
 }
 
---default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'team'
-
---returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
-end
-
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local showScore = Logic.readBool(args.score)
+	local mapVeto = Logic.readBool(args.mapVeto)
+	local streams = Logic.readBool(args.streams)
 
-	if bestof == 0 and args.score ~= 'false' then
-		args.score = 'true'
-	end
-
-	local score = args.score == 'true' and '|score=' or nil
-	local bans = args.bans == 'true'
-	local veto = args.veto == 'true'
-	local vetoBanRounds = tonumber(args.vetoBanRounds) or 0
 	local lines = Array.extend(
 		'{{Match',
-		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|youtube=|twitch='} or {}
+		INDENT .. '|date=|finished=',
+		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
+		end)
 	)
 
-	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
-	end
-
-	if veto and bestof > 0 then
-		local preFilledVetoTypes = string.rep('ban,', vetoBanRounds)
-			.. string.rep('pick,', bestof - 1) .. 'pick'
-		
+	if mapVeto and VETOES[bestof] then
 		Array.appendWith(lines,
-			indent .. '|mapveto={{MapVeto',
-			indent .. indent .. '|firstpick=',
-			indent .. indent .. '|types=' .. preFilledVetoTypes
+			INDENT .. '|mapveto={{MapVeto',
+			INDENT .. INDENT .. '|firstpick=',
+			INDENT .. INDENT .. '|types=' .. VETOES[bestof],
+			INDENT .. INDENT .. '|t1map1=|t2map1=',
+			INDENT .. INDENT .. '|t1map2=|t2map2=',
+			INDENT .. INDENT .. '|t1map3=|t2map3=',
+			INDENT .. INDENT .. '|t1map4=|t2map4=',
+			INDENT .. INDENT .. '|decider=',
+			INDENT .. '}}'
 		)
-
-		for roundIndex = 1, (vetoBanRounds + bestof) do
-			Array.appendWith(lines, indent .. indent .. '|t1map' .. roundIndex .. '=|t2map' .. roundIndex .. '=')
-		end
-
-		Array.appendWith(lines, indent .. '}}')
 	end
+	
+	local score = showScore and '|score1=|score2=' or ''
 
-	if bestof ~= 0 then
-		for i = 1, bestof do
-			Array.appendWith(lines,
-				indent .. '|map' .. i .. '={{Map|map=|score1=|score2=|winner=}}'
-			)
-		end
-	end
+	Array.forEach(Array.range(1, bestof), function(mapIndex)
+		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score  .. '|finished='
+	end)
 
-	table.insert(lines, '}}')
+	Array.appendWith(lines, INDENT .. '}}')
 
 	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
-	local out
-
-	if mode == 'solo' then
-		out = '{{SoloOpponent||flag=' .. (score or '') .. '}}'
-	elseif mode == 'team' then
-		out = '{{TeamOpponent|' .. (score or '') .. '}}'
-	elseif mode == 'literal' then
-		out = '{{Literal|}}'
-	end
-
-	return out
-end
-
-return wikiCopyPaste
+return WikiCopyPaste
