@@ -36,9 +36,7 @@ DateExt.defaultYear = '0000'
 ---@param dateString string|number|osdate|osdateparam?
 ---@return integer?
 function DateExt.readTimestamp(dateString)
-	-- due to metatable stuff for osdate empty checks do not work properly on it
-	-- hence check if year, month and day are set instead
-	if type(dateString) == 'table' and dateString.year and dateString.month and dateString.day then
+	if type(dateString) == 'table' then
 		-- in this case we have osdate really being osdateparam
 		---@cast dateString osdateparam
 		return tonumber(os.time(dateString))
