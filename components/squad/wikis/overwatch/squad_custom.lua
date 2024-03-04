@@ -89,7 +89,6 @@ end
 ---@param args table
 ---@return self
 function ExtendedSquadRow:number(args)
-	mw.logObject(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Number')
 
