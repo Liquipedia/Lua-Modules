@@ -55,4 +55,10 @@ function Variables.varDefaultMulti(...)
 	return varargs[varargs.n]
 end
 
+---@param name wikiVaribleKey Key of the wiki-variable
+---@return boolean
+function Variables.varExists(name)
+	return Variables.varDefault(name) ~= nil
+end
+
 return Class.export(Variables, {removeBlanks = false})
