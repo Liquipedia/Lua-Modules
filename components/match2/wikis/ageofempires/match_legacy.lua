@@ -45,7 +45,7 @@ function MatchLegacy.storeGames(match, match2)
 			local function processOpponent(opponentIndex)
 				for _, player, playerId in Table.iter.pairsByPrefix(participants, opponentIndex .. '_') do
 					local prefix = 'o' .. opponentIndex .. 'p' .. playerId
-					game.extradata.prefix = player.pageName
+					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ
 					game.extradata[prefix .. 'name'] = player.displayname
 					game.extradata[prefix .. 'flag'] = player.flag
