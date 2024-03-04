@@ -34,27 +34,41 @@ function MatchLegacy.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		local participants = Json.parseIfString(game2.participants) or {}
-		local player1 = participants['1_1'] or {}
-		local player2 = participants['2_1'] or {}
+
 		-- Extradata
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		game.extradata.mapmode = game2.extradata.mapmode
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
-		-- TODO: Team vs Solo based extrdata fields
-		game.extradata.opponent1civ = player1.civ
-		game.extradata.opponent2civ = player2.civ
-		game.extradata.winnerciv =
-				(tonumber(game.winner) == 1 and game.extradata.opponent1civ) or
-				(tonumber(game.winner) == 2 and game.extradata.opponent2civ) or
-				''
-		game.extradata.loserciv =
-				(tonumber(game.winner) == 2 and game.extradata.opponent1civ) or
-				(tonumber(game.winner) == 1 and game.extradata.opponent2civ) or
-				''
-		game.extradata.opponent1name = player1.player
-		game.extradata.opponent2name = player2.player
+		if game.mode == 'team' then
+			local function processOpponent(opponentIndex)
+				for _, player, playerId in Table.iter.pairsByPrefix(participants, opponentIndex .. '_') do
+					local prefix = 'o' .. opponentIndex .. 'p' .. playerId
+					game.extradata.prefix = player.pageName
+					game.extradata[prefix .. 'faction'] = player.civ
+					game.extradata[prefix .. 'name'] = player.displayname
+					game.extradata[prefix .. 'flag'] = player.flag
+				end
+			end
+			processOpponent(1)
+			processOpponent(2)
+		elseif game.mode == '1v1' then
+			local player1 = participants['1_1'] or {}
+			local player2 = participants['2_1'] or {}
+			game.extradata.opponent1civ = player1.civ
+			game.extradata.opponent2civ = player2.civ
+			game.extradata.winnerciv =
+					(tonumber(game.winner) == 1 and game.extradata.opponent1civ) or
+					(tonumber(game.winner) == 2 and game.extradata.opponent2civ) or
+					''
+			game.extradata.loserciv =
+					(tonumber(game.winner) == 2 and game.extradata.opponent1civ) or
+					(tonumber(game.winner) == 1 and game.extradata.opponent2civ) or
+					''
+			game.extradata.opponent1name = player1.player
+			game.extradata.opponent2name = player2.player
+		end
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
