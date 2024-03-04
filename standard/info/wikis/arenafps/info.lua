@@ -289,12 +289,12 @@ return {
 			name = 'Reflex',
 			link = 'Reflex',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Reflex Arena default full darkmode.png',
+				lightMode = 'Reflex Arena default full lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake default darkmode.png',
-				lightMode = 'Quake default lightmode.png',
+				darkMode = 'Reflex Arena default allmode.png',
+				lightMode = 'Reflex Arena default allmode.png',
 			},
 		},
 		sm = {
