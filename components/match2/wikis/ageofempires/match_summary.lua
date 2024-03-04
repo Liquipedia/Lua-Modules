@@ -119,13 +119,12 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param paricipantId string
----@return string?, string?
+---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
 function CustomMatchSummary._getPlayerData(game, paricipantId)
 	if not game or not game.participants then
-		return
+		return {}
 	end
-	local player = game.participants[paricipantId]
-	return (player or {}).civ, (player or {}).player
+	return game.participants[paricipantId] or {}
 end
 
 ---@param row MatchSummaryRow
@@ -143,19 +142,13 @@ function CustomMatchSummary._createGame(row, game, props)
 	local faction1, faction2
 
 	if props.soloMode then
-		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1'), normGame)
-		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1'), normGame)
+		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1').civ, normGame)
+		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1').civ, normGame)
 	else
-		local function findPlayer(participantId, name)
-			local opponentId = tonumber(participantId:sub(1, 1))
-			return Table.filter((props.opponents[opponentId] or {}).players or {}, function(player)
-				return player.displayName == name
-			end)[1] or {pageName = name, displayName = name}
-		end
 		local function createParticipant(participantId, flipped)
-			local civ, name = CustomMatchSummary._getPlayerData(game, participantId)
-			local playerNode = PlayerDisplay.BlockPlayer{player = findPlayer(participantId, name), flip = flipped}
-			local factionNode = CustomMatchSummary._createFactionIcon(civ, normGame)
+			local player = CustomMatchSummary._getPlayerData(game, participantId)
+			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
+			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
 			local playerRow = mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
 			return playerRow
 				:node(flipped and playerNode or factionNode)

@@ -405,10 +405,9 @@ function CustomMatchGroupInput.processPlayerMapData(map, match, numberOfOpponent
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
 		if Opponent.typeIsParty(opponent.type) then
-			local players = opponent.match2players
-			CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex, participants)
+			CustomMatchGroupInput._processPartyMapData(opponent.match2players, map, opponentIndex, participants)
 		elseif opponent.type == Opponent.team then
-			CustomMatchGroupInput._processTeamMapData(map, opponentIndex, participants)
+			CustomMatchGroupInput._processTeamMapData(opponent.match2players, map, opponentIndex, participants)
 		end
 	end
 
@@ -436,21 +435,31 @@ function CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex,
 	return participants
 end
 
+---@param opponentPlayers table[]
 ---@param map table
 ---@param opponentIndex integer
 ---@param participants table<string, table>
 ---@return table<string, table>
-function CustomMatchGroupInput._processTeamMapData(map, opponentIndex, participants)
+function CustomMatchGroupInput._processTeamMapData(opponentPlayers, map, opponentIndex, participants)
 	local players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
+
+	local function findPlayer(name)
+		return Table.filter(opponentPlayers or {}, function(player)
+			return player.displayName == name or player.pageName == name
+		end)[1] or {pageName = name, displayName = name}
+	end
 
 	for playerIndex, player in pairs(players) do
 		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
 		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+		local playerData = findPlayer(player)
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			civ = civ,
-			player = player,
+			displayName = playerData.displayname,
+			pageName = playerData.name,
+			flag = playerData.flag,
 		}
 	end
 
