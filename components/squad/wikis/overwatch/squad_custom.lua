@@ -118,7 +118,7 @@ function CustomSquad.run(frame)
 
 	local players = Array.mapIndexes(function(index)
 		local player = Json.parseIfString(args[index])
-		if player.number then
+		if type(player) == 'table' and player.number then
 			HAS_NUMBER = true
 		end
 		return player
