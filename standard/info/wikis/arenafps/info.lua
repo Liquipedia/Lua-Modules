@@ -42,12 +42,12 @@ return {
 			name = 'Chex Quest',
 			link = 'Chex Quest',
 			logo = {
-				darkMode = 'Chex Quest.png',
-				lightMode = 'Chex Quest.png',
+				darkMode = 'Chex Quest default allmode.png',
+				lightMode = 'Chex Quest default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Chex Quest.png',
-				lightMode = 'Chex Quest.png',
+				darkMode = 'Chex Quest default allmode.png',
+				lightMode = 'Chex Quest default allmode.png',
 			},
 		},
 		cpma = {
