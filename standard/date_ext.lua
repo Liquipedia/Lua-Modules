@@ -38,8 +38,7 @@ DateExt.defaultYear = '0000'
 function DateExt.readTimestamp(dateString)
 	if type(dateString) == 'table' then
 		-- in this case we have osdate really being osdateparam
-		---@cast dateString osdateparam
-		return tonumber(os.time(dateString))
+		return tonumber(os.time(dateString --[[@as osdateparam]]))
 	end
 
 	if Logic.isEmpty(dateString) then
