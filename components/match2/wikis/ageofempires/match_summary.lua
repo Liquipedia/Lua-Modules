@@ -148,12 +148,9 @@ function CustomMatchSummary._createGame(row, game, props)
 	else
 		local function findPlayer(participantId, name)
 			local opponentId = tonumber(participantId:sub(1, 1))
-			for _, player in pairs((props.opponents[opponentId] or {} ).players or {}) do
-				if player.displayName == name then
-					return player
-				end
-			end
-			return {pageName = name, displayName = name}
+			return Table.filter((props.opponents[opponentId] or {}).players or {}, function(player)
+				return player.displayName == name
+			end)[1] or {pageName = name, displayName = name}
 		end
 		local function createParticipant(participantId, flipped)
 			local civ, name = CustomMatchSummary._getPlayerData(game, participantId)
