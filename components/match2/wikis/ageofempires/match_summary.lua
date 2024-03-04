@@ -149,8 +149,8 @@ function CustomMatchSummary._createGame(row, game, props)
 			local player = CustomMatchSummary._getPlayerData(game, participantId)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
-			local playerRow = mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
-			return playerRow
+
+			return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
 				:node(flipped and playerNode or factionNode)
 				:wikitext('&nbsp;')
 				:node(flipped and factionNode or playerNode)
