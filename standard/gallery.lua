@@ -30,7 +30,8 @@ function Gallery.run(args)
 	---@param index integer
 	---@return {imageLightMode: string, imageDarkMode: string?, caption: string?, link: string?}?
 	local processImageInput = function(index)
-		local input = Json.parseIfTable(args[index])
+		local rawInput = args[index]
+		local input = type(rawInput) == 'table' and rawInput or Json.parseIfTable(args[index])
 		if Logic.isEmpty(input) then return end
 		---@cast input -nil
 
