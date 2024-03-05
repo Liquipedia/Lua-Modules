@@ -111,7 +111,8 @@ liquipedia.countdown = {
 			Loco: 'stream',
 			Mildom: 'mildom',
 			Nimo: 'nimotv',
-			Trovo: 'trovo'
+			Trovo: 'trovo',
+			Kik: 'kick'
 		};
 		for ( const dataSetName in streamKeys ) {
 			const icon = streamKeys[ dataSetName ];
