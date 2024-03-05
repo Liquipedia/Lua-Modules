@@ -42,7 +42,7 @@ StreamLinks.countdownPlatformNames = {
 }
 
 --[[
-Lookup table of allowed inputs that use a plattform with a different name
+Lookup table of allowed inputs that use a platform with a different name
 ]]
 StreamLinks.streamPlatformLookupNames = {
 	twitch2 = 'twitch',
