@@ -44,7 +44,11 @@ function TeamLogoGallery._getImageData(name)
 		})
 	end
 
-	local finalName = imageDatas[#imageDatas].raw.name
+	Array.forEach(imageDatas, function(imageData, index)
+		imageData.endDate = (imageDatas[index + 1] or {}).startDate
+	end)
+
+	local finalName = Table.extract(imageDatas, #imageDatas).raw.name
 
 	return Array.map(imageDatas, function(imageData, index)
 		local image = Logic.emptyOr(imageData.raw.image, imageData.raw.legacyimage)
@@ -58,9 +62,7 @@ function TeamLogoGallery._getImageData(name)
 			return nil
 		end
 
-		local nextStartDate = (imageDatas[index + 1] or {}).startDate
-
-		local caption, below = TeamLogoGallery._makeCaptionAndBelow(imageData, nextStartDate, index, finalName)
+		local caption, below = TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 
 		return {
 			lightmode = image,
@@ -71,18 +73,12 @@ function TeamLogoGallery._getImageData(name)
 	end)
 end
 
----@param imageData {startDate: string, raw: table}
----@param endDate string?
+---@param imageData {startDate: string, raw: table, endDate: string}
 ---@param index integer
 ---@param finalName string
 ---@return string
 ---@return Html|string
-function TeamLogoGallery._makeCaptionAndBelow(imageData, endDate, index, finalName)
-	if not endDate then
-		local caption = 'Current logo'
-		return caption, caption
-	end
-
+function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 	local number = index == 1 and 'Original' or
 		mw.getContentLanguage():ucfirst(Ordinal.written(index) --[[@as string]])
 
@@ -96,12 +92,8 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, endDate, index, finalNa
 		below:wikitext(', as '):tag('b'):wikitext(teamName)
 	end
 
-	if not endDate then
-		return caption, below
-	end
-
-	local month = DateExt.formatTimestamp('F', DateExt.readTimestamp(endDate)--[[@as integer]])
-	local dateArray = mw.text.split(endDate, '-', true)
+	local month = DateExt.formatTimestamp('F', DateExt.readTimestamp(imageData.endDate)--[[@as integer]])
+	local dateArray = mw.text.split(imageData.endDate, '-', true)
 	local year = dateArray[1]
 	local day = tonumber(dateArray[3])
 	local daySuffix = Ordinal.suffix(day)
