@@ -33,26 +33,26 @@ DateExt.defaultYear = '0000'
 --- The timezone offset is incorporated into the timestamp, and the timezone is discarded.
 --- If the timezone is not specified, then the date is assumed to be in UTC.
 --- Throws if the input string is non-empty and not a valid date.
----@param dateString string|number|osdate|osdateparam?
+---@param dateInput string|number|osdate|osdateparam?
 ---@return integer?
-function DateExt.readTimestamp(dateString)
-	if type(dateString) == 'table' then
+function DateExt.readTimestamp(dateInput)
+	if type(dateInput) == 'table' then
 		-- in this case we have osdate really being osdateparam
-		return tonumber(os.time(dateString --[[@as osdateparam]]))
+		return tonumber(os.time(dateInput --[[@as osdateparam]]))
 	end
 
-	if Logic.isEmpty(dateString) then
+	if Logic.isEmpty(dateInput) then
 		return nil
-	elseif type(dateString) == 'number' then
-		return dateString
+	elseif type(dateInput) == 'number' then
+		return dateInput
 	end
 
 	-- everything but strings was processed above
-	---@cast dateString string
+	---@cast dateInput string
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
-	local tzTemplateOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local datePart = (mw.text.split(dateString, '<', true)[1]):gsub('-', '')
+	local tzTemplateOffset = dateInput:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
+	local datePart = (mw.text.split(dateInput, '<', true)[1]):gsub('-', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
 	return tonumber(timestampString)
 end
