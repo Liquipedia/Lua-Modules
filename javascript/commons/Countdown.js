@@ -99,7 +99,7 @@ liquipedia.countdown = {
 		const streamKeys = {
 			Twitch: 'twitch',
 			Youtube: 'youtube',
-			Afreecatv: 'freeca',
+			Afreecatv: 'afreeca',
 			Bilibili: 'bilibili',
 			Booyah: 'booyah',
 			Cc163: 'cc',
