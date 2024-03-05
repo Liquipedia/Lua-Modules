@@ -83,7 +83,8 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, endDate, index, finalNa
 		return caption, caption
 	end
 
-	local number = index == 1 and 'Original' or Ordinal.written(index)
+	local number = index == 1 and 'Original' or
+		mw.getContentLanguage():ucfirst(Ordinal.written(index) --[[@as string]])
 
 	local caption = number .. ' logo'
 	local below = mw.html.create('p')
@@ -102,7 +103,7 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, endDate, index, finalNa
 	local month = DateExt.formatTimestamp('F', DateExt.readTimestamp(endDate)--[[@as integer]])
 	local dateArray = mw.text.split(endDate, '-', true)
 	local year = dateArray[1]
-	local day = dateArray[3]
+	local day = tonumber(dateArray[3])
 	local daySuffix = Ordinal.suffix(day)
 
 	caption = caption .. ' (prior to ' .. month .. ' ' .. day .. daySuffix .. ', ' .. year .. ')'
@@ -112,7 +113,7 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, endDate, index, finalNa
 		:tag('small')
 			:wikitext('(prior to ' .. month .. '&nbsp;' .. day)
 			:tag('sup'):wikitext(daySuffix):done()
-			:wikitext(',&nbsp;' .. year)
+			:wikitext(',&nbsp;' .. year .. ')')
 
 	return caption, below
 end
