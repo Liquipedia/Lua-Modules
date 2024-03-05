@@ -138,6 +138,9 @@ liquipedia.countdown = {
 		if ( timerObjectNode.dataset.streamLoco ) {
 			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/loco/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamLoco ) + '"><i class="lp-icon lp-icon-21 lp-loco"></i></a>' );
 		}
+		if ( timerObjectNode.dataset.streamKick ) {
+			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/kick/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamKick ) + '"><i class="lp-icon lp-icon-21 lp-kick"></i></a>' );
+		}
 		if ( timerObjectNode.dataset.streamMildom ) {
 			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/mildom/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamMildom ) + '"><i class="lp-icon lp-icon-21 lp-mildom"></i></a>' );
 		}
