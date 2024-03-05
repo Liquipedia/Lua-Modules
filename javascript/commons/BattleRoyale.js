@@ -22,12 +22,7 @@ liquipedia.battleRoyale = {
 			for ( const entry of entries ) {
 				if ( entry.borderBoxSize[ 0 ].blockSize > 0 && !this.instancesLoaded[ instanceId ] ) {
 					this.instancesLoaded[ instanceId ] = true;
-					this.battleRoyaleInstances[ instanceId ]
-						.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
-						.forEach( ( tableEl ) => {
-							this.recheckSideScrollButtonStates( tableEl );
-							this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
-						} );
+					this.recheckNavigationStates( instanceId );
 				}
 			}
 		} );
@@ -36,11 +31,7 @@ liquipedia.battleRoyale = {
 
 	implementOnWindowResize: function( instanceId ) {
 		window.addEventListener( 'resize', () => {
-			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
-				.forEach( ( tableEl ) => {
-					this.recheckSideScrollButtonStates( tableEl );
-					this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
-				} );
+			this.recheckNavigationStates( instanceId );
 		} );
 	},
 
@@ -128,6 +119,16 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
+	recheckNavigationStates: function( instanceId ) {
+		this.battleRoyaleInstances[ instanceId ]
+			.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
+			.forEach( ( tableEl ) => {
+				this.recheckSideScrollButtonStates( tableEl );
+				this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
+			} );
+
+	},
+
 	recheckSideScrollButtonStates: function( tableElement ) {
 		const navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
 		const navRight = tableElement.querySelector( '[data-js-battle-royale="navigate-right"]' );
@@ -169,6 +170,8 @@ liquipedia.battleRoyale = {
 				content.classList.add( 'is--hidden' );
 			}
 		} );
+
+		this.recheckNavigationStates( instanceId );
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
@@ -192,6 +195,8 @@ liquipedia.battleRoyale = {
 				contents[ panelId ].classList.add( 'is--hidden' );
 			}
 		} );
+
+		this.recheckNavigationStates( instanceId );
 	},
 
 	buildBattleRoyaleMap: function( id ) {
