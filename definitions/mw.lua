@@ -916,7 +916,7 @@ mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.VariablesLua = {}
----@alias wikiVaribleKey string|number
+---@alias wikiVariableKey string|number
 ---@alias wikiVariableValue string|number|nil
 
 ---Fake storage for enviroment simulation
@@ -924,7 +924,7 @@ mw.ext.VariablesLua = {}
 mw.ext.VariablesLua.variablesStorage = {}
 
 ---Stores a wiki-variable and returns the empty string
----@param name wikiVaribleKey
+---@param name wikiVariableKey
 ---@param value wikiVariableValue
 ---@return string #always an empty string
 function mw.ext.VariablesLua.vardefine(name, value)
@@ -933,7 +933,7 @@ function mw.ext.VariablesLua.vardefine(name, value)
 end
 
 ---Stores a wiki-variable and returns the stored value
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@param value wikiVariableValue Value of the wiki-variable
 ---@return string
 function mw.ext.VariablesLua.vardefineecho(name, value)
@@ -942,14 +942,14 @@ function mw.ext.VariablesLua.vardefineecho(name, value)
 end
 
 ---Gets the stored value of a wiki-variable
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@return string
 function mw.ext.VariablesLua.var(name)
 	return mw.ext.VariablesLua.variablesStorage[name] and tostring(mw.ext.VariablesLua.variablesStorage[name]) or ''
 end
 
 ---Checks if a wiki-variable is stored
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@return boolean
 function mw.ext.VariablesLua.varexist(name)
 	return mw.ext.VariablesLua.variablesStorage[name] ~= nil
