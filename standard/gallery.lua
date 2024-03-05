@@ -28,7 +28,7 @@ function Gallery.run(args)
 	local height = tonumber((string.gsub(args.height or '', 'px$', ''))) or DEFAULT_HEIGHT
 
 	---@param index integer
-	---@return {imageLightMode: string, imageDarkMode: string?, caption: string?, link: string?}?
+	---@return {imageLightMode: string, imageDarkMode: string?, caption: string, below: string|Html?, link: string?}?
 	local processImageInput = function(index)
 		local rawInput = args[index]
 		local input = type(rawInput) == 'table' and rawInput or Json.parseIfTable(args[index])
@@ -43,6 +43,7 @@ function Gallery.run(args)
 			imageDarkMode = input.darkmode,
 			caption = input.caption,
 			link = input.link,
+			below = input.below,
 		}
 	end
 
@@ -60,7 +61,7 @@ function Gallery.run(args)
 	return gallery
 end
 
----@param input {imageLightMode: string, imageDarkMode: string?, caption: string?, link: string?}
+---@param input {imageLightMode: string, imageDarkMode: string?, caption: string, below: string|Html?, link: string?}
 ---@param height number
 ---@return Html
 function Gallery._makeImage(input, height)
@@ -84,14 +85,16 @@ function Gallery._makeImage(input, height)
 			:node(image)
 			:done()
 
-	local text = input.caption and
-		mw.html.create('div'):addClass('gallerytext'):wikitext(input.caption)
+	local text = (input.below or input.caption) and
+		mw.html.create('div'):addClass('gallerytext'):node(input.below or input.caption)
 		or nil
 
 	local extendedWidth = width + 4
 
 	return mw.html.create('li')
 		:addClass('gallerybox')
+		:css('vertical-align', 'top')
+		:css('display', 'inline-block')
 		:css('width', extendedWidth .. 'px')
 		:tag('div')
 			:css('width', extendedWidth .. 'px')
