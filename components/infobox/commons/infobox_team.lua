@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Image = require('Module:Image')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -220,8 +221,7 @@ function Team:processCreateDates()
 		local cleanDate = ReferenceCleaner.clean(date)
 
 		if game:lower() == 'org' then
-			icon = self:_getTeamIcon(cleanDate)
-			icon = String.isNotEmpty(icon) and '[[File:' .. icon .. ']]' or nil
+			icon = Image.display(self:_getTeamIcon(cleanDate))
 		else
 			local timestamp = Team._parseDate(cleanDate)
 			if timestamp and timestamp < earliestGameTimestamp then
@@ -240,14 +240,21 @@ end
 
 ---@param date? string
 ---@return string?
+---@return string?
 function Team:_getTeamIcon(date)
 	if not self.teamTemplate then
 		return
 	end
 
-	return self.teamTemplate.historicaltemplate
+	local icon = self.teamTemplate.historicaltemplate
 		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
 		or self.teamTemplate.image
+
+	local iconDark = self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
+		or self.teamTemplate.imagedark
+
+	return icon, iconDark
 end
 
 ---@param date? string

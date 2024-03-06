@@ -49,12 +49,10 @@ StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 })
 
 ---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
----@field mapDisplayName string?
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
 ---@field offraces table<integer, string[]>?
 StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
 	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
-	mapDisplayName = 'string?',
 })
 ---@class StarcraftMatchGroupUtilVeto
 ---@field by number?
@@ -117,7 +115,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	for _, game in ipairs(match.games) do
 		game.opponents = StarcraftMatchGroupUtil.computeGameOpponents(game, match.opponents)
 		game.extradata = game.extradata or {}
-		game.mapDisplayName = game.extradata.displayname
 	end
 
 	-- Determine whether the match is a team match with different players each game

@@ -125,8 +125,11 @@ function CustomOpponent.resolve(opponent, date, options)
 				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {date = date, savePageVar = savePageVar})
-				player.team =
-					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
+				player.team = PlayerExt.syncTeam(
+					player.pageName:gsub(' ', '_'),
+					player.team,
+					{date = date, savePageVar = savePageVar}
+				)
 				player.faction = (hasFaction and player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else
 				PlayerExt.populatePageName(player)

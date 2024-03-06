@@ -11,33 +11,28 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local TypeUtil = require('Module:TypeUtil')
+local Table = require('Module:Table')
 
-local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
-local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 local ZERO_WIDTH_SPACE = '&#8203;'
 
-local CustomPlayerDisplay = {propTypes = {}}
+---@class StormgatePlayerDisplay: PlayerDisplay
+local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 
-CustomPlayerDisplay.propTypes.BlockPlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	player = CustomMatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showPlayerTeam = 'boolean?',
-	hideFaction = 'boolean?',
-	abbreviateTbd = 'boolean?',
-	note = 'string?',
-}
+---@class StormgateBlockPlayerProps: BlockPlayerProps
+---@field player StormgateStandardPlayer
+---@field hideFaction boolean?
 
+---@class StormgateInlinePlayerProps: InlinePlayerProps
+---@field player StormgateStandardPlayer
+---@field hideFaction boolean?
+
+---@param props StormgateBlockPlayerProps
+---@return Html
 function CustomPlayerDisplay.BlockPlayer(props)
-	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
 	local nameNode = mw.html.create(props.dq and 's' or 'span')
@@ -84,37 +79,9 @@ function CustomPlayerDisplay.BlockPlayer(props)
 		:node(teamNode)
 end
 
-CustomPlayerDisplay.propTypes.InlinePlayerContainer = {
-	date = 'string?',
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = 'table',
-	savePageVar = 'boolean?',
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	hideFaction = 'boolean?',
-}
-
-function CustomPlayerDisplay.InlinePlayerContainer(props)
-	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.InlinePlayerContainer)
-	PlayerExt.syncPlayer(props.player, {
-		date = props.date,
-		savePageVar = props.savePageVar,
-	})
-
-	return CustomPlayerDisplay.InlinePlayer(props)
-end
-
-CustomPlayerDisplay.propTypes.InlinePlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = CustomMatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	hideFaction = 'boolean?',
-}
+---@param props StormgateInlinePlayerProps
+---@return Html
 function CustomPlayerDisplay.InlinePlayer(props)
-	DisplayUtil.assertPropTypes(props, CustomPlayerDisplay.propTypes.InlinePlayer)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag

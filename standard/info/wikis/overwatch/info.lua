@@ -41,5 +41,5 @@ return {
 	defaultGame = 'overwatch2',
 	defaultTeamLogo = 'Overwatch Logo lightmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Overwatch Logo darkmode.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }
