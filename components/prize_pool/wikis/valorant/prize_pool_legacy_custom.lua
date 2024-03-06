@@ -15,10 +15,15 @@ local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 local CustomLegacyPrizePool = {}
 
 -- Template entry point
+---@return Html
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end
 
+---@param newArgs table
+---@param data table
+---@param header table
+---@return table
 function CustomLegacyPrizePool.customHeader(newArgs, data, header)
 	newArgs.prizesummary = header.prizenote and true or newArgs.prizesummary
 
@@ -31,6 +36,10 @@ function CustomLegacyPrizePool.customHeader(newArgs, data, header)
 	return newArgs
 end
 
+---@param newData table
+---@param data table
+---@param slot table
+---@return table
 function CustomLegacyPrizePool.customSlot(newData, data, slot)
 	-- Remove points with only image
 	-- Table.filter doesn't work on Tables (only Arrays)... Let's use Table.map instead
