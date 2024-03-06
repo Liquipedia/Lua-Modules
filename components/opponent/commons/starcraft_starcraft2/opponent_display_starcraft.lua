@@ -225,7 +225,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 					:css('position', 'absolute')
 					:css('right', '1px')
 					:css('bottom', '1px')
-					:node(StarcraftPlayerDisplay.Race(secondaryRace))
+					:node(Faction.Icon{faction = secondaryRace})
 			end
 			local raceNode = mw.html.create('div')
 				:css('position', 'relative')

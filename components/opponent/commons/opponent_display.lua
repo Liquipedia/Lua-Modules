@@ -226,7 +226,7 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
----@class BlockPlayerProps
+---@class BlockPlayersProps
 ---@field flip boolean?
 ---@field opponent {players: standardPlayer[]?}
 ---@field overflow OverflowModes?
@@ -238,7 +238,7 @@ end
 ---@field dq boolean?
 ---@field note string|number|nil
 
----@param props BlockPlayerProps
+---@param props BlockPlayersProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent

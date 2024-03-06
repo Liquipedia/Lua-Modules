@@ -89,7 +89,6 @@ end
 ---@param args table
 ---@return self
 function ExtendedSquadRow:number(args)
-	mw.logObject(args)
 	local cell = mw.html.create('td')
 	cell:addClass('Number')
 
@@ -119,7 +118,7 @@ function CustomSquad.run(frame)
 
 	local players = Array.mapIndexes(function(index)
 		local player = Json.parseIfString(args[index])
-		if player.number then
+		if type(player) == 'table' and player.number then
 			HAS_NUMBER = true
 		end
 		return player

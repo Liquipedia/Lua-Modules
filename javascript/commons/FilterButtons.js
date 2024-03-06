@@ -48,7 +48,7 @@ liquipedia.filterButtons = {
 		this.localStorageKey = this.buildLocalStorageKey();
 		this.generateFilterGroups( filterButtonGroups );
 		this.generateFilterableItems();
-		this.initalizeButtons();
+		this.initializeButtons();
 		this.performUpdate();
 	},
 
@@ -59,79 +59,92 @@ liquipedia.filterButtons = {
 		const localStorage = this.getLocalStorage();
 
 		filterButtonGroups.forEach( ( buttonsDiv ) => {
-			const filterGroup = buttonsDiv.dataset.filterGroup || this.fallbackFilterGroup;
-			const filterStates = ( localStorage[ filterGroup ] || {} ).filterStates || {};
-			const alwaysActiveFilters = buttonsDiv.dataset.filterAlwaysActive;
-			const buttons = [];
-			let allButton;
-			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach( ( /** @type HTMLElement */ buttonElement ) => {
-				const filterOn = buttonElement.dataset.filterOn || '';
-				const button = {
-					element: buttonElement,
-					filter: filterOn,
-					active: true
-				};
-				if ( filterOn === 'all' ) {
-					allButton = button;
-				} else {
-					buttons[ filterOn ] = button;
-					filterStates[ filterOn ] = filterStates[ filterOn ] || true;
-				}
-				buttonElement.setAttribute( 'tabindex', '0' );
-			} );
-
-			this.filterGroups[ filterGroup ] = {
+			const filterGroup = buttonsDiv.dataset.filterGroup ?? this.fallbackFilterGroup;
+			const filterGroupEntry = {
 				name: filterGroup,
-				buttons: buttons,
-				allButton: allButton,
-				alwaysActive: ( typeof alwaysActiveFilters === 'string' ) ? alwaysActiveFilters.split( ',' ) : [],
-				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect || this.fallbackFilterEffect ),
-				filterStates: filterStates,
+				buttons: [],
+				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
+				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
+				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
+				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
 				filterableItems: []
 			};
+
+			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
+				( /** @type HTMLElement */ buttonElement ) => {
+					const filterOn = buttonElement.dataset.filterOn ?? '';
+					const button = {
+						element: buttonElement,
+						filter: filterOn,
+						active: true
+					};
+					switch ( filterOn ) {
+						case 'curated':
+						case 'all':
+							filterGroupEntry[ filterOn + 'Button' ] = button;
+							break;
+						default:
+							filterGroupEntry.buttons[ filterOn ] = button;
+							filterGroupEntry.filterStates[ filterOn ] =
+								filterGroupEntry.filterStates[ filterOn ] ??
+									!( buttonElement.dataset.filterDefault === 'false' );
+					}
+					buttonElement.setAttribute( 'tabindex', '0' );
+				}
+			);
+
+			this.filterGroups[ filterGroup ] = filterGroupEntry;
 		} );
 	},
 
 	generateFilterableItems: function() {
 		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
-			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup || this.fallbackFilterGroup ];
+			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
 			filterGroup.filterableItems.push( {
 				element: filterableItem,
 				value: filterableItem.dataset.filterCategory,
+				curated: filterableItem.dataset.curated !== undefined,
 				hidden: false
 			} );
 		} );
 	},
 
-	initalizeButtons: function() {
+	initializeButtons: function() {
 		const handleClick = function( button, filterGroup, event ) {
 			if ( ( event.type === 'click' ) || ( event.type === 'keypress' && event.key === 'Enter' ) ) {
 				liquipedia.tracker.track( 'Filter button clicked: ' + button.element.textContent, true );
-				if ( button.filter === 'all' ) {
-					Object.entries( filterGroup.filterStates ).forEach( ( [ filterState ] ) => {
-						if ( !filterGroup.alwaysActive.includes( filterState ) ) {
-							filterGroup.filterStates[ filterState ] = !button.active;
-						}
-					} );
-				} else {
-					filterGroup.filterStates[ button.filter ] = !button.active;
+				switch ( button.filter ) {
+					case 'all':
+						Object.entries( filterGroup.filterStates ).forEach( ( [ filterState ] ) => {
+							if ( !filterGroup.alwaysActive.includes( filterState ) ) {
+								filterGroup.filterStates[ filterState ] = !button.active;
+							}
+						} );
+						filterGroup.curated = false;
+						break;
+					case 'curated':
+						filterGroup.curated = !button.active;
+						break;
+					default:
+						filterGroup.filterStates[ button.filter ] = !button.active;
+						filterGroup.curated = false;
 				}
 				this.performUpdate();
 			}
 		};
 
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			const buttons = Object.values( filterGroup.buttons );
+			buttons.push( filterGroup.allButton );
+			if ( filterGroup.curatedButton ) {
+				buttons.push( filterGroup.curatedButton );
+			}
 
-			Object.values( filterGroup.buttons ).forEach( ( button ) => {
+			buttons.forEach( ( button ) => {
 				const buttonEventHandler = handleClick.bind( this, button, filterGroup );
 				button.element.addEventListener( 'click', buttonEventHandler );
 				button.element.addEventListener( 'keypress', buttonEventHandler );
 			} );
-
-			const allEventHandler = handleClick.bind( this, filterGroup.allButton, filterGroup );
-			filterGroup.allButton.element.addEventListener( 'click', allEventHandler );
-			filterGroup.allButton.element.addEventListener( 'keypress', allEventHandler );
-
 		} );
 	},
 
@@ -143,32 +156,42 @@ liquipedia.filterButtons = {
 
 	updateFromFilterStates: function() {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-
 			let allState = true;
+
 			Object.values( filterGroup.buttons ).forEach( ( button ) => {
-				button.active = filterGroup.filterStates[ button.filter ];
-				allState = allState && button.active;
+				if ( filterGroup.curated ) {
+					button.active = false;
+					allState = false;
+				} else {
+					button.active = filterGroup.filterStates[ button.filter ];
+					allState = allState && button.active;
+				}
 			} );
 
 			filterGroup.allButton.active = allState;
+			if ( filterGroup.curatedButton ) {
+				filterGroup.curatedButton.active = filterGroup.curated;
+			}
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
-				filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
+				if ( filterGroup.curated ) {
+					filterableItem.hidden = !filterableItem.curated;
+				} else {
+					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
+				}
 			} );
-
 		} );
 	},
 
 	updateDOM: function() {
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-
-			if ( filterGroup.allButton.active ) {
-				filterGroup.allButton.element.classList.add( this.activeButtonClass );
-			} else {
-				filterGroup.allButton.element.classList.remove( this.activeButtonClass );
+			const buttons = Object.values( filterGroup.buttons );
+			buttons.push( filterGroup.allButton );
+			if ( filterGroup.curatedButton ) {
+				buttons.push( filterGroup.curatedButton );
 			}
 
-			Object.values( filterGroup.buttons ).forEach( ( button ) => {
+			buttons.forEach( ( button ) => {
 				if ( button.active ) {
 					button.element.classList.add( this.activeButtonClass );
 				} else {
@@ -178,12 +201,12 @@ liquipedia.filterButtons = {
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterableItem.hidden ) {
-					filterableItem.element.className = this.hiddenCategoryClass;
+					filterableItem.element.classList.remove( filterGroup.effectClass );
+					filterableItem.element.classList.add( this.hiddenCategoryClass );
 				} else {
-					filterableItem.element.className = filterGroup.effectClass;
+					filterableItem.element.classList.replace( this.hiddenCategoryClass, filterGroup.effectClass );
 				}
 			} );
-
 		} );
 	},
 
@@ -203,7 +226,7 @@ liquipedia.filterButtons = {
 	setLocalStorage: function() {
 		const filterGroups = {};
 		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
-			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates };
+			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates, curated: filterGroup.curated };
 		} );
 		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
 	}

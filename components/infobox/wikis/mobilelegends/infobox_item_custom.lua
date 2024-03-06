@@ -266,7 +266,7 @@ function CustomItem:_getAttributeCells(attributeCells)
 	return Array.map(attributeCells, function(attribute)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
-		if String.isEmpty(content) then return end
+		if String.isEmpty(content) then return nil end
 		return Cell{name = attribute.name, content = {content}}
 	end)
 end
