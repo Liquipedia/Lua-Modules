@@ -514,7 +514,7 @@ function MatchSummary:header(header)
 	return self
 end
 
----@param match MatchSummaryMatch
+---@param match MatchSummaryMatch?
 ---@return MatchSummary
 function MatchSummary:addMatch(match)
 	if not match then return self end
