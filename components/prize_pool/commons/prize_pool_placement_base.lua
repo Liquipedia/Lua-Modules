@@ -174,7 +174,7 @@ end
 
 ---@param opponent BasePlacementOpponent
 ---@param prize string
----@return unknown
+---@return string|number|boolean?
 function BasePlacement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
