@@ -140,3 +140,76 @@ Author: hjpalpha
 	font-weight: bold;
 	text-align: center;
 }
+
+/*******************************************************************************
+Template(s): Participants Tables
+Author(s): FO-nTTaX
+*******************************************************************************/
+.participants-table-scroller {
+	overflow: auto;
+}
+
+.participants-table .participants-row .participants-cell {
+	width: 200px;
+}
+
+.participants-table-buttons::after {
+	clear: both;
+	content: " ";
+	display: block;
+}
+
+.participants-table-buttons {
+	display: none;
+	font-size: 200%;
+}
+
+.participants-table-button-left {
+	float: left;
+	cursor: pointer;
+}
+
+.participants-table-button-right {
+	float: right;
+	cursor: pointer;
+}
+
+.participants-table-button-left.inactive,
+.participants-table-button-right.inactive {
+	opacity: 0.5;
+	cursor: initial;
+}
+
+@media ( max-width: 600px ) {
+	.participants-table .participants-row .participants-cell {
+		min-width: 200px;
+	}
+
+	.participants-table-columns-2 .participants-row .participants-cell {
+		width: 50%;
+	}
+
+	.participants-table-columns-3 .participants-row .participants-cell {
+		width: 33%;
+	}
+
+	.participants-table-columns-4 .participants-row .participants-cell {
+		width: 25%;
+	}
+
+	.participants-table-columns-2 {
+		width: 180% !important;
+	}
+
+	.participants-table-columns-3 {
+		width: 270% !important;
+	}
+
+	.participants-table-columns-4 {
+		width: 360% !important;
+	}
+
+	.participants-table-buttons {
+		display: block;
+	}
+}
