@@ -13,7 +13,6 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local BaseCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
-local Opponent = Lua.import('Module:Opponent')
 
 ---@class WorldofTanksMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
