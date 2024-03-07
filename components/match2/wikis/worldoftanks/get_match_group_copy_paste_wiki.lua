@@ -54,21 +54,4 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
----subfunction used to generate the code for the Opponent template, depending on the type of opponent
----@param mode string
----@param showScore boolean
----@return string
-function WikiCopyPaste._getOpponent(mode, showScore)
-	local score = showScore and '|score=' or ''
-	if mode == Opponent.solo then
-		return '{{PlayerOpponent||flag=' .. score .. '}}'
-	elseif mode == Opponent.team then
-		return '{{TeamOpponent|' .. score .. '}}'
-	elseif mode == Opponent.literal then
-		return '{{LiteralOpponent|}}'
-	end
-
-	return ''
-end
-
 return WikiCopyPaste
