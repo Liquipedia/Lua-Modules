@@ -43,10 +43,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
 
 	local team = lpdbData.participant or ''
-	local smwPrefix = Variables.varDefault('smw_prefix', '')
+	local lpdbPrefix = Variables.varDefault('lpdb_prefix', '')
 
-	Variables.varDefine('enddate_' .. smwPrefix .. team, lpdbData.date)
-	Variables.varDefine('ranking' .. smwPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
+	Variables.varDefine('enddate_' .. lpdbPrefix .. team, lpdbData.date)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
 
 
 	return lpdbData

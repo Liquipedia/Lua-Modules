@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -224,7 +225,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 					:css('position', 'absolute')
 					:css('right', '1px')
 					:css('bottom', '1px')
-					:node(StarcraftPlayerDisplay.Race(secondaryRace))
+					:node(Faction.Icon{faction = secondaryRace})
 			end
 			local raceNode = mw.html.create('div')
 				:css('position', 'relative')
@@ -267,7 +268,8 @@ function StarcraftOpponentDisplay.BlockArchon(props)
 		:node(playersNode)
 end
 
-StarcraftOpponentDisplay.CheckMark = '<i class="fa fa-check forest-green-text" aria-hidden="true"></i>'
+StarcraftOpponentDisplay.CheckMark =
+	Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', screenReaderHidden = true}
 
 ---Displays a score within the context of an inline element.
 ---@param opponent StarcraftStandardOpponent

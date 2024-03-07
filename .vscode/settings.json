@@ -1,6 +1,7 @@
 {
 	"files.associations" : {
-		".busted": "lua"
+		".busted": "lua",
+		".luacov": "lua"
 	},
 	"css.validate": false,
 	"less.validate": false,

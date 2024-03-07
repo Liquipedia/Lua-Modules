@@ -33,7 +33,7 @@ local TIER_VALUE = {10, 6, 4, 2}
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.syncPlayers = true
-	args.import = false
+	args.import = Logic.nilOr(Logic.readBoolOrNil(args.import), false)
 
 	local prizePool = PrizePool(args)
 		:create()

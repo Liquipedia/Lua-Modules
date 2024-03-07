@@ -17,6 +17,8 @@ local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+---@class PrizePoolPlacement: BasePlacement
+---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -149,7 +151,8 @@ Placement.additionalData = {
 	},
 }
 
---- @param lastPlacement integer The previous placement's end
+---@param lastPlacement integer The previous placement's end
+---@return self
 function Placement:create(lastPlacement)
 	self:_parseArgs()
 
@@ -193,6 +196,8 @@ end
 
 --- Parse and set additional data fields for opponents.
 -- This includes fields such as group stage score (wdl) and last versus (lastvs).
+---@param args table
+---@return table
 function Placement:readAdditionalData(args)
 	local data = {}
 
@@ -206,6 +211,8 @@ function Placement:readAdditionalData(args)
 	return data
 end
 
+---@param ... string|number
+---@return placement[]
 function Placement:_getLpdbData(...)
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
@@ -267,6 +274,7 @@ function Placement:_getLpdbData(...)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
+		lpdbData.players = lpdbData.players or lpdbData.opponentplayers
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then
@@ -284,6 +292,7 @@ function Placement:_getLpdbData(...)
 	return entries
 end
 
+---@return string|number
 function Placement:_lpdbValue()
 	for _, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -298,6 +307,7 @@ function Placement:_lpdbValue()
 	return self.placeStart
 end
 
+---@return string?
 function Placement:_displayPlace()
 	for _, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -313,6 +323,7 @@ function Placement:_displayPlace()
 	return start
 end
 
+---@return string?
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -323,6 +334,7 @@ function Placement:getBackground()
 	return PlacementInfo.getBgClass(self.placeStart)
 end
 
+---@return string?
 function Placement:getMedal()
 	if self:hasSpecialStatus() then
 		return
@@ -334,6 +346,7 @@ function Placement:getMedal()
 	end
 end
 
+---@return boolean
 function Placement:hasSpecialStatus()
 	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end

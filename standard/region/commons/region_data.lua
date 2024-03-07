@@ -66,6 +66,7 @@ return {
 		['south korea'] = 'korea',
 
 		['in'] = 'india',
+		cn = 'china',
 		tr = 'turkey',
 		tw = 'taiwan',
 		jp = 'japan',

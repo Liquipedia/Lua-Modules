@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local AgentIcon = require('Module:AgentIcon')
 local Arguments = require('Module:Arguments')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DivTable = require('Module:DivTable')
@@ -207,7 +207,10 @@ function BigMatch:stats(match, playerLookUp, opponents)
 						)
 						:cell(
 							mw.html.create('div')	:addClass('fb-match-page-valorant-stats-agent')
-													:wikitext(AgentIcon._getBracketIcon{player['agent']})
+													:wikitext(CharacterIcon.Icon{
+														character = player['agent'],
+														size = '20px'
+													})
 						)
 						:cell(mw.html.create('div'):wikitext(player['kills']))
 						:cell(mw.html.create('div'):wikitext(player['deaths']))

@@ -16,18 +16,18 @@ return {
 			name = 'Heroes of the Storm',
 			link = 'Heroes of the Storm',
 			logo = {
-				darkMode = 'Hots logo.png',
-				lightMode = 'Hots logo.png',
+				darkMode = 'Heroes of the Storm default allmode.png',
+				lightMode = 'Heroes of the Storm default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Hots logo.png',
-				lightMode = 'Hots logo.png',
+				darkMode = 'Heroes of the Storm default allmode.png',
+				lightMode = 'Heroes of the Storm default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'hots',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Hots logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Hots logo.png', ---@deprecated
+	defaultTeamLogo = 'Heroes of the Storm default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Heroes of the Storm default allmode.png', ---@deprecated
 	match2 = 1,
 }

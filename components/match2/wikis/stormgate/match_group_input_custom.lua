@@ -34,6 +34,7 @@ local DEFAULT_BEST_OF = 99
 local MODE_MIXED = 'mixed'
 local TBD = 'tbd'
 local DEFAULT_HERO_FACTION = HeroData.default.faction
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -60,30 +61,17 @@ end
 ---@param matchArgs table
 ---@return table
 function CustomMatchGroupInput._readDate(matchArgs)
-	local suggestedDate = Variables.varDefault('matchDate')
+	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+		'matchDate',
+		'tournament_startdate',
+		'tournament_enddate'
+	})
 
-	local tournamentStartTime = Variables.varDefault('tournament_starttimeraw')
-
-	if matchArgs.date or (not suggestedDate and tournamentStartTime) then
-		local dateProps = MatchGroupInput.readDate(matchArgs.date or tournamentStartTime)
-		dateProps.dateexact = Logic.nilOr(
-			Logic.readBoolOrNil(matchArgs.dateexact),
-			matchArgs.date and dateProps.dateexact or false
-		)
+	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
-		return dateProps
 	end
 
-	suggestedDate = suggestedDate or Variables.varDefaultMulti(
-		'tournament_startdate',
-		'tournament_enddate',
-		'1970-01-01'
-	)
-
-	return {
-		date = MatchGroupInput.getInexactDate(suggestedDate),
-		dateexact = false,
-	}
+	return dateProps
 end
 
 ---@param match table
@@ -95,10 +83,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-	local matchUnixTime = tonumber(mw.getContentLanguage():formatDate('U', match.date))
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = matchUnixTime + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table
@@ -381,9 +367,8 @@ function CustomMatchGroupInput.processPartyOpponentInput(opponent, partySize)
 		local name = Logic.emptyOr(opponent['p' .. playerIndex], opponent[playerIndex]) or ''
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
 				opponent['p' .. playerIndex .. 'link'],
-				Variables.varDefault(name .. '_page'),
-				name
-			)):gsub(' ', '_')
+				Variables.varDefault(name .. '_page')
+			) or name):gsub(' ', '_')
 		table.insert(links, link)
 
 		table.insert(players, {
@@ -449,11 +434,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		displayname = map.mapDisplayName,
 	}
-
-	-- inherit stuff from match data
-	map = MatchGroupInput.getCommonTournamentVars(map, match)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -470,13 +451,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- handle subgroup stuff if team match
 	if match.isTeamMatch then
-		map.subgroup = tonumber(map.subgroup)
-		if map.subgroup then
-			subGroupIndex = map.subgroup --[[@as integer]]
-		else
-			subGroupIndex = subGroupIndex + 1
-			map.subgroup = subGroupIndex
-		end
+		map.subgroup = tonumber(map.subgroup) or (subGroupIndex + 1)
+		subGroupIndex = map.subgroup
 	end
 
 	match['map' .. mapIndex] = map
@@ -511,22 +487,22 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		end
 	end
 
-	local winnerInput = tonumber(map.winner)
-	map.winner = winnerInput
+	local winner = tonumber(map.winner)
 	if Logic.isNotEmpty(map.walkover) then
 		local walkoverInput = tonumber(map.walkover)
 		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
-			map.winner = walkoverInput
+			winner = walkoverInput
 		end
 		map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
 		map.scores = {-1, -1}
 		map.resulttype = 'default'
+		map.winner = winner
 
 		return map
 	end
 
 	if hasManualScores then
-		map.winner = tonumber(map.winner) or CustomMatchGroupInput._getWinner(indexedScores)
+		map.winner = winner or CustomMatchGroupInput._getWinner(indexedScores)
 
 		return map
 	end
@@ -534,14 +510,16 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {-1, -1}
 		map.resulttype = RESULT_TYPE_NOT_PLAYED
-	elseif winnerInput == 1 then
+	elseif winner == 1 then
 		map.scores = {1, 0}
-	elseif winnerInput == 2 then
+	elseif winner == 2 then
 		map.scores = {0, 1}
-	elseif winnerInput == 0 or map.winner == 'draw' then
+	elseif winner == 0 or map.winner == 'draw' then
 		map.scores = {0.5, 0.5}
 		map.resulttype = 'draw'
 	end
+
+	map.winner = winner
 
 	return map
 end
@@ -653,7 +631,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 		if playerInput:lower() == TBD then
 			amountOfTbds = amountOfTbds + 1
 		else
-			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page'), playerInput)
+			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page')) or playerInput
 			link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
 
 			playerData[link] = {
@@ -662,37 +640,56 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'noheroescheck']),
 				playedRandom = Logic.readBool(map[prefix .. 'random']),
+				displayName = playerInput,
 			}
 		end
 	end
 
-	for playerIndex, player in pairs(players) do
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
+			heroes = CustomMatchGroupInput._readHeroes(
+				currentPlayer.heroes,
+				faction,
+				player.name,
+				currentPlayer.heroesCheckDisabled
+			),
+			random = currentPlayer.playedRandom,
+		}
+	end
+
+	Array.forEach(players, function(player, playerIndex)
 		local currentPlayer = playerData[player.name]
-		if currentPlayer then
-			local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+		if not currentPlayer then return end
 
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = currentPlayer.position,
-				flag = Flags.CountryName(player.flag),
-				heroes = CustomMatchGroupInput._readHeroes(
-					currentPlayer.heroes,
-					faction,
-					player.name,
-					currentPlayer.heroesCheckDisabled
-				),
-				random = currentPlayer.playedRandom,
-			}
-		end
-	end
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
 
-	for tbdIndex = 1, amountOfTbds do
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	Table.iter.forEachPair(playerData, function(playerLink, player)
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction},
+		})
+		addToParticipants(player, players[#players], #players)
+		numberOfPlayers = numberOfPlayers + 1
+	end)
+
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
 			faction = Faction.defaultFaction,
 			player = TBD:upper(),
 		}
-	end
+	end)
 
 	map.participants = participants
 

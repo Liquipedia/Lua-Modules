@@ -146,7 +146,7 @@ function Series:createInfobox()
 			builder = function()
 				if self.totalSeriesPrizepool then
 					return {Cell{
-						name = 'Total prize money',
+						name = 'Cumulative Prize Pool',
 						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end

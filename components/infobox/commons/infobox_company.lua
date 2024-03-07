@@ -24,7 +24,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 
 ---@class CompanyInfobox: BasicInfobox
 local Company = Class.new(BasicInfobox)
@@ -78,7 +78,7 @@ function Company:createInfobox()
 					infobox:categories('Tournament organizers')
 					return {
 						Cell{
-							name = 'Total Prize Money',
+							name = 'Awarded Prize Pools',
 							content = {self:_getOrganizerPrizepools()}
 						}
 					}

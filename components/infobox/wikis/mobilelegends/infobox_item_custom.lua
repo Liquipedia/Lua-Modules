@@ -8,7 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Icon = require('Module:Icon')
+local MobileLegendIcon = require('Module:MobileLegendIcon')
 local ItemIcon = require('Module:ItemIcon')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -195,14 +195,14 @@ function CustomItem:_getCostDisplay()
 
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
-		:wikitext(Icon.display({}, 'gold', '21') .. ' ' .. tostring(innerDiv))
+		:wikitext(MobileLegendIcon.display({}, 'gold', '21') .. ' ' .. tostring(innerDiv))
 	local display = tostring(outerDiv)
 
 	if String.isNotEmpty(self.args.recipecost) then
 		innerDiv = CustomItem._costInnerDiv('(' .. self.args.recipecost .. ')')
 		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
-			:wikitext(Icon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
+			:wikitext(MobileLegendIcon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
 		display = display .. tostring(outerDiv)
 	end
 
@@ -266,7 +266,7 @@ function CustomItem:_getAttributeCells(attributeCells)
 	return Array.map(attributeCells, function(attribute)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
-		if String.isEmpty(content) then return end
+		if String.isEmpty(content) then return nil end
 		return Cell{name = attribute.name, content = {content}}
 	end)
 end

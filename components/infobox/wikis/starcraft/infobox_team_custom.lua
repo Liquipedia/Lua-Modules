@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -72,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Gaming Director', content = {args['gaming director']}})
 	elseif id == 'earnings' then
 		local displayEarnings = function(value)
-			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
+			return value > 0 and '$' .. mw.getContentLanguage():formatNum(value) or nil
 		end
 
 		return {
@@ -199,7 +200,7 @@ function CustomTeam:getEarningsAndMedalsData(team)
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Qualifier'),
 		ConditionTree(BooleanOperator.any):add{

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -133,7 +134,7 @@ function CustomPlayer:_addCustomCells(args)
 	local currentYearEarnings = self.earningsPerYear[CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 
 	return {
@@ -292,9 +293,9 @@ function CustomPlayer._getYearsActive(years)
 	return yearsActive
 end
 
----@param table table<string, table<string, table<string, number>>>
-function CustomPlayer._setVarsForVS(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, table<string, number>>>
+function CustomPlayer._setVarsForVS(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			for key3, item3 in pairs(item2) do
 				Variables.varDefine(key1 .. '_vs_' .. key2 .. '_' .. key3, item3)
@@ -368,7 +369,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
@@ -459,9 +460,9 @@ function CustomPlayer:_addPlacementToMedals(medals, data)
 	return medals
 end
 
----@param table table<string, table<string, number>>
-function CustomPlayer._setVarsFromTable(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, number>>
+function CustomPlayer._setVarsFromTable(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			Variables.varDefine(key1 .. '_' .. key2, item2)
 		end

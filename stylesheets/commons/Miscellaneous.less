@@ -5215,6 +5215,38 @@ Author(s): Scribunto developer(s)
 }
 
 /*******************************************************************************
+Author(s): Hjpalpha, based on a template copied from Wikipedia
+Template: Sfrac
+*******************************************************************************/
+.sfrac {
+	display: inline-block;
+	font-size: 85%;
+	text-align: center;
+}
+
+.sfrac .numerator {
+	display: block;
+	line-height: 1em;
+	margin: 0 0.1em;
+}
+
+.sfrac .denominator {
+	display: block;
+	line-height: 1em;
+	margin: 0 0.1em;
+	border-top: 1px solid;
+}
+
+.sfrac .frac {
+	position: absolute;
+	left: -10000px;
+	top: auto;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/*******************************************************************************
 Hexagon portraits
 Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
 Author(s): PhiLtheFisH, FO-nTTaX, salle

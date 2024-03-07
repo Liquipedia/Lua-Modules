@@ -16,12 +16,12 @@ return {
 			name = 'Reign of Chaos',
 			link = 'Reign of Chaos',
 			logo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 		},
 		frozenthrone = {
@@ -29,12 +29,12 @@ return {
 			name = 'The Frozen Throne',
 			link = 'The Frozen Throne',
 			logo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 		},
 		reforged = {
@@ -42,18 +42,18 @@ return {
 			name = 'Reforged',
 			link = 'Reforged',
 			logo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Warcraft III logo.png',
-				lightMode = 'Warcraft III logo.png',
+				darkMode = 'Warcraft III default allmode.png',
+				lightMode = 'Warcraft III default allmode.png',
 			},
 		},
 	},
 	defaultGame = 'reforged',
-	defaultTeamLogo = 'Warcraft III logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Warcraft III logo.png', ---@deprecated
+	defaultTeamLogo = 'Warcraft III default allmode.png', ---@deprecated
+	defaultTeamLogoDark = 'Warcraft III default allmode.png', ---@deprecated
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,

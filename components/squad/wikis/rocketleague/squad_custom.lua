@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -15,15 +16,19 @@ local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 	squad:init(frame):title():header()
 
 	local args = squad.args
 
-	local index = 1
-	while args['p' .. index] ~= nil or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
+	local players = Array.mapIndexes(function(index)
+		return Json.parseIfString(args[index])
+	end)
+
+	Array.forEach(players, function(player)
 		local row = SquadRow{useTemplatesForSpecialTeams = true}
 		row:status(squad.type)
 		row:id({
@@ -39,7 +44,7 @@ function CustomSquad.run(frame)
 			:role({role = player.role})
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.TYPE_FORMER then
+		if squad.type == Squad.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam({
 				newteam = player.newteam,
@@ -47,7 +52,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			})
-		elseif squad.type == Squad.TYPE_INACTIVE then
+		elseif squad.type == Squad.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
@@ -57,9 +62,7 @@ function CustomSquad.run(frame)
 			.. (player.role and '_' .. player.role or '')
 			.. '_' .. squad.type
 		))
-
-		index = index + 1
-	end
+	end)
 
 	return squad:create()
 end

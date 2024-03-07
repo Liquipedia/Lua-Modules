@@ -22,7 +22,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
-local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -37,7 +37,7 @@ local Customizable = Widgets.Customizable
 ---@field locations string[]
 local Person = Class.new(BasicInfobox)
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 local LINK_VARIANT = 'player'
 local COUNTRIES_EASTERN_NAME_ORDER = {
 	'China',
@@ -119,6 +119,7 @@ function Person:createInfobox()
 			birthdate = args.birth_date,
 			birthlocation = args.birth_location,
 			deathdate = args.death_date,
+			deathlocation = args.death_location,
 		})
 	if not ageCalculationSuccess then
 		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
@@ -136,8 +137,11 @@ function Person:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
-		Cell{name = 'Name', content = {args.name}},
-		Cell{name = 'Romanized Name', content = {args.romanized_name}},
+		Customizable{id = 'names', children = {
+				Cell{name = 'Name', content = {args.name}},
+				Cell{name = 'Romanized Name', content = {args.romanized_name}},
+			}
+		},
 		Customizable{id = 'nationality', children = {
 				Cell{name = 'Nationality', content = self:displayLocations()}
 			}
@@ -460,6 +464,7 @@ function Person:_createTeam(team, link)
 	if String.isEmpty(link) then
 		return nil
 	end
+	---@cast link -nil
 
 	if mw.ext.TeamTemplate.teamexists(link) then
 		local data = mw.ext.TeamTemplate.raw(link)

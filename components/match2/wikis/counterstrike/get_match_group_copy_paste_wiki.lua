@@ -6,133 +6,139 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 local Opponent = Lua.import('Module:Opponent')
-local wikiCopyPaste = Table.copy(Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base'))
+
+---@class CounterstrikeMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
+
+local INDENT = WikiCopyPaste.Indent
 
 local GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR = 'gf'
 local GSL_WINNERS = 'winners'
 local GSL_LOSERS = 'losers'
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local streams = Logic.readBool(args.streams)
 	local showScore = Logic.readBool(args.score)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local hltv = Logic.readBool(args.hltv)
-	local mapStats = args.mapStats and wikiCopyPaste._ipairsSet(mw.text.split(args.mapStats, ', ')) or {}
-	local matchMatchpages = args.matchMatchpages and
-								wikiCopyPaste._ipairsSet(mw.text.split(args.matchMatchpages, ', ')) or {}
-	local out = '{{Match'
+	local mapStats = args.mapStats and Array.unique(mw.text.split(args.mapStats, ', ')) or {}
+	local matchMatchpages = args.matchMatchpages and Array.unique(mw.text.split(args.matchMatchpages, ', ')) or {}
 
 	if hltv then
 		table.insert(mapStats, 'Stats')
 		table.insert(matchMatchpages, 1, 'HLTV')
 	end
 
-	out = out .. '\n\t'
-	for i = 1, opponents do
-		out = out .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
-	end
-
-	out = out .. '\n\t|date= |finished='
+	local lines = {
+		'{{Match',
+		INDENT .. table.concat(Array.map(Array.range(1, opponents), function(opponentIndex)
+			return '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore)
+		end)),
+		INDENT .. '|date= |finished=',
+	}
 
 	if streams then
 		table.insert(mapStats, 'vod')
-		out = out .. '\n\t|twitch='
+		table.insert(lines, INDENT .. '|twitch=')
 	end
 
-	for i = 1, bestof do
-		out = out .. '\n\t|map' .. i .. '={{Map|map='
-		if not mapDetails then
-			out = out .. '|score1=|score2='
-		end
-		out = out .. '|finished='
-		if mapDetails then
-			out = out .. '\n\t\t|t1firstside=|t1t=|t1ct=|t2t=|t2ct='
-			if mapDetailsOT then
-				out = out .. '\n\t\t|o1t1firstside=|o1t1t=|o1t1ct=|o1t2t=|o1t2ct='
-			end
-		end
-		if #mapStats > 0 then
-			out = out .. '\n\t\t'
-			for _, stat in ipairs(mapStats) do
-				out = out .. '|' .. stat:lower() .. '='
-			end
-		end
-		out = out .. '}}'
+	---@param list string[]
+	---@param indents integer
+	---@return string?
+	local buildListLine = function(list, indents)
+		if #list == 0 then return nil end
+
+		return string.rep(INDENT, indents) .. table.concat(Array.map(list, function(elemenmt)
+			return '|' .. elemenmt:lower() .. '='
+		end))
 	end
 
-	if #matchMatchpages > 0 then
-		out = out .. '\n\t'
-		for _, matchpage in ipairs(matchMatchpages) do
-			out = out .. '|' .. matchpage:lower() .. '='
-		end
-	end
+	local mapStatsLine = buildListLine(mapStats, 2)
 
-	return out .. '\n\t}}'
+	Array.forEach(Array.range(1, bestof), function(mapIndex)
+		Array.appendWith(lines,
+			INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. (mapDetails and '' or '|score1=|score2=') .. '|finished=',
+			mapDetails and (INDENT .. INDENT .. '|t1firstside=|t1t=|t1ct=|t2t=|t2ct=') or nil,
+			mapDetails and mapDetailsOT and (INDENT .. INDENT .. '|o1t1firstside=|o1t1t=|o1t1ct=|o1t2t=|o1t2ct=') or nil,
+			mapStatsLine
+		)
+		lines[#lines] = lines[#lines] .. '}}'
+	end)
+
+	Array.appendWith(lines,
+		buildListLine(matchMatchpages, 1),
+		INDENT .. '}}'
+	)
+
+	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, showScore)
+---subfunction used to generate the code for the Opponent template, depending on the type of opponent
+---@param mode string
+---@param showScore boolean
+---@return string
+function WikiCopyPaste._getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''
-
 	if mode == Opponent.solo then
-		return '{{PlayerOpponent||flag=|team=' .. score .. '}}'
+		return '{{PlayerOpponent||flag=' .. score .. '}}'
 	elseif mode == Opponent.team then
 		return '{{TeamOpponent|' .. score .. '}}'
 	elseif mode == Opponent.literal then
 		return '{{LiteralOpponent|}}'
 	end
+
+	return ''
 end
 
-function wikiCopyPaste._ipairsSet(tbl)
-	local valuesSet = {}
-	local array = {}
-
-	for _, value in ipairs(tbl) do
-		if not valuesSet[value] then
-			table.insert(array, value)
-			valuesSet[value] = true
-		end
-	end
-
-	return array
-end
-
-function wikiCopyPaste.getStart(template, id, modus, args)
+---@param template string
+---@param id string
+---@param modus string
+---@param args table
+---@return string
+---@return table
+function WikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
 	args.headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
-	local out = '{{' .. (
-		(modus == 'bracket' and
-			('Bracket|Bracket/' .. template)
-		) or (modus == 'singlematch' and 'SingleMatch')
-		or 'Matchlist') ..
-		'|id=' .. id
+
+	local start = '{{' .. WikiCopyPaste.getMatchGroupTypeCopyPaste(modus, template) .. '|id=' .. id
 
 	local gslStyle = args.gsl
-	if modus == 'matchlist' and gslStyle then
-		args.customHeader = false
-		if String.startsWith(gslStyle:lower(), GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR) then
-			args.matches = 6
-			if String.endsWith(gslStyle:lower(), GSL_WINNERS) then
-				out = out .. '|gsl=' .. 'winnersfirst'
-			elseif String.endsWith(gslStyle:lower(), GSL_LOSERS) then
-				out = out .. '|gsl=' .. 'losersfirst'
-			end
-			out = out .. '\n|M6header=Grand Final'
-		else
-			args.matches = 5
-			out = out .. '|gsl=' .. gslStyle
-		end
+	if modus ~= 'matchlist' or not gslStyle then
+		return start, args
 	end
 
-	return out, args
+	args.customHeader = false
+
+	if not String.startsWith(gslStyle:lower(), GSL_STYLE_WITH_EXTRA_MATCH_INDICATOR) then
+		args.matches = 5
+		return start .. '|gsl=' .. gslStyle, args
+	end
+
+	args.matches = 6
+	if String.endsWith(gslStyle:lower(), GSL_WINNERS) then
+		start = start .. '|gsl=' .. 'winnersfirst'
+	elseif String.endsWith(gslStyle:lower(), GSL_LOSERS) then
+		start = start .. '|gsl=' .. 'losersfirst'
+	end
+	start = start .. '\n|M6header=Grand Final'
+
+	return start, args
 end
 
-return wikiCopyPaste
+return WikiCopyPaste

@@ -29,7 +29,7 @@ local Conditions = Lua.import('Module:TournamentsListing/Conditions')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local LANG = mw.language.new('en')
+local LANG = mw.getContentLanguage()
 local NONBREAKING_SPACE = '&nbsp;'
 local POSTPONED = 'postponed'
 local DELAYED = 'delayed'

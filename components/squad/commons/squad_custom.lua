@@ -17,6 +17,8 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
 	local squad = Squad()
 
@@ -35,6 +37,9 @@ function CustomSquad.run(frame)
 	return squad:create()
 end
 
+---@param playerList table[]
+---@param squadType integer
+---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
 	if #playerList == 0 then
 		return
@@ -72,6 +77,9 @@ function CustomSquad.runAuto(playerList, squadType)
 	return squad:create()
 end
 
+---@param player table
+---@param squadType integer
+---@return Html
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow()
 
@@ -89,7 +97,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.TYPE_FORMER then
+	if squadType == Squad.SquadType.FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
@@ -97,7 +105,7 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == Squad.TYPE_INACTIVE then
+	elseif squadType == Squad.SquadType.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 

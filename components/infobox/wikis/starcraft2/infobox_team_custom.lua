@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
@@ -66,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		local displayEarnings = function(earningsData)
 			local totalEarnings = Math.sum(Array.extractValues(earningsData or {}))
-			return totalEarnings > 0 and '$' .. mw.language.new('en'):formatNum(totalEarnings) or nil
+			return totalEarnings > 0 and '$' .. mw.getContentLanguage():formatNum(totalEarnings) or nil
 		end
 
 		return {
@@ -209,7 +210,7 @@ function CustomTeam:getEarningsAndMedalsData()
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{

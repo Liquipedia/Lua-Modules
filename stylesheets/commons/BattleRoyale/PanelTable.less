@@ -6,10 +6,46 @@ Author(s): Elysienna
 .panel-table {
 	display: flex;
 	flex-direction: column;
-	border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-	border-left: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 	width: 100%;
 	overflow-x: auto;
+	position: relative;
+	font-size: 0.875rem;
+
+	&__swipe-container {
+		width: 100%;
+		z-index: 1;
+		position: absolute;
+		display: inherit;
+		height: 100%;
+		left: 0;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		pointer-events: none;
+	}
+
+	&__swipe-hint {
+		position: absolute;
+		z-index: 1;
+		top: 0;
+		height: 100%;
+		width: 1rem;
+		pointer-events: none;
+		color: var( --clr-wiki-on-primary );
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		&.swipe-hint--left {
+			left: 0;
+			background: linear-gradient( 90deg, rgba( 0, 0, 0, 0.1 ), transparent );
+		}
+
+		&.swipe-hint--right {
+			right: 0;
+			background: linear-gradient( 90deg, transparent, rgba( 0, 0, 0, 0.1 ) );
+		}
+	}
 
 	&__sort {
 		margin-left: 0.25rem;
@@ -23,7 +59,7 @@ Author(s): Elysienna
 		position: absolute;
 		padding: 12px;
 		height: 100%;
-		background-color: #f5f5f5;
+		background-color: rgba( 245, 245, 245, 0.9 );
 		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		display: flex;
 		align-items: center;
@@ -55,6 +91,19 @@ Author(s): Elysienna
 				& .panel-table__cell__game-placement {
 					background-color: inherit;
 				}
+
+				& .cell--game-container {
+					align-items: flex-start;
+					height: 100%;
+				}
+
+				& .cell--game {
+					height: 100%;
+				}
+
+				& .cell--game-container-nav-holder {
+					min-width: 15.875rem;
+				}
 			}
 
 			&--navigate {
@@ -74,7 +123,7 @@ Author(s): Elysienna
 	&__cell {
 		border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		padding: 0.75rem 1rem;
+		padding: 0.5rem;
 		display: flex;
 		align-items: center;
 		flex: 0 0 auto;
@@ -107,6 +156,7 @@ Author(s): Elysienna
 				flex: 1 1 100%;
 				padding: 0.75rem 1rem;
 				text-align: right;
+				align-self: flex-start;
 			}
 
 			&-details {
@@ -128,9 +178,9 @@ Author(s): Elysienna
 				font-style: italic;
 				margin: 0;
 				min-height: 1.5rem;
-				display: flex;
 				justify-content: right;
 				align-items: center;
+				display: none;
 			}
 
 			&-placement {
@@ -139,7 +189,7 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
+				padding: 0.5rem 0;
 				background-color: #fafafa;
 			}
 
@@ -148,7 +198,7 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
+				padding: 0.5rem 0;
 
 				.panel-table__row:not( .row--header ) & {
 					background-color: #ffffff;
@@ -290,17 +340,21 @@ Author(s): Elysienna
 		}
 
 		&--rank {
-			flex-basis: 7.5rem;
+			flex-basis: 6.375rem;
 		}
 
 		&--team {
 			flex-basis: 15rem;
 			flex-grow: 0;
 			overflow: hidden;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9rem;
+			}
 		}
 
 		&--total-points {
-			flex-basis: 10.625rem;
+			flex-basis: 7.25rem;
 			flex-grow: 0;
 			justify-content: flex-end;
 			font-weight: bold;
@@ -309,11 +363,19 @@ Author(s): Elysienna
 		&--placements {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 9.375rem;
+			}
 		}
 
 		&--kills {
 			justify-content: flex-end;
 			flex-basis: 12rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 7rem;
+			}
 		}
 
 		&--button {
@@ -345,6 +407,7 @@ Author(s): Elysienna
 			scroll-behavior: smooth;
 			border: 0;
 			align-items: unset;
+			min-width: 15.875rem;
 		}
 	}
 
@@ -353,5 +416,7 @@ Author(s): Elysienna
 		font-size: unset;
 		font-weight: normal;
 		font-style: italic;
+		text-align: right;
+		margin-top: 0.25rem;
 	}
 }
