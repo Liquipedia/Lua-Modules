@@ -15,6 +15,21 @@ Author(s): Elysienna
 
 .filter-buttons {
 	display: flex;
+
+	// From manual css:
+	margin: 2px;
+	margin-bottom: 7px;
+	justify-content: center;
+	align-items: center;
+	flex-flow: row wrap;
+}
+
+.filter-buttons:not(:first-child) {
+	margin-top: -7px;
+}
+
+.filter-buttons-dropdown {
+	padding: 1px;
 }
 
 .filter-button {
@@ -24,6 +39,12 @@ Author(s): Elysienna
 	color: var( --clr-primary, #3366cc );
 	border-radius: 0.25rem;
 	transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	margin-top: 5px;
+}
+
+.filter-button-all {
+	font-size: 9pt;
+	padding: 2px;
 }
 
 .filter-button:not( :last-child ) {
