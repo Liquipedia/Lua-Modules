@@ -103,8 +103,11 @@ function MatchLegacy._convertParameters(match2)
 
 	match.staticid = match2.match2id
 
+	local extradata = Json.parseIfString(match2.extradata)
 	-- Handle extradata fields
-	match.extradata = {}
+	match.extradata = {
+		matchsection = extradata.matchsection or '',
+	}
 
 	match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
