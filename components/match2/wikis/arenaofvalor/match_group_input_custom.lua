@@ -446,7 +446,7 @@ function mapFunctions.getParticipants(map, opponents)
 		for playerIndex = 1, _MAX_NUM_PLAYERS do
 			local champ = map['t' .. opponentIndex .. 'h' .. playerIndex]
 			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				ChampionNames[champ] or champ
+				ChampionNames[champ and champ:lower()]
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =
 				map['t' .. opponentIndex .. 'kda' .. playerIndex]
@@ -466,7 +466,7 @@ function mapFunctions.getParticipants(map, opponents)
 		local banIndex = 1
 		local currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		while currentBan do
-			championData['team' .. opponentIndex .. 'ban' .. banIndex] = ChampionNames[currentBan] or currentBan
+			championData['team' .. opponentIndex .. 'ban' .. banIndex] = ChampionNames[currentBan and currentBan:lower()]
 			banIndex = banIndex + 1
 			currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end
