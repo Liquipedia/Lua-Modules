@@ -203,9 +203,9 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 end
 
 ---@param opponents table[]
----@param winner nil
----@param specialType nil
----@param finished nil
+---@param winner number
+---@param specialType string?
+---@param finished boolean?
 ---@return table[]
 ---@return number?
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
@@ -303,6 +303,7 @@ end
 --
 -- match related functions
 --
+
 ---@param match table
 ---@return table
 function matchFunctions.getBestOf(match)
@@ -340,9 +341,8 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
----comment
 ---@param matchArgs table
----@return { date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string? }
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string? }
 function matchFunctions.readDate(matchArgs)
 	return MatchGroupInput.readDate(matchArgs.date, {
 		'tournament_enddate',
@@ -469,9 +469,9 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
----@param opponents table
+---@param opponents table[]
 ---@param walkoverType string
----@return table
+---@return table[]
 function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	for index, _ in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
@@ -497,7 +497,7 @@ end
 
 -- Parse participant information
 ---@param map table
----@param opponents table
+---@param opponents table[]
 ---@return table
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
@@ -541,6 +541,8 @@ end
 ---@param opponentIndex integer
 ---@param players table[]?
 ---@param participants table
+---@param champion string?
+---@param kda string?
 ---@return table
 function mapFunctions.attachToParticipant(player, opponentIndex, players, participants, champion, kda)
 	player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
