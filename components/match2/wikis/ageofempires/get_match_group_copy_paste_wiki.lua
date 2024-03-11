@@ -29,17 +29,6 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local maps
-	if mode == Opponent.solo then
-		maps = Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
-		end)
-	else
-		maps = Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
-		end)
-	end
-
 	local lines = Array.extend(
 		'{{Match',
 		INDENT .. '|date=',
@@ -49,7 +38,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
 		end),
-		maps,
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
+		end),
 		'}}'
 	)
 
