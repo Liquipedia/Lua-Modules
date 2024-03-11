@@ -85,8 +85,7 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	Variables.varDefine('tournament_maps', data.maps)
 
 	match.game = match.game or data.game
-	local mapsInfo = Json.parse(data.maps)
-	match.mapsInfo = Logic.emptyOr(match.mapsInfo, mapsInfo)
+	match.mapsInfo = Logic.emptyOr(match.mapsInfo, (Json.parse(data.maps)))
 
 	return match
 end
