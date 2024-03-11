@@ -203,7 +203,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 end
 
 ---@param opponents table[]
----@param winner number
+---@param winner number?
 ---@param specialType string?
 ---@param finished boolean?
 ---@return table[]
