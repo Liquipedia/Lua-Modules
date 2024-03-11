@@ -119,7 +119,7 @@ function Import._getConfig(args, placements)
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
-		stageImportWinners = processStagesConfig('importWinners', tonumber),
+		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
 		stageGroupElimStatuses = processStagesConfig('importLimit', function(val)
 			return Array.map(mw.text.split(val, ','), String.trim)
 		end),
