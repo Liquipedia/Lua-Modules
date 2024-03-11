@@ -495,6 +495,18 @@ function mapFunctions.getAdditionalExtraData(map)
 	return map
 end
 
+---@param champion string?
+---@return string?
+function mapFunctions.getChampionName(champion)
+	if Logic.isNotEmpty(champion) then
+		local championName = ChampionNames[champion and champion:lower()]
+		assert(championName, 'Invalid hero:' .. champion)
+		return championName
+	end
+
+	return nil
+end
+
 -- Parse participant information
 ---@param map table
 ---@param opponents table[]
@@ -504,9 +516,10 @@ function mapFunctions.getParticipants(map, opponents)
 	local championData = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local champ = map['t' .. opponentIndex .. 'h' .. playerIndex]
-			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				ChampionNames[champ and champ:lower()]
+			local pick = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'h' .. playerIndex])
+			championData['team' .. opponentIndex .. 'champion' .. playerIndex] = pick
+			local ban = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'b' .. playerIndex])
+			championData['team' .. opponentIndex .. 'ban' .. playerIndex] = ban
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =
 				map['t' .. opponentIndex .. 'kda' .. playerIndex]
@@ -522,13 +535,6 @@ function mapFunctions.getParticipants(map, opponents)
 					championData['team' .. opponentIndex .. 'kda' .. playerIndex]
 				)
 			end
-		end
-		local banIndex = 1
-		local currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while currentBan do
-			championData['team' .. opponentIndex .. 'ban' .. banIndex] = ChampionNames[currentBan and currentBan:lower()]
-			banIndex = banIndex + 1
-			currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end
 	end
 
