@@ -69,9 +69,9 @@ function WikiCopyPaste._getMap(mode)
 	local lines = Array.extend(
 		'={{Map',
 		INDENT .. INDENT .. '|map=|winner=',
-		mode == Opponent.team and INDENT .. INDENT .. '|players1' or nil,
+		mode == Opponent.team and INDENT .. INDENT .. '|players1=' or nil,
 		INDENT .. INDENT .. '|civs1=',
-		mode == Opponent.team and INDENT .. INDENT .. '|players2' or nil,
+		mode == Opponent.team and INDENT .. INDENT .. '|players2=' or nil,
 		INDENT .. INDENT .. '|civs2=',
 		INDENT .. '}}'
 	)
