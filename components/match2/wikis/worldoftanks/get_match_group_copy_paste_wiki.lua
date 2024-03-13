@@ -9,9 +9,11 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local BaseCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local Opponent = Lua.import('Module:Opponent')
 
 ---@class WorldofTanksMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
@@ -32,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = {
 		'{{Match',
 		INDENT .. table.concat(Array.map(Array.range(1, opponents), function(opponentIndex)
-			return '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore)
+			return '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end)),
 		INDENT .. '|date= |finished=',
 	}
@@ -42,9 +44,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
-		Array.appendWith(lines,
-			INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=')
-		lines[#lines] = lines[#lines] .. '}}'
+		Array.appendWith(lines, INDENT .. '|map' .. mapIndex .. 
+			'={{Map|map=|score1=|score2=|finished=}}')
 	end)
 
 	table.insert(lines, '}}')
