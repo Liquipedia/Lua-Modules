@@ -63,9 +63,9 @@ function Tabs.dynamic(args)
 	if tabCount == 0 then return end
 
 	local hasContent = Array.all(tabArgs, function(tab)
-		return Logic.isNotEmpty(tabArgs[1].content) end)
+		return Logic.isNotEmpty(tab.content) end)
 	assert(hasContent or Array.all(tabArgs, function(tab)
-		return Logic.isEmpty(tabArgs[1].content) end), 'Some of the tabs have contents while others do not')
+		return Logic.isEmpty(tab.content) end), 'Some of the tabs have contents while others do not')
 
 	if tabCount == 1 and hasContent then return Tabs._single(tabArgs[1]) end
 
