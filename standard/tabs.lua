@@ -58,6 +58,7 @@ end
 function Tabs.dynamic(args)
 	args = args or {}
 
+	args.This = tonumber(args.This) or 1
 	local tabArgs = Tabs._readArguments(args, {removeEmptyTabs = Logic.readBool(args.removeEmptyTabs)})
 	local tabCount = #tabArgs
 	if tabCount == 0 then return end
@@ -68,10 +69,6 @@ function Tabs.dynamic(args)
 		return Logic.isEmpty(tab.content) end), 'Some of the tabs have contents while others do not')
 
 	if tabCount == 1 and hasContent then return Tabs._single(tabArgs[1]) end
-
-	if not Array.any(tabArgs, Operator.property('this')) then
-		tabArgs[1].this = true
-	end
 
 	local tabs = mw.html.create('ul')
 		:addClass('nav nav-tabs tabs tabs' .. tabCount)
@@ -135,6 +132,8 @@ end
 function Tabs._readArguments(args, options)
 	local tabArgs = {}
 	local tabIndex = 1
+	local this = tonumber(args.This)
+	local this2 = tonumber(args.This2)
 
 	while args['name' .. tabIndex] or args['link' .. tabIndex] do
 		if args['content' .. tabIndex] or not options.removeEmptyTabs then
@@ -143,7 +142,7 @@ function Tabs._readArguments(args, options)
 				link = Table.extract(args, 'link' .. tabIndex),
 				content = Table.extract(args, 'content' .. tabIndex),
 				tabs = Table.extract(args, 'tabs' .. tabIndex),
-				this = args.This == tabIndex or (options.allowThis2 and args.This2 == tabIndex),
+				this = this == tabIndex or (options.allowThis2 and this2 == tabIndex),
 			})
 		end
 		tabIndex = tabIndex + 1
@@ -163,7 +162,7 @@ function Tabs._setThis(tabArgs)
 	if Array.any(tabArgs, Operator.property('this')) then return end
 
 	local fullPageName = mw.title.getCurrentTitle().prefixedText
-	local this = nil
+	local this
 
 	-- Finds the link that is a prefix of the current page. If there are more than one, choose the longest, then first.
 	-- For example, if the current page is ab/cd/e3, then among
