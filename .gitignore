@@ -1,5 +1,6 @@
 .idea/
 node_modules
+stylesheets/complied
 package-lock.json
 luacov.report.out
 luacov.stats.out

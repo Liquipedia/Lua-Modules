@@ -23,23 +23,40 @@ jobs:
             components/**/*.lua
             standard/**/*.lua
 
-      - id: res-changed-files
+      - id: css-changed-files
         uses: tj-actions/changed-files@v42
         with:
           files: |
-            stylesheets/**/*.css
             stylesheets/**/*.less
-            stylesheets/**/*.scss
+
+      - id: js-changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
             javascript/**/*.js
 
-      - name: Resource Deploy
-        if: steps.res-changed-files.outputs.any_changed == 'true'
+      - name: Stylesheet complie
+        if: steps.css-changed-files.outputs.any_changed == 'true'
+        run: npm install
+          npm run less
+
+      - name: Stylesheet Deploy
+        if: steps.css-changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.LP_USER }}
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-        run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
+        run: bash scripts/deploy_res.sh "${{ steps.css-changed-files.outputs.all_changed_files }}" -- TODO update paths
+
+      - name: JS Deploy
+        if: steps.js-changed-files.outputs.any_changed == 'true'
+        env:
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+        run: bash scripts/deploy_res.sh "${{ steps.js-changed-files.outputs.all_changed_files }}"
 
       - name: Lua Deploy
         if: steps.lua-changed-files.outputs.any_changed == 'true'

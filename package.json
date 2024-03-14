@@ -5,12 +5,14 @@
 		"grunt": "*",
 		"grunt-eslint": "*",
 		"grunt-stylelint": "*",
+		"grunt-contrib-less": "*",
 		"postcss-less": "*",
 		"stylelint-config-wikimedia": "*",
 		"stylelint-less": "2.x.x"
 	},
 	"scripts": {
 		"test": "grunt main",
-		"fix": "grunt main --fix"
+		"fix": "grunt main --fix",
+		"less": "grunt less"
 	}
 }
