@@ -299,7 +299,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 			end)
 			if info then
 				map.map = info.link
-				map.mapDisplayName = info.name or info.link
+				map.mapDisplayName = info.name
 			end
 		else
 			map.mapDisplayName = map.map
