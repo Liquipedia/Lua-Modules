@@ -83,12 +83,10 @@ function Tabs.dynamic(args)
 		local element = mw.html.create(elementType)
 			:addClass(class)
 			:addClass(isActive and 'active' or nil)
-			:wikitext('\n')
+			:newline()
 			:node(content)
 
-		obj
-			:wikitext('\n')
-			:node(element)
+		obj:newline():node(element)
 	end
 
 	Array.forEach(tabArgs, function(tabData, tabIndex)
@@ -101,7 +99,7 @@ function Tabs.dynamic(args)
 			:wikitext('Show All')
 	end
 
-	tabs:wikitext('\n')
+	tabs:newline()
 
 	local contents = Tabs._buildContentDiv(
 		hasContent,
@@ -123,7 +121,7 @@ function Tabs.dynamic(args)
 		:addClass('tabs-dynamic navigation-not-searchable')
 		:attr('data-nosnippet')
 		:node(tabs)
-		:wikitext('\n')
+		:newline()
 		:node(contents)
 end
 
