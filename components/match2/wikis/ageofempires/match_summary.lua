@@ -52,7 +52,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return string
 function CustomMatchSummary._determineWidth(match)
-	return CustomMatchSummary._isSolo(match) and '285px' or '550px'
+	return CustomMatchSummary._isSolo(match) and '350px' or '550px'
 end
 
 ---@param match MatchGroupUtilMatch
@@ -70,7 +70,7 @@ function CustomMatchSummary.createBody(match)
 		if not game.map and not game.winner then return end
 		local row = MatchSummary.Row()
 				:addClass('brkts-popup-body-game')
-				:css('font-size', '84%')
+				:css('font-size', '0.75rem')
 				:css('padding', '4px')
 				:css('min-height', '24px')
 
@@ -149,7 +149,6 @@ function CustomMatchSummary._createGame(row, game, props)
 			local player = CustomMatchSummary._getPlayerData(game, participantId)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
-
 			return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
 				:node(flipped and playerNode or factionNode)
 				:wikitext('&nbsp;')
@@ -169,12 +168,12 @@ function CustomMatchSummary._createGame(row, game, props)
 
 	row
 			:addElement(faction1)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1, props.soloMode))
 			:addElement(mw.html.create('div')
 				:addClass('brkts-popup-spaced'):css('flex-grow', '1')
 				:wikitext(DisplayHelper.MapAndStatus(game))
 			)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2, props.soloMode))
 			:addElement(faction2)
 end
 
@@ -196,12 +195,12 @@ end
 ---@param winner integer|string
 ---@param opponentIndex integer
 ---@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
+function CustomMatchSummary._createCheckMark(winner, opponentIndex, soloMode)
 	return mw.html.create('div')
 			:addClass('brkts-popup-spaced')
 			:css('line-height', '17px')
-			:css('margin-left', '1%')
-			:css('margin-right', '1%')
+			:css('margin-left', (opponentIndex == 1 and soloMode) and '10%' or '1%')
+			:css('margin-right', (opponentIndex == 2 and soloMode) and '10%' or '1%')
 			:wikitext(
 				winner == opponentIndex and GREEN_CHECK
 				or winner == 0 and DRAW_LINE or NO_CHECK
