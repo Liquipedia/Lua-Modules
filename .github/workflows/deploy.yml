@@ -35,7 +35,7 @@ jobs:
           files: |
             javascript/**/*.js
 
-      - name: Stylesheet complie
+      - name: Stylesheet compile
         if: steps.css-changed-files.outputs.any_changed == 'true'
         run: npm install
           npm run less

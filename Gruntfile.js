@@ -31,7 +31,7 @@ module.exports = function( grunt ) {
 				expand: true,
 				cwd: 'stylesheets/',
 				src: [ '**/*.less' ],
-				dest: 'stylesheets/complied/',
+				dest: 'stylesheets/compiled/',
 				ext: '.css'
 			}
 		}
