@@ -22,6 +22,8 @@ local CustomPrizePool = {}
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.allGroupsUseWdl = true
@@ -32,6 +34,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
@@ -52,6 +58,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	if Logic.isEmpty(tier) then
 		return 0
