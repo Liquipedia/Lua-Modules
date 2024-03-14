@@ -299,7 +299,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 			end)
 			if info then
 				map.map = info.link
-				map.mapDisplayName = info.name
+				map.mapDisplayName = info.name or info.link
 			end
 		else
 			map.mapDisplayName = map.map
@@ -319,6 +319,16 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
+
+	-- Init score if match started and map info is present
+	if not match.opponent1.autoscore and not match.opponent2.autoscore
+			and map.map and map.map ~= 'TBD'
+			and match.timestamp < os.time(os.date('!*t'))
+			and String.isNotEmpty(map.civs1) and String.isNotEmpty(map.civs2) then
+		match.opponent1.autoscore = 0
+		match.opponent2.autoscore = 0
+	end
+
 	if Logic.isEmpty(map.resulttype) and map.scores[1] and map.scores[2] then
 		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
 		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]
