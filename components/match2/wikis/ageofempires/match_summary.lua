@@ -168,12 +168,12 @@ function CustomMatchSummary._createGame(row, game, props)
 
 	row
 			:addElement(faction1)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1, props.soloMode))
 			:addElement(mw.html.create('div')
 				:addClass('brkts-popup-spaced'):css('flex-grow', '1')
 				:wikitext(DisplayHelper.MapAndStatus(game))
 			)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2, props.soloMode))
 			:addElement(faction2)
 end
 
@@ -195,12 +195,12 @@ end
 ---@param winner integer|string
 ---@param opponentIndex integer
 ---@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
+function CustomMatchSummary._createCheckMark(winner, opponentIndex, soloMode)
 	return mw.html.create('div')
 			:addClass('brkts-popup-spaced')
 			:css('line-height', '17px')
-			:css('margin-left', opponentIndex == 1 and '10%' or '1%')
-			:css('margin-right', opponentIndex == 2 and '10%' or '1%')
+			:css('margin-left', (opponentIndex == 1 and soloMode) and '10%' or '1%')
+			:css('margin-right', (opponentIndex == 2 and soloMode) and '10%' or '1%')
 			:wikitext(
 				winner == opponentIndex and GREEN_CHECK
 				or winner == 0 and DRAW_LINE or NO_CHECK
