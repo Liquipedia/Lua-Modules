@@ -286,7 +286,8 @@ end
 
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match)
+		mvp = MatchGroupInput.readMvp(match),
+		casters = MatchGroupInput.readCasters(match, {noSort = true})
 	}
 	return match
 end
