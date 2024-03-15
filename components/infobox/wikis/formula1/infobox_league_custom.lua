@@ -37,6 +37,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return Array.appendWith(widgets,
+			Cell{name = 'Weather', content = {args.weather}},
 			Cell{name = 'Race Number', content = {args.race}},
 			Cell{name = 'Total Laps', content = {args.laps}},
 			Cell{name = 'Pole Position', content = {args.pole}},
@@ -46,7 +47,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Number of Teams', content = {args.team_number}},
 			Cell{name = 'Engine', content = {args.engine}},
 			Cell{name = 'Tyres', content = {args.tyres}},
-			Cell{name = 'Chassis', content = {args.chassis}}
+			Cell{name = 'Chassis', content = {args.chassis}},
+			Cell{name = 'Race Leaders', content = {args.leaders}}
 		)
 	end
 
