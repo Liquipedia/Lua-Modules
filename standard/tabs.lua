@@ -230,8 +230,8 @@ function Tabs._single(tab, showHeader)
 	local header
 	if showHeader then
 		header = mw.html.create()
-			:newline()
 			:tag('h6'):wikitext(tab.name):done()
+			:newline()
 	end
 	return mw.html.create()
 		:node(header)
