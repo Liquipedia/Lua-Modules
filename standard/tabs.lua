@@ -58,7 +58,6 @@ end
 function Tabs.dynamic(args)
 	args = args or {}
 
-	args.This = tonumber(args.This) or 1
 	local tabArgs = Tabs._readArguments(args, {removeEmptyTabs = Logic.readBool(args.removeEmptyTabs)})
 	local tabCount = #tabArgs
 	if tabCount == 0 then return end
@@ -69,10 +68,14 @@ function Tabs.dynamic(args)
 		return Logic.isEmpty(tab.content) end)
 	assert(hasContent or allEmpty, 'Some of the tabs have contents while others do not')
 
-	if tabCount == 1 and hasContent then return Tabs._single(tabArgs[1]) end
+	if tabCount == 1 and hasContent then return Tabs._single(tabArgs[1], not Logic.readBool(args.suppressHeader)) end
 
 	local tabs = mw.html.create('ul')
 		:addClass('nav nav-tabs tabs tabs' .. tabCount)
+
+	if not Array.any(tabArgs, Operator.property('this')) then
+		tabArgs[1].this = true
+	end
 
 	---@param obj Html
 	---@param elementType string
@@ -221,10 +224,17 @@ function Tabs._buildContentDiv(hasContent, hybridTabs, noPadding)
 end
 
 ---@param tab {name: string?, link: string?, content: string|Html?, tabs: string|Html?, this: boolean}
+---@param showHeader boolean
 ---@return Html
-function Tabs._single(tab)
+function Tabs._single(tab, showHeader)
+	local header
+	if showHeader then
+		header = mw.html.create()
+			:tag('h6'):wikitext(tab.name):done()
+			:newline()
+	end
 	return mw.html.create()
-		:tag('h6'):wikitext(tab.name):done()
+		:node(header)
 		:node(tab.content)
 end
 
