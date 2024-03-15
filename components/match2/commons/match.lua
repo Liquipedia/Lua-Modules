@@ -71,7 +71,7 @@ function Match.makeEncodedJson(matchArgs)
 end
 
 ---@param matchRecords table[]
----@param options {bracketId: string?, storeMatch1: string?, storeMatch2: string?, storePageVar: string?}?
+---@param options {bracketId: string?, storeMatch1: string|boolean?, storeMatch2: string?, storePageVar: string?}?
 function Match.storeMatchGroup(matchRecords, options)
 	options = options or {}
 	options = {
@@ -124,7 +124,7 @@ end
 
 ---Stores a single match from a match group. Used by standalone match pages.
 ---@param match table[]
----@param options {bracketId: string?, storeMatch1: string?, storeMatch2: string?, storePageVar: string?}?
+---@param options {bracketId: string?, storeMatch1: string|boolean?, storeMatch2: string?, storePageVar: string?}?
 function Match.store(match, options)
 	Match.storeMatchGroup({match}, type(options) == 'table' and options or nil)
 end
