@@ -298,7 +298,7 @@ end
 function BigMatch.render(model)
 	return mw.html.create('div')
 		:wikitext(BigMatch.header(model))
-		:wikitext(BigMatch.games(model))
+		:node(BigMatch.games(model))
 		:wikitext(BigMatch.footer(model))
 end
 
