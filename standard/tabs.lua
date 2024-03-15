@@ -58,7 +58,6 @@ end
 function Tabs.dynamic(args)
 	args = args or {}
 
-	args.This = tonumber(args.This) or 1
 	local tabArgs = Tabs._readArguments(args, {removeEmptyTabs = Logic.readBool(args.removeEmptyTabs)})
 	local tabCount = #tabArgs
 	if tabCount == 0 then return end
@@ -73,6 +72,10 @@ function Tabs.dynamic(args)
 
 	local tabs = mw.html.create('ul')
 		:addClass('nav nav-tabs tabs tabs' .. tabCount)
+
+	if not Array.any(tabArgs, Operator.property('this')) then
+		tabArgs[1].this = true
+	end
 
 	---@param obj Html
 	---@param elementType string
