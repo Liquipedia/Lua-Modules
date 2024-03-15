@@ -26,14 +26,15 @@ function TeamLogoGallery.run(args)
 
 	assert(mw.ext.TeamTemplate.teamexists(name), 'Missing team template "' .. name .. '"')
 
-	local imageData = TeamLogoGallery._getImageData(name)
+	local imageData = TeamLogoGallery._getImageData(name, Logic.readBool(args.showPresentLogo))
 
 	return Gallery.run(imageData)
 end
 
 ---@param name string
+---@param showPresentLogo boolean
 ---@return {imageLightMode: string, imageDarkMode: string?, caption: string}[]
-function TeamLogoGallery._getImageData(name)
+function TeamLogoGallery._getImageData(name, showPresentLogo)
 	local historicalTeamTemplates = Logic.emptyOr(Team.queryHistorical(name)) or {[DateExt.defaultDate] = name}
 
 	local imageDatas = {}
@@ -48,7 +49,9 @@ function TeamLogoGallery._getImageData(name)
 		imageData.endDate = (imageDatas[index + 1] or {}).startDate
 	end)
 
-	local finalName = Table.extract(imageDatas, #imageDatas).raw.name
+	local presentImageData = showPresentLogo and imageDatas[#imageDatas] or Table.extract(imageDatas, #imageDatas)
+
+	local finalName = presentImageData.raw.name
 
 	return Array.map(imageDatas, function(imageData, index)
 		local image = Logic.emptyOr(imageData.raw.image, imageData.raw.legacyimage)
@@ -79,6 +82,11 @@ end
 ---@return string
 ---@return Html|string
 function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
+	if not imageData.endDate then
+		local caption = 'Present logo'
+		return caption, caption
+	end
+
 	local number = index == 1 and 'Original' or
 		mw.getContentLanguage():ucfirst(Ordinal.written(index) --[[@as string]])
 
