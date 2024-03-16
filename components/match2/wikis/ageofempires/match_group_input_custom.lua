@@ -106,10 +106,15 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._getLinks(match)
-	match.links = {
-		civdraft = match.civdraft and ('https://aoe2cm.net/draft/' .. match.civdraft) or nil,
-		mapdraft = match.mapdraft and ('https://aoe2cm.net/draft/' .. match.mapdraft) or nil,
-	}
+	match.links = {}
+	match.civdraft1 = match.civdraft1 or match.civdraft
+	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
+		match.links[key] = 'https://aoe2cm.net/draft/' .. value
+	end
+	match.mapdraft1 = match.mapdraft1 or match.mapdraft
+	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
+		match.links[key] = 'https://aoe2cm.net/draft/' .. value
+	end
 end
 
 ---@param match table
