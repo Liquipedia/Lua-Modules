@@ -91,7 +91,19 @@ end
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	footer:addLinks(LINKDATA, match.links)
+	local addLinks = function(linkType)
+		local currentLinkData = LINKDATA[linkType]
+		if not currentLinkData then
+			mw.log('Unknown link: ' .. linkType)
+			return
+		end
+		for _, link in Table.iter.pairsByPrefix(match.links, linkType) do
+			footer:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
+		end
+	end
+	
+	addLinks('mapdraft')
+	addLinks('civdraft')
 
 	if not Logic.readBool(match.extradata.headtohead) or not CustomMatchSummary._isSolo(match) then
 		return footer
