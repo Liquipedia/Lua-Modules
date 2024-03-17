@@ -101,7 +101,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 			footer:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
 	end
-	
+
 	addLinks('mapdraft')
 	addLinks('civdraft')
 
