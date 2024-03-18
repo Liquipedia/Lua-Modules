@@ -152,7 +152,7 @@ function CopyPaste.bracket(frame, args)
 		end
 
 		if hasHeaderEntryParam and headersUpTop then
-			display = display .. '\n|M' .. matchKey .. 'header='
+			display = display .. '\n|' .. matchKey .. 'header='
 		end
 
 		local match = empty and '' or WikiSpecific.getMatchCode(bestof, mode, matchIndex, opponents, args)
