@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
-local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -16,7 +15,6 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 
