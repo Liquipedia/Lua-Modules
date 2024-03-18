@@ -248,7 +248,7 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 	return players
 end
 
----@param players any
+---@param players table
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
 ---@return table

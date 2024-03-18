@@ -811,7 +811,7 @@ end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
----@param recordExtradata any
+---@param recordExtradata table|string?
 ---@return table
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)

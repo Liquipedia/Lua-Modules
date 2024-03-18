@@ -36,7 +36,7 @@ local VALID_SKILLS = {
 }
 
 ---@param frame Frame
----@return unknown
+---@return Html
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
