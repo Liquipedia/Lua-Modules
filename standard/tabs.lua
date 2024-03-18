@@ -96,7 +96,7 @@ function Tabs.dynamic(args)
 		build(tabs, 'li', tabData.name, 'tab' .. tabIndex, tabData.this)
 	end)
 
-	if Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), true) then
+	if not Logic.readBool(args['hide-showall']) then
 		tabs:tag('li')
 			:addClass('show-all')
 			:wikitext('Show All')
