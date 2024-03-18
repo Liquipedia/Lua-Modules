@@ -14,13 +14,19 @@ local Lua = require('Module:Lua')
 
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
+local ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
+
 local MatchSubobjects = {}
 
+---@param frame Frame
+---@return string
 function MatchSubobjects.getMap(frame)
 	local args = Arguments.getArgs(frame)
 	return Json.stringify(MatchSubobjects.luaGetMap(args))
 end
 
+---@param args table
+---@return table?
 function MatchSubobjects.luaGetMap(args)
 	-- dont save map if 'map' is not filled in
 	if Logic.isEmpty(args.map) then
@@ -41,32 +47,39 @@ function MatchSubobjects.luaGetMap(args)
 	end
 end
 
+---@param frame Frame
+---@return string
 function MatchSubobjects.getRound(frame)
 	local args = Arguments.getArgs(frame)
 	return Json.stringify(MatchSubobjects.luaGetRound(frame, args))
 end
 
+---@param frame Frame
+---@param args table
+---@return table
 function MatchSubobjects.luaGetRound(frame, args)
 	return args
 end
 
+---@param frame Frame
+---@return table
 function MatchSubobjects.getPlayer(frame)
 	local args = Arguments.getArgs(frame)
 	return Json.stringify(MatchSubobjects.luaGetPlayer(args))
 end
 
+---@param args table
+---@return table
 function MatchSubobjects.luaGetPlayer(args)
 	return WikiSpecific.processPlayer(args)
 end
 
-local _ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
-
 if FeatureFlag.get('perf') then
 	local Match = Lua.import('Module:Match')
 	MatchSubobjects.perfConfig = Match.perfConfig
-	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, _ENTRY_POINT_NAMES)
+	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, ENTRY_POINT_NAMES)
 end
 
-Lua.autoInvokeEntryPoints(MatchSubobjects, 'Module:Match/Subobjects', _ENTRY_POINT_NAMES)
+Lua.autoInvokeEntryPoints(MatchSubobjects, 'Module:Match/Subobjects', ENTRY_POINT_NAMES)
 
 return MatchSubobjects
