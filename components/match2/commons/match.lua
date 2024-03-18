@@ -158,7 +158,7 @@ end
 ---and removes direct references between a match record and its subobject records.
 ---@param match table
 ---@return {matchRecord: table, gameRecords: table[], opponentRecords: table[], playerRecords: table[]}
----@overload fun(match: any): {}
+---@overload fun(match: table): {}
 function Match.splitRecordsByType(match)
 	if match == nil or type(match) ~= 'table' then
 		return {}
@@ -211,7 +211,7 @@ end
 ---to `list`. Sets the original location (so in `match`) to `nil`.
 ---@param match table
 ---@param list table[]
----@param typePrefix any
+---@param typePrefix string
 ---@return table[]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
 	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
@@ -247,7 +247,7 @@ subobject records, while copying the other objects like match.match2bracketdata
 and opponent.extradata by reference. Assumes that subobject references have
 been normalized (in Match.normalizeSubobjectReferences).
 ]]
----@param matchRecord any
+---@param matchRecord table
 ---@return table
 function Match.copyRecords(matchRecord)
 	return Table.merge(matchRecord, {
@@ -369,8 +369,8 @@ function Match._getSection()
 	return lastHeading
 end
 
----@param matchRecord any
----@param gameRecord any
+---@param matchRecord table
+---@param gameRecord table
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
