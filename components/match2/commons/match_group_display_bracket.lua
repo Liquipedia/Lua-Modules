@@ -15,7 +15,6 @@ local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local StringUtils = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -192,14 +191,6 @@ function BracketDisplay._computeOpponentHeight(opponentType, defaultOpponentHeig
 	-- remove padding then multipy it by player rows and after that add padding once
 	return numberOfRows * (defaultOpponentHeight - OPPONENT_HEIGHT_PADDING) + OPPONENT_HEIGHT_PADDING
 end
-
-BracketDisplay.types.Layout = TypeUtil.struct({
-	height = 'number',
-	lowerNodeMarginTop = 'number',
-	matchHeight = 'number',
-	matchMarginTop = 'number',
-	mid = 'number',
-})
 
 ---Computes certain layout properties of nodes in the bracket tree.
 ---@param bracket MatchGroupUtilBracket
