@@ -8,8 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
-local TypeUtil = require('Module:TypeUtil')
 
 --[[
 Utility module for working with starcraft and starcraft2 specific external
@@ -17,10 +15,11 @@ media links of matches. This includes the preview, lrthread, vodN, interviewN,
 recap, and review params of both matches and games.
 ]]
 
-local StarcraftMatchExternalLinks = {propTypes = {}}
+local StarcraftMatchExternalLinks = {}
 
 -- List of supported external link parameters, in display order
-StarcraftMatchExternalLinks.paramTypes = {
+---@enum StarcraftMatchExternalLinkTypes
+local PARAM_TYPES = {
 	'preview',
 	'lrthread',
 	'vod',
@@ -29,28 +28,17 @@ StarcraftMatchExternalLinks.paramTypes = {
 	'recap',
 	'review',
 }
+StarcraftMatchExternalLinks.paramTypes = PARAM_TYPES
 
 StarcraftMatchExternalLinks.paramTypeIndexes = {}
 for index, paramType in ipairs(StarcraftMatchExternalLinks.paramTypes) do
 	StarcraftMatchExternalLinks.paramTypeIndexes[paramType] = index
 end
 
---[[
-Renders a single external link.
-
-props.type: 'vod', 'preview', 'lrthread', or one of the allowed values in MatchExternalLinks.paramTypes
-props.number: A number used to visually distinguish between multiple vods. Only number 1-9 have unique icons.
-props.url:
-]]
-StarcraftMatchExternalLinks.propTypes.ExternalLink = {
-	number = 'number?',
-	type = 'string',
-	url = 'string',
-}
-
+---Renders a single external link.
+---@param props {number: number?, type: StarcraftMatchExternalLinkTypes, url: string}
+---@return string
 function StarcraftMatchExternalLinks.ExternalLink(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchExternalLinks.propTypes.ExternalLink)
-
 	if props.type == 'preview' then
 		return '[[File:Preview_Icon32.png|link=' .. props.url .. '|alt=preview|16px|Preview]] '
 	end
@@ -81,11 +69,10 @@ function StarcraftMatchExternalLinks.ExternalLink(props)
 	error('Unsupported prop type ' .. tostring(props.type))
 end
 
---[[
-Extracts match media link relevant args from a generic args array, and
-returns an array of link propss that can be rendered via
-StarcraftMatchExternalLinks.MatchExternalLinks.
-]]
+---Extracts match media link relevant args from a generic args array, and returns an array of link propss that can be
+---rendered via StarcraftMatchExternalLinks.MatchExternalLinks.
+---@param args table
+---@return {number: number?, type: StarcraftMatchExternalLinkTypes, url: string}[]
 function StarcraftMatchExternalLinks.extractFromArgs(args)
 	local links = {}
 	for paramName, url in pairs(args) do
@@ -102,6 +89,8 @@ function StarcraftMatchExternalLinks.extractFromArgs(args)
 	return links
 end
 
+---@param match table
+---@return {number: number?, type: StarcraftMatchExternalLinkTypes, url: string}[]
 function StarcraftMatchExternalLinks.extractFromMatch(match)
 	local links = StarcraftMatchExternalLinks.extractFromArgs(match.links)
 
@@ -117,12 +106,9 @@ function StarcraftMatchExternalLinks.extractFromMatch(match)
 	return links
 end
 
-StarcraftMatchExternalLinks.propTypes.MatchExternalLinks = {
-	links = TypeUtil.array(TypeUtil.struct(StarcraftMatchExternalLinks.propTypes.ExternalLink)),
-}
-
+---@param props {links: {number: number?, type: StarcraftMatchExternalLinkTypes, url: string}[]}
+---@return Html
 function StarcraftMatchExternalLinks.MatchExternalLinks(props)
-	DisplayUtil.assertPropTypes(props, StarcraftMatchExternalLinks.propTypes.MatchExternalLinks)
 	local links = Array.sortBy(props.links, function(link)
 		return {
 			StarcraftMatchExternalLinks.paramTypeIndexes[link.type],
@@ -139,6 +125,8 @@ function StarcraftMatchExternalLinks.MatchExternalLinks(props)
 end
 
 -- Entry point of Template:MatchExternalLink
+---@param frame Frame
+---@return Html
 function StarcraftMatchExternalLinks.TemplateMatchExternalLink(frame)
 	local args = Arguments.getArgs(frame)
 	local links = StarcraftMatchExternalLinks.extractFromArgs(args)
