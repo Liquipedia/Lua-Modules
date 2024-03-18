@@ -24,6 +24,9 @@ feature flag is enabled via {{#vardefine:feature_force_type_check|1}}.
 By default this only checks the contents of table properties up to 1 deep.
 Specify options.maxDepth to increase the depth.
 ]]
+---@param props table
+---@param propTypes table
+---@param options {maxDepth: integer?}?
 DisplayUtil.assertPropTypes = function(props, propTypes, options)
 	local typeCheckFeature = FeatureFlag.get('force_type_check')
 	if not typeCheckFeature then
@@ -51,6 +54,8 @@ DisplayUtil.propTypes.LuaError = {
 }
 
 -- Shows the message and stack trace of a lua error.
+---@param props {message: string, backtrace: string}
+---@return Html
 function DisplayUtil.LuaError(props)
 	DisplayUtil.assertPropTypes(props, DisplayUtil.propTypes.LuaError)
 	local messageNode = mw.html.create('div')
@@ -65,11 +70,11 @@ function DisplayUtil.LuaError(props)
 		:node(backtraceNode)
 end
 
---[[
-Attempts to render a component written in the pure function style. If an error
-is encountered when rendering the component, show the error and stack trace
-instead of the component.
-]]
+---Attempts to render a component written in the pure function style. If an error is encountered when rendering the
+---component, show the error and stack trace instead of the component.
+---@param Component function
+---@param props table
+---@return Html
 function DisplayUtil.TryPureComponent(Component, props)
 	local resultOrError = ResultOrError.try(function() return Component(props) end)
 	if resultOrError:isResult() then
@@ -85,11 +90,11 @@ function DisplayUtil.TryPureComponent(Component, props)
 	end
 end
 
---[[
-Attempts to invoke a function. If successful, returns the result. If an error
-is encountered, render the error and stack trace, and return it in the 2nd return
-value.
-]]
+---Attempts to invoke a function. If successful, returns the result. If an error is encountered,
+---render the error and stack trace, and return it in the 2nd return value.
+---@param f function
+---@return any
+---@return Html?
 function DisplayUtil.try(f)
 	local result, errorNode
 	xpcall(function()
@@ -110,10 +115,10 @@ end
 ---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
 
---[[
-Specifies overflow behavior on a block element. mode can be 'ellipsis', 'wrap',
-or 'hidden'.
-]]
+---Specifies overflow behavior on a block element. mode can be 'ellipsis', 'wrap', or 'hidden'.
+---@param node Html
+---@param mode OverflowModes
+---@return Html
 function DisplayUtil.applyOverflowStyles(node, mode)
 	return node
 		:css('overflow', (mode == 'ellipsis' or mode == 'hidden') and 'hidden' or nil)
@@ -126,14 +131,18 @@ end
 local mwHtmlMetatable = FnUtil.memoize(function()
 	return getmetatable(mw.html.create('div'))
 end)
+
+---@param x any
+---@return boolean
 function DisplayUtil.isMwHtmlNode(x)
 	return type(x) == 'table'
 		and getmetatable(x) == mwHtmlMetatable()
 end
 
---[[
-Like Array.flatten, except that mediawiki html nodes are not considered arrays.
-]]
+---Like Array.flatten, except that mediawiki html nodes are not considered arrays.
+---@generic T
+---@param elems T[]
+---@return T[]
 function DisplayUtil.flattenArray(elems)
 	local flattened = {}
 	for _, elem in ipairs(elems) do
@@ -154,6 +163,8 @@ Example:
 DisplayUtil.removeLinkFromWikiLink('[[File:ZergIcon.png|14px|link=Zerg]]')
 -- returns '[[File:ZergIcon.png|14px|link=]]''
 ]===]
+---@param text string
+---@return string
 function DisplayUtil.removeLinkFromWikiLink(text)
 	local textNoLink = text:gsub('link=[^|%]]*', 'link=')
 	return textNoLink
