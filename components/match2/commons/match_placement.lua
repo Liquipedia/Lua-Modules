@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local TypeUtil = require('Module:TypeUtil')
-
 local MatchPlacement = {}
 
 MatchPlacement.medalIcons = {
