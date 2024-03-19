@@ -252,7 +252,7 @@ All indexes start from 1. coords.depth is 0-based and coords.semanticDepth is
 converted to 0-based.
 ]]
 ---@param bracket MatchGroupUtilBracket
----@return {coordinatesByMatchId: table<string, MatchGroupUtilMatchCoordinates>, rounds: string[][], sections: string[][]}
+---@return {coordinatesByMatchId:table<string, MatchGroupUtilMatchCoordinates>, rounds:string[][], sections:string[][]}
 function MatchGroupCoordinates.computeCoordinates(bracket)
 	local sections, sectionIxs = MatchGroupCoordinates.computeSections(bracket)
 	local rounds, roundPropsByMatchId = MatchGroupCoordinates.computeRounds(bracket)
