@@ -443,7 +443,7 @@ end
 
 ---Populate bracketData.coordinates if it is missing.
 ---This can happen if the bracket template has not been recently purged.
----@param matchGroup MatchGroupUtilMatchGroup
+---@param matchGroup MatchGroupUtilBracket
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
