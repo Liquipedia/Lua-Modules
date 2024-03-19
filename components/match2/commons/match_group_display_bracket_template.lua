@@ -17,12 +17,11 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local BracketTemplateDisplay = {propTypes = {}}
 
---[[
-Display component showing an empty tournament bracket with no opponents. Used
-by Template:BracketDocumentation.
-]]
+---Display component showing an empty tournament bracket with no opponents. Used by Template:BracketDocumentation.
 
 --Entry point called from Template:BracketDocumentation
+---@param frame Frame
+---@return Html
 function BracketTemplateDisplay.TemplateBracketTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	return BracketTemplateDisplay.BracketContainer({
@@ -30,14 +29,17 @@ function BracketTemplateDisplay.TemplateBracketTemplate(frame)
 	})
 end
 
+---@param props {bracketId: string, config: BracketConfigOptions}
+---@return Html
 function BracketTemplateDisplay.BracketContainer(props)
-	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.BracketContainer)
 	return BracketTemplateDisplay.Bracket({
 		config = props.config,
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId) --[[@as MatchGroupUtilBracket]],
 	})
 end
 
+---@param props {bracket: MatchGroupUtilBracket, config: BracketConfigOptions}
+---@return Html
 function BracketTemplateDisplay.Bracket(props)
 	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Bracket)
 	return BracketDisplay.Bracket({
@@ -49,6 +51,8 @@ function BracketTemplateDisplay.Bracket(props)
 	})
 end
 
+---@param props table
+---@return Html
 function BracketTemplateDisplay.OpponentEntry(props)
 	return mw.html.create('div'):addClass('brkts-opponent-entry')
 end
