@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -41,7 +40,6 @@ end
 ---@param props {bracket: MatchGroupUtilBracket, config: BracketConfigOptions}
 ---@return Html
 function BracketTemplateDisplay.Bracket(props)
-	DisplayUtil.assertPropTypes(props, BracketDisplay.propTypes.Bracket)
 	return BracketDisplay.Bracket({
 		bracket = props.bracket,
 		config = Table.merge(props.config, {
