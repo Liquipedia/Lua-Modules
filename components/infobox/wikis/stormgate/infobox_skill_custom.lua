@@ -83,9 +83,20 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
-		local makeArrayLinks = function(arr)
-			return Array.map(arr, function(value) return Page.makeInternalLink({}, value) end)
+
+		---@param arr string[]
+		---@param trim string?
+		---@return string[]
+		local makeArrayLinks = function(arr, trim)
+			return Array.map(arr, function(value)
+				local dispaly = value
+				if trim then
+					dispaly = dispaly:gsub(trim, '')
+				end
+				return Page.makeInternalLink({}, dispaly, value)
+			end)
 		end
+
 		Array.extendWith(widgets, {
 				Cell{name = 'Researched From', content = {Page.makeInternalLink({}, args.from)}},
 				Cell{name = 'Upgrade Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.upgrade_target))},
@@ -95,7 +106,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Unlocks', content = makeArrayLinks(Array.parseCommaSeparatedString(args.unlocks))},
 				Cell{name = 'Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.target))},
 				Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
-				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect))},
+				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
 				Cell{name = 'Trigger', content = {args.trigger}},
 				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
 			},
