@@ -254,7 +254,7 @@ end
 ---@return Html
 function PortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')
-		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
+		:addClass(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned))
 
 	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
 	row:tag('td')
@@ -282,6 +282,18 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(table.concat(links))
 
 	return row
+end
+
+---@param status string?
+---@param banned string?
+---@return string?
+function PortalPlayers._getStatusBackground(status, banned)
+	if Logic.isEmpty(status) then
+		status = Logic.emptyOr(Logic.readBoolOrNil(banned), Logic.isNotEmpty(banned))
+			and 'banned' or nil
+	end
+
+	return BACKGROUND_CLASSES[(status or ''):lower()]
 end
 
 ---Converts the queried data int a readable format by OpponnetDisplay
