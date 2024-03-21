@@ -36,7 +36,7 @@ function Tabs.static(args)
 
 	Array.forEach(tabArgs, function(tab)
 		--if tab.name is unset tab.link is set as per `Tabs._readArguments`
-		local name = tab.name or mw.text.split(tab.link --[[@as string]], '/', true)[1]
+		local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
 		local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
 		tabs:tag('li'):addClass(tab.this and 'active' or nil):wikitext(text)
 		subTabs:node(tab.this and tab.tabs or nil)
@@ -236,6 +236,13 @@ function Tabs._single(tab, showHeader)
 	return mw.html.create()
 		:node(header)
 		:node(tab.content)
+end
+
+---@param link string
+---@return string
+function Tabs._getDisplayNameFromLink(link)
+	local linkParts = mw.text.split(link, '/', true)
+	return linkParts[#linkParts]
 end
 
 return Class.export(Tabs)
