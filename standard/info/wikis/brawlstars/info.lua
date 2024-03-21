@@ -29,5 +29,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'Brawl Stars Default allmode.png', ---@deprecated
 	defaultTeamLogoDark = 'Brawl Stars Default allmode.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }
