@@ -85,15 +85,15 @@ function CustomInjector:parse(id, widgets)
 		local castingTime = tonumber(args.casting_time)
 
 		---@param arr string[]
-		---@param trim string?
+		---@param trimPattern string?
 		---@return string[]
-		local makeArrayLinks = function(arr, trim)
+		local makeArrayLinks = function(arr, trimPattern)
 			return Array.map(arr, function(value)
-				local dispaly = value
-				if trim then
-					dispaly = dispaly:gsub(trim, '')
+				local display = value
+				if trimPattern then
+					display = display:gsub(trimPattern, '')
 				end
-				return Page.makeInternalLink({}, dispaly, value)
+				return Page.makeInternalLink({}, display, value)
 			end)
 		end
 
