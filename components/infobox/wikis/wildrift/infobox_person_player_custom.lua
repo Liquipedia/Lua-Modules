@@ -8,7 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local ChampionIcon = require('Module:ChampionIcon')
+local ChampionNames = mw.loadData('Module:ChampionNames')
+local CharacterIcon = require('Module:CharacterIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -91,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		-- Signature Champion
 		local championIcons = Array.map(caller:getAllArgsForBase(args, 'champion'), function(champion)
-			return ChampionIcon.getImage{champion, size = SIZE_CHAMPION}
+			return CharacterIcon.Icon{character = ChampionNames[champion:lower()], size = SIZE_CHAMPION}
 		end)
 		return {Cell{
 			name = #championIcons > 1 and 'Signature Champions' or 'Signature Champions',
@@ -152,12 +153,9 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role = (self.role or {}).variable
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
-
-	lpdbData.extradata.signatureChampion1 = args.champion1 or args.champion
-	lpdbData.extradata.signatureChampion2 = args.champion2
-	lpdbData.extradata.signatureChampion3 = args.champion3
-	lpdbData.extradata.signatureChampion4 = args.champion4
-	lpdbData.extradata.signatureChampion5 = args.champion5
+	for index, champion in ipairs(self:getAllArgsForBase(args, 'champion')) do
+		lpdbData.extradata['signatureChampion' .. index] = ChampionNames[champion:lower()]
+	end
 	lpdbData.type = self:_isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
