@@ -5,6 +5,17 @@ Author(s): ???
 .teamcard {
 	position: relative;
 	width: 200px;
+
+	.btn.btn-theme {
+		background-color: var( --clr-surface-4, #e6e6e6 );
+		color: var( --clr-on-background, #212529 );
+
+		@media ( hover: hover ) {
+			&:hover {
+				background-color: var( --clr-surface-3, #d3d3d3 );
+			}
+		}
+	}
 }
 
 .teamcard > center {
@@ -200,7 +211,7 @@ Author(s): ???
 
 	& .team-template-team-part,
 	& span.team-template-image-icon,
-	& span.team-template-image-legacy, {
+	& span.team-template-image-legacy {
 		width: 40px;
 		height: 20px;
 	}
