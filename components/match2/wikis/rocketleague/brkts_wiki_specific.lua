@@ -11,6 +11,7 @@ local Table = require('Module:Table')
 
 local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
+---@diagnostic disable-next-line: duplicate-set-field
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer

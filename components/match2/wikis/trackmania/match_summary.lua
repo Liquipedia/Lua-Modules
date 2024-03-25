@@ -277,7 +277,7 @@ function CustomMatchSummary._createGame(game)
 	return row
 end
 
----@param icon string
+---@param icon string?
 ---@param shouldDisplay boolean?
 ---@param additionalElement number|string|Html|nil
 ---@param side integer?

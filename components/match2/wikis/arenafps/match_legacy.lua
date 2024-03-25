@@ -55,6 +55,7 @@ end
 ---@param match2 table
 ---@return table
 function MatchLegacy._convertParameters(match2)
+	---@type table
 	local match = Table.filterByKey(match2, function(key) return not String.startsWith(key, 'match2') end)
 
 	match.staticid = match2.match2id

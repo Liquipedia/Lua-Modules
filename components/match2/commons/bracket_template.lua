@@ -56,7 +56,7 @@ end
 ---@return Html
 function BracketTemplate.BracketContainer(props)
 	return BracketDisplay.Bracket({
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId) --[[@as MatchGroupUtilBracket]],
 		config = Table.merge(props.config, {
 			OpponentEntry = function() return mw.html.create('div'):addClass('brkts-opponent-entry') end,
 			matchHasDetails = function() return false end,

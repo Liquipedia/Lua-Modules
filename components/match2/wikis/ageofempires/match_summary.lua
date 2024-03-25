@@ -206,6 +206,7 @@ end
 
 ---@param winner integer|string
 ---@param opponentIndex integer
+---@param soloMode boolean
 ---@return Html
 function CustomMatchSummary._createCheckMark(winner, opponentIndex, soloMode)
 	return mw.html.create('div')
