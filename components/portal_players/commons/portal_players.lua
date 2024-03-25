@@ -29,6 +29,7 @@ local BACKGROUND_CLASSES = {
 	retired = 'bg-neutral',
 	banned = 'cinnabar-bg',
 }
+local STATUS_INACTIVE = 'Inactive'
 
 --- @class PortalPlayers
 ---@operator call(portalPlayerArgs): PortalPlayers
@@ -288,7 +289,7 @@ end
 ---@param banned string?
 ---@return string?
 function PortalPlayers._getStatusBackground(status, banned)
-	if Logic.isEmpty(status) then
+	if status == STATUS_INACTIVE then
 		status = Logic.emptyOr(Logic.readBoolOrNil(banned), Logic.isNotEmpty(banned))
 			and 'banned' or nil
 	end
