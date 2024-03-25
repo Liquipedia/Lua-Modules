@@ -9,40 +9,29 @@
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local SingleMatchDisplay = {propTypes = {}, types = {}}
+local SingleMatchDisplay = {}
 
-SingleMatchDisplay.configFromArgs = function(args)
+---@class SingleMatchConfigOptions
+---@field MatchSummaryContainer function?
+---@field width number?
+
+---@param args table
+---@return table
+function SingleMatchDisplay.configFromArgs(args)
 	return {
 		width = tonumber((string.gsub(args.width or '', 'px', ''))),
 	}
 end
 
-SingleMatchDisplay.types.SingleMatchConfig = TypeUtil.struct({
-	MatchSummaryContainer = 'function',
-	width = 'number',
-})
-SingleMatchDisplay.types.SingleMatchConfigOptions = TypeUtil.struct(
-	Table.mapValues(SingleMatchDisplay.types.SingleMatchConfig.struct, TypeUtil.optional)
-)
-
-SingleMatchDisplay.propTypes.SingleMatchContainer = {
-	matchId = 'string',
-	config = TypeUtil.optional(SingleMatchDisplay.types.SingleMatchConfigOptions),
-}
-
---[[
-Display component for a singleMatch. The singleMatch is specified by matchID.
-The component fetches the match data from LPDB or page variables.
-]]
+---Display component for a singleMatch. The singleMatch is specified by matchID.
+---The component fetches the match data from LPDB or page variables.
+---@param props {matchId: string, config: SingleMatchConfigOptions}
+---@return string|Html
 function SingleMatchDisplay.SingleMatchContainer(props)
-	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatchContainer)
-
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
 	assert(bracketId, 'Missing or invalid matchId')
@@ -56,17 +45,10 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 		or ''
 end
 
-SingleMatchDisplay.propTypes.SingleMatch = {
-	config = TypeUtil.optional(SingleMatchDisplay.types.SingleMatchConfigOptions),
-	match = MatchGroupUtil.types.Match,
-}
-
---[[
-Display component for a singleMatch. Match data is specified in the input.
-]]
+---Display component for a singleMatch. Match data is specified in the input.
+---@param props {config: SingleMatchConfigOptions, match: MatchGroupUtilMatch}
+---@return Html
 function SingleMatchDisplay.SingleMatch(props)
-	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.SingleMatch)
-
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
@@ -78,30 +60,20 @@ function SingleMatchDisplay.SingleMatch(props)
 		match = props.match,
 	}
 
-	matchNode:addClass('brkts-popup brkts-match-info-flat')
-		:css('width', config.width .. 'px')
-
 	return matchNode
+		:addClass('brkts-popup brkts-match-info-flat')
+		:css('width', config.width .. 'px')
 end
 
-SingleMatchDisplay.propTypes.Match = {
-	MatchSummaryContainer = 'function',
-	match = MatchGroupUtil.types.Match,
-}
-
---[[
-Display component for a match in a singleMatch. Consists of the match summary.
-]]
+---Display component for a match in a singleMatch. Consists of the match summary.
+---@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch}
+---@return Html
 function SingleMatchDisplay.Match(props)
-	DisplayUtil.assertPropTypes(props, SingleMatchDisplay.propTypes.Match)
-
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
 		config = {showScore = true},
 	})
-
-	return matchSummaryNode
 end
 
 return Class.export(SingleMatchDisplay)

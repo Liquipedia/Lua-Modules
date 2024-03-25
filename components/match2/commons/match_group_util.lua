@@ -68,6 +68,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field type 'bracket'
 ---@field upperMatchId string?
 ---@field matchId string?
+---@field qualifiedHeader boolean?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
