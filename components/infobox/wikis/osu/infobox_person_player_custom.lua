@@ -62,9 +62,8 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'status' then
+	if id == 'custom' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
 			Cell{name = 'Years Active', content = {args.years_active}},
 		}
 	elseif id == 'role' then
