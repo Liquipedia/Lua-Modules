@@ -27,8 +27,9 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 -- a matchlist.
 local MatchGroup = {}
 
--- Sets up a MatchList, a list of matches displayed vertically. The matches
--- are saved to LPDB.
+-- Sets up a MatchList, a list of matches displayed vertically. The matches are saved to LPDB.
+---@param args table
+---@return string
 function MatchGroup.MatchList(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'matchlist')
 	local matches = MatchGroupInput.readMatchlist(options.bracketId, args)
@@ -52,6 +53,8 @@ function MatchGroup.MatchList(args)
 end
 
 -- Sets up a Bracket, a tree structure of matches. The matches are saved to LPDB.
+---@param args table
+---@return string
 function MatchGroup.Bracket(args)
 	local options, optionsWarnings = MatchGroupBase.readOptions(args, 'bracket')
 	local matches, bracketWarnings = MatchGroupInput.readBracket(options.bracketId, args, options)
@@ -76,6 +79,8 @@ function MatchGroup.Bracket(args)
 end
 
 -- Displays a matchlist or bracket specified by ID.
+---@param args table
+---@return Html
 function MatchGroup.MatchGroupById(args)
 	local bracketId = args.id or args[1]
 	assert(bracketId, 'Missing bracket ID')
@@ -126,6 +131,8 @@ function MatchGroup.MatchGroupById(args)
 end
 
 -- Displays a singleMatch specified by a bracket ID and matchID.
+---@param args table
+---@return Html
 function MatchGroup.MatchByMatchId(args)
 	local bracketId = args.id
 	local matchId = args.matchid
@@ -150,26 +157,33 @@ function MatchGroup.MatchByMatchId(args)
 	})
 end
 
-
 -- Entry point of Template:Matchlist
+---@param frame Frame
+---@return string
 function MatchGroup.TemplateMatchlist(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchList(args)
 end
 
 -- Entry point of Template:Bracket
+---@param frame Frame
+---@return string
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.Bracket(args)
 end
 
 -- Entry point of Template:ShowSingleMatch
+---@param frame Frame
+---@return Html
 function MatchGroup.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchByMatchId(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
+---@param frame Frame
+---@return Html
 function MatchGroup.TemplateShowBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchGroupById(args)

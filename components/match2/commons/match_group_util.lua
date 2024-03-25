@@ -67,6 +67,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field title string?
 ---@field type 'bracket'
 ---@field upperMatchId string?
+---@field matchId string?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -114,6 +115,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
+---@field matchId string?
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -441,7 +443,7 @@ end
 
 ---Populate bracketData.coordinates if it is missing.
 ---This can happen if the bracket template has not been recently purged.
----@param matchGroup MatchGroupUtilMatchGroup
+---@param matchGroup MatchGroupUtilBracket
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
