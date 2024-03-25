@@ -80,11 +80,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string[]
-function CustomPlayer:_getStatusContents()
-	return {Page.makeInternalLink({onlyIfExists = true}, self.args.status) or self.args.status}
-end
-
 ---@param role string?
 ---@return {category: string, variable: string, staff: boolean?, talent: boolean?}?
 function CustomPlayer:_getRoleData(role)
