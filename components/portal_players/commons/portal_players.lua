@@ -291,7 +291,7 @@ end
 function PortalPlayers._getStatusBackground(status, banned)
 	if status == STATUS_INACTIVE then
 		status = Logic.emptyOr(Logic.readBoolOrNil(banned), Logic.isNotEmpty(banned))
-			and 'banned' or nil
+			and 'banned' or status
 	end
 
 	return BACKGROUND_CLASSES[(status or ''):lower()]
