@@ -7,11 +7,12 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
 local Region = require('Module:Region')
+local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
@@ -43,6 +44,8 @@ local ROLES = {
 }
 ROLES['in-game leader'] = ROLES.igl
 
+local SIZE_AGENT = '20px'
+
 ---@class ValorantInfoboxPlayer: Person
 ---@field role {category: string, variable: string, talent: boolean?, staff: boolean?}?
 ---@field role2 {category: string, variable: string, talent: boolean?, staff: boolean?}?
@@ -57,6 +60,7 @@ function CustomPlayer.run(frame)
 
 	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
 	player.args.autoTeam = true
+	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 
@@ -71,7 +75,12 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Main Agents', content = {PlayersSignatureAgents.get{player = caller.pagename}}})
+		local icons = Array.map(args.agents, function(agent)
+			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
+		end)
+		return {
+			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
+		}
 	elseif id == 'status' then
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
@@ -133,9 +142,9 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
 	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
 
-	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
-	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
-	lpdbData.extradata.agent3 = Variables.varDefault('agent3')
+	Array.forEach(args.agents, function (agent, index)
+		lpdbData.extradata['agent' .. index] = agent
+	end)
 
 	lpdbData.region = Region.name({region = args.region, country = args.country})
 
