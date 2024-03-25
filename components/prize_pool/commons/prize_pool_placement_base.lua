@@ -150,7 +150,7 @@ function BasePlacement:readAdditionalData(args)
 end
 
 ---@param input table|string?
----@param date any
+---@param date string|number?
 ---@return standardOpponent
 function BasePlacement:parseOpponentArgs(input, date)
 	-- Allow for lua-table, json-table and just raw string input

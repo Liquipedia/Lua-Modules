@@ -55,6 +55,8 @@ function CustomInjector:parse(id, widgets)
 	if id == 'earnings' then
 		---@diagnostic disable-next-line: inject-field
 		widgets[1].name = 'Approx. Total Winnings'
+	elseif id == 'region' then
+		return {}
 	elseif id == 'custom' then
 		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
 	end

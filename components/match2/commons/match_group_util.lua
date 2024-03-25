@@ -444,7 +444,7 @@ end
 
 ---Populate bracketData.coordinates if it is missing.
 ---This can happen if the bracket template has not been recently purged.
----@param matchGroup MatchGroupUtilMatchGroup
+---@param matchGroup MatchGroupUtilBracket
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
@@ -814,7 +814,7 @@ end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
----@param recordExtradata any
+---@param recordExtradata table|string?
 ---@return table
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)

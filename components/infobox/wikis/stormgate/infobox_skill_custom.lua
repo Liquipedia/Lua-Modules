@@ -36,7 +36,7 @@ local VALID_SKILLS = {
 }
 
 ---@param frame Frame
----@return unknown
+---@return Html
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 
@@ -83,9 +83,20 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
-		local makeArrayLinks = function(arr)
-			return Array.map(arr, function(value) return Page.makeInternalLink({}, value) end)
+
+		---@param arr string[]
+		---@param trimPattern string?
+		---@return string[]
+		local makeArrayLinks = function(arr, trimPattern)
+			return Array.map(arr, function(value)
+				local display = value
+				if trimPattern then
+					display = display:gsub(trimPattern, '')
+				end
+				return Page.makeInternalLink({}, display, value)
+			end)
 		end
+
 		Array.extendWith(widgets, {
 				Cell{name = 'Researched From', content = {Page.makeInternalLink({}, args.from)}},
 				Cell{name = 'Upgrade Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.upgrade_target))},
@@ -95,7 +106,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Unlocks', content = makeArrayLinks(Array.parseCommaSeparatedString(args.unlocks))},
 				Cell{name = 'Target', content = makeArrayLinks(Array.parseCommaSeparatedString(args.target))},
 				Cell{name = 'Casting Time', content = {castingTime and (castingTime .. 's') or nil}},
-				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect))},
+				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
 				Cell{name = 'Trigger', content = {args.trigger}},
 				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
 			},
@@ -197,7 +208,8 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		healthtotal = args.healthTotal,
 		healthdps = args.healthDps,
 		healthovertime = args.health_over_time,
-		specialcost = args.special_cost
+		specialcost = args.special_cost,
+		impact = Array.parseCommaSeparatedString(args.impact),
 	}
 
 	return lpdbData

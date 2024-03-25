@@ -52,6 +52,11 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 	return newBracketId
 end
 
+---@param shortTemplate string
+---@param bracketId string
+---@param firstMatch match2
+---@param bracketDatasById table<string, table>
+---@return integer
 function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch, bracketDatasById)
 	local newRoundCount = bracketDatasById[FIRST_MATCH_KEY].coordinates.roundCount
 	local oldRoundCount = firstMatch.match2bracketdata.coordinates.roundCount
@@ -59,6 +64,12 @@ function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch,
 	return oldRoundCount - newRoundCount
 end
 
+---@param matches match2[]
+---@param idLength integer
+---@param skipRounds integer
+---@param newBracketId string
+---@param bracketDatasById table<string, table>
+---@return match2[]
 function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId, bracketDatasById)
 	local newMatches = {}
 
@@ -100,6 +111,8 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 	return newMatches
 end
 
+---@param match match2
+---@return table[]
 function ShortenBracket._calculateLowerEdges(match)
 	return Array.map(
 		MatchGroupUtil.autoAssignLowerEdges(#match.match2bracketdata.lowerMatchIds, #match.match2opponents),

@@ -55,7 +55,7 @@ end
 ---@class WildriftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
----@param args any
+---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
 	local cell = mw.html.create('td')

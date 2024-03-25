@@ -22,7 +22,7 @@ function PatchAuto.run(data, args)
 		return PatchAuto._toData(data, patch or {}, endPatch or {})
 	end
 
-	local endDate = data.endDate or TODAY
+	local endDate = data.endDate or TODAY --[[@as string]]
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::patch]] OR ([[date::<' .. endDate .. ']] OR [[date::' .. endDate .. ']])',
 		query = 'name, pagename, date',
@@ -61,7 +61,7 @@ function PatchAuto._fetchPatchData(patch, patchDisplay)
 end
 
 ---@param patches {pagename: string, name: string?, date: string}[]
----@param date any
+---@param date string
 ---@return table
 function PatchAuto._getPatch(patches, date)
 	for _, patch in ipairs(patches) do

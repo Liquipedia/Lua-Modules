@@ -13,8 +13,17 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TreeUtil = require('Module:TreeUtil')
 
+---@class MatchGroupCoordinatesRoundProps
+---@field depth integer
+---@field depthCount integer
+---@field roundIndex integer
+---@field matchIndexInRound integer
+
 local MatchGroupCoordinates = {}
 
+---@param bracketDatasById table<string, MatchGroupUtilBracketBracketData>
+---@param start string
+---@return function
 function MatchGroupCoordinates.dfsFrom(bracketDatasById, start)
 	return TreeUtil.dfs(
 		function(matchId)
@@ -24,12 +33,16 @@ function MatchGroupCoordinates.dfsFrom(bracketDatasById, start)
 	)
 end
 
+---@param bracket MatchGroupUtilBracket
+---@return function
 function MatchGroupCoordinates.dfs(bracket)
 	return Iterator.flatMap(function(_, rootMatchId)
 		return MatchGroupCoordinates.dfsFrom(bracket.bracketDatasById, rootMatchId)
 	end, ipairs(bracket.rootMatchIds))
 end
 
+---@param bracketDatasById table<string, MatchGroupUtilBracketData>
+---@return table<string, string>
 function MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
 	local upperMatchIds = {}
 	for matchId, bracketData in pairs(bracketDatasById) do
@@ -40,6 +53,9 @@ function MatchGroupCoordinates.computeUpperMatchIds(bracketDatasById)
 	return upperMatchIds
 end
 
+---@param bracket MatchGroupUtilBracket
+---@return string[][]
+---@return table<string, integer>
 function MatchGroupCoordinates.computeSections(bracket)
 	local sectionIxs = {}
 	local sections = {}
@@ -58,6 +74,10 @@ function MatchGroupCoordinates.computeSections(bracket)
 	return sections, sectionIxs
 end
 
+---@param bracketDatasById table<string, MatchGroupUtilBracketData>
+---@param startMatchId string
+---@return table<string, integer>
+---@return integer
 function MatchGroupCoordinates.computeDepthsFrom(bracketDatasById, startMatchId)
 	local depths = {}
 	local maxDepth = -1
@@ -73,6 +93,9 @@ function MatchGroupCoordinates.computeDepthsFrom(bracketDatasById, startMatchId)
 	return depths, maxDepth + 1
 end
 
+---@param bracket MatchGroupUtilBracket
+---@param sectionIxs table<string, integer>
+---@return table<string, integer>
 function MatchGroupCoordinates.computeSemanticDepths(bracket, sectionIxs)
 	local depths = {}
 	local function visit(matchId, depth)
@@ -102,6 +125,9 @@ function MatchGroupCoordinates.computeSemanticDepths(bracket, sectionIxs)
 	return depths
 end
 
+---@param bracket MatchGroupUtilBracket
+---@return string[][]
+---@return table<string, MatchGroupCoordinatesRoundProps>
 function MatchGroupCoordinates.computeRounds(bracket)
 	local rounds = {}
 	local roundPropsByMatchId = {}
@@ -137,6 +163,9 @@ function MatchGroupCoordinates.computeRounds(bracket)
 	return rounds, roundPropsByMatchId
 end
 
+---@param sections string[][]
+---@param roundPropsByMatchId table<string, MatchGroupCoordinatesRoundProps>
+---@return table<string, integer>
 function MatchGroupCoordinates.computeSemanticRounds(sections, roundPropsByMatchId)
 	local semanticRoundIxs = {}
 
@@ -221,8 +250,9 @@ coords.semanticRoundIndex: Index of the round, skipping rounds that have no matc
 All indexes start from 1. coords.depth is 0-based and coords.semanticDepth is
 1-based (0 denotes grand final). When stored to LPDB, the 1-based indexes are
 converted to 0-based.
-
 ]]
+---@param bracket MatchGroupUtilBracket
+---@return {coordinatesByMatchId:table<string, MatchGroupUtilMatchCoordinates>, rounds:string[][], sections:string[][]}
 function MatchGroupCoordinates.computeCoordinates(bracket)
 	local sections, sectionIxs = MatchGroupCoordinates.computeSections(bracket)
 	local rounds, roundPropsByMatchId = MatchGroupCoordinates.computeRounds(bracket)
@@ -261,6 +291,8 @@ previously computed.
 The list is identical to the one returned by
 MatchGroupCoordinates.computeSections.
 ]]
+---@param bracket MatchGroupUtilBracket
+---@return string[][]
 function MatchGroupCoordinates.getSectionsFromCoordinates(bracket)
 	return MatchGroupCoordinates.groupMatchIdsByField(bracket, 'sectionIndex')
 end
@@ -273,10 +305,15 @@ computed.
 The list is identical to the one returned by
 MatchGroupCoordinates.computeRounds.
 ]]
+---@param bracket MatchGroupUtilBracket
+---@return string[][]
 function MatchGroupCoordinates.getRoundsFromCoordinates(bracket)
 	return MatchGroupCoordinates.groupMatchIdsByField(bracket, 'roundIndex')
 end
 
+---@param bracket MatchGroupUtilBracket
+---@param fieldName string
+---@return string[][]
 function MatchGroupCoordinates.groupMatchIdsByField(bracket, fieldName)
 	local countFieldName = fieldName:gsub('Index$', 'Count')
 	local count = Table.getByPathOrNil(bracket.matches, {1, 'bracketData', 'coordinates', countFieldName}) or 0
@@ -295,6 +332,8 @@ Computes an array, where each key is round (column) of the bracket,
 and the value is the number of opponents who are either in the
 current round (column) or are seeded into a later round (column).
 ]]
+---@param bracket MatchGroupUtilBracket
+---@return integer[]
 function MatchGroupCoordinates.computeBracketOpponentCounts(bracket)
 	local countsByRound = MatchGroupCoordinates.computeRawCounts(bracket)
 
@@ -318,6 +357,8 @@ opponents leave the tournament directly from the upper bracket.
 
 The third place match is not counted.
 ]]
+---@param bracket MatchGroupUtilBracket
+---@return integer[][]
 function MatchGroupCoordinates.computeRawCounts(bracket)
 	local reverseRounds = Array.reverse(bracket.rounds)
 
