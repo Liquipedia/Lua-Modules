@@ -62,10 +62,8 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'custom' then
-		return {
-			Cell{name = 'Years Active', content = {args.years_active}},
-		}
+	if id == 'status' then
+			table.insert(widgets, Cell{name = 'Years Active', content = {args.years_active}})
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
