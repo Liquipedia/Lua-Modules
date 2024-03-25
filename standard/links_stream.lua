@@ -13,7 +13,7 @@ local StreamLinks = {}
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 --[[
@@ -38,12 +38,11 @@ StreamLinks.countdownPlatformNames = {
 	'tl',
 	'trovo',
 	'twitch',
-	'twitch2',
 	'youtube',
 }
 
 --[[
-Lookup table of allowed inputs that use a plattform with a different name
+Lookup table of allowed inputs that use a platform with a different name
 ]]
 StreamLinks.streamPlatformLookupNames = {
 	twitch2 = 'twitch',
@@ -83,47 +82,75 @@ function StreamLinks.processStreams(forwardedInputArgs)
 		forwardedInputArgs.stream = nil
 	end
 
+	local processedStreams = {}
 	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValue = Logic.emptyOr(
-			streams[platformName],
-			forwardedInputArgs[platformName],
-			Variables.varDefault(platformName)
+		local findStreamValues = function(key) return key:match('^' .. platformName) end
+
+		local streamValues = Table.merge(
+			Table.filterByKey(forwardedInputArgs, findStreamValues),
+			Table.filterByKey(streams, findStreamValues)
 		)
 
-		if String.isNotEmpty(streamValue) then
-			-- stream has no platform
-			if platformName ~= 'stream' then
-				local lookUpPlatform = StreamLinks.streamPlatformLookupNames[platformName] or platformName
+		if Table.isEmpty(streamValues) then
+			streamValues = {[platformName] = Variables.varDefault(platformName)}
+		end
 
-				streamValue = StreamLinks.resolve(lookUpPlatform, streamValue)
+		Table.mergeInto(processedStreams, StreamLinks._processStreamsOfPlatform(streamValues, platformName))
+	end
+
+	return processedStreams
+end
+
+function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
+	local platformStreams = {}
+	local legacyStreams = {}
+	local enCounter = 0
+
+	for key, streamValue in Table.iter.spairs(streamValues) do
+		if platformName ~= 'stream' then
+			streamValue = StreamLinks.resolve(platformName, streamValue)
+		end
+
+		-- legacy key
+		if key:match('^' .. platformName .. '%d*$') then
+			table.insert(legacyStreams, streamValue)
+		elseif key:match('^' .. platformName .. '_%a+_%d+') then
+			local streamKey = StreamLinks.StreamKey(key)
+			if streamKey.languageCode == 'en' then
+				enCounter = enCounter + 1
 			end
-
-			local key = StreamLinks.StreamKey(platformName):toString()
-			streams[key] = streamValue
-			streams[platformName] = streamValue -- Legacy
+			platformStreams[streamKey:toString()] = streamValue
 		end
 	end
 
-	return streams
+	for _, streamValue in ipairs(legacyStreams) do
+		if not Table.includes(platformStreams, streamValue) then
+			enCounter = enCounter + 1
+			local streamKey = StreamLinks.StreamKey(platformName, 'en', enCounter):toString()
+			platformStreams[streamKey] = streamValue
+			platformStreams[platformName] = streamValue -- Legacy
+		end
+	end
+
+	return platformStreams
 end
 
 --- StreamKey Class
 -- Contains the triplet that makes up a stream key
 -- [platform, languageCode, index]
----@class StreamKey
+---@class StreamKey: BaseClass
 ---@operator call(...): StreamKey
 ---@field platform string
 ---@field languageCode string
 ---@field index integer
----@field is_a function
-StreamLinks.StreamKey = Class.new(
+local StreamKey = Class.new(
 	function (self, ...)
 		self:new(...)
 	end
 )
-local StreamKey = StreamLinks.StreamKey
+StreamLinks.StreamKey = StreamKey
 
----@param tbl string
+---@param tbl string|StreamKey
 ---@param languageCode string
 ---@param index integer
 ---@overload fun(self, tbl: StreamKey): StreamKey
