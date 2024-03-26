@@ -119,9 +119,6 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 		faction = valueFromArgs('faction'),
 	}
 
-	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
-		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
-
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
@@ -136,7 +133,7 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		name = Opponent.toName(opponent),
+		name = Logic.emptyOr(Opponent.toName(opponent), opponent.template),
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 	}
 end
