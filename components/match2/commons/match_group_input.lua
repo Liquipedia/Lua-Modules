@@ -184,11 +184,12 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
 
+		---@type MatchGroupUtilBracketData
 		match.bracketdata = Table.mergeInto(bracketData, match.bracketdata or {})
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
-		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
+		bracketData.qualifiedheader = MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		bracketData.matchpage = match.matchPage
@@ -244,6 +245,22 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	end
 
 	return matches, warnings
+end
+
+---@param bracketData MatchGroupUtilBracketData
+---@param args table
+---@param matchKey string
+---@return string?
+function MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
+	if args[matchKey .. 'qualifiedHeader'] then
+		return args[matchKey .. 'qualifiedHeader']
+	end
+
+	if Logic.isEmpty(bracketData.header) or not Logic.readBool(bracketData.qualwin) then
+		return
+	end
+
+	return args.qualifiedHeader
 end
 
 -- Retrieve bracket data from the template generated bracket on commons
