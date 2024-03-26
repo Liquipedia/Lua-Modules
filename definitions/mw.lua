@@ -138,7 +138,8 @@ function mw.hash.hashValue(algo, value) end
 function mw.hash.listAlgorithms() end
 
 ---@class Html
-mw.html = {}
+---@field nodes Html[]
+mw.html = {nodes = {}}
 
 ---Creates a new mw.html object containing a tagName html element. You can also pass an empty string or nil as tagName in order to create an empty mw.html object.
 ---@param tagName? string
