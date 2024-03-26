@@ -101,7 +101,7 @@ function MatchLegacy._convertParameters(match2)
 	local match = Table.filterByKey(match2, function(key, entry) return not String.startsWith(key, 'match2') end)
 	---@cast match table
 	match.type = match.type and string.lower(match.type) or nil
-	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader, ''))[1]
+	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader) or '')[1]
 	match.tickername = Variables.varDefault('tournament_tickername', Variables.varDefault('tournament_ticker_name'))
 
 	match.staticid = match2.match2id

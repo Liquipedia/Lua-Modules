@@ -328,7 +328,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	-- Init score if match started and map info is present
 	if not match.opponent1.autoscore and not match.opponent2.autoscore
 			and map.map and map.map ~= 'TBD'
-			and match.timestamp < os.time(os.date('!*t'))
+			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]])
 			and String.isNotEmpty(map.civs1) and String.isNotEmpty(map.civs2) then
 		match.opponent1.autoscore = 0
 		match.opponent2.autoscore = 0

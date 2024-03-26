@@ -9,7 +9,10 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
+
+---@class RocketleagueBrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return matchGroupType == 'matchlist'

@@ -72,7 +72,7 @@ function MatchGroup.Bracket(args)
 
 	local parts = Array.extend(
 		Array.map(optionsWarnings, WarningBox.display),
-		Array.map(bracketWarnings, WarningBox.display),
+		Array.map(bracketWarnings or {}, WarningBox.display),
 		{bracketNode}
 	)
 	return table.concat(Array.map(parts, tostring))
