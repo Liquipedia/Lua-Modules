@@ -34,10 +34,8 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-		if id == 'region' then
+	if id == 'region' then
 		table.insert(widgets, Cell{name = 'Clan Tag', content = {args.clantag}})
-
-		return widgets
 	end
 	return widgets
 end
