@@ -20,8 +20,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _PAGENAME = mw.title.getCurrentTitle().text
-
 local MvpTable = {}
 
 ---Entry point for MvpTable.
@@ -110,7 +108,7 @@ function MvpTable._parseArgs(args)
 	end
 
 	if Table.isEmpty(parsedArgs.matchGroupIds) and Table.isEmpty(parsedArgs.tournaments) then
-		table.insert(parsedArgs.tournaments, _PAGENAME)
+		table.insert(parsedArgs.tournaments, mw.title.getCurrentTitle().text)
 	end
 
 	return parsedArgs

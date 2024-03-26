@@ -12,7 +12,7 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local _POINTS_TYPE = {
+local POINTS_TYPE = {
 	MANUAL = 'MANUAL',
 	PRIZE = 'PRIZE',
 	SECURED = 'SECURED'
@@ -153,7 +153,7 @@ function TableRow:pointsCell(points, tournament)
 	local finished = Logic.readBool(tournament.finished)
 	local pointString = points.amount ~= nil and points.amount or (finished and '-' or '')
 	local pointsCell = self:baseCell(pointString)
-	if points.type == _POINTS_TYPE.SECURED then
+	if points.type == POINTS_TYPE.SECURED then
 		pointsCell:css('font-weight', 'lighter'):css('font-style', 'italic')
 	end
 	table.insert(self.cells, pointsCell)
