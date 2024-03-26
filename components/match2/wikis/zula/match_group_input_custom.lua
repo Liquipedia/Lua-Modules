@@ -384,7 +384,7 @@ end
 
 -- Parse the mapVeto input
 ---@param match table
----@return {type: string, team1: string?, team2: string?, vetostart: string?}[]?
+---@return {type: string, team1: string?, team2: string?, decider: string?, vetostart: string?}[]?
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
