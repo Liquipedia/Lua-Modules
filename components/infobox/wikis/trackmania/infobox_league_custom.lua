@@ -125,7 +125,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	Variables.varDefine('circuit', self.data.circuit)
 	Variables.varDefine('circuittier', self.data.circuittier)
-	Variables.varDefine('circuitabbr', self.data.circuitabbr)
 end
 
 ---@param args table
