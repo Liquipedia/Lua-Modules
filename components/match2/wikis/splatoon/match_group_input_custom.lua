@@ -53,6 +53,9 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
@@ -70,6 +73,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.adjustMapData(match)
 	local opponents = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -85,6 +90,8 @@ function matchFunctions.adjustMapData(match)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	if map.map == DUMMY_MAP then
 		map.map = nil
@@ -94,6 +101,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -117,13 +126,15 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
---
 -- function to check for draws
---
+---@param scoreTable table
+---@return boolean
 function CustomMatchGroupInput.placementCheckDraw(scoreTable)
 	local last
 	for _, scoreInfo in pairs(scoreTable) do
@@ -140,6 +151,10 @@ function CustomMatchGroupInput.placementCheckDraw(scoreTable)
 	return true
 end
 
+---@param data table
+---@param indexedScores table[]
+---@return table
+---@return table[]
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if
@@ -181,6 +196,12 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	return data, indexedScores
 end
 
+---@param opponents table[]
+---@param winner integer?
+---@param specialType string?
+---@param finished boolean|string?
+---@return table[]
+---@return integer?
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == 'draw' then
 		for key, _ in pairs(opponents) do
@@ -219,6 +240,10 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 	return opponents, winner
 end
 
+---@param tbl table[]
+---@param key1 integer
+---@param key2 integer
+---@return boolean
 function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
 	local value1 = tonumber(tbl[key1].score) or NO_SCORE
 	local value2 = tonumber(tbl[key2].score) or NO_SCORE
@@ -226,6 +251,8 @@ function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
 end
 
 -- Check if any opponent has a none-standard status
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
 	return Table.any(tbl,
 		function (_, scoreinfo)
@@ -235,21 +262,29 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
 end
 
 -- function to check for forfeits
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckFF(tbl)
 	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_FORFEIT end)
 end
 
 -- function to check for DQ's
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckDQ(tbl)
 	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
 end
 
 -- function to check for W/L
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckWL(tbl)
 	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DEFAULT_LOSS end)
 end
 
 -- Get the winner when resulttype=default
+---@param tbl table
+---@return integer
 function CustomMatchGroupInput.getDefaultWinner(tbl)
 	for index, scoreInfo in pairs(tbl) do
 		if scoreInfo.status == STATUS_DEFAULT_WIN then
@@ -262,6 +297,9 @@ end
 --
 -- match related functions
 --
+
+---@param match table
+---@return table
 function matchFunctions.getBestOf(match)
 	if Logic.isNumeric(match.bestof) then
 		match.bestof = tonumber(match.bestof)
@@ -284,6 +322,8 @@ end
 -- Only update an opponents result if it's
 -- 1) Not manually added
 -- 2) At least one map has a winner
+---@param match table
+---@return table
 function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local setScores = false
@@ -312,6 +352,8 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
@@ -319,15 +361,21 @@ function matchFunctions.getTournamentVars(match)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getLinks(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
@@ -338,6 +386,8 @@ function matchFunctions.getExtraData(match)
 end
 
 -- Parse the mapVeto input
+---@param match table
+---@return {type:string, team1:string?, team2:string?, decider:string?, vetostart:string?}[]?
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
@@ -368,6 +418,8 @@ function matchFunctions.getMapVeto(match)
 	return data
 end
 
+---@param match table
+---@return table
 function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -440,6 +492,10 @@ function matchFunctions.getOpponents(match)
 	return match
 end
 
+---@param match table
+---@param opponents table[]
+---@param isScoreSet boolean
+---@return table
 function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
 	if Logic.isNotEmpty(match.winner) then
@@ -479,6 +535,9 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	return match
 end
 
+---@param opponents table[]
+---@param walkoverType string?
+---@return table[]
 function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	for index, _ in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
@@ -492,6 +551,8 @@ end
 --
 
 -- Parse extradata information
+---@param map table
+---@return table
 function mapFunctions.getAdditionalExtraData(map)
 	map.extradata = Table.merge(map.extradata, {
 		comment = map.comment,
@@ -503,6 +564,9 @@ function mapFunctions.getAdditionalExtraData(map)
 end
 
 -- Parse participant information
+---@param map table
+---@param opponents table[]
+---@return table
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local maximumPickIndex = 0
@@ -527,6 +591,8 @@ function mapFunctions.getParticipants(map, opponents)
 	return mapFunctions.getAdditionalExtraData(map)
 end
 
+---@param weaponRaw string
+---@return string
 function mapFunctions._cleanWeaponName(weaponRaw)
 	local weapon = WeaponNames[string.lower(weaponRaw)]
 	if not weapon then
@@ -537,6 +603,8 @@ function mapFunctions._cleanWeaponName(weaponRaw)
 end
 
 -- Calculate Score and Winner of the map
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
