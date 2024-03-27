@@ -90,7 +90,6 @@ local PREFIXES = {
 	},
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
-	['faceit-l'] = {'https://www.faceit.com/en//league//a14b8616-45b9-4581-8637-4dfd0b5f6af8/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
 	factor = {
 		'',
