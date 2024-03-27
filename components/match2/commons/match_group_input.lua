@@ -27,6 +27,8 @@ local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}
 
+local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
+
 local MatchGroupInput = {}
 
 ---@class MatchGroupContext
@@ -722,6 +724,145 @@ function MatchGroupInput._getCasterInformation(name, flag, displayName)
 		displayName = displayName,
 		flag = flag,
 	}
+end
+
+-- function for parsing mapVeto input
+---@param match table
+---@param allowedVetoes string[]?
+---@return {type:string, team1: string?, team2:string?, decider:string?, vetostart:string?}[]?
+function MatchGroupInput.getMapVeto(match, allowedVetoes)
+	if not match.mapveto then return nil end
+
+	allowedVetoes = allowedVetoes or DEFAULT_ALLOWED_VETOES
+
+	match.mapveto = Json.parseIfString(match.mapveto)
+
+	local vetoTypes = mw.text.split(match.mapveto.types or '', ',')
+	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetoStart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetoTypes) do
+		vetoType = mw.text.trim(vetoType):lower()
+		if not Table.includes(allowedVetoes, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
+	end
+	if data[1] then
+		data[1].vetostart = vetoStart
+	end
+	return data
+end
+
+-- function to check for draws
+---@param tbl table
+---@return boolean
+function MatchGroupInput.placementCheckDraw(tbl)
+	local last
+	for _, scoreInfo in pairs(tbl) do
+		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
+			return false
+		end
+		if last and last ~= scoreInfo.score then
+			return false
+		else
+			last = scoreInfo.score
+		end
+	end
+
+	return true
+end
+
+-- Check if any team has a none-standard status
+---@param tbl table
+---@return boolean
+function MatchGroupInput.placementCheckSpecialStatus(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+end
+
+-- function to check for forfeits
+---@param tbl table
+---@return boolean
+function MatchGroupInput.placementCheckFF(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+end
+
+-- function to check for DQ's
+---@param tbl table
+---@return boolean
+function MatchGroupInput.placementCheckDQ(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+end
+
+-- function to check for W/L
+---@param tbl table
+---@return boolean
+function MatchGroupInput.placementCheckWL(tbl)
+	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+end
+
+-- Get the winner when resulttype=default
+---@param tbl table
+---@return integer
+function MatchGroupInput.getDefaultWinner(tbl)
+	for index, scoreInfo in pairs(tbl) do
+		if scoreInfo.status == 'W' then
+			return index
+		end
+	end
+	return -1
+end
+
+-- Set the field 'placement' for the two participants in the opponenets list.
+-- Set the placementWinner field to the winner, and placementLoser to the other team
+-- Special cases:
+-- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
+-- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
+---@param opponents table[]
+---@param winner integer?
+---@param placementWinner integer
+---@param placementLoser integer
+---@return table[]
+function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
+	if not opponents or #opponents ~= 2 then
+		return opponents
+	end
+
+	local loserIdx
+	local winnerIdx
+	if winner == 1 then
+		winnerIdx = 1
+		loserIdx = 2
+	elseif winner == 2 then
+		winnerIdx = 2
+		loserIdx = 1
+	elseif winner == 0 then
+		-- Draw; idx of winner/loser doesn't matter
+		-- since loser and winner gets the same placement
+		placementLoser = placementWinner
+		winnerIdx = 1
+		loserIdx = 2
+	elseif winner == -1 then
+		-- No Winner (both loses). For example if both teams DQ.
+		-- idx's doesn't matter
+		placementWinner = placementLoser
+		winnerIdx = 1
+		loserIdx = 2
+	else
+		error('setPlacement: Unexpected winner')
+		return opponents
+	end
+	opponents[winnerIdx].placement = placementWinner
+	opponents[loserIdx].placement = placementLoser
+
+	return opponents
 end
 
 return MatchGroupInput
