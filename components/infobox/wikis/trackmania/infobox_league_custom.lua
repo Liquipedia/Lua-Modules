@@ -22,6 +22,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local Chronology = Widgets.Chronology
 
 local DEFAULT_MODE = 'solo'
 
@@ -81,6 +82,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
+
+		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
+			table.insert(widgets, Title{name = 'Circuit Information'})
+			self.caller:_createCircuitInformation(widgets)
+		end
 	end
 
 	return widgets
@@ -116,6 +122,10 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', self.data.endDate)
 	Variables.varDefine('sdate', self.data.startDate)
 	Variables.varDefine('edate', self.data.endDate)
+
+	Variables.varDefine('circuit', self.data.circuit)
+	Variables.varDefine('circuittier', self.data.circuittier)
+	Variables.varDefine('circuitabbr', self.data.circuitabbr)
 end
 
 ---@param args table
@@ -140,10 +150,50 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
+	lpdbData.extradata.circuit = args.circuit
+	lpdbData.extradata.circuittier = args.circuittier
+
 	-- Legacy, can be superseeded by lpdbData.mode
 	lpdbData.extradata.individual = self.data.mode == DEFAULT_MODE
 
 	return lpdbData
+end
+
+---@param widgets Widget[]
+---@param circuitIndex string|number?
+function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
+	local args = self.args
+	circuitIndex = circuitIndex or ''
+	local circuitArgs = {
+		tier = args['circuit' .. circuitIndex .. 'tier'],
+		region = args['region' .. circuitIndex],
+		points = args['points' .. circuitIndex],
+		next = args['circuit' .. circuitIndex .. '_next'],
+		previous = args['circuit' .. circuitIndex .. '_previous'],
+	}
+
+	Array.appendWith(widgets,
+		Cell{
+			name = 'Circuit',
+			content = {self:_createCircuitLink(circuitIndex)}
+		},
+		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
+		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
+		Cell{name = 'Points', content = {circuitArgs.points}},
+		Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}}
+	)
+end
+
+---@param circuitIndex string|number
+---@return string?
+function CustomLeague:_createCircuitLink(circuitIndex)
+	local args = self.args
+
+	return self:createSeriesDisplay({
+		displayManualIcons = true,
+		series = args['circuit' .. circuitIndex],
+		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
+	}, self.data['circuitIconDisplay' .. circuitIndex])
 end
 
 return CustomLeague
