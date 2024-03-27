@@ -40,7 +40,6 @@ local DUMMY_MAP = 'default'
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
-local NO_WINNER = -1
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
