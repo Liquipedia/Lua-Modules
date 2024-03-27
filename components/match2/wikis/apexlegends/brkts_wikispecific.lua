@@ -14,8 +14,11 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class ApexlegendsBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
+---@param matchGroupType string
+---@return function
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	return Lua.import('Module:MatchGroup/Display/Horizontallist').BracketContainer
+	local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+	return Horizontallist.BracketContainer
 end
 
 return WikiSpecific

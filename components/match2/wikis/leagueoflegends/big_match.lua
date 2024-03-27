@@ -81,11 +81,15 @@ local AVAILABLE_FOR_TIERS = {1, 2, 3}
 
 local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
+---@param match table
+---@return boolean
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > BIG_MATCH_START_TIME)
 end
 
+---@param frame Frame
+---@return Html
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -196,14 +200,21 @@ function BigMatch.run(frame)
 	return BigMatch.render(model)
 end
 
+---@param tbl table
+---@param item string
+---@return number
 function BigMatch._sumItem(tbl, item)
 	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
+---@param number number|string
+---@return string
 function BigMatch._abbreviateNumber(number)
 	return string.format('%.1fK', number / 1000)
 end
 
+---@param args table
+---@return table
 function BigMatch._contextualEnrichment(args)
 	-- Retrieve tournament info from the bracket/matchlist
 	if String.isEmpty(args.tournamentlink) then
@@ -219,6 +230,8 @@ function BigMatch._contextualEnrichment(args)
 	return args
 end
 
+---@param args table
+---@return table
 function BigMatch._match2Director(args)
 	local matchData = {}
 
@@ -295,6 +308,8 @@ function BigMatch._match2Director(args)
 	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
 end
 
+---@param model table
+---@return Html
 function BigMatch.render(model)
 	return mw.html.create('div')
 		:wikitext(BigMatch.header(model))
@@ -302,10 +317,14 @@ function BigMatch.render(model)
 		:wikitext(BigMatch.footer(model))
 end
 
+---@param model table
+---@return string
 function BigMatch.header(model)
 	return TemplateEngine():render(Template.header, model)
 end
 
+---@param model table
+---@return Html|string?
 function BigMatch.games(model)
 	local games = Array.map(Array.filter(model.games, function (game)
 		return game.resulttype ~= NOT_PLAYED
@@ -331,10 +350,14 @@ function BigMatch.games(model)
 	return Tabs.dynamic(tabs)
 end
 
+---@param model table
+---@return string
 function BigMatch.footer(model)
 	return TemplateEngine():render(Template.footer, model)
 end
 
+---@return string
+---@return string
 function BigMatch._getId()
 	local title = mw.title.getCurrentTitle().text
 
@@ -345,6 +368,8 @@ function BigMatch._getId()
 	return titleParts[2], titleParts[3]
 end
 
+---@param page string?
+---@return tournament|{}
 function BigMatch._fetchTournamentInfo(page)
 	if not page then
 		return {}
@@ -356,6 +381,8 @@ function BigMatch._fetchTournamentInfo(page)
 	})[1] or {}
 end
 
+---@param identifiers string[]
+---@return string?
 function BigMatch._fetchTournamentPageFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		query = 'parent',
