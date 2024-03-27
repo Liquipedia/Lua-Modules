@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -20,7 +19,6 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
-local ALLOWED_VETOES = { 'decider', 'pick', 'ban', 'defaultban' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
@@ -94,67 +92,6 @@ function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
--- function to check for draws
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckDraw(tbl)
-	local last
-	for _, scoreInfo in pairs(tbl) do
-		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
-	end
-
-	return true
-end
-
--- Set the field 'placement' for the two participants in the opponenets list.
--- Set the placementWinner field to the winner, and placementLoser to the other team
--- Special cases:
--- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
--- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
----@param opponents table[]
----@param winner integer?
----@param placementWinner integer
----@param placementLoser integer
----@return table[]
-function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
-	if opponents and #opponents == 2 then
-		local loserIdx
-		local winnerIdx
-		if winner == 1 then
-			winnerIdx = 1
-			loserIdx = 2
-		elseif winner == 2 then
-			winnerIdx = 2
-			loserIdx = 1
-		elseif winner == 0 then
-			-- Draw; idx of winner/loser doesn't matter
-			-- since loser and winner gets the same placement
-			placementLoser = placementWinner
-			winnerIdx = 1
-			loserIdx = 2
-		elseif winner == -1 then
-			-- No Winner (both loses). For example if both teams DQ.
-			-- idx's doesn't matter
-			placementWinner = placementLoser
-			winnerIdx = 1
-			loserIdx = 2
-		else
-			error('setPlacement: Unexpected winner')
-			return opponents
-		end
-		opponents[winnerIdx].placement = placementWinner
-		opponents[loserIdx].placement = placementLoser
-	end
-	return opponents
-end
-
 --- Fetch information about the tournament
 ---@param data table
 ---@return table
@@ -174,21 +111,21 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+		if MatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
-		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
-			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
+		elseif MatchGroupInput.placementCheckSpecialStatus(indexedScores) then
+			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = 'default'
-			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
+			if MatchGroupInput.placementCheckFF(indexedScores) then
 				data.walkover = 'ff'
-			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif MatchGroupInput.placementCheckDQ(indexedScores) then
 				data.walkover = 'dq'
-			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
+			elseif MatchGroupInput.placementCheckWL(indexedScores) then
 				data.walkover = 'l'
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		else
 			--R6 only has exactly 2 opponents, neither more or less
 			if #indexedScores ~= 2 then
@@ -203,47 +140,6 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		end
 	end
 	return data, indexedScores
-end
-
-
--- Check if any team has a none-standard status
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
-end
-
--- function to check for forfeits
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckFF(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
-end
-
--- function to check for DQ's
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckDQ(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
-end
-
--- function to check for W/L
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckWL(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
-end
-
--- Get the winner when resulttype=default
----@param tbl table
----@return integer
-function CustomMatchGroupInput.getDefaultWinner(tbl)
-	for index, scoreInfo in pairs(tbl) do
-		if scoreInfo.status == 'W' then
-			return index
-		end
-	end
-	return -1
 end
 
 --
@@ -346,43 +242,11 @@ end
 ---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mapveto = matchFunctions.getMapVeto(match),
+		mapveto = MatchGroupInput.getMapVeto(match),
 		mvp = MatchGroupInput.readMvp(match),
 		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 	return match
-end
-
--- Parse the mapVeto input
----@param match table
----@return {type:string, team1: string?, team2:string?, decider:string?, vetostart:string?}[]?
-function matchFunctions.getMapVeto(match)
-	if not match.mapveto then return nil end
-
-	match.mapveto = Json.parseIfString(match.mapveto)
-
-	local vetoTypes = mw.text.split(match.mapveto.types or '', ',')
-	local deciders = mw.text.split(match.mapveto.decider or '', ',')
-	local vetoStart = match.mapveto.firstpick or ''
-	local deciderIndex = 1
-
-	local data = {}
-	for index, vetoType in ipairs(vetoTypes) do
-		vetoType = mw.text.trim(vetoType):lower()
-		if not Table.includes(ALLOWED_VETOES, vetoType) then
-			return nil -- Any invalid input will not store (ie hide) all vetoes.
-		end
-		if vetoType == 'decider' then
-			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
-			deciderIndex = deciderIndex + 1
-		else
-			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
-		end
-	end
-	if data[1] then
-		data[1].vetostart = vetoStart
-	end
-	return data
 end
 
 ---@param match table
