@@ -41,6 +41,9 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
@@ -55,6 +58,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
@@ -63,6 +68,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -86,6 +93,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
@@ -93,6 +102,10 @@ end
 --
 --
 -- function to sort out winner/placements
+---@param tbl table[]
+---@param key1 integer
+---@param key2 integer
+---@return boolean
 function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	local op1 = tbl[key1]
 	local op2 = tbl[key2]
@@ -118,6 +131,8 @@ function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	end
 end
 
+---@param opp table
+---@return integer
 function CustomMatchGroupInput._getSetWins(opp)
 	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
@@ -131,16 +146,22 @@ end
 -- match related functions
 --
 
+---@param matchArgs table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function matchFunctions.readDate(matchArgs)
 	return MatchGroupInput.readDate(matchArgs.date, {'tournament_enddate'})
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -157,6 +178,8 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
@@ -164,6 +187,8 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
+---@param args table
+---@return table
 function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -257,7 +282,7 @@ function matchFunctions.getOpponents(args)
 	return args
 end
 
----@param opponents table
+---@param opponents table[]
 ---@param match table
 function matchFunctions._setPlacementsAndWinner(opponents, match)
 	local counter = 0
@@ -284,7 +309,7 @@ function matchFunctions._setPlacementsAndWinner(opponents, match)
 	end
 end
 
----@param opponents table
+---@param opponents table[]
 ---@param firstTo number
 ---@param match table
 function matchFunctions._checkDraw(opponents, firstTo, match)
@@ -306,6 +331,9 @@ end
 --
 -- map related functions
 --
+
+---@param map table
+---@return table
 function mapFunctions.getExtraData(map)
 	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
 	bestof = tonumber(bestof) or 3
@@ -334,6 +362,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1 or '')
 	map.score2 = tonumber(map.score2 or '')
@@ -356,6 +386,8 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = {}
 
@@ -380,6 +412,8 @@ function mapFunctions.getParticipantsData(map)
 	return map
 end
 
+---@param brawlerRaw string
+---@return string
 function mapFunctions._cleanBrawlerName(brawlerRaw)
 	local brawler = BrawlerNames[string.lower(brawlerRaw)]
 	if not brawler then
