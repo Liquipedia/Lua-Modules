@@ -35,13 +35,11 @@ local ALLOWED_STATUSES = {
 	STATUS_DISQUALIFIED,
 	STATUS_DEFAULT_LOSS,
 }
-local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 local NOT_PLAYED_MATCH_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local NOT_PLAYED_RESULT_TYPE = 'np'
 local DRAW_RESULT_TYPE = 'draw'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local NOT_PLAYED_SCORE = -1
-local NO_WINNER = -1
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local DEFAULT_RESULT_TYPE = 'default'
@@ -54,6 +52,8 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@return table
 function CustomMatchGroupInput.processMatch(match)
 	-- Count number of maps, check for empty maps to remove, and automatically count score
 	match = matchFunctions.getBestOf(match)
@@ -71,6 +71,8 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
@@ -78,6 +80,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -101,70 +105,27 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
---
---
 -- function to check for draws
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckDraw(tbl)
 	if #tbl < MAX_NUM_OPPONENTS then
 		return false
 	end
 
-	local last
-	for _, scoreInfo in pairs(tbl) do
-		if scoreInfo.status ~= STATUS_SCORE and scoreInfo.status ~= STATUS_DRAW then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
-	end
-
-	return true
+	return MatchGroupInput.placementCheckDraw(tbl)
 end
 
--- Set the field 'placement' for the two participants in the opponenets list.
--- Set the placementWinner field to the winner, and placementLoser to the other team
--- Special cases:
--- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
--- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will gt placementLoser
-function CustomMatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
-	if opponents and #opponents == 2 then
-		local loserIdx
-		local winnerIdx
-		if winner == 1 then
-			winnerIdx = 1
-			loserIdx = 2
-		elseif winner == 2 then
-			winnerIdx = 2
-			loserIdx = 1
-		elseif winner == 0 then
-			-- Draw; idx of winner/loser doesn't matter
-			-- since loser and winner gets the same placement
-			placementLoser = placementWinner
-			winnerIdx = 1
-			loserIdx = 2
-		elseif winner == -1 then
-			-- No Winner (both loses). For example if both teams DQ.
-			-- idx's doesn't matter
-			placementWinner = placementLoser
-			winnerIdx = 1
-			loserIdx = 2
-		else
-			error('setPlacement: Unexpected winner')
-			return opponents
-		end
-		opponents[winnerIdx].placement = placementWinner
-		opponents[loserIdx].placement = placementLoser
-	end
-	return opponents
-end
-
+---@param data table
+---@param indexedScores table[]
+---@return table
+---@return table[]
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
@@ -173,18 +134,18 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = DRAW_RESULT_TYPE
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
-			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
+			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
-			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
+			if MatchGroupInput.placementCheckFF(indexedScores) then
 				data.walkover = STATUS_FORFEIT
-			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif MatchGroupInput.placementCheckDQ(indexedScores) then
 				data.walkover = STATUS_DISQUALIFIED
-			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
+			elseif MatchGroupInput.placementCheckWL(indexedScores) then
 				data.walkover = STATUS_DEFAULT_LOSS
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		elseif CustomMatchGroupInput.placementCheckScoresSet(indexedScores) then
 			--C-OPS only has exactly 2 opponents, neither more or less
 			if #indexedScores == MAX_NUM_OPPONENTS then
@@ -193,7 +154,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 				else
 					data.winner = 2
 				end
-				indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+				indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 			end
 		end
 		--If a manual winner is set use it
@@ -204,7 +165,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 				data.resulttype = nil
 			end
 			data.winner = winner
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, winner, 1, 2)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, winner, 1, 2)
 		end
 	end
 	return data, indexedScores
@@ -212,6 +173,8 @@ end
 
 
 -- Check if any team has a none-standard status
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
 	return Table.any(tbl,
 		function (_, scoreinfo)
@@ -220,31 +183,8 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
 	)
 end
 
--- function to check for forfeits
-function CustomMatchGroupInput.placementCheckFF(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ==  STATUS_FORFEIT end)
-end
-
--- function to check for DQ's
-function CustomMatchGroupInput.placementCheckDQ(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
-end
-
--- function to check for W/L
-function CustomMatchGroupInput.placementCheckWL(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ==  STATUS_DEFAULT_LOSS end)
-end
-
--- Get the winner when resulttype=default
-function CustomMatchGroupInput.getDefaultWinner(tbl)
-	for index, scoreInfo in pairs(tbl) do
-		if scoreInfo.status == STATUS_DEFAULT_WIN then
-			return index
-		end
-	end
-	return NO_WINNER
-end
-
+---@param tbl table
+---@return boolean
 function CustomMatchGroupInput.placementCheckScoresSet(tbl)
 	return Table.all(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_SCORE end)
 end
@@ -252,6 +192,9 @@ end
 --
 -- match related functions
 --
+
+---@param match table
+---@return table
 function matchFunctions.getBestOf(match)
 	local mapCount = 0
 	for _, _, mapIndex in Table.iter.pairsByPrefix(match, 'map') do
@@ -265,6 +208,8 @@ end
 -- These maps however shouldn't be stored in lpdb, nor displayed
 -- The discardMap function will check if a map should be removed
 -- Remove all maps that should be removed.
+---@param match table
+---@return table
 function matchFunctions.removeUnsetMaps(match)
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 		if map.map == DUMMY_MAP_NAME then
@@ -280,6 +225,8 @@ end
 -- Only update a teams result if it's
 -- 1) Not manually added
 -- 2) At least one map has a winner
+---@param match table
+---@return table
 function matchFunctions.getScoreFromMapWinners(match)
 	-- For best of 1, display the results of the single map
 	local opponent1 = match.opponent1
@@ -312,17 +259,23 @@ function matchFunctions.getScoreFromMapWinners(match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 	return match
 end
 
+---@param match table
+---@return string?
 function matchFunctions.getMatchStatus(match)
 	if match.resulttype == NOT_PLAYED_RESULT_TYPE then
 		return match.status
@@ -331,45 +284,18 @@ function matchFunctions.getMatchStatus(match)
 	end
 end
 
+---@param match table
+---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mapveto = matchFunctions.getMapVeto(match),
+		mapveto = MatchGroupInput.getMapVeto(match),
 		status = matchFunctions.getMatchStatus(match),
 	}
 	return match
 end
 
--- Parse the mapVeto input
-function matchFunctions.getMapVeto(match)
-	if not match.mapveto then return nil end
-
-	match.mapveto = Json.parseIfString(match.mapveto)
-
-	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
-	local deciders = mw.text.split(match.mapveto.decider or '', ',')
-	local vetostart = match.mapveto.firstpick
-	local deciderIndex = 1
-
-	local data = {}
-	for index, vetoType in ipairs(vetotypes) do
-		vetoType = mw.text.trim(vetoType):lower()
-		if not Table.includes(ALLOWED_VETOES, vetoType) then
-			return nil -- Any invalid input will not store (ie hide) all vetoes.
-		end
-		if vetoType == 'decider' then
-			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
-			deciderIndex = deciderIndex + 1
-		else
-			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map' .. index],
-									team2 = match.mapveto['t2map' .. index]})
-		end
-	end
-	if data[1] then
-		data[1].vetostart = vetostart
-	end
-	return data
-end
-
+---@param match table
+---@return table
 function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -429,6 +355,10 @@ function matchFunctions.getOpponents(match)
 end
 
 -- Get Playerdata from Vars (get's set in TeamCards)
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@return table
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	-- match._storePlayers will break after the first empty player. let's make sure we don't leave any gaps.
 	local count = 1
@@ -454,11 +384,15 @@ end
 
 -- Check if a map should be discarded due to being redundant
 -- DUMMY_MAP_NAME needs the match the default value in Template:Map
+---@param map table
+---@return boolean
 function mapFunctions.discardMap(map)
 	return map.map == DUMMY_MAP_NAME
 end
 
 -- Parse extradata information
+---@param map table
+---@return table
 function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
@@ -466,6 +400,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions._getHalfScores(map)
 	map.extradata.t1sides = {}
 	map.extradata.t2sides = {}
@@ -509,6 +445,8 @@ end
 
 -- Calculate Score and Winner of the map
 -- Use the half information if available
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}

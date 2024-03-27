@@ -39,6 +39,8 @@ CustomMatchGroupInput.walkoverProcessing = {}
 local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
+---@param match table
+---@return table
 function CustomMatchGroupInput.processMatch(match)
 	if Logic.readBool(match.ffa) then
 		error('FFA matches are not yet supported')
@@ -56,11 +58,15 @@ function CustomMatchGroupInput.processMatch(match)
 	return match
 end
 
+---@param match any
+---@return table
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match any
+---@return table
 function CustomMatchGroupInput._getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod)
@@ -68,6 +74,8 @@ function CustomMatchGroupInput._getVodStuff(match)
 	return match
 end
 
+---@param match any
+---@return table
 function CustomMatchGroupInput._getExtraData(match)
 	match.extradata = {}
 
@@ -80,12 +88,17 @@ function CustomMatchGroupInput._getExtraData(match)
 	return match
 end
 
+---@param subGroupIndex integer
+---@param match table
+---@return string?
 function CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	local header = match['set' .. subGroupIndex .. 'header']
 
 	return String.isNotEmpty(header) and header or nil
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._adjustData(match)
 	--parse opponents + set base sumscores
 	match = CustomMatchGroupInput._opponentInput(match)
@@ -111,6 +124,8 @@ function CustomMatchGroupInput._adjustData(match)
 	return match
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof) or Variables.varDefault('bestof', DEFAULT_BEST_OF)
 	match.bestof = bestof
@@ -167,6 +182,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	return match
 end
 
+---@param match table
 function CustomMatchGroupInput._checkFinished(match)
 	if Logic.readBoolOrNil(match.finished) == false then
 		match.finished = false
@@ -184,6 +200,8 @@ function CustomMatchGroupInput._checkFinished(match)
 	end
 end
 
+---@param match table
+---@param scores number[]
 function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	local maxScore = math.max(unpack(scores) or 0)
 	-- if we have a positive score and the match is finished we also have a winner
@@ -202,6 +220,7 @@ function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	end
 end
 
+---@param match table
 function CustomMatchGroupInput._setPlacements(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
@@ -219,6 +238,9 @@ end
 OpponentInput functions
 
 ]]--
+
+---@param match table
+---@return table
 function CustomMatchGroupInput._opponentInput(match)
 	local opponentIndex = 1
 	local opponent = match['opponent' .. opponentIndex]
@@ -253,6 +275,9 @@ function CustomMatchGroupInput._opponentInput(match)
 	return match
 end
 
+---@param record table
+---@param timestamp integer
+---@return table
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -286,6 +311,12 @@ end
 MapInput functions
 
 ]]--
+
+---@param match table
+---@param mapIndex integer
+---@param subGroupIndex integer
+---@return table
+---@return integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
 
@@ -327,6 +358,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	return match, subGroupIndex
 end
 
+---@param map table
+---@return table
 function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {NO_SCORE, NO_SCORE}
@@ -367,6 +400,9 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	return map
 end
 
+---@param map table
+---@param match table
+---@return table
 function CustomMatchGroupInput._processPlayerMapData(map, match)
 	local participants = {}
 
@@ -391,6 +427,10 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 	return map
 end
 
+---@param players table
+---@param opponentIndex integer
+---@param map table
+---@param participants table<string, table>
 function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentIndex, map, participants)
 	for playerIndex = 1, #players do
 		participants[opponentIndex .. '_' .. playerIndex] = {
@@ -399,10 +439,14 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 	end
 end
 
+---@param match table
+---@return boolean
 function CustomMatchGroupInput._hasTeamOpponent(match)
 	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
+---@param obj table
+---@param scores (integer|string)[]
 function walkoverProcessing.walkover(obj, scores)
 	local walkover = obj.walkover
 
@@ -422,6 +466,8 @@ function walkoverProcessing.walkover(obj, scores)
 	end
 end
 
+---@param obj table
+---@param walkover integer|string
 function walkoverProcessing.numericWalkover(obj, walkover)
 	local winner = tonumber(walkover)
 
@@ -431,6 +477,8 @@ function walkoverProcessing.numericWalkover(obj, walkover)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param walkover integer|string
 function walkoverProcessing.nonNumericWalkover(obj, walkover)
 	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
 		error('Invalid walkover "' .. walkover .. '"')
@@ -444,6 +492,8 @@ function walkoverProcessing.nonNumericWalkover(obj, walkover)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param scores string[]
 function walkoverProcessing.scoreDoubleWalkover(obj, scores)
 	obj.winner = -1
 	obj.finished = true
@@ -451,6 +501,8 @@ function walkoverProcessing.scoreDoubleWalkover(obj, scores)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param scores (string|number)[]
 function walkoverProcessing.scoreWalkover(obj, scores)
 	local winner, status
 
@@ -475,6 +527,7 @@ function walkoverProcessing.scoreWalkover(obj, scores)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param match table
 function walkoverProcessing.applyMatchWalkoverToOpponents(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local score = match['opponent' .. opponentIndex].score
