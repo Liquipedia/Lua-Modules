@@ -81,8 +81,8 @@ function CustomInjector:parse(id, widgets)
 		end)
 
 		if #heroIcons > MAX_NUMBER_OF_SIGNATURE_HEROES then
-        		heroIcons = {unpack(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)}
-   		end
+			heroIcons = {unpack(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)}
+		end
 
 		Array.appendWith(widgets,
 			Cell{
