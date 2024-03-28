@@ -14,6 +14,10 @@ liquipedia.battleRoyale = {
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
+	isMobile: function() {
+		return window.matchMedia('(max-width: 768px)').matches;
+	},
+
 	implementOnElementResize: function( instanceId ) {
 		this.instancesLoaded[ instanceId ] = false;
 
@@ -120,6 +124,7 @@ liquipedia.battleRoyale = {
 	},
 
 	recheckNavigationStates: function( instanceId ) {
+		if( this.isMobile() ) return;
 		this.battleRoyaleInstances[ instanceId ]
 			.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 			.forEach( ( tableEl ) => {
@@ -459,43 +464,47 @@ liquipedia.battleRoyale = {
 	},
 
 	init: function() {
-		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( ( instance ) => {
-			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
+		Array.from(document.querySelectorAll('[data-js-battle-royale-id]')).forEach((instance) => {
+			this.battleRoyaleInstances[instance.dataset.jsBattleRoyaleId] = instance;
 
-			this.makeSortableTable( instance );
-		} );
+			this.makeSortableTable(instance);
+		});
 
-		Object.keys( this.battleRoyaleInstances ).forEach( function( instanceId ) {
+		Object.keys(this.battleRoyaleInstances).forEach(function (instanceId) {
 			// create object based on id
-			this.buildBattleRoyaleMap( instanceId );
+			this.buildBattleRoyaleMap(instanceId);
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			this.makeSideScrollElements( instanceId );
-			this.makeTableScrollHint( instanceId );
+			if( !this.isMobile() ) {
+				this.makeSideScrollElements(instanceId);
+				this.makeTableScrollHint(instanceId);
+			}
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
-			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
-			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
+			this.handleNavigationTabChange(instanceId, this.battleRoyaleMap[instanceId].navigationTabs[0]);
+			this.battleRoyaleMap[instanceId].navigationTabs.forEach((navTab) => {
 				const target = navTab.dataset.targetId;
-				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
+				const panels = this.battleRoyaleMap[instanceId].navigationContentPanelTabs[target];
 
-				if ( target && Array.isArray( panels ) && panels.length ) {
+				if (target && Array.isArray(panels) && panels.length) {
 					// Set on first panel on init
-					this.handlePanelTabChange( instanceId, target, panels[ 0 ] );
+					this.handlePanelTabChange(instanceId, target, panels[0]);
 				}
 
-				panels.forEach( ( panel, index ) => {
-					this.createBottomNav( instanceId, target, index );
-				} );
-			} );
+				panels.forEach((panel, index) => {
+					this.createBottomNav(instanceId, target, index);
+				});
+			});
 
-			this.implementScrollendEvent( instanceId );
-			this.implementOnWindowResize( instanceId );
-			this.implementOnElementResize( instanceId );
-			this.implementScrollWheelEvent();
+			if(!this.isMobile()) {
+				this.implementScrollendEvent(instanceId);
+				this.implementOnWindowResize(instanceId);
+				this.implementOnElementResize(instanceId);
+				this.implementScrollWheelEvent();
+			}
 
-		}.bind( this ) );
+		}.bind(this));
 	}
 };
 liquipedia.core.modules.push( 'battleRoyale' );
