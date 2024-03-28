@@ -159,22 +159,20 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param widgets Widget[]
----@param circuitIndex string|number?
-function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
+function CustomLeague:_createCircuitInformation(widgets)
 	local args = self.args
-	circuitIndex = circuitIndex or ''
 	local circuitArgs = {
-		tier = args['circuit' .. circuitIndex .. 'tier'],
-		region = args['region' .. circuitIndex],
-		points = args['points' .. circuitIndex],
-		next = args['circuit' .. circuitIndex .. '_next'],
-		previous = args['circuit' .. circuitIndex .. '_previous'],
+		tier = args['circuittier'],
+		region = args['region'],
+		points = args['points'],
+		next = args['circuit_next'],
+		previous = args['circuit_previous'],
 	}
 
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
-			content = {self:_createCircuitLink(circuitIndex)}
+			content = {self:_createCircuitLink()}
 		},
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
@@ -183,16 +181,14 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 	)
 end
 
----@param circuitIndex string|number
 ---@return string?
-function CustomLeague:_createCircuitLink(circuitIndex)
+function CustomLeague:_createCircuitLink()
 	local args = self.args
 
 	return self:createSeriesDisplay({
 		displayManualIcons = true,
-		series = args['circuit' .. circuitIndex],
-		abbreviation = args['circuit' .. circuitIndex .. 'abbr'],
-	}, self.data['circuitIconDisplay' .. circuitIndex])
+		series = args['circuit'],
+	}, self.data['circuitIconDisplay'])
 end
 
 return CustomLeague
