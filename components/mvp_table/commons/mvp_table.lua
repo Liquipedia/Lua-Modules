@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
@@ -19,6 +20,9 @@ local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local MvpTable = {}
 
@@ -56,6 +60,8 @@ function MvpTable.run(args)
 		return
 	end
 
+	MvpTable._enhanceMvpData(mvpList, args.parent)
+
 	local output = mw.html.create('table')
 		:addClass('wikitable prizepooltable collapsed')
 		:css('text-align', 'center')
@@ -81,6 +87,7 @@ end
 ---@field title string?
 ---@field matchGroupIds string[]
 ---@field tournaments string[]
+---@field parent string
 
 ---Parses the entered arguments to a table that can be used better further down the line
 ---@param args table
@@ -91,6 +98,7 @@ function MvpTable._parseArgs(args)
 		margin = Logic.nilOr(Logic.readBoolOrNil(args.margin), true) and 20 or 0,
 		points = Logic.readBool(args.points),
 		title = args.title,
+		parent = (args.parent or mw.title.getCurrentTitle().prefixedText):gsub(' ', '_'),
 
 		matchGroupIds = {},
 		tournaments = {},
@@ -329,6 +337,48 @@ function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
 	end
 
 	return playerData
+end
+
+---Tries to fill missing mvp data (flags and teams) from placement data
+---@param mvpList table[]
+---@param parent string
+function MvpTable._enhanceMvpData(mvpList, parent)
+	--if the team is set we also have the flag if available, hence only check for existence of team value
+	if Array.all(mvpList, function(mvp) return Logic.isNotEmpty(mvp.team) end) then
+		return
+	end
+
+	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[opponenttype::' .. Opponent.team .. ']] AND [[pagename::' .. parent .. ']]',
+		query = 'opponentplayers, opponentname',
+		limit = 1000,
+	})
+
+	if Logic.isEmpty(placements) then
+		return
+	end
+
+	---@param mvpName string
+	---@param placement placement
+	---@return string?
+	local getKeyOfMvpPlayer = function(mvpName, placement)
+		for key, value in pairs(placement.opponentplayers) do
+			if value == mvpName and key:match('^%l%d+$') ~= nil then
+				return key
+			end
+		end
+	end
+
+	Array.forEach(mvpList, function(mvp)
+		if Logic.isNotEmpty(mvp.team) then return end
+		local prefix
+		local foundPlacement = Array.find(placements, function(placement)
+			prefix = getKeyOfMvpPlayer(mvp.name, placement)
+			return prefix ~= nil
+		end) or {}
+		mvp.team = foundPlacement.opponentname
+		mvp.flag = mvp.flag or foundPlacement.opponentplayers[prefix .. 'flag']
+	end)
 end
 
 return Class.export(MvpTable)
