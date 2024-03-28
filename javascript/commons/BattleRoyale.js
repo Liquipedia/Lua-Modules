@@ -15,7 +15,7 @@ liquipedia.battleRoyale = {
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
 	isMobile: function() {
-		return window.matchMedia('(max-width: 768px)').matches;
+		return window.matchMedia( '(max-width: 767px)' ).matches;
 	},
 
 	implementOnElementResize: function( instanceId ) {
