@@ -472,7 +472,7 @@ liquipedia.battleRoyale = {
 			this.makeSortableTable( instance );
 		} );
 
-		Object.keys( this.battleRoyaleInstances ).forEach(function ( instanceId ) {
+		Object.keys( this.battleRoyaleInstances ).forEach( function ( instanceId ) {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
 
