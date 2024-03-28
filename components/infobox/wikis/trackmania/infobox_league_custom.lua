@@ -122,9 +122,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('date', self.data.endDate)
 	Variables.varDefine('sdate', self.data.startDate)
 	Variables.varDefine('edate', self.data.endDate)
-
-	Variables.varDefine('circuit', self.data.circuit)
-	Variables.varDefine('circuittier', self.data.circuittier)
 end
 
 ---@param args table
@@ -161,23 +158,16 @@ end
 ---@param widgets Widget[]
 function CustomLeague:_createCircuitInformation(widgets)
 	local args = self.args
-	local circuitArgs = {
-		tier = args['circuittier'],
-		region = args['region'],
-		points = args['points'],
-		next = args['circuit_next'],
-		previous = args['circuit_previous'],
-	}
 
 	Array.appendWith(widgets,
 		Cell{
 			name = 'Circuit',
 			content = {self:_createCircuitLink()}
 		},
-		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
-		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
-		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Cell{name = 'Circuit Tier', content = {args.circuittier}},
+		Cell{name = 'Tournament Region', content = {args.region}},
+		Cell{name = 'Points', content = {args.points}},
+		Chronology{content = {next = args.circuit_next, previous = args.circuit_previous}}
 	)
 end
 
@@ -187,8 +177,8 @@ function CustomLeague:_createCircuitLink()
 
 	return self:createSeriesDisplay({
 		displayManualIcons = true,
-		series = args['circuit'],
-	}, self.data['circuitIconDisplay'])
+		series = args.circuit,
+	}, self.data.circuitIconDisplay)
 end
 
 return CustomLeague
