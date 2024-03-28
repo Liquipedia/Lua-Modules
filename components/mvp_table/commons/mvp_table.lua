@@ -349,7 +349,7 @@ function MvpTable._enhanceMvpData(mvpList, parent)
 	end
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[opponenttype::' .. Opponent.team .. ']] AND [[pagename::' .. parent .. ']]',
+		conditions = '[[opponenttype::' .. Opponent.team .. ']] AND [[parent::' .. parent .. ']]',
 		query = 'opponentplayers, opponentname',
 		limit = 1000,
 	})
