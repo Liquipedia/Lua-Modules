@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
 		end
 
-		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
+		if args.circuit or args.circuit_next or args.circuit_previous then
 			table.insert(widgets, Title{name = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
@@ -166,7 +166,6 @@ function CustomLeague:_createCircuitInformation(widgets)
 		},
 		Cell{name = 'Circuit Tier', content = {args.circuittier}},
 		Cell{name = 'Tournament Region', content = {args.region}},
-		Cell{name = 'Points', content = {args.points}},
 		Chronology{content = {next = args.circuit_next, previous = args.circuit_previous}}
 	)
 end
