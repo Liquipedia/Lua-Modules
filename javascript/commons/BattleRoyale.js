@@ -466,7 +466,7 @@ liquipedia.battleRoyale = {
 	},
 
 	init: function() {
-		Array.from(document.querySelectorAll( '[ data-js-battle-royale-id ]') ).forEach( ( instance ) => {
+		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( instance ) => {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
 
 			this.makeSortableTable( instance );
@@ -478,7 +478,7 @@ liquipedia.battleRoyale = {
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			if( !this.isMobile() ) {
+			if ( !this.isMobile() ) {
 				this.makeSideScrollElements( instanceId );
 				this.makeTableScrollHint( instanceId );
 			}
@@ -491,7 +491,7 @@ liquipedia.battleRoyale = {
 
 				if ( target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
-					this.handlePanelTabChange( instanceId, target, panels[0] );
+					this.handlePanelTabChange( instanceId, target, panels[ 0 ] );
 				}
 
 				panels.forEach( ( panel, index ) => {
@@ -499,7 +499,7 @@ liquipedia.battleRoyale = {
 				} );
 			} );
 
-			if( !this.isMobile() ) {
+			if ( !this.isMobile() ) {
 				this.implementScrollendEvent( instanceId );
 				this.implementOnWindowResize( instanceId );
 				this.implementOnElementResize( instanceId );
