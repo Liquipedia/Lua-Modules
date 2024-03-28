@@ -91,7 +91,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_org}},
+			Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
