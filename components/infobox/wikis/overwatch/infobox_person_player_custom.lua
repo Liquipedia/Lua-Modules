@@ -76,13 +76,10 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero)
+		local heroes = Array.sub(caller:getAllArgsForBase(args, 'hero'), 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
+		local heroIcons = Array.map(heroes, function(hero)
 			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
-
-		if #heroIcons > MAX_NUMBER_OF_SIGNATURE_HEROES then
-			heroIcons = {unpack(heroIcons, 1, MAX_NUMBER_OF_SIGNATURE_HEROES)}
-		end
 
 		Array.appendWith(widgets,
 			Cell{
