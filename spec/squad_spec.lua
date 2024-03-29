@@ -25,7 +25,7 @@ describe('Squad', function()
 					:date('2022-03-03', 'Inactive Date:&nbsp;', 'inactivedate')
 					:date('2022-05-01', 'Leave Date:&nbsp;', 'leavedate')
 
-			GoldenTest('squad_row', tostring(row:create('foo_bar_baz'):tryMake()))
+			GoldenTest('squad_row', tostring(row:create('foo_bar_baz'):tryMake()[1]))
 
 			assert.stub(LpdbSquadStub).was.called_with('foo_bar_baz', {
 				id = 'Baz',
