@@ -18,6 +18,7 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+local Widget = require('Module:Widget/All')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
@@ -37,12 +38,12 @@ local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Sub
 
 ---@class SquadRow
 ---@operator call(table): SquadRow
----@field content Html
+---@field content WidgetTableRow
 ---@field options {useTemplatesForSpecialTeams: boolean?}
 ---@field lpdbData table
 local SquadRow = Class.new(
 	function(self, options)
-		self.content = mw.html.create('tr'):addClass('Player')
+		self.content = Widget.TableRow{classes = 'Player'}
 		self.options = options or {}
 
 		self.lpdbData = {type = DEFAULT_TYPE}
@@ -63,41 +64,41 @@ function SquadRow:id(args)
 		error('Something is off with your input!')
 	end
 
-	local cell = mw.html.create('td')
+	local cell = Widget.TableCell()
 	cell:addClass('ID')
 
 	local opponent = Opponent.resolve(
 		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo})),
 		nil, {syncPlayer = true}
 	)
-	cell:tag('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent})
+	cell:addContent('<b>' .. OpponentDisplay.InlineOpponent{opponent = opponent} .. '</b>')
 
 	if String.isNotEmpty(args.captain) then
-		cell:wikitext('&nbsp;' .. ICON_CAPTAIN)
+		cell:addContent('&nbsp;' .. ICON_CAPTAIN)
 		self.lpdbData.role = 'Captain'
 	end
 
 	if args.role == 'sub' then
-		cell:wikitext('&nbsp;' .. ICON_SUBSTITUTE)
+		cell:addContent('&nbsp;' .. ICON_SUBSTITUTE)
 	end
 
 	if String.isNotEmpty(args.name) then
-		cell:tag('br'):done():tag('i'):tag('small'):wikitext(args.name)
+		cell:addContent('<br>'):addContent('<small><i>' .. args.name .. '</i></small>')
 		self.lpdbData.name = args.name
 	end
 
-	local teamNode = mw.html.create('td')
+	local teamNode = Widget.TableCell()
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
 		local date = String.nilIfEmpty(ReferenceCleaner.clean(args.date))
-		teamNode:wikitext(mw.ext.TeamTemplate.teamicon(args.team, date))
+		teamNode:addContent(mw.ext.TeamTemplate.teamicon(args.team, date))
 		if args.teamrole then
-			teamNode:css('text-align', 'center')
-			teamNode:tag('div'):css('font-size', '85%'):tag('i'):wikitext(args.teamrole)
+			teamNode:addCss('text-align', 'center')
+			teamNode:addContent('<small><i>' .. args.teamrole .. '</i></small>')
 		end
 	end
 
-	self.content:node(cell)
-	self.content:node(teamNode)
+	self.content:addCell(cell)
+	self.content:addCell(teamNode)
 
 	self.lpdbData.id = args[1]
 	self.lpdbData.nationality = Flags.CountryName(args.flag)
@@ -110,12 +111,12 @@ end
 ---@param args table
 ---@return self
 function SquadRow:name(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Name')
-	cell:tag('div'):addClass('MobileStuff'):wikitext('(')
-	cell:wikitext(args.name)
-	cell:tag('div'):addClass('MobileStuff'):wikitext(')')
-	self.content:node(cell)
+	local cell = Widget.TableCell():addClass('Name')
+
+	cell:addContent{
+		mw.html.create('div'):addClass('MobileStuff'):wikitext('(', args.name, ')'),
+		mw.html.create('div'):addClass('LargeStuff'):wikitext(args.name),
+	}
 
 	self.lpdbData.name = args.name
 
@@ -125,16 +126,14 @@ end
 ---@param args table
 ---@return self
 function SquadRow:role(args)
-	local cell = mw.html.create('td')
-	-- The CSS class has this name, not a typo.
-	cell:addClass('Position')
+	local cell = Widget.TableCell():addClass('Position')
 
 	if String.isNotEmpty(args.role) then
-		cell:tag('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;')
-		cell:tag('i'):wikitext('(' .. args.role .. ')')
+		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
+		cell:addContent(mw.html.create('i'):wikitext('(' .. args.role .. ')'))
 	end
 
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	self.lpdbData.role = args.role or self.lpdbData.role
 
@@ -156,14 +155,13 @@ end
 ---@param lpdbColumn string
 ---@return self
 function SquadRow:date(dateValue, cellTitle, lpdbColumn)
-	local cell = mw.html.create('td')
-	cell:addClass('Date')
+	local cell = Widget.TableCell():addClass('Date')
 
 	if String.isNotEmpty(dateValue) then
-		cell:tag('div'):addClass('MobileStuffDate'):wikitext(cellTitle)
-		cell:tag('div'):addClass('Date'):tag('i'):wikitext(dateValue)
+		cell:addContent(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
+		cell:addContent(mw.html.create('div'):addClass('Date'):tag('i'):wikitext(dateValue))
 	end
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	self.lpdbData[lpdbColumn] = ReferenceCleaner.clean(dateValue)
 
@@ -173,38 +171,37 @@ end
 ---@param args table
 ---@return self
 function SquadRow:newteam(args)
-	local cell = mw.html.create('td')
-	cell:addClass('NewTeam')
+	local cell = Widget.TableCell():addClass('NewTeam')
 
 	if String.isNotEmpty(args.newteam) or String.isNotEmpty(args.newteamrole) then
 		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
 			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;')
-		cell:node(mobileStuffDiv)
+		cell:addContent(mobileStuffDiv)
 
 		if String.isNotEmpty(args.newteam) then
 			local newTeam = args.newteam
 			if mw.ext.TeamTemplate.teamexists(newTeam) then
 				local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
-				cell:wikitext(mw.ext.TeamTemplate.team(newTeam, date))
+				cell:addContent(mw.ext.TeamTemplate.team(newTeam, date))
 
 				self.lpdbData.newteam = mw.ext.TeamTemplate.teampage(newTeam)
 				self.lpdbData.newteamtemplate = mw.ext.TeamTemplate.raw(newTeam, date).templatename
 			elseif self.options.useTemplatesForSpecialTeams then
 				local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
 				if newTeamTemplate then
-					cell:wikitext(Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
+					cell:addContent(Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
 				end
 			end
 
 			if String.isNotEmpty(args.newteamrole) then
-				cell:wikitext('&nbsp;'):tag('i'):tag('small'):wikitext('(' .. args.newteamrole .. ')')
+				cell:addContent('&nbsp;'):addContent(mw.html.create('i'):tag('small'):wikitext('(' .. args.newteamrole .. ')'))
 			end
 		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(args.newteamrole) then
-			cell:tag('div'):addClass('NewTeamRole'):wikitext(args.newteamrole)
+			cell:addContent(mw.html.create('div'):addClass('NewTeamRole'):wikitext(args.newteamrole))
 		end
 	end
 
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	return self
 end
@@ -234,7 +231,7 @@ function SquadRow:setExtradata(extradata)
 end
 
 ---@param objectName string
----@return Html
+---@return WidgetTableRow
 function SquadRow:create(objectName)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)

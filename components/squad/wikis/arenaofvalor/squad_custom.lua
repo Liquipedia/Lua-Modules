@@ -13,41 +13,34 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Widget = require('Module:Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
+local ExtendedSquad = Class.new(Squad)
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
+---@return self
+function ExtendedSquad:header()
+	local headerRow = Widget.TableRow{classes = 'HeaderRow', css = {['font-weight'] = 'bold'}}
 
-		if wikiText == nil then
-			return headerCell
-		end
+	local cellArgs = {classes = 'divCell'}
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('ID'))
+	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Team Icon" (most commmonly used for loans)
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Name'))
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Position'))
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Join Date'))
 
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader())
-		:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
 	if self.type == Squad.SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Leave Date'))
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('New Team'))
 	elseif self.type == Squad.SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Inactive Date'))
 	end
 
-	self.content:node(headerRow)
+	self.content:addRow(headerRow)
 
 	return self
 end
@@ -58,23 +51,23 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
+	local cell = Widget.TableCell
 	cell:addClass('Position')
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
+			cell:addContent(args.position)
 			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
+				cell:addContent('&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
+			cell:addContent(args.role)
 		end
 	end
 
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
@@ -85,17 +78,10 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
-
-	local args = squad.args
-
-	squad.header = CustomSquad.header
-	squad:header()
+	local squad = ExtendedSquad():init(frame):title():header()
 
 	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
+		return Json.parseIfString(squad.args[index])
 	end)
 
 	Array.forEach(players, function(player)
@@ -113,12 +99,11 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
+	local squad = ExtendedSquad()
 	squad:init(mw.getCurrentFrame())
 
 	squad.type = squadType
 
-	squad.header = CustomSquad.header
 	squad:title():header()
 
 	for _, player in pairs(playerList) do

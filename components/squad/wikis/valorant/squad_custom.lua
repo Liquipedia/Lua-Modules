@@ -19,39 +19,6 @@ local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader())
-		:node(makeHeader('Name'))
-		:node(makeHeader()) -- "Role"
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
-end
-
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
@@ -73,7 +40,6 @@ function CustomSquad.run(frame)
 		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 
-	squad.header = CustomSquad.header
 	squad:header()
 
 	Array.forEach(players, function(player)
@@ -124,7 +90,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRow
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 

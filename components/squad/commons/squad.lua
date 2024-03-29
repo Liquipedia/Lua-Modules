@@ -10,12 +10,14 @@ local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
+local Widget = require('Module:Widget/All')
+local WidgetFactory = require('Module:Widget/Factory')
 
 ---@class Squad
----@field frame Frame
+---@operator call:Squad
 ---@field args table
 ---@field root Html
----@field content Html
+---@field content WidgetTable
 ---@field type integer
 local Squad = Class.new()
 
@@ -28,11 +30,10 @@ local SquadType = {
 }
 Squad.SquadType = SquadType
 
----@param frame Frame
+---@param args table
 ---@return self
-function Squad:init(frame)
-	self.frame = frame
-	self.args = Arguments.getArgs(frame)
+function Squad:init(args)
+	self.args = Arguments.getArgs(args)
 	self.root = mw.html.create('div')
 	self.root:addClass('table-responsive')
 	-- TODO: is this needed?
@@ -40,8 +41,9 @@ function Squad:init(frame)
 	-- TODO: is this needed?
 		:css('padding-bottom', '0px')
 
-	self.content = mw.html.create('table')
-	self.content:addClass('wikitable wikitable-striped roster-card')
+	self.content = Widget.Table{
+		classes = {'wikitable', 'wikitable-striped', 'roster-card'}
+	}
 
 	if not String.isEmpty(self.args.team) then
 		self.args.isLoan = true
@@ -66,21 +68,10 @@ function Squad:title()
 	local titleText = Logic.emptyOr(self.args.title, defaultTitle)
 
 	if String.isNotEmpty(titleText) then
-		local titleContainer = mw.html.create('tr')
+		local titleContainer = Widget.TableRow{css = {['font-weight'] = 'bold'}}
 
-		local titleRow = mw.html.create('th')
-		titleRow:addClass('large-only')
-			:attr('colspan', '1')
-			:wikitext(titleText)
-
-		local titleRow2 = mw.html.create('th')
-		titleRow2:addClass('large-only')
-			:attr('colspan', '10')
-			:addClass('roster-title-row2-border')
-			:wikitext(titleText)
-
-		titleContainer:node(titleRow):node(titleRow2)
-		self.content:node(titleContainer)
+		titleContainer:addCell(Widget.TableCell:addContent(titleText))
+		self.content:addRow(titleContainer)
 	end
 
 	return self
@@ -88,45 +79,42 @@ end
 
 ---@return self
 function Squad:header()
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
+	local headerRow = Widget.TableRow{classes = 'HeaderRow', css = {['font-weight'] = 'bold'}}
 
-		if wikiText == nil then
-			return headerCell
-		end
+	local cellArgs = {classes = 'divCell'}
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('ID'))
+	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Team Icon" (most commmonly used for loans)
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Name'))
+	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Role"
+	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Join Date'))
 
-		return headerCell:wikitext(wikiText):addClass('divCell')
+	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Inactive Date'))
 	end
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
-		:node(makeHeader('Name'))
-		:node(makeHeader()) -- "Role"
-		:node(makeHeader('Join Date'))
-	if self.type == SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	elseif self.type == SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
+	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Leave Date'))
+		headerRow:addCell(Widget.TableCell(cellArgs):addContent('New Team'))
 	end
 
-	self.content:node(headerRow)
+	self.content:addRow(headerRow)
 
 	return self
 end
 
----@param row Html
+---@param row WidgetTableRow
 ---@return self
 function Squad:row(row)
-	self.content:node(row)
+	self.content:addRow(row)
 	return self
 end
 
 ---@return Html
 function Squad:create()
-	return self.root:node(self.content)
+	for _, node in ipairs(WidgetFactory.work(self.content)) do
+		self.root:node(node)
+	end
+	return self.root
 end
 
 return Squad

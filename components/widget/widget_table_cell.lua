@@ -15,13 +15,13 @@ local Widget = Lua.import('Module:Infobox/Widget')
 ---@class WidgetCellInput
 ---@field content (string|number|table|Html)[]?
 ---@field classes string[]?
----@field css {[string]: string|number}[]?
+---@field css {[string]: string|number}?
 
 ---@class WidgetTableCell:Widget
 ---@operator call(WidgetCellInput): WidgetTableCell
 ---@field content (string|number|table|Html)[]
 ---@field classes string[]
----@field css {[string]: string|number}[]
+---@field css {[string]: string|number}
 ---@field rowSpan integer?
 ---@field colSpan integer?
 local TableCell = Class.new(
@@ -44,6 +44,14 @@ end
 ---@return self
 function TableCell:addClass(class)
 	table.insert(self.classes, class)
+	return self
+end
+
+---@param key string
+---@param value string|number|nil
+---@return self
+function TableCell:addCss(key, value)
+	self.css[key] = value
 	return self
 end
 

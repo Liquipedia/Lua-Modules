@@ -16,14 +16,14 @@ local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 ---@class WidgetTableInput
 ---@field rows WidgetTableRow[]?
 ---@field classes string[]?
----@field css {[string]: string|number|nil}[]?
+---@field css {[string]: string|number|nil}?
 ---@field columns integer?
 
 ---@class WidgetTable:Widget
 ---@operator call(WidgetTableInput):WidgetTable
 ---@field rows WidgetTableRow[]
 ---@field classes string[]
----@field css {[string]: string|number|nil}[]
+---@field css {[string]: string|number|nil}
 ---@field columns integer?
 local Table = Class.new(
 	Widget,

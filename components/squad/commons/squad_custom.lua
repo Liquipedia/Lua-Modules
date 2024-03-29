@@ -79,7 +79,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRow
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow()
 
