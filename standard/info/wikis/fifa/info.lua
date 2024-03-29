@@ -419,5 +419,5 @@ return {
 	defaultRoundPrecision = 0,
 	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
 	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }
