@@ -64,7 +64,7 @@ function SquadRow:id(args)
 		error('Something is off with your input!')
 	end
 
-	local cell = Widget.TableCell()
+	local cell = Widget.TableCell{}
 	cell:addClass('ID')
 
 	local opponent = Opponent.resolve(
@@ -87,7 +87,7 @@ function SquadRow:id(args)
 		self.lpdbData.name = args.name
 	end
 
-	local teamNode = Widget.TableCell()
+	local teamNode = Widget.TableCell{}
 	if args.team and mw.ext.TeamTemplate.teamexists(args.team) then
 		local date = String.nilIfEmpty(ReferenceCleaner.clean(args.date))
 		teamNode:addContent(mw.ext.TeamTemplate.teamicon(args.team, date))
@@ -111,7 +111,7 @@ end
 ---@param args table
 ---@return self
 function SquadRow:name(args)
-	local cell = Widget.TableCell():addClass('Name')
+	local cell = Widget.TableCell{}:addClass('Name')
 
 	cell:addContent{
 		mw.html.create('div'):addClass('MobileStuff'):wikitext('(', args.name, ')'),
@@ -126,7 +126,7 @@ end
 ---@param args table
 ---@return self
 function SquadRow:role(args)
-	local cell = Widget.TableCell():addClass('Position')
+	local cell = Widget.TableCell{}:addClass('Position')
 
 	if String.isNotEmpty(args.role) then
 		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
@@ -155,7 +155,7 @@ end
 ---@param lpdbColumn string
 ---@return self
 function SquadRow:date(dateValue, cellTitle, lpdbColumn)
-	local cell = Widget.TableCell():addClass('Date')
+	local cell = Widget.TableCell{}:addClass('Date')
 
 	if String.isNotEmpty(dateValue) then
 		cell:addContent(mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle))
@@ -171,7 +171,7 @@ end
 ---@param args table
 ---@return self
 function SquadRow:newteam(args)
-	local cell = Widget.TableCell():addClass('NewTeam')
+	local cell = Widget.TableCell{}:addClass('NewTeam')
 
 	if String.isNotEmpty(args.newteam) or String.isNotEmpty(args.newteamrole) then
 		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
