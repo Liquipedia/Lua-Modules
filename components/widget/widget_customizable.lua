@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Customizable
+-- page=Module:Widget/Customizable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class CustomizableWidget: Widget
 ---@operator call({id: string, children: Widget[]}): CustomizableWidget

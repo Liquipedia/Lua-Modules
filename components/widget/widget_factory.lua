@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Factory
+-- page=Module:Widget/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,7 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetFactory
 local WidgetFactory = Class.new()

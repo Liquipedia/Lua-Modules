@@ -16,7 +16,7 @@ local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -24,7 +24,7 @@ local Center = Widgets.Center
 local Chronology = Widgets.Chronology
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
-local Highlights = require('Module:Infobox/Widget/Highlights')
+local Highlights = require('Module:Widget/Highlights')
 
 ---@class PatchInfobox: BasicInfobox
 local Patch = Class.new(BasicInfobox)

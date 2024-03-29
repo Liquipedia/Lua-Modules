@@ -14,10 +14,10 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local Game = Lua.import('Module:Game')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CounterstrikeInfoboxTeam: InfoboxTeam

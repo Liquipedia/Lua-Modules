@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Chronology
+-- page=Module:Widget/Chronology
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class ChronologyWidget: Widget
 ---@operator call({content: table<string, string|number|nil>}): ChronologyWidget

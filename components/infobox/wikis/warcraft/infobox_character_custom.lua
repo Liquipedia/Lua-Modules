@@ -14,10 +14,10 @@ local Hotkeys = require('Module:Hotkey')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center

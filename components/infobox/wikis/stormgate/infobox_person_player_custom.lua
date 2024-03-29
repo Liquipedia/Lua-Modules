@@ -41,10 +41,10 @@ local ROLES = {
 	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = require('Module:Widget/Injector')
+local Cell = require('Module:Widget/Cell')
+local Title = require('Module:Widget/Title')
+local Center = require('Module:Widget/Center')
 
 ---@class StormgateInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)

@@ -31,8 +31,8 @@ local CLEAN_OTHER_ROLES = {
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Injector = Lua.import('Module:Widget/Injector')
+local Cell = require('Module:Widget/Cell')
 
 ---@class BrawlhallaInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
