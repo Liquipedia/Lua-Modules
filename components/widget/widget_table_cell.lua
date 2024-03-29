@@ -79,7 +79,7 @@ function TableCell:_concatContent()
 	return table.concat(Array.map(self.content, function (content)
 		if type(content) == 'table' then
 			local wrapper = mw.html.create('div')
-			Array.forEach(content, function (inner)
+			Array.forEach(content, function(inner)
 				wrapper:node(inner)
 			end)
 			return tostring(wrapper)

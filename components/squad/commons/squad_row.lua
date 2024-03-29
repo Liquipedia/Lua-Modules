@@ -71,7 +71,7 @@ function SquadRow:id(args)
 		Opponent.readOpponentArgs(Table.merge(args, {type = Opponent.solo})),
 		nil, {syncPlayer = true}
 	)
-	cell:addContent('<b>' .. tostring(OpponentDisplay.InlineOpponent{opponent = opponent}) .. '</b>')
+	cell:addContent(mw.html.create('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent}))
 
 	if String.isNotEmpty(args.captain) then
 		cell:addContent('&nbsp;' .. ICON_CAPTAIN)
