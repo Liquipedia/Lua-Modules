@@ -177,7 +177,7 @@ function CustomLeague:_createCircuitLink()
 	return self:createSeriesDisplay({
 		displayManualIcons = true,
 		series = args.circuit,
-	}, self.data.circuitIconDisplay)
+	})
 end
 
 return CustomLeague
