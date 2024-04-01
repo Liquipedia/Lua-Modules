@@ -78,8 +78,9 @@ function CustomInjector:parse(id, widgets)
 		local icons = Array.map(args.agents, function(agent)
 			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
 		end)
+		local name = #icons == 1 and 'Agent' or 'Agents'
 		return {
-			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = name, content = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		return {
