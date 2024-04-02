@@ -35,9 +35,11 @@ function Tabs.static(args)
 	local subTabs = mw.html.create()
 
 	Array.forEach(tabArgs, function(tab)
-		--if tab.name is unset tab.link is set as per `Tabs._readArguments`
+		if not tab.link then
+			return
+		end
 		local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-		local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+		local text = Page.makeInternalLink({}, name, tab.link)
 		tabs:tag('li'):addClass(tab.this and 'active' or nil):wikitext(text)
 		subTabs:node(tab.this and tab.tabs or nil)
 	end)
