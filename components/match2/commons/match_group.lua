@@ -190,7 +190,7 @@ function MatchGroup.TemplateShowBracket(frame)
 	return MatchGroup.MatchGroupById(args)
 end
 
--- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
+-- Entry point of Template:BracketMatchlistToggle
 ---@param frame Frame
 ---@return string|Html?
 function MatchGroup.TemplateBracketMatchlistToggle(frame)
@@ -202,7 +202,7 @@ function MatchGroup.TemplateBracketMatchlistToggle(frame)
 	return MatchGroup.BracketMatchlistToggle(Table.merge(args, {id = MatchGroupBase.readBracketId(args.id)}))
 end
 
--- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
+-- Entry point of Template:ShowBracketMatchlistToggle
 ---@param frame Frame
 ---@return string|Html?
 function MatchGroup.TemplateShowBracketMatchlistToggle(frame)
