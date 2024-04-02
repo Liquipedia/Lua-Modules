@@ -726,7 +726,7 @@ function MatchGroupInput._getCasterInformation(name, flag, displayName)
 	}
 end
 
--- function for parsing mapVeto input
+-- Parse map veto input
 ---@param match table
 ---@param allowedVetoes string[]?
 ---@return {type:string, team1: string?, team2:string?, decider:string?, vetostart:string?}[]?
