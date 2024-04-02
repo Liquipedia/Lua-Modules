@@ -780,7 +780,7 @@ function MatchGroupInput.placementCheckDraw(tbl)
 	return true
 end
 
--- Check if any team has a none-standard status
+-- Check if any opponent has a none-standard status
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
