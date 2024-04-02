@@ -31,7 +31,6 @@ local ROLES = {
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
 	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
 	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	
 	-- Talents
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
 	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
