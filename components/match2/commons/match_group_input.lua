@@ -761,7 +761,6 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
--- function to check for draws
 ---@param tbl table
 ---@return boolean
 function MatchGroupInput.placementCheckDraw(tbl)
