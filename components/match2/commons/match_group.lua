@@ -223,7 +223,11 @@ function MatchGroup.BracketMatchlistToggle(args)
 		content1 = MatchGroup.MatchGroupById(args),
 		content2 = mw.html.create()
 			:node(args.gtl)
-			:node(MatchGroup.MatchGroupById(Table.merge(args, {forceMatchList = true}))),
+			:node(MatchGroup.MatchGroupById(Table.merge(args, {
+				forceMatchList = true,
+				collapsed = Logic.nilOr(Logic.readBoolOrNil(args.collapsed), Logic.isNotEmpty(args.gtl)),
+				attached = Logic.nilOr(Logic.readBoolOrNil(args.attached), Logic.isNotEmpty(args.gtl)),
+			}))),
 	}
 end
 
