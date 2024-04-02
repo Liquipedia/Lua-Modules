@@ -119,7 +119,7 @@ function CustomMatchGroupInput.placementCheckDraw(tbl)
 		return false
 	end
 
-	return MatchGroupInput.placementCheckDraw(tbl)
+	return MatchGroupInput.isDraw(tbl)
 end
 
 ---@param data table
