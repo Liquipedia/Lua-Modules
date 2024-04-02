@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'goals',
-	defaultTeamLogo = 'GOALS default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'GOALS default allmode.png', ---@deprecated
 	match2 = 0,
 }
