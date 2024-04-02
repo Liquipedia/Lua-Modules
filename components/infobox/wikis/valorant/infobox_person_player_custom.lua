@@ -84,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
 		end)
 		return {
-			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Agent', content = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
 		return {
