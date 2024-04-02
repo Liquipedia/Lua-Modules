@@ -763,7 +763,7 @@ end
 
 ---@param tbl table
 ---@return boolean
-function MatchGroupInput.placementCheckDraw(tbl)
+function MatchGroupInput.isDraw(tbl)
 	local last
 	for _, scoreInfo in pairs(tbl) do
 		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
@@ -783,7 +783,7 @@ end
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
-	return Array.any(tbl, function (opponent) return opponent.status ~= 'S' end)
+	return Array.any(opponents, function (opponent) return opponent.status ~= 'S' end)
 end
 
 -- function to check for forfeits
@@ -808,15 +808,11 @@ function MatchGroupInput.placementCheckWL(tbl)
 end
 
 -- Get the winner when resulttype=default
----@param tbl table
+---@param opponents table[]
 ---@return integer
-function MatchGroupInput.getDefaultWinner(tbl)
-	for index, scoreInfo in pairs(tbl) do
-		if scoreInfo.status == 'W' then
-			return index
-		end
-	end
-	return -1
+function MatchGroupInput.getDefaultWinner(opponents)
+	local idx = Array.indexOf(opponents, function(opponent) return opponent.status == 'W' end)
+	return idx > 0 and idx or -1
 end
 
 -- Set the field 'placement' for the two participants in the opponenets list.
