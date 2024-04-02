@@ -154,7 +154,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if MatchGroupInput.placementCheckDraw(indexedScores) then
+		if MatchGroupInput.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
