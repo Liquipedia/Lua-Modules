@@ -395,19 +395,25 @@ Author(s): Elysienna
 			padding: 0;
 			position: relative;
 			flex: 1;
-			overflow: hidden;
 			border: 0;
+
+			@media ( min-width: 768px ) {
+				overflow: hidden;
+			}
 		}
 
 		&--game-container {
 			position: relative;
 			padding: 0;
-			overflow-x: hidden;
 			flex: 1;
-			scroll-behavior: smooth;
 			border: 0;
 			align-items: unset;
 			min-width: 15.875rem;
+
+			@media ( min-width: 768px ) {
+				overflow-x: hidden;
+				scroll-behavior: smooth;
+			}
 		}
 	}
 
