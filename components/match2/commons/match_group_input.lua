@@ -13,6 +13,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -761,22 +762,13 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
----@param tbl table
+---@param opponents table[]
 ---@return boolean
-function MatchGroupInput.isDraw(tbl)
-	local last
-	for _, scoreInfo in pairs(tbl) do
-		if scoreInfo.status ~= 'S' and scoreInfo.status ~= 'D' then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
+function MatchGroupInput.isDraw(opponents)
+	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' or opponent.status ~= 'D' end) then
+		return false
 	end
-
-	return true
+	return #Array.unique(Array.map(opponents, Operator.property('score'))) == 1
 end
 
 -- Check if any opponent has a none-standard status
@@ -787,24 +779,24 @@ function MatchGroupInput.hasSpecialStatus(opponents)
 end
 
 -- function to check for forfeits
----@param tbl table
+---@param opponents table[]
 ---@return boolean
-function MatchGroupInput.placementCheckFF(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'FF' end)
+function MatchGroupInput.hasForfeit(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'FF' end)
 end
 
 -- function to check for DQ's
----@param tbl table
+---@param opponents table[]
 ---@return boolean
-function MatchGroupInput.placementCheckDQ(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'DQ' end)
+function MatchGroupInput.hasDisqualified(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'DQ' end)
 end
 
 -- function to check for W/L
----@param tbl table
+---@param opponents table[]
 ---@return boolean
-function MatchGroupInput.placementCheckWL(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == 'L' end)
+function MatchGroupInput.hasDefaultWinLoss(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'L' end)
 end
 
 -- Get the winner when resulttype=default
