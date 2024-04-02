@@ -213,7 +213,8 @@ end
 ---@param args table
 ---@return string|Html?
 function MatchGroup.BracketMatchlistToggle(args)
-	--for the poc just use tabs dynamic, for live preferably use a toggle button
+	--for now use tabs dynamic, goal is to use toggle buttons for this,
+	--but they clash with rounds in GTL input (if the GTL has rounds set), so would need some additional js
 	return Tabs.dynamic{
 		['hide-showall'] = true,
 		This = args.This,
