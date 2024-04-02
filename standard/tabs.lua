@@ -39,7 +39,7 @@ function Tabs.static(args)
 			return
 		end
 		local name = tab.name or Tabs._getDisplayNameFromLink(tab.link --[[@as string]])
-		local text = tab.link and Page.makeInternalLink({}, name, tab.link) or tab.name
+		local text = Page.makeInternalLink({}, name, tab.link)
 		tabs:tag('li'):addClass(tab.this and 'active' or nil):wikitext(text)
 		subTabs:node(tab.this and tab.tabs or nil)
 	end)
