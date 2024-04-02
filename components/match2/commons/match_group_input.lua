@@ -781,10 +781,10 @@ function MatchGroupInput.placementCheckDraw(tbl)
 end
 
 -- Check if any team has a none-standard status
----@param tbl table
+---@param opponents table[]
 ---@return boolean
-function MatchGroupInput.placementCheckSpecialStatus(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status ~= 'S' end)
+function MatchGroupInput.hasSpecialStatus(opponents)
+	return Array.any(tbl, function (opponent) return opponent.status ~= 'S' end)
 end
 
 -- function to check for forfeits
