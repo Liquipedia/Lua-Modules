@@ -27,20 +27,25 @@ local ROLES = {
 	-- Players
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
 
-	-- Staff and Talents
+	-- Staff
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
+	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
+	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
+	-- Talents
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
 	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
 	['host'] = {category = 'Host', variable = 'Host', talent = true},
 	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
 	['expert'] = {category = 'Experts', variable = 'Expert', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
 	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	['streamer'] = {category = 'Content Creators', variable = 'Streamer', talent = true},
+	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', talent = true},
 	['producer'] = {category = 'Production Staff', variable = 'Producer', talent = true},
+	['stats producer'] = {category = 'Production Staff', variable = 'Stats Producer', talent = true},
 	['director'] = {category = 'Production Staff', variable = 'Director', talent = true},
 	['interviewer'] = {category = 'Interviewers', variable = 'Interviewer', talent = true},
+	['translator'] = {category = 'Production Staff', variable = 'Translator', talent = true},
+	['interpreter'] = {category = 'Production Staff', variable = 'Interpreter', talent = true},
 }
 ROLES['in-game leader'] = ROLES.igl
 
@@ -85,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
