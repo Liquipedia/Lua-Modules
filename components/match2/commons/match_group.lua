@@ -12,6 +12,7 @@ local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Tabs = require('Module:Tabs')
 local WarningBox = require('Module:WarningBox')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -187,6 +188,42 @@ end
 function MatchGroup.TemplateShowBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchGroupById(args)
+end
+
+-- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
+---@param frame Frame
+---@return string|Html?
+function MatchGroup.TemplateBracketMatchlistToggle(frame)
+	local args = Arguments.getArgs(frame)
+
+	-- build the brackets variables and storage
+	MatchGroup.Bracket(args)
+
+	return MatchGroup.BracketMatchlistToggle(Table.merge(args, {id = MatchGroupBase.readBracketId(args.id)}))
+end
+
+-- Entry point of Template:ShowBracket, Template:DisplayMatchGroup
+---@param frame Frame
+---@return string|Html?
+function MatchGroup.TemplateShowBracketMatchlistToggle(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.BracketMatchlistToggle(args)
+end
+
+---@param args table
+---@return string|Html?
+function MatchGroup.BracketMatchlistToggle(args)
+	--for the poc just use tabs dynamic, for live preferably use a toggle button
+	return Tabs.dynamic{
+		['hide-showall'] = true,
+		This = args.This,
+		name1 = 'Bracket',
+		name2 = 'Matchlist',
+		content1 = MatchGroup.MatchGroupById(args),
+		content2 = mw.html.create()
+			:node(args.gtl)
+			:node(MatchGroup.MatchGroupById(Table.merge(args, {forceMatchList = true}))),
+	}
 end
 
 if FeatureFlag.get('perf') then
