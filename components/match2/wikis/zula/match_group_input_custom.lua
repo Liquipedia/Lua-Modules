@@ -136,11 +136,11 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
 			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
-			if MatchGroupInput.placementCheckFF(indexedScores) then
+			if MatchGroupInput.hasForfeit(indexedScores) then
 				data.walkover = STATUS_FORFEIT
-			elseif MatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif MatchGroupInput.hasDisqualified(indexedScores) then
 				data.walkover = STATUS_DISQUALIFIED
-			elseif MatchGroupInput.placementCheckWL(indexedScores) then
+			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = STATUS_DEFAULT_LOSS
 			end
 			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
