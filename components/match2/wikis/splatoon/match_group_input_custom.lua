@@ -148,14 +148,14 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
-		elseif MatchGroupInput.placementCheckSpecialStatus(indexedScores) then
+		elseif MatchGroupInput.hasSpecialStatus(indexedScores) then
 			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
-			if MatchGroupInput.placementCheckFF(indexedScores) then
+			if MatchGroupInput.hasForfeit(indexedScores) then
 				data.walkover = 'ff'
-			elseif MatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif MatchGroupInput.hasDisqualified(indexedScores) then
 				data.walkover = 'dq'
-			elseif MatchGroupInput.placementCheckWL(indexedScores) then
+			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, DEFAULT_RESULT_TYPE)
@@ -404,7 +404,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- If special status has been applied to a team
-	if MatchGroupInput.placementCheckSpecialStatus(opponents) then
+	if MatchGroupInput.hasSpecialStatus(opponents) then
 		match.finished = true
 	end
 
