@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Widget = Lua.import('Module:Infobox/Widget')
 
-local ERROR_TEXT = '<span style="color:#ff0000;font-weight:bold" class="show-when-logged-in">' ..
+local ERROR_TEXT = '<span class="error show-when-logged-in">' ..
 					'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ' ..
 					'${errorMessage}' ..
 					'</span>[[Category:Pages with script errors]]'
