@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'wow',
-	defaultTeamLogo = 'WoWlogo Default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'WoWlogo Default allmode.png', ---@deprecated
 	match2 = 0,
 }

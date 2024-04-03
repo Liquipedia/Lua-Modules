@@ -27,8 +27,6 @@ return {
 		},
 	},
 	defaultGame = 'bw',
-	defaultTeamLogo = 'StarCraft default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'StarCraft default allmode.png', ---@deprecated
 
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',

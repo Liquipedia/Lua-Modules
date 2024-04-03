@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'squadrons',
-	defaultTeamLogo = 'Star Wars Squadrons allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png', ---@deprecated
 	match2 = 0,
 }

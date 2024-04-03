@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'underlords',
-	defaultTeamLogo = 'Dota Underlords lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Dota Underlords darkmode.png', ---@deprecated
 	match2 = 0,
 }
