@@ -40,7 +40,5 @@ return {
 	},
 	defaultGame = 'tft',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Teamfight Tactics Double Up lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Teamfight Tactics Double Up darkmode.png', ---@deprecated
 	match2 = 0,
 }
