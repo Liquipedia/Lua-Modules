@@ -52,7 +52,5 @@ return {
 		},
 	},
 	defaultGame = 'tabletop',
-	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
 	match2 = 1,
 }

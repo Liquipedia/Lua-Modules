@@ -27,7 +27,5 @@ return {
 	},
 	defaultGame = 'hots',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Heroes of the Storm default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Heroes of the Storm default allmode.png', ---@deprecated
 	match2 = 1,
 }
