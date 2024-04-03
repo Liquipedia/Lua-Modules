@@ -112,24 +112,6 @@ local infoData = {
 		},
 	},
 	defaultGame = 'csgo',
-	defaultTeamLogo = {
-		csgo = 'CSGO default lightmode.png',
-		cso = 'CS Online default lightmode.png',
-		css = 'CS default lightmode.png',
-		cs1 = 'CS default lightmode.png',
-		cs16 = 'CS default lightmode.png',
-		cscz = 'CS default lightmode.png',
-		cs2 = 'Counter-Strike 2 default lightmode.png',
-	}, ---@deprecated
-	defaultTeamLogoDark = {
-		csgo = 'CSGO default darkmode.png',
-		cso = 'CS Online default lightmode.png',
-		css = 'CS default darkmode.png',
-		cs1 = 'CS default lightmode.png',
-		cs16 = 'CS default darkmode.png',
-		cscz = 'CS default darkmode.png',
-		cs2 = 'Counter-Strike 2 default lightmode.png',
-	}, ---@deprecated
 	match2 = 2,
 }
 

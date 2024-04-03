@@ -104,7 +104,5 @@ return {
 		},
 	},
 	defaultGame = 'infinite',
-	defaultTeamLogo = 'Halo allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Halo allmode.png', ---@deprecated
 	match2 = 2,
 }

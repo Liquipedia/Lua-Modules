@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'hs',
-	defaultTeamLogo = 'Hearthstone default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Hearthstone default allmode.png', ---@deprecated
 	match2 = 0,
 }

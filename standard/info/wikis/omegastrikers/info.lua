@@ -27,7 +27,5 @@ return {
 	},
 	defaultGame = 'omegastrikers',
 
-	defaultTeamLogo = 'Omega Strikers default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Omega Strikers default allmode.png', ---@deprecated
 	match2 = 0,
 }

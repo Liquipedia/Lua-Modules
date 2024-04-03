@@ -221,7 +221,5 @@ return {
 		},
 	},
 	defaultGame = 'sv',
-	defaultTeamLogo = 'Pokemon logo std.png', ---@deprecated
-	defaultTeamLogoDark = 'Pokemon logo std.png', ---@deprecated
 	match2 = 1,
 }
