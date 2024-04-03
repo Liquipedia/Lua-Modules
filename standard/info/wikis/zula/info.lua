@@ -64,7 +64,7 @@ return {
 			},
 		},
 	},
-	defaultGame = 'zula',+
+	defaultGame = 'zula',
 
 	match2 = 2,
 }
