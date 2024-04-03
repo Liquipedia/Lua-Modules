@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'cr',
-	defaultTeamLogo = 'Clash Royale.png', ---@deprecated
-	defaultTeamLogoDark = 'Clash Royale.png', ---@deprecated
 	match2 = 0,
 }

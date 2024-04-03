@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'autochess',
-	defaultTeamLogo = 'Auto Chess lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Auto Chess darkmode.png', ---@deprecated
 	match2 = 0,
 }
