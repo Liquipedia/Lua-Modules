@@ -403,7 +403,5 @@ return {
 		},
 	},
 	defaultGame = 'qc',
-	defaultTeamLogo = 'Quake default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Quake default darkmode.png', ---@deprecated
 	match2 = 1,
 }
