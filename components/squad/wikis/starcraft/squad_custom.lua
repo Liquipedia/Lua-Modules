@@ -12,16 +12,17 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
+local TlpdSquad = Class.new(Squad)
 
----@param self Squad
 ---@return Squad
-function CustomSquad.headerTlpd(self)
+function TlpdSquad:headerTlpd()
 	local makeHeader = function(wikiText)
 		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
 	end
@@ -39,14 +40,19 @@ function CustomSquad.headerTlpd(self)
 	return self
 end
 
+---@return Squad
+function TlpdSquad:title()
+	return self
+end
+
 ---@class StarcraftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@param args table
 ---@return self
 function ExtendedSquadRow:elo(args)
-	self.content:node(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
-	self.content:node(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
+	self.content:addCell(Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-')))
+	self.content:addCell(Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-')))
 
 	return self
 end
@@ -54,20 +60,17 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame)
-
-	local args = squad.args
-
-	local tlpd = Logic.readBool(args.tlpd)
+	local tlpd = Logic.readBool(frame.args.tlpd)
+	local squad
 	if tlpd then
-		squad.header = CustomSquad.headerTlpd
+		squad = TlpdSquad()
 	else
-		squad:title()
+		squad = Squad()
 	end
 
-	squad:header()
-	local players = SquadUtils.parsePlayers(args)
+	squad:init(frame):title():header()
+
+	local players = SquadUtils.parsePlayers(squad.args)
 
 	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
