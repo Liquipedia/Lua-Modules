@@ -50,7 +50,9 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad:title():header()
 
 	Array.forEach(playerList, function(player)
-		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
+		local newPlayer = SquadUtils.convertAutoParameters(player)
+		newPlayer.faction = Logic.emptyOr(player.thisTeam.position, player.newTeam.position)
+		squad:row(CustomSquad._playerRow(newPlayer, squad.type))
 	end)
 
 	return squad:create()
