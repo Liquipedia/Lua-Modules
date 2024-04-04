@@ -18,30 +18,19 @@ local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+
 local CustomSquad = {}
-local ExtendedSquad = Class.new(Squad)
+local CustomInjector = Class.new(Injector)
 
----@return self
-function ExtendedSquad:header()
-	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
-	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
-	local cellArgs = {classes = {'divCell'}}
-	table.insert(self.rows, Widget.TableRow{
-		classes = {'HeaderRow'},
-		css = {['font-weight'] = 'bold'},
-		cells = {
-			Widget.TableCell(cellArgs):addContent('ID'),
-			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCell(cellArgs):addContent('Name'),
-			Widget.TableCell(cellArgs):addContent('Position'),
-			Widget.TableCell(cellArgs):addContent('Join Date'),
-			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {
+			Widget.TableCell{}:addContent('Position')
 		}
-	})
+	end
 
-	return self
+	return widgets
 end
 
 ---@class WildriftSquadRow: SquadRow
@@ -77,7 +66,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame):title():header()
+	local squad = Squad():init(frame, CustomInjector()):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -96,7 +85,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad():init(mw.getCurrentFrame())
+	local squad = Squad():init(mw.getCurrentFrame(), CustomInjector())
 
 	squad.type = squadType
 

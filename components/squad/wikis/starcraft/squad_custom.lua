@@ -22,20 +22,18 @@ local CustomSquad = {}
 local TlpdSquad = Class.new(Squad)
 
 ---@return Squad
-function TlpdSquad:headerTlpd()
-	local makeHeader = function(wikiText)
-		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader(''))
-		:node(makeHeader('Name'))
-		:node(makeHeader('ELO'))
-		:node(makeHeader('ELO Peak'))
-
-	self.content:node(headerRow)
+function TlpdSquad:header()
+	table.insert(self.rows, Widget.TableRow{
+		classes = {'HeaderRow'},
+		css = {['font-weight'] = 'bold'},
+		cells = {
+			Widget.TableCell{}:addContent('ID'),
+			Widget.TableCell{}, -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCell{}:addContent('Name'),
+			Widget.TableCell{}:addContent('ELO'),
+			Widget.TableCell{}:addContent('ELO Peak'),
+		}
+	})
 
 	return self
 end

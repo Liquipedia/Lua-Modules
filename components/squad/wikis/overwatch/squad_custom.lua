@@ -19,37 +19,24 @@ local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+
 local CustomSquad = {}
-local ExtendedSquad = Class.new(Squad)
+local CustomInjector = Class.new(Injector)
 local HAS_NUMBER = false
+
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {Widget.TableCell{}:addContent('Position')}
+	elseif id == 'header_name' and HAS_NUMBER then
+		table.insert(widgets, Widget.TableCell{}:addContent('Number'))
+	end
+
+	return widgets
+end
 
 ---@class OverwatchSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
-
----@param self Squad
----@return Squad
-function ExtendedSquad:header()
-	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
-	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
-	local cellArgs = {classes = {'divCell'}}
-	table.insert(self.rows, Widget.TableRow{
-		classes = {'HeaderRow'},
-		css = {['font-weight'] = 'bold'},
-		cells = {
-			Widget.TableCell(cellArgs):addContent('ID'),
-			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
-			HAS_NUMBER and Widget.TableCell(cellArgs):addContent('Number') or nil,
-			Widget.TableCell(cellArgs):addContent('Name'),
-			Widget.TableCell(cellArgs):addContent('Position'),
-			Widget.TableCell(cellArgs):addContent('Join Date'),
-			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
-		}
-	})
-
-	return self
-end
 
 ---@param args table
 ---@return self
@@ -102,7 +89,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = ExtendedSquad():init(frame):title()
+	local squad = Squad():init(frame, CustomInjector()):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -125,7 +112,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = ExtendedSquad():init(mw.getCurrentFrame()):title()
+	local squad = Squad():init(mw.getCurrentFrame(), CustomInjector()):title()
 
 	squad.type = squadType
 

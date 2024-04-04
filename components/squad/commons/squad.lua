@@ -78,12 +78,20 @@ function Squad:header()
 		cells = {
 			Widget.TableCell{}:addContent('ID'),
 			Widget.TableCell{}, -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCell{}:addContent('Name'),
-			Widget.Customizable{id = 'header_role', children = {Widget.TableCell{}}}, -- Role
+			Widget.Customizable{id = 'header_name',
+				children = {Widget.TableCell{}:addContent('Name')}
+			},
+			Widget.Customizable{id = 'header_role',
+				children = {Widget.TableCell{}}
+			},
 			Widget.TableCell{}:addContent('Join Date'),
-			isInactive and Widget.TableCell{}:addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell{}:addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell{}:addContent('New Team') or nil,
+			isInactive and Widget.Customizable{id = 'header_inactive', children = {
+				Widget.TableCell{}:addContent('Inactive Date')
+			}} or nil,
+			isFormer and Widget.Customizable{id = 'header_former', children = {
+				Widget.TableCell{}:addContent('Leave Date'),
+				Widget.TableCell{}:addContent('New Team')
+			}} or nil,
 		}
 	})
 

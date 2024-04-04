@@ -20,28 +20,19 @@ local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
-local ExtendedSquad = Class.new(Squad)
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
----@return self
-function ExtendedSquad:header()
-	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
-	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
-	local cellArgs = {classes = {'divCell'}}
-	table.insert(self.rows, Widget.TableRow{
-		classes = {'HeaderRow'},
-		css = {['font-weight'] = 'bold'},
-		cells = {
-			Widget.TableCell(cellArgs):addContent('Player'),
-			Widget.TableCell(cellArgs),
-			Widget.TableCell(cellArgs):addContent('Main'),
-			Widget.TableCell(cellArgs):addContent('Join Date'),
-			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+local CustomSquad = {}
+local CustomInjector = Class.new(Injector)
+
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {
+			Widget.TableCell{}:addContent('Main')
 		}
-	})
+	end
 
-	return self
+	return widgets
 end
 
 ---@class SmashSquadRow: SquadRow
@@ -64,7 +55,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = ExtendedSquad():init(frame):title():header()
+	local squad = Squad():init(frame, CustomInjector()):title():header()
 
 	local tableGame = squad.args.game
 
