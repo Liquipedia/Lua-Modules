@@ -21,4 +21,8 @@ Widgets.Header = Lua.import('Module:Infobox/Widget/Header')
 Widgets.Links = Lua.import('Module:Infobox/Widget/Links')
 Widgets.Title = Lua.import('Module:Infobox/Widget/Title')
 
+Widgets.Table = Lua.import('Module:Widget/Table')
+Widgets.TableRow = Lua.import('Module:Widget/TableRow')
+Widgets.TableCell = Lua.import('Module:Widget/TableCell')
+
 return Widgets
