@@ -85,7 +85,6 @@ function Infobox:build(widgets)
 		if widget == nil or widget['is_a'] == nil then
 			error('Infobox:build can only accept Widgets')
 		end
-		widget:setContext({injector = self.injector})
 
 		local contentItems = WidgetFactory.work(widget, self.injector)
 

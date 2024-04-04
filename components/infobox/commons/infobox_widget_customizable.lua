@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
@@ -24,17 +23,13 @@ local Customizable = Class.new(
 	end
 )
 
----@return Widget[]
-function Customizable:make()
-	if self.context.injector == nil then
+---@param injector WidgetInjector?
+---@return Widget[]?
+function Customizable:make(injector)
+	if injector == nil then
 		return self.children
 	end
-	if self.id == 'custom' then
-		local widgets = Logic.emptyOr(self.context.injector:addCustomCells(self.children), self.children, {})
-		---@cast widgets -nil
-		self.children = widgets
-	end
-	return self.context.injector:parse(self.id, self.children)
+	return injector:parse(self.id, self.children)
 end
 
 return Customizable
