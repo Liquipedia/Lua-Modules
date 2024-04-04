@@ -116,9 +116,9 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad.header = CustomSquad.header
 	squad:title():header()
 
-	for _, player in ipairs(playerList) do
+	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
-	end
+	end)
 
 	return squad:create()
 end
