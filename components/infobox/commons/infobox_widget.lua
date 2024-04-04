@@ -7,6 +7,7 @@
 --
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 ---@class Widget: BaseClass
 ---@operator call(): Widget
@@ -30,7 +31,7 @@ end
 function Widget:tryMake(injector)
 	local _, output = xpcall(
 		function()
-			return self:make()
+			return self:make(injector)
 		end,
 		function(errorMessage)
 			mw.log('-----Error in Widget:tryMake()-----')
