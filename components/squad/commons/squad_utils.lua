@@ -69,6 +69,8 @@ function SquadUtils.anyInactive(players)
 	end)
 end
 
+---@param player table
+---@return table
 function SquadUtils.convertAutoParameters(player)
 	local newPlayer = Table.copy(player)
 	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
