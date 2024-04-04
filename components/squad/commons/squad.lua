@@ -13,17 +13,15 @@ local String = require('Module:StringUtils')
 local SquadUtils = require('Module:Squad/Utils')
 
 ---@class Squad
----@field frame Frame
 ---@field args table
 ---@field root Html
 ---@field content Html
 ---@field type integer
 local Squad = Class.new()
 
----@param frame Frame
+---@param frame table|Frame
 ---@return self
 function Squad:init(frame)
-	self.frame = frame
 	self.args = Arguments.getArgs(frame)
 	self.root = mw.html.create('div')
 	self.root:addClass('table-responsive')
