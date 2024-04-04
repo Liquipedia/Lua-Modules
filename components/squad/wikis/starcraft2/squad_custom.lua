@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -16,6 +15,7 @@ local String = require('Module:StringUtils')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 --only for legacy reasons
 SquadRow.specialTeamsTemplateMapping.retirement = 'Team/retired'
@@ -39,8 +39,9 @@ function CustomSquad.run(frame)
 		or (isMainSquad and 'main')
 		or 'active'
 
-	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args[index])
+	local players = SquadUtils.parsePlayers(squad.args)
+
+	players = Array.map(players, function(player)
 		if not player then return player end
 		player.faction = Faction.read(player.race)
 		if isFormer then
