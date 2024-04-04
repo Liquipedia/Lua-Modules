@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -47,10 +46,10 @@ function CustomSquad.header(self)
 	headerRow:node(makeHeader('Name'))
 		:node(makeHeader('Position'))
 		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.FORMER then
+	if self.type == SquadUtils.SquadType.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == Squad.SquadType.INACTIVE then
+	elseif self.type == SquadUtils.SquadType.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 
@@ -136,10 +135,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
-
-	squad.type = squadType
+	local squad = Squad():init{type = squadType}
 
 	squad.header = CustomSquad.header
 	squad:title():header()
@@ -174,7 +170,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:position{role = player.role, position = player.position}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadType.FORMER then
+	if squadType == SquadUtils.SquadType.FORMER then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
@@ -182,15 +178,11 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == Squad.SquadType.INACTIVE then
+	elseif squadType == SquadUtils.SquadType.INACTIVE then
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-		.. (player.role and '_' .. player.role or '')
-		.. '_' .. squadType
-	)
+	return row:create(SquadUtils.defaultObjectName(player, squadType))
 end
 
 return CustomSquad
