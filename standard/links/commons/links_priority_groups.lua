@@ -19,6 +19,7 @@ return {
 		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
+		'cfs',
 		'challengermode',
 		'challonge',
 		'cybergamer',
@@ -100,5 +101,6 @@ return {
 		'steamtv',
 		'yandexefir',
 		'zhanqitv',
+		'rooter',
 	},
 }
