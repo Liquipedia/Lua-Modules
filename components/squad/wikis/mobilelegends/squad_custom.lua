@@ -88,8 +88,6 @@ function CustomSquad.run(frame)
 
 	squad:init(frame):title()
 
-	local args = squad.args
-
 	squad.header = CustomSquad.header
 	squad:header()
 
