@@ -92,7 +92,9 @@ function CustomSquad.run(frame)
 	squad.header = CustomSquad.header
 	squad:header()
 
-	Array.forEach(SquadUtils.parsePlayers(squad.args), function(player)
+	local players = SquadUtils.parsePlayers(squad.args)
+
+	Array.forEach(players, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
 	end)
 
