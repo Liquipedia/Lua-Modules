@@ -93,7 +93,7 @@ end
 
 ---@param player table
 ---@param squadType SquadType
----@return unknown
+---@return string
 function SquadUtils.defaultObjectName(player, squadType)
 	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
 
