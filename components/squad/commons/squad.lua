@@ -17,7 +17,7 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 ---@operator call:Squad
 ---@field args table
 ---@field root Html
----@field content WidgetTable
+---@field rows WidgetTableRow[]
 ---@field type integer
 local Squad = Class.new()
 
@@ -34,20 +34,8 @@ Squad.SquadType = SquadType
 ---@return self
 function Squad:init(args)
 	self.args = Arguments.getArgs(args)
-	self.root = mw.html.create('div')
-	self.root:addClass('table-responsive')
-	-- TODO: is this needed?
-		:css('margin-bottom', '10px')
-	-- TODO: is this needed?
-		:css('padding-bottom', '0px')
 
-	self.content = Widget.Table{
-		classes = {'wikitable', 'wikitable-striped', 'roster-card'}
-	}
-
-	if not String.isEmpty(self.args.team) then
-		self.args.isLoan = true
-	end
+	self.rows = {}
 
 	local status = (self.args.status or 'active'):upper()
 
@@ -56,7 +44,7 @@ function Squad:init(args)
 	return self
 end
 
----@return Squad
+---@return self
 function Squad:title()
 	local defaultTitle
 	if self.type == SquadType.FORMER then
@@ -67,37 +55,37 @@ function Squad:title()
 
 	local titleText = Logic.emptyOr(self.args.title, defaultTitle)
 
-	if String.isNotEmpty(titleText) then
-		local titleContainer = Widget.TableRow{css = {['font-weight'] = 'bold'}}
-
-		titleContainer:addCell(Widget.TableCell:addContent(titleText))
-		self.content:addRow(titleContainer)
+	if String.isEmpty(titleText) then
+		return self
 	end
+
+	table.insert(self.rows, Widget.TableRow{
+		css = {['font-weight'] = 'bold'},
+		cells = {Widget.TableCell:addContent(titleText)}
+	})
 
 	return self
 end
 
 ---@return self
 function Squad:header()
-	local headerRow = Widget.TableRow{classes = {'HeaderRow'}, css = {['font-weight'] = 'bold'}}
-
+	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
 	local cellArgs = {classes = {'divCell'}}
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('ID'))
-	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Team Icon" (most commmonly used for loans)
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Name'))
-	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Role"
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Join Date'))
-
-	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Inactive Date'))
-	end
-
-	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Leave Date'))
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('New Team'))
-	end
-
-	self.content:addRow(headerRow)
+	table.insert(self.rows, Widget.TableRow{
+		classes = {'HeaderRow'},
+		css = {['font-weight'] = 'bold'},
+		cells = {
+			Widget.TableCell(cellArgs):addContent('ID'),
+			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCell(cellArgs):addContent('Name'),
+			Widget.TableCell(cellArgs), -- Role
+			Widget.TableCell(cellArgs):addContent('Join Date'),
+			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+		}
+	})
 
 	return self
 end
@@ -105,16 +93,21 @@ end
 ---@param row WidgetTableRow
 ---@return self
 function Squad:row(row)
-	self.content:addRow(row)
+	table.insert(self.rows, row)
 	return self
 end
 
 ---@return Html
 function Squad:create()
-	for _, node in ipairs(WidgetFactory.work(self.content)) do
-		self.root:node(node)
+	local dataTable = Widget.Table{
+		classes = {'wikitable', 'wikitable-striped', 'roster-card'},
+		rows = self.rows,
+	}
+	local wrapper = mw.html.create('div'):addClass('table-responsive'):css('margin-bottom', '10px')
+	for _, node in ipairs(WidgetFactory.work(dataTable)) do
+		wrapper:node(node)
 	end
-	return self.root
+	return wrapper
 end
 
 return Squad
