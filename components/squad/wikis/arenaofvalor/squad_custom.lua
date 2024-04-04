@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
@@ -89,16 +89,10 @@ function CustomSquad.run(frame)
 
 	squad:init(frame):title()
 
-	local args = squad.args
-
 	squad.header = CustomSquad.header
 	squad:header()
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	Array.forEach(players, function(player)
+	Array.forEach(SquadUtils.parsePlayers(squad.args), function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
 	end)
 
@@ -121,26 +115,8 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad.header = CustomSquad.header
 	squad:title():header()
 
-	for _, player in pairs(playerList) do
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.position = player.thisTeam.position
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
+	for _, player in ipairs(playerList) do
+		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
 	end
 
 	return squad:create()
