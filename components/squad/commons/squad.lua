@@ -79,9 +79,9 @@ end
 
 ---@return self
 function Squad:header()
-	local headerRow = Widget.TableRow{classes = 'HeaderRow', css = {['font-weight'] = 'bold'}}
+	local headerRow = Widget.TableRow{classes = {'HeaderRow'}, css = {['font-weight'] = 'bold'}}
 
-	local cellArgs = {classes = 'divCell'}
+	local cellArgs = {classes = {'divCell'}}
 	headerRow:addCell(Widget.TableCell(cellArgs):addContent('ID'))
 	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Team Icon" (most commmonly used for loans)
 	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Name'))

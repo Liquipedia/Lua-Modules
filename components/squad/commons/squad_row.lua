@@ -43,7 +43,7 @@ local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Sub
 ---@field lpdbData table
 local SquadRow = Class.new(
 	function(self, options)
-		self.content = Widget.TableRow{classes = 'Player'}
+		self.content = Widget.TableRow{classes = {'Player'}}
 		self.options = options or {}
 
 		self.lpdbData = {type = DEFAULT_TYPE}
