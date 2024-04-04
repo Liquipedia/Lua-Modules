@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'battalion',
-	defaultTeamLogo = 'Battalion 1944 default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Battalion 1944 default darkmode.png', ---@deprecated
 	match2 = 0,
 }

@@ -27,7 +27,5 @@ return {
 	},
 	defaultGame = 'pubg',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'PUBG Default logo.png', ---@deprecated
-	defaultTeamLogoDark = 'PUBG Default logo.png', ---@deprecated
 	match2 = 0,
 }

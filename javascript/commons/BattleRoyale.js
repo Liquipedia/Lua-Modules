@@ -14,6 +14,10 @@ liquipedia.battleRoyale = {
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
+	isMobile: function() {
+		return window.matchMedia( '(max-width: 767px)' ).matches;
+	},
+
 	implementOnElementResize: function( instanceId ) {
 		this.instancesLoaded[ instanceId ] = false;
 
@@ -120,6 +124,9 @@ liquipedia.battleRoyale = {
 	},
 
 	recheckNavigationStates: function( instanceId ) {
+		if ( this.isMobile() ) {
+			return;
+		}
 		this.battleRoyaleInstances[ instanceId ]
 			.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 			.forEach( ( tableEl ) => {
@@ -459,20 +466,22 @@ liquipedia.battleRoyale = {
 	},
 
 	init: function() {
-		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( ( instance ) => {
+		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( instance ) => {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
 
 			this.makeSortableTable( instance );
 		} );
 
-		Object.keys( this.battleRoyaleInstances ).forEach( function( instanceId ) {
+		Object.keys( this.battleRoyaleInstances ).forEach( function ( instanceId ) {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			this.makeSideScrollElements( instanceId );
-			this.makeTableScrollHint( instanceId );
+			if ( !this.isMobile() ) {
+				this.makeSideScrollElements( instanceId );
+				this.makeTableScrollHint( instanceId );
+			}
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
@@ -490,10 +499,12 @@ liquipedia.battleRoyale = {
 				} );
 			} );
 
-			this.implementScrollendEvent( instanceId );
-			this.implementOnWindowResize( instanceId );
-			this.implementOnElementResize( instanceId );
-			this.implementScrollWheelEvent();
+			if ( !this.isMobile() ) {
+				this.implementScrollendEvent( instanceId );
+				this.implementOnWindowResize( instanceId );
+				this.implementOnElementResize( instanceId );
+				this.implementScrollWheelEvent();
+			}
 
 		}.bind( this ) );
 	}

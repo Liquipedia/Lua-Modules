@@ -65,22 +65,6 @@ function CustomPatch._netEaseRelease(args)
 	return args.release_netease == SKIP and SKIPPED or args.release_netease
 end
 
----@param args table
-function CustomPatch:setLpdbData(args)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			beta = tostring(Logic.readBool(args.beta)),
-			version = self.name,
-			release = args.release,
-			neteaserelease = args.release_netease ~= SKIP and args.release_netease or nil,
-			ptrdate = args.release_ptr,
-			balanceupdates = tostring(CustomPatch._hasBalanceUpdate(args)),
-			previous = args.previous and ('Patch args.previous') or nil,
-			next = args.next and ('Patch args.previous') or nil,
-		})
-	})
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table

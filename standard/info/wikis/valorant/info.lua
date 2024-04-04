@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'val',
-	defaultTeamLogo = 'VALORANT allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'VALORANT allmode.png', ---@deprecated
 	match2 = 2,
 }

@@ -39,8 +39,6 @@ return {
 		},
 	},
 	defaultGame = 'rl',
-	defaultTeamLogo = 'Rocket League.png', ---@deprecated
-	defaultTeamLogoDark = 'Rocket League.png', ---@deprecated
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,
 }

@@ -55,7 +55,6 @@ end
 
 -- Invoked by Template:MatchListEnd
 function MatchMapsLegacyStore.close()
-	---@type integer
 	local bracketId = matchlistVars:get('bracketid')
 	if not bracketId then
 		return '</table>'

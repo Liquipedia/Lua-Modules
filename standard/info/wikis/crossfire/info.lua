@@ -53,7 +53,5 @@ return {
 	},
 	defaultGame = 'cf',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Crossfire default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Crossfire default darkmode.png', ---@deprecated
 	match2 = 1,
 }

@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'sideswipe',
-	defaultTeamLogo = 'Sideswipe allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Sideswipe allmode.png', ---@deprecated
 	match2 = 2,
 }

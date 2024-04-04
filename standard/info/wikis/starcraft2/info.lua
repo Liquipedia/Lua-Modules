@@ -52,8 +52,6 @@ return {
 		},
 	},
 	defaultGame = 'wol',
-	defaultTeamLogo = 'StarCraft 2 Default logo.png', ---@deprecated
-	defaultTeamLogoDark = 'StarCraft 2 Default logo.png', ---@deprecated
 
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
