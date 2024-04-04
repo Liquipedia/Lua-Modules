@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Widget = require('Module:Infobox/Widget/All')
@@ -17,6 +16,7 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 ---@operator call:Squad
 ---@field args table
 ---@field root Html
+---@field private injector WidgetInjector?
 ---@field rows WidgetTableRow[]
 ---@field type integer
 local Squad = Class.new()
@@ -31,15 +31,15 @@ local SquadType = {
 Squad.SquadType = SquadType
 
 ---@param args table
+---@param injector WidgetInjector?
 ---@return self
-function Squad:init(args)
-	self.args = Arguments.getArgs(args)
-
+function Squad:init(args, injector)
 	self.rows = {}
 
-	local status = (self.args.status or 'active'):upper()
+	local status = (args.status or 'active'):upper()
 
 	self.type = SquadType[status] or SquadType.ACTIVE
+	self.injector = injector
 
 	return self
 end
@@ -71,19 +71,18 @@ end
 function Squad:header()
 	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
 	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
-	local cellArgs = {classes = {'divCell'}}
 	table.insert(self.rows, Widget.TableRow{
 		classes = {'HeaderRow'},
 		css = {['font-weight'] = 'bold'},
 		cells = {
-			Widget.TableCell(cellArgs):addContent('ID'),
-			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCell(cellArgs):addContent('Name'),
-			Widget.TableCell(cellArgs), -- Role
-			Widget.TableCell(cellArgs):addContent('Join Date'),
-			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+			Widget.TableCell{}:addContent('ID'),
+			Widget.TableCell{}, -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCell{}:addContent('Name'),
+			Widget.Customizable{id = 'header_role', children = {Widget.TableCell{}}}, -- Role
+			Widget.TableCell{}:addContent('Join Date'),
+			isInactive and Widget.TableCell{}:addContent('Inactive Date') or nil,
+			isFormer and Widget.TableCell{}:addContent('Leave Date') or nil,
+			isFormer and Widget.TableCell{}:addContent('New Team') or nil,
 		}
 	})
 
@@ -104,7 +103,7 @@ function Squad:create()
 		rows = self.rows,
 	}
 	local wrapper = mw.html.create('div'):addClass('table-responsive'):css('margin-bottom', '10px')
-	for _, node in ipairs(WidgetFactory.work(dataTable)) do
+	for _, node in ipairs(WidgetFactory.work(dataTable, self.injector)) do
 		wrapper:node(node)
 	end
 	return wrapper

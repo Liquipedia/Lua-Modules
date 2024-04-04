@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -17,31 +18,19 @@ local Widget = require('Module:Infobox/Widget/All')
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
 local CustomSquad = {}
-local ExtendedSquad = Class.new(Squad)
+local CustomInjector = Class.new(Injector)
 
----@return self
-function ExtendedSquad:header()
-	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
-	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
-	local cellArgs = {classes = {'divCell'}}
-	table.insert(self.rows, Widget.TableRow{
-		classes = {'HeaderRow'},
-		css = {['font-weight'] = 'bold'},
-		cells = {
-			Widget.TableCell(cellArgs):addContent('ID'),
-			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCell(cellArgs):addContent('Name'),
-			Widget.TableCell(cellArgs):addContent('Position'),
-			Widget.TableCell(cellArgs):addContent('Join Date'),
-			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
-			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {
+			Widget.TableCell{}:addContent('Position')
 		}
-	})
+	end
 
-	return self
+	return widgets
 end
 
 ---@class ArenaofvalorSquadRow: SquadRow
@@ -77,7 +66,8 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = ExtendedSquad():init(frame):title():header()
+	local args = Arguments.getArgs(frame)
+	local squad = Squad():init(args, CustomInjector()):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -96,8 +86,8 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = ExtendedSquad()
-	squad:init(mw.getCurrentFrame())
+	local squad = Squad()
+	squad:init(mw.getCurrentFrame(), CustomInjector())
 
 	squad.type = squadType
 
@@ -112,7 +102,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRow
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 

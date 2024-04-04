@@ -37,7 +37,7 @@ local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Categor
 local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
 
 ---@class SquadRow
----@operator call(table): SquadRow
+---@operator call: SquadRow
 ---@field content WidgetTableRow
 ---@field options {useTemplatesForSpecialTeams: boolean?}
 ---@field lpdbData table
@@ -104,7 +104,6 @@ function SquadRow:id(args)
 	self.lpdbData.nationality = Flags.CountryName(args.flag)
 	self.lpdbData.link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or args[1])
 
-
 	return self
 end
 
@@ -126,7 +125,7 @@ end
 ---@param args table
 ---@return self
 function SquadRow:role(args)
-	local cell = Widget.TableCell{}:addClass('Position')
+	local cell = Widget.TableCell{classes = {'Position'}}
 
 	if String.isNotEmpty(args.role) then
 		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'))
@@ -142,7 +141,7 @@ function SquadRow:role(args)
 
 	if role == 'sub' then
 		self.content:addClass('sub')
-	elseif role:find('coach', 1, true) then
+	elseif role:find('coach') then
 		self.content:addClass(role)
 		self.content:addClass('roster-coach')
 	end

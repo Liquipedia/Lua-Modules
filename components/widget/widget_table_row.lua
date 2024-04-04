@@ -13,13 +13,13 @@ local Widget = Lua.import('Module:Infobox/Widget')
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableRowInput
----@field cells WidgetTableCell[]?
+---@field cells Widget[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 
 ---@class WidgetTableRow:Widget
 ---@operator call(WidgetTableRowInput): WidgetTableRow
----@field cells WidgetTableCell[]
+---@field cells Widget[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}
 local TableRow = Class.new(
@@ -31,7 +31,7 @@ local TableRow = Class.new(
 	end
 )
 
----@param cell WidgetTableCell?
+---@param cell Widget?
 ---@return self
 function TableRow:addCell(cell)
 	table.insert(self.cells, cell)
