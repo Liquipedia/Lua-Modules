@@ -7,13 +7,12 @@
 --
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
@@ -24,19 +23,9 @@ function CustomSquad.run(frame)
 
 	squad:init(frame):title()
 
-	local args = squad.args
+	local players = SquadUtils.parsePlayers(squad.args)
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	---@param player table
-	---@return boolean
-	local hasInactive = function(player)
-		return Logic.isNotEmpty(player.inactivedate)
-	end
-
-	if squad.type == Squad.SquadType.FORMER and Array.any(players, hasInactive) then
+	if squad.type == Squad.SquadType.FORMER and SquadUtils.anyInactive(players) then
 		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 

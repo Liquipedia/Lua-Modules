@@ -7,15 +7,13 @@
 --
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
@@ -26,17 +24,9 @@ function CustomSquad.run(frame)
 
 	squad:init(frame):title()
 
-	local args = squad.args
+	local players = SquadUtils.parsePlayers(squad.args)
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	local hasInactive = function(player)
-		return Logic.isNotEmpty(player.inactivedate)
-	end
-
-	if squad.type == Squad.SquadType.FORMER and Array.any(players, hasInactive) then
+	if squad.type == Squad.SquadType.FORMER and SquadUtils.anyInactive(players) then
 		squad.type = Squad.SquadType.FORMER_INACTIVE
 	end
 
@@ -65,24 +55,7 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad:title():header()
 
 	Array.forEach(playerList, function(player)
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
+		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
 	end)
 
 	return squad:create()

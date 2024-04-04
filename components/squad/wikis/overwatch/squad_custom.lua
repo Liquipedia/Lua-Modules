@@ -8,8 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -17,7 +17,7 @@ local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 local ExtendedSquad = Class.new(Squad)
@@ -106,15 +106,9 @@ function CustomSquad.run(frame)
 
 	squad:init(frame):title()
 
-	local args = squad.args
+	local players = SquadUtils.parsePlayers(squad.args)
 
-	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args[index])
-		if type(player) == 'table' and player.number then
-			HAS_NUMBER = true
-		end
-		return player
-	end)
+	HAS_NUMBER = Array.any(players, Operator.property('number'))
 
 	squad:header()
 
@@ -141,25 +135,7 @@ function CustomSquad.runAuto(playerList, squadType)
 	squad:title():header()
 
 	Array.forEach(playerList, function(player)
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.position = player.thisTeam.position
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
+		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
 	end)
 
 	return squad:create()

@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Characters = require('Module:Characters')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local SquadPlayerData = require('Module:SquadPlayer/data')
@@ -18,6 +17,7 @@ local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 local ExtendedSquad = Class.new(Squad)
@@ -67,12 +67,9 @@ function CustomSquad.run(frame)
 	local squad = ExtendedSquad()
 	squad:init(frame):title():header()
 
-	local args = squad.args
-	local tableGame = args.game
+	local tableGame = squad.args.game
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
+	local players = SquadUtils.parsePlayers(squad.args)
 
 	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
