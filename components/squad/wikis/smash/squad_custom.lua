@@ -14,50 +14,49 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Variables = require('Module:Variables')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 
 local CustomSquad = {}
+local ExtendedSquad = Class.new(Squad)
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('Player'))
-		:node(makeHeader(''))
-		:node(makeHeader('Main'))
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
+---@return self
+function ExtendedSquad:header()
+	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
+	local cellArgs = {classes = {'divCell'}}
+	table.insert(self.rows, Widget.TableRow{
+		classes = {'HeaderRow'},
+		css = {['font-weight'] = 'bold'},
+		cells = {
+			Widget.TableCell(cellArgs):addContent('Player'),
+			Widget.TableCell(cellArgs),
+			Widget.TableCell(cellArgs):addContent('Main'),
+			Widget.TableCell(cellArgs):addContent('Join Date'),
+			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+		}
+	})
 
 	return self
 end
+
 ---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@param args table
 ---@return self
 function ExtendedSquadRow:mains(args)
-	local cell = mw.html.create('td')
+	local cell = Widget.TableCell{}
 	cell:css('text-align', 'center')
 
 	Array.forEach(args.mains, function(main)
-		cell:wikitext(Characters.GetIconAndName{main, game = args.game, large = true})
+		cell:addContent(Characters.GetIconAndName{main, game = args.game, large = true})
 	end)
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	return self
 end
@@ -65,12 +64,8 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title()
-
-	squad.mains = CustomSquad.mains
-	squad.header = CustomSquad.header
-	squad:header()
+	local squad = ExtendedSquad()
+	squad:init(frame):title():header()
 
 	local args = squad.args
 	local tableGame = args.game

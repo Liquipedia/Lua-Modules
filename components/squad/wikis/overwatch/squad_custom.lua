@@ -13,12 +13,14 @@ local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
+local ExtendedSquad = Class.new(Squad)
 local HAS_NUMBER = false
 
 ---@class OverwatchSquadRow: SquadRow
@@ -26,35 +28,25 @@ local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@param self Squad
 ---@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
-	if HAS_NUMBER then
-		headerRow:node(makeHeader('Number'))
-	end
-	headerRow:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	elseif self.type == Squad.SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-
-	self.content:node(headerRow)
+function ExtendedSquad:header()
+	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
+	local cellArgs = {classes = {'divCell'}}
+	table.insert(self.rows, Widget.TableRow{
+		classes = {'HeaderRow'},
+		css = {['font-weight'] = 'bold'},
+		cells = {
+			Widget.TableCell(cellArgs):addContent('ID'),
+			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
+			HAS_NUMBER and Widget.TableCell(cellArgs):addContent('Number') or nil,
+			Widget.TableCell(cellArgs):addContent('Name'),
+			Widget.TableCell(cellArgs):addContent('Position'),
+			Widget.TableCell(cellArgs):addContent('Join Date'),
+			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+		}
+	})
 
 	return self
 end
@@ -62,23 +54,23 @@ end
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
+	local cell = Widget.TableCell{}
 	cell:addClass('Position')
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
+			cell:addContent(args.position)
 			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
+				cell:addContent('&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
+			cell:addContent(args.role)
 		end
 	end
 
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
@@ -89,18 +81,18 @@ end
 ---@param args table
 ---@return self
 function ExtendedSquadRow:number(args)
-	local cell = mw.html.create('td')
+	local cell = Widget.TableCell{}
 	cell:addClass('Number')
 
 	if String.isNotEmpty(args.number) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'))
+		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'))
 
 		if String.isNotEmpty(args.number) then
-			cell:wikitext(args.number)
+			cell:addContent(args.number)
 		end
 	end
 
-	self.content:node(cell)
+	self.content:addCell(cell)
 
 	self.lpdbData.number = args.number
 
@@ -110,7 +102,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
+	local squad = ExtendedSquad()
 
 	squad:init(frame):title()
 
@@ -124,7 +116,6 @@ function CustomSquad.run(frame)
 		return player
 	end)
 
-	squad.header = CustomSquad.header
 	squad:header()
 
 	Array.forEach(players, function(player)
@@ -142,12 +133,11 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
+	local squad = ExtendedSquad()
 	squad:init(mw.getCurrentFrame())
 
 	squad.type = squadType
 
-	squad.header = CustomSquad.header
 	squad:title():header()
 
 	Array.forEach(playerList, function(player)

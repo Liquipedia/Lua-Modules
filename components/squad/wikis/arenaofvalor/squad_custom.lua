@@ -24,23 +24,23 @@ local ExtendedSquad = Class.new(Squad)
 
 ---@return self
 function ExtendedSquad:header()
-	local headerRow = Widget.TableRow{classes = 'HeaderRow', css = {['font-weight'] = 'bold'}}
-
-	local cellArgs = {classes = 'divCell'}
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('ID'))
-	headerRow:addCell(Widget.TableCell(cellArgs)) -- "Team Icon" (most commmonly used for loans)
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Name'))
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Position'))
-	headerRow:addCell(Widget.TableCell(cellArgs):addContent('Join Date'))
-
-	if self.type == Squad.SquadType.FORMER then
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Leave Date'))
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('New Team'))
-	elseif self.type == Squad.SquadType.INACTIVE then
-		headerRow:addCell(Widget.TableCell(cellArgs):addContent('Inactive Date'))
-	end
-
-	self.content:addRow(headerRow)
+	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
+	local cellArgs = {classes = {'divCell'}}
+	table.insert(self.rows, Widget.TableRow{
+		classes = {'HeaderRow'},
+		css = {['font-weight'] = 'bold'},
+		cells = {
+			Widget.TableCell(cellArgs):addContent('ID'),
+			Widget.TableCell(cellArgs), -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCell(cellArgs):addContent('Name'),
+			Widget.TableCell(cellArgs):addContent('Position'),
+			Widget.TableCell(cellArgs):addContent('Join Date'),
+			isInactive and Widget.TableCell(cellArgs):addContent('Inactive Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('Leave Date') or nil,
+			isFormer and Widget.TableCell(cellArgs):addContent('New Team') or nil,
+		}
+	})
 
 	return self
 end
@@ -51,7 +51,7 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = Widget.TableCell
+	local cell = Widget.TableCell{}
 	cell:addClass('Position')
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
