@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Widget = require('ModuleInfobox/Widget/All')
+local Widget = require('Module:Infobox/Widget/All')
 local WidgetFactory = require('Module:Widget/Factory')
 
 ---@class Squad

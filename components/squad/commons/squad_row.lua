@@ -18,7 +18,7 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Widget = require('ModuleInfobox/Widget/All')
+local Widget = require('Module:Infobox/Widget/All')
 
 -- TODO: Decided on all valid types
 -- TODO: Move to dedicated module
