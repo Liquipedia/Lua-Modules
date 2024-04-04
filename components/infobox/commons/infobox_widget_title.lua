@@ -21,8 +21,9 @@ local Title = Class.new(
 	end
 )
 
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function Title:make()
+function Title:make(injector)
 	return {Title:_create(self.content)}
 end
 

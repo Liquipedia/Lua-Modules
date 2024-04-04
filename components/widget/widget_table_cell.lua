@@ -47,8 +47,9 @@ function TableCell:addClass(class)
 	return self
 end
 
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function TableCell:make()
+function TableCell:make(injector)
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
