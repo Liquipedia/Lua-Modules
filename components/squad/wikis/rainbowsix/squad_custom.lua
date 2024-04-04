@@ -29,8 +29,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
+	local squad = Squad():init{}
 
 	squad.type = squadType
 

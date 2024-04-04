@@ -64,8 +64,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = ExtendedSquad()
-	squad:init(frame):title():header()
+	local squad = ExtendedSquad():init(frame):title():header()
 
 	local tableGame = squad.args.game
 

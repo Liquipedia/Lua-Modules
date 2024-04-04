@@ -79,9 +79,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = ExtendedSquad()
-
-	squad:init(frame):title()
+	local squad = ExtendedSquad():init(frame):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 

@@ -20,9 +20,7 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
+	local squad = Squad():init(frame):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -47,8 +45,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
+	local squad = Squad():init{}
 
 	squad.type = squadType
 

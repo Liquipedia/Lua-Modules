@@ -19,9 +19,7 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title():header()
+	local squad = Squad():init(frame):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -40,12 +38,11 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
+	local squad = Squad():init(mw.getCurrentFrame()):title()
 
 	squad.type = squadType
 
-	squad:title():header()
+	squad:header()
 
 	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))

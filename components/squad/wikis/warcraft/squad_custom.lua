@@ -20,8 +20,7 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title():header()
+	local squad = Squad():init(frame):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 

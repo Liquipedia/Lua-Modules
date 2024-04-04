@@ -96,12 +96,11 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = ExtendedSquad()
-	squad:init(mw.getCurrentFrame())
+	local squad = ExtendedSquad():init(mw.getCurrentFrame()):title()
 
 	squad.type = squadType
 
-	squad:title():header()
+	squad:header()
 
 	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
