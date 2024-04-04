@@ -83,7 +83,7 @@ function SquadRow:id(args)
 	end
 
 	if String.isNotEmpty(args.name) then
-		cell:addContent('<br>'):addContent('<small><i>' .. args.name .. '</i></small>')
+		cell:addContent('<br>'):addContent(mw.html.create('small'):tag('i'):wikitext(args.name))
 		self.lpdbData.name = args.name
 	end
 
@@ -93,7 +93,7 @@ function SquadRow:id(args)
 		teamNode:addContent(mw.ext.TeamTemplate.teamicon(args.team, date))
 		if args.teamrole then
 			teamNode:addCss('text-align', 'center')
-			teamNode:addContent('<small><i>' .. args.teamrole .. '</i></small>')
+			teamNode:addContent(mw.html.create('small'):tag('i'):wikitext(args.teamrole))
 		end
 	end
 
