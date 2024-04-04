@@ -11,7 +11,7 @@ local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Widget = require('Module:Infobox/Widget/All')
-local WidgetFactory = require('Module:Widget/Factory')
+local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 ---@class Squad
 ---@operator call:Squad
