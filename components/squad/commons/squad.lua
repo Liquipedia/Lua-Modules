@@ -62,7 +62,7 @@ function Squad:title()
 
 	table.insert(self.rows, Widget.TableRow{
 		css = {['font-weight'] = 'bold'},
-		cells = {Widget.TableCell:addContent(titleText)}
+		cells = {Widget.TableCell{}:addContent(titleText)}
 	})
 
 	return self
