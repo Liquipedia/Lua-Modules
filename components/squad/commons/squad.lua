@@ -34,6 +34,7 @@ Squad.SquadType = SquadType
 ---@param injector WidgetInjector?
 ---@return self
 function Squad:init(args, injector)
+	self.args = args
 	self.rows = {}
 
 	local status = (args.status or 'active'):upper()
