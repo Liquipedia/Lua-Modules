@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -29,7 +30,7 @@ local Squad = Class.new()
 ---@param injector WidgetInjector?
 ---@return self
 function Squad:init(args, injector)
-	self.args = args
+	self.args = Arguments.getArgs(args)
 	self.rows = {}
 
 	self.injector = injector
