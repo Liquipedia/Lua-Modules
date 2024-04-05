@@ -90,7 +90,7 @@ function CustomPlayer:addCustomCells(widgets)
 	end
 
 	return Array.extendWith(widgets,
-		{Title{name = 'Driver Statistics'}},
+		{Title{name = 'F1 Driver Statistics'}},
 		Array.map(statisticsCells, function(cellData)
 			return Cell{name = cellData.name, content = {args[cellData.key]}}
 		end)
