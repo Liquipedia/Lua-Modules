@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
@@ -75,21 +76,20 @@ function TableCell:make(injector)
 	return {cell}
 end
 
----@return string|number
+---@return string
 function TableCell:_concatContent()
 	return table.concat(Array.map(self.content, function (content)
-		if type(content) == 'table' then
-			if not Array.isArray(content) then
-				return tostring(content)
-			end
-			local wrapper = mw.html.create('div')
-			Array.forEach(content, function(inner)
-				wrapper:node(inner)
-			end)
-			return tostring(wrapper)
-		else
+		if type(content) ~= 'table' then
 			return content
 		end
+
+		if not Array.isArray(content) then
+			return tostring(content)
+		end
+
+		local wrapper = mw.html.create('div')
+		Array.forEach(content, FnUtil.curry(wrapper.node, wrapper))
+		return tostring(wrapper)
 	end))
 end
 
