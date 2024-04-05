@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -41,7 +40,7 @@ function CustomSquad.run(frame)
 		row:role{role = player.role}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadType.FORMER then
+		if squad.type == SquadUtils.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -49,16 +48,11 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.SquadType.INACTIVE then
+		elseif squad.type == SquadUtils.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
 	end)
 
 	return squad:create()

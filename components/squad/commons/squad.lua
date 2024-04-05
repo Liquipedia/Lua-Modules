@@ -8,9 +8,12 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Widget = require('Module:Infobox/Widget/All')
 local WidgetFactory = require('Module:Infobox/Widget/Factory')
+
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 ---@class Squad
 ---@operator call:Squad
@@ -21,14 +24,6 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 ---@field type integer
 local Squad = Class.new()
 
----@enum SquadType
-local SquadType = {
-	ACTIVE = 0,
-	INACTIVE = 1,
-	FORMER = 2,
-	FORMER_INACTIVE = 3,
-}
-Squad.SquadType = SquadType
 
 ---@param args table
 ---@param injector WidgetInjector?
@@ -37,10 +32,11 @@ function Squad:init(args, injector)
 	self.args = args
 	self.rows = {}
 
-	local status = (args.status or 'active'):upper()
-
-	self.type = SquadType[status] or SquadType.ACTIVE
 	self.injector = injector
+	self.type =
+		(SquadUtils.SquadTypeToStorageValue[self.args.type] and self.args.type) or
+		SquadUtils.statusToSquadType(self.args.status) or
+		SquadUtils.SquadType.ACTIVE
 
 	return self
 end
@@ -48,9 +44,9 @@ end
 ---@return self
 function Squad:title()
 	local defaultTitle
-	if self.type == SquadType.FORMER or SquadType.FORMER_INACTIVE then
+	if self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE then
 		defaultTitle = 'Former Squad'
-	elseif self.type == SquadType.INACTIVE then
+	elseif self.type == SquadUtils.SquadType.INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
@@ -70,8 +66,8 @@ end
 
 ---@return self
 function Squad:header()
-	local isInactive = self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE
-	local isFormer = self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE
+	local isInactive = self.type == SquadUtils.SquadType.INACTIVE or self.type == SquadUtils.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE
 	table.insert(self.rows, Widget.TableRow{
 		classes = {'HeaderRow'},
 		css = {['font-weight'] = 'bold'},

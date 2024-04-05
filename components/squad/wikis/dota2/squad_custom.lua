@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 local Widget = require('Module:Infobox/Widget/All')
 
@@ -71,8 +70,8 @@ function CustomSquad.run(frame)
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
-	if squad.type == Squad.SquadType.FORMER and SquadUtils.anyInactive(players) then
-		squad.type = Squad.SquadType.FORMER_INACTIVE
+	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
+		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
 	end
 
 	squad:header()
@@ -94,7 +93,7 @@ function CustomSquad.run(frame)
 			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
 			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadType.INACTIVE or squad.type == Squad.SquadType.FORMER_INACTIVE then
+		if squad.type == SquadUtils.SquadType.INACTIVE or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			row:newteam{
 				newteam = player.activeteam,
@@ -102,7 +101,7 @@ function CustomSquad.run(frame)
 				newteamdate = player.inactivedate
 			}
 		end
-		if squad.type == Squad.SquadType.FORMER or squad.type == Squad.SquadType.FORMER_INACTIVE then
+		if squad.type == SquadUtils.SquadType.FORMER or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -112,14 +111,7 @@ function CustomSquad.run(frame)
 			}
 		end
 
-		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. link .. '_'
-			.. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
 	end)
 
 	return squad:create()

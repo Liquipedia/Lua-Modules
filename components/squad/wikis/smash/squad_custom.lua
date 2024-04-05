@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Characters = require('Module:Characters')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Variables = require('Module:Variables')
 local Widget = require('Module:Infobox/Widget/All')
@@ -80,7 +79,7 @@ function CustomSquad.run(frame)
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadType.FORMER then
+		if squad.type == SquadUtils.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -88,16 +87,11 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.SquadType.INACTIVE then
+		elseif squad.type == SquadUtils.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
 
 		Variables.varDefine('nationality', '')
 		Variables.varDefine('name', '')
