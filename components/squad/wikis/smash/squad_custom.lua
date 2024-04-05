@@ -28,6 +28,8 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Widget.TableCell{}:addContent('Main')
 		}
+	elseif id == 'header_name' then
+		return {}
 	end
 
 	return widgets
