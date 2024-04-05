@@ -48,8 +48,12 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:elo(args)
-	self.content:addCell(Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-')))
-	self.content:addCell(Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-')))
+	self.content:addCell(
+		Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
+	)
+	self.content:addCell(
+		Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
+	)
 
 	return self
 end

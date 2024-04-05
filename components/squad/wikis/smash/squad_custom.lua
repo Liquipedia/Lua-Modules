@@ -18,7 +18,6 @@ local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
-local CustomSquad = {}
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
 local CustomSquad = {}
