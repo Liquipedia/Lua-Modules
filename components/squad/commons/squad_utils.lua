@@ -10,11 +10,48 @@ local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local SquadUtils = {}
+
+---@enum SquadType
+SquadUtils.SquadType = {
+	ACTIVE = 0,
+	INACTIVE = 1,
+	FORMER = 2,
+	FORMER_INACTIVE = 3,
+}
+
+---@type {string: SquadType}
+SquadUtils.StatusToSquadType = {
+	active = SquadUtils.SquadType.ACTIVE,
+	inactive = SquadUtils.SquadType.INACTIVE,
+	former = SquadUtils.SquadType.FORMER,
+}
+
+---@type {SquadType: string}
+SquadUtils.SquadTypeToStorageValue = {
+	[SquadUtils.SquadType.ACTIVE] = 'active',
+	[SquadUtils.SquadType.INACTIVE] = 'inactive',
+	[SquadUtils.SquadType.FORMER] = 'former',
+	[SquadUtils.SquadType.FORMER_INACTIVE] = 'former',
+}
+
+-- TODO: Decided on all valid types
+SquadUtils.validPersonTypes = {'player', 'staff'}
+SquadUtils.defaultPersonType = 'player'
+
+---@param status string?
+---@return SquadType?
+function SquadUtils.statusToSquadType(status)
+	if not status then
+		return
+	end
+	return SquadUtils.StatusToSquadType[status:lower()]
+end
 
 ---@param args table
 ---@return table[]
@@ -32,6 +69,8 @@ function SquadUtils.anyInactive(players)
 	end)
 end
 
+---@param player table
+---@return table
 function SquadUtils.convertAutoParameters(player)
 	local newPlayer = Table.copy(player)
 	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
@@ -52,6 +91,19 @@ function SquadUtils.convertAutoParameters(player)
 	newPlayer.newteamdate = player.newTeam.date
 
 	return newPlayer
+end
+
+---@param player table
+---@param squadType SquadType
+---@return string
+function SquadUtils.defaultObjectName(player, squadType)
+	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
+
+	return mw.title.getCurrentTitle().prefixedText
+	.. '_' .. link .. '_'
+	.. ReferenceCleaner.clean(player.joindate)
+	.. (player.role and '_' .. player.role or '')
+	.. '_' .. squadType
 end
 
 return SquadUtils

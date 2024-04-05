@@ -9,29 +9,21 @@
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
+local SquadUtils = Lua.import('Module:Squad/Utils')
+
 ---@class Squad
----@field frame Frame
 ---@field args table
 ---@field root Html
 ---@field content Html
 ---@field type integer
 local Squad = Class.new()
 
----@enum SquadType
-local SquadType = {
-	ACTIVE = 0,
-	INACTIVE = 1,
-	FORMER = 2,
-	FORMER_INACTIVE = 3,
-}
-Squad.SquadType = SquadType
-
----@param frame Frame
+---@param frame table|Frame
 ---@return self
 function Squad:init(frame)
-	self.frame = frame
 	self.args = Arguments.getArgs(frame)
 	self.root = mw.html.create('div')
 	self.root:addClass('table-responsive')
@@ -47,9 +39,10 @@ function Squad:init(frame)
 		self.args.isLoan = true
 	end
 
-	local status = (self.args.status or 'active'):upper()
-
-	self.type = SquadType[status] or SquadType.ACTIVE
+	self.type =
+		(SquadUtils.SquadTypeToStorageValue[self.args.type] and self.args.type) or
+		SquadUtils.statusToSquadType(self.args.status) or
+		SquadUtils.SquadType.ACTIVE
 
 	return self
 end
@@ -57,9 +50,9 @@ end
 ---@return Squad
 function Squad:title()
 	local defaultTitle
-	if self.type == SquadType.FORMER then
+	if self.type == SquadUtils.SquadType.FORMER then
 		defaultTitle = 'Former Squad'
-	elseif self.type == SquadType.INACTIVE then
+	elseif self.type == SquadUtils.SquadType.INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
@@ -105,10 +98,10 @@ function Squad:header()
 		:node(makeHeader('Name'))
 		:node(makeHeader()) -- "Role"
 		:node(makeHeader('Join Date'))
-	if self.type == SquadType.FORMER then
+	if self.type == SquadUtils.SquadType.FORMER then
 		headerRow:node(makeHeader('Leave Date'))
 			:node(makeHeader('New Team'))
-	elseif self.type == SquadType.INACTIVE then
+	elseif self.type == SquadUtils.SquadType.INACTIVE then
 		headerRow:node(makeHeader('Inactive Date'))
 	end
 

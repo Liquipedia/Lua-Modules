@@ -12,6 +12,7 @@ local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
 local CustomSquad = {}
@@ -29,12 +30,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
-
-	squad.type = squadType
-
-	squad:title():header()
+	local squad = Squad():init{type = squadType}:title():header()
 
 	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
@@ -69,7 +65,7 @@ function CustomSquad._playerRow(player, squadType)
 	row:role({role = player.thisTeam.role})
 	row:date(joinText, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == Squad.SquadType.FORMER then
+	if squadType == SquadUtils.SquadType.FORMER then
 		row:date(leaveText, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam({
 			newteam = player.newTeam.team,
@@ -77,15 +73,11 @@ function CustomSquad._playerRow(player, squadType)
 			newteamdate = player.newTeam.date,
 			leavedate = player.newTeam.date
 		})
-	elseif squadType == Squad.SquadType.INACTIVE then
+	elseif squadType == SquadUtils.SquadType.INACTIVE then
 		row:date(leaveText, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_'
-		.. player.joindate .. (player.role and '_' .. player.role or '')
-		.. '_' .. squadType
-	)
+	return row:create(SquadUtils.defaultObjectName(player, squadType))
 end
 
 return CustomSquad

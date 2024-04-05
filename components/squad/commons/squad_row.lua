@@ -7,29 +7,19 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
 local OpponentDisplay = OpponentLib.OpponentDisplay
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local Squad = require('Module:Squad')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
--- TODO: Decided on all valid types
--- TODO: Move to dedicated module
-local VALID_TYPES = {'player', 'staff'}
-local DEFAULT_TYPE = 'player'
-
-local STATUS_MAPPING = {
-	[Squad.SquadType.ACTIVE] = 'active',
-	[Squad.SquadType.INACTIVE] = 'inactive',
-	[Squad.SquadType.FORMER] = 'former',
-	[Squad.SquadType.FORMER_INACTIVE] = 'former',
-}
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
 	.. '|class=player-role-icon]]'
@@ -45,7 +35,7 @@ local SquadRow = Class.new(
 		self.content = mw.html.create('tr'):addClass('Player')
 		self.options = options or {}
 
-		self.lpdbData = {type = DEFAULT_TYPE}
+		self.lpdbData = {type = SquadUtils.defaultPersonType}
 	end
 )
 
@@ -213,7 +203,7 @@ end
 ---@return self
 function SquadRow:setType(type)
 	type = type:lower()
-	if Table.includes(VALID_TYPES, type) then
+	if Table.includes(SquadUtils.validPersonTypes, type) then
 		self.lpdbData.type = type
 	end
 	return self
@@ -222,7 +212,7 @@ end
 ---@param status integer
 ---@return self
 function SquadRow:status(status)
-	self.lpdbData.status = STATUS_MAPPING[status]
+	self.lpdbData.status = SquadUtils.SquadTypeToStorageValue[status]
 	return self
 end
 
