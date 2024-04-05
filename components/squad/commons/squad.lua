@@ -9,8 +9,10 @@
 local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local SquadUtils = require('Module:Squad/Utils')
+
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 ---@class Squad
 ---@field args table

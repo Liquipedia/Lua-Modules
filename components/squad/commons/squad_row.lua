@@ -7,17 +7,19 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
+local Lua = require('Lua:Flags')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
 local OpponentDisplay = OpponentLib.OpponentDisplay
 local ReferenceCleaner = require('Module:ReferenceCleaner')
-local SquadUtils = require('Module:SquadUtils')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
+
+local SquadUtils = Lua.import('Module:SquadUtils')
 
 local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
 	.. '|class=player-role-icon]]'
