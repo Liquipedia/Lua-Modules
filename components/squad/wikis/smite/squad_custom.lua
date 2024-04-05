@@ -76,7 +76,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad():init{type = squadType}:title():header()
+	local squad = Squad():init({type = squadType}, CustomInjector()):title():header()
 
 	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
