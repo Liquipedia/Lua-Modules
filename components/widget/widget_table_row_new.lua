@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
@@ -36,17 +38,13 @@ local TableRow = Class.new(
 function TableRow:make(injector)
 	local row = mw.html.create('tr')
 
-	for _, class in ipairs(self.classes) do
-		row:addClass(class)
-	end
+	Array.forEach(self.classes, FnUtil.curry(row.addClass, row))
 
 	row:css(self.css)
 
-	for _, cell in ipairs(self.children) do
-		for _, node in ipairs(WidgetFactory.work(cell, injector)) do
-			row:node(node)
-		end
-	end
+	Array.forEach(self.children, function(child)
+		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(row.node, row))
+	end)
 
 	return {row}
 end

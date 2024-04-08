@@ -49,9 +49,7 @@ function TableCell:make(injector)
 	cell:attr('colspan', self.colSpan)
 	cell:attr('rowspan', self.rowSpan)
 
-	for _, class in ipairs(self.classes) do
-		cell:addClass(class)
-	end
+	Array.forEach(self.classes, FnUtil.curry(cell.addClass, cell))
 
 	cell:css(self.css)
 

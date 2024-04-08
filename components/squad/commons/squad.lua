@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -109,9 +110,7 @@ function Squad:create()
 		children = self.rows,
 	}
 	local wrapper = mw.html.create()
-	for _, node in ipairs(WidgetFactory.work(dataTable, self.injector)) do
-		wrapper:node(node)
-	end
+	Array.forEach(WidgetFactory.work(dataTable, self.injector), FnUtil.curry(wrapper.node, wrapper))
 	return wrapper
 end
 
