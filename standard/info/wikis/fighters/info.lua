@@ -653,12 +653,12 @@ return {
 			name = 'Koihime Enbu',
 			link = 'Koihime Enbu',
 			logo = {
-				darkMode = 'Koihime Enbu logo.png',
-				lightMode = 'Koihime Enbu logo.png',
+				darkMode = 'Koihime Enbu default allmode.png',
+				lightMode = 'Koihime Enbu default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Koihime Enbu logo.png',
-				lightMode = 'Koihime Enbu logo.png',
+				darkMode = 'Koihime Enbu default allmode.png',
+				lightMode = 'Koihime Enbu default allmode.png',
 			},
 		},
 		hnk = {
