@@ -11,10 +11,10 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Widget = require('Module:Infobox/Widget/All')
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local Widget = Lua.import('Module:Infobox/Widget/All')
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class Squad
 ---@operator call:Squad

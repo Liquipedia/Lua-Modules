@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -79,10 +78,7 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-		.. (player.role and '_' .. player.role or '')
-	)
+	return row:create(SquadUtils.defaultObjectName(player, squadType))
 end
 
 return CustomSquad

@@ -18,9 +18,9 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Widget = require('Module:Infobox/Widget/All')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local Widget = Lua.import('Module:Infobox/Widget/All')
 
 local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
 	.. '|class=player-role-icon]]'
