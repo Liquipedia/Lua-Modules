@@ -65,8 +65,7 @@ function CustomSquad.run(frame)
 		local row = ExtendedSquadRow()
 
 		local game = player.game and mw.text.split(player.game:lower(), ',')[1] or tableGame
-		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game}
-			or player.mains
+		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game} or player.mains
 
 		row:status(squad.type)
 		row:id{
