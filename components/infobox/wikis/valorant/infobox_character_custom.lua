@@ -38,7 +38,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'class' then
-		Cell{name = 'Class', content = {CustomCharacter._getClassType(args)}}
+		table.insert(widgets, Cell{name = 'Class', content = {CustomCharacter._getClassType(args)}})
 	elseif 'custom' then
 		Array.appendWith(
 			widgets,
@@ -60,13 +60,12 @@ function CustomCharacter:getWikiCategories(args)
 end
 
 ---@param args table
----@return string[]
+---@return string?
 function CustomCharacter._getClassType(args)
 	if String.isEmpty(args.classtype) then
-		return {}
+		return
 	end
-	local releasedate = args.releasedate
-	local typeIcon = ClassTypes.get{type = args.classtype, date = releasedate, size = 15}
+	local typeIcon = ClassTypes.get{type = args.classtype, date = args.releasedate, size = 15}
 	return typeIcon .. ' [[' .. args.classtype .. ']]'
 end
 
