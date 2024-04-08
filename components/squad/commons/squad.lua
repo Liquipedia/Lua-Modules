@@ -7,6 +7,7 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -70,7 +71,7 @@ function Squad:header()
 	local isFormer = self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE
 	table.insert(self.rows, Widget.TableRowNew{
 		classes = {'HeaderRow'},
-		children = {
+		children = Array.append({},
 			Widget.TableCellNew{content = {'ID'}, header = true},
 			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
 			Widget.Customizable{id = 'header_name',
@@ -84,10 +85,10 @@ function Squad:header()
 				Widget.TableCellNew{content = {'Inactive Date'}, header = true},
 			}} or nil,
 			isFormer and Widget.Customizable{id = 'header_former', children = {
-				Widget.TableCellNew{content = {'Leave Date}'}, header = true},
+				Widget.TableCellNew{content = {'Leave Date'}, header = true},
 				Widget.TableCellNew{content = {'New Team'}, header = true},
-			}} or nil,
-		}
+			}} or nil
+		)
 	})
 
 	return self
