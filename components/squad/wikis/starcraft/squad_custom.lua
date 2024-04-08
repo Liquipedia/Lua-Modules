@@ -20,24 +20,23 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local CustomSquad = {}
 local TlpdSquad = Class.new(Squad)
 
----@return Squad
+---@return self
 function TlpdSquad:header()
-	table.insert(self.rows, Widget.TableRow{
+	table.insert(self.children, Widget.TableRowNew{
 		classes = {'HeaderRow'},
-		css = {['font-weight'] = 'bold'},
 		cells = {
-			Widget.TableCell{}:addContent('ID'),
-			Widget.TableCell{}, -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCell{}:addContent('Name'),
-			Widget.TableCell{}:addContent('ELO'),
-			Widget.TableCell{}:addContent('ELO Peak'),
+			Widget.TableCellNew{content = {'ID'}, header = true},
+			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCellNew{content = {'Name'}, header = true},
+			Widget.TableCellNew{content = {'ELO'}, header = true},
+			Widget.TableCellNew{content = {'ELO Peak'}, header = true},
 		}
 	})
 
 	return self
 end
 
----@return Squad
+---@return self
 function TlpdSquad:title()
 	return self
 end
@@ -48,11 +47,11 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:elo(args)
-	self.content:addCell(
-		Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
+	table.insert(self.children,
+		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-')}}
 	)
-	self.content:addCell(
-		Widget.TableCell{}:addContent(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
+	table.insert(self.children,
+		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-')}}
 	)
 
 	return self

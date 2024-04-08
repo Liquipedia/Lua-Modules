@@ -41,7 +41,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return WidgetTableRow
+---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
 	--Get Reference(s)
 	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)

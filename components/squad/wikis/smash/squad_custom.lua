@@ -26,7 +26,7 @@ local CustomInjector = Class.new(Injector)
 function CustomInjector:parse(id, widgets)
 	if id == 'header_role' then
 		return {
-			Widget.TableCell{}:addContent('Main')
+			Widget.TableCellNew{content = {'Main'}, header = true}
 		}
 	elseif id == 'header_name' then
 		return {}
@@ -41,13 +41,15 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:mains(args)
-	local cell = Widget.TableCell{}
-	cell:css('text-align', 'center')
-
+	local characters = {}
 	Array.forEach(args.mains, function(main)
-		cell:addContent(Characters.GetIconAndName{main, game = args.game, large = true})
+		table.insert(characters, Characters.GetIconAndName{main, game = args.game, large = true})
 	end)
-	self.content:addCell(cell)
+
+	table.insert(self.children, Widget.TableCellNew{
+		css = {['text-align'] = 'center'},
+		content = characters,
+	})
 
 	return self
 end

@@ -25,9 +25,9 @@ local LANG = mw.getContentLanguage()
 
 function CustomInjector:parse(id, widgets)
 	if id == 'header_role' then
-		return {Widget.TableCell{}:addContent('Position')}
+		return {Widget.TableCellNew{content = {'Position'}, header = true}}
 	elseif id == 'header_inactive' then
-		table.insert(widgets, Widget.TableCell{}:addContent('Active Team'))
+		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
 	end
 
 	return widgets
@@ -39,23 +39,25 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = Widget.TableCell{}
-	cell:addClass('Position')
+	local content = {}
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:addContent(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:addContent(args.position)
+			table.insert(content, args.position)
 			if String.isNotEmpty(args.role) then
-				cell:addContent('&nbsp;(' .. args.role .. ')')
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:addContent(args.role)
+			table.insert(content, args.role)
 		end
 	end
 
-	self.content:addCell(cell)
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
