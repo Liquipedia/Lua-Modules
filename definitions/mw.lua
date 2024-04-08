@@ -183,7 +183,16 @@ end
 ---@param tagName string
 ---@param args? {selfClosing: boolean, parent: Html}
 ---@return Html
-function mw.html:tag(tagName, args) end
+function mw.html:tag(tagName, args)
+	args = args or {}
+
+	--it actually does that according to logs ...
+	table.insert(self.nodes, args.parent)
+
+	local child = mw.html.create(tagName, {selfClosing = args.selfClosing, parent = self})
+	table.insert(self.nodes, child)
+	return child
+end
 
 ---Set an HTML attribute with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
@@ -243,11 +252,19 @@ end
 
 ---Returns the parent node under which the current node was created.
 ---@return Html
-function mw.html:done() end
+function mw.html:done()
+	return self.parent or self
+end
 
 ---Like html:done(), but traverses all the way to the root node of the tree and returns it.
 ---@return Html
-function mw.html:allDone() end
+function mw.html:allDone()
+	local current = self
+	while current.parent do
+		current = current.parent --[[@as Html]]
+	end
+	return current
+end
 
 --- Include the full functionality for faking
 mw.html = require('3rd.mw.html')
