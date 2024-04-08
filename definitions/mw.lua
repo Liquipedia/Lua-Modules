@@ -138,8 +138,13 @@ function mw.hash.hashValue(algo, value) end
 function mw.hash.listAlgorithms() end
 
 ---@class Html
----@field nodes Html[]
-mw.html = {nodes = {}}
+---@field tagName string?
+---@field selfClosing boolean
+---@field parent Html?
+---@field nodes (Html|string|number?)[]
+---@field attributes {name: string, val: string|number?}[]
+---@field styles ({name: string, val: string|number?}|string?)[]
+mw.html = {}
 
 ---Creates a new mw.html object containing a tagName html element. You can also pass an empty string or nil as tagName in order to create an empty mw.html object.
 ---@param tagName? string
@@ -150,16 +155,28 @@ function mw.html.create(tagName, args) end
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
 ---@param builder? Html|string|number
 ---@return self
-function mw.html:node(builder) end
+function mw.html:node(builder)
+	table.insert(self.nodes, builder)
+	return self
+end
 
 ---Appends an undetermined number of wikitext strings to the mw.html object. Note that this stops at the first nil item.
 ---@param ... string|number|nil
 ---@return self
-function mw.html:wikitext(...) end
+function mw.html:wikitext(...)
+	for i = 1, select('#', ...) do
+		table.insert(self.nodes, select(i, ...))
+	end
+
+	return self
+end
 
 ---Appends a newline to the mw.html object.
 ---@return self
-function mw.html:newline() end
+function mw.html:newline()
+	table.insert(self.nodes, '\n')
+	return self
+end
 
 ---Appends a new child node with the given tagName to the builder, and returns a mw.html instance representing that new node. The args parameter is identical to that of mw.html.create
 ---Note that contrarily to other methods such as html:node(), this method doesn't return the current mw.html instance, but the mw.html instance of the newly inserted tag. Make sure to use html:done() to go up to the parent mw.html instance, or html:allDone() if you have nested tags on several levels.
@@ -173,29 +190,56 @@ function mw.html:tag(tagName, args) end
 ---@param value string|number|nil
 ---@return self
 ---@overload fun(self, param: {[string]: string})
-function mw.html:attr(name, value) end
+function mw.html:attr(name, value)
+	if type(name) == 'string' then
+		table.insert(self.attributes, {name = name, val = value})
+		return self
+	elseif type(name) == 'table' then
+		return self
+	end
+	for attributeName, attributeValue in pairs(name) do
+		table.insert(self.attributes, {name = attributeName, val = attributeValue})
+	end
+	return self
+end
 
 ---Get the value of a html attribute previously set using html:attr() with the given name.
 ---@param name string
----@return string
-function mw.html:getAttr(name) end
+---@return string|number?
+function mw.html:getAttr(name)
+	for _, attribute in ipairs(self.attributes) do
+		if attribute.name == name then
+			return attribute.val
+		end
+	end
+end
 
 ---Adds a class name to the node's class attribute. If a nil parameter is passed, this is a no-op.
 ---@param class string?
 ---@return self
-function mw.html:addClass(class) end
+function mw.html:addClass(class)
+	if not class then return self end
+	local currentClasses = (self:getAttr('class') or '') .. ' ' .. class
+	return mw.html:attr('class', currentClasses)
+end
 
 ---Set a CSS property with the given name and value on the node. Alternatively a table holding name->value pairs of attributes to set can be passed. In the first form, a value of nil causes any attribute with the given name to be unset if it was previously set.
 ---@param name string
 ---@param value string|number|nil
 ---@return self
 ---@overload fun(self, param: {[string]: string|number|nil})
-function mw.html:css(name, value) end
+function mw.html:css(name, value)
+	table.insert(self.styles, {name = name, val = value})
+	return self
+end
 
 ---Add some raw css to the node's style attribute. If a nil parameter is passed, this is a no-op.
 ---@param css string?
 ---@return self
-function mw.html:cssText(css) end
+function mw.html:cssText(css)
+	table.insert(self.styles, css)
+	return self
+end
 
 ---Returns the parent node under which the current node was created.
 ---@return Html
