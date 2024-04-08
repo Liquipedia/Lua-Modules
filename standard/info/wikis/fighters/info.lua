@@ -648,6 +648,19 @@ return {
 				lightMode = 'KILL la KILL - IF default allmode.png',
 			},
 		},
+		koihime = {
+			abbreviation = 'Koihime Enbu',
+			name = 'Koihime Enbu',
+			link = 'Koihime Enbu',
+			logo = {
+				darkMode = 'Koihime Enbu logo.png',
+				lightMode = 'Koihime Enbu logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Koihime Enbu logo.png',
+				lightMode = 'Koihime Enbu logo.png',
+			},
+		},
 		hnk = {
 			abbreviation = 'HNK',
 			name = 'Hokuto no Ken',
