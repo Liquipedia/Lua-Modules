@@ -271,15 +271,13 @@ function matchFunctions.getVodStuff(match)
 
 	match.links = {}
 	local links = match.links
-	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.owl then links.owl = 'https://overwatchleague.com/en-us/match/' .. match.owl end
-	if match.owc then links.owc = 'https://www.overwatchcontenders.com/match/details/' .. match.owc end
-	if match.jcg then links.jcg = 'http://ow.j-cg.com/compe/view/match/' .. match.jcg end
-	if match.oceow then links.oceow = 'http://bmb.oceoverwatch.com/event/' .. match.oceow end
-	if match.tespa then links.tespa = 'https://compete.tespa.org/tournament/' .. match.tespa end
+	if match.owl then links.owl = 'https://web.archive.org/web/overwatchleague.com/en-us/match/' .. match.owl end
+	if match.jcg then links.jcg = 'https://web.archive.org/web/ow.j-cg.com/compe/view/match/' .. match.jcg end
+	if match.tespa then links.tespa = 'https://web.archive.org/web/compete.tespa.org/tournament/' .. match.tespa end
 	if match.overgg then links.overgg = 'http://www.over.gg/' .. match.overgg end
 	if match.pf then links.pf = 'http://www.plusforward.net/overwatch/post/' .. match.pf end
 	if match.wl then links.wl = 'https://www.winstonslab.com/matches/match.php?id=' .. match.wl end
+	if match.faceit then links.faceit = 'https://www.faceit.com/en/ow2/room/' .. match.faceit end
 	if match.stats then links.stats = match.stats end
 
 	return match
