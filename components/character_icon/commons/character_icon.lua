@@ -51,7 +51,7 @@ function CharacterIcon._makeImage(info, size, class)
 		info.file,
 		info.display,
 		size,
-		Logic.isNotEmpty(info.link) and 'link=' .. info.link or nil,
+		info.link and ('link=' .. info.link) or nil,
 		Logic.isNotEmpty(class) and 'class=' .. class or nil
 	)
 
