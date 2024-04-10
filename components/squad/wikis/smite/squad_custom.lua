@@ -23,7 +23,13 @@ end
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow, {usePosition = true}), SquadUtils.positionHeaderInjector())
+	return SquadUtils.defaultRunAuto(
+		playerList,
+		squadType,
+		Squad,
+		SquadUtils.defaultRow(SquadRow, {usePosition = true}),
+		SquadUtils.positionHeaderInjector()
+	)
 end
 
 return CustomSquad

@@ -17,14 +17,25 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow, {usePosition = true}), SquadUtils.positionHeaderInjector())
+	return SquadUtils.defaultRunManual(
+		frame,
+		Squad,
+		SquadUtils.defaultRow(SquadRow, {usePosition = true}),
+		SquadUtils.positionHeaderInjector()
+	)
 end
 
 ---@param playerList table[]
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow, {usePosition = true}), SquadUtils.positionHeaderInjector())
+	return SquadUtils.defaultRunAuto(
+		playerList,
+		squadType,
+		Squad,
+		SquadUtils.defaultRow(SquadRow, {usePosition = true}),
+		SquadUtils.positionHeaderInjector()
+	)
 end
 
 return CustomSquad

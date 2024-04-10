@@ -61,18 +61,14 @@ end
 ---@return Html
 function CustomSquad.run(frame)
 	local tlpd = Logic.readBool(frame.args.tlpd)
-	local squad
+	local SquadClass
 	if tlpd then
-		squad = TlpdSquad()
+		SquadClass = TlpdSquad
 	else
-		squad = Squad()
+		SquadClass = Squad
 	end
 
-	squad:init(frame):title():header()
-
-	local players = SquadUtils.parsePlayers(squad.args)
-
-	Array.forEach(players, function(player)
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(player, squadType)
 		local row = ExtendedSquadRow()
 
 		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race
@@ -84,7 +80,7 @@ function CustomSquad.run(frame)
 		local elo = CustomSquad._queryTLPD(player.id, 'elo')
 		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
 
-		row:status(squad.type)
+		row:status(squadType)
 		row:id{
 			id,
 			race = faction,
@@ -103,7 +99,7 @@ function CustomSquad.run(frame)
 			row:role{role = player.role}
 			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-			if squad.type == SquadUtils.SquadType.FORMER then
+			if squadType == SquadUtils.SquadType.FORMER then
 				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 				row:newteam{
 					newteam = player.newteam,
@@ -111,16 +107,16 @@ function CustomSquad.run(frame)
 					newteamdate = player.newteamdate,
 					leavedate = player.leavedate
 				}
-			elseif squad.type == SquadUtils.SquadType.INACTIVE then
+			elseif squadType == SquadUtils.SquadType.INACTIVE then
 				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			end
 		end
 
-		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
-	end)
-
-	return squad:create()
+		return row:create(SquadUtils.defaultObjectName(player, squadType))
+	end
+	)
 end
+
 
 ---@param id number?
 ---@param value string

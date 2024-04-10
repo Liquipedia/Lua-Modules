@@ -43,8 +43,6 @@ function ExtendedSquadRow:number(args)
 		} or nil,
 	})
 
-	self.lpdbData.number = args.number
-
 	return self
 end
 
