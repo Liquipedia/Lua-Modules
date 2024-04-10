@@ -19,7 +19,7 @@ liquipedia.battleRoyale = {
 		const elements = this.battleRoyaleInstances[ instanceId ]
 			.querySelectorAll( '[data-js-battle-royale="header-row"] [data-sort-type="total-points"] span' );
 		elements.forEach( ( element ) => {
-			element.innerText = this.TEXT_VALUE_MOBILE_TOTAL_POINTS
+			element.innerText = this.TEXT_VALUE_MOBILE_TOTAL_POINTS;
 		} );
 	},
 
