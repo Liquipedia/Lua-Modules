@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -49,7 +50,8 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame, CustomInjector()):title()
+	local args = Arguments.getArgs(frame)
+	local squad = Squad():init(args, CustomInjector()):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 

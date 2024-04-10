@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
@@ -24,9 +25,8 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame):title():header()
-
-	local args = squad.args
+	local args = Arguments.getArgs(frame)
+	local squad = Squad():init(args):title():header()
 
 	local isFormer = squad.type == SquadUtils.SquadType.FORMER
 	local isInactive = squad.type == SquadUtils.SquadType.INACTIVE
