@@ -28,8 +28,6 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Widget.TableCellNew{content = {'Main'}, header = true}
 		}
-	elseif id == 'header_name' then
-		return {}
 	end
 
 	return widgets
@@ -75,9 +73,9 @@ function CustomSquad.run(frame)
 			flag = Variables.varDefault('nationality') or player.flag,
 			link = player.link,
 			team = player.activeteam,
-			name = Variables.varDefault('name') or player.name,
 			date = player.leavedate or player.inactivedate or player.leavedate,
 		}
+		row:name{name = Variables.varDefault('name') or player.name}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 

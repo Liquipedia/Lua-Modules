@@ -2,6 +2,7 @@
 describe('Squad', function()
 	local Squad = require('Module:Squad')
 	local SquadRow = require('Module:Squad/Row')
+	local SquadUtils = require('Module:Squad/Utils')
 
 	describe('row', function()
 		local LpdbSquadStub, LpdbQueryStub
@@ -17,17 +18,23 @@ describe('Squad', function()
 		end)
 
 		it('displays correct and stores correctly', function()
-			local row = SquadRow()
-			row:id{'Baz', 'se'}
-					:name{name = 'Foo Bar'}
-					:status(2)
-					:role{}
-					:date('2022-01-01', 'Join Date:&nbsp;', 'joindate')
-					:date('2022-03-03', 'Inactive Date:&nbsp;', 'inactivedate')
-					:date('2022-05-01', 'Leave Date:&nbsp;', 'leavedate')
+			local squadPerson = SquadUtils.readSquadPersonArgs{
+				'Baz',
+				name = 'Foo Bar',
+				joindate = '2022-01-01',
+				inactivedate = '2022-03-03',
+				leavedate = '2022-05-01',
+				status = SquadUtils.SquadType.FORMER_INACTIVE,
+			}
+			local row = SquadRow(squadPerson)
+			row:id():name():role()
+			row:date('joindate', 'Join Date:&nbsp;')
+			row:date('inactivedate', 'Inactive Date:&nbsp;')
+			row:date('leavedate', 'Leave Date:&nbsp;')
 
 			GoldenTest('squad_row', tostring(row:create():tryMake()[1]))
 
+			SquadUtils.storeSquadPerson(squadPerson)
 			assert.stub(LpdbSquadStub).was.called_with('Baz_2022-01-01__former', {
 				id = 'Baz',
 				inactivedate = '2022-03-03',

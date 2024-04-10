@@ -48,7 +48,7 @@ function CustomSquad.runAuto(playerList, squadType)
 end
 
 ---@param player table
----@param squadType integer
+---@param squadType SquadType
 ---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(player, {type = squadType}))

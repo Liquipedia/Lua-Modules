@@ -145,7 +145,6 @@ end
 
 ---@param key string
 ---@param value any
----@return self
 function ModelRow:__newindex(key, value)
 	if key ~= 'extradata' then
 		-- Strip HTML from strings
@@ -165,21 +164,24 @@ function ModelRow:__newindex(key, value)
 	end
 
 	self.fields[key] = value
-	return self
+end
+
+function ModelRow:__index(key)
+	return ModelRow[key] or rawget(self, 'fields')[key]
 end
 
 ---@param key string
 ---@param value any
 ---@return self
 function ModelRow:set(key, value)
-	self:__newindex(key, value)
+	self[key] = value
 	return self
 end
 
 ---@param tbl table<string, any>
 ---@return self
 function ModelRow:setMany(tbl)
-	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.__newindex, self))
+	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.set, self))
 	return self
 end
 

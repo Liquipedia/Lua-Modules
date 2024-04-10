@@ -46,7 +46,7 @@ function SquadRow:id()
 			flag = self.model.nationality,
 			link = self.model.link,
 			faction = self.model.extradata.faction,
-			type = Opponent.solo
+			type = Opponent.solo,
 		},
 		nil, {syncPlayer = true}
 	)
@@ -58,11 +58,6 @@ function SquadRow:id()
 
 	if self.model.role == 'Sub' then
 		table.insert(content, '&nbsp;' .. ICON_SUBSTITUTE)
-	end
-
-	if self.model.name then
-		table.insert(content, '<br>')
-		table.insert(content, mw.html.create('small'):tag('i'):wikitext(self.model.name))
 	end
 
 	local cell = Widget.TableCellNew{
