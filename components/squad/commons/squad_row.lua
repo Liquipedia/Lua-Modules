@@ -121,7 +121,6 @@ function SquadRow:name(args)
 	return self
 end
 
----Position and Role shouldn't both be used, only one
 ---@param args table
 ---@return self
 function SquadRow:role(args)
@@ -148,7 +147,7 @@ function SquadRow:role(args)
 	return self
 end
 
----Position and Role shouldn't both be used, only one
+---Display Position and Role in a single cell
 ---@param args table
 ---@return self
 function SquadRow:position(args)
