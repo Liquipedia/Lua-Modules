@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -24,23 +25,25 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Position')
+	local content = {}
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
+			table.insert(content, args.position)
 			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
+			table.insert(content, args.role)
 		end
 	end
 
-	self.content:node(cell)
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
@@ -51,9 +54,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title():header()
+	local squad = Squad():init(frame):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -83,7 +84,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 

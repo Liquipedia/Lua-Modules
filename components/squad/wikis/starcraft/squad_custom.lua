@@ -11,30 +11,33 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
+local TlpdSquad = Class.new(Squad)
 
----@param self Squad
----@return Squad
-function CustomSquad.headerTlpd(self)
-	local makeHeader = function(wikiText)
-		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
-	end
+---@return self
+function TlpdSquad:header()
+	table.insert(self.children, Widget.TableRowNew{
+		classes = {'HeaderRow'},
+		cells = {
+			Widget.TableCellNew{content = {'ID'}, header = true},
+			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
+			Widget.TableCellNew{content = {'Name'}, header = true},
+			Widget.TableCellNew{content = {'ELO'}, header = true},
+			Widget.TableCellNew{content = {'ELO Peak'}, header = true},
+		}
+	})
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
+	return self
+end
 
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader(''))
-		:node(makeHeader('Name'))
-		:node(makeHeader('ELO'))
-		:node(makeHeader('ELO Peak'))
-
-	self.content:node(headerRow)
-
+---@return self
+function TlpdSquad:title()
 	return self
 end
 
@@ -44,8 +47,12 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:elo(args)
-	self.content:node(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
-	self.content:node(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
+	table.insert(self.children,
+		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-')}}
+	)
+	table.insert(self.children,
+		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-')}}
+	)
 
 	return self
 end
@@ -53,20 +60,17 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame)
-
-	local args = squad.args
-
-	local tlpd = Logic.readBool(args.tlpd)
+	local tlpd = Logic.readBool(frame.args.tlpd)
+	local squad
 	if tlpd then
-		squad.header = CustomSquad.headerTlpd
+		squad = TlpdSquad()
 	else
-		squad:title()
+		squad = Squad()
 	end
 
-	squad:header()
-	local players = SquadUtils.parsePlayers(args)
+	squad:init(frame):title():header()
+
+	local players = SquadUtils.parsePlayers(squad.args)
 
 	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()

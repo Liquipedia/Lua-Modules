@@ -10,51 +10,27 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+
 local CustomSquad = {}
+local CustomInjector = Class.new(Injector)
 
 local LANG = mw.getContentLanguage()
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {Widget.TableCellNew{content = {'Position'}, header = true}}
+	elseif id == 'header_inactive' then
+		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
 	end
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader())
-		:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
-	if self.type == SquadUtils.SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-			:node(makeHeader('Active Team'))
-	end
-	if self.type == SquadUtils.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-			:node(makeHeader('Last Active Team'))
-	end
-	if self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
+	return widgets
 end
 
 ---@class Dota2SquadRow: SquadRow
@@ -63,23 +39,25 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Position')
+	local content = {}
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
+			table.insert(content, args.position)
 			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
+			table.insert(content, args.role)
 		end
 	end
 
-	self.content:node(cell)
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
@@ -90,9 +68,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
+	local squad = Squad():init(frame, CustomInjector()):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -100,7 +76,6 @@ function CustomSquad.run(frame)
 		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
 	end
 
-	squad.header = CustomSquad.header
 	squad:header()
 
 	Array.forEach(players, function(player)

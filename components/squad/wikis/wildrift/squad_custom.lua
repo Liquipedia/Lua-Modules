@@ -11,43 +11,25 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+
 local CustomSquad = {}
+local CustomInjector = Class.new(Injector)
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {
+			Widget.TableCellNew{content = {'Position'}, header = true}
+		}
 	end
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader())
-		:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
-	if self.type == SquadUtils.SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	elseif self.type == SquadUtils.SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
+	return widgets
 end
 
 ---@class WildriftSquadRow: SquadRow
@@ -56,23 +38,25 @@ local ExtendedSquadRow = Class.new(SquadRow)
 ---@param args table
 ---@return self
 function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Position')
+	local content = {}
 
 	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
 		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
+			table.insert(content, args.position)
 			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
 			end
 		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
+			table.insert(content, args.role)
 		end
 	end
 
-	self.content:node(cell)
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
 
 	self.lpdbData.position = args.position
 	self.lpdbData.role = args.role or self.lpdbData.role
@@ -83,12 +67,7 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title()
-
-	squad.header = CustomSquad.header
-	squad:header()
+	local squad = Squad():init(frame, CustomInjector()):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -107,10 +86,7 @@ function CustomSquad.runAuto(playerList, squadType)
 		return
 	end
 
-	local squad = Squad():init{type = squadType}
-
-	squad.header = CustomSquad.header
-	squad:title():header()
+	local squad = Squad():init({type = squadType}, CustomInjector()):title():header()
 
 	Array.forEach(playerList, function(player)
 		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
@@ -121,7 +97,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
 	local row = ExtendedSquadRow()
 

@@ -1642,10 +1642,6 @@ Author(s): Rapture
 	background-color: var( --table-header-background-color, var( --clr-surface-4, #f5f5f5 ) );
 }
 
-.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
-	display: none;
-}
-
 .roster-card > tbody > tr.Player {
 	display: table-row;
 	border-top: 1px solid var( --clr-border, #bbbbbb );
@@ -1707,14 +1703,6 @@ Author(s): Rapture
 		border: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
 	}
 
-	.roster-card > tbody > tr > th.large-only[ colspan="10" ] {
-		display: none;
-	}
-
-	.roster-card > tbody > tr > th.large-only[ colspan="1" ] {
-		display: table-cell;
-	}
-
 	.roster-card > tbody > tr.HeaderRow {
 		display: none;
 	}
@@ -1768,6 +1756,10 @@ Author(s): Rapture
 		text-align: center;
 		clear: both;
 		border-right: 0;
+	}
+
+	.roster-card > tbody > tr.Player > td > .LargeStuff {
+		display: none;
 	}
 
 	.roster-card > tbody > tr.Player > td > .MobileStuff {

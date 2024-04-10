@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Table/Cell
+-- page=Module:Widget/Table/Cell/New
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,75 +9,57 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
 
----@class WidgetCellInput
+---@class WidgetCellInputNew
 ---@field content (string|number|table|Html)[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number}?
+---@field rowSpan integer?
+---@field colSpan integer?
+---@field header boolean?
 
----@class WidgetTableCell:Widget
----@operator call(WidgetCellInput): WidgetTableCell
+---@class WidgetTableCellNew:Widget
+---@operator call(WidgetCellInputNew): WidgetTableCellNew
 ---@field content (string|number|table|Html)[]
 ---@field classes string[]
 ---@field css {[string]: string|number}
 ---@field rowSpan integer?
 ---@field colSpan integer?
+---@field isHeader boolean
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
 		self.content = input.content or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
+		self.rowSpan = input.rowSpan
+		self.colSpan = input.colSpan
+		self.isHeader = Logic.readBool(input.header)
 	end
 )
-
----@param text string|number|table|nil
----@return self
-function TableCell:addContent(text)
-	table.insert(self.content, text)
-	return self
-end
-
----@param class string|nil
----@return self
-function TableCell:addClass(class)
-	table.insert(self.classes, class)
-	return self
-end
-
----@param key string
----@param value string|number|nil
----@return self
-function TableCell:addCss(key, value)
-	self.css[key] = value
-	return self
-end
 
 ---@param injector WidgetInjector?
 ---@return {[1]: Html}
 function TableCell:make(injector)
-	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
-	cell:css{
-		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
-		['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil,
-	}
+	local cell = mw.html.create(self.isHeader and 'th' or 'td')
+	cell:attr('colspan', self.colSpan)
+	cell:attr('rowspan', self.rowSpan)
 
-	for _, class in ipairs(self.classes) do
-		cell:addClass(class)
-	end
+	Array.forEach(self.classes, FnUtil.curry(cell.addClass, cell))
 
 	cell:css(self.css)
 
-	cell:node(self:_concatContent())
+	cell:node(self:_content())
 
 	return {cell}
 end
 
 ---@return string
-function TableCell:_concatContent()
+function TableCell:_content()
 	return table.concat(Array.map(self.content, function (content)
 		if type(content) ~= 'table' then
 			return content

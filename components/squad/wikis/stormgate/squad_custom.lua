@@ -20,9 +20,7 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title():header()
+	local squad = Squad():init(frame):title():header()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -54,7 +52,7 @@ end
 
 ---@param player table
 ---@param squadType integer
----@return Html
+---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
 	local row = SquadRow{useTemplatesForSpecialTeams = true}
 

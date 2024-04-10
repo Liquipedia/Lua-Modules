@@ -13,15 +13,15 @@ local Widget = Lua.import('Module:Infobox/Widget')
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableRowInput
----@field cells WidgetTableCell[]?
+---@field cells Widget[]?
 ---@field classes string[]?
----@field css {[string]: string|number|nil}[]?
+---@field css {[string]: string|number|nil}?
 
 ---@class WidgetTableRow:Widget
 ---@operator call(WidgetTableRowInput): WidgetTableRow
----@field cells WidgetTableCell[]
+---@field cells Widget[]
 ---@field classes string[]
----@field css {[string]: string|number|nil}[]
+---@field css {[string]: string|number|nil}
 local TableRow = Class.new(
 	Widget,
 	function(self, input)
@@ -31,7 +31,7 @@ local TableRow = Class.new(
 	end
 )
 
----@param cell WidgetTableCell?
+---@param cell Widget?
 ---@return self
 function TableRow:addCell(cell)
 	table.insert(self.cells, cell)
@@ -42,6 +42,14 @@ end
 ---@return self
 function TableRow:addClass(class)
 	table.insert(self.classes, class)
+	return self
+end
+
+---@param key string
+---@param value string|number|nil
+---@return self
+function TableRow:addCss(key, value)
+	self.css[key] = value
 	return self
 end
 

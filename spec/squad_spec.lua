@@ -19,16 +19,17 @@ describe('Squad', function()
 		it('displays correct and stores correctly', function()
 			local row = SquadRow()
 			row:id{'Baz', 'se'}
-					:name{'Foo Bar'}
+					:name{name = 'Foo Bar'}
 					:role{}
 					:date('2022-01-01', 'Join Date:&nbsp;', 'joindate')
 					:date('2022-03-03', 'Inactive Date:&nbsp;', 'inactivedate')
 					:date('2022-05-01', 'Leave Date:&nbsp;', 'leavedate')
 
-			GoldenTest('squad_row', tostring(row:create('foo_bar_baz')))
+			GoldenTest('squad_row', tostring(row:create('foo_bar_baz'):tryMake()[1]))
 
 			assert.stub(LpdbSquadStub).was.called_with('foo_bar_baz', {
 				id = 'Baz',
+				name = 'Foo Bar',
 				inactivedate = '2022-03-03',
 				joindate = '2022-01-01',
 				leavedate = '2022-05-01',
