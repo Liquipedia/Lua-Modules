@@ -51,7 +51,7 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
+		squad:row(row:create())
 	end)
 
 	return squad:create()

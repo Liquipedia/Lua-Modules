@@ -93,17 +93,4 @@ function SquadUtils.convertAutoParameters(player)
 	return newPlayer
 end
 
----@param player table
----@param squadType SquadType
----@return string
-function SquadUtils.defaultObjectName(player, squadType)
-	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
-
-	return mw.title.getCurrentTitle().prefixedText
-	.. '_' .. link .. '_'
-	.. ReferenceCleaner.clean(player.joindate)
-	.. (player.role and '_' .. player.role or '')
-	.. '_' .. squadType
-end
-
 return SquadUtils

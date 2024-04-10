@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
@@ -31,14 +32,14 @@ local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitu
 ---@field children Widget[]
 ---@field options {useTemplatesForSpecialTeams: boolean?}
 ---@field backgrounds string[]
----@field lpdbData table
+---@field lpdbData ModelRow
 local SquadRow = Class.new(
 	function(self, options)
 		self.options = options or {}
 		self.children = {}
 		self.backgrounds = {'Player'}
 
-		self.lpdbData = {type = SquadUtils.defaultPersonType}
+		self.lpdbData = Lpdb.SquadPlayer:new()
 	end
 )
 
@@ -55,7 +56,6 @@ function SquadRow:id(args)
 	if String.isEmpty(args[1]) then
 		error('Something is off with your input!')
 	end
-
 
 	local content = {}
 	local opponent = Opponent.resolve(
@@ -262,11 +262,10 @@ function SquadRow:setExtradata(extradata)
 	return self
 end
 
----@param objectName string
 ---@return WidgetTableRowNew
-function SquadRow:create(objectName)
+function SquadRow:create()
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
+		self.lpdbData:save()
 	end
 
 	return Widget.TableRowNew{
