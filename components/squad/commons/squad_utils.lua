@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
