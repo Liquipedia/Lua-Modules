@@ -60,12 +60,7 @@ end
 ---@return Html
 function CustomSquad.run(frame)
 	local tlpd = Logic.readBool(frame.args.tlpd)
-	local SquadClass
-	if tlpd then
-		SquadClass = TlpdSquad
-	else
-		SquadClass = Squad
-	end
+	local SquadClass = tlpd and TlpdSquad or Squad
 
 	return SquadUtils.defaultRunManual(frame, SquadClass, function(player, squadType)
 		local row = ExtendedSquadRow()
