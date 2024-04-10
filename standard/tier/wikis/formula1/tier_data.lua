@@ -74,7 +74,7 @@ return {
 		},
 		[''] = {
 			value = nil,
-			sort = 'B4',
+			sort = 'B5',
 			name = 'Undefined',
 			short = '?',
 		},
@@ -91,7 +91,7 @@ return {
 		},
 		test = {
 			value = 'Test',
-			sort = 'A10',
+			sort = 'B1',
 			name = 'Test',
 			short = 'Tests',
 			link = 'Test Sessions',
@@ -99,7 +99,7 @@ return {
 		},
 		nonchampionship = {
 			value = 'Non-Championship',
-			sort = 'B1',
+			sort = 'B2',
 			name = 'Non-Championship',
 			short = 'Non-Champs',
 			link = 'Non-Championship Events',
@@ -107,7 +107,7 @@ return {
 		},
 		showmatch = {
 			value = 'Showmatch',
-			sort = 'B2',
+			sort = 'B3',
 			name = 'Showmatch',
 			short = 'Showm.',
 			link = 'Showmatches',
@@ -115,7 +115,7 @@ return {
 		},
 		award = {
 			value = 'Awards',
-			sort = 'B3',
+			sort = 'B4',
 			name = 'Awards',
 			short = 'Awards',
 			link = 'Awards Shows',
