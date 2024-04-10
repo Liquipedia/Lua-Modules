@@ -11,27 +11,22 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-
 local CustomSquad = {}
-local CustomInjector = Class.new(Injector)
+local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
 local HAS_NUMBER = false
 
 function CustomInjector:parse(id, widgets)
-	if id == 'header_role' then
-		return  {Widget.TableCellNew{content = {'Position'}, header = true}}
-	elseif id == 'header_name' and HAS_NUMBER then
+	if id == 'header_name' and HAS_NUMBER then
 		table.insert(widgets, Widget.TableCellNew{content = {'Number'}, header = true})
 	end
 
-	return widgets
+	return self._base:parse(id, widgets)
 end
 
 ---@class OverwatchSquadRow: SquadRow
@@ -75,17 +70,7 @@ end
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	if Table.isEmpty(playerList) then
-		return
-	end
-
-	local squad = Squad():init({type = squadType}, CustomInjector()):title():header()
-
-	Array.forEach(playerList, function(player)
-		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
-	end)
-
-	return squad:create()
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, CustomInjector)
 end
 
 ---@param player table
