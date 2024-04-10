@@ -35,7 +35,7 @@ return {
 		{
 			value = '4',
 			sort = 'A4',
-			name = 'Regionals',
+			name = 'Regional',
 			short = 'RE',
 			link = 'Regional Tournaments',
 			category = 'Regional Tournaments',
