@@ -27,7 +27,13 @@ return {
 		},
 	},
 	defaultGame = 'bw',
-
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 	match2 = 1,

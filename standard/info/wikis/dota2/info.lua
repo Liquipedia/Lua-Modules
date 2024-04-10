@@ -39,6 +39,13 @@ return {
 		},
 	},
 	defaultGame = 'dota2',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

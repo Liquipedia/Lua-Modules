@@ -24,7 +24,7 @@ function CustomSquad.run(frame)
 	local players = SquadUtils.parsePlayers(squad.args)
 
 	Array.forEach(players, function(player)
-		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		local row = SquadRow()
 		row:status(squad.type)
 		row:id{
 			player.id,

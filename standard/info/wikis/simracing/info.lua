@@ -806,5 +806,12 @@ return {
 		},
 	},
 	defaultGame = 'sr',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

@@ -112,6 +112,13 @@ local infoData = {
 		},
 	},
 	defaultGame = 'csgo',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }
 

@@ -52,6 +52,13 @@ return {
 		},
 	},
 	defaultGame = 'reforged',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,

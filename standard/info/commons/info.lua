@@ -9,6 +9,7 @@
 return {
 	wikiName = 'commons',
 	name = 'Commons',
+	defaultGame = 'commons',
 	games = {
 		commons = {
 			abbreviation = 'Commons',
@@ -24,7 +25,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'commons',
-
+	config = {
+		squad = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

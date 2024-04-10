@@ -26,6 +26,12 @@ return {
 		},
 	},
 	defaultGame = 'clashofclans',
-
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

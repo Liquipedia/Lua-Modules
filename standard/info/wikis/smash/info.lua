@@ -91,5 +91,12 @@ return {
 		},
 	},
 	defaultGame = 'melee',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

@@ -39,5 +39,12 @@ return {
 		},
 	},
 	defaultGame = 'smite',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

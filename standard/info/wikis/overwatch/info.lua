@@ -39,5 +39,12 @@ return {
 		},
 	},
 	defaultGame = 'overwatch2',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

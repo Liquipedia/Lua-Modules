@@ -26,5 +26,12 @@ return {
 		},
 	},
 	defaultGame = 'val',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

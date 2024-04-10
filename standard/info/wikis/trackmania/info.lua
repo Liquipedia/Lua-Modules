@@ -143,6 +143,13 @@ return {
 		},
 	},
 	defaultGame = 'tm',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 1,

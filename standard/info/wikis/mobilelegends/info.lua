@@ -26,5 +26,12 @@ return {
 		},
 	},
 	defaultGame = 'mobilelegends',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

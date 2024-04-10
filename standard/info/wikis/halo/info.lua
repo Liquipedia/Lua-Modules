@@ -104,5 +104,12 @@ return {
 		},
 	},
 	defaultGame = 'infinite',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = false,
+		},
+	},
 	match2 = 2,
 }

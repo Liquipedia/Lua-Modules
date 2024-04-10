@@ -39,6 +39,13 @@ return {
 		},
 	},
 	defaultGame = 'rl',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,
 }

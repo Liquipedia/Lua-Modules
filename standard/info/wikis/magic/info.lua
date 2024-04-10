@@ -52,5 +52,12 @@ return {
 		},
 	},
 	defaultGame = 'tabletop',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

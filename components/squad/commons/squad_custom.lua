@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 
 local Squad = Lua.import('Module:Squad')
@@ -18,10 +19,18 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame):title():header()
+	if not Info.config.squad.allowManual then
+		error('This wiki do not use manual squad tables')
+	end
+	local squad = Squad():init(frame):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
+	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
+		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
+	end
+
+	squad:header()
 	Array.forEach(players, function(player)
 		squad:row(CustomSquad._playerRow(player, squad.type))
 	end)
@@ -66,16 +75,17 @@ function CustomSquad._playerRow(player, squadType)
 	row:role{role = player.role}
 	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	if squadType == SquadUtils.SquadType.FORMER then
+	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+	end
+	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
 		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 		row:newteam{
 			newteam = player.newteam,
-			newteamrole = player.newteamrole,
+			newteamrole = player.newteamrole or player.newrole,
 			newteamdate = player.newteamdate,
 			leavedate = player.leavedate
 		}
-	elseif squadType == SquadUtils.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
 	return row:create(SquadUtils.defaultObjectName(player, squadType))

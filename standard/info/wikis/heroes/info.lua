@@ -26,6 +26,13 @@ return {
 		},
 	},
 	defaultGame = 'hots',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 1,
 }

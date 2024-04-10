@@ -10,6 +10,7 @@ return {
 	startYear = 1995,
 	wikiName = 'arenafps',
 	name = 'Arena FPS',
+	defaultGame = 'qc',
 	games = {
 		ag = {
 			abbreviation = 'ag',
@@ -402,6 +403,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'qc',
+	config = {
+		squad = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

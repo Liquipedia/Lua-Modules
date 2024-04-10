@@ -39,7 +39,13 @@ return {
 		},
 	},
 	defaultGame = 'siege',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = false,
+		},
+	},
 	defaultRoundPrecision = 0,
-
 	match2 = 2,
 }
