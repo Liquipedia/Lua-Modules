@@ -16,8 +16,11 @@ liquipedia.battleRoyale = {
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
 	replaceTotalPointsText: function( instanceId ) {
-		const elements = this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="header-row"] [data-sort-type="total-points"] span' );
-		elements.forEach( element => element.innerText = this.TEXT_VALUE_MOBILE_TOTAL_POINTS );
+		const elements = this.battleRoyaleInstances[ instanceId ]
+			.querySelectorAll( '[data-js-battle-royale="header-row"] [data-sort-type="total-points"] span' );
+		elements.forEach( ( element ) => {
+			element.innerText = this.TEXT_VALUE_MOBILE_TOTAL_POINTS
+		} );
 	},
 
 	isMobile: function() {
