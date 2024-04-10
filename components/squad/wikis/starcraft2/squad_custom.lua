@@ -61,7 +61,7 @@ function CustomSquad.run(frame)
 				captain = player.captain,
 				role = player.role,
 				team = player.team,
-				date = player.leavedate or player.inactivedate or player.leavedate,
+				date = player.leavedate or player.inactivedate,
 			})
 			:name({name = player.name})
 			:role({role = player.role})

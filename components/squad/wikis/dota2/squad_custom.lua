@@ -44,7 +44,7 @@ function CustomSquad._playerRow(player, squadType)
 		role = player.role,
 		team = player.team,
 		teamrole = player.teamrole,
-		date = player.leavedate or player.inactivedate or player.leavedate,
+		date = player.leavedate or player.inactivedate,
 	}
 	row:name{name = player.name}
 	row:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}

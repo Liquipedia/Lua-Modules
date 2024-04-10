@@ -88,7 +88,7 @@ function CustomSquad.run(frame)
 			flag = player.flag,
 			captain = player.captain,
 			role = player.role,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:name{name = name .. ' ' .. localizedName}
 

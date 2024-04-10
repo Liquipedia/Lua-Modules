@@ -34,7 +34,7 @@ function CustomSquad.run(frame)
 			captain = player.captain,
 			role = player.role,
 			team = player.team,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:name{name = player.name}
 		row:role{role = player.role}
