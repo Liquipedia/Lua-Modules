@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
@@ -33,38 +32,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@class Dota2SquadRow: SquadRow
-local ExtendedSquadRow = Class.new(SquadRow)
-
----@param args table
----@return self
-function ExtendedSquadRow:position(args)
-	local content = {}
-
-	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
-
-		if String.isNotEmpty(args.position) then
-			table.insert(content, args.position)
-			if String.isNotEmpty(args.role) then
-				table.insert(content, '&nbsp;(' .. args.role .. ')')
-			end
-		elseif String.isNotEmpty(args.role) then
-			table.insert(content, args.role)
-		end
-	end
-
-	table.insert(self.children, Widget.TableCellNew{
-		classes = {'Position'},
-		content = content,
-	})
-
-	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role or self.lpdbData.role
-
-	return self
-end
-
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
@@ -79,7 +46,7 @@ function CustomSquad.run(frame)
 	squad:header()
 
 	Array.forEach(players, function(player)
-		local row = ExtendedSquadRow()
+		local row = SquadRow()
 		row:status(squad.type)
 		row:id{
 			player.id,
