@@ -7,10 +7,16 @@
 --
 
 local Array = require('Module:Array')
+local Faction = require('Module:Faction')
+local Flags = require('Module:Flags')
 local Json = require('Module:Json')
+local Lpdb = require('Module:Lpdb')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local ReferenceCleaner = require('Module:ReferenceCleaner')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 
@@ -90,6 +96,54 @@ function SquadUtils.convertAutoParameters(player)
 	newPlayer.newteamdate = player.newTeam.date
 
 	return newPlayer
+end
+
+---@param args table
+---@return ModelRow
+function SquadUtils.readSquadPersonArgs(args)
+	local function getTeamInfo(page, property)
+		if not page or not mw.ext.TeamTemplate.teamexists(page) then
+			return
+		end
+		return mw.ext.TeamTemplate.raw(page)[property]
+	end
+
+	local id = assert(String.nilIfEmpty(args[1]), 'Something is off with your input!')
+	return Lpdb.SquadPlayer:new{
+		id = id,
+		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
+		name = String.nilIfEmpty(args.name),
+		nationality = Flags.CountryName(args.flag),
+
+		position = String.nilIfEmpty(args.position),
+		role = String.nilIfEmpty(args.role) or (String.isNotEmpty(args.captain) and 'Captain') or nil, -- TODO UC First?
+		teamtemplate = getTeamInfo(mw.title.getCurrentTitle().baseText, 'templatename'),
+
+		newteam = getTeamInfo(args.newteam, 'page'),
+		newteamrole = String.nilIfEmpty(args.newteamrole) or String.nilIfEmpty(args.newrole),
+		newteamtemplate = getTeamInfo(args.newteam, 'templatename'),
+
+		joindate = ReferenceCleaner.clean(args.joindate),
+		leavedate = ReferenceCleaner.clean(args.leavedate),
+		inactivedate = ReferenceCleaner.clean(args.inactivedate),
+
+		status = SquadUtils.SquadTypeToStorageValue[args.status],
+		type = args.type,
+
+		extradata = {
+			loanedto = args.team,
+			loanedtorole = args.teamrole,
+			newteamdate = args.newteamdate,
+			faction = Faction.read(args.faction or args.race),
+		},
+	}
+end
+
+---@param squadPerson ModelRow
+function SquadUtils.storeSquadPerson(squadPerson)
+	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+		squadPerson:save()
+	end
 end
 
 return SquadUtils

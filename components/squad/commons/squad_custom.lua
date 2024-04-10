@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -50,32 +51,19 @@ end
 ---@param squadType integer
 ---@return WidgetTableRowNew
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow()
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(player, {type = squadType}))
+	SquadUtils.storeSquadPerson(squadPerson)
+	local row = SquadRow(squadPerson)
 
-	row:status(squadType)
-	row:id{
-		(player.idleavedate or player.id),
-		flag = player.flag,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		date = player.leavedate or player.inactivedate or player.leavedate,
-	}
-	row:name{name = player.name}
-	row:role{role = player.role}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	row:id():name():role():date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.FORMER then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
-	elseif squadType == SquadUtils.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+	end
+
+	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	end
 
 	return row:create()
