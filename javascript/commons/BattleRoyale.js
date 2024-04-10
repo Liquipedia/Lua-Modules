@@ -9,7 +9,7 @@ liquipedia.battleRoyale = {
 	ICON_SORT: 'fa-arrows-alt-v',
 	ICON_SORT_UP: 'fa-long-arrow-alt-up',
 	ICON_SORT_DOWN: 'fa-long-arrow-alt-down',
-	TEXT_VALUE_MOBILE_TOTAL_POINTS: 'Total Pts.',
+	TEXT_VALUE_MOBILE_TOTAL_POINTS: 'Pts.',
 	instancesLoaded: {},
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
