@@ -20,22 +20,30 @@ describe('Squad', function()
 			local row = SquadRow()
 			row:id{'Baz', 'se'}
 					:name{name = 'Foo Bar'}
+					:status(2)
 					:role{}
 					:date('2022-01-01', 'Join Date:&nbsp;', 'joindate')
 					:date('2022-03-03', 'Inactive Date:&nbsp;', 'inactivedate')
 					:date('2022-05-01', 'Leave Date:&nbsp;', 'leavedate')
 
-			GoldenTest('squad_row', tostring(row:create('foo_bar_baz'):tryMake()[1]))
+			GoldenTest('squad_row', tostring(row:create():tryMake()[1]))
 
-			assert.stub(LpdbSquadStub).was.called_with('foo_bar_baz', {
+			assert.stub(LpdbSquadStub).was.called_with('Baz_2022-01-01__former', {
 				id = 'Baz',
-				name = 'Foo Bar',
 				inactivedate = '2022-03-03',
 				joindate = '2022-01-01',
 				leavedate = '2022-05-01',
 				link = 'Baz',
+				name = 'Foo Bar',
 				nationality = '',
 				type = 'player',
+				newteam = '',
+				newteamtemplate = '',
+				position = '',
+				role = '',
+				status = 'former',
+				teamtemplate = '',
+				extradata = {},
 			})
 		end)
 	end)

@@ -85,7 +85,7 @@ function CustomSquad.run(frame)
 			status = status,
 		}
 
-		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
+		squad:row(row:create())
 	end)
 
 	return squad:create()
