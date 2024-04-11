@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Json = require('Module:Json')
@@ -19,6 +21,8 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Widget = Lua.import('Module:Infobox/Widget/All')
 
 local SquadUtils = {}
 
@@ -144,6 +148,90 @@ function SquadUtils.storeSquadPerson(squadPerson)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		squadPerson:save()
 	end
+
+---@param frame table
+---@param squadClass Squad
+---@param personFunction fun(player: table, squadType: integer):WidgetTableRowNew
+---@param injector WidgetInjector?
+---@return Html
+function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
+	local args = Arguments.getArgs(frame)
+	local squad = squadClass():init(args, injector and injector() or nil):title()
+
+	local players = SquadUtils.parsePlayers(squad.args)
+
+	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
+		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
+	end
+
+	squad:header()
+
+	Array.forEach(players, function(player)
+		squad:row(personFunction(player, squad.type))
+	end)
+
+	return squad:create()
+end
+
+---@param players table[]
+---@param squadType integer
+---@param squadClass Squad
+---@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param injector? WidgetInjector
+---@param personMapper? fun(person: table): table
+---@return Html?
+function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
+	local args = {type = squadType}
+	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+
+	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
+	Array.forEach(mappedPlayers, function(player)
+		squad:row(rowCreator(player, squad.type))
+	end)
+
+	return squad:create()
+end
+
+---@param squadRowClass SquadRow
+---@param options? {usePosition: boolean?, useTemplatesForSpecialTeams: boolean?}
+---@return fun(person: table, squadType: integer):WidgetTableRowNew
+function SquadUtils.defaultRow(squadRowClass, options)
+	options = options or {}
+	return function(person, squadType)
+	  local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(player, {type = squadType}))
+	  SquadUtils.storeSquadPerson(squadPerson)
+    local row = SquadRow(squadPerson)
+
+    row:id():name():role():date('joindate', 'Join Date:&nbsp;')
+
+    if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+      row:date('inactivedate', 'Inactive Date:&nbsp;')
+    end
+
+    if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+      row:date('leavedate', 'Leave Date:&nbsp;')
+      row:newteam()
+    end
+
+    return row:create()
+	end
+end
+
+---@return WidgetInjector
+function SquadUtils.positionHeaderInjector()
+	local CustomInjector = Class.new(Injector)
+
+	function CustomInjector:parse(id, widgets)
+		if id == 'header_role' then
+			return {
+				Widget.TableCellNew{content = {'Position'}, header = true}
+			}
+		end
+
+		return widgets
+	end
+
+	return CustomInjector
 end
 
 return SquadUtils

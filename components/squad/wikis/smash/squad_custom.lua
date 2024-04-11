@@ -73,7 +73,7 @@ function CustomSquad.run(frame)
 			flag = Variables.varDefault('nationality') or player.flag,
 			link = player.link,
 			team = player.activeteam,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:name{name = Variables.varDefault('name') or player.name}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
