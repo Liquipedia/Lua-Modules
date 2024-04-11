@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -60,19 +60,11 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local tlpd = Logic.readBool(frame.args.tlpd)
-	local squad
-	if tlpd then
-		squad = TlpdSquad()
-	else
-		squad = Squad()
-	end
+	local args = Arguments.getArgs(frame)
+	local tlpd = Logic.readBool(args.tlpd)
+	local SquadClass = tlpd and TlpdSquad or Squad
 
-	squad:init(frame):title():header()
-
-	local players = SquadUtils.parsePlayers(squad.args)
-
-	Array.forEach(players, function(player)
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(player, squadType)
 		local row = ExtendedSquadRow()
 
 		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race
@@ -84,7 +76,7 @@ function CustomSquad.run(frame)
 		local elo = CustomSquad._queryTLPD(player.id, 'elo')
 		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
 
-		row:status(squad.type)
+		row:status(squadType)
 		row:id{
 			id,
 			race = faction,
@@ -93,7 +85,7 @@ function CustomSquad.run(frame)
 			flag = player.flag,
 			captain = player.captain,
 			role = player.role,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:name{name = name .. ' ' .. localizedName}
 
@@ -103,7 +95,7 @@ function CustomSquad.run(frame)
 			row:role{role = player.role}
 			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-			if squad.type == SquadUtils.SquadType.FORMER then
+			if squadType == SquadUtils.SquadType.FORMER then
 				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 				row:newteam{
 					newteam = player.newteam,
@@ -111,16 +103,15 @@ function CustomSquad.run(frame)
 					newteamdate = player.newteamdate,
 					leavedate = player.leavedate
 				}
-			elseif squad.type == SquadUtils.SquadType.INACTIVE then
+			elseif squadType == SquadUtils.SquadType.INACTIVE then
 				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 			end
 		end
 
-		squad:row(row:create())
+		return row:create()
 	end)
-
-	return squad:create()
 end
+
 
 ---@param id number?
 ---@param value string
