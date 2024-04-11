@@ -39,35 +39,6 @@ local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@param args table
 ---@return self
-function ExtendedSquadRow:position(args)
-	local content = {}
-
-	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
-
-		if String.isNotEmpty(args.position) then
-			table.insert(content, args.position)
-			if String.isNotEmpty(args.role) then
-				table.insert(content, '&nbsp;(' .. args.role .. ')')
-			end
-		elseif String.isNotEmpty(args.role) then
-			table.insert(content, args.role)
-		end
-	end
-
-	table.insert(self.children, Widget.TableCellNew{
-		classes = {'Position'},
-		content = content,
-	})
-
-	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role or self.lpdbData.role
-
-	return self
-end
-
----@param args table
----@return self
 function ExtendedSquadRow:number(args)
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Number'},
@@ -152,7 +123,7 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(SquadUtils.defaultObjectName(player, squadType))
+	return row:create()
 end
 
 return CustomSquad

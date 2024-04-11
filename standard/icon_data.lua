@@ -72,4 +72,8 @@ return {
 
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
+
+	-- Usage: Sqaud Table
+	captain = 'fas fa-crown',
+	substitute = 'fas fa-people-arrows',
 }

@@ -8,7 +8,9 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
@@ -22,23 +24,22 @@ local Variables = require('Module:Variables')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
-local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
-	.. '|class=player-role-icon]]'
-local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
+local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', hover = 'Captain'}
+local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'}
 
 ---@class SquadRow
 ---@operator call: SquadRow
 ---@field children Widget[]
 ---@field options {useTemplatesForSpecialTeams: boolean?}
 ---@field backgrounds string[]
----@field lpdbData table
+---@field lpdbData ModelRow
 local SquadRow = Class.new(
 	function(self, options)
 		self.options = options or {}
 		self.children = {}
 		self.backgrounds = {'Player'}
 
-		self.lpdbData = {type = SquadUtils.defaultPersonType}
+		self.lpdbData = Lpdb.SquadPlayer:new()
 	end
 )
 
@@ -55,7 +56,6 @@ function SquadRow:id(args)
 	if String.isEmpty(args[1]) then
 		error('Something is off with your input!')
 	end
-
 
 	local content = {}
 	local opponent = Opponent.resolve(
@@ -147,6 +147,36 @@ function SquadRow:role(args)
 	return self
 end
 
+---Display Position and Role in a single cell
+---@param args table
+---@return self
+function SquadRow:position(args)
+	local content = {}
+
+	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+
+		if String.isNotEmpty(args.position) then
+			table.insert(content, args.position)
+			if String.isNotEmpty(args.role) then
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
+			end
+		elseif String.isNotEmpty(args.role) then
+			table.insert(content, args.role)
+		end
+	end
+
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
+
+	self.lpdbData.position = args.position
+	self.lpdbData.role = args.role or self.lpdbData.role
+
+	return self
+end
+
 ---@param dateValue string?
 ---@param cellTitle string?
 ---@param lpdbColumn string
@@ -232,11 +262,10 @@ function SquadRow:setExtradata(extradata)
 	return self
 end
 
----@param objectName string
 ---@return WidgetTableRowNew
-function SquadRow:create(objectName)
+function SquadRow:create()
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
+		self.lpdbData:save()
 	end
 
 	return Widget.TableRowNew{
