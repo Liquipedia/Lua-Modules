@@ -76,7 +76,7 @@ function CustomSquad.run(frame)
 			link = player.link,
 			team = player.activeteam,
 			name = Variables.varDefault('name') or player.name,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
@@ -93,7 +93,7 @@ function CustomSquad.run(frame)
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		squad:row(row:create(SquadUtils.defaultObjectName(player, squad.type)))
+		squad:row(row:create())
 
 		Variables.varDefine('nationality', '')
 		Variables.varDefine('name', '')

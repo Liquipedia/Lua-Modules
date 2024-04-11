@@ -8,8 +8,10 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Icon = require('Module:Icon')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
@@ -23,21 +25,20 @@ local Variables = require('Module:Variables')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
-local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
-	.. '|class=player-role-icon]]'
-local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
+local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', hover = 'Captain'}
+local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'}
 
 ---@class SquadRow
 ---@operator call: SquadRow
 ---@field children Widget[]
 ---@field backgrounds string[]
----@field lpdbData table
+---@field lpdbData ModelRow
 local SquadRow = Class.new(
 	function(self)
 		self.children = {}
 		self.backgrounds = {'Player'}
 
-		self.lpdbData = {type = SquadUtils.defaultPersonType}
+		self.lpdbData = Lpdb.SquadPlayer:new()
 	end
 )
 
@@ -54,7 +55,6 @@ function SquadRow:id(args)
 	if String.isEmpty(args[1]) then
 		error('Something is off with your input!')
 	end
-
 
 	local content = {}
 	local opponent = Opponent.resolve(
@@ -268,11 +268,10 @@ function SquadRow:setExtradata(extradata)
 	return self
 end
 
----@param objectName string
 ---@return WidgetTableRowNew
-function SquadRow:create(objectName)
+function SquadRow:create()
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		mw.ext.LiquipediaDB.lpdb_squadplayer(objectName, self.lpdbData)
+		self.lpdbData:save()
 	end
 
 	return Widget.TableRowNew{

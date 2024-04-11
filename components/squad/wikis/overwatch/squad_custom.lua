@@ -6,32 +6,28 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-
 local CustomSquad = {}
-local CustomInjector = Class.new(Injector)
+local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
 local HAS_NUMBER = false
 
 function CustomInjector:parse(id, widgets)
-	if id == 'header_role' then
-		return  {Widget.TableCellNew{content = {'Position'}, header = true}}
-	elseif id == 'header_name' and HAS_NUMBER then
+	if id == 'header_name' and HAS_NUMBER then
 		table.insert(widgets, Widget.TableCellNew{content = {'Number'}, header = true})
 	end
 
-	return widgets
+	return self._base:parse(id, widgets)
 end
 
 ---@class OverwatchSquadRow: SquadRow
@@ -48,15 +44,14 @@ function ExtendedSquadRow:number(args)
 		} or nil,
 	})
 
-	self.lpdbData.number = args.number
-
 	return self
 end
 
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame, CustomInjector()):title()
+	local args = Arguments.getArgs(frame)
+	local squad = Squad():init(args, CustomInjector()):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -75,17 +70,7 @@ end
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	if Table.isEmpty(playerList) then
-		return
-	end
-
-	local squad = Squad():init({type = squadType}, CustomInjector()):title():header()
-
-	Array.forEach(playerList, function(player)
-		squad:row(CustomSquad._playerRow(SquadUtils.convertAutoParameters(player), squad.type))
-	end)
-
-	return squad:create()
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, CustomInjector)
 end
 
 ---@param player table
@@ -102,7 +87,7 @@ function CustomSquad._playerRow(player, squadType)
 		captain = player.captain,
 		role = player.role,
 		team = player.team,
-		date = player.leavedate or player.inactivedate or player.leavedate,
+		date = player.leavedate or player.inactivedate,
 	})
 	if HAS_NUMBER then
 		row:number{number = player.number}
@@ -123,7 +108,7 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(SquadUtils.defaultObjectName(player, squadType))
+	return row:create()
 end
 
 return CustomSquad

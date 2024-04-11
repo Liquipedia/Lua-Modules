@@ -6,14 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Widget = Lua.import('Module:Infobox/Widget/All')
 
 local SquadUtils = {}
 
@@ -93,17 +96,108 @@ function SquadUtils.convertAutoParameters(player)
 	return newPlayer
 end
 
----@param player table
----@param squadType SquadType
----@return string
-function SquadUtils.defaultObjectName(player, squadType)
-	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
+---@param frame table
+---@param squadClass Squad
+---@param personFunction fun(player: table, squadType: integer):WidgetTableRowNew
+---@param injector WidgetInjector?
+---@return Html
+function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
+	local args = Arguments.getArgs(frame)
+	local squad = squadClass():init(args, injector and injector() or nil):title()
 
-	return mw.title.getCurrentTitle().prefixedText
-	.. '_' .. link .. '_'
-	.. ReferenceCleaner.clean(player.joindate)
-	.. (player.role and '_' .. player.role or '')
-	.. '_' .. squadType
+	local players = SquadUtils.parsePlayers(squad.args)
+
+	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
+		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
+	end
+
+	squad:header()
+
+	Array.forEach(players, function(player)
+		squad:row(personFunction(player, squad.type))
+	end)
+
+	return squad:create()
+end
+
+---@param players table[]
+---@param squadType integer
+---@param squadClass Squad
+---@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param injector? WidgetInjector
+---@param personMapper? fun(person: table): table
+---@return Html?
+function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
+	local args = {type = squadType}
+	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+
+	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
+	Array.forEach(mappedPlayers, function(player)
+		squad:row(rowCreator(player, squad.type))
+	end)
+
+	return squad:create()
+end
+
+---@param squadRowClass SquadRow
+---@param options? {usePosition: boolean?, useTemplatesForSpecialTeams: boolean?}
+---@return fun(person: table, squadType: integer):WidgetTableRowNew
+function SquadUtils.defaultRow(squadRowClass, options)
+	options = options or {}
+	return function(person, squadType)
+		local row = squadRowClass(options)
+
+		row:status(squadType)
+		row:id{
+			(person.idleavedate or person.id),
+			flag = person.flag,
+			link = person.link,
+			captain = person.captain or person.igl,
+			role = person.role,
+			team = person.team,
+			teamrole = person.teamrole,
+			date = person.leavedate or person.inactivedate,
+		}
+		row:name{name = person.name}
+		if options.usePosition then
+			row:position{role = person.role, position = person.position}
+		else
+			row:role{role = person.role}
+		end
+		row:date(person.joindate, 'Join Date:&nbsp;', 'joindate')
+
+		if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date(person.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+		end
+		if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date(person.leavedate, 'Leave Date:&nbsp;', 'leavedate')
+			row:newteam{
+				newteam = person.newteam,
+				newteamrole = person.newteamrole or person.newrole,
+				newteamdate = person.newteamdate,
+				leavedate = person.leavedate
+			}
+		end
+
+		return row:create()
+	end
+end
+
+---@return WidgetInjector
+function SquadUtils.positionHeaderInjector()
+	local CustomInjector = Class.new(Injector)
+
+	function CustomInjector:parse(id, widgets)
+		if id == 'header_role' then
+			return {
+				Widget.TableCellNew{content = {'Position'}, header = true}
+			}
+		end
+
+		return widgets
+	end
+
+	return CustomInjector
 end
 
 return SquadUtils

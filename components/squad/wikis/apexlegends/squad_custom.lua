@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
+-- wiki=apexlegends
 -- page=Module:Squad/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,14 +17,8 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow, {usePosition = true}))
-end
-
----@param playerList table[]
----@param squadType integer
----@return Html?
-function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow, {usePosition = true}))
+	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow, {useTemplatesForSpecialTeams = true}))
 end
 
 return CustomSquad
+
