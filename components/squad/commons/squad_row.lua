@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
@@ -22,9 +23,8 @@ local Variables = require('Module:Variables')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
-local ICON_CAPTAIN = '[[File:Captain Icon.png|18px|baseline|Captain|link=Category:Captains|alt=Captain'
-	.. '|class=player-role-icon]]'
-local ICON_SUBSTITUTE = '[[File:Substitution.png|18px|baseline|Sub|link=|alt=Substitution|class=player-role-icon]]'
+local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', alt = 'Captain', hover = 'Captain'}
+local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', alt = 'Substitute', hover = 'Substitute'}
 
 ---@class SquadRow
 ---@operator call: SquadRow
