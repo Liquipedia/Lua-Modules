@@ -121,7 +121,6 @@ function SquadRow:name(args)
 	return self
 end
 
----Position and Role shouldn't both be used, only one
 ---@param args table
 ---@return self
 function SquadRow:role(args)
