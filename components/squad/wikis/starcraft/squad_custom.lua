@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -59,7 +60,8 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local tlpd = Logic.readBool(frame.args.tlpd)
+	local args = Arguments.getArgs(frame)
+	local tlpd = Logic.readBool(args.tlpd)
 	local SquadClass = tlpd and TlpdSquad or Squad
 
 	return SquadUtils.defaultRunManual(frame, SquadClass, function(player, squadType)
