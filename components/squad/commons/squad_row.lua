@@ -23,8 +23,8 @@ local Variables = require('Module:Variables')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
-local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', alt = 'Captain', hover = 'Captain'}
-local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', alt = 'Substitute', hover = 'Substitute'}
+local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', hover = 'Captain'}
+local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'}
 
 ---@class SquadRow
 ---@operator call: SquadRow

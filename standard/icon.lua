@@ -16,7 +16,6 @@ local Icon = {}
 ---@field color string?
 ---@field screenReaderHidden boolean?
 ---@field hover string?
----@field alt string?
 ---@field size integer|string|nil
 
 ---@param args IconArgs
@@ -35,7 +34,6 @@ function Icon.makeIcon(args)
 			:addClass(icon)
 			:addClass(args.color)
 			:attr('title', args.hover)
-			:attr('alt', args.alt)
 			:css('font-size', size)
 			:attr('aria-hidden', args.screenReaderHidden and 'true' or nil)
 	)
