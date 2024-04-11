@@ -147,6 +147,36 @@ function SquadRow:role(args)
 	return self
 end
 
+---Display Position and Role in a single cell
+---@param args table
+---@return self
+function SquadRow:position(args)
+	local content = {}
+
+	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
+
+		if String.isNotEmpty(args.position) then
+			table.insert(content, args.position)
+			if String.isNotEmpty(args.role) then
+				table.insert(content, '&nbsp;(' .. args.role .. ')')
+			end
+		elseif String.isNotEmpty(args.role) then
+			table.insert(content, args.role)
+		end
+	end
+
+	table.insert(self.children, Widget.TableCellNew{
+		classes = {'Position'},
+		content = content,
+	})
+
+	self.lpdbData.position = args.position
+	self.lpdbData.role = args.role or self.lpdbData.role
+
+	return self
+end
+
 ---@param dateValue string?
 ---@param cellTitle string?
 ---@param lpdbColumn string
