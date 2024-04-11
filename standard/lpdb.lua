@@ -258,4 +258,30 @@ Lpdb.Placement = Model('placement', {
 	{name = 'extradata', fieldType = 'struct', default = {}},
 })
 
+---@class SquadPlayerModel:Model
+Lpdb.SquadPlayer = Model('squadplayer', {
+	{
+		name = 'objectname',
+		fieldType = 'string',
+		default = function(fields)
+			return fields.link .. '_' .. (fields.joindate or '') .. '_' .. (fields.role or '') .. '_' .. (fields.status or '')
+		end
+	},
+	{name = 'id', fieldType = 'string'},
+	{name = 'link', fieldType = 'string'},
+	{name = 'name', fieldType = 'string', default = ''},
+	{name = 'nationality', fieldType = 'string', default = ''},
+	{name = 'position', fieldType = 'string', default = ''},
+	{name = 'role', fieldType = 'string', default = ''},
+	{name = 'type', fieldType = 'string', default = 'player'},
+	{name = 'newteam', fieldType = 'string', default = ''},
+	{name = 'teamtemplate', fieldType = 'string', default = ''},
+	{name = 'newteamtemplate', fieldType = 'string', default = ''},
+	{name = 'status', fieldType = 'string'},
+	{name = 'joindate', fieldType = 'string', default = ''},
+	{name = 'leavedate', fieldType = 'string', default = ''},
+	{name = 'inactivedate', fieldType = 'string', default = ''},
+	{name = 'extradata', fieldType = 'struct', default = {}},
+})
+
 return Lpdb
