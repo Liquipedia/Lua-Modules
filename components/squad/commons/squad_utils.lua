@@ -103,13 +103,15 @@ end
 ---@return Html
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
-	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+	local squad = squadClass():init(args, injector and injector() or nil):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
 	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
 		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
 	end
+
+	squad:header()
 
 	Array.forEach(players, function(player)
 		squad:row(personFunction(player, squad.type))
