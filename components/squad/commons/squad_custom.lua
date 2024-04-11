@@ -27,4 +27,6 @@ function CustomSquad.runAuto(playerList, squadType)
 	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow))
 end
 
+end
+
 return CustomSquad

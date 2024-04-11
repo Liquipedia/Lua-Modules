@@ -108,7 +108,7 @@ function CustomSquad._playerRow(player, squadType)
 		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 	end
 
-	return row:create(SquadUtils.defaultObjectName(player, squadType))
+	return row:create()
 end
 
 return CustomSquad

@@ -68,7 +68,7 @@ function CustomSquad._playerRow(player, squadType)
 		}
 	end
 
-	return row:create(SquadUtils.defaultObjectName(player, squadType))
+	return row:create()
 end
 
 return CustomSquad

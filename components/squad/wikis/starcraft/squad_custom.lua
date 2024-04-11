@@ -106,9 +106,8 @@ function CustomSquad.run(frame)
 			end
 		end
 
-		return row:create(SquadUtils.defaultObjectName(player, squadType))
-	end
-	)
+		return row:create()
+	end)
 end
 
 

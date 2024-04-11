@@ -82,7 +82,7 @@ function CustomSquad._playerRow(player, squadType)
 
 	row:setExtradata{faction = faction}
 
-	return row:create(SquadUtils.defaultObjectName(player, squadType))
+	return row:create()
 end
 
 return CustomSquad
