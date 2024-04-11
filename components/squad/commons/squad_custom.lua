@@ -23,7 +23,7 @@ function CustomSquad.run(frame)
 		error('This wiki do not use manual squad tables')
 	end
 
-	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow)
+	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
 end
 
 ---@param playerList table[]
