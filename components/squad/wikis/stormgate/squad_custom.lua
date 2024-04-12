@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -20,34 +19,22 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame):title():header()
-
-	local players = SquadUtils.parsePlayers(squad.args)
-
-	Array.forEach(players, function(player)
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
+	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
 end
 
 ---@param playerList table[]
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	if #playerList == 0 then
-		return
-	end
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, nil, CustomSquad.personMapper)
+end
 
-	local squad = Squad():init{type = squadType}:title():header()
-
-	Array.forEach(playerList, function(player)
-		local newPlayer = SquadUtils.convertAutoParameters(player)
-		newPlayer.faction = Logic.emptyOr(player.thisTeam.position, player.newTeam.position)
-		squad:row(CustomSquad._playerRow(newPlayer, squad.type))
-	end)
-
-	return squad:create()
+---@param person table
+---@return table
+function CustomSquad.personMapper(person)
+	local newPerson = SquadUtils.convertAutoParameters(person)
+	newPerson.faction = Logic.emptyOr(person.thisTeam.position, person.newTeam.position)
+	return newPerson
 end
 
 ---@param player table
