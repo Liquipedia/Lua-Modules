@@ -211,7 +211,7 @@ function SquadRow:newteam(args)
 		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
 			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;'))
 
-		if not Info.config.squads.hasSpecialTeam and not hasNewTeam and hasNewTeamRole then
+		if not Info.config.squads.hasSpecialTeam and not hasNewTeam then
 			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
 			return
 		end
