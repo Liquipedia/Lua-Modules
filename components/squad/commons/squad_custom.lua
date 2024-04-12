@@ -7,7 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
