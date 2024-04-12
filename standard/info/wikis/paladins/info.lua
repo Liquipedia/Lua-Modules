@@ -10,6 +10,7 @@ return {
 	startYear = 2016,
 	wikiName = 'paladins',
 	name = 'Paladins',
+	defaultGame = 'paladins',
 	games = {
 		paladins = {
 			abbreviation = 'Paladins',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'paladins',
 	config = {
 		squads = {
 			hasPosition = false,

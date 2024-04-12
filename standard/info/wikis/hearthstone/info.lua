@@ -10,6 +10,7 @@ return {
 	startYear = 2014,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
+	defaultGame = 'hs',
 	games = {
 		hs = {
 			abbreviation = 'hs',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'hs',
 	config = {
 		squads = {
 			hasPosition = false,

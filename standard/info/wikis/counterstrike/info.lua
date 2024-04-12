@@ -10,6 +10,7 @@ local infoData = {
 	startYear = 2000,
 	wikiName = 'counterstrike',
 	name = 'Counter-Strike',
+	defaultGame = 'csgo',
 	games = {
 		cs1 = {
 			order = 1,
@@ -111,7 +112,6 @@ local infoData = {
 			},
 		},
 	},
-	defaultGame = 'csgo',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2003,
 	wikiName = 'halo',
 	name = 'Halo',
+	defaultGame = 'infinite',
 	games = {
 		hce = {
 			abbreviation = 'HCE',
@@ -103,7 +104,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'infinite',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2018,
 	wikiName = 'pubgmobile',
 	name = 'PUBG Mobile',
+	defaultGame = 'pubgm',
 	games = {
 		pubgm = {
 			abbreviation = 'PUBGM',
@@ -64,7 +65,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'pubgm',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 1999,
 	wikiName = 'smash',
 	name = 'Smash',
+	defaultGame = 'melee',
 	games = {
 		melee = {
 			abbreviation = 'Melee',
@@ -90,7 +91,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'melee',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'mobilelegends',
 	name = 'Mobile Legends',
+	defaultGame = 'mobilelegends',
 	games = {
 		mobilelegends = {
 			abbreviation = 'ML',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'mobilelegends',
 	config = {
 		squads = {
 			hasPosition = true,

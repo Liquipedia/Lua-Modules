@@ -10,6 +10,7 @@ return {
 	startYear = 1950,
 	wikiName = 'formula1',
 	name = 'Formula 1',
+	defaultGame = 'formula1',
 	games = {
 		formula1 = {
 			abbreviation = 'F1',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'formula1',
 	config = {
 		squads = {
 			hasPosition = false,

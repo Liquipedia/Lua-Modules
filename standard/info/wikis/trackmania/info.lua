@@ -10,6 +10,7 @@ return {
 	startYear = 2006,
 	wikiName = 'trackmania',
 	name = 'Trackmania',
+	defaultGame = 'tm',
 	games = {
 		tm = {
 			abbreviation = 'TM',
@@ -142,7 +143,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tm',
 	config = {
 		squads = {
 			hasPosition = false,

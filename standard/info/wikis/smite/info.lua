@@ -10,6 +10,7 @@ return {
 	startYear = 2013,
 	wikiName = 'smite',
 	name = 'SMITE',
+	defaultGame = 'smite',
 	games = {
 		smite = {
 			abbreviation = 'S1',
@@ -38,7 +39,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'smite',
 	config = {
 		squads = {
 			hasPosition = true,

@@ -10,6 +10,7 @@ return {
 	startYear = 2024,
 	wikiName = 'goals',
 	name = 'GOALS',
+	defaultGame = 'goals',
 	games = {
 		goals = {
 			abbreviation = 'GOALS',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'goals',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'teamfortress',
 	name = 'Team Fortress',
+	defaultGame = 'tf2',
 	games = {
 		tf2 = {
 			abbreviation = 'TF2',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tf2',
 	config = {
 		squads = {
 			hasPosition = false,

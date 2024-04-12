@@ -10,6 +10,7 @@ return {
 	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
+	defaultGame = 'siege',
 	games = {
 		siege = {
 			abbreviation = 'R6S',
@@ -38,7 +39,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'siege',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'squadrons',
 	name = 'Star Wars: Squadrons',
+	defaultGame = 'squadrons',
 	games = {
 		squadrons = {
 			abbreviation = 'Squadrons',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'squadrons',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'rocketleague',
 	name = 'Rocket League',
+	defaultGame = 'rl',
 	games = {
 		rl = {
 			abbreviation = '',
@@ -38,7 +39,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'rl',
 	config = {
 		squads = {
 			hasPosition = false,

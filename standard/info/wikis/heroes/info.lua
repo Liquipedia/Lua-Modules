@@ -10,6 +10,7 @@ return {
 	startYear = 2014,
 	wikiName = 'heroes',
 	name = 'Heroes of the Storm',
+	defaultGame = 'hots',
 	games = {
 		hots = {
 			abbreviation = 'Heroes',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'hots',
 	config = {
 		squads = {
 			hasPosition = false,

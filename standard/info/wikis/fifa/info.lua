@@ -10,6 +10,7 @@ return {
 	startYear = 2000,
 	wikiName = 'fifa',
 	name = 'FIFA',
+	defaultGame = 'fifa',
 	games = {
 		fifa = {
 			abbreviation = 'FIFA',
@@ -415,7 +416,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fifa',
 	config = {
 		squads = {
 			hasPosition = false,

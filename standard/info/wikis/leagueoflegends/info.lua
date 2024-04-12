@@ -10,6 +10,7 @@ return {
 	startYear = 2009,
 	wikiName = 'leagueoflegends',
 	name = 'League of Legends',
+	defaultGame = 'leagueoflegends',
 	games = {
 		leagueoflegends = {
 			abbreviation = 'LoL',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'leagueoflegends',
 	config = {
 		squads = {
 			hasPosition = true,

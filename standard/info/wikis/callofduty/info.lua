@@ -10,6 +10,7 @@ return {
 	startYear = 2003,
 	wikiName = 'callofduty',
 	name = 'Call of Duty',
+	defaultGame = 'cod',
 	games = {
 		aw = {
 			abbreviation = 'AW',
@@ -337,7 +338,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cod',
 	config = {
 		squads = {
 			hasPosition = false,

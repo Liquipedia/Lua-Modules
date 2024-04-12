@@ -10,6 +10,7 @@ return {
 	startYear = 2017,
 	wikiName = 'pubg',
 	name = 'PUBG',
+	defaultGame = 'pubg',
 	games = {
 		pubg = {
 			abbreviation = 'PUBG',
@@ -25,7 +26,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'pubg',
 	config = {
 		squads = {
 			hasPosition = false,

@@ -10,6 +10,7 @@ return {
 	startYear = 2002,
 	wikiName = 'warcraft',
 	name = 'Warcraft',
+	defaultGame = 'reforged',
 	games = {
 		reignofchaos = {
 			abbreviation = 'RoC',
@@ -51,7 +52,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'reforged',
 	config = {
 		squads = {
 			hasPosition = false,

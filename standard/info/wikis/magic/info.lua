@@ -10,6 +10,7 @@ return {
 	startYear = 1993,
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
+	defaultGame = 'tabletop',
 	games = {
 		mtga = {
 			abbreviation = 'MTGA',
@@ -51,7 +52,6 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tabletop',
 	config = {
 		squads = {
 			hasPosition = false,
