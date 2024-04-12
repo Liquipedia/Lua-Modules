@@ -9,19 +9,10 @@ liquipedia.battleRoyale = {
 	ICON_SORT: 'fa-arrows-alt-v',
 	ICON_SORT_UP: 'fa-long-arrow-alt-up',
 	ICON_SORT_DOWN: 'fa-long-arrow-alt-down',
-	TEXT_VALUE_MOBILE_TOTAL_POINTS: 'Pts.',
 	instancesLoaded: {},
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
-
-	replaceTotalPointsText: function( instanceId ) {
-		const elements = this.battleRoyaleInstances[ instanceId ]
-			.querySelectorAll( '[data-js-battle-royale="header-row"] [data-sort-type="total-points"] span' );
-		elements.forEach( ( element ) => {
-			element.innerText = this.TEXT_VALUE_MOBILE_TOTAL_POINTS;
-		} );
-	},
 
 	isMobile: function() {
 		return window.matchMedia( '(max-width: 767px)' ).matches;
@@ -487,9 +478,6 @@ liquipedia.battleRoyale = {
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			if ( this.isMobile() ) {
-				this.replaceTotalPointsText( instanceId );
-			}
 			if ( !this.isMobile() ) {
 				this.makeSideScrollElements( instanceId );
 				this.makeTableScrollHint( instanceId );
