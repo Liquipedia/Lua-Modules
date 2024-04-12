@@ -148,6 +148,7 @@ function SquadUtils.storeSquadPerson(squadPerson)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		squadPerson:save()
 	end
+end
 
 ---@param frame table
 ---@param squadClass Squad
@@ -193,27 +194,25 @@ function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, i
 end
 
 ---@param squadRowClass SquadRow
----@param options? {usePosition: boolean?, useTemplatesForSpecialTeams: boolean?}
 ---@return fun(person: table, squadType: integer):WidgetTableRowNew
-function SquadUtils.defaultRow(squadRowClass, options)
-	options = options or {}
+function SquadUtils.defaultRow(squadRowClass)
 	return function(person, squadType)
-	  local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(player, {type = squadType}))
-	  SquadUtils.storeSquadPerson(squadPerson)
-    local row = SquadRow(squadPerson)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+		SquadUtils.storeSquadPerson(squadPerson)
+		local row = squadRowClass(squadPerson)
 
-    row:id():name():role():date('joindate', 'Join Date:&nbsp;')
+		row:id():name():role():date('joindate', 'Join Date:&nbsp;')
 
-    if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
-      row:date('inactivedate', 'Inactive Date:&nbsp;')
-    end
+		if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date('inactivedate', 'Inactive Date:&nbsp;')
+		end
 
-    if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
-      row:date('leavedate', 'Leave Date:&nbsp;')
-      row:newteam()
-    end
+		if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:newteam()
+		end
 
-    return row:create()
+		return row:create()
 	end
 end
 
