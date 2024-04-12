@@ -28,7 +28,7 @@ local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 local Squad = Class.new()
 
 
----@param args table
+---@param args table|Frame|nil
 ---@param injector WidgetInjector?
 ---@return self
 function Squad:init(args, injector)
