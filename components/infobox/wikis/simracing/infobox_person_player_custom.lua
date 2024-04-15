@@ -6,11 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local GameAppearances = require('Module:GetGameAppearances')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -36,7 +34,6 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
 	if id == 'custom' then
 		return {
