@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		return {
 			Title{name = 'History'},
-			Center{content = {TeamHistoryAuto._results{
+			Center{content = {TeamHistoryAuto.results{
 				convertrole = true,
 				addlpdbdata = true
 			}}},
