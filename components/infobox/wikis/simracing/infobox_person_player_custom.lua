@@ -33,8 +33,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local caller = self.caller
-
 	if id == 'custom' then
 		return {
 			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
