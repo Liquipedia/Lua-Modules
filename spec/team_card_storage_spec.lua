@@ -43,4 +43,54 @@ describe('Team Card Storage', function()
 		assert.are_equal('participant_tbd_1', TCStorage._getLpdbObjectName('TBD'))
 		assert.are_equal('participant_tbd_2', TCStorage._getLpdbObjectName('TBD'))
 	end)
+
+	describe('qualifier parsing', function()
+		it('raw text', function()
+			local test = 'Foo Bar'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('Foo Bar', text)
+			assert.is_nil(internal)
+			assert.is_nil(external)
+		end)
+
+		it('SimpleInternalLink', function()
+			local test = '[[Foo_Bar/2022|Foo Bar]]'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('Foo Bar', text)
+			assert.are_equal('Foo_Bar/2022', internal)
+			assert.is_nil(external)
+		end)
+
+		it('RelativeInternalLink', function()
+			local test = '[[/2022|Foo Bar]]'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('Foo Bar', text)
+			assert.are_equal('FakePage/2022', internal)
+			assert.is_nil(external)
+		end)
+
+		it('FixingSpaceInternalLink', function()
+			local test = '[[Foo Bar/2022|Foo Bar]]'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('Foo Bar', text)
+			assert.are_equal('Foo_Bar/2022', internal)
+			assert.is_nil(external)
+		end)
+
+		it('ExternalLink', function()
+			local test = '[https://foo.bar Foo Bar]'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('Foo Bar', text)
+			assert.is_nil(internal)
+			assert.are_equal('https://foo.bar', external)
+		end)
+
+		it('ExternalLinkNoSpace', function()
+			local test = '[https://foo.bar]'
+			local text, internal, external = TCStorage._parseQualifier(test)
+			assert.are_equal('', text)
+			assert.is_nil(internal)
+			assert.are_equal('https://foo.bar', external)
+		end)
+	end)
 end)
