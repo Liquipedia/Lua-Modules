@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local GameAppearances = require('Module:GetGameAppearances')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Template = require('Module:Template')
@@ -38,12 +39,9 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local games = Array.map(caller:getAllArgsForBase(args, 'game'),
-			function(game)
-				return Template.safeExpand(mw.getCurrentFrame(), 'Game/' .. game)
-			end
-		)
-		table.insert(widgets, Cell{name = 'Games', content = {table.concat(games, '&nbsp;')}})
+		return {
+			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
+		}
 	end
 
 	return widgets
