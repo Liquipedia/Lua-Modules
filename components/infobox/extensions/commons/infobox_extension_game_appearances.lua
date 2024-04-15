@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Game = require('Module:Game')
 
 local MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
@@ -15,9 +14,10 @@ local MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
 local Appearances = {}
 
 ----Provide a list of games compete by a player
----@param args GameApperancesArgs
----@return string?
+---@param args GameAppearancesArgs
+---@return table?
 function Appearances.player(args)
+
 	if not args or not args.player then return end
 
 	local conditions = Array.map(Array.range(1, MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT), function(index)
@@ -32,7 +32,7 @@ function Appearances.player(args)
 		limit = 1000,
 	})
 
-	local games = {}	
+	local games = {}
 	Array.forEach(data, function(item)
 		local game = Game.name{game = item.game}
 		if game then
@@ -44,12 +44,12 @@ function Appearances.player(args)
 end
 
 function Appearances.removeDuplicates(games)
-    hashSet = {}
+    HashSet = {}
 	Array.forEach(games, function(game)
-		hashSet[game] = true
+		HashSet[game] = true
 	end)
 
-	games = Array.extractKeys(hashSet)
+	games = Array.extractKeys(HashSet)
 	table.sort(games)
 
 	return games
