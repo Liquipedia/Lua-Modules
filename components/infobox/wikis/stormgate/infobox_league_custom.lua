@@ -18,6 +18,7 @@ local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
+local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -49,6 +50,7 @@ function CustomLeague:customParseArguments(args)
 	args.maps = self:_getMaps(args)
 	self.data.status = self:_getStatus(args)
 	self.data.publishertier = tostring(Logic.readBool(args.publishertier))
+	self.data = PatchAuto.run(self.data, args)
 end
 
 ---@param args table
@@ -99,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		table.insert(widgets, Cell{name = 'Game Version', content = {CustomLeague._getGameVersion(args)}})
+		table.insert(widgets, Cell{name = 'Game Version', content = {self.caller:_getGameVersion()}})
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
@@ -142,12 +144,11 @@ function CustomLeague:_mapsDisplay(maps)
 	)
 end
 
----@param args table
 ---@return string?
-function CustomLeague._getGameVersion(args)
+function CustomLeague:_getGameVersion()
 	return table.concat({
-		Page.makeInternalLink(args.patch),
-		Page.makeInternalLink(args.epatch ~= args.patch and args.patch and args.epatch or nil)
+		Page.makeInternalLink({}, self.data.patchDisplay, self.data.patch),
+		Page.makeInternalLink({}, self.data.endPatchDisplay, self.data.endPatch)
 	}, ' &ndash; ')
 end
 

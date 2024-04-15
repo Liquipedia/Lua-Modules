@@ -6,67 +6,51 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title():header()
+	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
+end
 
-	local args = squad.args
+function CustomSquad._playerRow(player, squadType)
+	local row = SquadRow{useTemplatesForSpecialTeams = true}
+	row:status(squadType)
+	row:id{
+		player.id,
+		flag = player.flag,
+		race = Faction.read(player.race),
+		link = player.link,
+		captain = player.captain,
+		role = player.role,
+		team = player.team,
+		date = player.leavedate or player.inactivedate,
+	}
+	row:name{name = player.name}
+	row:role{role = player.role}
+	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	Array.forEach(players, function(player)
-		local row = SquadRow{useTemplatesForSpecialTeams = true}
-		row:status(squad.type)
-		row:id{
-			player.id,
-			flag = player.flag,
-			race = Faction.read(player.race),
-			link = player.link,
-			captain = player.captain,
-			role = player.role,
-			team = player.team,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+	if squadType == SquadUtils.SquadType.FORMER then
+		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
+		row:newteam{
+			newteam = player.newteam,
+			newteamrole = player.newteamrole,
+			newteamdate = player.newteamdate,
+			leavedate = player.leavedate
 		}
-		row:name{name = player.name}
-		row:role{role = player.role}
-		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	elseif squadType == SquadUtils.SquadType.INACTIVE then
+		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+	end
 
-		if squad.type == Squad.SquadType.FORMER then
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam{
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			}
-		elseif squad.type == Squad.SquadType.INACTIVE then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-		end
-
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
-	end)
-
-	return squad:create()
+	return row:create()
 end
 
 return CustomSquad

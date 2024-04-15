@@ -93,7 +93,5 @@ return {
 	},
 	defaultGame = 'Age of Empires II',
 
-	defaultTeamLogo = 'Age of Empires default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Age of Empires default allmode.png', ---@deprecated
 	match2 = 1,
 }

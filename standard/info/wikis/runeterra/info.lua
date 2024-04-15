@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'runeterra',
-	defaultTeamLogo = 'Legends of Runeterra logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Legends of Runeterra logo.png', ---@deprecated
 	match2 = 0,
 }

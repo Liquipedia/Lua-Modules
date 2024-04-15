@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'formula1',
-	defaultTeamLogo = 'Sim Racing default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Sim Racing default darkmode.png', ---@deprecated
 	match2 = 0,
 }

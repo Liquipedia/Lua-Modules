@@ -8,13 +8,18 @@
 
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
 
+---@class RocketleaguePlayerExt: PlayerExt
+local PlayerExtCustom = Table.copy(PlayerExt)
+
 --- Asks LPDB for the team a player belonged to on a page. For specific uses only.
 ---@param resolvedPageName string
----@date resolvedPageName string
-function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
+---@param date string|number|osdate?
+---@return {joinDate: string|number|osdate?, leaveDate: string|number|osdate?, template: string}?
+function PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
 	if Logic.isEmpty(resolvedPageName) then
 		return
 	end
@@ -37,4 +42,4 @@ function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	end
 end
 
-return PlayerExt
+return PlayerExtCustom

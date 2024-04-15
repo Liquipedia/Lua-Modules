@@ -137,7 +137,7 @@ end
 ---Builds the display for the dynamic tabs per year option
 ---@param data table[]
 ---@param args table
----@return Html
+---@return Html|string?
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 

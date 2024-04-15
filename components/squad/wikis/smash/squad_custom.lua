@@ -9,55 +9,47 @@
 local Array = require('Module:Array')
 local Characters = require('Module:Characters')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Variables = require('Module:Variables')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
+
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
 
 local CustomSquad = {}
+local CustomInjector = Class.new(Injector)
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
+function CustomInjector:parse(id, widgets)
+	if id == 'header_role' then
+		return {
+			Widget.TableCellNew{content = {'Main'}, header = true}
+		}
+	elseif id == 'header_name' then
+		return {}
 	end
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('Player'))
-		:node(makeHeader(''))
-		:node(makeHeader('Main'))
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.INACTIVE or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-	if self.type == Squad.SquadType.FORMER or self.type == Squad.SquadType.FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
+	return widgets
 end
+
 ---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@param args table
 ---@return self
 function ExtendedSquadRow:mains(args)
-	local cell = mw.html.create('td')
-	cell:css('text-align', 'center')
-
+	local characters = {}
 	Array.forEach(args.mains, function(main)
-		cell:wikitext(Characters.GetIconAndName{main, game = args.game, large = true})
+		table.insert(characters, Characters.GetIconAndName{main, game = args.game, large = true})
 	end)
-	self.content:node(cell)
+
+	table.insert(self.children, Widget.TableCellNew{
+		css = {['text-align'] = 'center'},
+		content = characters,
+	})
 
 	return self
 end
@@ -65,26 +57,17 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title()
+	local squad = Squad():init(frame, CustomInjector()):title():header()
 
-	squad.mains = CustomSquad.mains
-	squad.header = CustomSquad.header
-	squad:header()
+	local tableGame = squad.args.game
 
-	local args = squad.args
-	local tableGame = args.game
-
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
+	local players = SquadUtils.parsePlayers(squad.args)
 
 	Array.forEach(players, function(player)
 		local row = ExtendedSquadRow()
 
 		local game = player.game and mw.text.split(player.game:lower(), ',')[1] or tableGame
-		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game, returnType = 'lua'}
-			or player.mains
+		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game} or player.mains
 
 		row:status(squad.type)
 		row:id{
@@ -93,12 +76,12 @@ function CustomSquad.run(frame)
 			link = player.link,
 			team = player.activeteam,
 			name = Variables.varDefault('name') or player.name,
-			date = player.leavedate or player.inactivedate or player.leavedate,
+			date = player.leavedate or player.inactivedate,
 		}
 		row:mains{mains = mw.text.split(mains or '', ','), game = game}
 		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
 
-		if squad.type == Squad.SquadType.FORMER then
+		if squad.type == SquadUtils.SquadType.FORMER then
 			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
 			row:newteam{
 				newteam = player.newteam,
@@ -106,16 +89,11 @@ function CustomSquad.run(frame)
 				newteamdate = player.newteamdate,
 				leavedate = player.leavedate
 			}
-		elseif squad.type == Squad.SquadType.INACTIVE then
+		elseif squad.type == SquadUtils.SquadType.INACTIVE then
 			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
 		end
 
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		squad:row(row:create())
 
 		Variables.varDefine('nationality', '')
 		Variables.varDefine('name', '')

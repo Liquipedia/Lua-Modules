@@ -8,22 +8,23 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
-local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 
 local DisplayHelper = {}
-local _NONBREAKING_SPACE = '&nbsp;'
-local _UTC = Timezone.getTimezoneString('UTC')
+local NONBREAKING_SPACE = '&nbsp;'
+local UTC = Timezone.getTimezoneString('UTC')
 
 -- Whether to allow highlighting an opponent via mouseover
+---@param opponent standardOpponent
+---@return boolean
 function DisplayHelper.opponentIsHighlightable(opponent)
 	if opponent.type == 'literal' then
 		return opponent.name and opponent.name ~= '' and opponent.name ~= 'TBD' or false
@@ -35,6 +36,9 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 	end
 end
 
+---@param node Html
+---@param opponent standardOpponent
+---@return Html
 function DisplayHelper.addOpponentHighlight(node, opponent)
 	local canHighlight = DisplayHelper.opponentIsHighlightable(opponent)
 	return node
@@ -43,6 +47,8 @@ function DisplayHelper.addOpponentHighlight(node, opponent)
 end
 
 -- Expands a header code by making a RPC call.
+---@param headerCode string
+---@return string[]
 function DisplayHelper.expandHeaderCode(headerCode)
 	headerCode = headerCode:gsub('$', '!')
 	local args = mw.text.split(headerCode, '!')
@@ -61,6 +67,8 @@ Examples:
 DisplayHelper.expandHeader('!ux!2') -- returns {'Upper Semi-Finals', 'UB SF'}
 DisplayHelper.expandHeader('Qualified,Qual.,Q') -- returns {'Qualified', 'Qual.', 'Q'}
 ]]
+---@param header string
+---@return string[]
 function DisplayHelper.expandHeader(header)
 	local isCode = Table.includes({'$', '!'}, header:sub(1, 1))
 	return isCode
@@ -75,23 +83,26 @@ This is the default policy for Bracket and Matchlist. Wikis may specify a
 different policy by setting props.matchHasDetails in the Bracket and Matchlist
 components.
 ]]
+---@param match MatchGroupUtilMatch
+---@return boolean
 function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
 		or (match.timestamp and match.timestamp ~= Date.defaultTimestamp)
-		or match.vod
+		or Logic.isNotEmpty(match.vod)
 		or not Table.isEmpty(match.links)
-		or match.comment
+		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
 end
 
 -- Display component showing the streams, date, and countdown of a match.
+---@param match MatchGroupUtilMatch
+---@return Html
 function DisplayHelper.MatchCountdownBlock(match)
-	DisplayUtil.assertPropTypes(match, MatchGroupUtil.types.Match.struct)
 	local dateString
 	if match.dateIsExact == true then
 		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or _UTC)
+				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
@@ -107,10 +118,10 @@ function DisplayHelper.MatchCountdownBlock(match)
 		:node(require('Module:Countdown')._create(stream))
 end
 
---[[
-Displays the map name and link, and the status of the match if it had an
-unusual status.
-]]
+---Displays the map name and link, and the status of the match if it had an unusual status.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean}?
+---@return string
 function DisplayHelper.MapAndStatus(game, config)
 	config = config or {}
 	local mapText
@@ -130,13 +141,13 @@ function DisplayHelper.MapAndStatus(game, config)
 	local statusText = nil
 	if game.resultType == 'default' then
 		if game.walkover == 'L' then
-			statusText = _NONBREAKING_SPACE .. '<i>(w/o)</i>'
+			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
 		elseif game.walkover == 'FF' then
-			statusText = _NONBREAKING_SPACE .. '<i>(ff)</i>'
+			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
 		elseif game.walkover == 'DQ' then
-			statusText = _NONBREAKING_SPACE .. '<i>(dq)</i>'
+			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
-			statusText = _NONBREAKING_SPACE .. '<i>(def.)</i>'
+			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
 		end
 	end
 
@@ -153,7 +164,9 @@ This is the default implementation. Specific wikis may override this by passing
 in a different props.MatchSummaryContainer in the Bracket and Matchlist
 components.
 ]]
-DisplayHelper.DefaultMatchSummaryContainer = function(props)
+---@param props table
+---@return Html
+function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
 	if MatchSummaryModule.getByMatchId then
@@ -163,10 +176,8 @@ DisplayHelper.DefaultMatchSummaryContainer = function(props)
 	end
 end
 
---[[
-Retrieves the wiki specific global bracket config specified in
-MediaWiki:BracketConfig.
-]]
+---Retrieves the wiki specific global bracket config specified in MediaWiki:BracketConfig.
+---@return table
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	local defaultConfig = {
 		forceShortName = false,

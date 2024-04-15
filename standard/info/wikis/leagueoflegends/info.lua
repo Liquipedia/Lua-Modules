@@ -27,7 +27,5 @@ return {
 	},
 	defaultGame = 'leagueoflegends',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'League of Legends allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'League of Legends allmode.png', ---@deprecated
 	match2 = 2,
 }

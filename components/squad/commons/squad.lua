@@ -6,127 +6,112 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
+local SquadUtils = Lua.import('Module:Squad/Utils')
+local Widget = Lua.import('Module:Infobox/Widget/All')
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+
 ---@class Squad
----@field frame Frame
+---@operator call:Squad
 ---@field args table
 ---@field root Html
----@field content Html
+---@field private injector WidgetInjector?
+---@field rows WidgetTableRowNew[]
 ---@field type integer
 local Squad = Class.new()
 
----@enum SquadType
-local SquadType = {
-	ACTIVE = 0,
-	INACTIVE = 1,
-	FORMER = 2,
-	FORMER_INACTIVE = 3,
-}
-Squad.SquadType = SquadType
 
----@param frame Frame
+---@param args table|Frame|nil
+---@param injector WidgetInjector?
 ---@return self
-function Squad:init(frame)
-	self.frame = frame
-	self.args = Arguments.getArgs(frame)
-	self.root = mw.html.create('div')
-	self.root:addClass('table-responsive')
-	-- TODO: is this needed?
-		:css('margin-bottom', '10px')
-	-- TODO: is this needed?
-		:css('padding-bottom', '0px')
+function Squad:init(args, injector)
+	self.args = Arguments.getArgs(args)
+	self.rows = {}
 
-	self.content = mw.html.create('table')
-	self.content:addClass('wikitable wikitable-striped roster-card')
-
-	if not String.isEmpty(self.args.team) then
-		self.args.isLoan = true
-	end
-
-	local status = (self.args.status or 'active'):upper()
-
-	self.type = SquadType[status] or SquadType.ACTIVE
+	self.injector = injector
+	self.type =
+		(SquadUtils.SquadTypeToStorageValue[self.args.type] and self.args.type) or
+		SquadUtils.statusToSquadType(self.args.status) or
+		SquadUtils.SquadType.ACTIVE
 
 	return self
 end
 
----@return Squad
+---@return self
 function Squad:title()
 	local defaultTitle
-	if self.type == SquadType.FORMER then
+	if self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE then
 		defaultTitle = 'Former Squad'
-	elseif self.type == SquadType.INACTIVE then
+	elseif self.type == SquadUtils.SquadType.INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
 	local titleText = Logic.emptyOr(self.args.title, defaultTitle)
 
-	if String.isNotEmpty(titleText) then
-		local titleContainer = mw.html.create('tr')
-
-		local titleRow = mw.html.create('th')
-		titleRow:addClass('large-only')
-			:attr('colspan', '1')
-			:wikitext(titleText)
-
-		local titleRow2 = mw.html.create('th')
-		titleRow2:addClass('large-only')
-			:attr('colspan', '10')
-			:addClass('roster-title-row2-border')
-			:wikitext(titleText)
-
-		titleContainer:node(titleRow):node(titleRow2)
-		self.content:node(titleContainer)
+	if String.isEmpty(titleText) then
+		return self
 	end
+
+	table.insert(self.rows, Widget.TableRowNew{
+		children = {Widget.TableCellNew{content = {titleText}, colSpan = 10, header = true}}
+	})
 
 	return self
 end
 
 ---@return self
 function Squad:header()
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
-		:node(makeHeader('Name'))
-		:node(makeHeader()) -- "Role"
-		:node(makeHeader('Join Date'))
-	if self.type == SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	elseif self.type == SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-
-	self.content:node(headerRow)
+	local isInactive = self.type == SquadUtils.SquadType.INACTIVE or self.type == SquadUtils.SquadType.FORMER_INACTIVE
+	local isFormer = self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE
+	table.insert(self.rows, Widget.TableRowNew{
+		classes = {'HeaderRow'},
+		children = Array.append({},
+			Widget.TableCellNew{content = {'ID'}, header = true},
+			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
+			Widget.Customizable{id = 'header_name',
+				children = {Widget.TableCellNew{content = {'Name'}, header = true}}
+			},
+			Widget.Customizable{id = 'header_role',
+				children = {Widget.TableCellNew{header = true}}
+			},
+			Widget.TableCellNew{content = {'Join Date'}, header = true},
+			isInactive and Widget.Customizable{id = 'header_inactive', children = {
+				Widget.TableCellNew{content = {'Inactive Date'}, header = true},
+			}} or nil,
+			isFormer and Widget.Customizable{id = 'header_former', children = {
+				Widget.TableCellNew{content = {'Leave Date'}, header = true},
+				Widget.TableCellNew{content = {'New Team'}, header = true},
+			}} or nil
+		)
+	})
 
 	return self
 end
 
----@param row Html
+---@param row WidgetTableRowNew
 ---@return self
 function Squad:row(row)
-	self.content:node(row)
+	table.insert(self.rows, row)
 	return self
 end
 
 ---@return Html
 function Squad:create()
-	return self.root:node(self.content)
+	local dataTable = Widget.TableNew{
+		css = {['margin-bottom'] = '10px'},
+		classes = {'wikitable-striped', 'roster-card'},
+		children = self.rows,
+	}
+	local wrapper = mw.html.create()
+	Array.forEach(WidgetFactory.work(dataTable, self.injector), FnUtil.curry(wrapper.node, wrapper))
+	return wrapper
 end
 
 return Squad

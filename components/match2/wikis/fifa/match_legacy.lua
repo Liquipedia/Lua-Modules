@@ -25,6 +25,7 @@ function MatchLegacy.storeMatch(match2, options)
 end
 
 function MatchLegacy.convertParameters(match2)
+	---@type table
 	local match = Table.filterByKey(match2, function(key) return not String.startsWith(key, 'match2') end)
 
 	local opponents = match2.match2opponents

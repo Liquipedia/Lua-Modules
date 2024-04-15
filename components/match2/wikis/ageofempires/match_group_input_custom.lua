@@ -85,7 +85,7 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	Variables.varDefine('tournament_maps', data.maps)
 
 	match.game = match.game or data.game
-	match.mapsInfo = Logic.emptyOr(match.mapsInfo, Json.parse(data.maps))
+	match.mapsInfo = Logic.emptyOr(match.mapsInfo, (Json.parse(data.maps)))
 
 	return match
 end
@@ -106,10 +106,15 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._getLinks(match)
-	match.links = {
-		civdraft = match.civdraft and ('https://aoe2cm.net/draft/' .. match.civdraft) or nil,
-		mapdraft = match.mapdraft and ('https://aoe2cm.net/draft/' .. match.mapdraft) or nil,
-	}
+	match.links = {}
+	match.civdraft1 = match.civdraft1 or match.civdraft
+	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
+		match.links[key] = 'https://aoe2cm.net/draft/' .. value
+	end
+	match.mapdraft1 = match.mapdraft1 or match.mapdraft
+	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
+		match.links[key] = 'https://aoe2cm.net/draft/' .. value
+	end
 end
 
 ---@param match table
@@ -152,7 +157,7 @@ function CustomMatchGroupInput._calculateWinner(match)
 				local walkover = tonumber(match.walkover)
 				if walkover == opponentIndex then
 					match.winner = opponentIndex
-					match.walkover = 'L'
+					match.walkover = 'FF'
 					opponent.status = 'W'
 				elseif walkover == 0 then
 					match.winner = 0
@@ -319,6 +324,16 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
+
+	-- Init score if match started and map info is present
+	if not match.opponent1.autoscore and not match.opponent2.autoscore
+			and map.map and map.map ~= 'TBD'
+			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]])
+			and String.isNotEmpty(map.civs1) and String.isNotEmpty(map.civs2) then
+		match.opponent1.autoscore = 0
+		match.opponent2.autoscore = 0
+	end
+
 	if Logic.isEmpty(map.resulttype) and map.scores[1] and map.scores[2] then
 		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
 		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]

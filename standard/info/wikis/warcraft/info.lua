@@ -52,8 +52,6 @@ return {
 		},
 	},
 	defaultGame = 'reforged',
-	defaultTeamLogo = 'Warcraft III default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Warcraft III default allmode.png', ---@deprecated
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,

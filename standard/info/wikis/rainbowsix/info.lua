@@ -41,13 +41,5 @@ return {
 	defaultGame = 'siege',
 	defaultRoundPrecision = 0,
 
-	defaultTeamLogo = {
-		siege = 'Rainbow Six Siege Logo lightmode.png',
-		vegas2 = 'Rainbow Six Vegas Logo lightmode.png',
-	}, ---@deprecated
-	defaultTeamLogoDark = {
-		siege = 'Rainbow Six Siege Logo darkmode.png',
-		vegas2 = 'Rainbow Six Vegas Logo darkmode.png',
-	}, ---@deprecated
 	match2 = 2,
 }

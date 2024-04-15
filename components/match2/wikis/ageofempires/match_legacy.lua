@@ -95,18 +95,22 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	if match.walkover == 'FF' or match.walkover == 'DQ' then
+		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
+	elseif match.walkover == 'L' then
 		match.walkover = nil
 	end
 
 	match.staticid = match2.match2id
 
+	local extradata = Json.parseIfString(match2.extradata)
 	-- Handle extradata fields
-	match.extradata = {}
+	match.extradata = {
+		matchsection = extradata.matchsection or '',
+	}
 
-	match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
+	match.extradata.bestof = (match2.bestof and match2.bestof ~= 0) and tostring(match2.bestof) or ''
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' and bracketData.inheritedheader then
 		match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]

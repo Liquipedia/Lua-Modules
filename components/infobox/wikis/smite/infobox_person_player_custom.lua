@@ -46,7 +46,7 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-	player.args.history = TeamHistoryAuto._results{
+	player.args.history = TeamHistoryAuto.results{
 		convertrole = true,
 		iconModule = 'Module:PositionIcon/data',
 		player = player.pagename

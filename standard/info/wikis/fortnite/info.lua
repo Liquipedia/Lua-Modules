@@ -26,7 +26,5 @@ return {
 		},
 	},
 	defaultGame = 'fortnite',
-	defaultTeamLogo = 'Fortnite default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Fortnite default allmode.png', ---@deprecated
 	match2 = 0,
 }

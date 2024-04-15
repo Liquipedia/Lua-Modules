@@ -26,7 +26,7 @@ local PlacementStats = {}
 ---@field totals {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}}
 
 ---Entry Point: Queries placement statistics and builds a table for display of them below infoboxes
----@param args any
+---@param args table
 ---@return Html|string
 function PlacementStats.run(args)
 	args = args or {}

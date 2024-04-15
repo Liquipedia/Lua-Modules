@@ -8,8 +8,9 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = mw.loadData('Module:CharacterNames')
 local GameAppearances = require('Module:GetGameAppearances')
-local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -75,8 +76,9 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero)
-			return HeroIcon.getImage{hero, size = SIZE_HERO}
+		local heroes = Array.sub(caller:getAllArgsForBase(args, 'hero'), 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
+		local heroIcons = Array.map(heroes, function(hero)
+			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
 
 		Array.appendWith(widgets,
@@ -144,7 +146,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
+		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
 		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
 			break
 		end

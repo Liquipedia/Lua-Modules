@@ -10,8 +10,6 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -22,7 +20,26 @@ local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
-MatchlistDisplay.configFromArgs = function(args)
+---@class MatchlistConfigOptions
+---@field MatchSummaryContainer function?
+---@field Opponent function?
+---@field Score function?
+---@field attached boolean?
+---@field collapsed boolean?
+---@field collapsible boolean?
+---@field matchHasDetails function?
+---@field width number?
+
+---@class MatchlistDisplayMatchProps
+---@field MatchSummaryContainer function
+---@field Opponent function
+---@field Score function
+---@field match MatchGroupUtilMatch
+---@field matchHasDetails function
+
+---@param args table
+---@return table
+function MatchlistDisplay.configFromArgs(args)
 	return {
 		attached = Logic.readBoolOrNil(args.attached),
 		collapsed = Logic.readBoolOrNil(args.collapsed),
@@ -31,49 +48,22 @@ MatchlistDisplay.configFromArgs = function(args)
 	}
 end
 
-MatchlistDisplay.types.MatchlistConfig = TypeUtil.struct({
-	MatchSummaryContainer = 'function',
-	Opponent = 'function',
-	Score = 'function',
-	attached = 'boolean',
-	collapsed = 'boolean',
-	collapsible = 'boolean',
-	matchHasDetails = 'function',
-	width = 'number',
-})
-MatchlistDisplay.types.MatchlistConfigOptions = TypeUtil.struct(
-	Table.mapValues(MatchlistDisplay.types.MatchlistConfig.struct, TypeUtil.optional)
-)
-
-MatchlistDisplay.propTypes.MatchlistContainer = {
-	bracketId = 'string',
-	config = TypeUtil.optional(MatchlistDisplay.types.MatchlistConfigOptions),
-}
-
---[[
-Display component for a tournament matchlist. The matchlist is specified by ID.
-The component fetches the match data from LPDB or page variables.
-]]
+---Display component for a tournament matchlist. The matchlist is specified by ID.
+---The component fetches the match data from LPDB or page variables.
+---@param props {bracketId: string, config: MatchlistConfigOptions}
+---@param matches MatchGroupUtilMatch[]
+---@return Html
 function MatchlistDisplay.MatchlistContainer(props, matches)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.MatchlistContainer)
 	return MatchlistDisplay.Matchlist({
 		config = props.config,
 		matches = matches or MatchGroupUtil.fetchMatches(props.bracketId),
 	})
 end
 
-MatchlistDisplay.propTypes.Matchlist = {
-	config = TypeUtil.optional(MatchlistDisplay.types.MatchlistConfigOptions),
-	matches = TypeUtil.array(MatchGroupUtil.types.Match),
-}
-
---[[
-Display component for a tournament matchlist. Match data is specified in the
-input.
-]]
+---Display component for a tournament matchlist. Match data is specified in the input.
+---@param props {config: MatchlistConfigOptions, matches: MatchGroupUtilMatch[]}
+---@return Html
 function MatchlistDisplay.Matchlist(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Matchlist)
-
 	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = propsConfig.MatchSummaryContainer or DisplayHelper.DefaultMatchSummaryContainer,
@@ -124,20 +114,11 @@ function MatchlistDisplay.Matchlist(props)
 	return matchlistNode
 end
 
-MatchlistDisplay.propTypes.Match = {
-	MatchSummaryContainer = 'function',
-	Opponent = 'function',
-	Score = 'function',
-	match = MatchGroupUtil.types.Match,
-	matchHasDetails = 'function',
-}
-
---[[
-Display component for a match in a matchlist. Consists of two opponents, two
-scores, and a icon for the match summary popup.
-]]
+---Display component for a match in a matchlist. Consists of two opponents, two scores,
+---and a icon for the match summary popup.
+---@param props MatchlistDisplayMatchProps
+---@return Html
 function MatchlistDisplay.Match(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Match)
 	local match = props.match
 
 	local function renderOpponent(opponentIx)
@@ -185,40 +166,29 @@ function MatchlistDisplay.Match(props)
 		:node(matchSummaryNode)
 end
 
-MatchlistDisplay.propTypes.Title = {
-	title = 'string',
-}
-
---[[
-Display component for a title in a matchlist.
-]]
+---Display component for a title in a matchlist.
+---@param props {title: string}
+---@return Html
 function MatchlistDisplay.Title(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Title)
 	local titleNode = mw.html.create('div'):addClass('brkts-matchlist-title')
 		:wikitext(props.title)
 
 	return DisplayUtil.applyOverflowStyles(titleNode, 'wrap')
 end
 
-MatchlistDisplay.propTypes.Header = {
-	header = 'string',
-}
-
---[[
-Display component for a header in a matchlist.
-]]
+---Display component for a header in a matchlist.
+---@param props {header: string}
+---@return Html
 function MatchlistDisplay.Header(props)
-	DisplayUtil.assertPropTypes(props, MatchlistDisplay.propTypes.Header)
-
 	local headerNode = mw.html.create('div'):addClass('brkts-matchlist-header')
 		:wikitext(props.header)
 
 	return DisplayUtil.applyOverflowStyles(headerNode, 'wrap')
 end
 
---[[
-Display component for a dateHeader in a matchlist.
-]]
+---Display component for a dateHeader in a matchlist.
+---@param props {match: MatchGroupUtilMatch}
+---@return Html
 function MatchlistDisplay.DateHeader(props)
 	local dateHeaderNode = mw.html.create('div'):addClass('brkts-matchlist-header')
 		:node(DisplayHelper.MatchCountdownBlock(props.match))
@@ -233,6 +203,8 @@ This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Opponent to the Matchlist
 component.
 ]]
+---@param props {opponent: standardOpponent, resultType: ResultType, side: string}
+---@return Html
 function MatchlistDisplay.Opponent(props)
 	local contentNode = OpponentDisplay.BlockOpponent({
 		flip = props.side == 'left',
@@ -256,6 +228,8 @@ This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Score to the Matchlist
 component.
 ]]
+---@param props {opponent: standardOpponent, resultType: ResultType, side: string}
+---@return Html
 function MatchlistDisplay.Score(props)
 	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')
 		:node(OpponentDisplay.InlineScore(props.opponent))

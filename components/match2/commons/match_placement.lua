@@ -6,9 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local TypeUtil = require('Module:TypeUtil')
-
-local MatchPlacement = {propTypes = {}}
+local MatchPlacement = {}
 
 MatchPlacement.medalIcons = {
 	'Gold.png',
@@ -25,14 +23,9 @@ MatchPlacement.medalTitles = {
 	sf = 'Semifinalist',
 }
 
-MatchPlacement.propTypes.MedalIcon = {
-	place = 'number?',
-	range = TypeUtil.optional(TypeUtil.array('number')),
-}
-
---[[
-Display component for a medal icon representing a placement or placement range.
-]]
+---Display component for a medal icon representing a placement or placement range.
+---@param props {place: number?, range: number[]?}
+---@return Html?
 function MatchPlacement.MedalIcon(props)
 	local place = props.range[1] or props.place
 	if props.range and props.range[1] == 3 and props.range[2] == 4 then

@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -70,11 +69,11 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = Logic.emptyOr(player.args.history, TeamHistoryAuto._results{
-		hiderole = 'true',
+	player.args.history = String.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
+		hiderole = true,
 		iconModule = 'Module:PositionIcon/data',
-		addlpdbdata = 'true'
-	})
+		addlpdbdata = true,
+	}
 	player.args.autoTeam = true
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)

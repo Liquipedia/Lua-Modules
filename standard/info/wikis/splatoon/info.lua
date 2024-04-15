@@ -52,7 +52,5 @@ return {
 		},
 	},
 	defaultGame = '1',
-	defaultTeamLogo = 'Splatoon default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Splatoon default darkmode.png', ---@deprecated
 	match2 = 2,
 }

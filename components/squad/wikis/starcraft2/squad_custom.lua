@@ -6,16 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 --only for legacy reasons
 SquadRow.specialTeamsTemplateMapping.retirement = 'Team/retired'
@@ -25,13 +25,11 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title():header()
+	local args = Arguments.getArgs(frame)
+	local squad = Squad():init(args):title():header()
 
-	local args = squad.args
-
-	local isFormer = squad.type == Squad.SquadType.FORMER
-	local isInactive = squad.type == Squad.SquadType.INACTIVE
+	local isFormer = squad.type == SquadUtils.SquadType.FORMER
+	local isInactive = squad.type == SquadUtils.SquadType.INACTIVE
 	local isMainSquad = Logic.readBool(args.main)
 	local squadName = args.squad or mw.title.getCurrentTitle().prefixedText
 	local status = (isFormer and 'former')
@@ -39,8 +37,9 @@ function CustomSquad.run(frame)
 		or (isMainSquad and 'main')
 		or 'active'
 
-	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args[index])
+	local players = SquadUtils.parsePlayers(squad.args)
+
+	players = Array.map(players, function(player)
 		if not player then return player end
 		player.faction = Faction.read(player.race)
 		if isFormer then
@@ -62,7 +61,7 @@ function CustomSquad.run(frame)
 				captain = player.captain,
 				role = player.role,
 				team = player.team,
-				date = player.leavedate or player.inactivedate or player.leavedate,
+				date = player.leavedate or player.inactivedate,
 			})
 			:name({name = player.name})
 			:role({role = player.role})
@@ -86,11 +85,7 @@ function CustomSquad.run(frame)
 			status = status,
 		}
 
-		squad:row(row:create(
-			squadName .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		squad:row(row:create())
 	end)
 
 	return squad:create()

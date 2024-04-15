@@ -29,17 +29,6 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local maps
-	if mode == Opponent.solo then
-		maps = Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|winner=|civs1=|civs2=}}'
-		end)
-	else
-		maps = Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|winner=|players1=|civs1=|players2=|civs2=}}'
-		end)
-	end
-
 	local lines = Array.extend(
 		'{{Match',
 		INDENT .. '|date=',
@@ -49,7 +38,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
 		end),
-		maps,
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
+		end),
 		'}}'
 	)
 
@@ -69,6 +60,22 @@ function WikiCopyPaste._getOpponent(mode)
 	end
 
 	return ''
+end
+
+--subfunction used to generate code for the Map template, depending on the type of opponent
+---@param mode string
+---@return string
+function WikiCopyPaste._getMap(mode)
+	local lines = Array.extend(
+		'={{Map',
+		INDENT .. INDENT .. '|map=|winner=',
+		mode == Opponent.team and INDENT .. INDENT .. '|players1=' or nil,
+		INDENT .. INDENT .. '|civs1=',
+		mode == Opponent.team and INDENT .. INDENT .. '|players2=' or nil,
+		INDENT .. INDENT .. '|civs2=',
+		INDENT .. '}}'
+	)
+	return table.concat(lines, '\n')
 end
 
 return WikiCopyPaste

@@ -144,8 +144,8 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, finished)
 end
 
 ---@param tbl table
----@param key1 any
----@param key2 any
+---@param key1 string|number
+---@param key2 string|number
 ---@return boolean
 function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
 	local value1 = tonumber(tbl[key1].score) or NO_SCORE
@@ -389,9 +389,9 @@ end
 ---@param opponentIndex integer
 ---@param players table[]?
 ---@param participants table
----@return any
+---@return table
 function MapFunctions.attachToParticipant(player, opponentIndex, players, participants)
-	player.player = mw.ext.TeamLiquidIntegration.resolve_redirect(player):gsub(' ', '_')
+	player.player = mw.ext.TeamLiquidIntegration.resolve_redirect(player.player or ''):gsub(' ', '_')
 	for playerIndex, item in pairs(players or {}) do
 		if player.player == item.name then
 			participants[opponentIndex .. '_' .. playerIndex] = player

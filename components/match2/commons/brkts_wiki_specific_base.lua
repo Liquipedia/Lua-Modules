@@ -10,6 +10,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
+---@field defaultIcon string?
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
