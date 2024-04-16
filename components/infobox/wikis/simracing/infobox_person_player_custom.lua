@@ -6,8 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local GameAppearances = require('Module:GetGameAppearances')
 local Class = require('Module:Class')
+local GameAppearances = require('Module:Infobox/Extension/GameAppearances')
 local Lua = require('Module:Lua')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
