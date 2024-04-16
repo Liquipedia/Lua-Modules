@@ -12,7 +12,6 @@ local Game = require('Module:Game')
 local MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
 
 local Appearances = {}
-local HashSet = {}
 
 ---@class GameAppearancesArgs
 ---@field player string?
