@@ -78,6 +78,7 @@ end
 ---@return WidgetTableRowNew
 function CustomSquad._playerRow(person, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	squadPerson.extradata.number = person.number
 	SquadUtils.storeSquadPerson(squadPerson)
 	local row = ExtendedSquadRow(squadPerson)
 
