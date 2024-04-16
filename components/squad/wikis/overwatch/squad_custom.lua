@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
@@ -33,14 +34,13 @@ end
 ---@class OverwatchSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
----@param args table
 ---@return self
-function ExtendedSquadRow:number(args)
+function ExtendedSquadRow:number()
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Number'},
-		content = String.isNotEmpty(args.number) and {
+		content = String.isNotEmpty(self.model.extradata.number) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'),
-			args.number,
+			self.model.extradata.number,
 		} or nil,
 	})
 
@@ -70,42 +70,30 @@ end
 ---@param squadType integer
 ---@return Html?
 function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, CustomInjector)
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow))
 end
 
----@param player table
+---@param person table
 ---@param squadType integer
 ---@return WidgetTableRowNew
-function CustomSquad._playerRow(player, squadType)
-	local row = ExtendedSquadRow()
+function CustomSquad._playerRow(person, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	SquadUtils.storeSquadPerson(squadPerson)
+	local row = ExtendedSquadRow(squadPerson)
 
-	row:status(squadType)
-	row:id({
-		(player.idleavedate or player.id),
-		flag = player.flag,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		date = player.leavedate or player.inactivedate,
-	})
+	row:id()
 	if HAS_NUMBER then
-		row:number{number = player.number}
+		row:number()
 	end
-	row:name{name = player.name}
-	row:position{role = player.role, position = player.position}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	row:name():position():date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.FORMER then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
-	elseif squadType == SquadUtils.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+	end
+
+	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	end
 
 	return row:create()
