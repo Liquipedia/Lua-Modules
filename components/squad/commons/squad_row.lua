@@ -198,14 +198,13 @@ end
 ---@param args table
 ---@return self
 function SquadRow:newteam(args)
-	local content = {}
-
 	local function createContent()
+		local content = {}
 		local newTeam, newTeamRole = args.newteam, args.newteamrole
 		local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
 
 		if not hasNewTeam and not hasNewTeamRole then
-			return
+			return content
 		end
 
 		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
@@ -213,7 +212,7 @@ function SquadRow:newteam(args)
 
 		if not Info.config.squads.hasSpecialTeam and not hasNewTeam then
 			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
-			return
+			return content
 		end
 
 		if not mw.ext.TeamTemplate.teamexists(newTeam) then
@@ -221,7 +220,7 @@ function SquadRow:newteam(args)
 			if Info.config.squads.hasSpecialTeam and newTeamTemplate then
 				table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
 			end
-			return
+			return content
 		end
 
 		local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
@@ -234,6 +233,7 @@ function SquadRow:newteam(args)
 			table.insert(content, '&nbsp;')
 			table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. newTeamRole .. ')'))
 		end
+		return content
 	end
 
 	table.insert(self.children, Widget.TableCellNew{
