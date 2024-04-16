@@ -102,11 +102,9 @@ function Game.listGames(options)
 		return Array.sortBy(gamesList, getGameOrder)
 	end
 
-	Array.filter(gamesList, function(game)
+	return Array.filter(gamesList, function(game)
 		return not game.unlisted
 	end)
-
-	return gamesList
 end
 
 ---Fetches the abbreviation for a given game

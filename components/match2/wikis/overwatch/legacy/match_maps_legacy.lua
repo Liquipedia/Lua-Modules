@@ -34,13 +34,16 @@ local MatchMapsLegacy = {}
 ---@param args table
 ---@return table
 function MatchMapsLegacy._handleMaps(args)
-	Array.mapIndexes(function (index)
+	Array.forEach(Array.mapIndexes(function (index)
 		local prefix = 'map' .. index
 		local map = args[prefix]
-		local winner = Table.extract(args, prefix .. 'win')
+		local winner = args[prefix .. 'win']
 		if Logic.isEmpty(map) and Logic.isEmpty(winner) then
-			return false
+			return nil
 		end
+		return map
+	end), function(map, index)
+		local prefix = 'map' .. index
 		local score = Table.extract(args, prefix .. 'score')
 		local score1
 		local score2
@@ -53,10 +56,8 @@ function MatchMapsLegacy._handleMaps(args)
 		args[prefix .. 'score1'] = mw.text.trim(score1 or '')
 		args[prefix .. 'score2'] = mw.text.trim(score2 or '')
 		args[prefix .. 'mode'] = MapToMode[map and map:lower()] or ''
-		args[prefix .. 'winner'] = winner
+		args[prefix .. 'winner'] = Table.extract(args, prefix .. 'win')
 		args[prefix .. 'vod'] = Table.extract(args, 'vodgame' .. index)
-
-		return true
 	end)
 
 	return args
@@ -97,9 +98,9 @@ end
 ---@param details table
 ---@return table, table
 function MatchMapsLegacy._handleDetails(args, details)
-	Array.mapIndexes(function (index)
+	Array.forEach(Array.mapIndexes(function (index)
 		local prefix = 'map' .. index
-		local map = MatchSubobjects.luaGetMap{
+		return MatchSubobjects.luaGetMap{
 			map = Table.extract(details, prefix),
 			score1 = Table.extract(details, prefix .. 'score1'),
 			score2 = Table.extract(details, prefix .. 'score2'),
@@ -107,8 +108,8 @@ function MatchMapsLegacy._handleDetails(args, details)
 			winner = Table.extract(details, prefix .. 'winner'),
 			vod = Table.extract(details, prefix .. 'vod'),
 		}
+	end), function(map, index)
 		args['map' .. index] = map
-		return map
 	end)
 
 	return args, details
