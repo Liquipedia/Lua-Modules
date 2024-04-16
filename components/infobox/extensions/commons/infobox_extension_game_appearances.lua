@@ -18,7 +18,7 @@ local Appearances = {}
 
 ----Provide a list of games compete by a player
 ---@param args GameAppearancesArgs
----@return string[]
+---@return string[] | nil
 function Appearances.player(args)
 	if not args or not args.player then return end
 
