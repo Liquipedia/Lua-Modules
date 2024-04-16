@@ -78,7 +78,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
+	player.args.history = TeamHistoryAuto.results{addlpdbdata = true, specialRoles = true}
 	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS

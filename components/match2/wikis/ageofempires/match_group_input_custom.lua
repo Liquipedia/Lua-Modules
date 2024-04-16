@@ -157,7 +157,7 @@ function CustomMatchGroupInput._calculateWinner(match)
 				local walkover = tonumber(match.walkover)
 				if walkover == opponentIndex then
 					match.winner = opponentIndex
-					match.walkover = 'L'
+					match.walkover = 'FF'
 					opponent.status = 'W'
 				elseif walkover == 0 then
 					match.winner = 0

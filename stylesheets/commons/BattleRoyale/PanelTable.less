@@ -104,6 +104,16 @@ Author(s): Elysienna
 				& .cell--game-container-nav-holder {
 					min-width: 15.875rem;
 				}
+
+				& .cell--rank,
+				& .cell--team,
+				& .cell--total-points {
+					.panel-table__cell-icon {
+						@media ( max-width: 767px ) {
+							display: none;
+						}
+					}
+				}
 			}
 
 			&--navigate {
@@ -317,6 +327,8 @@ Author(s): Elysienna
 			padding: 0;
 			flex-wrap: wrap;
 			align-items: stretch;
+			border-left: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+			border-right-width: 0.0625rem;
 		}
 
 		&--status {
@@ -341,6 +353,10 @@ Author(s): Elysienna
 
 		&--rank {
 			flex-basis: 6.375rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.6875rem;
+			}
 		}
 
 		&--team {
@@ -349,7 +365,7 @@ Author(s): Elysienna
 			overflow: hidden;
 
 			@media ( max-width: 767px ) {
-				flex-basis: 9rem;
+				flex-basis: 8.375rem;
 			}
 		}
 
@@ -358,6 +374,10 @@ Author(s): Elysienna
 			flex-grow: 0;
 			justify-content: flex-end;
 			font-weight: bold;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.25rem;
+			}
 		}
 
 		&--placements {
