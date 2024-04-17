@@ -12,7 +12,7 @@ local Data = Lua.import('Module:MedalDisplay/Data', {loadData = true})
 
 local MedalDisplay = {}
 
----@param args {medal: string?, link: string?}?
+---@param args {medal: string|integer?, link: string?}?
 ---@return Html?
 function MedalDisplay.display(args)
 	args = args or {}
@@ -27,13 +27,13 @@ function MedalDisplay.display(args)
 		:wikitext('[[' .. medalData.file .. '|link=' .. (args.link or '') .. ']]')
 end
 
----@param input string?
+---@param input string|integer?
 ---@return {title: string, file: string}?
 function MedalDisplay.getData(input)
 	return Data.medals[MedalDisplay._toIdentifier(input)]
 end
 
----@param input string?
+---@param input string|integer?
 ---@return string|number?
 function MedalDisplay._toIdentifier(input)
 	return tonumber(input) or Data.aliases[input] or input
