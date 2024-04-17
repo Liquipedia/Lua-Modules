@@ -94,7 +94,7 @@ describe('Game', function()
 				assert.are_same({'cs1', 'css', 'cscz', 'cs2', 'csgo', 'cs16', 'cs', 'cso'}, Game.listGames())
 			end)
 			it('ordered', function ()
-				-- TODO
+				assert.are_same({'cs1', 'cs', 'cs16', 'cscz', 'css', 'cso', 'csgo', 'cs2'}, Game.listGames{ordered = true})
 			end)
 		end)
 	end)
