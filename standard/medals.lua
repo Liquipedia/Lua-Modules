@@ -8,15 +8,15 @@
 
 local Lua = require('Module:Lua')
 
-local Data = Lua.import('Module:MedalDisplay/Data', {loadData = true})
+local Data = Lua.import('Module:Medals/Data', {loadData = true})
 
-local MedalDisplay = {}
+local Medals = {}
 
 ---@param args {medal: string|integer?, link: string?}?
 ---@return Html?
-function MedalDisplay.display(args)
+function Medals.display(args)
 	args = args or {}
-	local medalData = MedalDisplay.getData(args.medal)
+	local medalData = Medals.getData(args.medal)
 
 	if not medalData then
 		return
@@ -29,14 +29,14 @@ end
 
 ---@param input string|integer?
 ---@return {title: string, file: string}?
-function MedalDisplay.getData(input)
-	return Data.medals[MedalDisplay._toIdentifier(input)]
+function Medals.getData(input)
+	return Data.medals[Medals._toIdentifier(input)]
 end
 
 ---@param input string|integer?
 ---@return string|number?
-function MedalDisplay._toIdentifier(input)
+function Medals._toIdentifier(input)
 	return tonumber(input) or Data.aliases[input] or input
 end
 
-return MedalDisplay
+return Medals
