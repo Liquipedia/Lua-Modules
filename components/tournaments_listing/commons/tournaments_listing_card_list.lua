@@ -312,7 +312,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	if placements.qualified then
 		row:tag('div')
 			:addClass('gridCell Placement Qualified')
-			:node(Medals.display{medal = 'qual'}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
+			:node(Medals.display{medal = 'qualified'}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
 			:node(self:_buildParticipantsSpan(placements.qualified))
 
 		self.display:node(row)
