@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
@@ -17,8 +18,6 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local CustomSquad = {}
 local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
 
-local LANG = mw.getContentLanguage()
-
 function CustomInjector:parse(id, widgets)
 	if id == 'header_inactive' then
 		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
@@ -27,45 +26,58 @@ function CustomInjector:parse(id, widgets)
 	return self._base:parse(id, widgets)
 end
 
+---@class Dota2SquadRow: SquadRow
+local ExtendedSquadRow = Class.new(SquadRow)
+
+---@return self
+function ExtendedSquadRow:activeteam()
+	local activeTeam, activeTeamRole = self.model.extradata.activeteam, self.model.activeteamrole
+	local date = self.model.inactivedate
+
+	if not activeTeam then
+		return self
+	end
+
+	local content = {}
+
+	table.insert(content, mw.ext.TeamTemplate.team(activeTeam, date))
+
+	if activeTeamRole then
+		table.insert(content, '&nbsp;')
+		table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. activeTeamRole .. ')'))
+	end
+
+	table.insert(self.children,
+		Widget.TableCellNew{classes = {'NewTeam'}, content = content}
+	)
+
+	return self
+end
+
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
 end
 
-function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow()
-	row:status(squadType)
-	row:id{
-		player.id,
-		flag = player.flag,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		teamrole = player.teamrole,
-		date = player.leavedate or player.inactivedate,
-	}
-	row:name{name = player.name}
-	row:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+function CustomSquad._playerRow(person, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	squadPerson.extradata.activeteam = person.activeteam
+	squadPerson.extradata.activeteamrole = person.activeteamrole
+
+	local row = ExtendedSquadRow(squadPerson)
+	row:id()
+	row:name()
+	row:position()
+	row:date('joindate', 'Join Date:&nbsp;')
 
 	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-		row:newteam{
-			newteam = player.activeteam,
-			newteamrole = player.activeteamrole,
-			newteamdate = player.inactivedate
-		}
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:activeteam()
 	end
 	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	end
 
 	return row:create()

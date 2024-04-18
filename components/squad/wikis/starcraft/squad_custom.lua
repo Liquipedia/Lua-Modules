@@ -49,10 +49,10 @@ local ExtendedSquadRow = Class.new(SquadRow)
 function ExtendedSquadRow:elo()
 	local eloCurrent, eloPeak = self.model.extradata.eloCurrent, self.model.extradata.eloPeak
 	table.insert(self.children,
-		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(eloCurrent and (eloCurrent .. ' pts') or '-')}}
+		Widget.TableCellNew{content = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
 	)
 	table.insert(self.children,
-		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(eloPeak and (eloPeak .. ' pts') or '-')}}
+		Widget.TableCellNew{content = {eloPeak and (eloPeak .. ' pts') or '-'}}
 	)
 
 	return self

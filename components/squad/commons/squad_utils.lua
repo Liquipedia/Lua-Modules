@@ -120,7 +120,9 @@ function SquadUtils.readSquadPersonArgs(args)
 		nationality = Flags.CountryName(args.flag),
 
 		position = String.nilIfEmpty(args.position),
-		role = String.nilIfEmpty(args.role) or (String.isNotEmpty(args.captain) and 'Captain') or nil, -- TODO UC First?
+		role = (String.nilIfEmpty(args.role) and mw.getContentLanguage():ucfirst(args.role))
+			or (String.isNotEmpty(args.captain) and 'Captain')
+			or nil,
 		teamtemplate = getTeamInfo(mw.title.getCurrentTitle().baseText, 'templatename'),
 
 		newteam = getTeamInfo(args.newteam, 'page'),
