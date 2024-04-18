@@ -110,21 +110,20 @@ function SquadRow:role()
 end
 
 ---Display Position and Role in a single cell
----@param args table
 ---@return self
-function SquadRow:position(args)
+function SquadRow:position()
 	local content = {}
 
-	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
+	if String.isNotEmpty(self.model.position) or String.isNotEmpty(self.model.role) then
 		table.insert(content, mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
 
-		if String.isNotEmpty(args.position) then
-			table.insert(content, args.position)
-			if String.isNotEmpty(args.role) then
-				table.insert(content, '&nbsp;(' .. args.role .. ')')
+		if String.isNotEmpty(self.model.position) then
+			table.insert(content, self.model.position)
+			if String.isNotEmpty(self.model.role) then
+				table.insert(content, '&nbsp;(' .. self.model.role .. ')')
 			end
-		elseif String.isNotEmpty(args.role) then
-			table.insert(content, args.role)
+		elseif String.isNotEmpty(self.model.role) then
+			table.insert(content, self.model.role)
 		end
 	end
 
@@ -153,38 +152,44 @@ end
 
 ---@return self
 function SquadRow:newteam()
-	local content = {}
+	local function createContent()
+		local content = {}
+		local newTeam, newTeamRole = self.model.newteam, self.model.newteamrole
+		local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
 
-	if String.isNotEmpty(self.model.newteam) or String.isNotEmpty(self.model.newteamrole) then
-		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
-			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;')
-		table.insert(content, mobileStuffDiv)
-
-		if String.isNotEmpty(self.model.newteam) then
-			local newTeam = self.model.newteam
-			if mw.ext.TeamTemplate.teamexists(newTeam) then
-				local date = self.model.newteamdate or self.model.leavedate
-				table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
-
-			elseif self.options.useTemplatesForSpecialTeams then
-				local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
-				if newTeamTemplate then
-					table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
-				end
-			end
-
-			if String.isNotEmpty(self.model.newteamrole) then
-				table.insert(content, '&nbsp;')
-				table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. self.model.newteamrole .. ')'))
-			end
-		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(self.model.newteamrole) then
-			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(self.model.newteamrole))
+		if not hasNewTeam and not hasNewTeamRole then
+			return content
 		end
+
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
+			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;'))
+
+		if not Info.config.squads.hasSpecialTeam and not hasNewTeam then
+			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
+			return content
+		end
+
+		if not mw.ext.TeamTemplate.teamexists(newTeam) then
+			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
+			if Info.config.squads.hasSpecialTeam and newTeamTemplate then
+				table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
+			end
+			return content
+		end
+
+		local date = self.model.newteamdate or self.model.leavedate
+		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
+
+		if hasNewTeamRole then
+			table.insert(content, '&nbsp;')
+			table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. newTeamRole .. ')'))
+		end
+		return content
 	end
 
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'NewTeam'},
-		content = content,
+		content = createContent(),
 	})
 
 	return self

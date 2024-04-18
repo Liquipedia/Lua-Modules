@@ -68,7 +68,10 @@ function Tabs.dynamic(args)
 		return Logic.isEmpty(tab.content) end)
 	assert(hasContent or allEmpty, 'Some of the tabs have contents while others do not')
 
-	if tabCount == 1 and hasContent then return Tabs._single(tabArgs[1], not Logic.readBool(args.suppressHeader)) end
+	local isSingular = tabCount == 1 and hasContent
+	if isSingular and not Logic.readBool(args.showSingularAsTab) then
+		return Tabs._single(tabArgs[1], not Logic.readBool(args.suppressHeader))
+	end
 
 	local tabs = mw.html.create('ul')
 		:addClass('nav nav-tabs tabs tabs' .. tabCount)
@@ -96,7 +99,7 @@ function Tabs.dynamic(args)
 		build(tabs, 'li', tabData.name, 'tab' .. tabIndex, tabData.this)
 	end)
 
-	if not Logic.readBool(args['hide-showall']) then
+	if not Logic.nilOr(Logic.readBoolOrNil(args['hide-showall']), isSingular) then
 		tabs:tag('li')
 			:addClass('show-all')
 			:wikitext('Show All')

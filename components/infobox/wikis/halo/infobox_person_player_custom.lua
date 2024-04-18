@@ -54,8 +54,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game Appearances', content = GameAppearances.player({player = caller.pagename})},
 		}
 	elseif id == 'history' then
-		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = 'true',
+		local automatedHistory = TeamHistoryAuto.results{
+			convertrole = true,
 			player = caller.pagename
 		}
 

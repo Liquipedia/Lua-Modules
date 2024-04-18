@@ -102,6 +102,7 @@ local MATCH_STANDING_COLUMNS = {
 		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
+			mobileValue = 'Pts.',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -203,6 +204,7 @@ local GAME_STANDINGS_COLUMNS = {
 		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
+			mobileValue = 'Pts.',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -553,9 +555,15 @@ function CustomMatchSummary._createMatchStandings(match)
 						:addClass('panel-table__cell-icon')
 						:addClass(column.iconClass)
 						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
+		local span = groupedCell:tag('span')
+				:wikitext(column.header.value)
+		if column.header.mobileValue then
+				span:addClass('d-none d-md-block')
+				groupedCell:tag('span')
+						:wikitext(column.header.mobileValue)
+						:addClass('d-block d-md-none')
+		end
+		span:done()
 		if (column.sortable and column.sortType) then
 			cell:attr('data-sort-type', column.sortType)
 			groupedCell:tag('div')

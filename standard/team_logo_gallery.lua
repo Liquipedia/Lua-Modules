@@ -53,17 +53,19 @@ function TeamLogoGallery._getImageData(name, showPresentLogo)
 
 	local finalName = presentImageData.raw.name
 
-	return Array.map(imageDatas, function(imageData, index)
+	local filteredImageDatas = Array.filter(imageDatas, function(imageData, index)
 		local image = Logic.emptyOr(imageData.raw.image, imageData.raw.legacyimage)
 		if not image or Game.isDefaultTeamLogo{logo = image} then
-			return nil
+			return false
 		end
 
 		local previous = imageDatas[index - 1] or {raw = {}}
 		local previousImage = Logic.emptyOr(previous.raw.image, previous.raw.legacyimage)
-		if previousImage == image then
-			return nil
-		end
+		return previousImage ~= image
+	end)
+
+	return Array.map(filteredImageDatas, function(imageData, index)
+		local image = Logic.emptyOr(imageData.raw.image, imageData.raw.legacyimage)
 
 		local caption, below = TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 
