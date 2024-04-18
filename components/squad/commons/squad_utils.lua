@@ -104,7 +104,8 @@ end
 ---@return Html
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
-	local squad = squadClass():init(args, injector and injector() or nil):title()
+	local injectorToUse = (injector and injector()) or (Info.config.squad.hasPosition and SquadUtils.positionHeaderInjector()) or nil
+	local squad = squadClass():init(args, injectorToUse):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -130,7 +131,8 @@ end
 ---@return Html?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
 	local args = {type = squadType}
-	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+	local injectorToUse = (injector and injector()) or (Info.config.squad.hasPosition and SquadUtils.positionHeaderInjector()) or nil
+	local squad = squadClass():init(args, injectorToUse):title():header()
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	Array.forEach(mappedPlayers, function(player)
