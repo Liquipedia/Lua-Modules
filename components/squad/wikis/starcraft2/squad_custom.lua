@@ -12,13 +12,11 @@ local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
-
---only for legacy reasons
-SquadRow.specialTeamsTemplateMapping.retirement = 'Team/retired'
 
 local CustomSquad = {}
 
@@ -50,40 +48,23 @@ function CustomSquad.run(frame)
 		return player
 	end)
 
-	Array.forEach(players, function(player)
-		local row = SquadRow{useTemplatesForSpecialTeams = true}
-			:status(squad.type)
-			:id({
-				player.id,
-				flag = player.flag,
-				race = player.faction,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-				date = player.leavedate or player.inactivedate,
-			})
-			:name({name = player.name})
-			:role({role = player.role})
-			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	Array.forEach(players, function(person)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squad.type}))
+		squadPerson.extradata.faction = person.faction
+		squadPerson.extradata.squadname = squadName
+		squadPerson.extradata.status = status
+		local row = SquadRow(squadPerson)
+			:id()
+			:name()
+			:role()
+			:date('joindate', 'Join Date:&nbsp;')
 
 		if isFormer then
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam({
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			})
+			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:newteam()
 		elseif isInactive then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
-
-		row:setExtradata{
-			faction = player.faction,
-			squadname = squadName,
-			status = status,
-		}
 
 		squad:row(row:create())
 	end)
