@@ -9,26 +9,26 @@
 return {
 	{
 		title = 'First Place',
-		file = 'File:Gold.png',
+		file = 'Gold.png',
 	},
 	{
 		title = 'Second Place',
-		file = 'File:Silver.png',
+		file = 'Silver.png',
 	},
 	{
 		title = 'Third Place',
-		file = 'File:Bronze.png',
+		file = 'Bronze.png',
 	},
 	{
 		title = 'Fourth Place',
-		file = 'File:Copper.png',
+		file = 'Copper.png',
 	},
 	['3-4'] = {
 		title = 'Semifinalist(s)',
-		file = 'File:SF.png',
+		file = 'SF.png',
 	},
 	qualified = {
 		title = 'Qualified',
-		file = 'File:Medal Icon qualified.png',
+		file = 'Medal Icon qualified.png',
 	},
 }
