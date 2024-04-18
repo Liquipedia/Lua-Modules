@@ -9,6 +9,7 @@
 local Lua = require('Module:Lua')
 
 local Data = Lua.import('Module:Medals/Data', {loadData = true})
+local Image = Lua.import('Module:Image')
 
 local Medals = {}
 
@@ -24,7 +25,7 @@ function Medals.display(args)
 
 	return mw.html.create('span')
 		:attr('title', medalData.title)
-		:wikitext('[[' .. medalData.file .. '|link=' .. (args.link or '') .. ']]')
+		:wikitext(Image.display(medalData.file, nil, {link = args.link or '', alt = medalData.title}))
 end
 
 ---@param input string|integer?
