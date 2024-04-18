@@ -19,7 +19,7 @@ local CustomSquad = {}
 ---@return Html
 function CustomSquad.run(frame)
 	if not Info.config.squads.allowManual then
-		error('This wiki do not use manual squad tables')
+		error('This wiki does not use manual squad tables')
 	end
 
 	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
