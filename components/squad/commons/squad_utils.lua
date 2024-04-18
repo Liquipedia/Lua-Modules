@@ -104,7 +104,7 @@ end
 ---@return Html
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
-	local injectorToUse = (injector and injector()) or (Info.config.squad.hasPosition and SquadUtils.positionHeaderInjector()) or nil
+	local injectorToUse = (injector and injector()) or (Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()) or nil
 	local squad = squadClass():init(args, injectorToUse):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
@@ -131,7 +131,7 @@ end
 ---@return Html?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
 	local args = {type = squadType}
-	local injectorToUse = (injector and injector()) or (Info.config.squad.hasPosition and SquadUtils.positionHeaderInjector()) or nil
+	local injectorToUse = (injector and injector()) or (Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()) or nil
 	local squad = squadClass():init(args, injectorToUse):title():header()
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
@@ -160,7 +160,7 @@ function SquadUtils.defaultRow(squadRowClass)
 			date = person.leavedate or person.inactivedate,
 		}
 		row:name{name = person.name}
-		if Info.config.squad.hasPosition then
+		if Info.config.squads.hasPosition then
 			row:position{role = person.role, position = person.position}
 		else
 			row:role{role = person.role}

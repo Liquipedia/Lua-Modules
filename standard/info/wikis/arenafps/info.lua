@@ -404,7 +404,7 @@ return {
 		},
 	},
 	config = {
-		squad = {
+		squads = {
 			hasPosition = false,
 			hasSpecialTeam = false,
 			allowManual = true,

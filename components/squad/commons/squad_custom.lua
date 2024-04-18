@@ -18,7 +18,7 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	if not Info.config.squad.allowManual then
+	if not Info.config.squads.allowManual then
 		error('This wiki do not use manual squad tables')
 	end
 

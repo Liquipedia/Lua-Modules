@@ -68,7 +68,7 @@ return {
 	},
 
 	config = {
-		squad = {
+		squads = {
 			hasPosition = true,
 			hasSpecialTeam = false,
 			allowManual = true,
