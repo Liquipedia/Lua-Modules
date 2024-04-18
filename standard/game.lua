@@ -97,14 +97,14 @@ function Game.listGames(options)
 	end
 
 	local gamesList = Array.extractKeys(GamesData)
-	---@cast gamesList GameData[]
+
+	gamesList = Array.filter(gamesList, function(gameIdentifier)
+		return not GamesData[gameIdentifier].unlisted
+	end)
+
 	if Logic.readBool(options.ordered) and Array.all(gamesList, getGameOrder) then
 		return Array.sortBy(gamesList, getGameOrder)
 	end
-
-	Array.filter(gamesList, function(game)
-		return not game.unlisted
-	end)
 
 	return gamesList
 end
