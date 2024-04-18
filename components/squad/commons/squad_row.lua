@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Icon = require('Module:Icon')
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 local OpponentLib = require('Module:OpponentLibraries')
 local Opponent = OpponentLib.Opponent
