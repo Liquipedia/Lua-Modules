@@ -30,13 +30,7 @@ end
 ---@param input string|integer?
 ---@return {title: string, file: string}?
 function Medals.getData(input)
-	return Data.medals[Medals._toIdentifier(input)]
-end
-
----@param input string|integer?
----@return string|number?
-function Medals._toIdentifier(input)
-	return tonumber(input) or Data.aliases[input] or input
+	return Data[tonumber(input) or input]
 end
 
 return Medals
