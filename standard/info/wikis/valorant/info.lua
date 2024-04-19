@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'valorant',
 	name = 'VALORANT',
+	defaultGame = 'val',
 	games = {
 		val = {
 			abbreviation = 'VAL',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'val',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

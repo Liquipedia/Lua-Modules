@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'splatoon',
 	name = 'Splatoon',
+	defaultGame = '1',
 	games = {
 		['1'] = {
 			abbreviation = 'SP1',
@@ -51,6 +52,12 @@ return {
 			},
 		},
 	},
-	defaultGame = '1',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

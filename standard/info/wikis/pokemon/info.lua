@@ -10,6 +10,7 @@ return {
 	startYear = 1996,
 	wikiName = 'pokemon',
 	name = 'Pokémon',
+	defaultGame = 'sv',
 	games = {
 		bw = {
 			abbreviation = 'bw',
@@ -220,6 +221,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'sv',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

@@ -10,6 +10,7 @@ return {
 	startYear = 1997,
 	wikiName = 'ageofempires',
 	name = 'Age of Empires',
+	defaultGame = 'Age of Empires II',
 
 	games = {
 		['Age of Empires I'] = {
@@ -91,7 +92,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'Age of Empires II',
 
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

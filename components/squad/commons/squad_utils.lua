@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
 local Logic = require('Module:Logic')
@@ -159,7 +160,10 @@ end
 ---@return Html
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
-	local squad = squadClass():init(args, injector and injector() or nil):title()
+	local injectorInstance = (injector and injector()) or
+		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+		nil
+	local squad = squadClass():init(args, injectorInstance):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -185,7 +189,10 @@ end
 ---@return Html?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
 	local args = {type = squadType}
-	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+	local injectorInstance = (injector and injector()) or
+		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+		nil
+	local squad = squadClass():init(args, injectorInstance):title():header()
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	Array.forEach(mappedPlayers, function(player)
@@ -203,7 +210,13 @@ function SquadUtils.defaultRow(squadRowClass)
 		SquadUtils.storeSquadPerson(squadPerson)
 		local row = squadRowClass(squadPerson)
 
-		row:id():name():role():date('joindate', 'Join Date:&nbsp;')
+		row:id():name()
+		if Info.config.squads.hasPosition then
+			row:position()
+		else
+			row:role()
+		end
+		row:date('joindate', 'Join Date:&nbsp;')
 
 		if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')

@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'arenaofvalor',
 	name = 'Arena of Valor',
+	defaultGame = 'aov',
 
 	games = {
 		aov = {
@@ -65,7 +66,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'aov',
 
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

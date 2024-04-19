@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'splitgate',
 	name = 'Splitgate',
+	defaultGame = 'splitgate',
 	games = {
 		splitgate = {
 			abbreviation = 'SG',
@@ -25,7 +26,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'splitgate',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

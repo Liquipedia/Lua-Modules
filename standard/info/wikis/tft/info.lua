@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'tft',
 	name = 'Teamfight Tactics',
+	defaultGame = 'tft',
 	games = {
 		tft = {
 			abbreviation = 'TFT',
@@ -38,7 +39,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tft',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 0,
 }

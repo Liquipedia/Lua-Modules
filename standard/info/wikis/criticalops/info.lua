@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'criticalops',
 	name = 'Critical Ops',
+	defaultGame = 'cops',
 	games = {
 		cops = {
 			abbreviation = 'Crit Ops',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cops',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }
