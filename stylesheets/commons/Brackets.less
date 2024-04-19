@@ -281,12 +281,18 @@
 	text-align: center;
 }
 
-.brkts-cs-score-color-ct {
-	color: #0000ff;
+.brkts-cs-score-color-t {
+	.theme--light & {
+		color: var( --clr-sun-30, #ff0000 );
+	}
+
+	.theme--dark & {
+		color: var( --clr-sun-80, #ff0000 );
+	}
 }
 
-.brkts-cs-score-color-t {
-	color: #ff0000;
+.brkts-cs-score-color-ct {
+	color: var( --clr-primary, #0000ff );
 }
 
 .brkts-valorant-score-color-def {
@@ -792,6 +798,7 @@
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
+	font-weight: 800;
 }
 
 .brkts-popup-body-match-sidewins-overtime {
