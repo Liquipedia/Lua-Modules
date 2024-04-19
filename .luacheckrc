@@ -41,4 +41,4 @@ ignore = {
 	"212" -- unused argument
 }
 
-files["spec/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki"}
+files["spec/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki", "allwikis"}
