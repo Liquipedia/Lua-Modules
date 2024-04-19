@@ -6,9 +6,7 @@ return function(busted, helper, options)
 		if package.loaded[name] then
 			return true
 		else
-			-- Package.Searchers was renamed from Loaders in lua5.2, have support for both
-			---@diagnostic disable-next-line: deprecated
-			for _, searcher in ipairs(package.searchers or package.loaders) do
+			for _, searcher in ipairs(package.loaders) do
 				local loader = searcher(name)
 				if type(loader) == 'function' then
 					package.preload[name] = loader
@@ -23,12 +21,20 @@ return function(busted, helper, options)
 		mw.ext.VariablesLua.variablesStorage = {}
 	end
 
+	local preloadByWiki = {}
+	local activeWiki
 	local function SetActiveWiki(wiki)
-		package.preload = {}
+		wiki = wiki or ''
+		if activeWiki == wiki then
+			return
+		end
+		preloadByWiki[activeWiki or ''] = package.preload
+		package.preload = preloadByWiki[wiki] or {}
+		activeWiki = wiki
 		local paths = {}
 		table.insert(paths, '?.lua')
 		table.insert(paths, 'standard/?.lua')
-		if wiki then
+		if wiki ~= '' then
 			table.insert(paths, 'components/faction/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'components/match2/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'components/prize_pool/wikis/'.. wiki ..'/?.lua')
