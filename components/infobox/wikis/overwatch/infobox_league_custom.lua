@@ -41,6 +41,11 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = self:_validPublisherTier(args.blizzardtier) and args.blizzardtier:lower()
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
