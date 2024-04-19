@@ -114,7 +114,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	end
 
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
-	return Lpdb.SquadPlayer:new{
+	local person =  Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = String.nilIfEmpty(args.name),
@@ -141,11 +141,22 @@ function SquadUtils.readSquadPersonArgs(args)
 			loanedtorole = args.teamrole,
 			newteamdate = args.newteamdate,
 			faction = Faction.read(args.faction or args.race),
-			joindatedisplay = args.joindate,
-			leavedatedisplay = args.leavedate,
-			inactivedatedisplay = args.inactivedate,
 		},
 	}
+
+	if person.joindate ~= args.joindate then
+		person.extradata.joindatedisplay = args.joindate
+	end
+
+	if person.leavedate ~= args.leavedate then
+		person.extradata.leavedatedisplay = args.leavedate
+	end
+
+	if person.inactivedate ~= args.inactivedate then
+		person.extradata.inactivedatedisplay = args.inactivedate
+	end
+
+	return person
 end
 
 ---@param squadPerson ModelRow
