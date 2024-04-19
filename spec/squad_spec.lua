@@ -19,7 +19,7 @@ describe('Squad', function()
 
 		it('displays correct and stores correctly', function()
 			local squadPerson = SquadUtils.readSquadPersonArgs{
-				'Baz',
+				id = 'Baz',
 				name = 'Foo Bar',
 				joindate = '2022-01-01',
 				inactivedate = '2022-03-03',
