@@ -18,8 +18,10 @@ local Template = require('Module:Template')
 
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
-local ICON_CAPTAIN = Icon.makeIcon{iconName = 'captain', hover = 'Captain'}
-local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'}
+local RoleIcons = {
+	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
+	sub = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'},
+}
 
 ---@class SquadRow
 ---@operator call(ModelRow): SquadRow
@@ -54,12 +56,9 @@ function SquadRow:id()
 	)
 	table.insert(content, mw.html.create('b'):node(OpponentDisplay.InlineOpponent{opponent = opponent}))
 
-	if self.model.role == 'Captain' then
-		table.insert(content, '&nbsp;' .. ICON_CAPTAIN)
-	end
-
-	if self.model.role == 'Sub' then
-		table.insert(content, '&nbsp;' .. ICON_SUBSTITUTE)
+	local roleIcon = RoleIcons[(self.model.role or ''):lower()]
+	if roleIcon then
+		table.insert(content, '&nbsp;' .. roleIcon)
 	end
 
 	local cell = Widget.TableCellNew{
@@ -99,11 +98,7 @@ end
 
 ---@return self
 function SquadRow:role()
-	local display = true
-	if String.isEmpty(self.model.role) or self.model.role == 'Captain' or self.model.role == 'Sub' then
-		-- Sub and Captain have icons instead
-		display = false
-	end
+	local display = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
 
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Position'},
@@ -119,6 +114,8 @@ end
 ---Display Position and Role in a single cell
 ---@return self
 function SquadRow:position()
+	local displayRole = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
+
 	local content = {}
 
 	if String.isNotEmpty(self.model.position) or String.isNotEmpty(self.model.role) then
@@ -126,10 +123,10 @@ function SquadRow:position()
 
 		if String.isNotEmpty(self.model.position) then
 			table.insert(content, self.model.position)
-			if String.isNotEmpty(self.model.role) then
+			if displayRole then
 				table.insert(content, '&nbsp;(' .. self.model.role .. ')')
 			end
-		elseif String.isNotEmpty(self.model.role) then
+		elseif displayRole then
 			table.insert(content, self.model.role)
 		end
 	end
