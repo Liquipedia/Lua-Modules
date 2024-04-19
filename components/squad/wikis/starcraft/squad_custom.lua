@@ -77,6 +77,8 @@ function CustomSquad.run(frame)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 		squadPerson.extradata.eloCurrent = CustomSquad._queryTLPD(inputId, 'elo')
 		squadPerson.extradata.eloPeak = CustomSquad._queryTLPD(inputId, 'peak_elo')
+		SquadUtils.storeSquadPerson(squadPerson)
+
 		local row = ExtendedSquadRow(squadPerson)
 
 		row:id():name()

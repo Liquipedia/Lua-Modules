@@ -39,7 +39,6 @@ function CustomSquad.run(frame)
 
 	players = Array.map(players, function(player)
 		if not player then return player end
-		player.faction = Faction.read(player.race)
 		if isFormer then
 			player.newteam = String.nilIfEmpty(player.newteam) or
 				Logic.readBool(player.retired) and 'retired' or
@@ -50,9 +49,9 @@ function CustomSquad.run(frame)
 
 	Array.forEach(players, function(person)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squad.type}))
-		squadPerson.extradata.faction = person.faction
-		squadPerson.extradata.squadname = squadName
 		squadPerson.extradata.status = status
+		SquadUtils.storeSquadPerson(squadPerson)
+
 		local row = SquadRow(squadPerson)
 			:id()
 			:name()

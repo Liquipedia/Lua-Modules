@@ -64,6 +64,7 @@ function CustomSquad._playerRow(person, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
+	SquadUtils.storeSquadPerson(squadPerson)
 
 	local row = ExtendedSquadRow(squadPerson)
 	row:id()

@@ -49,8 +49,9 @@ function CustomSquad._playerRow(person, squadType)
 			squadPerson.newteam = 'military'
 		end
 	end
-	local row = SquadRow(squadPerson)
+	SquadUtils.storeSquadPerson(squadPerson)
 
+	local row = SquadRow(squadPerson)
 	row:id()
 	row:name()
 	row:role()

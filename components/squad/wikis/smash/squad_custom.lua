@@ -70,11 +70,10 @@ function CustomSquad.run(frame)
 		person.name = Variables.varDefault('name') or person.name
 
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squad.type}))
-
 		squadPerson.extradata.game = game
 		squadPerson.extradata.mains = mains
-
 		SquadUtils.storeSquadPerson(squadPerson)
+
 		local row = ExtendedSquadRow(squadPerson) ---@type SmashSquadRow
 
 		row:id():name()
