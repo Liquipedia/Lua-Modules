@@ -99,9 +99,15 @@ end
 
 ---@return self
 function SquadRow:role()
+	local display = true
+	if String.isEmpty(self.model.role) or self.model.role == 'Captain' or self.model.role == 'Sub' then
+		-- Sub and Captain have icons instead
+		display = false
+	end
+
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Position'},
-		content = String.isNotEmpty(self.model.role) and {
+		content = display and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'),
 			mw.html.create('i'):wikitext('(' .. self.model.role .. ')'),
 		} or nil,
@@ -144,7 +150,8 @@ function SquadRow:date(field, cellTitle)
 		classes = {'Date'},
 		content = self.model[field] and {
 			mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle),
-			mw.html.create('div'):addClass('Date'):tag('i'):wikitext(self.model[field]),
+			mw.html.create('div'):addClass('Date')
+				:tag('i'):wikitext(self.model[field], ' ', self.model[field .. 'ref']),
 		} or nil
 	})
 

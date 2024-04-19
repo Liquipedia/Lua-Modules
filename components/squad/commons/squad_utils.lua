@@ -113,6 +113,15 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
+	local function dateInputToReference(dateInput)
+		if not dateInput then
+			return
+		end
+		local input = String.split(String.trim(dateInput), ' ')
+		table.remove(input, 1)
+		return table.concat(input, ' ')
+	end
+
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
 	return Lpdb.SquadPlayer:new{
 		id = id,
@@ -122,7 +131,7 @@ function SquadUtils.readSquadPersonArgs(args)
 
 		position = String.nilIfEmpty(args.position),
 		role = (String.nilIfEmpty(args.role) and mw.getContentLanguage():ucfirst(args.role))
-			or (String.isNotEmpty(args.captain) and 'Captain')
+			or ((String.isNotEmpty(args.captain) or String.isNotEmpty(args.igl)) and 'Captain')
 			or nil,
 		teamtemplate = getTeamInfo(mw.title.getCurrentTitle().baseText, 'templatename'),
 
@@ -133,6 +142,10 @@ function SquadUtils.readSquadPersonArgs(args)
 		joindate = ReferenceCleaner.clean(args.joindate),
 		leavedate = ReferenceCleaner.clean(args.leavedate),
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
+
+		joindateref = dateInputToReference(args.joindate),
+		leavedateref = dateInputToReference(args.leavedate),
+		inactivedateref = dateInputToReference(args.inactivedate),
 
 		status = SquadUtils.SquadTypeToStorageValue[args.type],
 
