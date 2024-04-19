@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 
 local Squad = Lua.import('Module:Squad')
@@ -17,6 +18,10 @@ local CustomSquad = {}
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
+	if not Info.config.squads.allowManual then
+		error('This wiki does not use manual squad tables')
+	end
+
 	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
 end
 

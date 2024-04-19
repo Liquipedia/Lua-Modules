@@ -9,6 +9,7 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -103,7 +104,10 @@ end
 ---@return Html
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
-	local squad = squadClass():init(args, injector and injector() or nil):title()
+	local injectorInstance = (injector and injector()) or
+		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+		nil
+	local squad = squadClass():init(args, injectorInstance):title()
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
@@ -129,7 +133,10 @@ end
 ---@return Html?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
 	local args = {type = squadType}
-	local squad = squadClass():init(args, injector and injector() or nil):title():header()
+	local injectorInstance = (injector and injector()) or
+		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+		nil
+	local squad = squadClass():init(args, injectorInstance):title():header()
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	Array.forEach(mappedPlayers, function(player)
@@ -140,12 +147,10 @@ function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, i
 end
 
 ---@param squadRowClass SquadRow
----@param options? {usePosition: boolean?, useTemplatesForSpecialTeams: boolean?}
 ---@return fun(person: table, squadType: integer):WidgetTableRowNew
-function SquadUtils.defaultRow(squadRowClass, options)
-	options = options or {}
+function SquadUtils.defaultRow(squadRowClass)
 	return function(person, squadType)
-		local row = squadRowClass(options)
+		local row = squadRowClass()
 
 		row:status(squadType)
 		row:id{
@@ -159,7 +164,7 @@ function SquadUtils.defaultRow(squadRowClass, options)
 			date = person.leavedate or person.inactivedate,
 		}
 		row:name{name = person.name}
-		if options.usePosition then
+		if Info.config.squads.hasPosition then
 			row:position{role = person.role, position = person.position}
 		else
 			row:role{role = person.role}

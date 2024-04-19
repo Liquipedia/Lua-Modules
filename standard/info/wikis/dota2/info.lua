@@ -10,6 +10,7 @@ return {
 	startYear = 2011,
 	wikiName = 'dota2',
 	name = 'Dota 2',
+	defaultGame = 'dota2',
 	games = {
 		dota = {
 			abbreviation = 'DotA',
@@ -38,7 +39,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'dota2',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

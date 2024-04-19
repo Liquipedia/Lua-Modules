@@ -10,6 +10,7 @@ return {
 	startYear = 1996,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
+	defaultGame = 'fighters',
 	games = {
 		fighters = {
 			abbreviation = 'Fighters',
@@ -1663,6 +1664,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fighters',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

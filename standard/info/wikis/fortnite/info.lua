@@ -10,6 +10,7 @@ return {
 	startYear = 2018,
 	wikiName = 'fortnite',
 	name = 'Fortnite',
+	defaultGame = 'fortnite',
 	games = {
 		fortnite = {
 			abbreviation = 'Fortnite',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fortnite',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

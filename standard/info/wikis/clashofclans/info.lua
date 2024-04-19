@@ -10,6 +10,7 @@ return {
 	startYear = 2012,
 	wikiName = 'clashofclans',
 	name = 'Clash of Clans',
+	defaultGame = 'clashofclans',
 	games = {
 		clashofclans = {
 			abbreviation = 'CoC',
@@ -25,7 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'clashofclans',
-
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

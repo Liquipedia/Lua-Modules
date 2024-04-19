@@ -51,7 +51,7 @@ function CustomSquad.run(frame)
 	end)
 
 	Array.forEach(players, function(player)
-		local row = SquadRow{useTemplatesForSpecialTeams = true}
+		local row = SquadRow()
 			:status(squad.type)
 			:id({
 				player.id,

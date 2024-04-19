@@ -10,6 +10,7 @@ return {
 	startYear = 2018,
 	wikiName = 'brawlstars',
 	name = 'Brawl Stars',
+	defaultGame = 'brawlstars',
 	games = {
 		brawlstars = {
 			abbreviation = 'BS',
@@ -25,7 +26,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'brawlstars',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

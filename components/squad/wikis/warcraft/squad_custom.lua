@@ -22,7 +22,7 @@ function CustomSquad.run(frame)
 end
 
 function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow{useTemplatesForSpecialTeams = true}
+	local row = SquadRow()
 	row:status(squadType)
 	row:id{
 		player.id,
