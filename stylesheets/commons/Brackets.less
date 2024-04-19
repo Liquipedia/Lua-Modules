@@ -282,7 +282,15 @@
 }
 
 .brkts-cs-score-color-ct {
-	color: #0000ff;
+	color: var(--clr-primary, #0000ff);
+}
+
+.brkts-cs-score-color-t .theme--light {
+	color: #928157;
+}
+
+.brkts-cs-score-color-t .theme--dark {
+	color: #cbba7b;
 }
 
 .brkts-cs-score-color-t {
@@ -792,6 +800,7 @@
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
+	font-weight: 800;
 }
 
 .brkts-popup-body-match-sidewins-overtime {
