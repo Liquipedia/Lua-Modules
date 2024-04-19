@@ -57,7 +57,7 @@ end
 ---@return Html
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
-	local squad = Squad():init(args, CustomInjector()):title():header()
+	local squad = Squad(args, CustomInjector()):title():header()
 
 	local tableGame = squad.args.game
 

@@ -176,8 +176,7 @@ function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector
 	local injectorInstance = (injector and injector()) or
 		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
 		nil
-	local squad = squadClass():init(args, injectorInstance):title()
-
+	local squad = squadClass(args, injectorInstance):title()
 	local players = SquadUtils.parsePlayers(squad.args)
 
 	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
@@ -205,7 +204,7 @@ function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, i
 	local injectorInstance = (injector and injector()) or
 		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
 		nil
-	local squad = squadClass():init(args, injectorInstance):title():header()
+	local squad = squadClass(args, injectorInstance):title():header()
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	Array.forEach(mappedPlayers, function(player)
