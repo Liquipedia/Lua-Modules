@@ -1,4 +1,5 @@
 ---Enable LLS
+-- luacheck: ignore
 return function(busted, helper, options)
 	-- Copy from standard/lua.lua
 	local function fileExists(name)
