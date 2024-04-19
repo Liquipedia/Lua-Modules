@@ -24,7 +24,7 @@ describe('Squad', function()
 				joindate = '2022-01-01',
 				inactivedate = '2022-03-03',
 				leavedate = '2022-05-01',
-				status = SquadUtils.SquadType.FORMER_INACTIVE,
+				type = SquadUtils.SquadType.FORMER_INACTIVE,
 			}
 			local row = SquadRow(squadPerson)
 			row:id():name():role()
