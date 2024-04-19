@@ -9,11 +9,9 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
-local Lpdb = require('Module:Lpdb')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
@@ -21,6 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local Lpdb = Lua.import('Module:Lpdb')
+local Faction = Lua.import('Module:Faction')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Widget = Lua.import('Module:Infobox/Widget/All')
@@ -113,7 +113,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
-	local id = assert(String.nilIfEmpty(args[1]), 'Something is off with your input!')
+	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
 	return Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
@@ -134,8 +134,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		leavedate = ReferenceCleaner.clean(args.leavedate),
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
 
-		status = SquadUtils.SquadTypeToStorageValue[args.status],
-		type = args.type,
+		status = SquadUtils.SquadTypeToStorageValue[args.type],
 
 		extradata = {
 			loanedto = args.team,

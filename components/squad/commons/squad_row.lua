@@ -88,7 +88,7 @@ end
 function SquadRow:name()
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Name'},
-		content = self.model.name and {
+		content = String.isNotEmpty(self.model.name) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('(', self.model.name, ')'),
 			mw.html.create('div'):addClass('LargeStuff'):wikitext(self.model.name),
 		} or nil
@@ -101,7 +101,7 @@ end
 function SquadRow:role()
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'Position'},
-		content = self.model.role and {
+		content = String.isNotEmpty(self.model.role) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'),
 			mw.html.create('i'):wikitext('(' .. self.model.role .. ')'),
 		} or nil,
