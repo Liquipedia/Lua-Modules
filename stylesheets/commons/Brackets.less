@@ -281,20 +281,17 @@
 	text-align: center;
 }
 
-.brkts-cs-score-color-ct {
-	color: var( --clr-primary, #0000ff );
-}
-
-.theme--light .brkts-cs-score-color-t {
-	color: #928157;
-}
-
-.theme--dark .brkts-cs-score-color-t {
-	color: #cbba7b;
-}
-
 .brkts-cs-score-color-t {
-	color: #ff0000;
+  .theme--light & {
+    color: var(--clr-sun-30, #ff0000)
+  }
+  .theme--dark & {
+    color: var(--clr-sun-80, #ff0000)
+  }
+}
+
+.brkts-cs-score-color-ct {
+  color: var(--clr-primary, #0000FF)
 }
 
 .brkts-valorant-score-color-def {
