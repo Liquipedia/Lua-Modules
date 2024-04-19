@@ -120,10 +120,6 @@ return function(busted, helper, options)
 				newName = Plugin.luaifyModuleName(module)
 			end
 
-			if fileExists(newName) then
-				return require_original(newName)
-			end
-
 			if newName == 'arguments' then
 				return {getArgs = function(t) return t end}
 			end
@@ -170,6 +166,10 @@ return function(busted, helper, options)
 			-- TODO Work away this usage
 			if newName == 'games' then
 				return {abbr = {}, name = {}}
+			end
+
+			if fileExists(newName) then
+				return require_original(newName)
 			end
 		end
 
