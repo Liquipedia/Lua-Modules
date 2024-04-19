@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Game = require('Module:Game')
+local Table = require('Module:Table')
 
 local DEFAULT_MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
 
@@ -25,18 +26,20 @@ function Appearances.player(args)
 	end)
 	table.insert(conditions, '[[opponentname::' .. args.player .. ']]')
 
-	local data = mw.ext.LiquipediaDB.lpdb('placement', {
+	local queriedGames = Array.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = table.concat(conditions, ' OR '),
 		query = 'game',
 		groupby = 'game asc',
 		limit = 1000,
-	})
+	}), function(item) return item.game end)
 
-	local games = Array.unique(Array.map(data, function(item)
-		return Game.name{game = item.game}
-	end))
-	table.sort(games)
-	return games
+	local orderedGames = Array.filter(Game.listGames{ordered = true}, function(game)
+		return Table.includes(queriedGames, game)
+	end)
+
+	return Array.map(orderedGames, function(game)
+		return Game.name{game = game}
+	end)
 end
 
 return Appearances
