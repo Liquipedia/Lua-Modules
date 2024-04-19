@@ -151,7 +151,7 @@ function SquadRow:date(field, cellTitle)
 		content = self.model[field] and {
 			mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle),
 			mw.html.create('div'):addClass('Date')
-				:tag('i'):wikitext(self.model[field], ' ', self.model[field .. 'ref']),
+				:tag('i'):wikitext(self.model.extradata[field .. 'display'] or self.model[field])
 		} or nil
 	})
 

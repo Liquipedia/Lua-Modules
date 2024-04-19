@@ -113,15 +113,6 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
-	local function dateInputToReference(dateInput)
-		if not dateInput then
-			return
-		end
-		local input = String.split(String.trim(dateInput), ' ')
-		table.remove(input, 1)
-		return table.concat(input, ' ')
-	end
-
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
 	return Lpdb.SquadPlayer:new{
 		id = id,
@@ -143,10 +134,6 @@ function SquadUtils.readSquadPersonArgs(args)
 		leavedate = ReferenceCleaner.clean(args.leavedate),
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
 
-		joindateref = dateInputToReference(args.joindate),
-		leavedateref = dateInputToReference(args.leavedate),
-		inactivedateref = dateInputToReference(args.inactivedate),
-
 		status = SquadUtils.SquadTypeToStorageValue[args.type],
 
 		extradata = {
@@ -154,6 +141,9 @@ function SquadUtils.readSquadPersonArgs(args)
 			loanedtorole = args.teamrole,
 			newteamdate = args.newteamdate,
 			faction = Faction.read(args.faction or args.race),
+			joindatedisplay = args.joindate,
+			leavedatedisplay = args.leavedate,
+			inactivedatedisplay = args.inactivedate,
 		},
 	}
 end
