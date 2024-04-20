@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
@@ -92,28 +93,29 @@ end
 ---@param size number|string|nil
 ---@return Html?
 function Header:_image(fileName, fileNameDark, default, defaultDark, size)
-	if (fileName == nil or fileName == '') and (default == nil or default == '') then
+	if Logic.isEmpty(fileName) and Logic.isEmpty(default) then
 		return nil
 	end
 
-	local imageName = fileName or default
-	---@cast imageName -nil
-	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
+	local imageName = fileName or default --[[@as string]]
+	local imageDarkname = fileNameDark or fileName or defaultDark or default --[[@as string]]
 
-	imageName = fileNameDark or fileName or defaultDark or default
-	---@cast imageName -nil
-	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
+	if imageName == imageDarkname then
+		return mw.html.create('div'):node(Header:_makeSizedImage(imageName, size))
+	end
+
+	local infoboxImage = Header:_makeSizedImage(imageName, size, 'lightmode')
+	local infoboxImageDark = Header:_makeSizedImage(imageDarkname, size, 'darkmode')
 
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
 
 ---@param imageName string
----@param fileName string?
 ---@param size number|string|nil
----@param mode string
+---@param mode string?
 ---@return Html
-function Header:_makeSizedImage(imageName, fileName, size, mode)
-	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
+function Header:_makeSizedImage(imageName, size, mode)
+	local infoboxImage = mw.html.create('div'):addClass('infobox-image'):addClass(mode)
 
 	-- Number (interpret as pixels)
 	size = size or ''
@@ -133,7 +135,7 @@ function Header:_makeSizedImage(imageName, fileName, size, mode)
 		size = '600px'
 	end
 
-	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
+	local fullFileName = '[[File:' .. imageName .. '|' .. size .. ']]'
 	infoboxImage:wikitext(fullFileName)
 
 	return infoboxImage
