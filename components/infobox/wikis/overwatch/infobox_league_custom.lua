@@ -30,6 +30,7 @@ local BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
 	owcs = 'Overwatch Champions Series',
+	owwc = 'Overwatch World Cup',
 }
 
 ---@param frame Frame
