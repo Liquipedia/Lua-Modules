@@ -26,15 +26,15 @@ function Appearances.player(args)
 	end)
 	table.insert(conditions, '[[opponentname::' .. args.player .. ']]')
 
-	local queriedGames = Array.map(mw.ext.LiquipediaDB.lpdb('placement', {
+	local queriedGames = Table.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = table.concat(conditions, ' OR '),
 		query = 'game',
 		groupby = 'game asc',
 		limit = 1000,
-	}), function(item) return item.game end)
+	}), function(_, item) return Game.toIdentifier{game = item.game, useDefault = false}, true end)
 
 	local orderedGames = Array.filter(Game.listGames{ordered = true}, function(game)
-		return Table.includes(queriedGames, game)
+		return queriedGames[game]
 	end)
 
 	return Array.map(orderedGames, function(game)
