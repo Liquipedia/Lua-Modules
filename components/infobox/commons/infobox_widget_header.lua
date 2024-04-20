@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Infobox/Widget')
@@ -93,7 +93,7 @@ end
 ---@param size number|string|nil
 ---@return Html?
 function Header:_image(fileName, fileNameDark, default, defaultDark, size)
-	if Logic.isEmpty(fileName) and Logic.isEmpty(default) then
+	if String.isEmpty(fileName) and String.isEmpty(default) then
 		return nil
 	end
 
