@@ -7,8 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local String = require('Module:StringUtils')
+local Image = require('Module:Image')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 local Widget = Lua.import('Module:Infobox/Widget')
 
@@ -93,12 +95,12 @@ end
 ---@param size number|string|nil
 ---@return Html?
 function Header:_image(fileName, fileNameDark, default, defaultDark, size)
-	if String.isEmpty(fileName) and String.isEmpty(default) then
+	local imageName = fileName or default
+	local imageDarkname = fileNameDark or fileName or defaultDark or default
+
+	if String.isEmpty(imageName) and String.isEmpty(imageDarkname) then
 		return nil
 	end
-
-	local imageName = fileName or default --[[@as string]]
-	local imageDarkname = fileNameDark or fileName or defaultDark or default --[[@as string]]
 
 	if imageName == imageDarkname then
 		return mw.html.create('div'):node(Header:_makeSizedImage(imageName, size))
@@ -110,33 +112,23 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
 end
 
----@param imageName string
+---@param imageName string?
 ---@param size number|string|nil
 ---@param mode string?
----@return Html
+---@return Html?
 function Header:_makeSizedImage(imageName, size, mode)
-	local infoboxImage = mw.html.create('div'):addClass('infobox-image'):addClass(mode)
-
-	-- Number (interpret as pixels)
-	size = size or ''
-	if tonumber(size) then
-		size = tonumber(size) .. 'px'
-		infoboxImage:addClass('infobox-fixed-size-image')
-	-- Percentage (interpret as scaling)
-	elseif size:find('%%') then
-		local scale = size:gsub('%%', '')
-		local scaleNumber = tonumber(scale)
-		if scaleNumber then
-			size = 'frameless|upright=' .. (scaleNumber / 100)
-			infoboxImage:addClass('infobox-fixed-size-image')
-		end
-	-- Default
-	else
-		size = '600px'
+	if String.isEmpty(imageName) then
+		return
 	end
 
-	local fullFileName = '[[File:' .. imageName .. '|' .. size .. ']]'
-	infoboxImage:wikitext(fullFileName)
+	local infoboxImage = mw.html.create('div'):addClass('infobox-image'):addClass(mode)
+	if Logic.isNumeric(size) then
+		infoboxImage:addClass('infobox-fixed-size-image')
+	else
+		size = 600
+	end
+
+	infoboxImage:wikitext(Image.display(imageName, nil, {size = size}))
 
 	return infoboxImage
 end
