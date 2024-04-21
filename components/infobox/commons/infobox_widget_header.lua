@@ -103,7 +103,7 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	end
 
 	if imageName == imageDarkname then
-		return mw.html.create('div'):node(Header:_makeSizedImage(imageName, size))
+		imageDarkname  = nil
 	end
 
 	local infoboxImage = Header:_makeSizedImage(imageName, size, 'lightmode')
