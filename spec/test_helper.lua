@@ -22,25 +22,35 @@ local function resetMediawiki()
 	mw.ext.VariablesLua.variablesStorage = {}
 end
 
+function SetActiveWiki(wiki)
+	package.preload = {}
+	local paths = {}
+	table.insert(paths, '?.lua')
+	table.insert(paths, 'standard/?.lua')
+	if wiki then
+		table.insert(paths, 'standard/info/wikis/'.. wiki ..'/?.lua')
+	end
+	table.insert(paths, 'components/match2/commons/?.lua')
+	table.insert(paths, 'components/prize_pool/commons/?.lua')
+	table.insert(paths, 'components/infobox/commons/?.lua')
+	table.insert(paths, 'components/infobox/commons/custom/?.lua')
+	table.insert(paths, 'components/opponent/commons/?.lua')
+	table.insert(paths, 'components/hidden_data_box/commons/?.lua')
+	table.insert(paths, 'components/squad/commons/?.lua')
+	table.insert(paths, 'components/standings/commons/?.lua')
+	table.insert(paths, 'components/team_card/?.lua')
+	table.insert(paths, 'standard/info/commons/?.lua')
+	table.insert(paths, 'standard/region/commons/?.lua')
+	table.insert(paths, 'standard/tier/commons/?.lua')
+	table.insert(paths, 'components/widget/?.lua')
+
+	package.path = table.concat(paths, ';')
+end
+
 local function setupForTesting()
 	require('definitions.mw')
 
-	package.path = '?.lua;' ..
-			'standard/?.lua;' ..
-			'components/match2/commons/?.lua;' ..
-			'components/prize_pool/commons/?.lua;' ..
-			'components/infobox/commons/?.lua;' ..
-			'components/infobox/commons/custom/?.lua;' ..
-			'components/opponent/commons/?.lua;' ..
-			'components/hidden_data_box/commons/?.lua;' ..
-			'components/squad/commons/?.lua;' ..
-			'components/standings/commons/?.lua;' ..
-			'components/team_card/?.lua;' ..
-			'standard/info/commons/?.lua;' ..
-			'standard/region/commons/?.lua;' ..
-			'standard/tier/commons/?.lua;' ..
-			'components/widget/?.lua;' ..
-			package.path
+	SetActiveWiki()
 
 	local require_original = require
 	local Plugin = require_original('plugins.sumneko_plugin')

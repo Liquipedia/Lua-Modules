@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'osu',
 	name = 'osu!',
+	defaultGame = 'osu',
 	games = {
 		osu = {
 			abbreviation = 'osu!',
@@ -38,7 +39,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'osu',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

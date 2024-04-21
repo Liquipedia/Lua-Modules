@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'battalion',
 	name = 'Battalion 1944',
+	defaultGame = 'battalion',
 	games = {
 		battalion = {
 			abbreviation = 'Battalion',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'battalion',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

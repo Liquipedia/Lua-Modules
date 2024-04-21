@@ -10,6 +10,7 @@ return {
 	startYear = 2016,
 	wikiName = 'battlerite',
 	name = 'Battlerite',
+	defaultGame = 'battlerite',
 	games = {
 		battlerite = {
 			abbreviation = 'Battlerite',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'battlerite',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

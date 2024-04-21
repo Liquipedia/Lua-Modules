@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Icon = require('Module:Icon')
+local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
@@ -30,12 +31,10 @@ local ICON_SUBSTITUTE = Icon.makeIcon{iconName = 'substitute', hover = 'Substitu
 ---@class SquadRow
 ---@operator call: SquadRow
 ---@field children Widget[]
----@field options {useTemplatesForSpecialTeams: boolean?}
 ---@field backgrounds string[]
 ---@field lpdbData ModelRow
 local SquadRow = Class.new(
-	function(self, options)
-		self.options = options or {}
+	function(self)
 		self.children = {}
 		self.backgrounds = {'Player'}
 
@@ -199,40 +198,47 @@ end
 ---@param args table
 ---@return self
 function SquadRow:newteam(args)
-	local content = {}
+	local function createContent()
+		local content = {}
+		local newTeam, newTeamRole = args.newteam, args.newteamrole
+		local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
 
-	if String.isNotEmpty(args.newteam) or String.isNotEmpty(args.newteamrole) then
-		local mobileStuffDiv = mw.html.create('div'):addClass('MobileStuff')
-			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;')
-		table.insert(content, mobileStuffDiv)
-
-		if String.isNotEmpty(args.newteam) then
-			local newTeam = args.newteam
-			if mw.ext.TeamTemplate.teamexists(newTeam) then
-				local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
-				table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
-
-				self.lpdbData.newteam = mw.ext.TeamTemplate.teampage(newTeam)
-				self.lpdbData.newteamtemplate = mw.ext.TeamTemplate.raw(newTeam, date).templatename
-			elseif self.options.useTemplatesForSpecialTeams then
-				local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
-				if newTeamTemplate then
-					table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
-				end
-			end
-
-			if String.isNotEmpty(args.newteamrole) then
-				table.insert(content, '&nbsp;')
-				table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. args.newteamrole .. ')'))
-			end
-		elseif not self.options.useTemplatesForSpecialTeams and String.isNotEmpty(args.newteamrole) then
-			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(args.newteamrole))
+		if not hasNewTeam and not hasNewTeamRole then
+			return content
 		end
+
+		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
+			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;'))
+
+		if not Info.config.squads.hasSpecialTeam and not hasNewTeam then
+			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
+			return content
+		end
+
+		if not mw.ext.TeamTemplate.teamexists(newTeam) then
+			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
+			if Info.config.squads.hasSpecialTeam and newTeamTemplate then
+				table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
+			end
+			return content
+		end
+
+		local date = args.newteamdate or ReferenceCleaner.clean(args.leavedate)
+		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
+
+		self.lpdbData.newteam = mw.ext.TeamTemplate.teampage(newTeam)
+		self.lpdbData.newteamtemplate = mw.ext.TeamTemplate.raw(newTeam, date).templatename
+
+		if hasNewTeamRole then
+			table.insert(content, '&nbsp;')
+			table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. newTeamRole .. ')'))
+		end
+		return content
 	end
 
 	table.insert(self.children, Widget.TableCellNew{
 		classes = {'NewTeam'},
-		content = content,
+		content = createContent(),
 	})
 
 	return self

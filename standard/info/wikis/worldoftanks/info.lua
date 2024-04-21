@@ -10,6 +10,7 @@ return {
 	startYear = 2010,
 	wikiName = 'worldoftanks',
 	name = 'World of Tanks',
+	defaultGame = 'worldoftanks',
 	games = {
 		worldoftanks = {
 			abbreviation = 'WoT',
@@ -64,7 +65,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'worldoftanks',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
 }

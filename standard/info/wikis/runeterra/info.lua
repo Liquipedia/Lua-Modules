@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'runeterra',
 	name = 'Legends of Runeterra',
+	defaultGame = 'runeterra',
 	games = {
 		runeterra = {
 			abbreviation = 'Runeterra',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'runeterra',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }
