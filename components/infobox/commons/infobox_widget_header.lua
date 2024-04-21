@@ -125,7 +125,7 @@ function Header:_makeSizedImage(imageName, size, mode)
 	if Logic.isNumeric(size) then
 		infoboxImage:addClass('infobox-fixed-size-image')
 	else
-		size = 600
+		size = '600x1000px'
 	end
 
 	infoboxImage:wikitext(Image.display(imageName, nil, {size = size}))
