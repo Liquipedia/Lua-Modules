@@ -21,10 +21,20 @@ function Appearances.player(args)
 	if not args or not args.player then return end
 	local numberOfPlayersInPlacement = args.numberOfPlayersInPlacement or DEFAULT_MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT
 
-	local conditions = Array.map(Array.range(1, numberOfPlayersInPlacement), function(index)
-		return '[[opponentplayers_p' .. index .. '::' .. args.player .. ']]'
+	local player = args.player:gsub(' ', '_')
+	local playerWithoutUnderscores = args.player:gsub('_', ' ')
+
+	local conditions = {
+		'[[opponentname::' .. player .. ']]',
+		'[[opponentname::' .. playerWithoutUnderscores .. ']]',
+	}
+
+	Array.forEach(Array.range(1, numberOfPlayersInPlacement), function(index)
+		Array.appenWith(conditions,
+			'[[opponentplayers_p' .. index .. '::' .. player .. ']]',
+			'[[opponentplayers_p' .. index .. '::' .. playerWithoutUnderscores .. ']]'
+		)
 	end)
-	table.insert(conditions, '[[opponentname::' .. args.player .. ']]')
 
 	local queriedGames = Table.map(mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = table.concat(conditions, ' OR '),
