@@ -44,9 +44,9 @@ function CustomSquad._playerRow(person, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 	if Logic.isEmpty(squadPerson.newteam) then
 		if Logic.readBool(person.retired) then
-			squadPerson.newteam = 'retired'
+			squadPerson.newteamspecial = 'retired'
 		elseif Logic.readBool(person.military) then
-			squadPerson.newteam = 'military'
+			squadPerson.newteamspecial = 'military'
 		end
 	end
 	SquadUtils.storeSquadPerson(squadPerson)

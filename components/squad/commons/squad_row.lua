@@ -34,13 +34,6 @@ local SquadRow = Class.new(
 	end
 )
 
-SquadRow.specialTeamsTemplateMapping = {
-	retired = 'Team/retired',
-	inactive = 'Team/inactive',
-	['passed away'] = 'Team/passed away',
-	military = 'Team/military',
-}
-
 ---@return self
 function SquadRow:id()
 	local content = {}
@@ -159,26 +152,24 @@ end
 function SquadRow:newteam()
 	local function createContent()
 		local content = {}
-		local newTeam, newTeamRole = self.model.newteam, self.model.newteamrole
+		local newTeam, newTeamRole, newTeamSpecial = self.model.newteam, self.model.newteamrole, self.model.newTeamSpecial
 		local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
+		local hasNewTeamSpecial = String.isNotEmpty(newTeamSpecial)
 
-		if not hasNewTeam and not hasNewTeamRole then
+		if not hasNewTeam and not hasNewTeamRole and not hasNewTeamSpecial then
 			return content
 		end
 
 		table.insert(content, mw.html.create('div'):addClass('MobileStuff')
 			:tag('i'):addClass('fa fa-long-arrow-right'):attr('aria-hidden', 'true'):done():wikitext('&nbsp;'))
 
-		if not Info.config.squads.hasSpecialTeam and not hasNewTeam then
-			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
+		if hasNewTeamSpecial then
+			table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamSpecial))
 			return content
 		end
 
-		if not mw.ext.TeamTemplate.teamexists(newTeam) then
-			local newTeamTemplate = SquadRow.specialTeamsTemplateMapping[newTeam]
-			if Info.config.squads.hasSpecialTeam and newTeamTemplate then
-				table.insert(content, Template.safeExpand(mw.getCurrentFrame(), newTeamTemplate))
-			end
+		if not hasNewTeam then
+			table.insert(content, mw.html.create('div'):addClass('NewTeamRole'):wikitext(newTeamRole))
 			return content
 		end
 

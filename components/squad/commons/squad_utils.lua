@@ -50,6 +50,13 @@ SquadUtils.SquadTypeToStorageValue = {
 	[SquadUtils.SquadType.FORMER_INACTIVE] = 'former',
 }
 
+SquadUtils.specialTeamsTemplateMapping = {
+	retired = 'Team/retired',
+	inactive = 'Team/inactive',
+	['passed away'] = 'Team/passed away',
+	military = 'Team/military',
+}
+
 -- TODO: Decided on all valid types
 SquadUtils.validPersonTypes = {'player', 'staff'}
 SquadUtils.defaultPersonType = 'player'
@@ -143,6 +150,10 @@ function SquadUtils.readSquadPersonArgs(args)
 			faction = Faction.read(args.faction or args.race),
 		},
 	}
+
+	if Info.config.squads.hasSpecialTeam and not person.newteam and args.newteam then
+		person.newteamspecial = SquadUtils.specialTeamsTemplateMapping[args.newteam]
+	end
 
 	if person.joindate ~= args.joindate then
 		person.extradata.joindatedisplay = args.joindate
