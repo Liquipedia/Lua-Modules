@@ -98,5 +98,6 @@ return {
 			allowManual = true,
 		},
 	},
+	opponentLibrary = 'Opponent/Custom',
 	match2 = 0,
 }

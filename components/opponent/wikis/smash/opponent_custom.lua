@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local Opponent = Lua.import('Module:Opponent')
 
@@ -31,7 +33,7 @@ function CustomOpponent.readOpponentArgs(args)
 
 	if partySize == 1 then
 		opponent.players[1].chars = args.chars and mw.text.split(args.chars or '', ',') or nil
-		opponent.players[1].game = args.game
+		opponent.players[1].game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 	elseif partySize then
 		for _, player in ipairs(opponent.players) do
 			player.chars = args.chars and mw.text.split(args.chars or '', ',') or nil
