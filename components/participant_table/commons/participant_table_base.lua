@@ -49,7 +49,7 @@ local pageVars = PageVariableNamespace('ParticipantTable')
 ---@field display boolean
 ---@field width string
 ---@field columnWidth string
----@field displayTitle boolean
+---@field showTitle boolean only applies for the title of the whole table
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
@@ -110,7 +110,7 @@ function ParticipantTable.readConfig(args, parentConfig)
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
 		display = not Logic.readBool(args.hidden),
-		displayTitle = not Logic.readBool(args.noTitle),
+		showTitle = not Logic.readBool(args.hideTitle),
 	}
 
 	config.width = parentConfig.width
@@ -314,7 +314,7 @@ function ParticipantTable:create()
 		:addClass('participantTable')
 		:css('max-width', '100%!important')
 		:css('width', config.width)
-		:node(config.displayTitle and
+		:node(config.showTitle and
 			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
 			or nil)
 
