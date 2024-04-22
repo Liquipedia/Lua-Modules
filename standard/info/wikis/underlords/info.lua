@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'underlords',
 	name = 'Dota Underlords',
+	defaultGame = 'underlords',
 	games = {
 		underlords = {
 			abbreviation = 'Underlords',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'underlords',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

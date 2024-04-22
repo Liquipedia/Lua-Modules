@@ -10,6 +10,7 @@ return {
 	startYear = 2016,
 	wikiName = 'clashroyale',
 	name = 'Clash Royale',
+	defaultGame = 'cr',
 	games = {
 		cr = {
 			abbreviation = 'CR',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cr',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

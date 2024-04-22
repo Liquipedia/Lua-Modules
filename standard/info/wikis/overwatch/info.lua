@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'overwatch',
 	name = 'Overwatch',
+	defaultGame = 'overwatch2',
 	games = {
 		overwatch = {
 			abbreviation = 'OW',
@@ -38,6 +39,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'overwatch2',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

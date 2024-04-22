@@ -292,6 +292,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		extradata = {
 			firstname = args.givenname,
 			lastname = args.familyname,
+			banned = args.banned,
 		},
 	}
 

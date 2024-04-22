@@ -1941,6 +1941,15 @@ Author(s): Inflicted
 }
 
 /*******************************************************************************
+Module(s): MatchTable
+Author(s): hjpalpha
+*******************************************************************************/
+.match-table-year-header {
+	font-weight: bold;
+	background-color: var( --table-striped-background-color, var( --clr-surface-2, #f5f5f5 ) );
+}
+
+/*******************************************************************************
 Template(s): Page Form Checkboxes
 Author(s): Inflicted
 *******************************************************************************/
@@ -3490,7 +3499,7 @@ ul.halfbox {
 }
 
 ul.halfbox > li {
-	background: none repeat scroll 0 0 #f2f2f2;
+	background: none repeat scroll 0 0 var( --clr-surface-1, #f2f2f2 );
 	border: 1px solid #aaaaaa;
 	display: block;
 	float: left;
@@ -3757,6 +3766,10 @@ Author(s): Rathoz
 	display: flex;
 	flex-direction: column;
 	border: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-match-header-overview {
@@ -3812,6 +3825,11 @@ Author(s): Rathoz
 	padding: 8px;
 	background: #f5f5f5;
 	border-top: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-match-header-date {
@@ -3820,6 +3838,11 @@ Author(s): Rathoz
 	padding: 4px;
 	background: #f5f5f5;
 	border-top: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-match-mvp {
@@ -3829,6 +3852,11 @@ Author(s): Rathoz
 	gap: 4px;
 	background: #f5f5f5;
 	border: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 /* >= ??px icons in 1→2 columns */
@@ -3868,6 +3896,10 @@ Author(s): Rathoz
 	flex-direction: column;
 	border: 1px solid #bbbbbb;
 	width: 100%;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-game-veto-overview-team-header {
@@ -3877,6 +3909,10 @@ Author(s): Rathoz
 	align-items: center;
 	padding: 8px;
 	background: #f5f5f5;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+	}
 }
 
 .match-bm-lol-game-veto-overview-team-veto {
@@ -3886,6 +3922,10 @@ Author(s): Rathoz
 	padding: 8px;
 	gap: 8px;
 	border-top: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-game-veto-overview-ban,
@@ -3931,6 +3971,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #f5f5f5;
 	border: 1px solid #bbbbbb;
 	width: 100%;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 /* >= 768px reflow picks/bans order */
@@ -3951,6 +3996,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 		gap: 8px;
 		border: 1px solid #bbbbbb;
 		width: 100%;
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+		}
 	}
 
 	.match-bm-lol-game-veto-order-team-choice-group {
@@ -3985,6 +4034,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 		gap: 8px;
 		border: 1px solid #bbbbbb;
 		width: 100%;
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+		}
 	}
 
 	.match-bm-lol-game-veto-order-team-choice-group {
@@ -4017,6 +4070,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	padding: 8px;
 	background: #f5f5f5;
 	border: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-game-veto-order-team-choice {
@@ -4036,6 +4094,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 	display: flex;
 	font-weight: bold;
 	font-size: 12px;
+
+	.theme--dark &:not( .match-bm-lol-game-veto-order-step-blue ):not( .match-bm-lol-game-veto-order-step-red ) {
+		background-color: var( --clr-secondary-39 );
+	}
 }
 
 .match-bm-lol-game-veto-order-step-blue {
@@ -4093,6 +4155,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #eaecf0;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-players-player {
@@ -4105,6 +4172,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #ffffff;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-7 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-players-player-details {
@@ -4252,6 +4324,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 	justify-content: flex-start;
 	gap: 4px;
 	width: 88px;
+
+	.theme--dark & > img {
+		filter: invert( 1 );
+	}
 }
 
 .match-bm-lol-h2h {
@@ -4268,6 +4344,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #eaecf0;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-h2h-header-team {
@@ -4285,6 +4366,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 	align-items: flex-start;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-h2h-stat {
@@ -4299,10 +4384,18 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 .match-bm-lol-h2h-stat-title {
 	width: 80px;
+
+	.theme--dark & > img {
+		filter: invert( 1 );
+	}
 }
 
 .match-bm-lol-game-overview {
 	border: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-lol-game-summary {
@@ -4386,6 +4479,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 	gap: 4px;
 	border: 1px solid #bbbbbb;
 	background: #f5f5f5;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 /*******************************************************************************

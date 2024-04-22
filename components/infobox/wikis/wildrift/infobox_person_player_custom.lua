@@ -73,7 +73,7 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	if String.isEmpty(player.args.history) then
-		player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
+		player.args.history = TeamHistoryAuto.results{addlpdbdata = true}
 	end
 	player.args.autoTeam = true
 	player.role = player:_getRoleData(player.args.role)

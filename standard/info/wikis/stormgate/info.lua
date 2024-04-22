@@ -10,6 +10,7 @@ return {
 	startYear = 2023,
 	wikiName = 'stormgate',
 	name = 'Stormgate',
+	defaultGame = 'stormgate',
 	games = {
 		stormgate = {
 			abbreviation = 'SG',
@@ -25,7 +26,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'stormgate',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',

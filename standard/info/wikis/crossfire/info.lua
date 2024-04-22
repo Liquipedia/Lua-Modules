@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'crossfire',
 	name = 'Crossfire',
+	defaultGame = 'cf',
 	games = {
 		cf = {
 			abbreviation = 'CF',
@@ -51,7 +52,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cf',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
 	match2 = 1,
 }

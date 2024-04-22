@@ -9,7 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Medal = require('Module:Medal')
+local Medals = require('Module:Medals')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 
@@ -164,9 +164,9 @@ end
 function PlacementStats._header()
 	return mw.html.create('tr')
 		:tag('th'):wikitext('Tier'):css('text-align', 'left'):css('width', '100%'):done()
-		:tag('th'):wikitext(Medal['1']):done()
-		:tag('th'):wikitext(Medal['2']):done()
-		:tag('th'):wikitext(Medal['3']):done()
+		:tag('th'):node(Medals.display{medal = 1}):done()
+		:tag('th'):node(Medals.display{medal = 2}):done()
+		:tag('th'):node(Medals.display{medal = 3}):done()
 		:tag('th'):wikitext(Abbreviation.make('Top3', 'Total of top 3')):done()
 		:tag('th'):wikitext('All'):done()
 end

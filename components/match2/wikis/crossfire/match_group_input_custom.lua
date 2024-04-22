@@ -311,11 +311,18 @@ function matchFunctions.getOpponents(match)
 				opponent.score = -1
 			end
 			opponents[opponentIndex] = opponent
+
+			-- get players from vars for teams
+			if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
+				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					maxNumPlayers = 5, resolveRedirect = true, applyUnderScores = true
+				})
+			end
 		end
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
-	 match.finished = Logic.readBool(match.finished)
+	match.finished = Logic.readBool(match.finished)
 		or isScoreSet and (
 			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
 			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)

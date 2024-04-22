@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'apexlegends',
 	name = 'Apex Legends',
+	defaultGame = 'apexlegends',
 	games = {
 		apexlegends = {
 			abbreviation = 'APEX',
@@ -25,7 +26,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'apexlegends',
-	defaultRoundPrecision = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
+	defaultRoundPrecision = 0,
 }

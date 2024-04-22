@@ -1,41 +1,43 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('Squad', function()
-	local Squad = require('Module:Squad')
-	local SquadRow = require('Module:Squad/Row')
+insulate('Squad', function()
+	allwikis('storage', function (args, wikiName)
+		local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
+		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
+		local SquadCustom = require('Module:Squad/Custom')
 
-	describe('row', function()
-		local LpdbSquadStub, LpdbQueryStub
+		GoldenTest('squad_row_' .. wikiName, tostring(SquadCustom.run(args.input)))
 
-		before_each(function()
-			LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
-			LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
-		end)
+		for _, row in ipairs(args.lpdbExpected) do
+			local obName = row.objectname
+			row.objectname = nil
+			assert.stub(LpdbSquadStub).was.called_with(obName, row)
+			row.objectname = obName
+		end
 
-		after_each(function()
-			LpdbSquadStub:revert()
-			LpdbQueryStub:revert()
-		end)
-
-		it('displays correct and stores correctly', function()
-			local row = SquadRow()
-			row:id{'Baz', 'se'}
-					:name{name = 'Foo Bar'}
-					:status(2)
-					:role{}
-					:date('2022-01-01', 'Join Date:&nbsp;', 'joindate')
-					:date('2022-03-03', 'Inactive Date:&nbsp;', 'inactivedate')
-					:date('2022-05-01', 'Leave Date:&nbsp;', 'leavedate')
-
-			GoldenTest('squad_row', tostring(row:create():tryMake()[1]))
-
-			assert.stub(LpdbSquadStub).was.called_with('Baz_2022-01-01__former', {
+		LpdbSquadStub:revert()
+		LpdbQueryStub:revert()
+	end, {default = {
+		input = {
+			status = 'former',
+			{
+				id = 'Baz',
+				flag = 'se',
+				name = 'Foo Bar',
+				joindate = '2022-01-01',
+				inactivedate = '2022-03-03',
+				leavedate = '2022-05-01',
+			}
+		},
+		lpdbExpected = {
+			{
+				objectname = 'Baz_2022-01-01__former',
 				id = 'Baz',
 				inactivedate = '2022-03-03',
 				joindate = '2022-01-01',
 				leavedate = '2022-05-01',
 				link = 'Baz',
 				name = 'Foo Bar',
-				nationality = '',
+				nationality = 'Sweden',
 				type = 'player',
 				newteam = '',
 				newteamtemplate = '',
@@ -44,11 +46,7 @@ describe('Squad', function()
 				status = 'former',
 				teamtemplate = '',
 				extradata = {},
-			})
-		end)
-	end)
-
-	describe('header', function()
-		GoldenTest('squad_header', tostring(Squad({}):init{}:title():header():create()))
-	end)
+			}
+		}
+	}})
 end)

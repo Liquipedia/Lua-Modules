@@ -10,6 +10,7 @@ return {
 	startYear = 2021,
 	wikiName = 'sideswipe',
 	name = 'Rocket League Sideswipe',
+	defaultGame = 'sideswipe',
 	games = {
 		sideswipe = {
 			abbreviation = 'SW',
@@ -25,6 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'sideswipe',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }
