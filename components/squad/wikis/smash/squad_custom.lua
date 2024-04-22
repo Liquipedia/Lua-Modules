@@ -6,11 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Characters = require('Module:Characters')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local SquadPlayerData = require('Module:SquadPlayer/data')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Widget = require('Module:Infobox/Widget/All')
 
@@ -28,8 +30,6 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Widget.TableCellNew{content = {'Main'}, header = true}
 		}
-	elseif id == 'header_name' then
-		return {}
 	end
 
 	return widgets
@@ -38,12 +38,11 @@ end
 ---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
----@param args table
 ---@return self
-function ExtendedSquadRow:mains(args)
+function ExtendedSquadRow:mains()
 	local characters = {}
-	Array.forEach(args.mains, function(main)
-		table.insert(characters, Characters.GetIconAndName{main, game = args.game, large = true})
+	Array.forEach(mw.text.split(self.model.extradata.mains or '', ','), function(main)
+		table.insert(characters, Characters.GetIconAndName{main, game = self.model.extradata.game, large = true})
 	end)
 
 	table.insert(self.children, Widget.TableCellNew{
@@ -57,46 +56,43 @@ end
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad():init(frame, CustomInjector()):title():header()
+	local args = Arguments.getArgs(frame)
+	local squad = Squad(args, CustomInjector()):title():header()
 
 	local tableGame = squad.args.game
 
 	local players = SquadUtils.parsePlayers(squad.args)
 
-	Array.forEach(players, function(player)
-		local row = ExtendedSquadRow()
+	Array.forEach(players, function(person)
+		local game = person.game and mw.text.split(person.game:lower(), ',')[1] or tableGame
+		local mains = SquadPlayerData.get{link = person.link, player = person.id, game = game} or person.mains
+		person.flag = Variables.varDefault('nationality') or person.flag
+		person.name = Variables.varDefault('name') or person.name
 
-		local game = player.game and mw.text.split(player.game:lower(), ',')[1] or tableGame
-		local mains = SquadPlayerData.get{link = player.link, player = player.id, game = game} or player.mains
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squad.type}))
+		squadPerson.extradata.game = game
+		squadPerson.extradata.mains = mains
+		SquadUtils.storeSquadPerson(squadPerson)
 
-		row:status(squad.type)
-		row:id{
-			player.id,
-			flag = Variables.varDefault('nationality') or player.flag,
-			link = player.link,
-			team = player.activeteam,
-			name = Variables.varDefault('name') or player.name,
-			date = player.leavedate or player.inactivedate,
-		}
-		row:mains{mains = mw.text.split(mains or '', ','), game = game}
-		row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+		local row = ExtendedSquadRow(squadPerson) ---@type SmashSquadRow
 
-		if squad.type == SquadUtils.SquadType.FORMER then
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam{
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			}
-		elseif squad.type == SquadUtils.SquadType.INACTIVE then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+		row:id():name()
+		row:mains():date('joindate', 'Join Date:&nbsp;')
+
+		if squad.type == SquadUtils.SquadType.INACTIVE or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		squad:row(row:create())
+		if squad.type == SquadUtils.SquadType.FORMER or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
+			row:date('leavedate', 'Leave Date:&nbsp;')
+			row:newteam()
+		end
 
 		Variables.varDefine('nationality', '')
 		Variables.varDefine('name', '')
+
+		squad:row(row:create())
+
 	end)
 
 	return squad:create()

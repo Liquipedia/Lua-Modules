@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
@@ -44,14 +45,14 @@ end
 ---@class StarcraftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
----@param args table
 ---@return self
-function ExtendedSquadRow:elo(args)
+function ExtendedSquadRow:elo()
+	local eloCurrent, eloPeak = self.model.extradata.eloCurrent, self.model.extradata.eloPeak
 	table.insert(self.children,
-		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-')}}
+		Widget.TableCellNew{content = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
 	)
 	table.insert(self.children,
-		Widget.TableCellNew{content = {mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-')}}
+		Widget.TableCellNew{content = {eloPeak and (eloPeak .. ' pts') or '-'}}
 	)
 
 	return self
@@ -64,47 +65,35 @@ function CustomSquad.run(frame)
 	local tlpd = Logic.readBool(args.tlpd)
 	local SquadClass = tlpd and TlpdSquad or Squad
 
-	return SquadUtils.defaultRunManual(frame, SquadClass, function(player, squadType)
-		local row = ExtendedSquadRow()
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadType)
+		local inputId = person.id --[[@as number]]
+		person.race = CustomSquad._queryTLPD(inputId, 'race') or person.race
+		person.id = CustomSquad._queryTLPD(inputId, 'name') or person.id
+		person.link = person.link or person.altname or person.id
+		person.team = CustomSquad._queryTLPD(inputId, 'team_name')
+		person.name = (CustomSquad._queryTLPD(inputId, 'name_korean') or '') .. ' ' ..
+			(CustomSquad._queryTLPD(inputId, 'name_romanized') or person.name or '')
 
-		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race
-		local id = CustomSquad._queryTLPD(player.id, 'name') or player.id
-		local link = player.link or player.altname or id
-		local currentTeam = CustomSquad._queryTLPD(player.id, 'team_name')
-		local name = CustomSquad._queryTLPD(player.id, 'name_korean') or ''
-		local localizedName = CustomSquad._queryTLPD(player.id, 'name_romanized') or player.name or ''
-		local elo = CustomSquad._queryTLPD(player.id, 'elo')
-		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+		squadPerson.extradata.eloCurrent = CustomSquad._queryTLPD(inputId, 'elo')
+		squadPerson.extradata.eloPeak = CustomSquad._queryTLPD(inputId, 'peak_elo')
+		SquadUtils.storeSquadPerson(squadPerson)
 
-		row:status(squadType)
-		row:id{
-			id,
-			race = faction,
-			link = link,
-			team = currentTeam,
-			flag = player.flag,
-			captain = player.captain,
-			role = player.role,
-			date = player.leavedate or player.inactivedate,
-		}
-		row:name{name = name .. ' ' .. localizedName}
+		local row = ExtendedSquadRow(squadPerson)
+
+		row:id():name()
 
 		if tlpd then
-			row:elo{eloCurrent = elo, eloPeak = eloPeak}
+			row:elo()
 		else
-			row:role{role = player.role}
-			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+			row:role()
+			row:date('joindate', 'Join Date:&nbsp;')
 
 			if squadType == SquadUtils.SquadType.FORMER then
-				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-				row:newteam{
-					newteam = player.newteam,
-					newteamrole = player.newteamrole,
-					newteamdate = player.newteamdate,
-					leavedate = player.leavedate
-				}
+				row:date('leavedate', 'Leave Date:&nbsp;')
+				row:newteam()
 			elseif squadType == SquadUtils.SquadType.INACTIVE then
-				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+				row:date('inactivedate', 'Inactive Date:&nbsp;')
 			end
 		end
 

@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -37,50 +37,32 @@ function CustomSquad.personMapper(person)
 	return newPerson
 end
 
----@param player table
+---@param person table
 ---@param squadType integer
 ---@return WidgetTableRowNew
-function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow{useTemplatesForSpecialTeams = true}
+function CustomSquad._playerRow(person, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	if Logic.isEmpty(squadPerson.newteam) then
+		if Logic.readBool(person.retired) then
+			squadPerson.newteam = 'retired'
+		elseif Logic.readBool(person.military) then
+			squadPerson.newteam = 'military'
+		end
+	end
+	SquadUtils.storeSquadPerson(squadPerson)
 
-	local faction = Faction.read(player.faction)
-
-	row:status(squadType)
-	row:id{
-		player.id,
-		flag = player.flag,
-		faction = faction,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		date = player.leavedate or player.inactivedate or player.joindate,
-	}
-	row:name{name = player.name}
-	row:role{role = player.role}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	local row = SquadRow(squadPerson)
+	row:id()
+	row:name()
+	row:role()
+	row:date('joindate', 'Join Date:&nbsp;')
 
 	if squadType == SquadUtils.SquadType.FORMER then
-		if Logic.isEmpty(player.newteam) then
-			if Logic.readBool(player.retired) then
-				player.newteam = 'retired'
-			elseif Logic.readBool(player.military) then
-				player.newteam = 'military'
-			end
-		end
-
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate,
-		}
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	elseif squadType == SquadUtils.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
 	end
-
-	row:setExtradata{faction = faction}
 
 	return row:create()
 end

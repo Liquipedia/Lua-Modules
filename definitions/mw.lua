@@ -92,7 +92,7 @@ function mw.frame:getParent() end
 
 ---Returns the title associated with the frame as a string. For the frame created by {{#invoke:}}, this is the title of the module invoked.
 ---@return string
-function mw.frame:getTitle() end
+function mw.frame:getTitle() return '' end
 
 ---Create a new Frame object that is a child of the current frame, with optional arguments and title.
 --This is mainly intended for use in the debug console for testing functions that would normally be called by {{#invoke:}}. The number of frames that may be created at any one time is limited.
@@ -503,7 +503,7 @@ function mw.message:isDisabled() end
 ---@field subjectNamespaces table<number|string, namespaceInfo>
 ---@field talkNamespaces table<number|string, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number}
-mw.site = {}
+mw.site = {server = 'https://liquipedia.net/wiki/'}
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -699,7 +699,9 @@ end
 ---@param namespace string?
 ---@return Title?
 ---@overload fun(id: number):Title?
-function mw.title.new(text, namespace) end
+function mw.title.new(text, namespace)
+	return setmetatable(mw.title, {})
+end
 
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
@@ -911,6 +913,9 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 ---@param s string|number
 ---@return string
 function mw.ustring.upper(s) return string.upper(s) end
+
+mw.uri = {}
+function mw.uri.localUrl(s, s2) return '' end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
