@@ -49,7 +49,7 @@ function CustomSquad._playerRow(person, squadType)
 		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
 		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
 	end
-	squadPerson.newteam = Logic.emptyOr(squadPerson.newteam,
+	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
 		Logic.readBool(person.retired) and 'retired' or nil,
 		Logic.readBool(person.military) and 'military' or nil)
 
