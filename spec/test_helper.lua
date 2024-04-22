@@ -169,11 +169,6 @@ return function(busted, helper, options)
 				}
 			end
 
-			-- TODO Work away this usage
-			if newName == 'games' then
-				return {abbr = {}, name = {}}
-			end
-
 			if fileExists(newName) then
 				return require_original(newName)
 			end
