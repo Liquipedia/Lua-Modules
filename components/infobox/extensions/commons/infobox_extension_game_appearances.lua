@@ -30,7 +30,7 @@ function Appearances.player(args)
 	}
 
 	Array.forEach(Array.range(1, numberOfPlayersInPlacement), function(index)
-		Array.appenWith(conditions,
+		Array.appendWith(conditions,
 			'[[opponentplayers_p' .. index .. '::' .. player .. ']]',
 			'[[opponentplayers_p' .. index .. '::' .. playerWithoutUnderscores .. ']]'
 		)
