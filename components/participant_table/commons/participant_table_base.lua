@@ -49,6 +49,7 @@ local pageVars = PageVariableNamespace('ParticipantTable')
 ---@field display boolean
 ---@field width string
 ---@field columnWidth string
+---@field displayTitle boolean
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
@@ -108,7 +109,8 @@ function ParticipantTable.readConfig(args, parentConfig)
 		showTeams = not Logic.readBool(args.disable_teams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
-		display = not Logic.readBool(args.hidden)
+		display = not Logic.readBool(args.hidden),
+		displayTitle = not Logic.readBool(args.noTitle),
 	}
 
 	config.width = parentConfig.width
@@ -312,7 +314,9 @@ function ParticipantTable:create()
 		:addClass('participantTable')
 		:css('max-width', '100%!important')
 		:css('width', config.width)
-		:node(mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants'))
+		:node(config.displayTitle and
+			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
+			or nil)
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
