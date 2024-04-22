@@ -152,7 +152,7 @@ end
 function SquadRow:newteam()
 	local function createContent()
 		local content = {}
-		local newTeam, newTeamRole, newTeamSpecial = self.model.newteam, self.model.newteamrole, self.model.newTeamSpecial
+		local newTeam, newTeamRole, newTeamSpecial = self.model.newteam, self.model.newteamrole, self.model.newteamspecial
 		local hasNewTeam, hasNewTeamRole = String.isNotEmpty(newTeam), String.isNotEmpty(newTeamRole)
 		local hasNewTeamSpecial = String.isNotEmpty(newTeamSpecial)
 
