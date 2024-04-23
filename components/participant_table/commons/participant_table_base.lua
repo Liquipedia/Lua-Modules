@@ -268,8 +268,11 @@ function ParticipantTable:store()
 		if placements[lpdbData.opponentname] or section.config.noStorage or
 			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-
-		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
+		lpdbData = Table.merge(
+			lpdbTournamentData,
+			lpdbData,
+			{date = section.config.resolveDate, extradata = {dq = entry.dq and 'true' or nil}}
+		)
 
 		self:adjustLpdbData(lpdbData, entry, section.config)
 
