@@ -126,9 +126,7 @@ function AoEParticipantTable:_createSeedList()
 		Array.filter(Array.flatMap(self.sections, function(section)
 			return section.entries
 		end), Logic.isNotEmpty),
-		function (element)
-			return element and element.seed or nil
-		end,
+		Operator.property('seed'),
 		function (a, b)
 			return a and b and a < b or false
 		end
@@ -170,7 +168,7 @@ function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, b
 	else
 		title:css('position', 'absolute')
 	end
-	
+
 	return title:done()
 			:tag('div')
 				:addClass('participantTable-title')
