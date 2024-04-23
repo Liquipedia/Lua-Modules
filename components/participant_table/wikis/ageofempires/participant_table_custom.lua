@@ -118,9 +118,7 @@ function AoEParticipantTable:_createSeedList()
 	local display = self:_createTitle('Seeding', self.config.title or 'Participants', 2, 1, width, true)
 
 	local wrapper = mw.html.create('div')
-		:addClass('participantTable-Seeding')
-		:css('display', 'grid')
-		:css('grid-template-columns', '50px 1fr')
+		:addClass('participantTable-seeding')
 
 	local entries = Array.sortBy(
 		Array.filter(Array.flatMap(self.sections, function(section)
@@ -135,7 +133,7 @@ function AoEParticipantTable:_createSeedList()
 	Array.forEach(entries, function (entry, index)
 		wrapper
 			:tag('div')
-				:addClass('participantTable-tbd')
+				:addClass('participantTable-seed')
 				:wikitext(index)
 				:done()
 			:node(self:displayEntry(entry))
