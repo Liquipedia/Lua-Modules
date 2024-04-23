@@ -14,7 +14,7 @@ local HighlightConditions = {}
 ---@param data table
 ---@return boolean
 function HighlightConditions.tournament(data)
-	return String.isNotEmpty(data.publishertier) and data.liquipediatier == 1
+	return String.isNotEmpty(data.publishertier) and tonumber(data.liquipediatier) == 1
 end
 
 return HighlightConditions
