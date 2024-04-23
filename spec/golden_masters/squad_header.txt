@@ -1,1 +1,0 @@
-<div class="table-responsive"><table class="wikitable wikitable-striped roster-card" style="margin-bottom:10px"><tr class="HeaderRow"><th>ID</th><th></th><th>Name</th><th></th><th>Join Date</th></tr></table></div>

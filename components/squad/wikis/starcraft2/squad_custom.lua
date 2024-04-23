@@ -7,88 +7,67 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
-
---only for legacy reasons
-SquadRow.specialTeamsTemplateMapping.retirement = 'Team/retired'
 
 local CustomSquad = {}
 
 ---@param frame Frame
 ---@return Html
 function CustomSquad.run(frame)
-	local args = Arguments.getArgs(frame)
-	local squad = Squad():init(args):title():header()
+	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
+end
 
-	local isFormer = squad.type == SquadUtils.SquadType.FORMER
-	local isInactive = squad.type == SquadUtils.SquadType.INACTIVE
-	local isMainSquad = Logic.readBool(args.main)
-	local squadName = args.squad or mw.title.getCurrentTitle().prefixedText
-	local status = (isFormer and 'former')
-		or (isInactive and 'inactive')
-		or (isMainSquad and 'main')
-		or 'active'
+---@param playerList table[]
+---@param squadType integer
+---@return Html?
+function CustomSquad.runAuto(playerList, squadType)
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, nil, CustomSquad.personMapper)
+end
 
-	local players = SquadUtils.parsePlayers(squad.args)
+---@param person table
+---@return table
+function CustomSquad.personMapper(person)
+	local newPerson = SquadUtils.convertAutoParameters(person)
+	newPerson.faction = Logic.emptyOr(person.thisTeam.position, person.newTeam.position)
+	return newPerson
+end
 
-	players = Array.map(players, function(player)
-		if not player then return player end
-		player.faction = Faction.read(player.race)
-		if isFormer then
-			player.newteam = String.nilIfEmpty(player.newteam) or
-				Logic.readBool(player.retired) and 'retired' or
-				Logic.readBool(player.military) and 'military' or nil
-		end
-		return player
-	end)
+---@param person table
+---@param squadType integer
+---@return WidgetTableRowNew
+function CustomSquad._playerRow(person, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
 
-	Array.forEach(players, function(player)
-		local row = SquadRow()
-			:status(squad.type)
-			:id({
-				player.id,
-				flag = player.flag,
-				race = player.faction,
-				link = player.link,
-				captain = player.captain,
-				role = player.role,
-				team = player.team,
-				date = player.leavedate or player.inactivedate,
-			})
-			:name({name = player.name})
-			:role({role = player.role})
-			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	if squadType == SquadUtils.SquadType.ACTIVE then
+		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
+		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
+	end
+	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
+		Logic.readBool(person.retired) and 'retired' or nil,
+		Logic.readBool(person.military) and 'military' or nil)
 
-		if isFormer then
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam({
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			})
-		elseif isInactive then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-		end
+	SquadUtils.storeSquadPerson(squadPerson)
 
-		row:setExtradata{
-			faction = player.faction,
-			squadname = squadName,
-			status = status,
-		}
+	local row = SquadRow(squadPerson)
 
-		squad:row(row:create())
-	end)
+	row:id():name():role():date('joindate', 'Join Date:&nbsp;')
 
-	return squad:create()
+	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+	end
+	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
+	end
+
+	return row:create()
 end
 
 return CustomSquad
