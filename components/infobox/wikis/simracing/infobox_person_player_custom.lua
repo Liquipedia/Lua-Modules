@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local GameAppearances = require('Module:Infobox/Extension/GameAppearances')
 local Lua = require('Module:Lua')
 
+local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
