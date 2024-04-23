@@ -30,6 +30,11 @@ Author: hjpalpha
 	flex-wrap: wrap;
 }
 
+.participantTable-seeding {
+	display: grid;
+        grid-template-columns: 50px 1fr;
+}
+
 .participantTable-entry {
 	background-color: inherit;
 	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
@@ -45,6 +50,15 @@ Author: hjpalpha
 	border-right: 1px solid var( --table-border-color, #bbbbbb );
 	padding: 4px;
 	font-style: italic;
+	text-align: center;
+	width: 100%;
+}
+
+.participantTable-seed {
+	background-color: inherit;
+	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
+	border-right: 1px solid var( --table-border-color, #bbbbbb );
+	padding: 8px 4px 4px;
 	text-align: center;
 	width: 100%;
 }
