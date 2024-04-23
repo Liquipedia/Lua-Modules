@@ -216,8 +216,8 @@ function MatchlistDisplay.Opponent(props)
 		:addClass('brkts-matchlist-cell-content')
 	return mw.html.create('div')
 		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
-		:addClass(props.opponent.placement == 1 and props.resultType ~= 'draw' and 'brkts-matchlist-slot-winner' or nil)
-		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or nil)
+		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or
+			props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:node(contentNode)
 end
 
