@@ -161,11 +161,11 @@ function CustomMatchGroupInput._calculateWinner(match)
 					opponent.status = 'W'
 				elseif walkover == 0 then
 					match.winner = 0
-					match.walkover = 'L'
-					opponent.status = 'L'
+					match.walkover = 'FF'
+					opponent.status = 'FF'
 				else
 					local score = string.upper(opponent.score or '')
-					opponent.status = CONVERT_STATUS_INPUT[score] or 'L'
+					opponent.status = CONVERT_STATUS_INPUT[score] or 'FF'
 				end
 			elseif Table.includes(ALLOWED_STATUSES, string.upper(match.walkover)) then
 				if tonumber(match.winner or 0) == opponentIndex then
@@ -473,12 +473,11 @@ function CustomMatchGroupInput._processTeamMapData(opponentPlayers, map, opponen
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			civ = civ,
-			displayName = playerData.displayname,
-			pageName = playerData.name,
+			displayName = playerData.displayName,
+			pageName = playerData.pageName,
 			flag = playerData.flag,
 		}
 	end
-
 	return participants
 end
 
