@@ -792,11 +792,11 @@ function MatchTable:displayStats()
 			data.l .. 'L'
 		), ' : ')
 
-		local percentage = Math.round((data.w + 0.5 * data.d) / sum, 2)
+		local percentage = Math.round((data.w + 0.5 * data.d) / sum, 4) * 100
 
 		local parts = {
 			scoreText,
-			'(' .. percentage .. '1)',
+			'(' .. percentage .. '%)',
 			'in',
 			statsType,
 		}
