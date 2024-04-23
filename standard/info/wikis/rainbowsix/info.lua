@@ -17,8 +17,8 @@ return {
 			name = 'Tom Clancy\'s Rainbow Six Siege',
 			link = 'Rainbow Six Siege',
 			logo = {
-				darkMode = 'R6S icon.png',
-				lightMode = 'R6S icon.png',
+				darkMode = 'Rainbow Six Siege gameicon lightmode.png',
+				lightMode = 'Rainbow Six Siege gameicon darkmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Siege Logo darkmode.png',
