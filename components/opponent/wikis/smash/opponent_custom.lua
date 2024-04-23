@@ -33,11 +33,11 @@ function CustomOpponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize(opponent.type)
 
 	if partySize == 1 then
-		opponent.players[1].chars = Array.parseCommaSeparatedString(args.char)
+		opponent.players[1].chars = Array.parseCommaSeparatedString(args.chars)
 		opponent.players[1].game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 	elseif partySize then
 		Array.forEach(opponent.players, function (player)
-			player.chars = Array.parseCommaSeparatedString(args.char)
+			player.chars = Array.parseCommaSeparatedString(args.chars)
 		end)
 	end
 
