@@ -142,10 +142,12 @@ function AoEParticipantTable:_createSeedList()
 	return display:node(wrapper)
 end
 
----@param togglearea integer
----@param title string
----@param buttonarea integer
+---@param tabletitle string
 ---@param buttontitle string
+---@param togglearea integer
+---@param buttonarea integer
+---@param width string?
+---@param float boolean?
 ---@return Html
 function AoEParticipantTable:_createTitle(tabletitle, buttontitle, togglearea, buttonarea, width, float)
 	local title = mw.html.create('div')
