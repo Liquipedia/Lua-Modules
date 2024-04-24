@@ -1,17 +1,17 @@
 ---@meta
 
 ---@param wiki string?
-function SetActiveWiki(wiki) end
+function SetActiveWiki(wiki) error('SOMETHING WENT WRONG') end
 
 ---@param name string
 ---@param funcToRun fun(args: table, name: string)
 ---@param wikiArgs {default: {}?, [any]: {}}
 ---@return function
-function allwikis(name, funcToRun, wikiArgs) end
+function allwikis(name, funcToRun, wikiArgs) error('SOMETHING WENT WRONG') end
 
 ---@param testname string
 ---@param actual string
-function GoldenTest(testname, actual) end
+function GoldenTest(testname, actual) error('SOMETHING WENT WRONG') end
 
 -- luacheck: ignore
 return function(busted, helper, options)
