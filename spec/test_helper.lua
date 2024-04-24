@@ -1,4 +1,18 @@
----Enable LLS
+---@meta
+
+---@param wiki string?
+function SetActiveWiki(wiki) end
+
+---@param name string
+---@param funcToRun fun(args: table, name: string)
+---@param wikiArgs {default: {}?, [any]: {}}
+---@return function
+function allwikis(name, funcToRun, wikiArgs) end
+
+---@param testname string
+---@param actual string
+function GoldenTest(testname, actual) end
+
 -- luacheck: ignore
 return function(busted, helper, options)
 	-- Copy from standard/lua.lua
