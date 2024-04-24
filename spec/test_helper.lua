@@ -1,4 +1,5 @@
 ---@meta
+-- luacheck: ignore
 
 ---@param wiki string?
 function SetActiveWiki(wiki) error('SOMETHING WENT WRONG') end
@@ -13,7 +14,6 @@ function allwikis(name, funcToRun, wikiArgs) error('SOMETHING WENT WRONG') end
 ---@param actual string
 function GoldenTest(testname, actual) error('SOMETHING WENT WRONG') end
 
--- luacheck: ignore
 return function(busted, helper, options)
 	-- Copy from standard/lua.lua
 	local function fileExists(name)
