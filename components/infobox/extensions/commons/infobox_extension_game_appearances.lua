@@ -15,7 +15,7 @@ local DEFAULT_MAX_NUMBER_OF_PLAYERS_IN_PLACEMENT = 10
 local Appearances = {}
 
 ----Provide a list of games compete by a player
----@param args {player: string?, numberOfPlayersInPlacement}?
+---@param args {player: string?, numberOfPlayersInPlacement: integer?}?
 ---@return string[]?
 function Appearances.player(args)
 	if not args or not args.player then return end
