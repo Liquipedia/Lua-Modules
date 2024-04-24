@@ -166,8 +166,16 @@ function ParticipantTable:readSection(args)
 	local section = {config = config}
 
 	local entriesByName = {}
+	local tbds = {}
 	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
+
+		if entry.opponent and Opponent.isTbd(entry.opponent) then
+			table.insert(tbds, entry)
+			--needed so index is increased
+			return entry
+		end
+
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
@@ -187,6 +195,8 @@ function ParticipantTable:readSection(args)
 	Array.sortInPlaceBy(section.entries, function(entry)
 		return config.sortOpponents and entry.name:lower() or entry.inputIndex or -1
 	end)
+
+	Array.extendWith(section.entries, tbds)
 
 	table.insert(self.sections, section)
 end
@@ -350,7 +360,15 @@ function ParticipantTable:displaySection(section)
 		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
 	end)
 
-	local currentColumn = (#entries) % self.config.colSpan
+	local tbdsAdded = 0
+	if section.config.count and section.config.count > sectionEntryCount then
+		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
+			tbdsAdded = tbdsAdded + 1
+			sectionNode:node(self:tbdEntry():css('width', self.config.columnWidth))
+		end)
+	end
+
+	local currentColumn = (#entries + tbdsAdded) % self.config.colSpan
 	if currentColumn ~= 0 then
 		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
 	end
@@ -383,6 +401,15 @@ function ParticipantTable:sectionTitle(section, amountOfEntries)
 	if not section.config.showCountBySection then return title end
 
 	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+end
+
+---@return Html
+function ParticipantTable:tbdEntry()
+	return mw.html.create('div')
+		:addClass('participantTable-entry')
+		:node(OpponentDisplay.BlockOpponent{
+			opponent = Opponent.tbd(),
+		})
 end
 
 ---@param entry ParticipantTableEntry
