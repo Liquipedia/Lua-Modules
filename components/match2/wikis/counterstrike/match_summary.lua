@@ -265,7 +265,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 	if Logic.isNotEmpty(match.links.vod2) then
 		for _, vod2 in ipairs(match.links.vod2) do
 			local link, gameIndex = unpack(vod2)
-			secondVods[gameIndex] = Array.map(mw.text.split(link, ','), String.trim)
+			secondVods[gameIndex] = Array.parseCommaSeparatedString(link)
 		end
 		match.links.vod2 = nil
 	end

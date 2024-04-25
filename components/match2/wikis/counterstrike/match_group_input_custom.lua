@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -426,14 +427,14 @@ function matchFunctions.getMapVeto(match)
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
-	local vetotypes = mw.text.split(match.mapveto.types or '', ',')
-	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetotypes = Array.parseCommaSeparatedString(match.mapveto.types)
+	local deciders = Array.parseCommaSeparatedString(match.mapveto.decider)
 	local vetostart = match.mapveto.firstpick or ''
 	local deciderIndex = 1
 
 	local data = {}
 	for index, vetoType in ipairs(vetotypes) do
-		vetoType = mw.text.trim(vetoType):lower()
+		vetoType = vetoType:lower()
 		if not Table.includes(ALLOWED_VETOES, vetoType) then
 			return nil -- Any invalid input will not store (ie hide) all vetoes.
 		end

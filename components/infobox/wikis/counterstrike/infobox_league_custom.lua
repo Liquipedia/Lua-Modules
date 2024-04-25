@@ -343,8 +343,9 @@ function CustomLeague.getRestrictions(restrictions)
 	end
 	---@cast restrictions -nil
 
-	return Array.map(mw.text.split(restrictions, ','),
-		function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+	return Array.map(Array.parseCommaSeparatedString(restrictions),
+		function(restriction) return RESTRICTIONS[restriction] end
+	)
 end
 
 ---@param restrictions string?

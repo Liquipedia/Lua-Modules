@@ -662,7 +662,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		table.insert(opponent.extradata.substitutions, {
 			substitute = substitute,
 			player = player,
-			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
+			games = subbedGames and Array.parseCommaSeparatedString(subbedGames, ';') or nil,
 			reason = substitution['reason'],
 		})
 

@@ -111,18 +111,13 @@ function Import._getConfig(args, placements)
 		placementsToSkip = tonumber(args.placementsToSkip),
 		matchGroupsSpec = TournamentStructure.readMatchGroupsSpec(args)
 			or TournamentStructure.currentPageSpec(),
-		groupElimStatuses = Array.map(
-			mw.text.split(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS, ','),
-			String.trim
-		),
+		groupElimStatuses = Array.parseCommaSeparatedString(args.groupElimStatuses or DEFAULT_ELIMINATION_STATUS),
 		groupScoreDelimiter = args.groupScoreDelimiter or GROUPSCORE_DELIMITER,
 		allGroupsUseWdl = Logic.readBool(args.allGroupsUseWdl),
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
 		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
-		stageGroupElimStatuses = processStagesConfig('importLimit', function(val)
-			return Array.map(mw.text.split(val, ','), String.trim)
-		end),
+		stageGroupElimStatuses = processStagesConfig('importLimit', Array.parseCommaSeparatedString),
 	}
 end
 

@@ -83,7 +83,7 @@ function CustomMap._parseArgs(args)
 		local value = tonumber(args[key])
 		args[key] = value ~= 0 and value or nil
 	end)
-	args.types =  Array.map(mw.text.split((args.type or ManualMapTypes.MISC):upper(), ','), String.trim)
+	args.types =  Array.parseCommaSeparatedString((args.type or ManualMapTypes.MISC):upper())
 
 	--check for invalid type input
 	assert(
@@ -98,7 +98,7 @@ function CustomMap._parseArgs(args)
 		table.insert(args.types, 1, LADDER_MAP_TYPE_KEY)
 	end
 
-	args.players = tonumber(args.players) or Table.size(mw.text.split(args.positions))
+	args.players = tonumber(args.players) or string.len(args.positions)
 
 	return args
 end

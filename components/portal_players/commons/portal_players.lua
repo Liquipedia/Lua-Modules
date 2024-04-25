@@ -93,7 +93,7 @@ end
 ---@return {[string]: {players: table[]?, nonPlayers: table[]?}}
 function PortalPlayers:_getPlayers()
 	local games = String.isNotEmpty(self.args.game) and
-		Array.map(Array.map(mw.text.split(self.args.game, ',', true), String.trim), function (game)
+		Array.map(Array.parseCommaSeparatedString(self.args.game), function (game)
 			return '[[extradata_maingame::' .. game .. ']]'
 		end)
 	local gameConditions = games and ('(' .. table.concat(games, ' OR ') .. ')') or ''
@@ -146,14 +146,14 @@ end
 ---@param gameConditions string?
 ---@return string[], string[]
 function PortalPlayers._getCountries(regionsInput, countriesInput, gameConditions)
-	local regionConditions = String.isNotEmpty(regionsInput) and
-		Array.map(Array.map(mw.text.split(regionsInput --[[@as string]], ',', true), String.trim), function (region)
+	local regionConditions = regionsInput and
+		Array.map(Array.parseCommaSeparatedString(regionsInput), function (region)
 			return '[[region::' .. region .. ']]'
 		end) or {}
 
 	if String.isNotEmpty(countriesInput) then
 		---@cast countriesInput -nil
-		local countries = Array.map(mw.text.split(countriesInput, ',', true), String.trim)
+		local countries = Array.parseCommaSeparatedString(countriesInput)
 		if Table.isNotEmpty(countries) then
 			return countries, regionConditions
 		end

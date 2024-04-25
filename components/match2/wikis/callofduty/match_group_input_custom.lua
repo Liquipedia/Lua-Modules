@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -291,13 +292,7 @@ function matchFunctions.getMVP(match)
 	if not match.mvp then return {} end
 	local mvppoints = match.mvppoints or 1
 
-	-- Split the input
-	local players = mw.text.split(match.mvp, ',')
-
-	-- Trim the input
-	for index, player in pairs(players) do
-		players[index] = mw.text.trim(player)
-	end
+	local players = Array.parseCommaSeparatedString(match.mvp)
 
 	return {players = players, points = mvppoints}
 end

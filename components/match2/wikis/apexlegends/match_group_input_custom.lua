@@ -191,16 +191,9 @@ function MatchFunctions.parseSetting(match)
 	end))
 
 	-- Up/Down colors
-	local function splitAndTrim(s, pattern)
-		if not s then
-			return {}
-		end
-		return Array.map(mw.text.split(s, pattern), String.trim)
-	end
-
-	match.statusSettings = Array.flatMap(splitAndTrim(match.bg, ','), function (status)
-		local placements, color = unpack(splitAndTrim(status, '='))
-		local pStart, pEnd = unpack(splitAndTrim(placements, '-'))
+	match.statusSettings = Array.flatMap(Array.parseCommaSeparatedString(match.bg, ','), function (status)
+		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
+		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
 		return Array.map(Array.range(tonumber(pStart), tonumber(pEnd)), function()
 			return color
 		end)

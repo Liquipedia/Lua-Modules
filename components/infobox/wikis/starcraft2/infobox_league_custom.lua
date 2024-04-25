@@ -303,7 +303,7 @@ function CustomLeague:_getServer(args)
 		return nil
 	end
 	local server = args.server
-	local servers = mw.text.split(server, '/')
+	local servers = Array.parseCommaSeparatedString(server, '/')
 
 	local output = ''
 	for key, item in ipairs(servers or {}) do
@@ -311,7 +311,6 @@ function CustomLeague:_getServer(args)
 		if key ~= 1 then
 			output = output .. ' / '
 		end
-		item = mw.text.trim(item)
 		output = output .. (AllowedServers[string.lower(item)] or ('[[Category:Server Unknown|' .. item .. ']]'))
 	end
 	return output

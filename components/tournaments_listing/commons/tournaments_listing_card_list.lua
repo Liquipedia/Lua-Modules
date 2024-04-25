@@ -79,7 +79,7 @@ end
 function BaseTournamentsListing:_allowedPlacements()
 	local placeConditions = self.args.placeConditions or DEFAULT_ALLOWED_PLACES
 
-	return Array.map(mw.text.split(placeConditions, ','), String.trim)
+	return Array.parseCommaSeparatedString(placeConditions)
 end
 
 ---@return self

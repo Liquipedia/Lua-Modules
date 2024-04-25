@@ -98,12 +98,10 @@ function CustomPlayer.run(frame)
 
 	-- Uppercase first letter in status
 	if args.status then
-		args.status = mw.getContentLanguage():ucfirst(args.status)
+		args.status = String.upperCaseFirst(args.status)
 	end
 
-	args.roleList = args.roles and Array.map(mw.text.split(args.roles, ','), function(role)
-		return mw:getContentLanguage():ucfirst(mw.text.trim(role))
-	end) or {}
+	args.roleList = args.roles and Array.map(Array.parseCommaSeparatedString(args.roles), String.upperCaseFirst) or {}
 	args.gameList = player:_getGames()
 
 	local builtInfobox = player:createInfobox()
@@ -327,9 +325,9 @@ function CustomPlayer:_getGames()
 
 	-- Games entered manually
 	local manualGames = args.games and Array.map(
-		mw.text.split(args.games, ','),
+		Array.parseCommaSeparatedString(args.games),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualGames,
@@ -340,9 +338,9 @@ function CustomPlayer:_getGames()
 
 	-- Games entered manually as inactive
 	local manualInactiveGames = args.games_inactive and Array.map(
-		mw.text.split(args.games_inactive, ','),
+		Array.parseCommaSeparatedString(args.games_inactive),
 		function(game)
-			return {game = Game.name{game = mw.text.trim(game), useDefault = false}}
+			return {game = Game.name{game = game, useDefault = false}}
 		end
 	) or {}
 	Array.extendWith(games, Array.filter(manualInactiveGames,

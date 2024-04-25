@@ -135,7 +135,7 @@ Placement.additionalData = {
 			end
 
 			-- split the lastvsscore entry by '-', but allow negative scores
-			local rawScores = Array.map(mw.text.split(input, '-'), String.trim)
+			local rawScores = Array.parseCommaSeparatedString(input, '-')
 			local scores = {}
 			for index, rawScore in ipairs(rawScores) do
 				if Logic.isEmpty(rawScore) and Logic.isNotEmpty(rawScores[index + 1]) then

@@ -341,8 +341,8 @@ function matchFunctions.getMapVeto(match)
 		vetostart = mapVeto.vetostart,
 		format = mapVeto.format,
 	}
-	for index, vetoType in ipairs(mw.text.split(mapVeto.types or '', ',')) do
-		vetoType = mw.text.trim(vetoType):lower()
+	for index, vetoType in ipairs(Array.parseCommaSeparatedString(mapVeto.types)) do
+		vetoType = vetoType:lower()
 		if not Table.includes(ALLOWED_VETOES, vetoType) then
 			return nil -- Any invalid input will not store (ie hide) all vetoes.
 		end

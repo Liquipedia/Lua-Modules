@@ -61,7 +61,7 @@ function MediaList._parseArgs(args)
 	args.player1 = args.player1 or args.player
 
 	return {
-		types = args.type and Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower) or nil,
+		types = args.type and Array.map(Array.parseCommaSeparatedString(args.type), string.lower) or nil,
 		author = args.author and mw.ext.TeamLiquidIntegration.resolve_redirect(args.author) or nil,
 		subjects = Array.mapIndexes(function(subjectIndex)
 			local subject = args['subject' .. subjectIndex] or args['player' .. subjectIndex]

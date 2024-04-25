@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
@@ -91,8 +92,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.organizer then
 		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in ipairs(mw.text.split(args.organizer, ',', true)) do
-			organizer = mw.text.trim(organizer)
+		for _, organizer in ipairs(Array.parseCommaSeparatedString(args.organizer)) do
 			organizerConditions:add{
 				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
 				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
@@ -104,8 +104,7 @@ function TournamentsListingConditions.base(args)
 
 	if args.region then
 		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
-			region = mw.text.trim(region)
+		for _, region in ipairs(Array.parseCommaSeparatedString(args.region)) do
 			regionConditions:add{
 				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
 				ConditionNode(ColumnName('locations_region2'), Comparator.eq, region),

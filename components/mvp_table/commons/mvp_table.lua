@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Flags = require('Module:Flags')
@@ -272,9 +273,8 @@ function MvpTable._queryMatch1(conditions)
 	for _, match in pairs(queryData) do
 		local players, points = string.match((match.extradata or {}).mvp or '', '([%w%(%) _,%w-]+);(%d+)')
 		if players and points then
-			for _, player in pairs(mw.text.split(players, ',')) do
+			for _, player in pairs(Array.parseCommaSeparatedString(players)) do
 				if String.isNotEmpty(player) then
-					player = mw.text.trim(player)
 					local redirectResolvedPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(player)
 					local identifier = redirectResolvedPlayer:gsub(' ', '_')
 

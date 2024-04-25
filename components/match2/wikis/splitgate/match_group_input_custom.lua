@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -308,19 +309,19 @@ end
 function matchFunctions.getMapVeto(match)
 	if not match.vetoes then return {} end
 
-	local vetoes = mw.text.split(match.vetoes or '', ',')
+	local vetoes = Array.parseCommaSeparatedString(match.vetoes)
 	match.vetoes = nil
-	local vetoesBy = mw.text.split(match.vetoesBy or '', ',')
+	local vetoesBy = Array.parseCommaSeparatedString(match.vetoesBy)
 	match.vetoesBy = nil
 	local index = 1
-	local currentVetoMap = mw.text.trim(vetoes[1])
+	local currentVetoMap = vetoes[1]
 	local vetoData = {}
 
-	while not String.isEmpty(currentVetoMap) do
-		local by = tonumber(mw.text.trim(vetoesBy[index]) or '')
+	while not currentVetoMap do
+		local by = tonumber(vetoesBy[index])
 		vetoData[index] = { map = currentVetoMap, by = by }
 		index = index + 1
-		currentVetoMap = mw.text.trim(vetoes[index] or '')
+		currentVetoMap = vetoes[index]
 	end
 
 	return vetoData

@@ -173,7 +173,7 @@ function Person:createInfobox()
 			end}
 		}},
 		Cell{name = 'Alternate IDs', content = {
-				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
+				table.concat(Array.parseCommaSeparatedString(args.ids or ''), ', ')
 			}
 		},
 		Cell{name = 'Nicknames', content = {args.nicknames}},
