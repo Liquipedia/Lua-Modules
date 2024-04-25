@@ -45,11 +45,16 @@ local TROPHY_COLOR = {
 }
 
 local STATUS_ICONS = {
+	-- Normal Status
 	up = 'fas fa-chevron-double-up',
 	stayup = 'fas fa-chevron-up',
 	stay = 'fas fa-equals',
 	staydown = 'fas fa-chevron-down',
 	down = 'fas fa-skull',
+
+	-- Special Status for Match Point matches
+	trophy = 'fas fa-trophy',
+	matchpoint = 'fad fa-diamond',
 }
 
 local MATCH_STANDING_COLUMNS = {
@@ -790,7 +795,7 @@ end
 ---Determines whether the status column should be shown or not
 ---@param match table
 function CustomMatchSummary._showStatusColumn(match)
-	return CustomMatchSummary._isFinished(match) and Table.isNotEmpty(match.extradata.status)
+	return Table.isNotEmpty(match.extradata.status)
 end
 
 ---@param opponent standardOpponent
