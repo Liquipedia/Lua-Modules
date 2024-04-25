@@ -225,7 +225,7 @@ function MatchFunctions.getScoreFromMaps(match)
 
 	for index = 1, MAX_NUM_OPPONENTS do
 		if match['opponent' .. index] and not match['opponent' .. index].score then
-			match['opponent' .. index].score = newScores[index] or 0
+			match['opponent' .. index].score = (newScores[index] or 0) + (match['opponent' .. index].pointmodifier or 0)
 		end
 	end
 
