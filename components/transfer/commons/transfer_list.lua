@@ -6,17 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
 local TransferRow = Lua.import('Module:Transfer')
 
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
+local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
 	oder = 'desc',
@@ -30,7 +40,7 @@ local DEFAULT_VALUES = {
 ---@field shown boolean
 ---@field platformIcons boolean
 ---@field class string?
----@field showNoResultsMessage boolean
+---@field showMissingResultsMessage boolean
 ---@field iconModule string?
 ---@field iconFunction string?
 ---@field iconTransfers boolean?
@@ -39,22 +49,25 @@ local DEFAULT_VALUES = {
 ---@field conditions TransferListConditionConfig
 
 ---@class TransferListConditionConfig
----@field nationality string[]?
+---@field nationalities string[]?
 ---@field players string[]?
 ---@field roles1 string[]?
 ---@field roles2 string[]?
 ---@field teams string[]?
 ---@field startDate string?
 ---@field endDate string?
+---@field date string?
 ---@field tournament string?
----@field fromTeam string?
----@field toTeam string?
----@field position string?
+---@field positions string?
 ---@field platform string?
 ---@field onlyNotableTransfers boolean
 
 ---@class TransferList: BaseClass
 ---@field config TransferListConfig
+---@field groupedTransfers transfer[][]
+---@field teamConditions ConditionTree?
+---@field baseConditions ConditionTree
+---@field conditions string
 local TransferList = Class.new(
 	---@param frame Frame
 	---@return self
@@ -67,21 +80,62 @@ local TransferList = Class.new(
 ---@param frame Frame
 ---@return Html
 function TransferList.run(frame)
-	return TransferList(frame):query():create()
+	return TransferList(frame):fetch():create()
 end
 
 ---@param args table
----@return TransferListConfig
+---@return self
 function TransferList:parseArgs(args)
 	local players = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.players)) or {args.player} --[[@as string[] ]]
 	local roles = Array.parseCommaSeparatedString(args.role)
 
+	local sortOrder = args.order or DEFAULT_VALUES.order
+	local objectNameSortOrder = 'asc'
+	if sortOrder:lower() == 'asc' then
+		objectNameSortOrder = 'desc'
+	end
 
-	local teams = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.teams)) --[[@as string[]?]]
-	if not teams then
+	return {
+		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
+		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
+			', objectname ' .. objectNameSortOrder,
+		title = Logic.nilIfEmpty(args.title),
+		shown = Logic.readBool(args.shown),
+		platformIcons = Logic.readBool(args.platformIcons),
+		class = Logic.nilIfEmpty(args.class),
+		showMissingResultsMessage = Logic.readBool(args.form),
+		iconModule = Logic.nilIfEmpty(args.iconModule),
+		iconFunction = Logic.nilIfEmpty(args.iconFunction),
+		iconTransfers = Logic.readBoolOrNil(args.iconTransfers),
+		refType = args.refType,
+		displayTeamName = Logic.nilOr(Logic.readBoolOrNil(args.displayTeamName), Logic.readBoolOrNil(args.showteamname)),
+		conditions = {
+			nationalities = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
+			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
+			startDate = Logic.nilIfEmpty(args.sdate),
+			endDate = Logic.nilIfEmpty(args.edate),
+			date = Logic.nilIfEmpty(args.date),
+			roles1 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role1))),
+			roles2 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role2))),
+			positions = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.position)),
+			platform = Logic.nilIfEmpty(args.platform),
+			onlyNotableTransfers = Logic.readBool(args.onlyNotableTransfers),
+			teams = Logic.nilIfEmpty(self:_getTeams(args)),
+		}
+	}
+end
+
+---@param args table
+---@return string[]
+function TransferList:_getTeams(args)
+	local teams = Array.parseCommaSeparatedString(args.teams)
+	if Logic.isEmpty(teams) then
 		teams = Array.extractValues(Table.filterByKey(args, function(key)
 			return key:find('^team%d*$') ~= nil
 		end))
+	end
+	if Logic.isEmpty(teams) then
+		teams = self:_getTeamsFromTournament(args.page) or {}
 	end
 
 	local teamList = {}
@@ -92,38 +146,293 @@ function TransferList:parseArgs(args)
 		Array.extendWith(teamList, Team.queryHistoricalNames(team) or {team})
 	end)
 
-	return {
-		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
-		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) .. ', objectname asc',
-		title = Logic.nilIfEmpty(args.title),
-		shown = Logic.readBool(args.shown),
-		platformIcons = Logic.readBool(args.platformIcons),
-		class = Logic.nilIfEmpty(args.class),
-		showNoResultsMessage = Logic.readBool(args.form),
-		iconModule = Logic.nilIfEmpty(args.iconModule),
-		iconFunction = Logic.nilIfEmpty(args.iconFunction),
-		iconTransfers = Logic.readBoolOrNil(args.iconTransfers),
-		refType = args.refType,
-		displayTeamName = Logic.nilOr(Logic.readBoolOrNil(args.displayTeamName), Logic.readBoolOrNil(args.showteamname)),
-		conditions = {
-			nationality = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
-			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
-			startDate = Logic.emptyOr(args.sdate, args.date),
-			endDate = Logic.emptyOr(args.edate, args.date),
-			tournament = Logic.nilIfEmpty((args.page or ''):gsub(' ', '_')),
-			fromTeam = Logic.nilIfEmpty(args.fromteam),
-			toTeam = Logic.nilIfEmpty(args.toteam),
-			roles1 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role1))),
-			roles2 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role2))),
-			position = Logic.nilIfEmpty(args.position),
-			platform = Logic.nilIfEmpty(args.platform),
-			onlyNotableTransfers = Logic.readBool(args.onlyNotableTransfers),
-			teams = Logic.nilIfEmpty(teamList),
-		}
-	}
+	return teamList
 end
 
+---@param tournamentPage string?
+---@return string[]?
+function TransferList:_getTeamsFromTournament(tournamentPage)
+	if Logic.isEmpty(tournamentPage) then return end
+	---@cast tournamentPage -nil
+	tournamentPage = tournamentPage:gsub(' ', '_')
+
+	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. tournamentPage .. ']] AND [[participant::!Tbd]] AND [[participant::!TBD]] AND [[mode::team]]',
+		limit = 500,
+		query = 'opponentname'
+	})
+
+	if type(placements[1]) ~= 'table' then return nil end
+
+	return Array.map(placements, Operator.property('opponentname'))
+end
+
+---@return self
+function TransferList:fetch()
+	self.conditions = self:_buildConditions()
+	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = self.conditions,
+		limit = self.config.limit,
+		order = self.config.sortOrder,
+		groupby = 'date desc, toteam desc, fromteam desc, role1 desc',--role2 desc
+	})
+
+	local groupedData = {}
+	Array.forEach(queryData, function(transfer)
+		local transfers = mw.ext.LiquipediaDB.lpdb('transfer', {
+			conditions = self:_buildConditions{
+				date = transfer.date,
+				fromTeam = transfer.fromteam or '',
+				toTeam = transfer.toteam or '',
+				roles1 = {transfer.role1},
+			},
+			limit = self.config.limit + 10,
+			order = self.config.sortOrder,
+		})
+		local currentGroup
+		local currentRole2
+		Array.forEach(transfers, function(transf)
+			if currentRole2 ~= transf.role2 or Table.includes(SPECIAL_ROLES, (transf.role2 or ''):lower()) then
+				currentRole2 = transf.role2
+				Array.appendWith(groupedData, currentGroup)
+				currentGroup = {}
+			end
+			table.insert(currentGroup, transf)
+		end)
+		Array.appendWith(groupedData, currentGroup)
+	end)
+
+	self.groupedTransfers = groupedData
+
+	return self
+end
+
+---@param config {date: string, fromTeam: string, toTeam: string, roles1: string[]}?
+---@return string
+function TransferList:_buildConditions(config)
+	config = config or {}
+
+	local conditions = self:_buildBaseConditions()
+		:add(self:_buildDateCondition(config.date))
+		:add(self:_buildTeamConditions(config.toTeam, config.fromTeam))
+		:add(self:_buildOrConditions('roles1', 'role1', config.roles1))
+
+	return conditions:toString()
+end
+
+---@return ConditionTree
+function TransferList:_buildBaseConditions()
+	if self.baseConditions then return self.baseConditions end
+
+	local config = self.config.conditions
+
+	self.baseConditions = ConditionTree(BooleanOperator.all)
+		:add(self:_buildOrConditions('players', 'player'))
+		:add(self:_buildOrConditions('nationalities', 'nationality'))
+		:add(self:_buildOrConditions('roles2', 'role2'))
+		:add(self:_buildOrConditions('extradata_position', 'positions'))
+
+	if config.platform then
+		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
+	end
+
+	if config.onlyNotableTransfers then
+		self.baseConditions:add{ConditionNode(ColumnName('extradata_notable'), Comparator.eq, '1')}
+	end
+
+	return self.baseConditions
+end
+
+---@param date string?
+---@return ConditionTree?
+function TransferList:_buildDateCondition(date)
+	local config = self.config.conditions
+	local dateConditions = ConditionTree(BooleanOperator.any)
+
+	date = date or config.date
+	if date then
+		return dateConditions:add{ConditionNode(ColumnName('date'), Comparator.eq, date)}
+	end
+
+	if not config.startDate and not config.endDate then
+		return nil
+	end
+
+	if config.startDate then
+		dateConditions:add{
+			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
+			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
+		}
+	else
+		dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
+	end
+
+	if config.endDate then
+		local endDate = config.endDate .. ' 23:59:59'
+		dateConditions:add{
+			ConditionNode(ColumnName('date'), Comparator.lt, endDate),
+			ConditionNode(ColumnName('date'), Comparator.eq, endDate),
+		}
+	end
+
+	return dateConditions
+end
+
+---@param toTeam string?
+---@param fromTeam string?
+---@return ConditionTree?
+function TransferList:_buildTeamConditions(toTeam, fromTeam)
+	if toTeam then
+		---if toTeam is set so is fromTeam
+		---@cast fromTeam string
+		return ConditionTree(BooleanOperator.all)
+			:add{ConditionNode(ColumnName('fromteam'), Comparator.eq, fromTeam)}
+			:add{ConditionNode(ColumnName('toteam'), Comparator.eq, toTeam)}
+	end
+
+	if self.teamConditions then return self.teamConditions end
+
+	self.teamConditions = ConditionTree(BooleanOperator.any)
+		:add(TransferList:_buildOrConditions('teams', 'fromteam'))
+		:add(TransferList:_buildOrConditions('teams', 'toteam'))
+
+	return self.teamConditions
+end
+
+---@param configField string
+---@param lpdbField string
+---@param data string[]?
+---@return ConditionTree?
+function TransferList:_buildOrConditions(configField, lpdbField, data)
+	data = data or self.config.conditions[configField]
+	if not data then return nil end
+	return ConditionTree(BooleanOperator.any)
+		:add(Array.map(data, function(item)
+			return ConditionNode(ColumnName(lpdbField), Comparator.eq, item)
+		end))
+end
+
+---@return Html|string?
+function TransferList:create()
+	local config = self.config
+	if config.showMissingResultsMessage and Logic.isDeepEmpty(self.groupedTransfers) then
+		return mw.html.create('pre'):wikitext('No results for: ' .. mw.text.nowiki(self.conditions))
+	elseif Logic.isDeepEmpty(self.groupedTransfers) then
+		return
+	end
+
+	local display = mw.html.create('div')
+		:addClass('divTable mainpage-transfer Ref')
+		:css('text-align', 'center')
+		:css('width', '100%')
+		:node(self:_buildHeader())
+
+	Array.forEach(self.groupedTransfers, function(rowData)
+		display:node(self:_buildRow(rowData))
+	end)
+
+	if not config.title then
+		-- for whatever reason currently class is only applied in this case ...
+		if config.class then
+			display:addClass(config.class)
+		end
+		return mw.html.create('div')
+			:node(display)
+	end
+
+	return mw.html.create('table')
+		:css('margin-top','0px')
+		:addClass('wikitable OffSeasonOverview')
+		:addClass(config.shown and 'collapsible collapsed' or nil)
+		:tag('tr'):tag('th'):attr('colspan', 7):wikitext(config.title):allDone()
+		:tag('tr'):tag('td'):css('padding', '0'):node(display):allDone()
+end
+
+---@return Html
+function TransferList:_buildHeader()
+	local headerRow = mw.html.create('div')
+		:addClass('divHeaderRow')
+		:tag('div'):addClass('divCell Date'):wikitext('Date'):allDone()
+
+	if self.config.platformIcons then
+		headerRow:tag('div'):addClass('divCell GameIcon')
+	end
+
+	return headerRow
+		:tag('div'):addClass('divCell Name'):wikitext('Player'):done()
+		:tag('div'):addClass('divCell Team OldTeam'):wikitext('Old'):done()
+		:tag('div'):addClass('divCell Icon'):done()
+		:tag('div'):addClass('divCell Team NewTeam'):wikitext('New'):done()
+		:tag('div'):addClass('divCell Empty')
+			:tag('span')
+				:addClass('mobile-hide')
+				:wikitext(Abbreviation.make('Ref', 'Reference'))
+		:allDone()
+end
+
+---@param transfers transfer[]
+---@return Html?
+function TransferList:_buildRow(transfers)
+	local firstTransfer = transfers[1]
+	if not firstTransfer then
+		return
+	end
+
+	local config = self.config
+
+	local showRole = (firstTransfer.role1 ~= 'Substitute' and firstTransfer.role2 ~= 'Substitute') or
 
 
+
+	and rowOfTransfers[1].extradata.icontype and rowOfTransfers[1].extradata.icontype == 'Substitute' and (obj.team1 == nil or	obj.team2 == nil)
+
+	local transferRowArgs = {
+		platformIcons = config.platformIcons,
+		iconParam = 'pos',
+		iconModule = config.iconModule,
+		iconFunction = config.iconFunction,
+		iconTransfers = config.iconTransfers,
+		date = firstTransfer.date,
+		date_disp = Logic.nilIfEmpty(firstTransfer.extradata.displaydate)
+			or mw.getContentLanguage():formatDate('Y-m-d', firstTransfer.date),
+		platform = firstTransfer.extradata.platform,
+		name = firstTransfer.displayname,
+		link = firstTransfer.player,
+		flag = Logic.nilIfEmpty(firstTransfer.nationality),
+		pos = Logic.nilIfEmpty(firstTransfer.extradata.position),
+		posIcon = Logic.nilIfEmpty(firstTransfer.extradata.icon),
+		posIcon_2 = Logic.nilIfEmpty(firstTransfer.extradata.icon2),
+		team1 = Logic.nilIfEmpty(firstTransfer.fromteam),
+		team1_2 = Logic.nilIfEmpty(firstTransfer.extradata.fromteamsec),
+		team2 = Logic.nilIfEmpty(firstTransfer.toteam),
+		team2_2 = Logic.nilIfEmpty(firstTransfer.extradata.toteamsec),
+		role1 = Logic.nilIfEmpty(firstTransfer.role1),
+		role1_2 = Logic.nilIfEmpty(firstTransfer.extradata.role1sec),
+		role2 = Logic.nilIfEmpty(firstTransfer.role2),
+		role2_2 = Logic.nilIfEmpty(firstTransfer.extradata.role2sec),
+	}
+
+	local references = {}
+
+	Array.forEach(transfers, function(transfer)
+		for _, reference in Table.iter.pairsByPrefix(transfer.reference or {}, 'reference') do
+			if Array.all(references, function(ref) return ref ~= reference end) then
+				table.insert(references, reference)
+			end
+		end
+		todo: add other players
+	end)
+
+	local refTable
+	if config.refType == 'table' then
+		refTable = Table.map(references, function(key, value)
+			return 'reference' .. key, value
+		end)
+	else
+		transferRowArgs.ref = table.concat(references)
+	end
+
+
+end
 
 return TransferList

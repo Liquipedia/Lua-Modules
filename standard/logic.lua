@@ -70,6 +70,13 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---@param val table|string?
+---@return table|string?
+function Logic.nilIfEmpty(val)
+	return Logic.isNotEmpty(val) and val or nil
+end
+
+
 ---Checks if a given object (table|string|nil) is deep empty
 ---i.e. is empty itself or only contains objects that are deep empty
 ---@param val table|string|nil
