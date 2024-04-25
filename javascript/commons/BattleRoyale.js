@@ -46,16 +46,16 @@ liquipedia.battleRoyale = {
 		return el.scrollWidth > el.offsetWidth;
 	},
 
-	handleWheelEvent: function(e, table) {
+	handleWheelEvent: function( e, table ) {
 		if ( this.hasVisibleSideScrollButtons( table ) ) {
 			const delta = e.deltaY || e.detail || e.wheelDelta;
 			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
 
-			const gameContainer = table.querySelector('[data-js-battle-royale="game-container"]');
+			const gameContainer = table.querySelector( '[data-js-battle-royale="game-container"]' );
 
 			if ( dir === this.DIRECTION_RIGHT && (
-				gameContainer.scrollWidth <= gameContainer.scrollLeft + gameContainer.offsetWidth )
-				|| dir === this.DIRECTION_LEFT && gameContainer.scrollLeft === 0
+				gameContainer.scrollWidth <= gameContainer.scrollLeft + gameContainer.offsetWidth ) ||
+				dir === this.DIRECTION_LEFT && gameContainer.scrollLeft === 0
 			) {
 				// Resume default browser scroll behavior if scrolling down and the table is already at the far right
 				// or scrolling up and the table is at the far left
