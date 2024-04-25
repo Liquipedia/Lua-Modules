@@ -809,7 +809,7 @@ end
 ---Determines whether the status column should be shown or not
 ---@param match table
 function CustomMatchSummary._showStatusColumn(match)
-	return CustomMatchSummary._isFinished(match) and Table.isNotEmpty(match.extradata.status)
+	return Table.isNotEmpty(match.extradata.status)
 end
 
 ---@param opponent standardOpponent
