@@ -17,6 +17,9 @@ local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 local TransferRow = Lua.import('Module:Transfer')
 
 local Condition = require('Module:Condition')
@@ -157,7 +160,8 @@ function TransferList:_getTeamsFromTournament(tournamentPage)
 	tournamentPage = tournamentPage:gsub(' ', '_')
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = '[[pagename::' .. tournamentPage .. ']] AND [[participant::!Tbd]] AND [[participant::!TBD]] AND [[mode::team]]',
+		conditions = '[[pagename::' .. tournamentPage .. ']] AND '
+			.. '[[opponentname::!Tbd]] AND [[opponentname::!TBD]] AND [[opponenttype::' .. Opponent.team .. ']]',
 		limit = 500,
 		query = 'opponentname'
 	})
