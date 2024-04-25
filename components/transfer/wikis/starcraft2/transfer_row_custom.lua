@@ -33,7 +33,6 @@ function CustomTransferRow.run(frame)
 		local race = args['race' .. playerIndex]
 		local flag = args['flag' .. playerIndex]
 		if not race or not flag then
-			local link = args['link' .. playerIndex] or name
 			local player = PlayerExt.syncPlayer{
 				displayName = name,
 				flag = flag,

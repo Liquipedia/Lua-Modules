@@ -66,7 +66,6 @@ function TransferRow:store()
 	if not self.config.storage then	return self end
 
 	Array.forEach(self.transfers, function(transfer, transferIndex)
-		local date = transfer.date
 		mw.ext.LiquipediaDB.lpdb_transfer(TransferRow._objectName(transfer), Json.stringifySubTables(transfer))
 	end)
 
