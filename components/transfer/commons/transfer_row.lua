@@ -63,7 +63,7 @@ end
 
 ---@return self
 function TransferRow:store()
-	if not self.config.storage then	end
+	if not self.config.storage then	return self end
 
 	Array.forEach(self.transfers, function(transfer, transferIndex)
 		local date = transfer.date
