@@ -20,7 +20,7 @@ local Team = require('Module:Team')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local TransferRow = Lua.import('Module:Transfer')
+local TransferRow = Lua.import('Module:Transfer/Custom')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -77,6 +77,8 @@ local TransferList = Class.new(
 	function(self, frame)
 		local args = Arguments.getArgs(frame)
 		self.config = self:parseArgs(args)
+
+		return self
 	end
 )
 
@@ -388,6 +390,7 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.extradata.icontype ~= 'Substitute' or
 		(Logic.isEmpty(firstTransfer.fromteam) and Logic.isEmpty(firstTransfer.toteam))
 
+	--[[todo: remove once transferRow module is done (nice for double checking stuff)
 	local transferRowArgs = {
 		platformIcons = config.platformIcons,
 		iconParam = 'pos',
@@ -440,8 +443,16 @@ function TransferList:_buildRow(transfers)
 	else
 		transferRowArgs.ref = table.concat(references)
 	end
+	]]
 
-	return TransferRow.display(transferRowArgs)
+	return TransferRow.displayRow(transfers, {
+		platformIcons = config.platformIcons,
+		iconModule = config.iconModule,
+		iconFunction = config.iconFunction,
+		iconTransfers = config.iconTransfers,
+		showRole = showRole,
+		refType = config.refType,
+	})
 end
 
 return TransferList
