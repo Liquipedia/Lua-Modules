@@ -46,25 +46,37 @@ liquipedia.battleRoyale = {
 		return el.scrollWidth > el.offsetWidth;
 	},
 
-	implementScrollWheelEvent: function() {
-		const handleWheelEvent = ( e, table ) => {
-			if ( this.hasVisibleSideScrollButtons( table ) ) {
-				e.preventDefault();
-				const delta = e.deltaY || e.detail || e.wheelDelta;
-				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
-				this.handleTableSideScroll( table, dir );
-			}
-		};
+	handleWheelEvent: function(e, table) {
+		if ( this.hasVisibleSideScrollButtons( table ) ) {
+			const delta = e.deltaY || e.detail || e.wheelDelta;
+			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
 
+			const gameContainer = table.querySelector('[data-js-battle-royale="game-container"]');
+
+			if ( dir === this.DIRECTION_RIGHT && (
+				gameContainer.scrollWidth <= gameContainer.scrollLeft + gameContainer.offsetWidth )
+				|| dir === this.DIRECTION_LEFT && gameContainer.scrollLeft === 0
+			) {
+				// Resume default browser scroll behavior if scrolling down and the table is already at the far right
+				// or scrolling up and the table is at the far left
+				return;
+			}
+
+			e.preventDefault();
+			this.handleTableSideScroll( table, dir );
+		}
+	},
+
+	implementScrollWheelEvent: function() {
 		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
 			const table = el.closest( '[data-js-battle-royale="table"]' );
 			const gameContainerElements = table.querySelectorAll(
 				'[data-js-battle-royale="row"] > [data-js-battle-royale="game-container"]'
 			);
 
-			el.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
+			el.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
 			gameContainerElements.forEach( ( gameContainer ) => {
-				gameContainer.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
+				gameContainer.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
 			} );
 		} );
 	},
