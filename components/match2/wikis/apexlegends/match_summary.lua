@@ -540,7 +540,7 @@ function CustomMatchSummary._createMatchStandings(match)
 			:addClass('row--header')
 			:attr('data-js-battle-royale', 'header-row')
 
-	if CustomMatchSummary._isFinished(match) then
+	if CustomMatchSummary._showStatusColumn(match) then
 		header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass('cell--status')
@@ -621,7 +621,7 @@ function CustomMatchSummary._createMatchStandings(match)
 	Array.forEach(match.opponents, function (opponentMatch, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
-		if CustomMatchSummary._isFinished(match) then
+		if CustomMatchSummary._showStatusColumn(match) then
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
@@ -799,6 +799,12 @@ function CustomMatchSummary._getStatusIcon(status)
 	if STATUS_ICONS[status] then
 		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
 	end
+end
+
+---Determines whether the status column should be shown or not
+---@param match table
+function CustomMatchSummary._showStatusColumn(match)
+	return CustomMatchSummary._isFinished(match) and Table.isNotEmpty(match.extradata.status)
 end
 
 ---@param opponent standardOpponent
