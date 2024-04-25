@@ -381,10 +381,8 @@ function TransferList:_buildRow(transfers)
 	local config = self.config
 
 	local showRole = (firstTransfer.role1 ~= 'Substitute' and firstTransfer.role2 ~= 'Substitute') or
-
-
-
-	and rowOfTransfers[1].extradata.icontype and rowOfTransfers[1].extradata.icontype == 'Substitute' and (obj.team1 == nil or	obj.team2 == nil)
+		firstTransfer.extradata.icontype ~= 'Substitute' or
+		(Logic.isEmpty(firstTransfer.fromteam) and Logic.isEmpty(firstTransfer.toteam))
 
 	local transferRowArgs = {
 		platformIcons = config.platformIcons,
@@ -406,33 +404,40 @@ function TransferList:_buildRow(transfers)
 		team1_2 = Logic.nilIfEmpty(firstTransfer.extradata.fromteamsec),
 		team2 = Logic.nilIfEmpty(firstTransfer.toteam),
 		team2_2 = Logic.nilIfEmpty(firstTransfer.extradata.toteamsec),
-		role1 = Logic.nilIfEmpty(firstTransfer.role1),
+		role1 = showRole and Logic.nilIfEmpty(firstTransfer.role1) or nil,
 		role1_2 = Logic.nilIfEmpty(firstTransfer.extradata.role1sec),
-		role2 = Logic.nilIfEmpty(firstTransfer.role2),
+		role2 = showRole and Logic.nilIfEmpty(firstTransfer.role2) or nil,
 		role2_2 = Logic.nilIfEmpty(firstTransfer.extradata.role2sec),
 	}
 
 	local references = {}
 
-	Array.forEach(transfers, function(transfer)
+	Array.forEach(transfers, function(transfer, index)
 		for _, reference in Table.iter.pairsByPrefix(transfer.reference or {}, 'reference') do
 			if Array.all(references, function(ref) return ref ~= reference end) then
 				table.insert(references, reference)
 			end
 		end
-		todo: add other players
+		if index == 1 then return end
+		Table.merge(transferRowArgs, {
+			['name' .. index] = transfer.extradata.displayname,
+			['link' .. index] = transfer.player,
+			['flag' .. index] = transfer.nationality,
+			['pos' .. index] = Logic.nilIfEmpty(transfer.extradata.position),
+			['posIcon' .. index] = Logic.nilIfEmpty(transfer.extradata.icon),
+			['posIcon' .. index .. '_2'] = Logic.nilIfEmpty(transfer.extradata.icon2),
+		})
 	end)
 
-	local refTable
 	if config.refType == 'table' then
-		refTable = Table.map(references, function(key, value)
+		transferRowArgs.refTable = Table.map(references, function(key, value)
 			return 'reference' .. key, value
 		end)
 	else
 		transferRowArgs.ref = table.concat(references)
 	end
 
-
+	return TransferRow.display(transferRowArgs)
 end
 
 return TransferList
