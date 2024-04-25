@@ -45,11 +45,16 @@ local TROPHY_COLOR = {
 }
 
 local STATUS_ICONS = {
+	-- Normal Status
 	up = 'fas fa-chevron-double-up',
 	stayup = 'fas fa-chevron-up',
 	stay = 'fas fa-equals',
 	staydown = 'fas fa-chevron-down',
 	down = 'fas fa-skull',
+
+	-- Special Status for Match Point matches
+	trophy = 'fas fa-trophy',
+	matchpoint = 'fad fa-diamond',
 }
 
 local MATCH_STANDING_COLUMNS = {
