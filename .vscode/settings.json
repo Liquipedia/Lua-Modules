@@ -1,7 +1,14 @@
 {
 	"files.associations" : {
-		".busted": "lua"
+		".busted": "lua",
+		".luacov": "lua"
 	},
+	"stylelint.validate": [
+		"css",
+		"postcss",
+		"less",
+		"scss"
+	],
 	"css.validate": false,
 	"less.validate": false,
 	"scss.validate": false

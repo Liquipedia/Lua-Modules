@@ -27,7 +27,8 @@ local Opponent = OpponentLibrary.Opponent
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
 local CONVERT_STATUS_INPUT = {W = 'W', FF = 'FF', L = 'L', DQ = 'DQ', ['-'] = 'L'}
-local DEFAULT_LOSS_STATUSES = {'FF', 'L', 'DQ'}
+local DEFAULT_WIN_STATUS = 'W'
+local SCORE_STATUS = 'S'
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local LINKS_KEYS = {'preview', 'preview2', 'interview', 'interview2', 'review', 'recap'}
@@ -203,7 +204,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 					opponent.score = -1
 				end
 			else
-				opponent.status = 'S'
+				opponent.status = SCORE_STATUS
 				opponent.score = tonumber(opponent.score) or
 					tonumber(opponent.sumscore) or -1
 				if opponent.score > bestof / 2 then
@@ -514,13 +515,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- handle subgroup stuff if team match
 	if match.isTeamMatch then
-		map.subgroup = tonumber(map.subgroup)
-		if map.subgroup then
-			subGroupIndex = map.subgroup
-		else
-			subGroupIndex = subGroupIndex + 1
-			map.subgroup = subGroupIndex
-		end
+		map.subgroup = tonumber(map.subgroup) or (subGroupIndex + 1)
+		subGroupIndex = map.subgroup
 	end
 
 	match['map' .. mapIndex] = map
@@ -542,7 +538,7 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 			hasManualScores = true
 			score = CONVERT_STATUS_INPUT[score] or score
 			if Logic.isNumeric(score) then
-				obj.status = 'S'
+				obj.status = SCORE_STATUS
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
 				obj.status = score
@@ -555,28 +551,22 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		end
 	end
 
-	local winnerInput = tonumber(map.winner)
-	map.winner = winnerInput
+	local winner = tonumber(map.winner)
 	if Logic.isNotEmpty(map.walkover) then
 		local walkoverInput = tonumber(map.walkover)
 		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
-			map.winner = walkoverInput
+			winner = walkoverInput
 		end
 		map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
 		map.scores = {-1, -1}
 		map.resulttype = 'default'
+		map.winner = winner
 
 		return map
 	end
 
 	if hasManualScores then
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, CustomMatchGroupInput._placementSortFunction) do
-			if not tonumber(map.winner) then
-				map.winner = scoreIndex
-			else
-				break
-			end
-		end
+		map.winner = winner or CustomMatchGroupInput._getWinner(indexedScores)
 
 		return map
 	end
@@ -584,16 +574,27 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {-1, -1}
 		map.resulttype = 'np'
-	elseif winnerInput == 1 then
+	elseif winner == 1 then
 		map.scores = {1, 0}
-	elseif winnerInput == 2 then
+	elseif winner == 2 then
 		map.scores = {0, 1}
-	elseif winnerInput == 0 or map.winner == 'draw' then
+	elseif winner == 0 or map.winner == 'draw' then
+		winner = 0
 		map.scores = {0.5, 0.5}
 		map.resulttype = 'draw'
 	end
 
+	map.winner = winner
+
 	return map
+end
+
+---@param indexedScores table
+---@return integer?
+function CustomMatchGroupInput._getWinner(indexedScores)
+	table.sort(indexedScores, CustomMatchGroupInput._mapWinnerSortFunction)
+
+	return indexedScores[1].index
 end
 
 ---@param map table
@@ -772,27 +773,23 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 	end)
 end
 
--- function to sort out winner/placements
----@param tbl table
----@param key1 string
----@param key2 string
+
+---@param opponent1 table
+---@param opponent2 table
 ---@return boolean
-function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
-	local opponent1 = tbl[key1]
-	local opponent2 = tbl[key2]
-	local opponent1Norm = opponent1.status == 'S'
-	local opponent2Norm = opponent2.status == 'S'
-	if opponent1Norm then
-		if opponent2Norm then
-			return tonumber(opponent1.score) > tonumber(opponent2.score)
-		else return true end
-	else
-		if opponent2Norm then return false
-		elseif opponent1.status == 'W' then return true
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent1.status) then return false
-		elseif opponent2.status == 'W' then return false
-		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
-		else return true end
+function CustomMatchGroupInput._mapWinnerSortFunction(opponent1, opponent2)
+	local opponent1Norm = opponent1.status == SCORE_STATUS
+	local opponent2Norm = opponent2.status == SCORE_STATUS
+
+	if opponent1Norm and opponent2Norm then
+		return tonumber(opponent1.score) > tonumber(opponent2.score)
+	elseif opponent1Norm then return true
+	elseif opponent2Norm then return false
+	elseif opponent1.status == DEFAULT_WIN_STATUS then return true
+	elseif Table.includes(ALLOWED_STATUSES, opponent1.status) then return false
+	elseif opponent2.status == DEFAULT_WIN_STATUS then return false
+	elseif Table.includes(ALLOWED_STATUSES, opponent2.status) then return true
+	else return true
 	end
 end
 

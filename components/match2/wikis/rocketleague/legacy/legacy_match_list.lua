@@ -11,7 +11,7 @@ local LegacyMatchList = {}
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local getArgs = require('Module:Arguments').getArgs
+local Arguments = require('Module:Arguments')
 local json = require('Module:Json')
 
 local MatchSubobjects = Lua.import('Module:Match/Subobjects')
@@ -21,7 +21,7 @@ local _MAX_NUMBER_OF_MATCHES = 64
 local _MAX_NUMBER_OF_MAPS = 15
 
 function LegacyMatchList.convertMatchList(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 
 	--switch matches (and headers) to the correct parameters for the new system
 	for index = 1, _MAX_NUMBER_OF_MATCHES do
@@ -59,7 +59,7 @@ function LegacyMatchList.convertMatchList(frame)
 end
 
 function LegacyMatchList.convertMatchMaps(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 	local details = json.parseIfString(args.details or '{}')
 
 	--process maps
@@ -118,7 +118,7 @@ function LegacyMatchList.convertMatchMaps(frame)
 end
 
 function LegacyMatchList.convertSwissMatchMaps(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 	local details = json.parseIfString(args.details or '{}')
 
 	--process maps
@@ -215,6 +215,8 @@ function LegacyMatchList.processMaps(args, details)
 				t1goals = details['map' .. index .. 't1goals'],
 				t2goals = details['map' .. index .. 't2goals'],
 			}
+			---can not be nil due to details['map' .. index] being set
+			---@cast map -nil
 			args['map' .. index] = map
 			if map.winner == '1' then
 				t1wins = t1wins + 1

@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
-local CustomLeague = Lua.import('Module:Infobox/League/Custom')
+local CustomLeague = Lua.import('Module:Infobox/League/Custom') ---@type RocketleagueLeagueInfobox
 local CustomHiddenDataBox = {}
 
 ---@param args table

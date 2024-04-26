@@ -110,6 +110,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		participantData.cards = participantData.cards or {}
 		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 			return participantData.cards[idx] or DEFAULT_CARD end)
+		cards.tower = participantData.cards.tower
 		table.insert(cardData[opponentIndex], cards)
 	end
 
@@ -247,7 +248,7 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 	return players
 end
 
----@param players any
+---@param players table
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
 ---@return table
@@ -375,6 +376,14 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
 	local wrapper = mw.html.create('div')
+		:css('flex-basis', '1px')
+		:css('display', 'inline-flex')
+		:css('flex-direction', (flip and 'row' or 'row-reverse'))
+		:css('align-items', 'center')
+
+	local wrapperCards = mw.html.create('div')
+		:css('display', 'flex')
+		:css('flex-direction', 'column')
 
 	for _, cardData in ipairs(cardDataSets) do
 		local cardDisplays = {}
@@ -382,7 +391,6 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 			table.insert(cardDisplays, mw.html.create('div')
 				:addClass('brkts-popup-side-color-' .. color)
 				:addClass('brkts-champion-icon')
-				:css('float', flip and 'right' or 'left')
 				:node(CharacterIcon.Icon{
 					character = card,
 					date = date
@@ -391,19 +399,32 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 		end
 
 		local display
-
 		for cardIndex, card in ipairs(cardDisplays) do
 			-- break the card rows into fragments of 4 cards each
 			if cardIndex % 4 == 1 then
-				wrapper:node(display)
+				wrapperCards:node(display)
 				display = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
+					:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'left' or 'right'))
 			end
 
 			display:node(card)
 		end
+		wrapperCards:node(display)
+		wrapper:node(wrapperCards)
 
-		wrapper:node(display)
+		if Logic.isNotEmpty(cardData.tower) then
+			local towerCardDisplay = mw.html.create('div')
+					:addClass('brkts-popup-body-element-thumbs')
+					:tag('div')
+						:addClass('brkts-popup-side-color-' .. color)
+						:addClass('brkts-champion-icon')
+						:node(CharacterIcon.Icon{
+							character = cardData.tower,
+							date = date
+						})
+			wrapper:node(towerCardDisplay)
+		end
 	end
 
 	return wrapper

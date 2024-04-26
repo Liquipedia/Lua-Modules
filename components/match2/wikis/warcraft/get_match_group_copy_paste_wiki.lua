@@ -98,7 +98,7 @@ end
 ---@return string
 ---@diagnostic disable-next-line: inject-field
 function WikiCopyPaste._mapDetails(opponents, mode)
-	if mode[1] == Opponent.literal then return '' end
+	if mode[1] == Opponent.literal then return '}}' end
 	local lines = {''}
 
 	Array.forEach(Array.range(1, opponents), function(opponentIndex)

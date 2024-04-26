@@ -26,19 +26,13 @@ local ICONS = {
 }
 
 local LINK_DATA = {
-	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
-		text = 'Match page on ESL'
-	},
 	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
-	owc = {icon = 'File:Overwatch Contenders logo.png', text = 'Overwatch Contenders matchpage'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
 	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
 	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
+	faceit = {icon = 'File:FACEIT icon allmode.png', text = 'FACEIT matchpage'},
 }
 
 local CustomMatchSummary = {}

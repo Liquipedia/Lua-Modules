@@ -58,6 +58,8 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
+	player.args.autoTeam = true
+
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 
@@ -73,8 +75,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'history' then
 		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = 'true',
+		local automatedHistory = TeamHistoryAuto.results{
+			convertrole = true,
 			player = caller.pagename
 		}
 

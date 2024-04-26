@@ -40,7 +40,7 @@ end
 ---subfunction used to generate the code for the Map template
 ---sets up as many maps as specified via the bestoff param
 ---@param bestof integer
----@return unknown
+---@return string
 function WikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local lines = Array.map(Array.range(1, bestof), function(mapIndex)

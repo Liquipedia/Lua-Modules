@@ -19,6 +19,7 @@ return {
 		'apexlegendsstatus',
 		'battlefy',
 		'b5csgo',
+		'cfs',
 		'challengermode',
 		'challonge',
 		'cybergamer',
@@ -30,6 +31,7 @@ return {
 		'esportal',
 		'etf2l',
 		'faceit',
+		'faceit-l',
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
@@ -99,5 +101,6 @@ return {
 		'steamtv',
 		'yandexefir',
 		'zhanqitv',
+		'rooter',
 	},
 }

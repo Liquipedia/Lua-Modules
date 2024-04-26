@@ -9,9 +9,11 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 
----@diagnostic disable-next-line: duplicate-set-field
+---@class ApexlegendsBrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
+
 function WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return Lua.import('Module:MatchGroup/Display/Horizontallist').BracketContainer
 end

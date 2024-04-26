@@ -26,6 +26,7 @@ local TableCell = require('Module:Widget/Table/Cell')
 --- @field _lpdbInjector LpdbInjector?
 local AwardPrizePool = Class.new(BasePrizePool)
 
+---@param args table
 function AwardPrizePool:readPlacements(args)
 	local numberOfParticipants = 0
 	self.placements = Array.mapIndexes(function(placementIndex)
@@ -47,6 +48,8 @@ function AwardPrizePool:readPlacements(args)
 	end)
 end
 
+---@param placement AwardPlacement
+---@return WidgetTableCell
 function AwardPrizePool:placeOrAwardCell(placement)
 	local awardCell = TableCell{
 		content = {placement.award},
@@ -58,12 +61,17 @@ function AwardPrizePool:placeOrAwardCell(placement)
 	return awardCell
 end
 
+---@param placement AwardPlacement
+---@param row WidgetTableRow
 function AwardPrizePool:applyCutAfter(placement, row)
 	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
 		row:addClass('ppt-hide-on-collapse')
 	end
 end
 
+---@param placement AwardPlacement?
+---@param nextPlacement AwardPlacement
+---@param rows WidgetTableRow[]
 function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
 	if placement ~= nil
 		and (placement.previousTotalNumberOfParticipants + 1) <= self.options.cutafter
@@ -74,6 +82,7 @@ function AwardPrizePool:applyToggleExpand(placement, nextPlacement, rows)
 	end
 end
 
+---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
 	local expandButton = TableCell{content = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
 		:addClass('general-collapsible-expand-button')
@@ -84,6 +93,10 @@ function AwardPrizePool:_toggleExpand()
 end
 
 -- Get the lpdbObjectName depending on opponenttype
+---@param lpdbEntry placement
+---@param prizePoolIndex integer|string
+---@param lpdbPrefix string?
+---@return string
 function AwardPrizePool:_lpdbObjectName(lpdbEntry, prizePoolIndex, lpdbPrefix)
 	local objectName = 'award'
 	if String.isNotEmpty(lpdbPrefix) then

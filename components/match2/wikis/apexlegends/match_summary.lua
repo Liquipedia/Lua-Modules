@@ -45,11 +45,16 @@ local TROPHY_COLOR = {
 }
 
 local STATUS_ICONS = {
+	-- Normal Status
 	up = 'fas fa-chevron-double-up',
 	stayup = 'fas fa-chevron-up',
 	stay = 'fas fa-equals',
 	staydown = 'fas fa-chevron-down',
 	down = 'fas fa-skull',
+
+	-- Special Status for Match Point matches
+	trophy = 'fas fa-trophy',
+	matchpoint = 'fad fa-diamond',
 }
 
 local MATCH_STANDING_COLUMNS = {
@@ -102,6 +107,7 @@ local MATCH_STANDING_COLUMNS = {
 		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
+			mobileValue = 'Pts.',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -203,6 +209,7 @@ local GAME_STANDINGS_COLUMNS = {
 		iconClass = 'fas fa-star',
 		header = {
 			value = 'Total Points',
+			mobileValue = 'Pts.',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -436,6 +443,7 @@ function CustomMatchSummary._createOverallPage(match)
 			:attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel0')
 	local schedule = page:tag('div')
 			:addClass('panel-content__collapsible')
+			:addClass('is--collapsed')
 			:attr('data-js-battle-royale', 'collapsible')
 	local button = schedule:tag('h5')
 			:addClass('panel-content__button')
@@ -482,64 +490,29 @@ function CustomMatchSummary._createGameTab(game, idx)
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content')
 			:attr('id', 'panel' .. idx)
-	local details = page:tag('div')
-			:addClass('panel-content__collapsible')
-			:attr('data-js-battle-royale', 'collapsible')
-	local button = details:tag('h5')
-			:addClass('panel-content__button')
-			:attr('data-js-battle-royale', 'collapsible-button')
-			:attr('tabindex', 0)
-	button:tag('i')
-			:addClass('far fa-chevron-up')
-			:addClass('panel-content__button-icon')
-	button:tag('span'):wikitext('Game Details')
 
-	local gameDetails = details:tag('div')
+	local gameDetails = page:tag('div')
 			:addClass('panel-content__container')
 			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
-			:tag('ul')
-					:addClass('panel-content__game-schedule')
-					:tag('li')
-							:tag('i')
-									:addClass(CustomMatchSummary._countdownIcon(game))
-									:addClass('panel-content__game-schedule__icon')
-									:done()
-							:tag('span')
-									:addClass('panel-content__game-schedule__title')
-									:wikitext('Game ', idx, ': ')
-									:done()
-							:done()
-					:tag('li')
-							:tag('div')
-									:addClass('panel-content__game-schedule__container')
-									:tag('i')
-										:addClass('fas fa-clock')
-										:addClass('panel-content__game-schedule__icon')
-										:done()
-									:node(CustomMatchSummary._gameCountdown(game))
-									:done()
-							:done()
 
-	if CustomMatchSummary._isLive(game) or CustomMatchSummary._isUpcoming(game) then
-		gameDetails:tag('li')
-				:tag('div')
+	local informationList = gameDetails:tag('ul'):addClass('panel-content__game-schedule')
+	informationList:tag('li')
+			:tag('div')
 					:addClass('panel-content__game-schedule__container')
 					:tag('i')
-							:addClass('fas fa-clock')
+							:addClass(CustomMatchSummary._countdownIcon(game))
 							:addClass('panel-content__game-schedule__icon')
 							:done()
 					:node(CustomMatchSummary._gameCountdown(game))
-					:done()
+	if game.map then
+		informationList:tag('li')
+				:tag('i')
+						:addClass('far fa-map')
+						:addClass('panel-content__game-schedule__icon')
+						:done()
+				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
-
-	gameDetails:tag('li')
-			:tag('i')
-					:addClass('far fa-map')
-					:addClass('panel-content__game-schedule__icon')
-					:done()
-			:tag('span')
-					:wikitext(Page.makeInternalLink(game.map))
 
 	page:node(CustomMatchSummary._createPointsDistributionTable(game))
 
@@ -558,7 +531,7 @@ function CustomMatchSummary._createMatchStandings(match)
 			:addClass('row--header')
 			:attr('data-js-battle-royale', 'header-row')
 
-	if CustomMatchSummary._isFinished(match) then
+	if CustomMatchSummary._showStatusColumn(match) then
 		header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass('cell--status')
@@ -573,9 +546,15 @@ function CustomMatchSummary._createMatchStandings(match)
 						:addClass('panel-table__cell-icon')
 						:addClass(column.iconClass)
 						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
+		local span = groupedCell:tag('span')
+				:wikitext(column.header.value)
+		if column.header.mobileValue then
+				span:addClass('d-none d-md-block')
+				groupedCell:tag('span')
+						:wikitext(column.header.mobileValue)
+						:addClass('d-block d-md-none')
+		end
+		span:done()
 		if (column.sortable and column.sortType) then
 			cell:attr('data-sort-type', column.sortType)
 			groupedCell:tag('div')
@@ -633,8 +612,7 @@ function CustomMatchSummary._createMatchStandings(match)
 	Array.forEach(match.opponents, function (opponentMatch, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
-		if CustomMatchSummary._isFinished(match) then
-			mw.logObject(opponentMatch, opponentMatch.name)
+		if CustomMatchSummary._showStatusColumn(match) then
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
@@ -812,6 +790,12 @@ function CustomMatchSummary._getStatusIcon(status)
 	if STATUS_ICONS[status] then
 		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
 	end
+end
+
+---Determines whether the status column should be shown or not
+---@param match table
+function CustomMatchSummary._showStatusColumn(match)
+	return Table.isNotEmpty(match.extradata.status)
 end
 
 ---@param opponent standardOpponent

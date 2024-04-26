@@ -10,6 +10,7 @@ return {
 	startYear = 2003,
 	wikiName = 'callofduty',
 	name = 'Call of Duty',
+	defaultGame = 'cod',
 	games = {
 		aw = {
 			abbreviation = 'AW',
@@ -337,9 +338,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cod',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Call of Duty Default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Call of Duty Default darkmode.png', ---@deprecated
 	match2 = 1,
 }

@@ -268,7 +268,7 @@ end
 ---@param localPrize string|number|nil
 ---@param currency string
 ---@param exchangeDate string
----@return unknown
+---@return number?
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{

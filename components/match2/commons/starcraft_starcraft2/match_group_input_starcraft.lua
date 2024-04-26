@@ -40,18 +40,21 @@ local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
 	literal = 'literal',
 }
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+local TBD = 'tbd'
+local TBA = 'tba'
 
 local getStarcraftFfaInputModule = FnUtil.memoize(function()
 	return Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
 end)
 
---[[
-Module for converting input args of match group objects into LPDB records. This
-module is specific to the Starcraft and Starcraft2 wikis.
-]]
+---Module for converting input args of match group objects into LPDB records.
+---This module is specific to the Starcraft and Starcraft2 wikis.
 local StarcraftMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function StarcraftMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
@@ -71,6 +74,8 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	return match
 end
 
+---@param matchArgs table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function StarcraftMatchGroupInput._readDate(matchArgs)
 	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
 		'matchDate',
@@ -83,9 +88,12 @@ function StarcraftMatchGroupInput._readDate(matchArgs)
 	return dateProps
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._checkFinished(match)
 	if Logic.readBoolOrNil(match.finished) == false then
 		match.finished = false
+		return match
 	elseif Logic.readBool(match.finished) then
 		match.finished = true
 	elseif Logic.isNotEmpty(match.winner) then
@@ -104,6 +112,8 @@ function StarcraftMatchGroupInput._checkFinished(match)
 	return match
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.cancelled = Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament', 'false'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
@@ -115,6 +125,8 @@ function StarcraftMatchGroupInput._getTournamentVars(match)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod)
@@ -122,6 +134,8 @@ function StarcraftMatchGroupInput._getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._getLinks(match)
 	match.links = {
 		preview = match.preview,
@@ -135,6 +149,8 @@ function StarcraftMatchGroupInput._getLinks(match)
 	return match
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._getExtraData(match)
 	local extradata
 	if Logic.readBool(match.ffa) then
@@ -162,12 +178,20 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	return match
 end
 
+---@param extradata table
+---@param map string
+---@param match table
+---@param prefix string
+---@param vetoIndex integer
 function StarcraftMatchGroupInput._getVeto(extradata, map, match, prefix, vetoIndex)
 	extradata[prefix] = map and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
 	extradata[prefix .. 'by'] = match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex]
 	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
+---@param subGroupIndex integer
+---@param match table
+---@return string?
 function StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 	local header = Logic.emptyOr(
 		match['subGroup' .. subGroupIndex .. 'header'],
@@ -175,9 +199,11 @@ function StarcraftMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
 		match['submatch' .. subGroupIndex .. 'header']
 	)
 
-	return String.isNotEmpty(header) and header or nil
+	return String.nilIfEmpty(header)
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._adjustData(match)
 	--parse opponents + set base sumscores + determine match mode
 	match.mode = ''
@@ -202,13 +228,8 @@ function StarcraftMatchGroupInput._adjustData(match)
 	return match
 end
 
---[[
-
-Misc. MatchInput functions
---> Winner, Walkover, Placement, Resulttype, Status
---> Sub-Match Structure
-
-]]--
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof) or DEFAULT_BEST_OF
 	local walkover = match.walkover or ''
@@ -309,6 +330,8 @@ function StarcraftMatchGroupInput._matchWinnerProcessing(match)
 	return match
 end
 
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 	if Logic.readBool(match.finished) and Logic.isEmpty(match.winner) then
 		local scores = Array.mapIndexes(function(opponentIndex)
@@ -337,11 +360,10 @@ function StarcraftMatchGroupInput._determineWinnerIfMissing(match)
 	return match
 end
 
---[[
+--OpponentInput functions
 
-OpponentInput functions
-
-]]--
+---@param match table
+---@return table
 function StarcraftMatchGroupInput._opponentInput(match)
 	local opponentIndex = 1
 	local opponent = match['opponent' .. opponentIndex]
@@ -414,6 +436,8 @@ function StarcraftMatchGroupInput._opponentInput(match)
 	return match
 end
 
+---@param opponent table
+---@return table
 function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	local name = Logic.emptyOr(
 		opponent.name,
@@ -441,6 +465,8 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	}
 end
 
+---@param opponent table
+---@return table
 function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 	opponent.p1 = opponent.p1 or ''
 	opponent.p2 = opponent.p2 or ''
@@ -491,6 +517,9 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 	}
 end
 
+---@param opponent table
+---@param playernumber integer
+---@return table
 function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 	local name = ''
 
@@ -529,6 +558,8 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 	}
 end
 
+---@param opponent table
+---@return table
 function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 	local race = opponent.race or ''
 	local flag = opponent.flag or ''
@@ -554,6 +585,8 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 	}
 end
 
+---@param playerData string|table?
+---@return table
 function StarcraftMatchGroupInput._getManuallyEnteredPlayers(playerData)
 	local players = {}
 	playerData = Json.parseIfString(playerData) or {}
@@ -580,6 +613,8 @@ function StarcraftMatchGroupInput._getManuallyEnteredPlayers(playerData)
 	return players
 end
 
+---@param teamName string
+---@return table
 function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	local players = {}
 	for playerIndex = 1, MAX_NUM_PLAYERS do
@@ -604,6 +639,9 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 	return players
 end
 
+---@param opponent table
+---@param date string?
+---@return table
 function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 	local name, icon, iconDark
 
@@ -629,6 +667,12 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 	}
 end
 
+---@param template string?
+---@param date string?
+---@return string?
+---@return string?
+---@return string?
+---@return string
 function StarcraftMatchGroupInput._processTeamTemplateInput(template, date)
 	local icon, name, iconDark
 	template = string.lower(template or ''):gsub('_', ' ')
@@ -651,11 +695,13 @@ function StarcraftMatchGroupInput._processTeamTemplateInput(template, date)
 	return name, icon, iconDark, template
 end
 
---[[
+--MapInput functions
 
-MapInput functions
-
-]]--
+---@param match table
+---@param mapIndex integer
+---@param subGroupIndex integer
+---@return table
+---@return integer
 function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
 	--redirect maps
@@ -708,6 +754,8 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	return match, subGroupIndex
 end
 
+---@param map table
+---@return table
 function StarcraftMatchGroupInput._mapWinnerProcessing(map)
 	map.scores = {}
 	local hasManualScores = false
@@ -772,6 +820,10 @@ function StarcraftMatchGroupInput._mapWinnerProcessing(map)
 	return map
 end
 
+---@param map table
+---@param match table
+---@param numberOfOpponents integer
+---@return table
 function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponents)
 	local participants = {}
 	local mapMode = ''
@@ -780,16 +832,12 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 		local opponentMapMode
 		if match['opponent' .. opponentIndex].type == Opponent.team then
 			local players = match['opponent' .. opponentIndex].match2players
-			if Table.isEmpty(players) then
-				break
-			else
-				participants, opponentMapMode = StarcraftMatchGroupInput._processTeamPlayerMapData(
-					players,
-					map,
-					opponentIndex,
-					participants
-				)
-			end
+			participants, opponentMapMode = StarcraftMatchGroupInput._processTeamPlayerMapData(
+				players or {},
+				map,
+				opponentIndex,
+				participants
+			)
 		elseif match['opponent' .. opponentIndex].type == Opponent.literal then
 			opponentMapMode = 'Literal'
 		elseif
@@ -845,6 +893,9 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 	return map
 end
 
+---@param participants table
+---@return table
+---@return table
 function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	local opponentRaces, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
@@ -858,6 +909,11 @@ function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
 	return opponentRaces, playerNameArray
 end
 
+---@param players table
+---@param map table
+---@param opponentIndex integer
+---@param participants table
+---@return table
 function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opponentIndex, participants)
 	map['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
 		map['t' .. opponentIndex .. 'p1race'],
@@ -875,6 +931,11 @@ function StarcraftMatchGroupInput._processDefaultPlayerMapData(players, map, opp
 	return participants
 end
 
+---@param players table
+---@param map table
+---@param opponentIndex integer
+---@param participants table
+---@return table
 function StarcraftMatchGroupInput._processArchonPlayerMapData(players, map, opponentIndex, participants)
 	local faction = Logic.emptyOr(
 		map['opponent' .. opponentIndex .. 'race'],
@@ -894,81 +955,91 @@ function StarcraftMatchGroupInput._processArchonPlayerMapData(players, map, oppo
 	return participants
 end
 
+---@param players table
+---@param map table
+---@param opponentIndex integer
+---@param participants table
+---@return table
+---@return string|integer
 function StarcraftMatchGroupInput._processTeamPlayerMapData(players, map, opponentIndex, participants)
 	local amountOfTbds = 0
 	local playerData = {}
 
-	for playerIndex = 1, 4 do
-		local playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
-		if Logic.isNotEmpty(map[playerKey]) then
-			if map[playerKey] ~= 'TBD' and map[playerKey] ~= 'TBA' then
-				-- allows fetching the link of the player from preset wiki vars
-				local mapPlayer = mw.ext.TeamLiquidIntegration.resolve_redirect(
-					map[playerKey .. 'link'] or
-					Variables.varDefault(map[playerKey] .. '_page') or
-					map[playerKey]
-				):gsub(' ', '_')
-				if Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
-					playerData[mapPlayer] = {
-						faction = Faction.read(Logic.emptyOr(
-								map['t' .. opponentIndex .. 'race'],
-								map['opponent' .. opponentIndex .. 'race'],
-								map[playerKey .. 'race']
-							)) or Faction.defaultFaction,
-						position = playerIndex
-					}
-				else
-					playerData[mapPlayer] = {
-						faction = Faction.read(map[playerKey .. 'race']),
-						position = playerIndex
-					}
-				end
-			else
-				amountOfTbds = amountOfTbds + 1
-			end
+	local numberOfPlayers = 0
+	for prefix, playerInput, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+		numberOfPlayers = numberOfPlayers + 1
+		if playerInput:lower() == TBD or playerInput:lower() == TBA then
+			amountOfTbds = amountOfTbds + 1
 		else
-			break
+			local link = Logic.emptyOr(map[prefix .. 'link'], Variables.varDefault(playerInput .. '_page')) or playerInput
+			link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
+
+			local faction = Logic.readBool(map['opponent' .. opponentIndex .. 'archon'])
+				and Logic.emptyOr(map['t' .. opponentIndex .. 'race'], map['opponent' .. opponentIndex .. 'race'])
+				or map[prefix .. 'race']
+
+			playerData[link] = {
+				faction = Faction.read(faction),
+				position = playerIndex,
+				displayName = playerInput,
+			}
 		end
 	end
 
-	local numberOfParticipants = 0
-	for playerIndex, player in pairs(players) do
-		if player and playerData[player.name] then
-			numberOfParticipants = numberOfParticipants + 1
-			local faction = playerData[player.name].faction
-				or player.extradata.faction or Faction.defaultFaction
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = playerData[player.name].position,
-				flag = Flags.CountryName(player.flag),
-			}
-			end
-	end
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
 
-	numberOfParticipants = numberOfParticipants + amountOfTbds
-	for tbdIndex = 1, amountOfTbds do
-		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
-			faction = Faction.defaultFaction,
-			player = 'TBD'
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
 		}
 	end
 
-	local opponentMapMode
-	if numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
-		opponentMapMode = 'Archon'
-	elseif numberOfParticipants == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
-		opponentMapMode = '2S'
-	elseif numberOfParticipants == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
-		opponentMapMode = '4S'
-	else
-		opponentMapMode = numberOfParticipants
+	Array.forEach(players, function(player, playerIndex)
+		local currentPlayer = playerData[player.name]
+		if not currentPlayer then return end
+
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
+
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	Table.iter.forEachPair(playerData, function(playerLink, player)
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction},
+		})
+		addToParticipants(player, players[#players], #players)
+	end)
+
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
+		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
+			faction = Faction.defaultFaction,
+			player = TBD:upper(),
+		}
+	end)
+
+	if numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'archon']) then
+		return participants, 'Archon'
+	elseif numberOfPlayers == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
+		return participants, '2S'
+	elseif numberOfPlayers == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
+		return participants, '4S'
 	end
 
-	return participants, opponentMapMode
+	return participants, numberOfPlayers
 end
 
 -- function to sort out winner/placements
+---@param tbl table
+---@param key1 string|integer
+---@param key2 string|integer
+---@return boolean
 function StarcraftMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	local opponent1 = tbl[key1]
 	local opponent2 = tbl[key2]

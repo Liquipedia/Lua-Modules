@@ -63,18 +63,18 @@ function StarcraftOpponent.readOpponentArgs(args)
 	end
 
 	if partySize == 1 then
-		opponent.players[1].race = Faction.read(args.race)
+		opponent.players[1].race = Faction.read(args.faction or args.race)
 
 	elseif partySize then
 		opponent.isArchon = Logic.readBool(args.isarchon)
 		if opponent.isArchon then
-			local archonRace = Faction.read(args.race)
+			local archonRace = Faction.read(args.faction or args.race)
 			for _, player in ipairs(opponent.players) do
 				player.race = archonRace
 			end
 		else
 			for playerIx, player in ipairs(opponent.players) do
-				player.race = Faction.read(args['p' .. playerIx .. 'race'])
+				player.race = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
 			end
 		end
 	end
@@ -162,8 +162,11 @@ function StarcraftOpponent.resolve(opponent, date, options)
 				local hasRace = String.isNotEmpty(player.race)
 				local savePageVar = not Opponent.playerIsTbd(player --[[@as standardPlayer]])
 				StarcraftPlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
-				player.team =
-					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
+				player.team = PlayerExt.syncTeam(
+					player.pageName:gsub(' ', '_'),
+					player.team,
+					{date = date, savePageVar = savePageVar}
+				)
 				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)

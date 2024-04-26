@@ -9,6 +9,7 @@ Author(s): Elysienna
 	width: 100%;
 	overflow-x: auto;
 	position: relative;
+	font-size: 0.875rem;
 
 	&__swipe-container {
 		width: 100%;
@@ -103,6 +104,16 @@ Author(s): Elysienna
 				& .cell--game-container-nav-holder {
 					min-width: 15.875rem;
 				}
+
+				& .cell--rank,
+				& .cell--team,
+				& .cell--total-points {
+					.panel-table__cell-icon {
+						@media ( max-width: 767px ) {
+							display: none;
+						}
+					}
+				}
 			}
 
 			&--navigate {
@@ -122,7 +133,7 @@ Author(s): Elysienna
 	&__cell {
 		border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		padding: 0.75rem;
+		padding: 0.5rem;
 		display: flex;
 		align-items: center;
 		flex: 0 0 auto;
@@ -188,7 +199,7 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
+				padding: 0.5rem 0;
 				background-color: #fafafa;
 			}
 
@@ -197,7 +208,7 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
+				padding: 0.5rem 0;
 
 				.panel-table__row:not( .row--header ) & {
 					background-color: #ffffff;
@@ -316,6 +327,8 @@ Author(s): Elysienna
 			padding: 0;
 			flex-wrap: wrap;
 			align-items: stretch;
+			border-left: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+			border-right-width: 0.0625rem;
 		}
 
 		&--status {
@@ -340,6 +353,10 @@ Author(s): Elysienna
 
 		&--rank {
 			flex-basis: 6.375rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.6875rem;
+			}
 		}
 
 		&--team {
@@ -348,7 +365,7 @@ Author(s): Elysienna
 			overflow: hidden;
 
 			@media ( max-width: 767px ) {
-				flex-basis: 9rem;
+				flex-basis: 8.375rem;
 			}
 		}
 
@@ -357,6 +374,10 @@ Author(s): Elysienna
 			flex-grow: 0;
 			justify-content: flex-end;
 			font-weight: bold;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.25rem;
+			}
 		}
 
 		&--placements {
@@ -394,19 +415,25 @@ Author(s): Elysienna
 			padding: 0;
 			position: relative;
 			flex: 1;
-			overflow: hidden;
 			border: 0;
+
+			@media ( min-width: 768px ) {
+				overflow: hidden;
+			}
 		}
 
 		&--game-container {
 			position: relative;
 			padding: 0;
-			overflow-x: hidden;
 			flex: 1;
-			scroll-behavior: smooth;
 			border: 0;
 			align-items: unset;
 			min-width: 15.875rem;
+
+			@media ( min-width: 768px ) {
+				overflow-x: hidden;
+				scroll-behavior: smooth;
+			}
 		}
 	}
 

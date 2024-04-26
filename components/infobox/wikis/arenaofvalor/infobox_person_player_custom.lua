@@ -7,8 +7,8 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
-local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Role = require('Module:Role')
@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 				table.insert(caller.infobox.warnings,
 					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]')
 			end
-			return HeroIcon.getImage{standardizedHero or hero, size = SIZE_HERO}
+			return CharacterIcon.Icon{character = standardizedHero or hero, size = SIZE_HERO}
 		end)
 
 		if Table.isEmpty(heroIcons) then return widgets end

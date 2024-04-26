@@ -53,10 +53,10 @@ function CustomOpponent.readOpponentArgs(args)
 	end
 
 	if partySize == 1 then
-		opponent.players[1].race = Faction.read(args.race)
+		opponent.players[1].race = Faction.read(args.faction or args.race)
 	elseif partySize then
 		for playerIx, player in ipairs(opponent.players) do
-			player.race = Faction.read(args['p' .. playerIx .. 'race'])
+			player.race = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
 		end
 	end
 
@@ -128,8 +128,11 @@ function CustomOpponent.resolve(opponent, date, options)
 				local hasRace = String.isNotEmpty(player.race)
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
-				player.team =
-					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
+				player.team = PlayerExt.syncTeam(
+					player.pageName:gsub(' ', '_'),
+					player.team,
+					{date = date, savePageVar = savePageVar}
+				)
 				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
 			else
 				PlayerExt.populatePageName(player)

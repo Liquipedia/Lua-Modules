@@ -97,7 +97,7 @@ end
 ---@param hasHeroes boolean
 ---@return string
 function WikiCopyPaste._mapDetails(opponents, mode, hasHeroes)
-	if mode[1] == Opponent.literal or not hasHeroes then return '' end
+	if mode[1] == Opponent.literal or not hasHeroes then return '}}' end
 	local lines = {''}
 
 	Array.forEach(Array.range(1, opponents), function(opponentIndex)

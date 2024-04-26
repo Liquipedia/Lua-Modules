@@ -434,7 +434,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		displayname = map.mapDisplayName,
 	}
 
 	-- determine score, resulttype, walkover and winner
@@ -452,13 +451,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 
 	-- handle subgroup stuff if team match
 	if match.isTeamMatch then
-		map.subgroup = tonumber(map.subgroup)
-		if map.subgroup then
-			subGroupIndex = map.subgroup --[[@as integer]]
-		else
-			subGroupIndex = subGroupIndex + 1
-			map.subgroup = subGroupIndex
-		end
+		map.subgroup = tonumber(map.subgroup) or (subGroupIndex + 1)
+		subGroupIndex = map.subgroup
 	end
 
 	match['map' .. mapIndex] = map
@@ -493,22 +487,22 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		end
 	end
 
-	local winnerInput = tonumber(map.winner)
-	map.winner = winnerInput
+	local winner = tonumber(map.winner)
 	if Logic.isNotEmpty(map.walkover) then
 		local walkoverInput = tonumber(map.walkover)
 		if walkoverInput == 1 or walkoverInput == 2 or walkoverInput == 0 then
-			map.winner = walkoverInput
+			winner = walkoverInput
 		end
 		map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
 		map.scores = {-1, -1}
 		map.resulttype = 'default'
+		map.winner = winner
 
 		return map
 	end
 
 	if hasManualScores then
-		map.winner = tonumber(map.winner) or CustomMatchGroupInput._getWinner(indexedScores)
+		map.winner = winner or CustomMatchGroupInput._getWinner(indexedScores)
 
 		return map
 	end
@@ -516,14 +510,16 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {-1, -1}
 		map.resulttype = RESULT_TYPE_NOT_PLAYED
-	elseif winnerInput == 1 then
+	elseif winner == 1 then
 		map.scores = {1, 0}
-	elseif winnerInput == 2 then
+	elseif winner == 2 then
 		map.scores = {0, 1}
-	elseif winnerInput == 0 or map.winner == 'draw' then
+	elseif winner == 0 or map.winner == 'draw' then
 		map.scores = {0.5, 0.5}
 		map.resulttype = 'draw'
 	end
+
+	map.winner = winner
 
 	return map
 end
@@ -644,37 +640,56 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, map, opponentI
 				heroes = map[prefix .. 'heroes'],
 				heroesCheckDisabled = Logic.readBool(map[prefix .. 'noheroescheck']),
 				playedRandom = Logic.readBool(map[prefix .. 'random']),
+				displayName = playerInput,
 			}
 		end
 	end
 
-	for playerIndex, player in pairs(players) do
+	local addToParticipants = function(currentPlayer, player, playerIndex)
+		local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = faction,
+			player = player.name,
+			position = currentPlayer.position,
+			flag = Flags.CountryName(player.flag),
+			heroes = CustomMatchGroupInput._readHeroes(
+				currentPlayer.heroes,
+				faction,
+				player.name,
+				currentPlayer.heroesCheckDisabled
+			),
+			random = currentPlayer.playedRandom,
+		}
+	end
+
+	Array.forEach(players, function(player, playerIndex)
 		local currentPlayer = playerData[player.name]
-		if currentPlayer then
-			local faction = currentPlayer.faction or (player.extradata or {}).faction or Faction.defaultFaction
+		if not currentPlayer then return end
 
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				faction = faction,
-				player = player.name,
-				position = currentPlayer.position,
-				flag = Flags.CountryName(player.flag),
-				heroes = CustomMatchGroupInput._readHeroes(
-					currentPlayer.heroes,
-					faction,
-					player.name,
-					currentPlayer.heroesCheckDisabled
-				),
-				random = currentPlayer.playedRandom,
-			}
-		end
-	end
+		addToParticipants(currentPlayer, player, playerIndex)
+		playerData[player.name] = nil
+	end)
 
-	for tbdIndex = 1, amountOfTbds do
+	-- if we have players not already in the match2players insert them
+	-- this is to break conditional data loops between match2 and teamCard/HDB
+	Table.iter.forEachPair(playerData, function(playerLink, player)
+		local faction = player.faction or Faction.defaultFaction
+		table.insert(players, {
+			name = playerLink,
+			displayname = player.displayName,
+			extradata = {faction = faction},
+		})
+		addToParticipants(player, players[#players], #players)
+		numberOfPlayers = numberOfPlayers + 1
+	end)
+
+	Array.forEach(Array.range(1, amountOfTbds), function(tbdIndex)
 		participants[opponentIndex .. '_' .. (#players + tbdIndex)] = {
 			faction = Faction.defaultFaction,
 			player = TBD:upper(),
 		}
-	end
+	end)
 
 	map.participants = participants
 

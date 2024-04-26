@@ -10,6 +10,7 @@ return {
 	startYear = 2022,
 	wikiName = 'omegastrikers',
 	name = 'Omega Strikers',
+	defaultGame = 'omegastrikers',
 	games = {
 		omegastrikers = {
 			abbreviation = 'OS',
@@ -25,9 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'omegastrikers',
-
-	defaultTeamLogo = 'Omega Strikers default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Omega Strikers default allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

@@ -92,7 +92,7 @@ function mw.frame:getParent() end
 
 ---Returns the title associated with the frame as a string. For the frame created by {{#invoke:}}, this is the title of the module invoked.
 ---@return string
-function mw.frame:getTitle() end
+function mw.frame:getTitle() return '' end
 
 ---Create a new Frame object that is a child of the current frame, with optional arguments and title.
 --This is mainly intended for use in the debug console for testing functions that would normally be called by {{#invoke:}}. The number of frames that may be created at any one time is limited.
@@ -327,6 +327,14 @@ end
 ---@param localTime boolean?
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime)
+	local function localTimezoneOffset(ts)
+		local utcDt   = os.date("!*t", ts)
+		local localDt = os.date("*t", ts)
+		localDt.isdst = false
+		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
+	end
+
+
 	if format == 'U' then
 		if not timestamp then
 			return os.time(os.date("!*t") --[[@as osdateparam]])
@@ -334,11 +342,33 @@ function mw.language:formatDate(format, timestamp, localTime)
 		if type(timestamp) ~= 'string' then
 			return os.time(timestamp)
 		end
-		-- Only supports YYYY-MM-DD so far
-		local pattern = "(%d%d%d%d)-?(%d%d)-?(%d%d)"
-		local year, month, day = timestamp:match(pattern)
+		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
+		local offset = 0
+		if tzHour then
+			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
+		end
 
-		return os.time({year = year, month = month or 1, day = day or 1})
+		local year, month, day, hour, minute, second
+
+		local pattern = '(%d%d%d%d)-?(%d%d)-?(%d%d)'
+		year, month, day = timestamp:match(pattern)
+
+		if not year then
+			return ''
+		end
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)'
+		hour = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?(%d%d)'
+		minute = timestamp:match(pattern)
+
+		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
+		second = timestamp:match(pattern)
+
+		local ts = os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
+
+		return ts + localTimezoneOffset(ts)
 	end
 	return ''
 end
@@ -473,7 +503,7 @@ function mw.message:isDisabled() end
 ---@field subjectNamespaces table<number|string, namespaceInfo>
 ---@field talkNamespaces table<number|string, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number}
-mw.site = {}
+mw.site = {server = 'https://liquipedia.net/wiki/'}
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
 ---@param filter nil|'local'|'!local'
@@ -669,7 +699,9 @@ end
 ---@param namespace string?
 ---@return Title?
 ---@overload fun(id: number):Title?
-function mw.title.new(text, namespace) end
+function mw.title.new(text, namespace)
+	return setmetatable(mw.title, {})
+end
 
 ---Creates a title object with title title in namespace namespace, optionally with the specified fragment and interwiki prefix. namespace may be any key found in mw.site.namespaces. If the resulting title is not valid, returns nil.
 ---Note that, unlike mw.title.new(), this method will always apply the specified namespace.
@@ -882,11 +914,14 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 ---@return string
 function mw.ustring.upper(s) return string.upper(s) end
 
+mw.uri = {}
+function mw.uri.localUrl(s, s2) return '' end
+
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.VariablesLua = {}
----@alias wikiVaribleKey string|number
+---@alias wikiVariableKey string|number
 ---@alias wikiVariableValue string|number|nil
 
 ---Fake storage for enviroment simulation
@@ -894,7 +929,7 @@ mw.ext.VariablesLua = {}
 mw.ext.VariablesLua.variablesStorage = {}
 
 ---Stores a wiki-variable and returns the empty string
----@param name wikiVaribleKey
+---@param name wikiVariableKey
 ---@param value wikiVariableValue
 ---@return string #always an empty string
 function mw.ext.VariablesLua.vardefine(name, value)
@@ -903,7 +938,7 @@ function mw.ext.VariablesLua.vardefine(name, value)
 end
 
 ---Stores a wiki-variable and returns the stored value
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@param value wikiVariableValue Value of the wiki-variable
 ---@return string
 function mw.ext.VariablesLua.vardefineecho(name, value)
@@ -912,14 +947,14 @@ function mw.ext.VariablesLua.vardefineecho(name, value)
 end
 
 ---Gets the stored value of a wiki-variable
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@return string
 function mw.ext.VariablesLua.var(name)
 	return mw.ext.VariablesLua.variablesStorage[name] and tostring(mw.ext.VariablesLua.variablesStorage[name]) or ''
 end
 
 ---Checks if a wiki-variable is stored
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@return boolean
 function mw.ext.VariablesLua.varexist(name)
 	return mw.ext.VariablesLua.variablesStorage[name] ~= nil

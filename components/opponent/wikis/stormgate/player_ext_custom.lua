@@ -18,10 +18,14 @@ local Table = require('Module:Table')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
 
-local CustomPlayerExt = Table.deepCopy(PlayerExt)
-
 local globalVars = PlayerExt.globalVars
 
+---@class StormgatePlayerExt: PlayerExt
+local CustomPlayerExt = Table.deepCopy(PlayerExt)
+CustomPlayerExt.globalVars = globalVars
+
+---@param resolvedPageName string
+---@return {flag: string?, faction: string?, factionHistory: table[]?}?
 CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -42,6 +46,9 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	end
 end)
 
+---@param resolvedPageName string
+---@param date string|number?
+---@return string?
 function CustomPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.factionHistory then
@@ -53,11 +60,15 @@ function CustomPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	end
 end
 
+---@param resolvedPageName string
+---@return string?
 function CustomPlayerExt.fetchPlayerFlag(resolvedPageName)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
 	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName(lpdbPlayer.flag))
 end
 
+---@param resolvedPageName string
+---@return table[]
 function CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 	local conditions = {
 		'[[type::playerfaction]]',
@@ -79,11 +90,13 @@ function CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 	return factionHistory
 end
 
-
+---@param player StormgateStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@return StormgateStandardPlayer
 function CustomPlayerExt.syncPlayer(player, options)
 	options = options or {}
 
-	player = PlayerExt.syncPlayer(player, options)
+	player = PlayerExt.syncPlayer(player, options) --[[@as StormgateStandardPlayer]]
 
 	player.faction = player.faction
 		or globalVars:get(player.displayName .. '_faction')
@@ -98,10 +111,14 @@ function CustomPlayerExt.syncPlayer(player, options)
 end
 
 --Same as CustomPlayerExt.syncPlayer, except it does not save the player's flag to page variables.
+---@param player StormgateStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
+---@return StormgateStandardPlayer
 function CustomPlayerExt.populatePlayer(player, options)
 	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
+---@param player StormgateStandardPlayer
 function CustomPlayerExt.saveToPageVars(player)
 	if player.faction and player.faction ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_faction', player.faction)

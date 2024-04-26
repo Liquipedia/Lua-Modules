@@ -30,6 +30,7 @@ local BACKGROUND_CLASSES = {
 	banned = 'cinnabar-bg',
 	['passed away'] = 'gigas-bg',
 }
+
 local STATUS_INACTIVE = 'Inactive'
 
 --- @class PortalPlayers

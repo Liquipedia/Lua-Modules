@@ -29,6 +29,25 @@ local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInput = {}
 
+---@class MatchGroupContext
+---@field bracketIndex integer
+---@field groupRoundIndex number?
+---@field matchSection string?
+---@field sectionHeader string?
+---@field tournamentParent string
+
+---@class MatchGroupMvpPlayer
+---@field displayname string
+---@field name string
+---@field comment string?
+---@field team string?
+---@field template string
+
+---@class MatchGroupInputReadPlayersOfTeamOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field applyUnderScores boolean?
+
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
 	{default = 'Opening Matches'},
 	{},
@@ -41,18 +60,24 @@ local VALID_GSL_GROUP_STYLES = {
 	'losersfirst',
 }
 
+---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
 		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
 	end
 end
 
+---@param matchArgs table
+---@return table
 function MatchGroupInput._processMatch(matchArgs)
 	local match = WikiSpecific.processMatch(matchArgs)
 	MatchGroupInput._applyTournamentVarsToMaps(match)
 	return match
 end
 
+---@param bracketId string
+---@param args table
+---@return table[]
 function MatchGroupInput.readMatchlist(bracketId, args)
 	local matchKeys = Table.mapArgumentsByPrefix(args, {'M'}, FnUtil.identity)
 
@@ -105,10 +130,17 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 	)
 end
 
+---@param matchIndex integer
+---@return string
 function MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 	return string.format('%04d', matchIndex)
 end
 
+---@param bracketId string
+---@param args table
+---@param options MatchGroupBaseOptions
+---@return table[]
+---@return string[]?
 function MatchGroupInput.readBracket(bracketId, args, options)
 	local warnings = {}
 	local templateId = args[1]
@@ -152,11 +184,12 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
 
+		---@type MatchGroupUtilBracketData
 		match.bracketdata = Table.mergeInto(bracketData, match.bracketdata or {})
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
-		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
+		bracketData.qualifiedheader = MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		bracketData.matchpage = match.matchPage
@@ -214,7 +247,26 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	return matches, warnings
 end
 
+---@param bracketData MatchGroupUtilBracketData
+---@param args table
+---@param matchKey string
+---@return string?
+function MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
+	if args[matchKey .. 'qualifiedHeader'] then
+		return args[matchKey .. 'qualifiedHeader']
+	end
+
+	if Logic.isEmpty(bracketData.header) or not Logic.readBool(bracketData.qualwin) then
+		return
+	end
+
+	return args.qualifiedHeader
+end
+
 -- Retrieve bracket data from the template generated bracket on commons
+---@param templateId string
+---@param bracketId string
+---@return table<string, table>
 function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateId)
 	assert(type(matches) == 'table')
@@ -260,6 +312,8 @@ function MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
 end
 
+---@param matches table<string, table>
+---@param args table
 function MatchGroupInput.applyOverrideArgs(matches, args)
 	local matchGroupType = matches[1].bracketData.type
 
@@ -274,6 +328,7 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 	else
 		for _, match in ipairs(matches) do
 			local _, baseMatchId = MatchGroupUtil.splitMatchId(match.matchId)
+			assert(baseMatchId, 'Invalid matchId "' .. match.matchId .. '"')
 			local matchKey = MatchGroupUtil.matchIdToKey(baseMatchId)
 			match.bracketData.header = args[matchKey .. 'header'] or match.bracketData.header
 		end
@@ -282,12 +337,13 @@ end
 
 local getContentLanguage = FnUtil.memoize(mw.getContentLanguage)
 
+---@param headerInput string?
+---@return string?
 function MatchGroupInput._inheritedHeader(headerInput)
 	local inheritedHeader = headerInput or globalVars:get('inheritedHeader')
 	globalVars:set('inheritedHeader', inheritedHeader)
 	return inheritedHeader
 end
-
 
 ---@param dateString string?
 ---@param dateFallbacks string[]?
@@ -330,10 +386,11 @@ function MatchGroupInput.readDate(dateString, dateFallbacks)
 	end
 end
 
---[[
-Parses the match group context. The match group context describes where a match
-group is relative to the tournament page.
-]]
+---Parses the match group context.
+---The match group context describes where a match group is relative to the tournament page.
+---@param matchArgs table
+---@param matchGroupArgs table
+---@return MatchGroupContext
 function MatchGroupInput.readContext(matchArgs, matchGroupArgs)
 	return {
 		bracketIndex = tonumber(globalVars:get('match2bracketindex')) or 0,
@@ -344,6 +401,9 @@ function MatchGroupInput.readContext(matchArgs, matchGroupArgs)
 	}
 end
 
+---@param matchArgs table
+---@param matchGroupArgs table
+---@return number?
 function MatchGroupInput.readGroupRoundIndex(matchArgs, matchGroupArgs)
 	if matchArgs.round then
 		return tonumber(matchArgs.round)
@@ -358,19 +418,17 @@ function MatchGroupInput.readGroupRoundIndex(matchArgs, matchGroupArgs)
 	return roundIndex and tonumber(roundIndex)
 end
 
---[[
-Saves changes to the match group context, as set by match group args, in page variables.
-]]
+---Saves changes to the match group context, as set by match group args, in page variables.
+---@param context MatchGroupContext
 function MatchGroupInput.persistContextChanges(context)
 	globalVars:set('bracket_header', context.sectionHeader)
 	globalVars:set('matchsection', context.matchSection)
 end
 
---[[
-Fetches the LPDB records of a match group containing standalone matches.
-Standalone matches are specified from individual match pages in the Match
-namespace.
-]]
+---Fetches the LPDB records of a match group containing standalone matches.
+---Standalone matches are specified from individual match pages in the Match namespace.
+---@param bracketId string
+---@return match2[]
 MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
@@ -378,13 +436,14 @@ MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	})
 end)
 
---[[
-Fetches the LPDB record of a standalone match.
-
-matchId is a full match ID, such as MATCH_wec2CbLWRx_0001
-]]
+---Fetches the LPDB record of a standalone match.
+---
+---matchId is a full match ID, such as MATCH_wec2CbLWRx_0001
+---@param matchId string
+---@return match2?
 function MatchGroupInput.fetchStandaloneMatch(matchId)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(matchId)
+	assert(bracketId, 'Invalid matchId "' .. matchId .. '"')
 	local matches = MatchGroupInput.fetchStandaloneMatchGroup(bracketId)
 	return Array.find(matches, function(match)
 		return match.match2id == matchId
@@ -398,6 +457,9 @@ If any property exists in both the record and opponent struct, the value from th
 The opponent struct is retrieved programmatically via Module:Opponent, by using the team template extension.
 Using the team template extension, the opponent struct is standardised and not user input dependant, unlike the record.
 ]]
+---@param record table
+---@param opponent standardOpponent
+---@return standardOpponent
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
@@ -422,6 +484,9 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 -- Retrieves Common Tournament Variables used inside match2 and match2game
+---@param obj table
+---@param parent table?
+---@return table
 function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	parent = parent or {}
 	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
@@ -449,6 +514,8 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	return obj
 end
 
+---@param match table
+---@return {players: MatchGroupMvpPlayer[], points: integer}?
 function MatchGroupInput.readMvp(match)
 	if not match.mvp then return end
 	local mvppoints = match.mvppoints or 1
@@ -478,11 +545,6 @@ function MatchGroupInput.readMvp(match)
 
 	return {players = parsedPlayers, points = mvppoints}
 end
-
----@class MatchGroupInputReadPlayersOfTeamOptions
----@field maxNumPlayers integer?
----@field resolveRedirect boolean?
----@field applyUnderScores boolean?
 
 ---reads the players of a team from input and wiki variables
 ---@param match table

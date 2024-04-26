@@ -49,6 +49,9 @@ local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
 
 local MODES = {
 	team = {tier = 'Team', store = 'team', category = 'Team'},
+	['FFA'] = {tier = ' FFA', store = 'FFA', category = 'FFA'},
+	['4v4'] = {tier = ' 4v4', store = '4v4', category = '4v4'},
+	['3v3'] = {tier = ' 3v3', store = '3v3', category = '3v3'},
 	['2v2'] = {tier = ' 2v2', store = '2v2', category = '2v2'},
 	default = {store = '1v1', category = 'Individual'},
 }
@@ -155,7 +158,7 @@ end
 ---@param args table
 ---@return {link: string, displayname: string}[]
 function CustomLeague:_getMaps(prefix, args)
-	local maps = Table.map(self:getAllArgsForBase(args, 'map'), function(mapIndex, map)
+	local maps = Table.map(self:getAllArgsForBase(args, prefix), function(mapIndex, map)
 		local mapArray = mw.text.split(map, '|')
 
 		mapArray[1] = (MapsData[mapArray[1]:lower()] or {}).name or mapArray[1]
@@ -296,6 +299,7 @@ function CustomInjector:parse(id, widgets)
 		displayMaps('map', 'Maps', caller.data.maps)
 		displayMaps('2map', '2v2 Maps')
 		displayMaps('3map', '3v3 Maps')
+		displayMaps('4map', '4v4 Maps')
 	end
 	return widgets
 end
