@@ -20,6 +20,7 @@ local Team = require('Module:Team')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
+local Info = Lua.import('Module:Info', {loadData = true})
 local TransferRow = Lua.import('Module:Transfer/Custom')
 
 local Condition = require('Module:Condition')
@@ -100,7 +101,7 @@ function TransferList:parseArgs(args)
 		objectNameSortOrder = 'desc'
 	end
 
-	return {
+	return Table.merge(Info.config.squads, {
 		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
@@ -108,12 +109,6 @@ function TransferList:parseArgs(args)
 		shown = Logic.readBool(args.shown),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
-		iconModule = Logic.nilIfEmpty(args.iconModule),
-		iconFunction = Logic.nilIfEmpty(args.iconFunction),
-		iconTransfers = Logic.readBoolOrNil(args.iconTransfers),
-		platformIcons = Logic.readBool(args.platformIcons),
-		refType = args.refType,
-		displayTeamName = Logic.nilOr(Logic.readBoolOrNil(args.displayTeamName), Logic.readBoolOrNil(args.showteamname)),
 		conditions = {
 			nationalities = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.nationality)),
 			players = Logic.nilIfEmpty(Array.map(players, mw.ext.TeamLiquidIntegration.resolve_redirect)),
@@ -127,7 +122,7 @@ function TransferList:parseArgs(args)
 			onlyNotableTransfers = Logic.readBool(args.onlyNotableTransfers),
 			teams = Logic.nilIfEmpty(self:_getTeams(args)),
 		}
-	}
+	})
 end
 
 ---@param args table
@@ -392,61 +387,6 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role1 = nil
 		firstTransfer.role2 = nil
 	end
-
-	--[[todo: remove once transferRow module is done (nice for double checking stuff)
-	local transferRowArgs = {
-		platformIcons = config.platformIcons,
-		iconParam = 'pos',
-		iconModule = config.iconModule,
-		iconFunction = config.iconFunction,
-		iconTransfers = config.iconTransfers,
-		date = firstTransfer.date,
-		date_disp = Logic.nilIfEmpty(firstTransfer.extradata.displaydate)
-			or mw.getContentLanguage():formatDate('Y-m-d', firstTransfer.date),
-		platform = firstTransfer.extradata.platform,
-		name = firstTransfer.displayname,
-		link = firstTransfer.player,
-		flag = Logic.nilIfEmpty(firstTransfer.nationality),
-		pos = Logic.nilIfEmpty(firstTransfer.extradata.position),
-		posIcon = Logic.nilIfEmpty(firstTransfer.extradata.icon),
-		posIcon_2 = Logic.nilIfEmpty(firstTransfer.extradata.icon2),
-		team1 = Logic.nilIfEmpty(firstTransfer.fromteam),
-		team1_2 = Logic.nilIfEmpty(firstTransfer.extradata.fromteamsec),
-		team2 = Logic.nilIfEmpty(firstTransfer.toteam),
-		team2_2 = Logic.nilIfEmpty(firstTransfer.extradata.toteamsec),
-		role1 = showRole and Logic.nilIfEmpty(firstTransfer.role1) or nil,
-		role1_2 = Logic.nilIfEmpty(firstTransfer.extradata.role1sec),
-		role2 = showRole and Logic.nilIfEmpty(firstTransfer.role2) or nil,
-		role2_2 = Logic.nilIfEmpty(firstTransfer.extradata.role2sec),
-	}
-
-	local references = {}
-
-	Array.forEach(transfers, function(transfer, index)
-		for _, reference in Table.iter.pairsByPrefix(transfer.reference or {}, 'reference') do
-			if Array.all(references, function(ref) return ref ~= reference end) then
-				table.insert(references, reference)
-			end
-		end
-		if index == 1 then return end
-		Table.merge(transferRowArgs, {
-			['name' .. index] = transfer.extradata.displayname,
-			['link' .. index] = transfer.player,
-			['flag' .. index] = transfer.nationality,
-			['pos' .. index] = Logic.nilIfEmpty(transfer.extradata.position),
-			['posIcon' .. index] = Logic.nilIfEmpty(transfer.extradata.icon),
-			['posIcon' .. index .. '_2'] = Logic.nilIfEmpty(transfer.extradata.icon2),
-		})
-	end)
-
-	if config.refType == 'table' then
-		transferRowArgs.refTable = Table.map(references, function(key, value)
-			return 'reference' .. key, value
-		end)
-	else
-		transferRowArgs.ref = table.concat(references)
-	end
-	]]
 
 	return TransferRow.displayRow(transfers)
 end
