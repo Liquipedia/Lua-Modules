@@ -35,7 +35,14 @@ Besides these twelve there is Gray which will fit in with them very well. There 
 .gray-theme-light-alt-bg,
 ul.nav-tabs li.game-none,
 .overview.game-none {
-	background-color: var( --clr-moon-80, #ababab );
+	background-color: var( --clr-moon-80, #d3d3d3 );
+}
+[ data-darkreader-scheme="dark" ] &,
+.theme--dark & {
+	.overview.game-none {
+		background: var( --clr-moon-20 );
+	}
+}
 }
 
 .gray-bg-alt,
