@@ -41,14 +41,12 @@ end
 
 ---@param player StarcraftStandardPlayer|WarcraftStandardPlayer|StormgateStandardPlayer
 ---@param playerIndex integer|string
----@return {icon: string?, icon2: string?, position: string?}
+---@return string[] #icons
+---@return string[] #positions
 function FactionTransferRow:readIconsAndPosition(player, playerIndex)
 	local faction = Faction.read(player.faction or player.race)
-	return {
-		icon = faction,
-		icon2 = faction, --possibly remove due to redundancy?
-		position = faction, --possibly remove due to redundancy?
-	}
+	return {faction, faction}, --possibly remove 2nd one due to redundancy?
+		{faction} --possibly remove due to redundancy?
 end
 
 return FactionTransferRow

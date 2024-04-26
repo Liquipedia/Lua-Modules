@@ -38,6 +38,7 @@ return {
 			iconParam = 'pos', -- string?
 			iconTransfers = false, -- bool
 			platformIcons = false, -- bool
+			positionConvert = nil, -- string?
 			referencesAsTable = false, -- bool
 			syncPlayers = false, -- bool
 		},

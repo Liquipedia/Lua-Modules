@@ -31,6 +31,7 @@ local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 ---@field iconParam string?
 ---@field iconTransfers boolean
 ---@field platformIcons boolean
+---@field positionConvert string?
 ---@field referencesAsTable boolean
 ---@field storage boolean?
 ---@field syncPlayers boolean
@@ -75,7 +76,7 @@ function TransferRow:readInput()
 	local players = self:readPlayers()
 	self.references = self:_readReferences(#players)
 
-	local transfers Array.map(players, function(player, playerIndex)
+	local transfers = Array.map(players, function(player, playerIndex)
 		playerIndex = playerIndex == 1 and '' or playerIndex
 
 		local transfer = self:_convertToTransferStructure{
@@ -210,33 +211,52 @@ function TransferRow:_convertToTransferStructure(data)
 	local player = data.player
 
 	local subs = {args['sub' .. playerIndex], args['sub' .. playerIndex .. '_2']}
-	local iconData = self:readIconsAndPosition(data.player, playerIndex)
+	local icons, positions = self:readIconsAndPosition(data.player, playerIndex)
 
-	local transfer = {}
-	Table.deepMergeInto(transfer, self.baseData, {
+	return Table.deepMergeInto({}, self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
 		nationality = player.flag,
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
 		reference = self.references.applyAll and self.references.refs or self.references.refs['reference' .. playerIndex],
 		extradata = {
-			position = iconData.position,
-			icon = iconData.icon or '',
-			icon2 = iconData.icon2 or '',
+			position = positions[1] or '',
+			icon = icons[1] or '',
+			icon2 = icons[2] or '',
 			icontype = subs[1] and 'Substitute' or '',
 			displayname = player.displayName or '',
 			sortindex = data.sortIndex,
 		},
 	})
-
-	return transfer
 end
 
 ---@param player standardPlayer
 ---@param playerIndex integer|string
----@return {icon: string?, icon2: string?, position: string?}
+---@return string[] #icons
+---@return string[] #positions
 function TransferRow:readIconsAndPosition(player, playerIndex)
-	--todo
+	local args = self.args
+	local iconParam = self.config.iconParam or 'pos'
+
+	local postfixes = {playerIndex, playerIndex .. '_2'}
+
+	local positions = Array.map(postfixes, function(postfix) return args[iconParam .. postfix] end)
+
+	if self.config.positionConvert then
+		self.positionConvert = self.positionConvert or mw.loadData(self.config.positionConvert)
+		positions = Array.map(positions, function(pos)
+			return self.positionConvert[(pos or ''):lower()] or pos
+		end)
+	end
+
+	local icons = Array.map(positions, function(iconInput, iconIndex)
+		if not iconInput or not args['sub' .. postfixes[iconIndex]] then
+			return iconInput
+		end
+		return iconInput .. '_Substitute'
+	end)
+
+	return icons, positions
 end
 
 ---@param numberOfPlayers integer

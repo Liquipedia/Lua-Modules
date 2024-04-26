@@ -62,7 +62,6 @@ return {
 			displayTeamName = false,
 			iconFunction = 'Icon',
 			iconModule = 'Module:Faction',
-			iconParam = 'race',
 			iconTransfers = false,
 			platformIcons = false,
 			referencesAsTable = false,
