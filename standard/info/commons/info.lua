@@ -31,6 +31,16 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		transfers = {
+			displayTeamName = false, -- bool
+			iconFunction = nil, -- string?
+			iconModule = nil, -- string?
+			iconParam = 'pos', -- string?
+			iconTransfers = false, -- bool
+			platformIcons = false, -- bool
+			referencesAsTable = false, -- bool
+			syncPlayers = false, -- bool
+		},
 	},
 	match2 = 2,
 }

@@ -106,12 +106,12 @@ function TransferList:parseArgs(args)
 			', objectname ' .. objectNameSortOrder,
 		title = Logic.nilIfEmpty(args.title),
 		shown = Logic.readBool(args.shown),
-		platformIcons = Logic.readBool(args.platformIcons),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
 		iconModule = Logic.nilIfEmpty(args.iconModule),
 		iconFunction = Logic.nilIfEmpty(args.iconFunction),
 		iconTransfers = Logic.readBoolOrNil(args.iconTransfers),
+		platformIcons = Logic.readBool(args.platformIcons),
 		refType = args.refType,
 		displayTeamName = Logic.nilOr(Logic.readBoolOrNil(args.displayTeamName), Logic.readBoolOrNil(args.showteamname)),
 		conditions = {
@@ -384,11 +384,14 @@ function TransferList:_buildRow(transfers)
 		return
 	end
 
-	local config = self.config
-
 	local showRole = (firstTransfer.role1 ~= 'Substitute' and firstTransfer.role2 ~= 'Substitute') or
 		firstTransfer.extradata.icontype ~= 'Substitute' or
 		(Logic.isEmpty(firstTransfer.fromteam) and Logic.isEmpty(firstTransfer.toteam))
+
+	if not showRole then
+		firstTransfer.role1 = nil
+		firstTransfer.role2 = nil
+	end
 
 	--[[todo: remove once transferRow module is done (nice for double checking stuff)
 	local transferRowArgs = {
@@ -445,14 +448,7 @@ function TransferList:_buildRow(transfers)
 	end
 	]]
 
-	return TransferRow.displayRow(transfers, {
-		platformIcons = config.platformIcons,
-		iconModule = config.iconModule,
-		iconFunction = config.iconFunction,
-		iconTransfers = config.iconTransfers,
-		showRole = showRole,
-		refType = config.refType,
-	})
+	return TransferRow.displayRow(transfers)
 end
 
 return TransferList

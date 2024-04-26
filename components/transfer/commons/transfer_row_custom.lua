@@ -10,8 +10,7 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local TransferRow = Lua.import('Module:TransferRow', {requireDevIfEnabled = true})
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display', {requireDevIfEnabled = true})
+local TransferRow = Lua.import('Module:TransferRow')
 
 ---@class CustomTransferRow: TransferRow
 local CustomTransferRow = Class.new(TransferRow)
@@ -21,7 +20,5 @@ local CustomTransferRow = Class.new(TransferRow)
 function CustomTransferRow.run(frame)
 	return CustomTransferRow(Arguments.getArgs(frame)):read():store():build()
 end
-
-CustomTransferRow.displayRow = TransferRowDisplay.run
 
 return CustomTransferRow
