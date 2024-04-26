@@ -8,7 +8,6 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
@@ -16,8 +15,6 @@ local Links = require('Module:Links')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-
-local AgeCalculation = require('Module:AgeCalculation')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -31,8 +28,9 @@ local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
 	banned = 'cinnabar-bg',
-	['passed away'] = 'gray-bg',
+	['passed away'] = 'gigas-bg',
 }
+local STATUS_INACTIVE = 'Inactive'
 
 --- @class PortalPlayers
 ---@operator call(portalPlayerArgs): PortalPlayers
@@ -57,7 +55,7 @@ function PortalPlayers:init(args)
 	self.showLocalizedName = Logic.readBool(args.showLocalizedName)
 	self.queryOnlyByRegion = Logic.readBool(args.queryOnlyByRegion)
 	self.playerType = args.playerType or DEFAULT_PLAYER_TYPE
-	self.width = args.width or '1100px'
+	self.width = args.width or '720px'
 
 	return self
 end
@@ -236,17 +234,16 @@ function PortalPlayers:header(args)
 
 	local header = mw.html.create('tr')
 		:tag('th')
-			:attr('colspan', 5)
+			:attr('colspan', 4)
 			:css('padding-left', '1em')
 			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
 			:done()
 
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
-		:tag('th'):css('width', '200px'):wikitext(' Name'):done()
-		:tag('th'):css('width', '215px'):wikitext(' Age'):done()
-		:tag('th'):css('width', '215px'):wikitext(teamText):done()
-		:tag('th'):css('width', '100px'):wikitext(' Links'):done()
+		:tag('th'):css('width', '175px'):wikitext(' Real Name'):done()
+		:tag('th'):css('width', '250px'):wikitext(teamText):done()
+		:tag('th'):css('width', '120px'):wikitext(' Links'):done()
 
 	return mw.html.create()
 		:node(header)
@@ -259,7 +256,7 @@ end
 ---@return Html
 function PortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')
-		:addClass(BACKGROUND_CLASSES[(player.status or ''):lower()])
+		:addClass(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned))
 
 	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
 	row:tag('td')
@@ -273,7 +270,6 @@ function PortalPlayers:row(player, isPlayer)
 	elseif String.isNotEmpty(role) then
 		teamText = teamText .. ' (' .. role .. ')'
 	end
-	row:tag('td'):node(PortalPlayers._getAge(player))
 	row:tag('td'):wikitext(' ' .. teamText)
 
 	local links = Array.extractValues(Table.map(player.links or {}, function(key, link)
@@ -290,20 +286,16 @@ function PortalPlayers:row(player, isPlayer)
 	return row
 end
 
----Builds the age display
----@param player table
----@return string
-function PortalPlayers._getAge(player)
-	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
-		birthdate = DateExt.nilIfDefaultTimestamp(player.birthdate),
-		deathdate = DateExt.nilIfDefaultTimestamp(player.deathdate),
-	})
-
-	if not ageCalculationSuccess then
-		return age --[[@as string]]
+---@param status string?
+---@param banned string?
+---@return string?
+function PortalPlayers._getStatusBackground(status, banned)
+	if status == STATUS_INACTIVE then
+		status = Logic.emptyOr(Logic.readBoolOrNil(banned), Logic.isNotEmpty(banned))
+			and 'banned' or status
 	end
 
-	return table.concat(Array.append({}, age.birth, age.death), '<br>')
+	return BACKGROUND_CLASSES[(status or ''):lower()]
 end
 
 ---Converts the queried data int a readable format by OpponnetDisplay
