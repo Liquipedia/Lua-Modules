@@ -625,10 +625,6 @@ end
 ---@param timestamp number
 ---@return string?
 function MatchTable._calculateDateTimeString(timeZone, timestamp)
-	if timestamp == DateExt.defaultTimestamp then
-		return nil
-	end
-
 	local offset = Timezone.getOffset(timeZone) or 0
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
