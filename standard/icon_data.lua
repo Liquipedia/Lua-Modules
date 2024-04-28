@@ -58,6 +58,9 @@ return {
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
+	link = 'fad fa-link',
+	insidesource = 'fad fa-user-secret',
+	transferdatabase = 'fad fa-scroll',
 
 	-- Usage: Section links
 	activestage = 'fas fa-bell-exclamation',

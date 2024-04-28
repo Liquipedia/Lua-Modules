@@ -6,22 +6,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[old one:
-https://liquipedia.net/commons/index.php?title=Module:Transfer/dev&action=edit
-]]
-
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.requireIfExists('Module:Platform')
+local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
+local TRANSFER_ARROW = '&#x21d2;'
 
 ---@class TransferRowDisplayConfig
 ---@field showTeamName boolean
@@ -29,7 +30,6 @@ local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed 
 ---@field iconParam string?
 ---@field iconTransfers boolean
 ---@field platformIcons boolean
----@field positionConvert string?
 ---@field referencesAsTable boolean
 ---@field syncPlayers boolean
 
@@ -41,11 +41,9 @@ local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed 
 ---@field date string
 ---@field wholeteam boolean
 ---@field players transferPlayer[]
----@field references b[]
+---@field references string[]
 
 ---@class transferPlayer: standardPlayer
----@field isSubstitute boolean
----@field position string?
 ---@field icons string[]
 ---@field faction string?
 ---@field race string?
@@ -119,7 +117,63 @@ end
 ---@param transfers transfer[]
 ---@return transferPlayer[]
 function TransferRowDisplay:_readPlayers(transfers)
+	return Array.map(transfers, function(transfer)
+		local extradata = transfer.extradata
+		return {
+			pageName = transfer.player,
+			displayName = String.nilIfEmpty(extradata.displayname) or transfer.player,
+			flag = transfer.nationality,
+			icons = {String.nilIfEmpty(extradata.icon), String.nilIfEmpty(extradata.icon2)},
+			faction = extradata.position,
+			race = extradata.position,
+			chars = {extradata.position},
+		}
+	end)
+end
 
+---@param transfers transfer[]
+---@return string[]
+function TransferRowDisplay:_getReferences(transfers)
+	if not self.config.referencesAsTable then
+		return {transfers[1].reference.reference1}
+	end
+
+	local references = {}
+	Array.forEach(transfers, function(transfer)
+		for _, reference in Table.iter.pairsByPrefix(transfer.reference, 'reference') do
+			if Array.all(references, function(ref) return ref ~= reference end) then
+				table.insert(references, reference)
+			end
+		end
+	end)
+
+	return Array.map(references, function(reference)
+		local refferenceDataArray = Array.parseCommaSeparatedString(reference, ',,,')
+		local refType = refferenceDataArray[1]
+		local link = refferenceDataArray[2] or ''
+		if refType == 'web source' and Logic.isNotEmpty(link) then
+			return Page.makeExternalLink(Icon.makeIcon{
+				iconName = 'reference',
+				color = 'wiki-color-dark',
+			}, link)
+		elseif refType == 'tournament source' then
+			return Page.makeInternalLink(Abbreviation.make(
+				Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
+				'Transfer wasn\'t formally announced, but individual represented team starting with this tournament'
+			), link)
+		elseif refType == 'inside source' then
+			return Abbreviation.make(
+				Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
+				'Liquipedia has gained this information from a trusted inside source'
+			)
+		elseif refType == 'contract database' then
+			return Page.makeExternalLink(Abbreviation.make(
+				Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
+				'This transfer was not formally announced, ' ..
+					'but was revealed by a change in the LoL Esports League-Recognized Contract Database'
+			), 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#')
+		end
+	end)
 end
 
 ---@return Html?
@@ -192,7 +246,17 @@ end
 
 ---@return self
 function TransferRowDisplay:players()
+	local playersCell = self.display:tag('div')
+		:addClass('divCell Name')
 
+	Array.forEach(self.transfer.players, function(player, playerIndex)
+		if playerIndex ~= 1 then
+			playersCell:newline()
+		end
+		playersCell:node(PlayerDisplay.InlinePlayer{player = player})
+	end)
+
+	return self
 end
 
 ---@return self
@@ -269,61 +333,27 @@ function TransferRowDisplay:icon()
 
 	local config = self.config
 	if not config.iconModule or not config.iconTransfers then
-		iconCell:css('font-size','larger'):wikitext('&#x21d2;')
+		iconCell:css('font-size','larger'):wikitext(TRANSFER_ARROW)
 		return self
 	end
 
 	local iconModule = Lua.import(config.iconModule, {loadData = true})
-	local getIcon = function(icon) return iconModule[string.lower(icon)] end
+	local getIcon = function(iconInput)
+		local icon = iconModule[string.lower(iconInput)]
+		if not icon then
+			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
+			return '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]]'
+		end
+
+		return icon
+	end
 
 	local iconRows = Array.map(self.transfer.players, function(player)
-		return self:_createPosRow(player.icons, getIcon)
+		return getIcon(player.icons[1]) .. '&nbsp;' .. TRANSFER_ARROW .. '&nbsp;' .. getIcon(player.icons[2])
 	end)
+	iconCell:wikitext(table.concat(iconRows, '<br>'))
 
-
-end
-function p._createPosRow(frame, iconLeft, iconRight, iconModule)
-	local function createIcon(iconInput)
-		if iconInput then
-			local iconTemp = iconModule{iconInput, faction = iconInput}
-			if not iconTemp then
-				mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
-				return '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]] '
-			end
-			return iconTemp
-		end
-	end
-
-	return (createIcon(iconLeft) or '')  .. '&nbsp;&#x21d2;&nbsp;' .. (createIcon(iconRight) or '')
-end
-function p._createIcon(frame, args)
-	local div = mw.html.create('div'):attr('class', 'divCell Icon'):css('width', '70px')
-
-	if args.iconModule and not args.iconPlayer then
-		if args.iconFunction then
-			getIcon = require(args.iconModule)[args.iconFunction]
-		else
-			getIcon = function(iconData) return mw.loadData(args.iconModule)[string.lower(iconData[1])] end
-		end
-
-		div:wikitext(p._createPosRow(frame, args.posIcon, args.posIcon_2, getIcon))
-		local nameIndex = 2
-		while (args['name' .. nameIndex] ~= nil) do
-			div:wikitext('<br/>')
-			div:wikitext(p._createPosRow(
-				frame,
-				args['posIcon' .. nameIndex],
-				args['posIcon' .. nameIndex .. '_2'],
-				getIcon
-			))
-			nameIndex = nameIndex + 1
-		end
-	else
-		-- The Arrow
-		div:css('font-size','larger'):wikitext('&#x21d2;')
-	end
-
-	return div
+	return self
 end
 
 ---@return self
@@ -338,7 +368,10 @@ end
 
 ---@return self
 function TransferRowDisplay:references()
-
+	self.display:tag('div')
+		:addClass('divCell Ref')
+		:wikitext(table.concat(self.transfer.references, '<br>'))
+	return self
 end
 
 ---@return Html
