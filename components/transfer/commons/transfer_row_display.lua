@@ -27,11 +27,9 @@ local TRANSFER_ARROW = '&#x21d2;'
 ---@class TransferRowDisplayConfig
 ---@field showTeamName boolean
 ---@field iconModule string?
----@field iconParam string?
 ---@field iconTransfers boolean
 ---@field platformIcons boolean
 ---@field referencesAsTable boolean
----@field syncPlayers boolean
 
 ---@class enrichedTransfer
 ---@field from {teams: string[], roles: string[]}
