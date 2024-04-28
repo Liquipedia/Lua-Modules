@@ -21,7 +21,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local Info = Lua.import('Module:Info', {loadData = true})
-local TransferRow = Lua.import('Module:Transfer/Custom')
+local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -388,7 +388,7 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRow.displayRow(transfers)
+	return TransferRowDisplay(transfers):display()
 end
 
 return TransferList

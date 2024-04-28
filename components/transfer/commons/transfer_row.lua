@@ -301,7 +301,7 @@ end
 
 ---@return Html?
 function TransferRow:build()
-	return TransferRowDisplay.run(self.transfers)
+	return TransferRowDisplay(self.transfers):display()
 end
 
 return TransferRow
