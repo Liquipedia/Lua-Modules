@@ -32,8 +32,7 @@ return {
 			allowManual = true,
 		},
 		transfers = {
-			displayTeamName = false, -- bool
-			iconFunction = nil, -- string?
+			showTeamName = false, -- bool
 			iconModule = nil, -- string?
 			iconParam = 'pos', -- string?
 			iconTransfers = false, -- bool

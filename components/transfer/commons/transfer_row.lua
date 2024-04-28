@@ -25,8 +25,7 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
 ---@class TransferRowConfig
----@field displayTeamName boolean
----@field iconFunction string?
+---@field showTeamName boolean
 ---@field iconModule string?
 ---@field iconParam string?
 ---@field iconTransfers boolean
@@ -145,7 +144,9 @@ function TransferRow:_readBaseData()
 		extradata = {
 			displaydate = args.date or '',
 			fromteamsec = fromTeam[1].name or '',
+			fromteamsectemplate = fromTeam[1].template or '',
 			toteamsec = toTeam[2].name or '',
+			toteamsectemplate = toTeam[2].template or '',
 			notable = Logic.readBool(args.notableTransfer) and 1 or nil,
 			role1sec = fromRole[2] or '',
 			role2sec = toRole[2] or '',
@@ -301,7 +302,7 @@ end
 
 ---@return Html?
 function TransferRow:build()
-	return TransferRowDisplay(self.transfers):display()
+	return TransferRowDisplay(self.transfers):build()
 end
 
 return TransferRow

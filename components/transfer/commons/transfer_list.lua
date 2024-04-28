@@ -46,10 +46,9 @@ local DEFAULT_VALUES = {
 ---@field class string?
 ---@field showMissingResultsMessage boolean
 ---@field iconModule string?
----@field iconFunction string?
 ---@field iconTransfers boolean?
 ---@field refType string?
----@field displayTeamName boolean
+---@field showTeamName boolean
 ---@field conditions TransferListConditionConfig
 
 ---@class TransferListConditionConfig
@@ -388,7 +387,7 @@ function TransferList:_buildRow(transfers)
 		firstTransfer.role2 = nil
 	end
 
-	return TransferRowDisplay(transfers):display()
+	return TransferRowDisplay(transfers):build()
 end
 
 return TransferList

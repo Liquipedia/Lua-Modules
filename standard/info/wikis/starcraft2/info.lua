@@ -59,9 +59,7 @@ return {
 			allowManual = true,
 		},
 		transfers = {
-			displayTeamName = false,
-			iconFunction = 'Icon',
-			iconModule = 'Module:Faction',
+			showTeamName = false,
 			iconTransfers = false,
 			platformIcons = false,
 			referencesAsTable = false,
