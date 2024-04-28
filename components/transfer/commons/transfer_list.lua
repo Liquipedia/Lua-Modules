@@ -46,7 +46,6 @@ local DEFAULT_VALUES = {
 ---@field class string?
 ---@field showMissingResultsMessage boolean
 ---@field iconModule string?
----@field iconTransfers boolean?
 ---@field refType string?
 ---@field showTeamName boolean
 ---@field conditions TransferListConditionConfig

@@ -28,7 +28,6 @@ local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 ---@field showTeamName boolean
 ---@field iconModule string?
 ---@field iconParam string?
----@field iconTransfers boolean
 ---@field platformIcons boolean
 ---@field positionConvert string?
 ---@field referencesAsTable boolean

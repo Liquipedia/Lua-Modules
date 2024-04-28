@@ -27,7 +27,6 @@ local TRANSFER_ARROW = '&#x21d2;'
 ---@class TransferRowDisplayConfig
 ---@field showTeamName boolean
 ---@field iconModule string?
----@field iconTransfers boolean
 ---@field platformIcons boolean
 ---@field referencesAsTable boolean
 
@@ -330,7 +329,7 @@ function TransferRowDisplay:icon()
 		:css('width', '70px')
 
 	local config = self.config
-	if not config.iconModule or not config.iconTransfers then
+	if not config.iconModule then
 		iconCell:css('font-size','larger'):wikitext(TRANSFER_ARROW)
 		return self
 	end

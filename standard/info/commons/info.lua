@@ -35,7 +35,6 @@ return {
 			showTeamName = false, -- bool
 			iconModule = nil, -- string?
 			iconParam = 'pos', -- string?
-			iconTransfers = false, -- bool
 			platformIcons = false, -- bool
 			positionConvert = nil, -- string?
 			referencesAsTable = false, -- bool

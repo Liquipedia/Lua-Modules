@@ -60,7 +60,6 @@ return {
 		},
 		transfers = {
 			showTeamName = false,
-			iconTransfers = false,
 			platformIcons = false,
 			referencesAsTable = false,
 			syncPlayers = true,
