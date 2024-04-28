@@ -79,7 +79,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field result MatchTableMatchResult
 ---@field game string?
 ---@field date string
----@field dateTime string
+---@field dateTime string?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -400,8 +400,12 @@ end
 
 ---@param timeZone string
 ---@param timestamp number
----@return string
+---@return string?
 function MatchTable._calculateDateTimeString(timeZone, timestamp)
+	if timestamp == DateExt.defaultTimestamp then
+		return nil
+	end
+
 	local offset = Timezone.getOffset(timeZone) or 0
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
@@ -614,16 +618,18 @@ function MatchTable:_displayDate(match)
 		:css('text-align', 'left')
 		:attr('data-sort-value', match.timestamp)
 
+	local timestamp = match.timestamp ~= DateExt.defaultTimestamp and match.timestamp or nil
+
 	if not match.timeIsExact then
-		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp or ''))
+		return cell:node(timestamp and DateExt.formatTimestamp('M d, Y', match.timestamp) or '')
 	end
 
-	return cell:node(Countdown._create{
+	return cell:node(match.dateTime and Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
 		date = match.dateTime,
 		rawdatetime = true,
-	})
+	} or nil)
 end
 
 ---@param match MatchTableMatch
