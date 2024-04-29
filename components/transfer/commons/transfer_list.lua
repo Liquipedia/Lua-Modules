@@ -90,7 +90,7 @@ end
 ---@param args table
 ---@return self
 function TransferList:parseArgs(args)
-	local players = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.players)) or {args.player} --[[@as string[] ]]
+	local players = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.players)) or {args.player}
 	local roles = Array.parseCommaSeparatedString(args.role)
 
 	local sortOrder = args.order or DEFAULT_VALUES.order
