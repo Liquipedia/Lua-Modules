@@ -67,7 +67,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class MatchTableMatch
 ---@field timestamp number
----@field timezoneid string
+---@field timezone string
 ---@field timeIsExact boolean
 ---@field liquipediatier string?
 ---@field liquipediatiertype string?
@@ -382,7 +382,7 @@ function MatchTable:matchFromRecord(record)
 
 	return {
 		timestamp = record.extradata.timestamp,
-		timezoneid = record.extradata.timezoneid or UTC,
+		timezone = record.extradata.timezoneid or UTC,
 		timeIsExact = Logic.readBool(record.dateexact),
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
@@ -615,7 +615,7 @@ function MatchTable:_displayDate(match)
 	return cell:node(Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
-		date = MatchTable._calculateDateTimeString(match.timezoneid, match.timestamp),
+		date = MatchTable._calculateDateTimeString(match.timezone, match.timestamp),
 		rawdatetime = true,
 	} or nil)
 end
@@ -624,8 +624,8 @@ end
 ---@param timeZone string
 ---@param timestamp number
 ---@return string?
-function MatchTable._calculateDateTimeString(timeZone, timestamp)
-	local offset = Timezone.getOffset(timeZone) or 0
+function MatchTable._calculateDateTimeString(timezone, timestamp)
+	local offset = Timezone.getOffset(timezone) or 0
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
 		' ' .. Timezone.getTimezoneString(timeZone)
