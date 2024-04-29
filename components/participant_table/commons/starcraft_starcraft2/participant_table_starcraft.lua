@@ -117,7 +117,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
-		race = valueFromArgs('race'),
+		faction = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -232,9 +232,9 @@ function StarcraftParticipantTable:_getFactionNumbers()
 		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
 		Array.forEach(section.entries, function(entry)
-			local faction = entry.opponent.players[1].race or Faction.defaultFaction
+			local faction = entry.opponent.players[1].faction or Faction.defaultFaction
 			--if we have defaultFaction push it into the entry too
-			entry.opponent.players[1].race = faction
+			entry.opponent.players[1].faction = faction
 			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
 			if entry.dq then
 				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
@@ -303,7 +303,7 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
-				entry and self:displayEntry(entry, {showRace = false}) or
+				entry and self:displayEntry(entry, {showFaction = false}) or
 				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)
