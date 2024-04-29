@@ -620,7 +620,6 @@ function MatchTable:_displayDate(match)
 	} or nil)
 end
 
---dateTime = MatchTable._calculateDateTimeString(record.extradata.timezoneid or UTC, record.extradata.timestamp),
 ---@param timeZone string
 ---@param timestamp number
 ---@return string?
