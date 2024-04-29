@@ -25,7 +25,7 @@ local CustomPlayerExt = Table.deepCopy(PlayerExt)
 CustomPlayerExt.globalVars = globalVars
 
 ---@param resolvedPageName string
----@return {flag: string?, race: string?, raceHistory: table[]?}?
+---@return {flag: string?, faction: string?, factionHistory: table[]?}?
 CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -34,14 +34,14 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		local raceHistory = Logic.readBool(record.extradata.factionhistorical)
-			and CustomPlayerExt.fetchRaceHistory(resolvedPageName)
+		local factionHistory = Logic.readBool(record.extradata.factionhistorical)
+			and CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 			or nil
 
 		return {
 			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
-			race = Faction.read(record.extradata.faction),
-			raceHistory = raceHistory,
+			faction = Faction.read(record.extradata.faction),
+			factionHistory = factionHistory,
 		}
 	end
 end)
@@ -49,14 +49,14 @@ end)
 ---@param resolvedPageName string
 ---@param date string|number?
 ---@return string?
-function CustomPlayerExt.fetchPlayerRace(resolvedPageName, date)
+function CustomPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
-	if lpdbPlayer and lpdbPlayer.raceHistory then
+	if lpdbPlayer and lpdbPlayer.factionHistory then
 		date = date or DateExt.getContextualDateOrNow()
-		local entry = Array.find(lpdbPlayer.raceHistory, function(entry) return date <= entry.endDate end)
-		return entry and Faction.read(entry.race)
+		local entry = Array.find(lpdbPlayer.factionHistory, function(entry) return date <= entry.endDate end)
+		return entry and Faction.read(entry.faction)
 	else
-		return lpdbPlayer and lpdbPlayer.race
+		return lpdbPlayer and lpdbPlayer.faction
 	end
 end
 
@@ -69,7 +69,7 @@ end
 
 ---@param resolvedPageName string
 ---@return table[]
-function CustomPlayerExt.fetchRaceHistory(resolvedPageName)
+function CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 	local conditions = {
 		'[[type::playerrace]]',
 		'[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -79,15 +79,15 @@ function CustomPlayerExt.fetchRaceHistory(resolvedPageName)
 		query = 'information, extradata',
 	})
 
-	local raceHistory = Array.map(rows, function(row)
+	local factionHistory = Array.map(rows, function(row)
 		return {
 			endDate = row.extradata.enddate,
-			race = Faction.read(row.information),
+			faction = Faction.read(row.information),
 			startDate = row.extradata.startdate,
 		}
 	end)
-	Array.sortInPlaceBy(raceHistory, function(entry) return entry.startDate end)
-	return raceHistory
+	Array.sortInPlaceBy(factionHistory, function(entry) return entry.startDate end)
+	return factionHistory
 end
 
 ---@param player WarcraftStandardPlayer
@@ -98,9 +98,9 @@ function CustomPlayerExt.syncPlayer(player, options)
 
 	player = PlayerExt.syncPlayer(player, options) --[[@as WarcraftStandardPlayer]]
 
-	player.race = player.race
+	player.faction = player.faction
 		or globalVars:get(player.displayName .. '_race')
-		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerRace(player.pageName, options.date)
+		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerFaction(player.pageName, options.date)
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
@@ -112,8 +112,8 @@ end
 
 ---@param player WarcraftStandardPlayer
 function CustomPlayerExt.saveToPageVars(player)
-	if player.race and player.race ~= Faction.defaultFaction then
-		globalVars:set(player.displayName .. '_race', player.race)
+	if player.faction and player.faction ~= Faction.defaultFaction then
+		globalVars:set(player.displayName .. '_race', player.faction)
 	end
 
 	PlayerExt.saveToPageVars(player)

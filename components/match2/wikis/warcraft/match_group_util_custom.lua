@@ -25,11 +25,11 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
+CustomMatchGroupUtil.types.Faction = TypeUtil.literalUnion(unpack(Faction.getFactions()))
 
 CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
 	position = 'number?',
-	race = CustomMatchGroupUtil.types.Race,
+	faction = CustomMatchGroupUtil.types.Faction,
 	random = 'boolean',
 })
 
@@ -51,7 +51,7 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class WarcraftMatchGroupUtilGame: MatchGroupUtilGame
 ---@field opponents  WarcraftMatchGroupUtilGameOpponent[]
----@field offraces table<integer, string[]>?
+---@field offfactions table<integer, string[]>?
 
 ---@class WarcraftMatchGroupUtilVeto
 ---@field by number?
@@ -138,7 +138,7 @@ function CustomMatchGroupUtil.populateOpponents(match)
 		opponent.status2 = opponent.score2 and SCORE_STATUS or nil
 
 		for _, player in ipairs(opponent.players) do
-			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
+			player.faction = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
 	end
 
@@ -159,7 +159,7 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		if matchPlayer then
 			return Table.merge(matchPlayer, {
 				matchplayerIndex = matchplayerIndex,
-				race = participant.faction,
+				faction = participant.faction,
 				position = tonumber(participant.position),
 				heroes = participant.heroes,
 				random = participant.random,
@@ -168,7 +168,7 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 			return {
 				displayName = 'TBD',
 				matchplayerIndex = matchplayerIndex,
-				race = Faction.defaultFaction,
+				faction = Faction.defaultFaction,
 			}
 		end
 	end
@@ -244,9 +244,9 @@ end
 function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
-	--check the race of the players
+	--check the faction of the players
 	for opponentIndex in pairs(opponents) do
-		CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
+		CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
 	end
 
 	-- Sum up scores
@@ -314,52 +314,52 @@ end
 ---@param games WarcraftMatchGroupUtilGame[]
 ---@param opponents WarcraftMatchGroupUtilGameOpponent[]
 ---@param opponentIndex integer
-function CustomMatchGroupUtil._determineSubmatchPlayerRaces(match, games, opponents, opponentIndex)
+function CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
 	local opponent = opponents[opponentIndex]
-	local playerRaces = {}
+	local playerFactions = {}
 	Array.forEach(games, function(game)
 		for playerIndex, player in pairs(game.opponents[opponentIndex].players) do
-			playerRaces[playerIndex] = playerRaces[playerIndex] or {}
-			playerRaces[playerIndex][player.race] = true
+			playerFactions[playerIndex] = playerFactions[playerIndex] or {}
+			playerFactions[playerIndex][player.faction] = true
 		end
 	end)
 
-	local toRace = function(playerIndex, player)
+	local toFaction = function(playerIndex, player)
 		local isRandom = Array.any(games, function(game)
 			return game.opponents[opponentIndex].players[playerIndex].random
 		end)
 		if isRandom then return Faction.read('r') end
 
-		local race = Table.uniqueKey(playerRaces[playerIndex])
-		if race then return race end
+		local faction = Table.uniqueKey(playerFactions[playerIndex])
+		if faction then return faction end
 
-		if Table.isNotEmpty(playerRaces[playerIndex]) then
+		if Table.isNotEmpty(playerFactions[playerIndex]) then
 			return Faction.read('m')
 		end
 
 		local matchPlayer = match.opponents[opponentIndex].players[player.matchplayerIndex]
-		return matchPlayer and matchPlayer.race or Faction.defaultFaction
+		return matchPlayer and matchPlayer.faction or Faction.defaultFaction
 	end
 
 	for playerIndex, player in pairs(opponent.players) do
-		player.race = toRace(playerIndex, player)
+		player.faction = toFaction(playerIndex, player)
 	end
 end
 
----Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
----Returns the races played if at least one player chose an offrace or nil if otherwise.
+---Determines if any players in an opponent are not playing their main faction by comparing them to a reference opponent.
+---Returns the factions played if at least one player chose an offfaction or nil if otherwise.
 ---@param gameOpponent WarcraftMatchGroupUtilGameOpponent
 ---@param referenceOpponent WarcraftStandardOpponent|WarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
-function CustomMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
-	local gameRaces = {}
-	local hasOffrace = false
+function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent)
+	local gameFactions = {}
+	local hasOfffaction = false
 	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do
 		local referencePlayer = referenceOpponent.players[playerIndex]
-		table.insert(gameRaces, gamePlayer.race)
-		hasOffrace = hasOffrace or gamePlayer.race ~= referencePlayer.race
+		table.insert(gameFactions, gamePlayer.faction)
+		hasOfffaction = hasOfffaction or gamePlayer.faction ~= referencePlayer.faction
 	end
-	return hasOffrace and gameRaces or nil
+	return hasOfffaction and gameFactions or nil
 end
 
 ---@param record table
@@ -372,7 +372,7 @@ function CustomMatchGroupUtil.playerFromRecord(record)
 		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
 		pageIsResolved = true,
 		pageName = record.name,
-		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
+		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
 end
 
