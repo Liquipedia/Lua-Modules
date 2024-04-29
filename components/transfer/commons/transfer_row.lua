@@ -213,20 +213,20 @@ function TransferRow:_convertToTransferStructure(data)
 	local subs = {args['sub' .. playerIndex], args['sub' .. playerIndex .. '_2']}
 	local icons, positions = self:readIconsAndPosition(data.player, playerIndex)
 
-	return Table.deepMergeInto({}, self.baseData, {
+	return Table.merge(self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
 		nationality = player.flag,
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
 		reference = self.references.applyAll and self.references.refs or self.references.refs['reference' .. playerIndex],
-		extradata = {
+		extradata = Table.merge(self.baseData.extradata, {
 			position = positions[1] or '',
 			icon = icons[1] or '',
 			icon2 = icons[2] or '',
 			icontype = subs[1] and 'Substitute' or '',
 			displayname = player.displayName or '',
 			sortindex = data.sortIndex,
-		},
+		}),
 	})
 end
 
