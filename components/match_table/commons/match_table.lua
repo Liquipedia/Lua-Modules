@@ -627,7 +627,7 @@ function MatchTable._calculateDateTimeString(timezone, timestamp)
 	local offset = Timezone.getOffset(timezone) or 0
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. Timezone.getTimezoneString(timeZone)
+		' ' .. Timezone.getTimezoneString(timezone)
 end
 
 ---@param match MatchTableMatch
