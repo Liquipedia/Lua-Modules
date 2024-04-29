@@ -250,7 +250,7 @@ function TransferRowDisplay:players()
 		if playerIndex ~= 1 then
 			playersCell:newline()
 		end
-		playersCell:node(PlayerDisplay.InlinePlayer{player = player})
+		playersCell:node(PlayerDisplay.BlockPlayer{player = player})
 	end)
 
 	return self
@@ -311,15 +311,18 @@ end
 function TransferRowDisplay:_createRole(roles, team)
 	if Logic.isEmpty(roles) then return end
 
+	local rolesText = table.concat(roles, '/')
+
 	local roleCell = mw.html.create('span')
 		:css('font-style', 'italic')
-		:wikitext('(' .. table.concat(roles, '/') .. ')')
 
 	if Logic.isEmpty(team) then
-		return roleCell
+		return roleCell:wikitext(rolesText)
 	end
 
-	return roleCell:css('font-size', '85%')
+	return roleCell
+		:css('font-size', '85%')
+		:wikitext('(' .. rolesText .. ')')
 end
 
 ---@return self

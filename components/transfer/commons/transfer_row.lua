@@ -117,26 +117,30 @@ function TransferRow:_readBaseData()
 	local date = args.date_est or args.date
 	local fromDate = TransferRow._shiftDate(date)
 
-	---@param teamInput string?
+	---@param teamInput string
 	---@param dateInput string?
 	---@return {name: string?, template: string?}
 	local checkTeam = function(teamInput, dateInput)
-		if not teamInput or not mw.ext.TeamTemplate.teamexists(teamInput) then
+		if Logic.isEmpty(teamInput) or not mw.ext.TeamTemplate.teamexists(teamInput) then
 			return {}
 		end
 		local teamData = mw.ext.TeamTemplate.raw(teamInput, dateInput)
 		return {name = teamData.page, template = teamData.templatename}
 	end
 
-	local toTeam = Array.map({args.team2, args.team2_2}, function(input) return checkTeam(input, date) end)
-	local fromTeam = Array.map({args.team1, args.team1_2}, function(input) return checkTeam(input, fromDate) end)
+	local toTeam = Array.map({args.team2 or '', args.team2_2 or ''}, function(input)
+		return checkTeam(input, date)
+	end)
+	local fromTeam = Array.map({args.team1 or '', args.team1_2 or ''}, function(input)
+		return checkTeam(input, fromDate)
+	end)
 
 	return {
 		date = date,
-		fromteam = toTeam[1].name or '',
-		fromteamtemplate = toTeam[1].template or '',
-		toteam = fromTeam[1].name or '',
-		toteamtemplate = fromTeam[1].template or '',
+		fromteam = fromTeam[1].name or '',
+		fromteamtemplate = fromTeam[1].template or '',
+		toteam = toTeam[1].name or '',
+		toteamtemplate = toTeam[1].template or '',
 		role1 = fromRole[1],
 		role2 = toRole[1],
 		wholeteam = Logic.readBool(args.wholeteam) and 1 or 0,
