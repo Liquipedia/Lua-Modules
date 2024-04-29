@@ -218,7 +218,7 @@ function TransferRow:_convertToTransferStructure(data)
 		nationality = player.flag,
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
-		reference = self.references.applyAll and self.references.refs or self.references.refs['reference' .. playerIndex],
+		reference = self.references.applyToAll and self.references.refs or self.references.refs['reference' .. playerIndex],
 		extradata = Table.merge(self.baseData.extradata, {
 			position = positions[1] or '',
 			icon = icons[1] or '',
@@ -260,10 +260,10 @@ function TransferRow:readIconsAndPosition(player, playerIndex)
 end
 
 ---@param numberOfPlayers integer
----@return {refs: table, applyAll: boolean}
+---@return {refs: table, applyToAll: boolean}
 function TransferRow:_readReferences(numberOfPlayers)
 	if Logic.isEmpty(self.args.ref) or not self.config.referencesAsTable then
-		return {refs = {reference1 = self.args.ref or ''}, applyAll = true}
+		return {refs = {reference1 = self.args.ref or ''}, applyToAll = true}
 	end
 
 	local referencesArray = Array.parseCommaSeparatedString(self.args.ref, ';;;')
@@ -276,10 +276,10 @@ function TransferRow:_readReferences(numberOfPlayers)
 
 	-- same amount of players and references? individually allocate them for LPDB storage
 	-- special case: 2 refs/players (often times this will be a reference from both teams)
-	local allRef = numberOfReferences == numberOfPlayers and
-		(numberOfReferences > 2 or not Logic.isEmpty(self.args.team1) or Logic.isEmpty(self.args.team2))
+	local allRef = numberOfReferences ~= numberOfPlayers or
+		(numberOfReferences <= 2 and Logic.isNotEmpty(self.args.team1) and Logic.isNotEmpty(self.args.team2))
 
-	return {refs = references, applyAll = allRef}
+	return {refs = references, applyToAll = allRef}
 end
 
 ---@return self
