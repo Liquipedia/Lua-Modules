@@ -194,7 +194,7 @@ function MatchFunctions.parseSetting(match)
 	match.statusSettings = Array.flatMap(Array.parseCommaSeparatedString(match.bg, ','), function (status)
 		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
 		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
-		return Array.map(Array.range(tonumber(pStart), tonumber(pEnd)), function()
+		return Array.map(Array.range(tonumber(pStart), tonumber(pEnd) or tonumber(pStart)), function()
 			return color
 		end)
 	end)

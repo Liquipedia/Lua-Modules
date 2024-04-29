@@ -120,7 +120,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 end
 
 function CustomPlayerDisplay.character(game, character)
-	return Characters.GetIconAndName{character, game = game, large = true}
+	return Characters.GetIconAndName{character, game = game}
 end
 
 return CustomPlayerDisplay
