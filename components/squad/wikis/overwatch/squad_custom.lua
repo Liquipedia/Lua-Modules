@@ -25,7 +25,7 @@ local HAS_NUMBER = false
 
 function CustomInjector:parse(id, widgets)
 	if id == 'header_name' and HAS_NUMBER then
-		table.insert(widgets, Widget.TableCellNew{content = {'Number'}, header = true})
+		table.insert(widgets, 1, Widget.TableCellNew{content = {'Number'}, header = true})
 	end
 
 	return self._base:parse(id, widgets)
