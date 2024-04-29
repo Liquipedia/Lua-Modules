@@ -99,7 +99,7 @@ function TransferList:parseArgs(args)
 		objectNameSortOrder = 'desc'
 	end
 
-	return Table.merge(Info.config.squads, {
+	return Table.merge(Info.config.transfers, {
 		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,

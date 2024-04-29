@@ -54,7 +54,7 @@ local TransferRowDisplay = Class.new(
 	---@param transfers transfer[]
 	---@return self
 	function(self, transfers)
-		self.config = Info.config.squads
+		self.config = Info.config.transfers
 		self.transfer = self:_enrichTransfers(transfers)
 		self.display = mw.html.create('div')
 
@@ -137,7 +137,7 @@ function TransferRowDisplay:_getReferences(transfers)
 
 	local references = {}
 	Array.forEach(transfers, function(transfer)
-		for _, reference in Table.iter.pairsByPrefix(transfer.reference, 'reference') do
+		for _, reference in Table.iter.pairsByPrefix(transfer.reference or {}, 'reference') do
 			if Array.all(references, function(ref) return ref ~= reference end) then
 				table.insert(references, reference)
 			end
@@ -170,6 +170,7 @@ function TransferRowDisplay:_getReferences(transfers)
 					'but was revealed by a change in the LoL Esports League-Recognized Contract Database'
 			), 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#')
 		end
+		return nil
 	end)
 end
 
@@ -247,9 +248,6 @@ function TransferRowDisplay:players()
 		:addClass('divCell Name')
 
 	Array.forEach(self.transfer.players, function(player, playerIndex)
-		if playerIndex ~= 1 then
-			playersCell:newline()
-		end
 		playersCell:node(PlayerDisplay.BlockPlayer{player = player})
 	end)
 
@@ -274,7 +272,7 @@ function TransferRowDisplay:_displayTeam(args)
 	local data = args.data
 	local align = isOldTeam and 'right' or 'left'
 	local teamCell = mw.html.create('div')
-		:addClass('divCell Team' .. (args.isOldTeam and 'OldTeam' or 'NewTeam'))
+		:addClass('divCell Team ' .. (args.isOldTeam and 'OldTeam' or 'NewTeam'))
 
 	if showTeamName then
 		teamCell:css('text-align', align)
@@ -299,7 +297,8 @@ function TransferRowDisplay:_displayTeam(args)
 	end
 
 	if data.teams[1] then
-		teamCell:newline()
+		---`teamCell:newline()` does not work here ...
+		teamCell:wikitext('<br>')
 	end
 
 	return teamCell:node(roleCell)
