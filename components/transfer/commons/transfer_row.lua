@@ -6,10 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[old one:
-https://liquipedia.net/commons/index.php?title=Module:Transfer/dev&action=edit
-]]
-
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
@@ -59,7 +55,7 @@ end
 
 ---@return TransferRowConfig
 function TransferRow:readConfig()
-	return Table.merge(Info.config.squads, {
+	return Table.merge(Info.config.transfers, {
 		storage = not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 			and Namespace.isMain()
@@ -146,8 +142,8 @@ function TransferRow:_readBaseData()
 		wholeteam = Logic.readBool(args.wholeteam) and 1 or 0,
 		extradata = {
 			displaydate = args.date or '',
-			fromteamsec = fromTeam[1].name or '',
-			fromteamsectemplate = fromTeam[1].template or '',
+			fromteamsec = fromTeam[2].name or '',
+			fromteamsectemplate = fromTeam[2].template or '',
 			toteamsec = toTeam[2].name or '',
 			toteamsectemplate = toTeam[2].template or '',
 			notable = Logic.readBool(args.notableTransfer) and 1 or nil,
@@ -300,7 +296,7 @@ end
 ---@param transfer transfer
 ---@return string
 function TransferRow._objectName(transfer)
-	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.transferSortIndex)
+	return 'transfer_' .. transfer.date .. '_' .. string.format('%06d', transfer.extradata.sortindex)
 end
 
 ---@return Html?
