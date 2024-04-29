@@ -33,8 +33,8 @@ local ColumnName = Condition.ColumnName
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
-	oder = 'desc',
-	limit = 20,
+	order = 'desc',
+	limit = 300,
 }
 
 ---@class TransferListConfig
@@ -113,8 +113,8 @@ function TransferList:parseArgs(args)
 			startDate = Logic.nilIfEmpty(args.sdate),
 			endDate = Logic.nilIfEmpty(args.edate),
 			date = Logic.nilIfEmpty(args.date),
-			roles1 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role1))),
-			roles2 = Logic.nilIfEmpty(Array.append(roles, Array.parseCommaSeparatedString(args.role2))),
+			roles1 = Logic.nilIfEmpty(Array.extend(roles, Array.parseCommaSeparatedString(args.role1))),
+			roles2 = Logic.nilIfEmpty(Array.extend(roles, Array.parseCommaSeparatedString(args.role2))),
 			positions = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.position)),
 			platform = Logic.nilIfEmpty(args.platform),
 			onlyNotableTransfers = Logic.readBool(args.onlyNotableTransfers),
@@ -221,15 +221,13 @@ end
 
 ---@return ConditionTree
 function TransferList:_buildBaseConditions()
-	if self.baseConditions then return self.baseConditions end
-
 	local config = self.config.conditions
 
 	self.baseConditions = ConditionTree(BooleanOperator.all)
 		:add(self:_buildOrConditions('players', 'player'))
 		:add(self:_buildOrConditions('nationalities', 'nationality'))
 		:add(self:_buildOrConditions('roles2', 'role2'))
-		:add(self:_buildOrConditions('extradata_position', 'positions'))
+		:add(self:_buildOrConditions('positions', 'extradata_position'))
 
 	if config.platform then
 		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
@@ -246,7 +244,7 @@ end
 ---@return ConditionTree?
 function TransferList:_buildDateCondition(date)
 	local config = self.config.conditions
-	local dateConditions = ConditionTree(BooleanOperator.any)
+	local dateConditions = ConditionTree(BooleanOperator.all)
 
 	date = date or config.date
 	if date then
@@ -258,20 +256,20 @@ function TransferList:_buildDateCondition(date)
 	end
 
 	if config.startDate then
-		dateConditions:add{
+		dateConditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('date'), Comparator.gt, config.startDate),
 			ConditionNode(ColumnName('date'), Comparator.eq, config.startDate),
-		}
+		})
 	else
 		dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
 	end
 
 	if config.endDate then
 		local endDate = config.endDate .. ' 23:59:59'
-		dateConditions:add{
+		dateConditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('date'), Comparator.lt, endDate),
 			ConditionNode(ColumnName('date'), Comparator.eq, endDate),
-		}
+		})
 	end
 
 	return dateConditions
@@ -290,10 +288,11 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	end
 
 	if self.teamConditions then return self.teamConditions end
+	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(TransferList:_buildOrConditions('teams', 'fromteam'))
-		:add(TransferList:_buildOrConditions('teams', 'toteam'))
+		:add(self:_buildOrConditions('teams', 'fromteam'))
+		:add(self:_buildOrConditions('teams', 'toteam'))
 
 	return self.teamConditions
 end
@@ -304,7 +303,7 @@ end
 ---@return ConditionTree?
 function TransferList:_buildOrConditions(configField, lpdbField, data)
 	data = data or self.config.conditions[configField]
-	if not data then return nil end
+	if Logic.isEmpty(data) then return nil end
 	return ConditionTree(BooleanOperator.any)
 		:add(Array.map(data, function(item)
 			return ConditionNode(ColumnName(lpdbField), Comparator.eq, item)
