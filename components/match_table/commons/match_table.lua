@@ -620,9 +620,9 @@ function MatchTable:_displayDate(match)
 	} or nil)
 end
 
----@param timeZone string
+---@param timezone string
 ---@param timestamp number
----@return string?
+---@return string
 function MatchTable._calculateDateTimeString(timezone, timestamp)
 	local offset = Timezone.getOffset(timezone) or 0
 
