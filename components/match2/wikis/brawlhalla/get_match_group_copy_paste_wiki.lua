@@ -10,9 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 ---WikiSpecific Code for MatchList and Bracket Code Generators
