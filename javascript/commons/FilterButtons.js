@@ -36,7 +36,7 @@
  *   Expanded template will replace default content.
  * - data-filter-group (required): Identify the groups of filterbuttons the template should receive the current parameters from.
  *   Should correspond to appropriate filter button groups used on the page.
- *	 For each group, the template will receive a parameter groupName holding the currently active group settings.
+ *   For each group, the template will receive a parameter groupName holding the currently active group settings.
  */
 
 liquipedia.filterButtons = {
