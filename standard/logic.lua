@@ -70,8 +70,9 @@ function Logic.isNotEmpty(val)
 	end
 end
 
----@param val table|string?
----@return table|string?
+---@generic V
+---@param val V?
+---@return V?
 function Logic.nilIfEmpty(val)
 	return Logic.isNotEmpty(val) and val or nil
 end
