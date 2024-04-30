@@ -24,7 +24,7 @@ local Center = Widgets.Center
 local Chronology = Widgets.Chronology
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
-local Highlights = require('Module:Infobox/Widget/Highlights')
+local Highlights = Widgets.Highlights
 
 ---@class PatchInfobox: BasicInfobox
 local Patch = Class.new(BasicInfobox)
