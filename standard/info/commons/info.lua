@@ -33,8 +33,10 @@ return {
 		},
 		transfers = {
 			showTeamName = false, -- bool
-			iconParam = 'pos', -- string?
-			referencesAsTable = false, -- bool
+			iconParam = nil, -- string?, default is 'pos',
+				-- smash uses `head`
+				-- teamfortress `class`
+				-- rest all default
 		},
 	},
 	match2 = 2,

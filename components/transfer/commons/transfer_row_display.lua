@@ -28,7 +28,6 @@ local TRANSFER_ARROW = '&#x21d2;'
 
 ---@class TransferRowDisplayConfig
 ---@field showTeamName boolean
----@field referencesAsTable boolean
 
 ---@class enrichedTransfer
 ---@field from {teams: string[], roles: string[]}
@@ -129,24 +128,21 @@ end
 ---@param transfers transfer[]
 ---@return string[]
 function TransferRowDisplay:_getReferences(transfers)
-	if not self.config.referencesAsTable then
-		return {transfers[1].reference.reference1}
-	end
-
 	local references = {}
 	Array.forEach(transfers, function(transfer)
-		for _, reference in Table.iter.pairsByPrefix(transfer.reference or {}, 'reference') do
-			if Array.all(references, function(ref) return ref ~= reference end) then
+		transfer.reference = transfer.reference or {}
+		for prefix, referenceUrl in Table.iter.pairsByPrefix(transfer.reference, 'reference') do
+			local reference = {url = referenceUrl, type = transfer.reference[prefix .. 'type']}
+			if Array.all(references, function(ref) return not Table.deepEquals(ref, reference) end) then
 				table.insert(references, reference)
 			end
 		end
 	end)
 
 	return Array.map(references, function(reference)
-		local refferenceDataArray = Array.parseCommaSeparatedString(reference, ',,,')
-		local refType = refferenceDataArray[1]
-		local link = refferenceDataArray[2] or ''
-		if refType == 'web source' and Logic.isNotEmpty(link) then
+		local refType = reference.type
+		local link = reference.url
+		if refType == 'web source' then
 			return Page.makeExternalLink(Icon.makeIcon{
 				iconName = 'reference',
 				color = 'wiki-color-dark',

@@ -26,7 +26,6 @@ local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform')
 
 ---@class TransferRowConfig
 ---@field iconParam string?
----@field referencesAsTable boolean
 ---@field storage boolean?
 
 ---@class TransferRow: BaseClass
@@ -198,7 +197,7 @@ function TransferRow:readPlayer(playerIndex)
 	}
 end
 
----@param data {player: standardPlayer, index: integer|string, sortIndex: integer, references: table<integer, string[]>}
+---@param data {player: standardPlayer, index: integer|string, sortIndex: integer}
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
 	local args = self.args
@@ -213,7 +212,7 @@ function TransferRow:_convertToTransferStructure(data)
 		nationality = player.flag,
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
-		reference = self.references.applyToAll and self.references.refs or self.references.refs['reference' .. playerIndex],
+		reference = self.references[playerIndex] or self.references.all or {reference1 = ''},
 		extradata = Table.merge(self.baseData.extradata, {
 			position = positions[1] or '',
 			icon = icons[1] or '',
@@ -254,26 +253,44 @@ function TransferRow:readIconsAndPosition(player, playerIndex)
 end
 
 ---@param numberOfPlayers integer
----@return {refs: table, applyToAll: boolean}
+---@return table
 function TransferRow:_readReferences(numberOfPlayers)
-	if Logic.isEmpty(self.args.ref) or not self.config.referencesAsTable then
-		return {refs = {reference1 = self.args.ref or ''}, applyToAll = true}
+	if Logic.isEmpty(self.args.ref) then
+		return {}
 	end
 
-	local referencesArray = Array.parseCommaSeparatedString(self.args.ref, ';;;')
+	local references = Array.parseCommaSeparatedString(self.args.ref, ';;;')
 
-	local references = Table.map(referencesArray, function(indedx, ref)
-		return 'reference' .. indedx, Logic.isNotEmpty(ref) and ref or nil
+	---@type {type: string, url: string?}[]
+	references = Array.map(references, function(ref)
+		local reference = Json.parseIfTable(ref) or {}
+		local url = String.nilIfEmpty(reference.url)
+		local refType = (String.nilIfEmpty(reference.type) or 'web source'):lower()
+		if not url and (refType == 'web source' or refType == 'tournament source') then
+			return nil
+		end
+
+		return {type = refType, url = url}
 	end)
-
-	local numberOfReferences = Table.size(references)
 
 	-- same amount of players and references? individually allocate them for LPDB storage
 	-- special case: 2 refs/players (often times this will be a reference from both teams)
-	local allRef = numberOfReferences ~= numberOfPlayers or
-		(numberOfReferences <= 2 and Logic.isNotEmpty(self.args.team1) and Logic.isNotEmpty(self.args.team2))
+	local allRef = #references ~= numberOfPlayers or
+		(#references <= 2 and Logic.isNotEmpty(self.args.team1) and Logic.isNotEmpty(self.args.team2))
 
-	return {refs = references, applyToAll = allRef}
+	if not allRef then
+		return Array.map(references, function(ref)
+			return {reference1 = ref.url, reference1type = ref.type}
+		end)
+	end
+
+	local allReferences = {}
+	Array.forEach(references, function(reference, referenceIndex)
+		allReferences['reference' .. referenceIndex .. 'type'] = reference.type
+		allReferences['reference' .. referenceIndex] = reference.url or ''
+	end)
+
+	return {all = allReferences}
 end
 
 ---@return self

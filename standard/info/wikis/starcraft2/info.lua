@@ -60,7 +60,6 @@ return {
 		},
 		transfers = {
 			showTeamName = false,
-			referencesAsTable = false,
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
