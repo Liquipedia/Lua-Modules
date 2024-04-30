@@ -65,8 +65,6 @@ function TransferRow:readInput()
 	self.references = self:_readReferences(#players)
 
 	local transfers = Array.map(players, function(player, playerIndex)
-		playerIndex = playerIndex == 1 and '' or playerIndex
-
 		local transfer = self:_convertToTransferStructure{
 			player = player,
 			index = playerIndex,
@@ -197,7 +195,7 @@ end
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
 	local args = self.args
-	local playerIndex = data.index
+	local playerIndex = data.index == 1 and '' or data.index
 	local player = data.player
 
 	local subs = {args['sub' .. playerIndex], args['sub' .. playerIndex .. '_2']}
@@ -208,7 +206,7 @@ function TransferRow:_convertToTransferStructure(data)
 		nationality = player.flag,
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
-		reference = self.references[playerIndex] or self.references.all or {reference1 = ''},
+		reference = self.references[data.index] or self.references.all or {reference1 = ''},
 		extradata = Table.merge(self.baseData.extradata, {
 			position = positions[1] or '',
 			icon = icons[1] or '',
