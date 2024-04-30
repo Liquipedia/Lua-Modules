@@ -45,8 +45,7 @@ end
 ---@return string[] #positions
 function FactionTransferRow:readIconsAndPosition(player, playerIndex)
 	local faction = Faction.read(player.faction or player.race)
-	return {faction, faction}, --possibly remove 2nd one due to redundancy?
-		{faction} --possibly remove due to redundancy?
+	return {}, {faction}
 end
 
 return FactionTransferRow
