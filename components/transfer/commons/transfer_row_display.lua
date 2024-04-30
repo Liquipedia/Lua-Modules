@@ -67,8 +67,6 @@ local TransferRowDisplay = Class.new(
 function TransferRowDisplay:_enrichTransfers(transfers)
 	if Logic.isEmpty(transfers) then return {} end
 
-	local config = self.config
-
 	local transfer = transfers[1]
 
 	local date = DateExt.toYmdInUtc(transfer.date)
@@ -330,7 +328,6 @@ function TransferRowDisplay:icon()
 		:addClass('divCell Icon')
 		:css('width', '70px')
 
-	local config = self.config
 	if not IconModule then
 		iconCell:css('font-size','larger'):wikitext(TRANSFER_ARROW)
 		return self
