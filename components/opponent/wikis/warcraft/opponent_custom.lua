@@ -18,21 +18,6 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
-CustomOpponent.types.Player = TypeUtil.extendStruct(Opponent.types.Player, {
-	race = 'string?',
-})
-
-CustomOpponent.types.PartyOpponent = TypeUtil.struct{
-	players = TypeUtil.array(CustomOpponent.types.Player),
-	type = TypeUtil.literalUnion(unpack(Opponent.partyTypes)),
-}
-
-CustomOpponent.types.Opponent = TypeUtil.union(
-	Opponent.types.TeamOpponent,
-	CustomOpponent.types.PartyOpponent,
-	Opponent.types.LiteralOpponent
-)
-
 ---@class WarcraftStandardPlayer:standardPlayer
 ---@field faction string?
 
@@ -125,7 +110,7 @@ function CustomOpponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				local hasRace = String.isNotEmpty(player.faction)
+				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
 				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
 				player.team = PlayerExt.syncTeam(
@@ -133,7 +118,7 @@ function CustomOpponent.resolve(opponent, date, options)
 					player.team,
 					{date = date, savePageVar = savePageVar}
 				)
-				player.faction = (hasRace or player.faction ~= Faction.defaultFaction) and player.faction or nil
+				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else
 				PlayerExt.populatePageName(player)
 			end

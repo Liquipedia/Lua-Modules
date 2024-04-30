@@ -25,14 +25,6 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-CustomMatchGroupUtil.types.Faction = TypeUtil.literalUnion(unpack(Faction.getFactions()))
-
-CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
-	position = 'number?',
-	faction = CustomMatchGroupUtil.types.Faction,
-	random = 'boolean',
-})
-
 ---@class WarcraftMatchGroupUtilGamePlayer: WarcraftStandardPlayer
 ---@field matchplayerIndex integer
 ---@field heroes string[]?
@@ -43,11 +35,6 @@ CustomMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.P
 ---@field placement number?
 ---@field players WarcraftMatchGroupUtilGamePlayer[]
 ---@field score number?
-CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
-	placement = 'number?',
-	players = TypeUtil.array(CustomMatchGroupUtil.types.Player),
-	score = 'number?',
-})
 
 ---@class WarcraftMatchGroupUtilGame: MatchGroupUtilGame
 ---@field opponents  WarcraftMatchGroupUtilGameOpponent[]
