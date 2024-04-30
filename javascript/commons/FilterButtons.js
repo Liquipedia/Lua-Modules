@@ -1,6 +1,6 @@
 /*******************************************************************************
  Template(s): Filter buttons
- Author(s): Elysienna (original), iMarbot (refactor)
+ Author(s): Elysienna (original), iMarbot (refactor), SyntacticSalt (template expansion)
  *******************************************************************************/
 /**
  * Usage of module:
@@ -29,6 +29,14 @@
  *     Note: See data-filter-group in Filter buttons above as to why it is encouraged to always provide.
  * - data-filter-category (required): identifier for 'data-filter-on'
  *
+ * Replacement by Template with filter options:
+ * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1 group2">Default content</div>
+ *
+ * - data-filter-expansion-template (required): The template to expand with the current filter options.
+ *   Expanded template will replace default content.
+ * - data-filter-group (required): Identify the groups of filterbuttons the template should receive the current parameters from.
+ *   Should correspond to appropriate filter button groups used on the page.
+ *	 For each group, the template will receive a parameter groupName holding the currently active group settings.
  */
 
 liquipedia.filterButtons = {
@@ -38,6 +46,7 @@ liquipedia.filterButtons = {
 	fallbackFilterGroup: 'filter-group-fallback-common',
 
 	filterGroups: {},
+	templateExpansions : [],
 
 	init: function() {
 		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
@@ -108,6 +117,13 @@ liquipedia.filterButtons = {
 				value: filterableItem.dataset.filterCategory,
 				curated: filterableItem.dataset.curated !== undefined,
 				hidden: false
+			} );
+		} );
+		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach( ( /** @type HTMLElement */ templateExpansion ) => {
+			this.templateExpansions.push( {
+				element: templateExpansion,
+				groups: templateExpansion.dataset.filterGroups.split(' '),
+				template: templateExpansion.dataset.filterExpansionTemplate
 			} );
 		} );
 	},
@@ -209,6 +225,32 @@ liquipedia.filterButtons = {
 				} else {
 					filterableItem.element.classList.replace( this.hiddenCategoryClass, filterGroup.effectClass );
 				}
+			} );
+		} );
+
+		this.templateExpansions.forEach( ( templateExpansion ) => {
+			const parameters = templateExpansion.groups.map( ( group ) => {
+				const filterStates = this.filterGroups[group].filterStates
+				const activeFilters = Object.keys(filterStates).filter( k => filterStates[k] )
+				return group + '=' + activeFilters.toString()
+			} )
+			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join('|') + '}}'
+			mw.loader.using( ['mediawiki.api', 'mediawiki.util'] ).then( () => {
+				var api = new mw.Api();
+				api.get( {
+					action: 'parse',
+					format: 'json',
+					contentmodel: 'wikitext',
+					maxage: 600,
+					smaxage: 600,
+					disablelimitreport: true,
+					prop: 'text',
+					text: wikitext
+				} ).done( data => {
+					if (data.parse && data.parse.text && data.parse.text['*']) {
+						templateExpansion.element.innerHTML = data.parse.text['*'];
+					}
+				});
 			} );
 		} );
 	},
