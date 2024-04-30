@@ -101,7 +101,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 		:wikitext(text)
 end
 
-function CustomPlayerDisplay.Race(faction)
+function CustomPlayerDisplay.Faction(faction)
 	return Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = faction}
 end
 
