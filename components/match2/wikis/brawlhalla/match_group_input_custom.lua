@@ -50,7 +50,7 @@ function CustomMatchGroupInput._getTournamentVars(match)
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
 	match.bestof = match.bestof
-	match.mode = Variables.varDefault('tournament_mode') or 'singles'
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
 
 ---@param match table

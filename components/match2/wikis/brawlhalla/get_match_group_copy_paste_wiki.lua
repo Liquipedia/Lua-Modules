@@ -34,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		INDENT .. '|twitch=|vod=',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
@@ -43,21 +43,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	return table.concat(lines, '\n')
-end
-
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
----@param mode string
----@return string
-function WikiCopyPaste._getOpponent(mode)
-	if mode == Opponent.solo then
-		return '{{SoloOpponent|}}'
-	elseif mode == Opponent.team then
-		return '{{TeamOpponent|}}'
-	elseif mode == Opponent.literal then
-		return '{{Literal|}}'
-	end
-
-	return ''
 end
 
 --subfunction used to generate code for the Map template, depending on the type of opponent
