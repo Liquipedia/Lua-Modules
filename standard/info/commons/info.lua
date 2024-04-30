@@ -32,11 +32,12 @@ return {
 			allowManual = true,
 		},
 		transfers = {
-			showTeamName = false, -- bool
+			showTeamName = false, -- bool?
 			iconParam = nil, -- string?, default is 'pos',
 				-- smash uses `head`
 				-- teamfortress `class`
 				-- rest all default
+			platformIcons = false, -- bool?
 		},
 	},
 	match2 = 2,
