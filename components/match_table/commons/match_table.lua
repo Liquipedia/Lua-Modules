@@ -67,6 +67,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class MatchTableMatch
 ---@field timestamp number
+---@field timezone string
 ---@field timeIsExact boolean
 ---@field liquipediatier string?
 ---@field liquipediatiertype string?
@@ -79,7 +80,6 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field result MatchTableMatchResult
 ---@field game string?
 ---@field date string
----@field dateTime string
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
@@ -382,6 +382,7 @@ function MatchTable:matchFromRecord(record)
 
 	return {
 		timestamp = record.extradata.timestamp,
+		timezone = record.extradata.timezoneid or UTC,
 		timeIsExact = Logic.readBool(record.dateexact),
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
@@ -394,18 +395,7 @@ function MatchTable:matchFromRecord(record)
 		result = result,
 		game = record.game,
 		date = record.date,
-		dateTime = MatchTable._calculateDateTimeString(record.extradata.timezoneid or UTC, record.extradata.timestamp),
 	}
-end
-
----@param timeZone string
----@param timestamp number
----@return string
-function MatchTable._calculateDateTimeString(timeZone, timestamp)
-	local offset = Timezone.getOffset(timeZone) or 0
-
-	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. Timezone.getTimezoneString(timeZone)
 end
 
 ---@param record table
@@ -614,16 +604,30 @@ function MatchTable:_displayDate(match)
 		:css('text-align', 'left')
 		:attr('data-sort-value', match.timestamp)
 
+	if match.timestamp == DateExt.defaultTimestamp then
+		return cell
+	end
+
 	if not match.timeIsExact then
-		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp or ''))
+		return cell:node(DateExt.formatTimestamp('M d, Y', match.timestamp))
 	end
 
 	return cell:node(Countdown._create{
 		timestamp = match.timestamp,
 		finished = true,
-		date = match.dateTime,
+		date = MatchTable._calculateDateTimeString(match.timezone, match.timestamp),
 		rawdatetime = true,
-	})
+	} or nil)
+end
+
+---@param timezone string
+---@param timestamp number
+---@return string
+function MatchTable._calculateDateTimeString(timezone, timestamp)
+	local offset = Timezone.getOffset(timezone) or 0
+
+	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
+		' ' .. Timezone.getTimezoneString(timezone)
 end
 
 ---@param match MatchTableMatch
