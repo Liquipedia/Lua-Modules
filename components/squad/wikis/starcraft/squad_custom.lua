@@ -23,7 +23,7 @@ local TlpdSquad = Class.new(Squad)
 
 ---@return self
 function TlpdSquad:header()
-	table.insert(self.children, Widget.TableRowNew{
+	table.insert(self.rows, Widget.TableRowNew{
 		classes = {'HeaderRow'},
 		cells = {
 			Widget.TableCellNew{content = {'ID'}, header = true},
