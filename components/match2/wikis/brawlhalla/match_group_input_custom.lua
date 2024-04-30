@@ -31,7 +31,10 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date, {
+		'tournament_enddate',
+		'tournament_startdate',
+	}))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._processMaps(match)
