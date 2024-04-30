@@ -45,8 +45,7 @@ local DEFAULT_VALUES = {
 ---@field shown boolean
 ---@field class string?
 ---@field showMissingResultsMessage boolean
----@field refType string?
----@field showTeamName boolean
+---@field showTeamName boolean?
 ---@field conditions TransferListConditionConfig
 
 ---@class TransferListConditionConfig
@@ -98,7 +97,7 @@ function TransferList:parseArgs(args)
 		objectNameSortOrder = 'desc'
 	end
 
-	return Table.merge(Info.config.transfers, {
+	return {
 		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
@@ -119,7 +118,7 @@ function TransferList:parseArgs(args)
 			onlyNotableTransfers = Logic.readBool(args.onlyNotableTransfers),
 			teams = Logic.nilIfEmpty(self:_getTeams(args)),
 		}
-	})
+	}
 end
 
 ---@param args table

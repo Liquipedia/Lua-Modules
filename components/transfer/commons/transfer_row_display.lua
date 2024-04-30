@@ -26,9 +26,6 @@ local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local TRANSFER_ARROW = '&#x21d2;'
 
----@class TransferRowDisplayConfig
----@field showTeamName boolean
-
 ---@class enrichedTransfer
 ---@field from {teams: string[], roles: string[]}
 ---@field to {teams: string[], roles: string[]}
@@ -47,13 +44,13 @@ local TRANSFER_ARROW = '&#x21d2;'
 
 ---@class TransferRowDisplay: BaseClass
 ---@field transfer enrichedTransfer
----@field config TransferRowDisplayConfig
+---@field config {showTeamName: boolean?}
 ---@field display Html
 local TransferRowDisplay = Class.new(
 	---@param transfers transfer[]
 	---@return self
 	function(self, transfers)
-		self.config = Info.config.transfers
+		self.config = {showTeamName = (Info.config.transfers or {}).showTeamName}
 		self.transfer = self:_enrichTransfers(transfers)
 		self.display = mw.html.create('div')
 

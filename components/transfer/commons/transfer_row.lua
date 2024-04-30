@@ -24,12 +24,8 @@ local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadDat
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform')
 
----@class TransferRowConfig
----@field iconParam string?
----@field storage boolean?
-
 ---@class TransferRow: BaseClass
----@field config TransferRowConfig
+---@field config {storage: boolean, iconParam: string?}
 ---@field transfers transfer[]
 ---@field args table
 ---@field baseData table
@@ -51,13 +47,14 @@ function TransferRow:read()
 	return self
 end
 
----@return TransferRowConfig
+---@return {storage: boolean, iconParam: string?}
 function TransferRow:readConfig()
-	return Table.merge(Info.config.transfers, {
+	return {
 		storage = not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
-			and Namespace.isMain()
-	})
+			and Namespace.isMain(),
+		iconParam = (Info.config.transfers or {}).iconParam
+	}
 end
 
 ---@return transfer[]
