@@ -33,12 +33,8 @@ return {
 		},
 		transfers = {
 			showTeamName = false, -- bool
-			iconModule = nil, -- string?
 			iconParam = 'pos', -- string?
-			platformIcons = false, -- bool
-			positionConvert = nil, -- string?
 			referencesAsTable = false, -- bool
-			syncPlayers = false, -- bool
 		},
 	},
 	match2 = 2,

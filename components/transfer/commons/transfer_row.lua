@@ -20,15 +20,14 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
+local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
+
+local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform')
+
 ---@class TransferRowConfig
----@field showTeamName boolean
----@field iconModule string?
 ---@field iconParam string?
----@field platformIcons boolean
----@field positionConvert string?
 ---@field referencesAsTable boolean
 ---@field storage boolean?
----@field syncPlayers boolean
 
 ---@class TransferRow: BaseClass
 ---@field config TransferRowConfig
@@ -156,7 +155,7 @@ end
 
 ---@return string
 function TransferRow:readPlatform()
-	if not self.config.platformIcons then return '' end
+	if not HAS_PLATFORM_ICONS then return '' end
 	local getPlatform = require('Module:Platform')
 	self.args.platform = getPlatform._getName(self.args.platform) or ''
 	return self.args.platform
@@ -179,11 +178,7 @@ function TransferRow:readPlayers()
 	local players = {}
 	for _, _, playerIndex in Table.iter.pairsByPrefix(args, 'name', {requireIndex = false}) do
 		playerIndex = playerIndex == 1 and '' or playerIndex
-		local player = self:readPlayer(playerIndex)
-		if self.config.syncPlayers then
-			player = PlayerExt.syncPlayer(player)
-		end
-		table.insert(players, player)
+		table.insert(players, PlayerExt.syncPlayer(self:readPlayer(playerIndex)))
 	end
 
 	return players
@@ -242,10 +237,9 @@ function TransferRow:readIconsAndPosition(player, playerIndex)
 
 	local positions = Array.map(postfixes, function(postfix) return args[iconParam .. postfix] end)
 
-	if self.config.positionConvert then
-		self.positionConvert = self.positionConvert or mw.loadData(self.config.positionConvert)
+	if PositionConvert then
 		positions = Array.map(positions, function(pos)
-			return self.positionConvert[(pos or ''):lower()] or pos
+			return PositionConvert[(pos or ''):lower()] or pos
 		end)
 	end
 

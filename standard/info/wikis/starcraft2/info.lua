@@ -60,9 +60,7 @@ return {
 		},
 		transfers = {
 			showTeamName = false,
-			platformIcons = false,
 			referencesAsTable = false,
-			syncPlayers = true,
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',

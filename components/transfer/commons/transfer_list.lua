@@ -30,6 +30,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform')
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
@@ -42,10 +43,8 @@ local DEFAULT_VALUES = {
 ---@field sortOrder string
 ---@field title string?
 ---@field shown boolean
----@field platformIcons boolean
 ---@field class string?
 ---@field showMissingResultsMessage boolean
----@field iconModule string?
 ---@field refType string?
 ---@field showTeamName boolean
 ---@field conditions TransferListConditionConfig
@@ -352,7 +351,7 @@ function TransferList:_buildHeader()
 		:addClass('divHeaderRow')
 		:tag('div'):addClass('divCell Date'):wikitext('Date'):allDone()
 
-	if self.config.platformIcons then
+	if HAS_PLATFORM_ICONS then
 		headerRow:tag('div'):addClass('divCell GameIcon')
 	end
 

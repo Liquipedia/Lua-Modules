@@ -17,17 +17,17 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.requireIfExists('Module:Platform')
 local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
+
 
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local TRANSFER_ARROW = '&#x21d2;'
 
 ---@class TransferRowDisplayConfig
 ---@field showTeamName boolean
----@field iconModule string?
----@field platformIcons boolean
 ---@field referencesAsTable boolean
 
 ---@class enrichedTransfer
@@ -94,7 +94,7 @@ function TransferRowDisplay:_enrichTransfers(transfers)
 				String.nilIfEmpty(transfer.extradata.role2sec),
 			},
 		},
-		platform = config.platformIcons and self:_displayPlatform(transfer.extradata.platform) or nil,
+		platform = Platform and self:_displayPlatform(transfer.extradata.platform) or nil,
 		displayDate = String.nilIfEmpty(transfer.extradata.displaydate) or date,
 		date = date,
 		wholeteam = Logic.readBool(transfer.wholeteam),
@@ -106,7 +106,7 @@ end
 ---@param platform string
 ---@return string?
 function TransferRowDisplay:_displayPlatform(platform)
-	if not self.config.platformIcons then return end
+	if not Platform then return end
 	if Logic.isEmpty(platform) then return '' end
 	return Platform._getIcon(platform) or ''
 end
@@ -331,14 +331,13 @@ function TransferRowDisplay:icon()
 		:css('width', '70px')
 
 	local config = self.config
-	if not config.iconModule then
+	if not IconModule then
 		iconCell:css('font-size','larger'):wikitext(TRANSFER_ARROW)
 		return self
 	end
 
-	local iconModule = Lua.import(config.iconModule, {loadData = true})
 	local getIcon = function(iconInput)
-		local icon = iconModule[string.lower(iconInput)]
+		local icon = IconModule[string.lower(iconInput)]
 		if not icon then
 			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
 			return '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]]'
