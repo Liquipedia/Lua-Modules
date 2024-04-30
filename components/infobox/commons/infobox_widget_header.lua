@@ -152,6 +152,7 @@ function Header:_createInfoboxButtons()
 
 	local buttons = mw.html.create('span')
 	buttons:addClass('infobox-buttons')
+	buttons:addClass('navigation-not-searchable')
 
 	-- Quick edit link
 	buttons:node(
