@@ -20,7 +20,6 @@ local Team = require('Module:Team')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local Info = Lua.import('Module:Info', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
 local Condition = require('Module:Condition')
