@@ -46,7 +46,7 @@ liquipedia.filterButtons = {
 	fallbackFilterGroup: 'filter-group-fallback-common',
 
 	filterGroups: {},
-	templateExpansions : [],
+	templateExpansions: [],
 
 	init: function() {
 		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
@@ -122,7 +122,7 @@ liquipedia.filterButtons = {
 		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach( ( /** @type HTMLElement */ templateExpansion ) => {
 			this.templateExpansions.push( {
 				element: templateExpansion,
-				groups: templateExpansion.dataset.filterGroups.split(' '),
+				groups: templateExpansion.dataset.filterGroups.split( ' ' ),
 				template: templateExpansion.dataset.filterExpansionTemplate
 			} );
 		} );
@@ -230,13 +230,13 @@ liquipedia.filterButtons = {
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
 			const parameters = templateExpansion.groups.map( ( group ) => {
-				const filterStates = this.filterGroups[group].filterStates
-				const activeFilters = Object.keys(filterStates).filter( k => filterStates[k] )
-				return group + '=' + activeFilters.toString()
-			} )
-			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join('|') + '}}'
-			mw.loader.using( ['mediawiki.api', 'mediawiki.util'] ).then( () => {
-				var api = new mw.Api();
+				const filterStates = this.filterGroups[ group ].filterStates;
+				const activeFilters = Object.keys( filterStates ).filter( ( k ) => filterStates[ k ] );
+				return group + '=' + activeFilters.toString();
+			} );
+			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join( '|' ) + '}}';
+			mw.loader.using( [ 'mediawiki.api', 'mediawiki.util' ] ).then( () => {
+				const api = new mw.Api();
 				api.get( {
 					action: 'parse',
 					format: 'json',
@@ -246,11 +246,11 @@ liquipedia.filterButtons = {
 					disablelimitreport: true,
 					prop: 'text',
 					text: wikitext
-				} ).done( data => {
-					if (data.parse && data.parse.text && data.parse.text['*']) {
-						templateExpansion.element.innerHTML = data.parse.text['*'];
+				} ).done( ( data ) => {
+					if ( data.parse && data.parse.text && data.parse.text[ '*' ] ) {
+						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
 					}
-				});
+				} );
 			} );
 		} );
 	},
