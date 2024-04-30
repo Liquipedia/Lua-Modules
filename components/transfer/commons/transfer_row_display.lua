@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local Info = Lua.import('Module:Info', {loadData = true})
-local Platform = Lua.requireIfExists('Module:Platform')
+local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 
 
@@ -44,13 +44,16 @@ local TRANSFER_ARROW = '&#x21d2;'
 
 ---@class TransferRowDisplay: BaseClass
 ---@field transfer enrichedTransfer
----@field config {showTeamName: boolean?}
+---@field config {showTeamName: boolean?, platformIcons: boolean?}
 ---@field display Html
 local TransferRowDisplay = Class.new(
 	---@param transfers transfer[]
 	---@return self
 	function(self, transfers)
-		self.config = {showTeamName = (Info.config.transfers or {}).showTeamName}
+		self.config = {
+			showTeamName = (Info.config.transfers or {}).showTeamName,
+			platformIcons = (Info.config.transfers or {}).platformIcons,
+		}
 		self.transfer = self:_enrichTransfers(transfers)
 		self.display = mw.html.create('div')
 
@@ -88,7 +91,7 @@ function TransferRowDisplay:_enrichTransfers(transfers)
 				String.nilIfEmpty(transfer.extradata.role2sec),
 			},
 		},
-		platform = Platform and self:_displayPlatform(transfer.extradata.platform) or nil,
+		platform = self.config.platformIcons and self:_displayPlatform(transfer.extradata.platform) or nil,
 		displayDate = String.nilIfEmpty(transfer.extradata.displaydate) or date,
 		date = date,
 		wholeteam = Logic.readBool(transfer.wholeteam),

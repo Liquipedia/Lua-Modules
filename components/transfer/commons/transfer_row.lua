@@ -22,10 +22,8 @@ local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 
-local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform')
-
 ---@class TransferRow: BaseClass
----@field config {storage: boolean, iconParam: string?}
+---@field config {storage: boolean, iconParam: string?, platformIcons: boolean?}
 ---@field transfers transfer[]
 ---@field args table
 ---@field baseData table
@@ -47,13 +45,14 @@ function TransferRow:read()
 	return self
 end
 
----@return {storage: boolean, iconParam: string?}
+---@return {storage: boolean, iconParam: string?, platformIcons: boolean?}
 function TransferRow:readConfig()
 	return {
 		storage = not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 			and Namespace.isMain(),
-		iconParam = (Info.config.transfers or {}).iconParam
+		iconParam = (Info.config.transfers or {}).iconParam,
+		platformIcons = (Info.config.transfers or {}).platformIcons,
 	}
 end
 
@@ -151,7 +150,7 @@ end
 
 ---@return string
 function TransferRow:readPlatform()
-	if not HAS_PLATFORM_ICONS then return '' end
+	if not self.config.platformIcons then return '' end
 	local getPlatform = require('Module:Platform')
 	self.args.platform = getPlatform._getName(self.args.platform) or ''
 	return self.args.platform
