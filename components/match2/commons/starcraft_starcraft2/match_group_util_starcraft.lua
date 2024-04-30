@@ -13,7 +13,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
@@ -338,7 +337,7 @@ function StarcraftMatchGroupUtil.matchHasDetails(match)
 		end)
 end
 
----Determines if any players in an opponent are not playing their main faction by comparing them to a reference opponent.
+---Determines if any player in an opponent is not playing their main faction by comparing them to a reference opponent.
 ---Returns the factions played if at least one player chose an offFaction or nil if otherwise.
 ---@param gameOpponent StarcraftMatchGroupUtilGameOpponent
 ---@param referenceOpponent StarcraftStandardOpponent|StarcraftMatchGroupUtilGameOpponent

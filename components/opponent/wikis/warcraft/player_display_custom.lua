@@ -11,9 +11,7 @@ local DisplayUtil = require('Module:DisplayUtil')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local TypeUtil = require('Module:TypeUtil')
 
-local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
