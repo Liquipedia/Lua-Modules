@@ -124,7 +124,7 @@ end
 function CustomMatchSummary._createCharacterIcon(char)
 	return mw.html.create('span')
 		:addClass('draft faction')
-		:wikitext(CharacterIcon.display{
+		:wikitext(CharacterIcon.Icon{
 			character = char,
 			size = '18px',
 		})

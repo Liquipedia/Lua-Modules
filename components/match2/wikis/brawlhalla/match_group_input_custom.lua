@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -44,6 +45,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	CustomMatchGroupInput._getVod(match)
 	return match
 end
+
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
