@@ -20,7 +20,6 @@ local Team = require('Module:Team')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local Info = Lua.import('Module:Info', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
 local Condition = require('Module:Condition')
@@ -30,6 +29,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
@@ -42,7 +42,6 @@ local DEFAULT_VALUES = {
 ---@field sortOrder string
 ---@field title string?
 ---@field shown boolean
----@field platformIcons boolean
 ---@field class string?
 ---@field showMissingResultsMessage boolean
 ---@field showTeamName boolean?
@@ -98,7 +97,6 @@ function TransferList:parseArgs(args)
 	end
 
 	return {
-		platformIcons = Info.config.transfers.platformIcons,
 		limit = tonumber(args.limit) or DEFAULT_VALUES.limit,
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
@@ -351,7 +349,7 @@ function TransferList:_buildHeader()
 		:addClass('divHeaderRow')
 		:tag('div'):addClass('divCell Date'):wikitext('Date'):allDone()
 
-	if self.config.platformIcons then
+	if HAS_PLATFORM_ICONS then
 		headerRow:tag('div'):addClass('divCell GameIcon')
 	end
 
