@@ -33,5 +33,5 @@ return {
 			allowManual = true,
 		},
 	},
-	match2 = 0,
+	match2 = 1,
 }
