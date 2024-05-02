@@ -24,20 +24,22 @@ function PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
 		return
 	end
 	local conditions = {
-		'[[type::Notable]]',
+		'[[opponenttype::solo]]', -- can not use Opponent.solo due to circular requires
 		'[[pagename::' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-		'[[name::' .. resolvedPageName .. ']]',
+		'[[oppobentname::' .. resolvedPageName .. ']]',
 	}
-	local datapoint = mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local placement = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 1,
 		conditions = table.concat(conditions, ' AND '),
-		query = 'information',
-	})[1]
-	if datapoint and Logic.isNotEmpty(datapoint.information) then
+		query = 'opponentplayers',
+	})[1] or {}
+
+local team = (placement.opponentplayers or {}).p1team
+	if Logic.isNotEmpty(team) then
 		return {
 			joinDate = date,
 			leaveDate = date,
-			template = datapoint.information:lower(),
+			template = team:gsub('_', ' '):lower(),
 		}
 	end
 end
