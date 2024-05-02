@@ -34,7 +34,7 @@ function PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
 		query = 'opponentplayers',
 	})[1] or {}
 
-local team = (placement.opponentplayers or {}).p1team
+	local team = (placement.opponentplayers or {}).p1team
 	if Logic.isNotEmpty(team) then
 		return {
 			joinDate = date,
