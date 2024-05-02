@@ -25,7 +25,7 @@ local PlayerExtCustom = Table.copy(PlayerExt)
 ---@param resolvedPageName string
 ---@param date string|number|osdate?
 ---@return {joinDate: string|number|osdate?, leaveDate: string|number|osdate?, template: string}?
-function PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
+function PlayerExtCustom._fetchTeamFromPlacement(resolvedPageName, date)
 	if Logic.isEmpty(resolvedPageName) then
 		return
 	end
@@ -55,7 +55,7 @@ end
 ---@param date string|number|osdate?
 ---@return string?
 function PlayerExtCustom.fetchTeamTemplate(resolvedPageName, date)
-	local entry = PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
+	local entry = PlayerExtCustom._fetchTeamFromPlacement(resolvedPageName, date)
 	return entry and TeamTemplate.resolve(entry.template, date) or nil
 end
 
@@ -69,7 +69,7 @@ function PlayerExtCustom.syncTeam(pageName, template, options)
 	template = PlayerExt.syncTeam(pageName, template, options)
 	if Logic.isNotEmpty(template) or options.fetchPlayer == false then return template end
 
-	local entry = PlayerExtCustom.fetchTeamHistoryEntry(pageName, options.date) --[[@as table]]
+	local entry = PlayerExtCustom._fetchTeamFromPlacement(pageName, options.date) --[[@as table]]
 
 	if entry and not entry.isResolved then
 		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
