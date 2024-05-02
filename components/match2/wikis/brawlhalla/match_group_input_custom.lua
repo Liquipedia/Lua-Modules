@@ -33,6 +33,7 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date, {
+		'match_date',
 		'tournament_enddate',
 		'tournament_startdate',
 	}))
