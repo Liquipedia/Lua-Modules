@@ -171,7 +171,7 @@ function StarcraftParticipantTable:getPlacements()
 
 	for prizePoolIndex = 1, maxPrizePoolIndex do
 		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
-			placements[placement.opponentname] = true
+			placements[placement.opponentname] = placement
 		end)
 	end
 
