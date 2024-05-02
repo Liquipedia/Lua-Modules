@@ -60,8 +60,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		}
 	end
 
-	lpdbData.extradata.assumedprize = Variables.varDefault('assumedpayout', '')
-
 	return lpdbData
 end
 
