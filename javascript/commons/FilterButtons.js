@@ -30,11 +30,11 @@
  * - data-filter-category (required): identifier for 'data-filter-on'
  *
  * Replacement by Template with filter options:
- * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1 group2">Default content</div>
+ * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1,group2">Default content</div>
  *
  * - data-filter-expansion-template (required): The template to expand with the current filter options.
  *   Expanded template will replace default content.
- * - data-filter-group (required): Identify the groups of filterbuttons the template should receive the current parameters from.
+ * - data-filter-groups (required): Identify the groups of filterbuttons the template should receive the current parameters from.
  *   Should correspond to appropriate filter button groups used on the page.
  *   For each group, the template will receive a parameter groupName holding the currently active group settings.
  */
@@ -122,7 +122,7 @@ liquipedia.filterButtons = {
 		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach( ( /** @type HTMLElement */ templateExpansion ) => {
 			this.templateExpansions.push( {
 				element: templateExpansion,
-				groups: templateExpansion.dataset.filterGroups.split( ' ' ),
+				groups: templateExpansion.dataset.filterGroups.split( ',' ),
 				template: templateExpansion.dataset.filterExpansionTemplate
 			} );
 		} );
@@ -235,7 +235,7 @@ liquipedia.filterButtons = {
 				return group + '=' + activeFilters.toString();
 			} );
 			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join( '|' ) + '}}';
-			mw.loader.using( [ 'mediawiki.api', 'mediawiki.util' ] ).then( () => {
+			mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
 				const api = new mw.Api();
 				api.get( {
 					action: 'parse',
@@ -247,7 +247,7 @@ liquipedia.filterButtons = {
 					prop: 'text',
 					text: wikitext
 				} ).done( ( data ) => {
-					if ( data.parse && data.parse.text && data.parse.text[ '*' ] ) {
+					if ( data.parse?.text?.[ '*' ] ) {
 						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
 					}
 				} );
