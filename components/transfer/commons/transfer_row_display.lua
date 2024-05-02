@@ -328,8 +328,10 @@ function TransferRowDisplay:icon()
 		return self
 	end
 
+	---@param iconInput string?
+	---@return string
 	local getIcon = function(iconInput)
-		local icon = IconModule[string.lower(iconInput)]
+		local icon = IconModule[string.lower(iconInput or '')]
 		if not icon then
 			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
 			return '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]]'
