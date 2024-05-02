@@ -29,7 +29,9 @@ end
 ---@param args table
 ---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	local offsetTime = DateExt.readTimestampOrNil(Variables.varDefault('tournament_enddate') or Variables.varDefault('tournament_startdate'))
+	local offsetTime = DateExt.readTimestampOrNil(
+		Variables.varDefault('tournament_enddate') or Variables.varDefault('tournament_startdate')
+	)
 	if offsetTime then
 		if tonumber(args.phase) then
 			offsetTime = offsetTime + 7200 * tonumber(args.phase)
