@@ -130,12 +130,16 @@ function TransferRowDisplay:_getReferences(transfers)
 	local references = {}
 	Array.forEach(transfers, function(transfer)
 		transfer.reference = transfer.reference or {}
-		for prefix, referenceUrl in Table.iter.pairsByPrefix(transfer.reference, 'reference') do
-			local reference = {url = referenceUrl, type = transfer.reference[prefix .. 'type']}
+		Array.forEach(Array.mapIndexes(function(referenceIndex)
+			local prefix = 'reference' .. referenceIndex
+			local referenceUrl = String.nilIfEmpty(transfer.reference[prefix])
+			local referenceType = String.nilIfEmpty(transfer.reference[prefix .. 'type'])
+			return (referenceUrl or referenceType) and {url = referenceUrl, type = referenceType}
+		end), function(reference)
 			if Array.all(references, function(ref) return not Table.deepEquals(ref, reference) end) then
 				table.insert(references, reference)
 			end
-		end
+		end)
 	end)
 
 	return Array.map(references, function(reference)
