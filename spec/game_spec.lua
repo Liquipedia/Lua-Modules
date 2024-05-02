@@ -34,7 +34,7 @@ describe('Game', function()
 					Game.icon{noSpan = true})
 				assert.are_equal('<span class="span-class">' .. COMMONS_ICON .. '</span>',
 					tostring(Game.icon{spanClass = 'span-class'}))
-				assert.are_equal(COMMONS_ICON,
+				assert.are_equal('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
 					tostring(Game.icon()))
 			end)
 		end)

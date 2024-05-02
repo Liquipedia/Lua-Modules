@@ -157,7 +157,7 @@ function Game.icon(options)
 	local link = Logic.readBool(options.noLink) and '' or options.link or gameData.link
 	local spanClass = (Logic.readBool(options.noSpan) and '') or
 		(String.isNotEmpty(options.spanClass) and options.spanClass) or
-		(String.isNotEmpty(options.size) and DEFAULT_SPAN_CLASS or '')
+		(String.isEmpty(options.size) and DEFAULT_SPAN_CLASS or '')
 
 	if Table.isEmpty(gameData) then
 		gameIcons = Game._createIcon{icon = ICON_PLACEHOLDER, size = options.size}
