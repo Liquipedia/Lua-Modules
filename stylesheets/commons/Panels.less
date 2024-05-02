@@ -35,6 +35,13 @@ Author(s): FO-nTTaX
 		box-shadow: 0 0.0625rem 0.25rem 0 rgba(0, 0, 0, 0.12);
 		border: none;
 		border-radius: 0.5rem;
+		overflow: hidden;
+
+		&.is--collapsed {
+			.panel-box-body {
+				display: none;
+			}
+		}
 	}
 
 	.panel-box-heading {
