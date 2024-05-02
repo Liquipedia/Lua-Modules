@@ -76,7 +76,9 @@ liquipedia.filterButtons = {
 				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
 				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
 				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
-				filterableItems: []
+				filterableItems: [],
+				defaultStates: {},
+				defaultCurated: buttonsDiv.dataset.filterDefaultCurated === 'true'
 			};
 
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
@@ -89,7 +91,7 @@ liquipedia.filterButtons = {
 					const button = {
 						element: buttonElement,
 						filter: filterOn,
-						active: true
+						active: true,
 					};
 					switch ( filterOn ) {
 						case 'curated':
@@ -100,6 +102,7 @@ liquipedia.filterButtons = {
 							filterGroupEntry.buttons[ filterOn ] = button;
 							filterGroupEntry.filterStates[ filterOn ] =
 								filterGroupEntry.filterStates[ filterOn ] ?? defaultState;
+							filterGroupEntry.defaultStates[ filterOn ] = defaultState;
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );
 				}
@@ -229,9 +232,26 @@ liquipedia.filterButtons = {
 		} );
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
+			const isDefault = this.templateExpansion.groups.every( ( group ) => {
+				const filterGroup = this.filterGroups[ group ];
+				if ( filterGroup.curated === filterGroup.defaultCurated) {
+					return true;
+				}
+				return Object.keys(filterGroup.filterStates).every( ( filterState ) => {
+					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
+				} );
+			} );
+			if ( isDefault ) {
+				return;
+			}
 			const parameters = templateExpansion.groups.map( ( group ) => {
+				if ( group.curated ) {
+					return group + '=curated'
+				}
+
 				const filterStates = this.filterGroups[ group ].filterStates;
 				const activeFilters = Object.keys( filterStates ).filter( ( k ) => filterStates[ k ] );
+
 				return group + '=' + activeFilters.toString();
 			} );
 			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join( '|' ) + '}}';
