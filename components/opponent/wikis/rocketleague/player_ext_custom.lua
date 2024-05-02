@@ -66,10 +66,10 @@ end
 function PlayerExtCustom.syncTeam(pageName, template, options)
 	options = options or {}
 
-	local template = PlayerExt.syncTeam(pageName, template, options)
+	template = PlayerExt.syncTeam(pageName, template, options)
 	if Logic.isNotEmpty(template) or options.fetchPlayer == false then return template end
 
-	local entry = PlayerExtCustom.fetchTeamHistoryEntry(pageName, options.date)
+	local entry = PlayerExtCustom.fetchTeamHistoryEntry(pageName, options.date) --[[@as table]]
 
 	if entry and not entry.isResolved then
 		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
@@ -78,8 +78,7 @@ function PlayerExtCustom.syncTeam(pageName, template, options)
 
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
-	if options.savePageVar ~= false and entry
-		and (entry and entry.template) ~= (pageVarEntry and pageVarEntry.template) then
+	if options.savePageVar ~= false and entry and entry.template then
 		if entry.isTimeless then
 			history.timeless = entry
 		else
