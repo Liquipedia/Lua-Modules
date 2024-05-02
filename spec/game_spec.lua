@@ -6,7 +6,7 @@ describe('Game', function()
 
 		local COMMONS_IDENTIFIER = 'commons'
 		local COMMONS_DATA = Info.games.commons
-		local COMMONS_ICON = '[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|25x25px]]'
+		local COMMONS_ICON = '[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|32x32px]]'
 		local GAME_TO_THROW = 'please throw'
 
 		describe('to identifier', function()
