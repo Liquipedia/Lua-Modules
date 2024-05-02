@@ -345,7 +345,8 @@ function TransferRowDisplay:icon()
 	end
 
 	local iconRows = Array.map(self.transfer.players, function(player)
-		return getIcon(player.icons[1]) .. '&nbsp;' .. TRANSFER_ARROW .. '&nbsp;' .. getIcon(player.icons[2])
+		return getIcon(player.icons[1]) .. '&nbsp;' .. TRANSFER_ARROW ..
+			'&nbsp;' .. getIcon(player.icons[2] or player.icons[1])
 	end)
 	iconCell:wikitext(table.concat(iconRows, '<br>'))
 
