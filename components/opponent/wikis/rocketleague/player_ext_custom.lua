@@ -26,7 +26,7 @@ function PlayerExtCustom.fetchTeamHistoryEntry(resolvedPageName, date)
 	local conditions = {
 		'[[opponenttype::solo]]', -- can not use Opponent.solo due to circular requires
 		'[[pagename::' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-		'[[oppobentname::' .. resolvedPageName .. ']]',
+		'[[opponentname::' .. resolvedPageName .. ']]',
 	}
 	local placement = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 1,
