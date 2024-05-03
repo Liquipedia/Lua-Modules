@@ -193,7 +193,7 @@ function Count.placements(args)
 
 	if String.isNotEmpty(args.placement) then
 		local placementConditions = ConditionTree(BooleanOperator.any)
-		Array.map(Array.map(mw.text.split(args.placement, ',', true), String.trim),
+		Array.map(Array.parseCommaSeparatedString(args.placement),
 		function(placementValue)
 			return placementConditions:add{
 				ConditionNode(ColumnName('placement'), Comparator.eq, placementValue)}

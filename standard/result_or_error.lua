@@ -141,12 +141,9 @@ function Error:getErrorJson()
 	end
 
 	Array.forEach(self.stacks, function(stack)
-		local stackFrames = mw.text.split(stack, '\n')
+		local stackFrames = Array.parseCommaSeparatedString(stack, '\n', false)
 		stackFrames = Array.filter(
-			Array.map(
-				Array.sub(stackFrames, 2, #stackFrames),
-				function(frame) return String.trim(frame) end
-			),
+			Array.sub(stackFrames, 2, #stackFrames),
 			function(frame) return not Table.any(FILTERED_ERROR_STACK_ITEMS, function(_, filter)
 				return string.find(frame, filter) ~= nil
 			end) end

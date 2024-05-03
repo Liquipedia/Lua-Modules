@@ -626,11 +626,13 @@ end
 
 ---@param inputString string?
 ---@param sep string?
+---@param pattern boolean? #set to true to have the seperator be treated as a lua pattern
 ---@return string[]
-function Array.parseCommaSeparatedString(inputString, sep)
+function Array.parseCommaSeparatedString(inputString, sep, pattern)
 	if Logic.isEmpty(inputString) then return {} end
 	---@cast inputString -nil
-	return Array.map(mw.text.split(inputString, sep or ','), String.trim)
+	local usePlain = not pattern
+	return Array.map(mw.text.split(inputString, sep or ',', usePlain), String.trim)
 end
 
 return Array

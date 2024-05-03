@@ -100,9 +100,7 @@ function MedalStats:_getConfig()
 	---@param sep string?
 	---@return string[]
 	local splitAndTrimIfExist = function(input, sep)
-		if String.isEmpty(input) then return {} end
-		---@cast input -nil
-		return Array.map(mw.text.split(input, sep or '||'), String.trim)
+		return Array.parseCommaSeparatedString(input, sep or '||')
 	end
 
 	local series = splitAndTrimIfExist(args.series or mw.title.getCurrentTitle().prefixedText)

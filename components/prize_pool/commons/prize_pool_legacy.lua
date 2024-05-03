@@ -393,8 +393,8 @@ function LegacyPrizePool.parseWikiLink(input)
 			local link, displayName
 			if cleanedInput:find('|') then
 				-- Link and Display
-				local linkParts = mw.text.split(cleanedInput, '|', true)
-				link, displayName = mw.text.trim(linkParts[1]), linkParts[2]
+				local linkParts = Array.parseCommaSeparatedString(cleanedInput, '|')
+				link, displayName = linkParts[1], linkParts[2]
 
 			else
 				-- Just link

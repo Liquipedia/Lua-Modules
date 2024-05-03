@@ -85,7 +85,7 @@ function BaseResultsTable:readConfig()
 		displayDefaultLogoAsIs = Logic.readBool(args.displayDefaultLogoAsIs),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
 		useIndivPrize = Logic.readBool(args.useIndivPrize),
-		aliases = args.aliases and Array.map(mw.text.split(args.aliases, ','), String.trim) or {}
+		aliases = args.aliases and Array.parseCommaSeparatedString(args.aliases) or {}
 	}
 
 	config.sort = args.sort or
@@ -237,7 +237,7 @@ function BaseResultsTable:buildBaseConditions()
 
 	if args.tier then
 		local tierConditions = ConditionTree(BooleanOperator.any)
-		for _, tier in pairs(Array.map(mw.text.split(args.tier, ',', true), String.trim)) do
+		for _, tier in pairs(Array.parseCommaSeparatedString(args.tier)) do
 			tierConditions:add{ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)}
 		end
 		conditions:add{tierConditions}

@@ -569,25 +569,51 @@ function mw.text.nowiki(s)
 end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
----@param s string
----@param pattern string?
+---@param text string
+---@param pattern string
 ---@param plain boolean?
 ---@return string[]
-function mw.text.split(s, pattern, plain)
-	pattern = pattern or "%s"
-	local t = {}
-	for str in string.gmatch(s, "([^"..pattern.."]+)") do
-			table.insert(t, str)
+function mw.text.split( text, pattern, plain )
+	local ret = {}
+	for m in mw.text.gsplit( text, pattern, plain ) do
+		ret[#ret+1] = m
 	end
-	return t
+	return ret
 end
 
 ---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
----@param s string
----@param pattern string?
+---@param text string
+---@param pattern string
 ---@param plain boolean?
----@return function
-function mw.text.gsplit(s, pattern, plain) end
+---@return fun():string?
+---@return nil
+---@return nil
+function mw.text.gsplit( text, pattern, plain )
+	local s = 1 ---@type integer?
+	local l = mw.ustring.len( text )
+	return function ()
+		if s then
+			local e, n = string.find( text, pattern, s, plain )
+			local ret
+			if not e then
+				ret = string.sub( text, s )
+				s = nil
+			elseif n < e then
+				-- Empty separator!
+				ret = string.sub( text, s, e )
+				if e < l then
+					s = e + 1
+				else
+					s = nil
+				end
+			else
+				ret = e > s and string.sub( text, s, e - 1 ) or ''
+				s = n + 1
+			end
+			return ret
+		end
+	end, nil, nil
+end
 
 ---Generates an HTML-style tag for name.
 ---@param name string

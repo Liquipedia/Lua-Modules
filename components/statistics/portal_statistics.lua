@@ -1427,7 +1427,7 @@ function StatisticsPortal._isTableOrSplitOrDefault(input, default)
 		return default or {}
 	end
 	---@cast input -nil
-	return Array.map(mw.text.split(input, ',', true), String.trim)
+	return Array.parseCommaSeparatedString(input)
 end
 
 

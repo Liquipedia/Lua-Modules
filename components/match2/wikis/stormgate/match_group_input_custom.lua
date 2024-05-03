@@ -707,7 +707,7 @@ function CustomMatchGroupInput._readHeroes(heroesInput, faction, playerName, ign
 	end
 	---@cast heroesInput -nil
 
-	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
+	local heroes = Array.parseCommaSeparatedString(heroesInput)
 	return Array.map(heroes, function(hero)
 		local heroData = HeroData[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
