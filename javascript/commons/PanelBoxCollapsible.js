@@ -25,7 +25,7 @@ liquipedia.panels = {
 			const id = panelBox.getAttribute( this.DATA_ATTR_PANEL_BOX_ID );
 
 			if ( closedPanelIDsArray.includes( id ) ) {
-				this.setCollapsedClass( panelBox );
+				this.toggleCollapsedClass( panelBox );
 			}
 
 			const button = panelBox.querySelector( '[data-component="panel-box-collapsible-button"]' );
@@ -58,6 +58,19 @@ liquipedia.panels = {
 	},
 
 	/**
+	 * Removes a panel box ID from the array of collapsed panel box IDs in local storage.
+	 * @param {string} id - The ID of the panel box to remove.
+	 */
+	removeFromLocalStorage: function( id ) {
+		const items = this.getFromLocalStorage();
+		const index = items.indexOf( id );
+		if ( index > -1 ) {
+			items.splice( index, 1 );
+			localStorage.setItem( this.LOCAL_STORAGE_KEY, JSON.stringify( items ) );
+		}
+	},
+
+	/**
 	 * Checks if a panel box ID is in the array of collapsed panel box IDs in local storage.
 	 * @param {string} id - The ID of the panel box to check.
 	 * @return {boolean} True if the ID is in the array, false otherwise.
@@ -68,12 +81,14 @@ liquipedia.panels = {
 	},
 
 	/**
-	 * Adds the collapsed class to a panel box element.
-	 * @param {Element} element - The panel box element to add the class to.
+	 * Adds or removes the collapsed class to a panel box element.
+	 * @param {Element} element - The panel box element to add or remove the class to.
 	 */
-	setCollapsedClass: function( element ) {
+	toggleCollapsedClass: function( element ) {
 		if ( !element.classList.contains( this.CLASS_COLLAPSED ) ) {
 			element.classList.add( this.CLASS_COLLAPSED );
+		} else {
+			element.classList.remove( this.CLASS_COLLAPSED );
 		}
 	},
 
@@ -83,8 +98,10 @@ liquipedia.panels = {
 	 * @param {string} id - The ID of the panel box that was clicked.
 	 */
 	handleClick: function( element, id ) {
-		this.setCollapsedClass( element );
-		if ( !this.isInLocalStorage( id ) ) {
+		this.toggleCollapsedClass( element );
+		if ( this.isInLocalStorage( id ) ) {
+			this.removeFromLocalStorage( id );
+		} else {
 			this.setToLocalStorage( id );
 		}
 	}
