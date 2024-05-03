@@ -1,12 +1,12 @@
 /**
  * @file This module provides functionality for collapsible panel boxes.
- * @author Elysienna
+ * @author Elysienna (Laura van Helvoort)
  */
 
 /**
- * @namespace liquipedia.panels
+ * @namespace liquipedia.panelBoxCollapsible
  */
-liquipedia.panels = {
+liquipedia.panelBoxCollapsible = {
 
 	/**
 	 * LOCAL_STORAGE_KEY {string} - The key used to store the array of collapsed panel box IDs in local storage.
@@ -19,20 +19,26 @@ liquipedia.panels = {
 
 	init: function() {
 		const panelBoxes = document.querySelectorAll( '[data-component="panel-box"]' );
+		panelBoxes.forEach( ( panelBox ) => this.handlePanelBox( panelBox ) );
+	},
 
-		panelBoxes.forEach( ( panelBox ) => {
-			const closedPanelIDsArray = this.getFromLocalStorage();
-			const id = panelBox.getAttribute( this.DATA_ATTR_PANEL_BOX_ID );
+	/**
+	 * Handles a panel box element by adding an event listener to its collapsible button and checking if
+	 * it should be collapsed.
+	 * @param {Element} panelBox - The panel box element to handle.
+	 */
+	handlePanelBox: function( panelBox ) {
+		const closedPanelIDsArray = this.getFromLocalStorage();
+		const id = panelBox.getAttribute( this.DATA_ATTR_PANEL_BOX_ID );
 
-			if ( closedPanelIDsArray.includes( id ) ) {
-				this.toggleCollapsedClass( panelBox );
-			}
+		/* If the panel box ID is in the array of collapsed panel box IDs, add the collapsed class. */
+		if ( closedPanelIDsArray.includes( id ) ) {
+			this.toggleCollapsedClass( panelBox );
+		}
 
-			const button = panelBox.querySelector( '[data-component="panel-box-collapsible-button"]' );
-
-			button.addEventListener( 'click', () => {
-				this.handleClick( panelBox, id );
-			} );
+		const button = panelBox.querySelector( '[data-component="panel-box-collapsible-button"]' );
+		button.addEventListener( 'click', () => {
+			this.handleClick( panelBox, id );
 		} );
 	},
 
@@ -106,4 +112,4 @@ liquipedia.panels = {
 		}
 	}
 };
-liquipedia.core.modules.push( 'panels' );
+liquipedia.core.modules.push( 'panelBoxCollapsible' );
