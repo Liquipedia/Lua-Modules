@@ -738,14 +738,14 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
-	local vetoTypes = mw.text.split(match.mapveto.types or '', ',')
-	local deciders = mw.text.split(match.mapveto.decider or '', ',')
+	local vetoTypes = Array.parseCommaSeparatedString(match.mapveto.types)
+	local deciders = Array.parseCommaSeparatedString(match.mapveto.decider)
 	local vetoStart = match.mapveto.firstpick or ''
 	local deciderIndex = 1
 
 	local data = {}
 	for index, vetoType in ipairs(vetoTypes) do
-		vetoType = mw.text.trim(vetoType):lower()
+		vetoType = vetoType:lower()
 		if not Table.includes(allowedVetoes, vetoType) then
 			return nil -- Any invalid input will not store (ie hide) all vetoes.
 		end
