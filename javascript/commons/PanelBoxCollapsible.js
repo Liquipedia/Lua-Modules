@@ -29,7 +29,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {Element} panelBox - The panel box element to handle.
+	 * @param {Element} panelBox - Panel box element to handle.
 	 */
 	handlePanelBox: function( panelBox ) {
 		const closedPanelIDsArray = this.getFromLocalStorage();
@@ -49,7 +49,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @return {Array} The array of collapsed panel box IDs.
+	 * @return {Array} Array of collapsed panel box IDs.
 	 */
 	getFromLocalStorage: function() {
 		const items = window.localStorage.getItem( this.LOCAL_STORAGE_KEY );
@@ -61,7 +61,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {string} id - The ID of the panel box to add.
+	 * @param {string} id - Panel box ID.
 	 */
 	setToLocalStorage: function( id ) {
 		const items = this.getFromLocalStorage();
@@ -72,7 +72,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {string} id - The ID of the panel box to remove.
+	 * @param {string} id - Panel box ID.
 	 */
 	removeFromLocalStorage: function( id ) {
 		const items = this.getFromLocalStorage();
@@ -84,7 +84,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {string} id - The ID of the panel box to check.
+	 * @param {string} id - Panel box ID.
 	 * @return {boolean} True if the ID is in the array, false otherwise.
 	 */
 	isInLocalStorage: function( id ) {
@@ -93,7 +93,7 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {Element} element - The panel box element to add or remove the class to.
+	 * @param {Element} element - Panel box element.
 	 */
 	toggleCollapsedClass: function( element ) {
 		if ( !element.classList.contains( this.CLASS_COLLAPSED ) ) {
@@ -104,8 +104,8 @@ liquipedia.panelBoxCollapsible = {
 	},
 
 	/**
-	 * @param {Element} element - The panel box element that was clicked.
-	 * @param {string} id - The ID of the panel box that was clicked.
+	 * @param {Element} element - Panel box element.
+	 * @param {string} id - ID of the panel box that was clicked.
 	 */
 	handleClick: function( element, id ) {
 		this.toggleCollapsedClass( element );
