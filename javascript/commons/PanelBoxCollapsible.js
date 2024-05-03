@@ -2,8 +2,11 @@
  * @file This module provides functionality for collapsible panel boxes.
  * @author Elysienna (Laura van Helvoort)
  *
- * A unique data attribute ID (data-panel-box-id) is set on the html of the panel box to help track if the panel is
- * collapsed. If the panel is collapsed, the data-panel-box-id is added to the array of the local storage key.
+ * To query all panel boxes, a data-component attribute with the value "panel-box" is set in the HTML.
+ * It is done by data attribute to ensure that the script is not dependent on the class name.
+ * To further specify the panel box, a unique data attribute ID (data-panel-box-id) is set on the HTML of the panel
+ * box to help track if the panel is collapsed. If the panel is collapsed, the data-panel-box-id is added to the
+ * array of the local storage key.
  * On init, it will check if the local storage contains panel box ids and applies the collapsed class to the element.
  * It will then add a click event to the button to toggle the collapsed class and add or remove the panel box id in
  * local storage.
