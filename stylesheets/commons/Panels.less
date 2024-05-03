@@ -35,12 +35,16 @@ Author(s): FO-nTTaX
 		box-shadow: 0 0.0625rem 0.25rem 0 rgba(0, 0, 0, 0.12);
 		border: none;
 		border-radius: 0.5rem;
-		overflow: hidden;
 
 		&.is--collapsed {
-			.panel-box-heading-icon {
-				transform: rotate( 180deg );
+			.panel-box-heading {
+				border-radius: 0.5rem;
+
+				&-icon {
+					transform: rotate( 180deg );
+				}
 			}
+
 			.panel-box-body {
 				display: none;
 			}
