@@ -331,6 +331,7 @@ end
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = DateExt.toYmdInUtc(match.date),
+		matchId = match.matchId,
 	}
 
 	if match.winner and 1 <= match.winner and #match.opponents == 2 then
@@ -595,7 +596,7 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		wdl = (not lpdbEntry.needsLastVs) and self:_formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = lastVsScore,
-		lastvsmatchid = additionalData.matchId,
+		lastvsmatchid = lpdbEntry.matchId or additionalData.matchId,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
