@@ -37,9 +37,11 @@ liquipedia.panelBoxCollapsible = {
 		}
 
 		const button = panelBox.querySelector( '[data-component="panel-box-collapsible-button"]' );
-		button.addEventListener( 'click', () => {
-			this.handleClick( panelBox, id );
-		} );
+		if ( button ) {
+			button.addEventListener( 'click', () => {
+				this.handleClick( panelBox, id );
+			} );
+		}
 	},
 
 	/**
