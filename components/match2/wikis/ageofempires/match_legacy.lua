@@ -95,9 +95,10 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	if match.walkover == 'FF' or match.walkover == 'DQ' then
+		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
+	elseif match.walkover == 'L' then
 		match.walkover = nil
 	end
 

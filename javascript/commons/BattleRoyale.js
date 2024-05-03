@@ -14,6 +14,10 @@ liquipedia.battleRoyale = {
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
+	isMobile: function() {
+		return window.matchMedia( '(max-width: 767px)' ).matches;
+	},
+
 	implementOnElementResize: function( instanceId ) {
 		this.instancesLoaded[ instanceId ] = false;
 
@@ -42,25 +46,37 @@ liquipedia.battleRoyale = {
 		return el.scrollWidth > el.offsetWidth;
 	},
 
-	implementScrollWheelEvent: function() {
-		const handleWheelEvent = ( e, table ) => {
-			if ( this.hasVisibleSideScrollButtons( table ) ) {
-				e.preventDefault();
-				const delta = e.deltaY || e.detail || e.wheelDelta;
-				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
-				this.handleTableSideScroll( table, dir );
-			}
-		};
+	handleWheelEvent: function( e, table ) {
+		if ( this.hasVisibleSideScrollButtons( table ) ) {
+			const delta = e.deltaY || e.detail || e.wheelDelta;
+			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
 
+			const gameContainer = table.querySelector( '[data-js-battle-royale="game-container"]' );
+
+			if ( dir === this.DIRECTION_RIGHT && (
+				gameContainer.scrollWidth <= gameContainer.scrollLeft + gameContainer.offsetWidth ) ||
+				dir === this.DIRECTION_LEFT && gameContainer.scrollLeft === 0
+			) {
+				// Resume default browser scroll behavior if scrolling down and the table is already at the far right
+				// or scrolling up and the table is at the far left
+				return;
+			}
+
+			e.preventDefault();
+			this.handleTableSideScroll( table, dir );
+		}
+	},
+
+	implementScrollWheelEvent: function() {
 		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
 			const table = el.closest( '[data-js-battle-royale="table"]' );
 			const gameContainerElements = table.querySelectorAll(
 				'[data-js-battle-royale="row"] > [data-js-battle-royale="game-container"]'
 			);
 
-			el.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
+			el.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
 			gameContainerElements.forEach( ( gameContainer ) => {
-				gameContainer.addEventListener( 'wheel', ( e ) => handleWheelEvent( e, table ) );
+				gameContainer.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
 			} );
 		} );
 	},
@@ -120,6 +136,9 @@ liquipedia.battleRoyale = {
 	},
 
 	recheckNavigationStates: function( instanceId ) {
+		if ( this.isMobile() ) {
+			return;
+		}
 		this.battleRoyaleInstances[ instanceId ]
 			.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
 			.forEach( ( tableEl ) => {
@@ -459,20 +478,22 @@ liquipedia.battleRoyale = {
 	},
 
 	init: function() {
-		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( ( instance ) => {
+		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( instance ) => {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
 
 			this.makeSortableTable( instance );
 		} );
 
-		Object.keys( this.battleRoyaleInstances ).forEach( function( instanceId ) {
+		Object.keys( this.battleRoyaleInstances ).forEach( function ( instanceId ) {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			this.makeSideScrollElements( instanceId );
-			this.makeTableScrollHint( instanceId );
+			if ( !this.isMobile() ) {
+				this.makeSideScrollElements( instanceId );
+				this.makeTableScrollHint( instanceId );
+			}
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
@@ -490,10 +511,12 @@ liquipedia.battleRoyale = {
 				} );
 			} );
 
-			this.implementScrollendEvent( instanceId );
-			this.implementOnWindowResize( instanceId );
-			this.implementOnElementResize( instanceId );
-			this.implementScrollWheelEvent();
+			if ( !this.isMobile() ) {
+				this.implementScrollendEvent( instanceId );
+				this.implementOnWindowResize( instanceId );
+				this.implementOnElementResize( instanceId );
+				this.implementScrollWheelEvent();
+			}
 
 		}.bind( this ) );
 	}

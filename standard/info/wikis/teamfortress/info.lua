@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'teamfortress',
 	name = 'Team Fortress',
+	defaultGame = 'tf2',
 	games = {
 		tf2 = {
 			abbreviation = 'TF2',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tf2',
-	defaultTeamLogo = 'Team Fortress logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Team Fortress logo.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

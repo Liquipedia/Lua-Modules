@@ -122,7 +122,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate)
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
@@ -355,7 +355,7 @@ function matchFunctions.getOpponents(match)
 						applyUnderScores = true,
 					})
 				end
-			elseif Opponent.typeIsParty(opponent) then
+			elseif Opponent.typeIsParty(opponent.type) then
 				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
 				opponent.match2players[1].name = opponent.name
 			elseif opponent.type ~= Opponent.literal then

@@ -16,7 +16,7 @@ local Widget = Lua.import('Module:Infobox/Widget')
 local WidgetFactory = Class.new()
 
 ---@param widget Widget
----@param injector WidgetInjector
+---@param injector WidgetInjector?
 ---@return Html[]
 function WidgetFactory.work(widget, injector)
 	local convertedWidgets = {} ---@type Html[]
@@ -25,10 +25,9 @@ function WidgetFactory.work(widget, injector)
 		return {}
 	end
 
-	for _, child in ipairs(widget:tryMake() or {}) do
+	for _, child in ipairs(widget:tryMake(injector) or {}) do
 		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
 			---@cast child Widget
-			child:setContext{injector = injector}
 			Array.extendWith(convertedWidgets, WidgetFactory.work(child, injector))
 		else
 			---@cast child Html

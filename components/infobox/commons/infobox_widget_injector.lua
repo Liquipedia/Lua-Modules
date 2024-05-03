@@ -26,11 +26,4 @@ function Injector:parse(id, widgets)
 	return widgets
 end
 
----Adds custom cells
----@param widgets Widget[]
----@return Widget[]?
-function Injector:addCustomCells(widgets)
-	return {}
-end
-
 return Injector

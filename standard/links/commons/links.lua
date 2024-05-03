@@ -55,6 +55,7 @@ local PREFIXES = {
 	chzzk = {'https://chzzk.naver.com/live/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},
+	cfs = {'https://www.crossfirestars.com/'},
 	datdota = {
 		'https://www.datdota.com/leagues/',
 		player = 'https://www.datdota.com/players/',
@@ -153,6 +154,7 @@ local PREFIXES = {
 		team = 'https://rgl.gg/Public/Team?t=',
 		player = 'https://rgl.gg/Public/PlayerProfile?p=',
 	},
+	rooter = {'https://rooter.gg/'},
 	royaleapi = {'https://royaleapi.com/player/'},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
@@ -272,6 +274,7 @@ local ICON_KEYS_TO_RENAME = {
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
+	['faceit-l'] = 'faceit',
 	['faceit-hub'] = 'faceit',
 	['faceit-org'] = 'faceit',
 	matcherinolink = 'matcherino',

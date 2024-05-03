@@ -10,6 +10,7 @@ return {
 	startYear = 2016,
 	wikiName = 'paladins',
 	name = 'Paladins',
+	defaultGame = 'paladins',
 	games = {
 		paladins = {
 			abbreviation = 'Paladins',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'paladins',
-	defaultTeamLogo = 'Paladins allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Paladins allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

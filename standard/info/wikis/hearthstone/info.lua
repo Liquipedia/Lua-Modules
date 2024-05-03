@@ -10,6 +10,7 @@ return {
 	startYear = 2014,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
+	defaultGame = 'hs',
 	games = {
 		hs = {
 			abbreviation = 'hs',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'hs',
-	defaultTeamLogo = 'Hearthstone default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Hearthstone default allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

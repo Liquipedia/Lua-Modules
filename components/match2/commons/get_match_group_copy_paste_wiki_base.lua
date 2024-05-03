@@ -73,7 +73,7 @@ end
 
 ---subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
----@param showScore boolean
+---@param showScore boolean?
 ---@return string
 function WikiCopyPaste.getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''

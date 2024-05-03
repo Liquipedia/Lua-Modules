@@ -10,6 +10,7 @@ return {
 	startYear = 2018,
 	wikiName = 'fortnite',
 	name = 'Fortnite',
+	defaultGame = 'fortnite',
 	games = {
 		fortnite = {
 			abbreviation = 'Fortnite',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fortnite',
-	defaultTeamLogo = 'Fortnite default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Fortnite default allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

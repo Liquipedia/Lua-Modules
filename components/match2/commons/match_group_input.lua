@@ -13,6 +13,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -26,6 +27,8 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}
+
+local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 
 local MatchGroupInput = {}
 
@@ -184,11 +187,12 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
 
+		---@type MatchGroupUtilBracketData
 		match.bracketdata = Table.mergeInto(bracketData, match.bracketdata or {})
 
 		bracketData.type = 'bracket'
 		bracketData.header = args[matchKey .. 'header'] or bracketData.header
-		bracketData.qualifiedheader = args[matchKey .. 'qualifiedHeader']
+		bracketData.qualifiedheader = MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
 		bracketData.inheritedheader = MatchGroupInput._inheritedHeader(bracketData.header)
 
 		bracketData.matchpage = match.matchPage
@@ -244,6 +248,22 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	end
 
 	return matches, warnings
+end
+
+---@param bracketData MatchGroupUtilBracketData
+---@param args table
+---@param matchKey string
+---@return string?
+function MatchGroupInput._readQualifiedHeader(bracketData, args, matchKey)
+	if args[matchKey .. 'qualifiedHeader'] then
+		return args[matchKey .. 'qualifiedHeader']
+	end
+
+	if Logic.isEmpty(bracketData.header) or not Logic.readBool(bracketData.qualwin) then
+		return
+	end
+
+	return args.qualifiedHeader
 end
 
 -- Retrieve bracket data from the template generated bracket on commons
@@ -722,6 +742,131 @@ function MatchGroupInput._getCasterInformation(name, flag, displayName)
 		displayName = displayName,
 		flag = flag,
 	}
+end
+
+-- Parse map veto input
+---@param match table
+---@param allowedVetoes string[]?
+---@return {type:string, team1: string?, team2:string?, decider:string?, vetostart:string?}[]?
+function MatchGroupInput.getMapVeto(match, allowedVetoes)
+	if not match.mapveto then return nil end
+
+	allowedVetoes = allowedVetoes or DEFAULT_ALLOWED_VETOES
+
+	match.mapveto = Json.parseIfString(match.mapveto)
+
+	local vetoTypes = Array.parseCommaSeparatedString(match.mapveto.types)
+	local deciders = Array.parseCommaSeparatedString(match.mapveto.decider)
+	local vetoStart = match.mapveto.firstpick or ''
+	local deciderIndex = 1
+
+	local data = {}
+	for index, vetoType in ipairs(vetoTypes) do
+		vetoType = vetoType:lower()
+		if not Table.includes(allowedVetoes, vetoType) then
+			return nil -- Any invalid input will not store (ie hide) all vetoes.
+		end
+		if vetoType == 'decider' then
+			table.insert(data, {type = vetoType, decider = deciders[deciderIndex]})
+			deciderIndex = deciderIndex + 1
+		else
+			table.insert(data, {type = vetoType, team1 = match.mapveto['t1map'..index], team2 = match.mapveto['t2map'..index]})
+		end
+	end
+	if data[1] then
+		data[1].vetostart = vetoStart
+	end
+	return data
+end
+
+---@param opponents table[]
+---@return boolean
+function MatchGroupInput.isDraw(opponents)
+	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' and opponent.status ~= 'D' end) then
+		return false
+	end
+	return #Array.unique(Array.map(opponents, Operator.property('score'))) == 1
+end
+
+-- Check if any opponent has a none-standard status
+---@param opponents table[]
+---@return boolean
+function MatchGroupInput.hasSpecialStatus(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status ~= 'S' end)
+end
+
+-- function to check for forfeits
+---@param opponents table[]
+---@return boolean
+function MatchGroupInput.hasForfeit(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'FF' end)
+end
+
+-- function to check for DQ's
+---@param opponents table[]
+---@return boolean
+function MatchGroupInput.hasDisqualified(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'DQ' end)
+end
+
+-- function to check for W/L
+---@param opponents table[]
+---@return boolean
+function MatchGroupInput.hasDefaultWinLoss(opponents)
+	return Array.any(opponents, function (opponent) return opponent.status == 'L' end)
+end
+
+-- Get the winner when resulttype=default
+---@param opponents table[]
+---@return integer
+function MatchGroupInput.getDefaultWinner(opponents)
+	local idx = Array.indexOf(opponents, function(opponent) return opponent.status == 'W' end)
+	return idx > 0 and idx or -1
+end
+
+-- Set the field 'placement' for the two participants in the opponenets list.
+-- Set the placementWinner field to the winner, and placementLoser to the other team
+-- Special cases:
+-- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
+-- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
+---@param opponents table[]
+---@param winner integer?
+---@param placementWinner integer
+---@param placementLoser integer
+---@return table[]
+function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
+	if not opponents or #opponents ~= 2 then
+		return opponents
+	end
+
+	local loserIdx
+	local winnerIdx
+	if winner == 1 then
+		winnerIdx = 1
+		loserIdx = 2
+	elseif winner == 2 then
+		winnerIdx = 2
+		loserIdx = 1
+	elseif winner == 0 then
+		-- Draw; idx of winner/loser doesn't matter
+		-- since loser and winner gets the same placement
+		placementLoser = placementWinner
+		winnerIdx = 1
+		loserIdx = 2
+	elseif winner == -1 then
+		-- No Winner (both loses). For example if both teams DQ.
+		-- idx's doesn't matter
+		placementWinner = placementLoser
+		winnerIdx = 1
+		loserIdx = 2
+	else
+		error('setPlacement: Unexpected winner')
+		return opponents
+	end
+	opponents[winnerIdx].placement = placementWinner
+	opponents[loserIdx].placement = placementLoser
+
+	return opponents
 end
 
 return MatchGroupInput
