@@ -91,7 +91,7 @@ liquipedia.filterButtons = {
 					const button = {
 						element: buttonElement,
 						filter: filterOn,
-						active: true,
+						active: true
 					};
 					switch ( filterOn ) {
 						case 'curated':
@@ -234,10 +234,10 @@ liquipedia.filterButtons = {
 		this.templateExpansions.forEach( ( templateExpansion ) => {
 			const isDefault = this.templateExpansion.groups.every( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
-				if ( filterGroup.curated === filterGroup.defaultCurated) {
+				if ( filterGroup.curated === filterGroup.defaultCurated ) {
 					return true;
 				}
-				return Object.keys(filterGroup.filterStates).every( ( filterState ) => {
+				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => {
 					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
 				} );
 			} );
@@ -246,7 +246,7 @@ liquipedia.filterButtons = {
 			}
 			const parameters = templateExpansion.groups.map( ( group ) => {
 				if ( group.curated ) {
-					return group + '=curated'
+					return group + '=curated';
 				}
 
 				const filterStates = this.filterGroups[ group ].filterStates;
