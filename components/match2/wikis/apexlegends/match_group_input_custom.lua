@@ -201,8 +201,7 @@ function MatchFunctions.parseSetting(match)
 	match.statusSettings = Array.flatMap(splitAndTrim(match.bg, ','), function (status)
 		local placements, color = unpack(splitAndTrim(status, '='))
 		local pStart, pEnd = unpack(splitAndTrim(placements, '-'))
-		---@type integer
-		local pStartNumber = tonumber(pStart)
+		local pStartNumber = tonumber(pStart) --[[@as integer]]
 		local pEndNumber = tonumber(pEnd) or pStartNumber
 		return Array.map(Array.range(pStartNumber, pEndNumber), function()
 			return color
