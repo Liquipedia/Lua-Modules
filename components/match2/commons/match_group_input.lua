@@ -765,7 +765,7 @@ end
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
-	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' or opponent.status ~= 'D' end) then
+	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' and opponent.status ~= 'D' end) then
 		return false
 	end
 	return #Array.unique(Array.map(opponents, Operator.property('score'))) == 1
