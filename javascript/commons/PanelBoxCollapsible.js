@@ -1,0 +1,92 @@
+/**
+ * @file This module provides functionality for collapsible panel boxes.
+ * @author Elysienna
+ */
+
+/**
+ * @namespace liquipedia.panels
+ */
+liquipedia.panels = {
+
+	/**
+	 * LOCAL_STORAGE_KEY {string} - The key used to store the array of collapsed panel box IDs in local storage.
+	 * CLASS_COLLAPSED {string} - The class added to a panel box when it is collapsed.
+	 * DATA_ATTR_PANEL_BOX_ID {string} - The data attribute used to store the ID of a panel box.
+	 */
+	LOCAL_STORAGE_KEY: 'panelBoxCollapsed',
+	CLASS_COLLAPSED: 'is--collapsed',
+	DATA_ATTR_PANEL_BOX_ID: 'data-panel-box-id',
+
+	init: function() {
+		const panelBoxes = document.querySelectorAll( '[data-component="panel-box"]' );
+
+		panelBoxes.forEach( ( panelBox ) => {
+			const closedPanelIDsArray = this.getFromLocalStorage();
+			const id = panelBox.getAttribute( this.DATA_ATTR_PANEL_BOX_ID );
+
+			if ( closedPanelIDsArray.includes( id ) ) {
+				this.setCollapsedClass( panelBox );
+			}
+
+			const button = panelBox.querySelector( '[data-component="panel-box-collapsible-button"]' );
+
+			button.addEventListener( 'click', () => {
+				this.handleClick( panelBox, id );
+			} );
+		} );
+	},
+
+	/**
+	 * Retrieves the array of collapsed panel box IDs from local storage.
+	 * @return {Array} The array of collapsed panel box IDs.
+	 */
+	getFromLocalStorage: function() {
+		const items = window.localStorage.getItem( this.LOCAL_STORAGE_KEY );
+		return items ? JSON.parse( items ) : [ ];
+	},
+
+	/**
+	 * Adds a panel box ID to the array of collapsed panel box IDs in local storage.
+	 * @param {string} id - The ID of the panel box to add.
+	 */
+	setToLocalStorage: function( id ) {
+		const items = this.getFromLocalStorage();
+		if ( !items.includes( id ) ) {
+			items.push( id );
+			localStorage.setItem( this.LOCAL_STORAGE_KEY, JSON.stringify( items ) );
+		}
+	},
+
+	/**
+	 * Checks if a panel box ID is in the array of collapsed panel box IDs in local storage.
+	 * @param {string} id - The ID of the panel box to check.
+	 * @return {boolean} True if the ID is in the array, false otherwise.
+	 */
+	isInLocalStorage: function( id ) {
+		const items = this.getFromLocalStorage();
+		return items.includes( id );
+	},
+
+	/**
+	 * Adds the collapsed class to a panel box element.
+	 * @param {Element} element - The panel box element to add the class to.
+	 */
+	setCollapsedClass: function( element ) {
+		if ( !element.classList.contains( this.CLASS_COLLAPSED ) ) {
+			element.classList.add( this.CLASS_COLLAPSED );
+		}
+	},
+
+	/**
+	 * Handles a click event on a panel box, collapsing the panel box and adding its ID to local storage if necessary.
+	 * @param {Element} element - The panel box element that was clicked.
+	 * @param {string} id - The ID of the panel box that was clicked.
+	 */
+	handleClick: function( element, id ) {
+		this.setCollapsedClass( element );
+		if ( !this.isInLocalStorage( id ) ) {
+			this.setToLocalStorage( id );
+		}
+	}
+};
+liquipedia.core.modules.push( 'panels' );
