@@ -595,7 +595,7 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		wdl = (not lpdbEntry.needsLastVs) and self:_formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = lastVsScore,
-		lastvsmatchid = additionalData.matchid,
+		lastvsmatchid = additionalData.matchId,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
@@ -643,7 +643,7 @@ function Import._getScore(opponentData)
 end
 
 ---@param lpdbEntry table
----@return table
+---@return {date: string?, lastVs: standardOpponent?, score:string|number?, vsScore:string|number?, matchId: string?}
 function Import:_groupLastVsAdditionalData(lpdbEntry)
 	local opponentName = Opponent.toName(lpdbEntry.opponent)
 	local matchConditions = {}
@@ -690,7 +690,7 @@ end
 
 ---@param opponentName string
 ---@param match match2
----@return table
+---@return {date: string?, lastVs: standardOpponent?, score:string|number?, vsScore:string|number?, matchId: string?}
 function Import._makeAdditionalDataFromMatch(opponentName, match)
 	-- catch unfinished or invalid match
 	local winner = tonumber(match.winner)
