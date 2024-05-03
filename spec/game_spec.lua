@@ -34,10 +34,10 @@ describe('Game', function()
 					Game.icon{noSpan = true})
 				assert.are_equal('<span class="span-class">' .. COMMONS_ICON .. '</span>',
 					tostring(Game.icon{spanClass = 'span-class'}))
-					assert.are_equal('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
-						tostring(Game.icon()))
-					assert.are_equal('[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|24x24px]]',
-						tostring(Game.icon{size = '24x24px'}))
+				assert.are_equal('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
+					tostring(Game.icon()))
+				assert.are_equal('[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|24x24px]]',
+					tostring(Game.icon{size = '24x24px'}))
 			end)
 		end)
 
