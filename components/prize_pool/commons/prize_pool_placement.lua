@@ -149,6 +149,12 @@ Placement.additionalData = {
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
+	LASTVSMATCHID = {
+		field = 'lastvsmatchid',
+		parse = function (placement, input, context)
+			return input
+		end
+	},
 }
 
 ---@param lastPlacement integer The previous placement's end

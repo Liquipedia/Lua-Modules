@@ -595,6 +595,7 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		wdl = (not lpdbEntry.needsLastVs) and self:_formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = lastVsScore,
+		lastvsmatchid = additionalData.matchid,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
@@ -657,7 +658,7 @@ function Import:_groupLastVsAdditionalData(lpdbEntry)
 		self:_lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
 			conditions = conditions,
 			order = 'date desc, match2id desc',
-			query = 'date, match2opponents, winner',
+			query = 'match2id, date, match2opponents, winner',
 			limit = 1000,
 		}))
 	end
@@ -712,6 +713,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		lastVs = lastVs,
 		score = score,
 		vsScore = vsScore,
+		matchId = match.match2id,
 	}
 end
 
