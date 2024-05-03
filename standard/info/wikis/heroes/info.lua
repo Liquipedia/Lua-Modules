@@ -10,6 +10,7 @@ return {
 	startYear = 2014,
 	wikiName = 'heroes',
 	name = 'Heroes of the Storm',
+	defaultGame = 'hots',
 	games = {
 		hots = {
 			abbreviation = 'Heroes',
@@ -25,9 +26,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'hots',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Heroes of the Storm default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Heroes of the Storm default allmode.png', ---@deprecated
 	match2 = 1,
 }

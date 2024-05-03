@@ -33,8 +33,9 @@ local Header = Class.new(
 	end
 )
 
+---@param injector WidgetInjector?
 ---@return Html[]
-function Header:make()
+function Header:make(injector)
 	local header = {
 		Header:_name(self.name),
 		Header:_image(
@@ -151,6 +152,7 @@ function Header:_createInfoboxButtons()
 
 	local buttons = mw.html.create('span')
 	buttons:addClass('infobox-buttons')
+	buttons:addClass('navigation-not-searchable')
 
 	-- Quick edit link
 	buttons:node(

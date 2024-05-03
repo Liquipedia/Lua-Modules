@@ -20,7 +20,7 @@ local CustomHiddenDataBox = {}
 ---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
-	args.game = Game.toIdentifier{game = args.game}
+	args.game = Game.toIdentifier{game = args.game, useDefault = false}
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 

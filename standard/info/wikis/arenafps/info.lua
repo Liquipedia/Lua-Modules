@@ -10,6 +10,7 @@ return {
 	startYear = 1995,
 	wikiName = 'arenafps',
 	name = 'Arena FPS',
+	defaultGame = 'qc',
 	games = {
 		ag = {
 			abbreviation = 'ag',
@@ -402,8 +403,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'qc',
-	defaultTeamLogo = 'Quake default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Quake default darkmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 1,
 }

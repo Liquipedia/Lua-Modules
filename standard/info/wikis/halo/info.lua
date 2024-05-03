@@ -10,6 +10,7 @@ return {
 	startYear = 2003,
 	wikiName = 'halo',
 	name = 'Halo',
+	defaultGame = 'infinite',
 	games = {
 		hce = {
 			abbreviation = 'HCE',
@@ -103,8 +104,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'infinite',
-	defaultTeamLogo = 'Halo allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Halo allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = false,
+		},
+	},
 	match2 = 2,
 }

@@ -22,6 +22,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local Chronology = Widgets.Chronology
 
 local DEFAULT_MODE = 'solo'
 
@@ -80,6 +81,11 @@ function CustomInjector:parse(id, widgets)
 		if #maps > 0 then
 			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+		end
+
+		if args.circuit or args.circuit_next or args.circuit_previous then
+			table.insert(widgets, Title{name = 'Circuit Information'})
+			self.caller:_createCircuitInformation(widgets)
 		end
 	end
 
@@ -140,10 +146,38 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 
+	lpdbData.extradata.circuit = args.circuit
+	lpdbData.extradata.circuittier = args.circuittier
+
 	-- Legacy, can be superseeded by lpdbData.mode
 	lpdbData.extradata.individual = self.data.mode == DEFAULT_MODE
 
 	return lpdbData
+end
+
+---@param widgets Widget[]
+function CustomLeague:_createCircuitInformation(widgets)
+	local args = self.args
+
+	Array.appendWith(widgets,
+		Cell{
+			name = 'Circuit',
+			content = {self:_createCircuitLink()}
+		},
+		Cell{name = 'Circuit Tier', content = {args.circuittier}},
+		Cell{name = 'Tournament Region', content = {args.region}},
+		Chronology{content = {next = args.circuit_next, previous = args.circuit_previous}}
+	)
+end
+
+---@return string?
+function CustomLeague:_createCircuitLink()
+	local args = self.args
+
+	return self:createSeriesDisplay({
+		displayManualIcons = true,
+		series = args.circuit,
+	})
 end
 
 return CustomLeague

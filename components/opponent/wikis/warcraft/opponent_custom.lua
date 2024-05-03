@@ -53,10 +53,10 @@ function CustomOpponent.readOpponentArgs(args)
 	end
 
 	if partySize == 1 then
-		opponent.players[1].race = Faction.read(args.race)
+		opponent.players[1].race = Faction.read(args.faction or args.race)
 	elseif partySize then
 		for playerIx, player in ipairs(opponent.players) do
-			player.race = Faction.read(args['p' .. playerIx .. 'race'])
+			player.race = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
 		end
 	end
 

@@ -10,6 +10,7 @@ return {
 	startYear = 2002,
 	wikiName = 'warcraft',
 	name = 'Warcraft',
+	defaultGame = 'reforged',
 	games = {
 		reignofchaos = {
 			abbreviation = 'RoC',
@@ -51,9 +52,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'reforged',
-	defaultTeamLogo = 'Warcraft III default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Warcraft III default allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,

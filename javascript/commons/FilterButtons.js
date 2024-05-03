@@ -73,6 +73,10 @@ liquipedia.filterButtons = {
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
 				( /** @type HTMLElement */ buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
+					const defaultState = !(
+						buttonElement.dataset.filterDefault === 'false' ||
+							!buttonElement.classList.contains( 'filter-button--active' )
+					);
 					const button = {
 						element: buttonElement,
 						filter: filterOn,
@@ -86,8 +90,7 @@ liquipedia.filterButtons = {
 						default:
 							filterGroupEntry.buttons[ filterOn ] = button;
 							filterGroupEntry.filterStates[ filterOn ] =
-								filterGroupEntry.filterStates[ filterOn ] ??
-									!( buttonElement.dataset.filterDefault === 'false' );
+								filterGroupEntry.filterStates[ filterOn ] ?? defaultState;
 					}
 					buttonElement.setAttribute( 'tabindex', '0' );
 				}

@@ -49,6 +49,7 @@ local pageVars = PageVariableNamespace('ParticipantTable')
 ---@field display boolean
 ---@field width string
 ---@field columnWidth string
+---@field showTitle boolean only applies for the title of the whole table
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
@@ -108,7 +109,8 @@ function ParticipantTable.readConfig(args, parentConfig)
 		showTeams = not Logic.readBool(args.disable_teams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
-		display = not Logic.readBool(args.hidden)
+		display = not Logic.readBool(args.hidden),
+		showTitle = not Logic.readBool(args.hideTitle),
 	}
 
 	config.width = parentConfig.width
@@ -164,8 +166,16 @@ function ParticipantTable:readSection(args)
 	local section = {config = config}
 
 	local entriesByName = {}
+	local tbds = {}
 	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
+
+		if entry.opponent and Opponent.isTbd(entry.opponent) then
+			table.insert(tbds, entry)
+			--needed so index is increased
+			return entry
+		end
+
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
@@ -185,6 +195,8 @@ function ParticipantTable:readSection(args)
 	Array.sortInPlaceBy(section.entries, function(entry)
 		return config.sortOpponents and entry.name:lower() or entry.inputIndex or -1
 	end)
+
+	Array.extendWith(section.entries, tbds)
 
 	table.insert(self.sections, section)
 end
@@ -266,8 +278,11 @@ function ParticipantTable:store()
 		if placements[lpdbData.opponentname] or section.config.noStorage or
 			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-
-		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
+		lpdbData = Table.merge(
+			lpdbTournamentData,
+			lpdbData,
+			{date = section.config.resolveDate, extradata = {dq = entry.dq and 'true' or nil}}
+		)
 
 		self:adjustLpdbData(lpdbData, entry, section.config)
 
@@ -312,7 +327,9 @@ function ParticipantTable:create()
 		:addClass('participantTable')
 		:css('max-width', '100%!important')
 		:css('width', config.width)
-		:node(mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants'))
+		:node(config.showTitle and
+			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
+			or nil)
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
@@ -343,7 +360,15 @@ function ParticipantTable:displaySection(section)
 		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
 	end)
 
-	local currentColumn = (#entries) % self.config.colSpan
+	local tbdsAdded = 0
+	if section.config.count and section.config.count > sectionEntryCount then
+		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
+			tbdsAdded = tbdsAdded + 1
+			sectionNode:node(self:tbdEntry():css('width', self.config.columnWidth))
+		end)
+	end
+
+	local currentColumn = (#entries + tbdsAdded) % self.config.colSpan
 	if currentColumn ~= 0 then
 		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
 	end
@@ -376,6 +401,15 @@ function ParticipantTable:sectionTitle(section, amountOfEntries)
 	if not section.config.showCountBySection then return title end
 
 	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+end
+
+---@return Html
+function ParticipantTable:tbdEntry()
+	return mw.html.create('div')
+		:addClass('participantTable-entry')
+		:node(OpponentDisplay.BlockOpponent{
+			opponent = Opponent.tbd(),
+		})
 end
 
 ---@param entry ParticipantTableEntry

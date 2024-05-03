@@ -58,7 +58,7 @@ function DateExt.readTimestamp(dateInput)
 end
 
 --- Same as DateExt.readTimestamp, except that it returns nil upon failure.
----@param dateString string|number|osdate
+---@param dateString string|number|osdate?
 ---@return integer?
 function DateExt.readTimestampOrNil(dateString)
 	local success, timestamp = pcall(DateExt.readTimestamp, dateString)
@@ -122,6 +122,7 @@ end
 ---@param str string
 ---@return osdateparam
 ---@overload fun():nil
+---@overload fun(nil):nil
 function DateExt.parseIsoDate(str)
 	if not str then
 		return

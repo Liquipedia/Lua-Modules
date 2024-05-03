@@ -213,8 +213,35 @@ BasePrizePool.prizeTypes = {
 			return (tonumber(data) or 0) * rate
 		end,
 	},
-	[PRIZE_TYPE_QUALIFIES] = {
+	[PRIZE_TYPE_PERCENTAGE] = {
 		sortOrder = 30,
+
+		header = 'percentage',
+		headerParse = function (prizePool, input, context, index)
+			assert(index == 1, 'Percentage only supports index 1')
+			return {title = 'Percentage'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{content = {{data.title}}}
+		end,
+
+		row = 'percentage',
+		rowParse = function (placement, input, context, index)
+			local value = BasePrizePool._parseInteger(input)
+			if value then
+				placement.hasPercentage = true
+			end
+
+			return value
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return TableCell{content = {{data .. '%'}}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_QUALIFIES] = {
+		sortOrder = 40,
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
@@ -269,7 +296,7 @@ BasePrizePool.prizeTypes = {
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 40,
+		sortOrder = 50,
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
@@ -318,33 +345,6 @@ BasePrizePool.prizeTypes = {
 		rowDisplay = function (headerData, data)
 			if data > 0 then
 				return TableCell{content = {{LANG:formatNum(data)}}}
-			end
-		end,
-	},
-	[PRIZE_TYPE_PERCENTAGE] = {
-		sortOrder = 50,
-
-		header = 'percentage',
-		headerParse = function (prizePool, input, context, index)
-			assert(index == 1, 'Percentage only supports index 1')
-			return {title = 'Percentage'}
-		end,
-		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
-		end,
-
-		row = 'percentage',
-		rowParse = function (placement, input, context, index)
-			local value = BasePrizePool._parseInteger(input)
-			if value then
-				placement.hasPercentage = true
-			end
-
-			return value
-		end,
-		rowDisplay = function (headerData, data)
-			if String.isNotEmpty(data) then
-				return TableCell{content = {{data .. '%'}}}
 			end
 		end,
 	},
@@ -604,7 +604,6 @@ function BasePrizePool:_buildTable(isAward)
 		tbl:addRow(row)
 	end
 
-	tbl:setContext{self._widgetInjector}
 	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
 	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
 		tableNode:node(node)

@@ -333,9 +333,9 @@ return {
 	},
 	idr = {
 		code = 'IDR',
-		name = 'Indonesian Rupee',
+		name = 'Indonesian rupiah',
 		symbol = {
-			hasSpace = true,
+			hasSpace = false,
 			isAfter = false,
 			text = 'Rp',
 		},

@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'zula',
 	name = 'Zula',
+	defaultGame = 'zula',
 	games = {
 		zula = {
 			abbreviation = 'Zula',
@@ -64,9 +65,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'zula',
-
-	defaultTeamLogo = 'Zula Global default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Zula Global default allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }
