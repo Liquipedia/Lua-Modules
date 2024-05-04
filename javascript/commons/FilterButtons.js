@@ -233,13 +233,13 @@ liquipedia.filterButtons = {
 		} );
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
-			const isDefault = !templateExpansion.groups.some( ( group ) => {
+			const isDefault = templateExpansion.groups.every( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
 				if ( filterGroup.curated !== filterGroup.defaultCurated ) {
-					return true;
+					return false;
 				}
-				return Object.keys( filterGroup.filterStates ).some( ( filterState ) => {
-					return filterGroup.filterStates[ filterState ] !== filterGroup.defaultStates[ filterState ];
+				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => {
+					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
 				} );
 			} );
 			if ( isDefault ) {
