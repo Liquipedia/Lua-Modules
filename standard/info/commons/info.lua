@@ -31,9 +31,6 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
-		transfers = {
-			showTeamName = false, -- bool?
-		},
 	},
 	match2 = 2,
 }
