@@ -16,16 +16,15 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Info = Lua.import('Module:Info', {loadData = true})
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
-local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 
 ---@class TransferRow: BaseClass
----@field config {storage: boolean, iconParam: string?}
+---@field config {storage: boolean}
 ---@field transfers transfer[]
 ---@field args table
 ---@field baseData table
@@ -47,13 +46,12 @@ function TransferRow:read()
 	return self
 end
 
----@return {storage: boolean, iconParam: string?}
+---@return {storage: boolean}
 function TransferRow:readConfig()
 	return {
 		storage = not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 			and Namespace.isMain(),
-		iconParam = (Info.config.transfers or {}).iconParam,
 	}
 end
 
@@ -228,11 +226,10 @@ end
 ---@return string[] #positions
 function TransferRow:readIconsAndPosition(playerIndex)
 	local args = self.args
-	local iconParam = self.config.iconParam or 'pos'
 
 	local postfixes = {playerIndex, playerIndex .. '_2'}
 
-	local positions = Array.map(postfixes, function(postfix) return args[iconParam .. postfix] end)
+	local positions = Array.map(postfixes, function(postfix) return args['pos' .. postfix] end)
 
 	if PositionConvert then
 		positions = Array.map(positions, function(pos)

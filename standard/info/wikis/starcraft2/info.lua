@@ -58,9 +58,6 @@ return {
 			hasSpecialTeam = true,
 			allowManual = true,
 		},
-		transfers = {
-			showTeamName = false,
-		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
