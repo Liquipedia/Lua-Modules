@@ -39,7 +39,6 @@ local TRANSFER_ARROW = '&#x21d2;'
 ---@class transferPlayer: standardPlayer
 ---@field icons string[]
 ---@field faction string?
----@field race string?
 ---@field chars string[]
 
 ---@class TransferRowDisplay: BaseClass
@@ -117,9 +116,8 @@ function TransferRowDisplay:_readPlayers(transfers)
 			displayName = String.nilIfEmpty(extradata.displayname) or transfer.player,
 			flag = transfer.nationality,
 			icons = {String.nilIfEmpty(extradata.icon), String.nilIfEmpty(extradata.icon2)},
-			faction = extradata.position,
-			race = extradata.position,
-			chars = {extradata.position},
+			faction = extradata.faction,
+			chars = extradata.chars,
 		}
 	end)
 end

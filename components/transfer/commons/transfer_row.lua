@@ -166,7 +166,7 @@ function TransferRow._shiftDate(dateInput)
 	return os.date( "%Y-%m-%d", date) --[[@as string]]
 end
 
----@return standardPlayer[]
+---@return transferPlayer[]
 function TransferRow:readPlayers()
 	local args = self.args
 	local players = {}
@@ -179,7 +179,7 @@ function TransferRow:readPlayers()
 end
 
 ---@param playerIndex integer|string
----@return standardPlayer
+---@return transferPlayer
 function TransferRow:readPlayer(playerIndex)
 	local args = self.args
 
@@ -189,10 +189,12 @@ function TransferRow:readPlayer(playerIndex)
 		displayName = name,
 		flag = args['flag' .. playerIndex],
 		pageName = args['link' .. playerIndex] or mw.getContentLanguage():ucfirst(name),
+		faction = args['faction' .. playerIndex] or args['race' .. playerIndex],
+		chars = Array.parseCommaSeparatedString(args['head' .. playerIndex]),
 	}
 end
 
----@param data {player: standardPlayer, index: integer|string, sortIndex: integer}
+---@param data {player: transferPlayer, index: integer|string, sortIndex: integer}
 ---@return transfer
 function TransferRow:_convertToTransferStructure(data)
 	local args = self.args
@@ -200,7 +202,7 @@ function TransferRow:_convertToTransferStructure(data)
 	local player = data.player
 
 	local subs = {args['sub' .. playerIndex], args['sub' .. playerIndex .. '_2']}
-	local icons, positions = self:readIconsAndPosition(data.player, playerIndex)
+	local icons, positions = self:readIconsAndPosition(playerIndex)
 
 	return Table.merge(self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
@@ -215,15 +217,16 @@ function TransferRow:_convertToTransferStructure(data)
 			icontype = subs[1] and 'Substitute' or '',
 			displayname = player.displayName or '',
 			sortindex = data.sortIndex,
+			faction = player.faction,
+			chars = player.chars,
 		}),
 	})
 end
 
----@param player standardPlayer
 ---@param playerIndex integer|string
 ---@return string[] #icons
 ---@return string[] #positions
-function TransferRow:readIconsAndPosition(player, playerIndex)
+function TransferRow:readIconsAndPosition(playerIndex)
 	local args = self.args
 	local iconParam = self.config.iconParam or 'pos'
 
