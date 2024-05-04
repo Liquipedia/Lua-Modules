@@ -261,7 +261,7 @@ function TransferRowDisplay:_displayTeam(args)
 	local data = args.data
 	local align = isOldTeam and 'right' or 'left'
 	local teamCell = mw.html.create('div')
-		:addClass('divCell Team ' .. (args.isOldTeam and 'OldTeam' or 'NewTeam'))
+		:addClass('divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
 		:css('text-align', align)
 
 	if not data.teams[1] and not data.roles[1] then
