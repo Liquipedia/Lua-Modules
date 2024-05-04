@@ -54,6 +54,7 @@ function CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._getMapsAndGame(match)
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
+	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))
 
 	Variables.varDefine('bestof', match.bestof)
 end
