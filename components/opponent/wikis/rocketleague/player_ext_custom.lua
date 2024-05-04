@@ -43,8 +43,7 @@ function PlayerExtCustom._fetchTeamFromPlacement(resolvedPageName, date)
 	local team = (placement.opponentplayers or {}).p1team
 	if Logic.isNotEmpty(team) then
 		return {
-			joinDate = date,
-			leaveDate = date,
+			isTimeless = true,
 			template = team:gsub('_', ' '):lower(),
 		}
 	end
