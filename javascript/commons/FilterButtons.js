@@ -126,7 +126,8 @@ liquipedia.filterButtons = {
 			this.templateExpansions.push( {
 				element: templateExpansion,
 				groups: templateExpansion.dataset.filterGroups.split( ',' ),
-				template: templateExpansion.dataset.filterExpansionTemplate
+				template: templateExpansion.dataset.filterExpansionTemplate,
+				defaultContent: templateExpansion.innerHTML
 			} );
 		} );
 	},
@@ -232,20 +233,21 @@ liquipedia.filterButtons = {
 		} );
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
-			const isDefault = this.templateExpansion.groups.every( ( group ) => {
+			const isDefault = !templateExpansion.groups.some( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
-				if ( filterGroup.curated === filterGroup.defaultCurated ) {
+				if ( filterGroup.curated !== filterGroup.defaultCurated ) {
 					return true;
 				}
-				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => {
-					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
+				return Object.keys( filterGroup.filterStates ).some( ( filterState ) => {
+					return filterGroup.filterStates[ filterState ] !== filterGroup.defaultStates[ filterState ];
 				} );
 			} );
 			if ( isDefault ) {
+				templateExpansion.element.innerHTML = templateExpansion.defaultContent;
 				return;
 			}
 			const parameters = templateExpansion.groups.map( ( group ) => {
-				if ( group.curated ) {
+				if ( this.filterGroups[ group ].curated ) {
 					return group + '=curated';
 				}
 
