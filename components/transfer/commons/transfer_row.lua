@@ -24,7 +24,7 @@ local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 
 ---@class TransferRow: BaseClass
----@field config {storage: boolean}
+---@field config {storage: boolean, isRumour: boolean}
 ---@field transfers transfer[]
 ---@field args table
 ---@field baseData table
@@ -46,12 +46,15 @@ function TransferRow:read()
 	return self
 end
 
----@return {storage: boolean}
+---@return {storage: boolean, isRumour: boolean}
 function TransferRow:readConfig()
+	local isRumour = Logic.readBool(self.args.isRumour)
 	return {
-		storage = not Logic.readBool(self.args.disable_storage) and
+		storage = not isRumour and
+			not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 			and Namespace.isMain(),
+		isRumour = isRumour
 	}
 end
 
@@ -131,7 +134,7 @@ function TransferRow:_readBaseData()
 		role1 = fromRole[1],
 		role2 = toRole[1],
 		wholeteam = Logic.readBool(args.wholeteam) and 1 or 0,
-		extradata = {
+		extradata = Table.merge(self:_getRumourInformation(), {
 			displaydate = args.date or '',
 			fromteamsec = fromTeam[2].name or '',
 			fromteamsectemplate = fromTeam[2].template or '',
@@ -141,8 +144,18 @@ function TransferRow:_readBaseData()
 			role1sec = fromRole[2] or '',
 			role2sec = toRole[2] or '',
 			platform = self:readPlatform(),
-		},
+		}),
 	}
+end
+
+---@return {}
+function TransferRow:_getRumourInformation()
+	if not self.config.isRumour then return {} end
+
+	--todo:
+	---parse he rumour stuff & update annotation on this
+	---assert that certain arguments are supplied!
+	---adjust display too
 end
 
 ---@return string
