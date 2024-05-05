@@ -20,8 +20,14 @@ local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 
-
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
+local VALID_CONFIDENCES = {
+	'certain',
+	'likely',
+	'possible',
+	'unlikely',
+	'unknown',
+}
 
 ---@class TransferRow: BaseClass
 ---@field config {storage: boolean, isRumour: boolean}
@@ -54,7 +60,7 @@ function TransferRow:readConfig()
 			not Logic.readBool(self.args.disable_storage) and
 			not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 			and Namespace.isMain(),
-		isRumour = isRumour
+		isRumour = isRumour,
 	}
 end
 
@@ -152,10 +158,19 @@ end
 function TransferRow:_getRumourInformation()
 	if not self.config.isRumour then return {} end
 
-	--todo:
-	---parse he rumour stuff & update annotation on this
-	---assert that certain arguments are supplied!
-	---adjust display too
+	local args = self.args
+
+	local confidence = (args.confidence or 'unknown'):lower()
+	assert(Table.includes(VALID_CONFIDENCES, confidence), 'Invalid confidence "' .. confidence .. '"')
+
+	local confirmed = Logic.readBoolOrNil(args.confirmed)
+
+	return {
+		confirmed = confirmed and 'correct' or (confirmed == false and 'wrong') or 'uncertain',
+		confidence = confidence,
+		isRumour = true,
+	}
+
 end
 
 ---@return string

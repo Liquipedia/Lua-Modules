@@ -24,6 +24,18 @@ local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local TRANSFER_ARROW = '&#x21d2;'
+local RUMOUR_STATUS_TO_ICON_ARGS = {
+	correct = {iconName = 'correct', color = 'forest-green-text'},
+	wrong = {iconName = 'wrong', color = 'cinnabar-text'},
+	uncertain = {iconName = 'uncertain', color = 'bright-sun-text'},
+}
+local CONFIDENCE_TO_COLOR = {
+	certain = 'forest-theme-dark-text',
+	likely = 'bright-sun-non-text',
+	possible = 'california-non-text',
+	unlikely = 'cinnabar-theme-dark-text',
+	unknown = 'gigas-theme-light-alt-text',
+}
 
 ---@class enrichedTransfer
 ---@field from {teams: string[], roles: string[]}
@@ -34,6 +46,9 @@ local TRANSFER_ARROW = '&#x21d2;'
 ---@field wholeteam boolean
 ---@field players transferPlayer[]
 ---@field references string[]
+---@field confirmed boolean?
+---@field confidence string?
+---@field isRumour boolean?
 
 ---@class transferPlayer: standardPlayer
 ---@field icons string[]
@@ -90,6 +105,9 @@ function TransferRowDisplay:_enrichTransfers(transfers)
 		wholeteam = Logic.readBool(transfer.wholeteam),
 		players = self:_readPlayers(transfers),
 		references = self:_getReferences(transfers),
+		confirmed = transfer.extradata.confirmed,
+		confidence = transfer.extradata.confidence,
+		isRumour = transfer.extradata.isRumour,
 	}
 end
 
@@ -171,6 +189,8 @@ function TransferRowDisplay:build()
 
 	return self
 		:cssClass()
+		:status()
+		:confidence()
 		:date()
 		:platform()
 		:players()
@@ -183,7 +203,37 @@ end
 
 ---@return self
 function TransferRowDisplay:cssClass()
+	if self.transfer.isRumour then
+		self.display:addClass('RumourRow')
+		return self
+	end
 	self.display:addClass('divRow mainpage-transfer-' .. self:_getStatus())
+	return self
+end
+
+---@return self
+function TransferRowDisplay:status()
+	if not self.transfer.isRumour then return self end
+
+	self.display:tag('div')
+		:addClass('divCell Status')
+		:node(Icon.makeIcon(RUMOUR_STATUS_TO_ICON_ARGS[self.transfer.confirmed]))
+
+	return self
+end
+
+---@return self
+function TransferRowDisplay:confidence()
+	if not self.transfer.isRumour then return self end
+
+	local confidence = self.transfer.confidence
+
+	self.display:tag('div')
+		:addClass('divCell Confidence')
+		:addClass(CONFIDENCE_TO_COLOR[confidence])
+		:css('font-weight', 'bold')
+		:wikitext(confidence and mw.getContentLanguage():ucfirst(confidence) or nil)
+
 	return self
 end
 
