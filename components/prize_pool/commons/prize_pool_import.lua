@@ -331,6 +331,7 @@ end
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
 		date = DateExt.toYmdInUtc(match.date),
+		matchId = match.matchId,
 	}
 
 	if match.winner and 1 <= match.winner and #match.opponents == 2 then
@@ -595,6 +596,7 @@ function Import:_entryToOpponent(lpdbEntry, placement)
 		wdl = (not lpdbEntry.needsLastVs) and self:_formatGroupScore(lpdbEntry) or nil,
 		lastvs = Table.isNotEmpty(lastVs) and {lastVs} or nil,
 		lastvsscore = lastVsScore,
+		lastvsmatchid = lpdbEntry.matchId or additionalData.matchId,
 		date = additionalData.date or lpdbEntry.date,
 	}}[1]
 end
@@ -642,7 +644,7 @@ function Import._getScore(opponentData)
 end
 
 ---@param lpdbEntry table
----@return table
+---@return {date: string?, lastVs: standardOpponent?, score:string|number?, vsScore:string|number?, matchId: string?}
 function Import:_groupLastVsAdditionalData(lpdbEntry)
 	local opponentName = Opponent.toName(lpdbEntry.opponent)
 	local matchConditions = {}
@@ -657,7 +659,7 @@ function Import:_groupLastVsAdditionalData(lpdbEntry)
 		self:_lastVsMatchesDataToCache(mw.ext.LiquipediaDB.lpdb('match2', {
 			conditions = conditions,
 			order = 'date desc, match2id desc',
-			query = 'date, match2opponents, winner',
+			query = 'match2id, date, match2opponents, winner',
 			limit = 1000,
 		}))
 	end
@@ -689,7 +691,7 @@ end
 
 ---@param opponentName string
 ---@param match match2
----@return table
+---@return {date: string?, lastVs: standardOpponent?, score:string|number?, vsScore:string|number?, matchId: string?}
 function Import._makeAdditionalDataFromMatch(opponentName, match)
 	-- catch unfinished or invalid match
 	local winner = tonumber(match.winner)
@@ -712,6 +714,7 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 		lastVs = lastVs,
 		score = score,
 		vsScore = vsScore,
+		matchId = match.match2id,
 	}
 end
 

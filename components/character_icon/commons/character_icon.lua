@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local Data = Lua.requireIfExists('Module:CharacterIcon/Data', {loadData = true})
 
 ---@class IconArguments
----@field character string
+---@field character string?
 ---@field size string?
 ---@field class string?
 ---@field date string?
