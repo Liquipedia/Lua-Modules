@@ -24,9 +24,8 @@ Returns nil if the team template does not exist.
 function CustomOpponent.toName(opponent)
 	if opponent.type == Opponent.team then
 		return mw.ext.TeamTemplate.raw(opponent.template).page
-	else
-		return Opponent.toName(opponent)
 	end
+	return Opponent.toName(opponent)
 end
 
 return CustomOpponent
