@@ -17,8 +17,18 @@ local CustomTransferRow = Class.new(TransferRow)
 
 ---@param frame Frame
 ---@return Html?
-function CustomTransferRow.run(frame)
-	return CustomTransferRow(Arguments.getArgs(frame)):read():store():build()
+function CustomTransferRow.transfer(frame)
+	local args = Arguments.getArgs(frame)
+	args.isRumour = false
+	return CustomTransferRow(args):read():store():build()
+end
+
+---@param frame Frame
+---@return Html?
+function CustomTransferRow.rumour(frame)
+	local args = Arguments.getArgs(frame)
+	args.isRumour = true
+	return CustomTransferRow(args):read():store():build()
 end
 
 return CustomTransferRow
