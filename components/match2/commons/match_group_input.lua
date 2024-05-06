@@ -250,7 +250,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	return matches, warnings
 end
 
----@param bracketData MatchGroupUtilBracketData
+---@param bracketData table
 ---@param args table
 ---@param matchKey string
 ---@return string?
