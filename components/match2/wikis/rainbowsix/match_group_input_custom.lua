@@ -136,7 +136,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			else
 				data.winner = 2
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		end
 	end
 	return data, indexedScores
