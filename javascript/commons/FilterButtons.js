@@ -235,8 +235,8 @@ liquipedia.filterButtons = {
 		this.templateExpansions.forEach( ( templateExpansion ) => {
 			const isDefault = templateExpansion.groups.every( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
-				if ( filterGroup.curated !== filterGroup.defaultCurated ) {
-					return false;
+				if ( filterGroup.curated || filterGroup.defaultCurated ) {
+					return filterGroup.curated === filterGroup.defaultCurated;
 				}
 				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => {
 					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
