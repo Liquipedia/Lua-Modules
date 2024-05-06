@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
+-- wiki=brawlhalla
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
 local Array = require('Module:Array')
-local Faction = require('Module:Faction')
-local Game = require('Module:Game')
+local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -33,62 +34,29 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date, {
+		'match_date',
+		'tournament_enddate',
+		'tournament_startdate',
+	}))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._processMaps(match)
 	CustomMatchGroupInput._calculateWinner(match)
 	CustomMatchGroupInput._updateFinished(match)
 	match.stream = Streams.processStreams(match)
-	CustomMatchGroupInput._getLinks(match)
 	CustomMatchGroupInput._getVod(match)
-	CustomMatchGroupInput._getExtraData(match)
 	return match
 end
+
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match = CustomMatchGroupInput._getMapsAndGame(match)
-	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
-	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))
-
-	Variables.varDefine('bestof', match.bestof)
-end
-
----@param match table
----@return table
-function CustomMatchGroupInput._getMapsAndGame(match)
-	match.mapsInfo = Json.parse(Variables.varDefault('tournament_maps'))
-
-	if Logic.isNotEmpty(match.mapsInfo) and match.game then
-		return match
-	end
-
-	-- likely in preview w/o Infobox/HDB. Fetch from LPDB
-	local title = mw.title.getCurrentTitle()
-	local pages = {
-		title.text:gsub(' ', '_'),
-		title.baseText:gsub(' ', '_'),
-		title.rootText:gsub(' ', '_'),
-	}
-	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = table.concat(Array.map(pages, function(page) return '[[pagename::' .. page .. ']]' end), ' OR '),
-			query = 'game, maps',
-			order = 'pagename desc'
-		})[1] or {}
-
-	-- Store fetched data for following matches
-	Variables.varDefine('tournament_game', data.game)
-	Variables.varDefine('tournament_maps', data.maps)
-
-	match.game = match.game or data.game
-	match.mapsInfo = Logic.emptyOr(match.mapsInfo, (Json.parse(data.maps)))
-
-	return match
+	match.bestof = match.bestof
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
 
 ---@param match table
@@ -106,31 +74,9 @@ function CustomMatchGroupInput._updateFinished(match)
 end
 
 ---@param match table
-function CustomMatchGroupInput._getLinks(match)
-	match.links = {}
-	match.civdraft1 = match.civdraft1 or match.civdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
-		match.links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-	match.mapdraft1 = match.mapdraft1 or match.mapdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
-		match.links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-end
-
----@param match table
 function CustomMatchGroupInput._getVod(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod)
-end
-
----@param match table
-function CustomMatchGroupInput._getExtraData(match)
-	match.extradata = {
-		headtohead = match.headtohead,
-		civdraft = match.civdraft,
-		mapdraft = match.mapdraft,
-	}
 end
 
 ---@param match table
@@ -299,26 +245,13 @@ end
 function CustomMatchGroupInput._mapInput(match, mapIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
 	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
-		if Logic.isNotEmpty(match.mapsInfo) then
-			local info = Array.find(match.mapsInfo, function(m)
-				return m.name == map.map or m.link == map.map
-			end)
-			if info then
-				map.map = info.link
-				map.mapDisplayName = info.name
-			end
-		else
-			map.mapDisplayName = map.map
-			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or '')
-		end
+		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 	end
 
 	-- set initial extradata for maps
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
-		displayname = map.mapDisplayName,
-		mapmode = map.mode
 	}
 	map.game = match.game
 	map.mode = match.mode
@@ -330,7 +263,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	if not match.opponent1.autoscore and not match.opponent2.autoscore
 			and map.map and map.map ~= 'TBD'
 			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]])
-			and String.isNotEmpty(map.civs1) and String.isNotEmpty(map.civs2) then
+			and String.isNotEmpty(map.char1) and String.isNotEmpty(map.char2) then
 		match.opponent1.autoscore = 0
 		match.opponent2.autoscore = 0
 	end
@@ -407,7 +340,7 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	elseif winnerInput == 2 then
 		map.scores = {0, 1}
 	elseif winnerInput == 0 or map.winner == 'draw' then
-		map.scores = {0.5, 0.5}
+		map.scores = {0, 0}
 		map.resulttype = 'draw'
 	end
 
@@ -421,64 +354,28 @@ function CustomMatchGroupInput.processPlayerMapData(map, match, numberOfOpponent
 	local participants = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
-		if Opponent.typeIsParty(opponent.type) then
-			CustomMatchGroupInput._processPartyMapData(opponent.match2players, map, opponentIndex, participants)
-		elseif opponent.type == Opponent.team then
-			CustomMatchGroupInput._processTeamMapData(opponent.match2players, map, opponentIndex, participants)
+		if opponent.type == Opponent.solo then
+			CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex, participants)
 		end
 	end
 
 	map.participants = participants
 end
 
----@param players table[]
+---@param player table
 ---@param map table
 ---@param opponentIndex integer
 ---@param participants table<string, table>
 ---@return table<string, table>
-function CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex, participants)
-	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
+function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
+	local char = map['char' .. opponentIndex] or ''
+	char = CharacterStandardization[char:lower()]
 
-	for playerIndex, player in pairs(players) do
-		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+	participants[opponentIndex .. '_1'] = {
+		char = char,
+		player = player.name,
+	}
 
-		participants[opponentIndex .. '_' .. playerIndex] = {
-			civ = civ,
-			player = player.name,
-		}
-	end
-
-	return participants
-end
-
----@param opponentPlayers table[]
----@param map table
----@param opponentIndex integer
----@param participants table<string, table>
----@return table<string, table>
-function CustomMatchGroupInput._processTeamMapData(opponentPlayers, map, opponentIndex, participants)
-	local players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
-	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
-
-	local function findPlayer(name)
-		return Table.filter(opponentPlayers or {}, function(player)
-			return player.displayName == name or player.pageName == name
-		end)[1] or {pageName = name, displayName = name}
-	end
-
-	for playerIndex, player in pairs(players) do
-		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
-		local playerData = findPlayer(player)
-
-		participants[opponentIndex .. '_' .. playerIndex] = {
-			civ = civ,
-			displayName = playerData.displayName,
-			pageName = playerData.pageName,
-			flag = playerData.flag,
-		}
-	end
 	return participants
 end
 

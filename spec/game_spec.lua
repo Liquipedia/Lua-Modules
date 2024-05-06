@@ -6,7 +6,7 @@ describe('Game', function()
 
 		local COMMONS_IDENTIFIER = 'commons'
 		local COMMONS_DATA = Info.games.commons
-		local COMMONS_ICON = '[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|25x25px]]'
+		local COMMONS_ICON = '[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|32x32px]]'
 		local GAME_TO_THROW = 'please throw'
 
 		describe('to identifier', function()
@@ -36,6 +36,8 @@ describe('Game', function()
 					tostring(Game.icon{spanClass = 'span-class'}))
 				assert.are_equal('<span class="icon-16px">' .. COMMONS_ICON .. '</span>',
 					tostring(Game.icon()))
+				assert.are_equal('[[File:Liquipedia logo.png|Commons|link=lpcommons:Main Page|class=|24x24px]]',
+					tostring(Game.icon{size = '24x24px'}))
 			end)
 		end)
 

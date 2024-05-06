@@ -35,6 +35,9 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
@@ -49,6 +52,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
+---@param match table
 function CustomMatchGroupInput._underScoreAdjusts(match)
 	local fixUnderscore = function(page)
 		return page and page:gsub(' ', '_') or page
@@ -64,6 +68,8 @@ function CustomMatchGroupInput._underScoreAdjusts(match)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	local bestof = tonumber(Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof'))) or 3
 	Variables.varDefine('map_bestof', bestof)
@@ -76,6 +82,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -99,13 +107,17 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
+---@param player table
+---@return table
 function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
---
---
 -- function to sort out winner/placements
+---@param tbl table[]
+---@param key1 integer
+---@param key2 integer
+---@return boolean
 function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	local op1 = tbl[key1]
 	local op2 = tbl[key2]
@@ -125,16 +137,21 @@ end
 --
 -- match related functions
 --
-
+---@param matchArgs table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function matchFunctions.readDate(matchArgs)
 	return MatchGroupInput.readDate(matchArgs.date, {'tournament_enddate'})
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -142,6 +159,8 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param args table
+---@return table
 function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -262,6 +281,10 @@ function matchFunctions.getOpponents(args)
 	return args
 end
 
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@return table
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
@@ -278,6 +301,9 @@ end
 --
 -- map related functions
 --
+
+---@param map table
+---@return table
 function mapFunctions.getExtraData(map)
 	local bans = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
@@ -296,6 +322,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1)
 	map.score2 = tonumber(map.score2)
@@ -318,6 +346,8 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = {}
 
@@ -342,6 +372,8 @@ function mapFunctions.getParticipantsData(map)
 	return map
 end
 
+---@param strikerRaw string
+---@return string
 function mapFunctions._cleanStrikerName(strikerRaw)
 	local striker = StrikerNames[string.lower(strikerRaw)]
 	if not striker then
