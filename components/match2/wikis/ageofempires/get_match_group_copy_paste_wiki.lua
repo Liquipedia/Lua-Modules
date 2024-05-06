@@ -34,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		INDENT .. '|bestof=' .. bestof,
 		INDENT .. '|twitch=|vod=',
-		INDENT .. '|civdraft=|mapdraft=',
+		INDENT .. '|mapdraft=|civdraft=',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
 		end),
