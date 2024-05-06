@@ -135,25 +135,6 @@ function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
--- function to check for draws
----@param tbl table
----@return boolean
-function CustomMatchGroupInput.placementCheckDraw(tbl)
-	local last
-	for _, scoreInfo in pairs(tbl) do
-		if scoreInfo.status ~= STATUS_SCORE and scoreInfo.status ~= STATUS_DRAW then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
-	end
-
-	return true
-end
-
 ---@param data table
 ---@param indexedScores table[]
 ---@return table
@@ -169,7 +150,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+		if MatchGroupInput.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')

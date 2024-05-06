@@ -782,6 +782,7 @@ end
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
+	if Logic.isEmpty(opponents) then return true end
 	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' and opponent.status ~= 'D' end) then
 		return false
 	end
