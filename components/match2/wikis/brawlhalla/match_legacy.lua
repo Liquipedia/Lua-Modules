@@ -61,13 +61,12 @@ function MatchLegacy._convertParameters(match2)
 	-- Handle Opponents
 	local headList = function (participant)
 		local heads = Set{}
-		local games = match2.match2games or {}
-		for _, game in ipairs(games) do
+		Array.forEach(match2.match2games or {}, function(game)
 			local participants = Json.parseIfString(game.participants) or {}
 			if participants[participant] then
 				heads:add(participants[participant].char)
 			end
-		end
+		end)
 		return heads:toArray()
 	end
 
