@@ -5,7 +5,9 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
 local Array = require('Module:Array')
+local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -366,7 +368,8 @@ end
 ---@param participants table<string, table>
 ---@return table<string, table>
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
-	local char = map['char' .. opponentIndex]
+	local char = map['char' .. opponentIndex] or ''
+	char = CharacterStandardization[char:lower()]
 
 	participants[opponentIndex .. '_1'] = {
 		char = char,

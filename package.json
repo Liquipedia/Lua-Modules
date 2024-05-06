@@ -4,7 +4,8 @@
 		"eslint-config-wikimedia": "*",
 		"grunt": "*",
 		"grunt-eslint": "24.x.x",
-		"grunt-stylelint": "*",
+		"grunt-stylelint": "0.19.x",
+		"jquery": "3.6.1",
 		"postcss-less": "*",
 		"stylelint-config-wikimedia": "*",
 		"stylelint-less": "2.x.x"
