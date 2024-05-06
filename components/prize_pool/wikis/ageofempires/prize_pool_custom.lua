@@ -70,9 +70,15 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	local points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	---for points it can never be boolean
+	---@cast points -boolean
+	lpdbData.extradata.points = points
 	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
-	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	local points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	---for points it can never be boolean
+	---@cast points2 -boolean
+	lpdbData.extradata.points2 = points2
 	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)

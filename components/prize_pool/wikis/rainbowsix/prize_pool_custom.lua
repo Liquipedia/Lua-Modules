@@ -55,7 +55,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end)[1]
 
 	if sixInvitePoints then
-		CustomPrizePool.addSiDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, sixInvitePoints.id))
+		local points = placement:getPrizeRewardForOpponent(opponent, sixInvitePoints.id)
+		---for points it can never be boolean
+		---@cast points -boolean
+		CustomPrizePool.addSiDatapoint(lpdbData, points)
 	end
 
 	Variables.varDefine(lpdbData.participant:lower() .. '_prizepoints', lpdbData.extradata.prizepoints)
@@ -79,7 +82,7 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
 end
 
 ---@param data placement
----@param siPoints number?
+---@param siPoints number|string?
 function CustomPrizePool.addSiDatapoint(data, siPoints)
 	local pageName = mw.title.getCurrentTitle().fullText
 	mw.ext.LiquipediaDB.lpdb_datapoint('si_points_' .. pageName .. '_' .. data.placement .. '_' .. data.participant, {

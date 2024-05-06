@@ -58,7 +58,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end)[1]
 
 	if worldTourPoints then
-		lpdbData.extradata.prizepoints = placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id)
+		local points = placement:getPrizeRewardForOpponent(opponent, worldTourPoints.id)
+		---for points it can never be boolean
+		---@cast points -boolean
+		lpdbData.extradata.prizepoints = points
 		lpdbData.extradata.prizepointsTitle = 'wt_points'
 	end
 
