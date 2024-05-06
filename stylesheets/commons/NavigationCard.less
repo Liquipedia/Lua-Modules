@@ -2,6 +2,12 @@
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
 	gap: 0.5rem;
+	margin-bottom: 1rem;
+	position: relative;
+
+	@media (min-width: 768px) {
+		grid-template-columns: repeat( 5, 1fr );
+	}
 
 	@media (min-width: 1024px) {
 		display: flex;
@@ -10,7 +16,7 @@
 
 .navigation-card {
 	flex: 1 0 auto;
-	box-shadow: 0 0.0625rem 0.25rem 0 rgba(0, 0, 0, 0.12);
+	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 	border-radius: 0.5rem;
 	font-size: 0.875rem;
 	padding-bottom: 0.5rem;
@@ -42,6 +48,16 @@
 		display: block;
 		text-align: center;
 		margin-top: 0.5rem;
+
+		> a::after {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			z-index: 4;
+		}
 	}
 
 	&__subtitle {
