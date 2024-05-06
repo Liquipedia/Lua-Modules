@@ -110,6 +110,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		participantData.cards = participantData.cards or {}
 		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 			return participantData.cards[idx] or DEFAULT_CARD end)
+		---@cast cards table
 		cards.tower = participantData.cards.tower
 		table.insert(cardData[opponentIndex], cards)
 	end

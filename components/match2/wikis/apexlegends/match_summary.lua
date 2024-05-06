@@ -265,7 +265,7 @@ local GAME_STANDINGS_COLUMNS = {
 ---@param args table
 ---@return string
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId) --[[@as table]]
 
 	match.scoringTable = CustomMatchSummary._createScoringData(match)
 	Array.forEach(match.games, function(game)
@@ -794,6 +794,7 @@ end
 
 ---Determines whether the status column should be shown or not
 ---@param match table
+---@return boolean
 function CustomMatchSummary._showStatusColumn(match)
 	return Table.isNotEmpty(match.extradata.status)
 end

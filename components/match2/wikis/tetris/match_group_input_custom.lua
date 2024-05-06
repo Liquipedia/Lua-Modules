@@ -137,7 +137,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 
 		-- set the score either from manual input or sumscore
 		opponent.score = Table.includes(ALLOWED_STATUSES, string.upper(opponent.score or ''))
-			and opponent.score:upper()
+			and string.upper(opponent.score)
 			or tonumber(opponent.score) or tonumber(opponent.sumscore) or NO_SCORE
 
 		return opponent.score
