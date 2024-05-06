@@ -167,7 +167,7 @@ function CustomMatchSummary._getMapDisplay(game)
 end
 
 ---@param showIcon boolean?
----@param iconType CrossFireMatchIcons?
+---@param iconType string?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div')

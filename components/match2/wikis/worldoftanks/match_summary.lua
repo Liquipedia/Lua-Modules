@@ -317,7 +317,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param iconType WoTMatchIcons?
+---@param iconType string?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
