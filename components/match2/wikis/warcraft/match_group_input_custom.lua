@@ -408,7 +408,7 @@ function CustomMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 			flag = Flags.CountryName(flag),
 			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 		}
-		extradata.hasRaceOrFlag = true
+		extradata.hasFactionOrFlag = true
 	end
 
 	return {

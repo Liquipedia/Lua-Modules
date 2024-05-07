@@ -13,7 +13,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
@@ -22,47 +21,22 @@ Utility functions for match group related things specific to the starcraft and s
 ]]
 local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
-StarcraftMatchGroupUtil.types = {}
-
-StarcraftMatchGroupUtil.types.Race = TypeUtil.literalUnion(unpack(Faction.getFactions()))
-StarcraftMatchGroupUtil.types.Player = TypeUtil.extendStruct(MatchGroupUtil.types.Player, {
-	position = 'number?',
-	race = StarcraftMatchGroupUtil.types.Race,
-})
-StarcraftMatchGroupUtil.types.Opponent = TypeUtil.extendStruct(MatchGroupUtil.types.Opponent, {
-	isArchon = 'boolean',
-	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
-	team = TypeUtil.optional(MatchGroupUtil.types.Team),
-})
 ---@class StarcraftMatchGroupUtilGameOpponent:GameOpponent
 ---@field isArchon boolean
 ---@field isSpecialArchon boolean
 ---@field placement number?
 ---@field players StarcraftStandardPlayer[]
 ---@field score number?
-StarcraftMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
-	isArchon = 'boolean',
-	isSpecialArchon = 'boolean',
-	placement = 'number?',
-	players = TypeUtil.array(StarcraftMatchGroupUtil.types.Player),
-	score = 'number?',
-})
 
 ---@class StarcraftMatchGroupUtilGame: MatchGroupUtilGame
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
----@field offraces table<integer, string[]>?
-StarcraftMatchGroupUtil.types.Game = TypeUtil.extendStruct(MatchGroupUtil.types.Game, {
-	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
-})
+---@field offFactions table<integer, string[]>?
+
 ---@class StarcraftMatchGroupUtilVeto
 ---@field by number?
 ---@field map string
 ---@field displayName string?
-StarcraftMatchGroupUtil.types.MatchVeto = TypeUtil.struct({
-	by = 'number?',
-	map = 'string',
-	displayName = 'string?',
-})
+
 ---@class StarcraftMatchGroupUtilSubmatch
 ---@field games StarcraftMatchGroupUtilGame[]
 ---@field mode string
@@ -73,16 +47,7 @@ StarcraftMatchGroupUtil.types.MatchVeto = TypeUtil.struct({
 ---@field walkover WalkoverType
 ---@field winner number?
 ---@field header string?
-StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
-	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
-	mode = 'string',
-	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
-	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
-	scores = TypeUtil.table('number', 'number'),
-	subgroup = 'number',
-	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
-	winner = 'number?',
-})
+
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
 ---@field headToHead boolean
@@ -93,15 +58,6 @@ StarcraftMatchGroupUtil.types.Submatch = TypeUtil.struct({
 ---@field vetoes StarcraftMatchGroupUtilVeto[]
 ---@field submatches StarcraftMatchGroupUtilSubmatch[]?
 ---@field casters string?
-StarcraftMatchGroupUtil.types.Match = TypeUtil.extendStruct(MatchGroupUtil.types.Match, {
-	games = TypeUtil.array(StarcraftMatchGroupUtil.types.Game),
-	headToHead = 'boolean',
-	isFfa = 'boolean',
-	noScore = 'boolean?',
-	opponentMode = TypeUtil.literalUnion('uniform', 'team'),
-	opponents = TypeUtil.array(StarcraftMatchGroupUtil.types.Opponent),
-	vetoes = TypeUtil.array(StarcraftMatchGroupUtil.types.MatchVeto),
-})
 
 ---@param record table
 ---@return StarcraftMatchGroupUtilMatch
@@ -168,7 +124,7 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 		opponent.status2 = opponent.score2 and 'S' or nil
 
 		for _, player in ipairs(opponent.players) do
-			player.race = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
+			player.faction = Table.extract(player.extradata, 'faction') or Faction.defaultFaction
 		end
 	end
 
@@ -189,14 +145,14 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 		if matchPlayer then
 			return Table.merge(matchPlayer, {
 				matchPlayerIndex = matchPlayerIndex,
-				race = participant.faction,
+				faction = participant.faction,
 				position = tonumber(participant.position),
 			})
 		else
 			return {
 				displayName = 'TBD',
 				matchPlayerIndex = matchPlayerIndex,
-				race = Faction.defaultFaction,
+				faction = Faction.defaultFaction,
 			}
 		end
 	end
@@ -281,25 +237,25 @@ end
 function StarcraftMatchGroupUtil.constructSubmatch(games, match)
 	local opponents = Table.deepCopy(games[1].opponents)
 
-	-- If the same race was played in all games, display that instead of the
-	-- player's race listed in the match.
+	-- If the same faction was played in all games, display that instead of the
+	-- player's faction listed in the match.
 	for opponentIndex, opponent in pairs(opponents) do
-		-- Aggregate races among games for each player
-		local playerRaces = {}
+		-- Aggregate factions among games for each player
+		local playerFactions = {}
 		for _, game in pairs(games) do
 			for playerIndex, player in pairs(game.opponents[opponentIndex].players) do
-				if not playerRaces[playerIndex] then
-					playerRaces[playerIndex] = {}
+				if not playerFactions[playerIndex] then
+					playerFactions[playerIndex] = {}
 				end
-				playerRaces[playerIndex][player.race] = true
+				playerFactions[playerIndex][player.faction] = true
 			end
 		end
 
 		for playerIndex, player in pairs(opponent.players) do
-			player.race = Table.uniqueKey(playerRaces[playerIndex])
-			if not player.race then
+			player.faction = Table.uniqueKey(playerFactions[playerIndex])
+			if not player.faction then
 				local matchPlayer = match.opponents[opponentIndex].players[player.matchPlayerIndex]
-				player.race = matchPlayer and matchPlayer.race or Faction.defaultFaction
+				player.faction = matchPlayer and matchPlayer.faction or Faction.defaultFaction
 			end
 		end
 	end
@@ -381,22 +337,22 @@ function StarcraftMatchGroupUtil.matchHasDetails(match)
 		end)
 end
 
----Determines if any players in an opponent are not playing their main race by comparing them to a reference opponent.
----Returns the races played if at least one player chose an offrace or nil if otherwise.
+---Determines if any player in an opponent is not playing their main faction by comparing them to a reference opponent.
+---Returns the factions played if at least one player chose an offFaction or nil if otherwise.
 ---@param gameOpponent StarcraftMatchGroupUtilGameOpponent
 ---@param referenceOpponent StarcraftStandardOpponent|StarcraftMatchGroupUtilGameOpponent
 ---@return string[]?
-function StarcraftMatchGroupUtil.computeOffraces(gameOpponent, referenceOpponent)
-	local gameRaces = {}
-	local hasOffrace = false
+function StarcraftMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent)
+	local gameFactions = {}
+	local hasOffFaction = false
 	for playerIndex, gamePlayer in ipairs(gameOpponent.players) do
 		local referencePlayer = referenceOpponent.players[playerIndex] or {}
-		table.insert(gameRaces, gamePlayer.race)
-		if gamePlayer.race ~= referencePlayer.race then
-			hasOffrace = true
+		table.insert(gameFactions, gamePlayer.faction)
+		if gamePlayer.faction ~= referencePlayer.faction then
+			hasOffFaction = true
 		end
 	end
-	return hasOffrace and gameRaces or nil
+	return hasOffFaction and gameFactions or nil
 end
 
 ---@param record table
@@ -409,7 +365,7 @@ function StarcraftMatchGroupUtil.playerFromRecord(record)
 		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
 		pageIsResolved = true,
 		pageName = record.name,
-		race = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
+		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
 	}
 end
 

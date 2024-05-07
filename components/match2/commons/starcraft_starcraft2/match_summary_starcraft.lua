@@ -127,7 +127,7 @@ end
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return MatchSummaryBody
 function StarcraftMatchSummary.createBody(match)
-	StarcraftMatchSummary.computeOffraces(match)
+	StarcraftMatchSummary.computeOffFactions(match)
 
 	local body = MatchSummary.Body()
 
@@ -185,22 +185,22 @@ function StarcraftMatchSummary.createBody(match)
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
-function StarcraftMatchSummary.computeOffraces(match)
+function StarcraftMatchSummary.computeOffFactions(match)
 	if match.opponentMode == UNIFORM_MATCH then
-		StarcraftMatchSummary.computeMatchOffraces(match)
+		StarcraftMatchSummary.computeMatchOffFactions(match)
 	else
 		for _, submatch in pairs(match.submatches) do
-			StarcraftMatchSummary.computeMatchOffraces(submatch)
+			StarcraftMatchSummary.computeMatchOffFactions(submatch)
 		end
 	end
 end
 
 ---@param match StarcraftMatchGroupUtilMatch|StarcraftMatchGroupUtilSubmatch
-function StarcraftMatchSummary.computeMatchOffraces(match)
+function StarcraftMatchSummary.computeMatchOffFactions(match)
 	for _, game in ipairs(match.games) do
-		game.offraces = {}
+		game.offFactions = {}
 		for opponentIndex, gameOpponent in pairs(game.opponents) do
-			game.offraces[opponentIndex] = MatchGroupUtilStarcraft.computeOffraces(
+			game.offFactions[opponentIndex] = MatchGroupUtilStarcraft.computeOffFactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
@@ -223,7 +223,7 @@ function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
 			showFlag = false,
 			showLink = true,
-			showRace = false,
+			showFaction = false,
 			teamStyle = 'short',
 		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
 end
@@ -239,17 +239,17 @@ function StarcraftMatchSummary.Game(game, options)
 			or game.winner == opponentIndex and 'greenCheck')
 	end
 
-	local showOffraceIcons = game.offraces ~= nil and (game.offraces[1] ~= nil or game.offraces[2] ~= nil)
-	local offraceIcons = function(opponentIndex)
-		local offraces = game.offraces ~= nil and game.offraces[opponentIndex] or nil
+	local showOffFactionIcons = game.offFactions ~= nil and (game.offFactions[1] ~= nil or game.offFactions[2] ~= nil)
+	local offFactionIcons = function(opponentIndex)
+		local offFactions = game.offFactions ~= nil and game.offFactions[opponentIndex] or nil
 		local opponent = game.opponents ~= nil and game.opponents[opponentIndex] or nil
 
-		if offraces and opponent and opponent.isArchon then
-			return StarcraftMatchSummary.OffraceIcons({offraces[1]})
-		elseif offraces and opponent then
-			return StarcraftMatchSummary.OffraceIcons(offraces)
-		elseif showOffraceIcons then
-			return StarcraftMatchSummary.OffraceIcons({})
+		if offFactions and opponent and opponent.isArchon then
+			return StarcraftMatchSummary.offFactionIcons({offFactions[1]})
+		elseif offFactions and opponent then
+			return StarcraftMatchSummary.offFactionIcons(offFactions)
+		elseif showOffFactionIcons then
+			return StarcraftMatchSummary.offFactionIcons({})
 		else
 			return nil
 		end
@@ -263,9 +263,9 @@ function StarcraftMatchSummary.Game(game, options)
 	table.insert(gameNodes, mw.html.create('div')
 		:addClass('brkts-popup-sc-game-body')
 		:node(getWinnerIcon(1))
-		:node(offraceIcons(1))
+		:node(offFactionIcons(1))
 		:node(centerNode)
-		:node(offraceIcons(2))
+		:node(offFactionIcons(2))
 		:node(getWinnerIcon(2))
 	)
 
@@ -281,17 +281,17 @@ function StarcraftMatchSummary.Game(game, options)
 	return gameNodes
 end
 
----Renders off-races as Nx2 grid of tiny icons
----@param races string[]
+---Renders off-factions as Nx2 grid of tiny icons
+---@param factions string[]
 ---@return Html
-function StarcraftMatchSummary.OffraceIcons(races)
-	local racesNode = mw.html.create('div')
+function StarcraftMatchSummary.OffFactionIcons(factions)
+	local factionsNode = mw.html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
-	for _, race in ipairs(races) do
-		racesNode:node(Faction.Icon{size = '12px', faction = race})
+	for _, faction in ipairs(factions) do
+		factionsNode:node(Faction.Icon{size = '12px', faction = faction})
 	end
 
-	return racesNode
+	return factionsNode
 end
 
 ---@param header string|number|nil

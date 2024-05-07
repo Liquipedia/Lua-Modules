@@ -132,7 +132,7 @@ end
 ---@param match table
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	CustomMatchSummary.computeOffraces(match)
+	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
 
 	local body = MatchSummary.Body()
@@ -179,22 +179,22 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param match table
-function CustomMatchSummary.computeOffraces(match)
+function CustomMatchSummary.computeOfffactions(match)
 	if match.opponentMode == UNIFORM_MATCH then
-		CustomMatchSummary.computeMatchOffraces(match)
+		CustomMatchSummary.computeMatchOfffactions(match)
 	else
 		for _, submatch in pairs(match.submatches) do
-			CustomMatchSummary.computeMatchOffraces(submatch)
+			CustomMatchSummary.computeMatchOfffactions(submatch)
 		end
 	end
 end
 
 ---@param match table
-function CustomMatchSummary.computeMatchOffraces(match)
+function CustomMatchSummary.computeMatchOfffactions(match)
 	for _, game in ipairs(match.games) do
-		game.offraces = {}
+		game.offfactions = {}
 		for opponentIndex, gameOpponent in pairs(game.opponents) do
-			game.offraces[opponentIndex] = MatchGroupUtil.computeOffraces(
+			game.offfactions[opponentIndex] = MatchGroupUtil.computeOfffactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
@@ -225,7 +225,7 @@ function CustomMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
 			showFlag = false,
 			showLink = true,
-			showRace = false,
+			showFaction = false,
 			teamStyle = 'short',
 		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
 end
@@ -239,15 +239,15 @@ function CustomMatchSummary.Game(game, hasHeroes)
 			or game.winner == opponentIndex and 'greenCheck')
 	end
 
-	local showOffraceIcons = game.offraces ~= nil and (game.offraces[1] ~= nil or game.offraces[2] ~= nil)
-	local offraceIcons = function(opponentIndex)
-		local offraces = game.offraces ~= nil and game.offraces[opponentIndex] or nil
+	local showOfffactionIcons = game.offfactions ~= nil and (game.offfactions[1] ~= nil or game.offfactions[2] ~= nil)
+	local offfactionIcons = function(opponentIndex)
+		local offfactions = game.offfactions ~= nil and game.offfactions[opponentIndex] or nil
 		local opponent = game.opponents ~= nil and game.opponents[opponentIndex] or nil
 
-		if offraces and opponent then
-			return CustomMatchSummary.OffraceIcons(offraces)
-		elseif showOffraceIcons then
-			return CustomMatchSummary.OffraceIcons({})
+		if offfactions and opponent then
+			return CustomMatchSummary.OfffactionIcons(offfactions)
+		elseif showOfffactionIcons then
+			return CustomMatchSummary.OfffactionIcons({})
 		end
 	end
 
@@ -260,9 +260,9 @@ function CustomMatchSummary.Game(game, hasHeroes)
 		:addClass('brkts-popup-sc-game-body')
 		:node(CustomMatchSummary.DispalyHeroes(game.opponents[1], hasHeroes))
 		:node(getWinnerIcon(1))
-		:node(offraceIcons(1))
+		:node(offfactionIcons(1))
 		:node(centerNode)
-		:node(offraceIcons(2))
+		:node(offfactionIcons(2))
 		:node(getWinnerIcon(2))
 		:node(CustomMatchSummary.DispalyHeroes(game.opponents[2], hasHeroes, true))
 	)
@@ -274,17 +274,17 @@ function CustomMatchSummary.Game(game, hasHeroes)
 	return gameNodes
 end
 
----Renders off-races as Nx2 grid of tiny icons
----@param races string[]
+---Renders off-factions as Nx2 grid of tiny icons
+---@param factions string[]
 ---@return Html
-function CustomMatchSummary.OffraceIcons(races)
-	local racesNode = mw.html.create('div')
+function CustomMatchSummary.OfffactionIcons(factions)
+	local factionsNode = mw.html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
-	for _, race in ipairs(races) do
-		racesNode:node(Faction.Icon{size = '12px', faction = race})
+	for _, faction in ipairs(factions) do
+		factionsNode:node(Faction.Icon{size = '12px', faction = faction})
 	end
 
-	return racesNode
+	return factionsNode
 end
 
 ---@param header string|number|nil

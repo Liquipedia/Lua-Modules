@@ -573,7 +573,7 @@ function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
 			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 		}
 		local extradata = opponent.extradata or {}
-		extradata.hasRaceOrFlag = true
+		extradata.hasFactionOrFlag = true
 	end
 
 	return {

@@ -26,11 +26,11 @@ local StarcraftPlayerDisplay = Table.copy(PlayerDisplay)
 
 ---@class StarcraftBlockPlayerProps: BlockPlayerProps
 ---@field player StarcraftStandardPlayer
----@field showRace boolean?
+---@field showFaction boolean?
 
 ---@class StarcraftInlinePlayerProps: InlinePlayerProps
 ---@field player StarcraftStandardPlayer
----@field showRace boolean?
+---@field showFaction boolean?
 
 ---@class InlinePlayerContainerProps: StarcraftInlinePlayerProps
 ---@field date string?
@@ -66,10 +66,10 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
 
-	local raceNode
-	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
-		raceNode = mw.html.create('span'):addClass('race')
-			:wikitext(Faction.Icon{faction = player.race})
+	local factionNode
+	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
+		factionNode = mw.html.create('span'):addClass('race')
+			:wikitext(Faction.Icon{faction = player.faction})
 	end
 
 	local teamNode
@@ -83,7 +83,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
-		:node(raceNode)
+		:node(factionNode)
 		:node(nameNode)
 		:node(teamNode)
 end
@@ -113,7 +113,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		displayName = displayName,
 		flag = String.nilIfEmpty(args.flag),
 		pageName = pageName,
-		race = String.nilIfEmpty(args.race) or Faction.defaultFaction,
+		faction = String.nilIfEmpty(args.race) or String.nilIfEmpty(args.faction) or Faction.defaultFaction,
 	}
 
 	if not args.novar then
@@ -121,13 +121,13 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	end
 
 	local hiddenSortNode = args.hs
-		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.race, args.hs)
+		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.faction, args.hs)
 		or ''
 	local playerNode = StarcraftPlayerDisplay.InlinePlayer({
 		dq = Logic.readBoolOrNil(args.dq),
 		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
-		showRace = (args.showRace or 'true') == 'true',
+		showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction), true),
 	})
 	return tostring(hiddenSortNode) .. tostring(playerNode)
 end
@@ -143,7 +143,7 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		displayName = args[1],
 		flag = args.flag,
 		pageName = args.link,
-		race = Faction.read(args.race),
+		faction = Faction.read(args.race or args.faction),
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
@@ -153,13 +153,13 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		savePageVar = not Logic.readBool(args.novar),
 		showFlag = Logic.readBoolOrNil(args.showFlag),
 		showLink = Logic.readBoolOrNil(args.showLink),
-		showRace = Logic.readBoolOrNil(args.showRace),
+		showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction)),
 	})
 end
 
 --[[
 Displays a player as an inline element. Useful for referencing players in
-prose. This container will automatically look up the pageName, race, and flag
+prose. This container will automatically look up the pageName, race/faction, and flag
 of the player from page variables or LPDB, and save the results to page
 variables.
 ]]
@@ -184,8 +184,8 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
-		and Faction.Icon{faction = player.race}
+	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
+		and Faction.Icon{faction = player.faction}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -198,11 +198,11 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 	local text
 	if props.flip then
 		text = nameAndLink
-			.. (race and '&nbsp;' .. race or '')
+			.. (faction and '&nbsp;' .. faction or '')
 			.. (flag and '&nbsp;' .. flag or '')
 	else
 		text = (flag and flag .. '&nbsp;' or '')
-			.. (race and race .. '&nbsp;' or '')
+			.. (faction and faction .. '&nbsp;' or '')
 			.. nameAndLink
 	end
 
@@ -213,13 +213,13 @@ end
 
 ---@param name string?
 ---@param flag string?
----@param race string?
+---@param faction string?
 ---@param field string?
 ---@return Html
-function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
+function StarcraftPlayerDisplay.HiddenSort(name, flag, faction, field)
 	local text
-	if field == 'race' then
-		text = race
+	if field == 'race' or field == 'faction' then
+		text = faction
 	elseif field == 'name' then
 		text = name
 	elseif field == 'flag' then

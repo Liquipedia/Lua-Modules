@@ -18,12 +18,12 @@ local Variables = require('Module:Variables')
 ---@class StarcraftParticipantTableConfig: ParticipantTableConfig
 ---@field displayUnknownColumn boolean?
 ---@field displayRandomColumn boolean?
----@field showCountByRace boolean
+---@field showCountByFaction boolean
 ---@field isRandomEvent boolean
 ---@field isQualified boolean?
 ---@field manualFactionCounts table<string, number?>
 ---@field soloColumnWidth number
----@field soloAsRaceTable boolean
+---@field soloAsFactionTable boolean
 
 ---@class StarcraftParticipantTableEntry: ParticipantTableEntry
 ---@field isQualified boolean?
@@ -35,7 +35,7 @@ local Variables = require('Module:Variables')
 ---@class StarcraftParticipantTable: ParticipantTable
 ---@field config StarcraftParticipantTableConfig
 ---@field isPureSolo boolean
----@field _displaySoloRaceTableSection function
+---@field _displaySoloFactionTableSection function
 ---@field _displayHeader function
 ---@field _getFactionNumbers function
 
@@ -57,15 +57,15 @@ function StarcraftParticipantTable.run(frame)
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
 	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
 	participantTable.getPlacements = StarcraftParticipantTable.getPlacements
-	participantTable._displaySoloRaceTableSection = StarcraftParticipantTable._displaySoloRaceTableSection
+	participantTable._displaySoloFactionTableSection = StarcraftParticipantTable._displaySoloFactionTableSection
 	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
 	participantTable.setCustomPageVariables = StarcraftParticipantTable.setCustomPageVariables
 
 	participantTable:read():store()
 
-	if StarcraftParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsRaceTable then
-		participantTable.create = StarcraftParticipantTable.createSoloRaceTable
+	if StarcraftParticipantTable.isPureSolo(participantTable.sections) and participantTable.config.soloAsFactionTable then
+		participantTable.create = StarcraftParticipantTable.createSoloFactionTable
 	end
 
 	return participantTable:create()
@@ -80,7 +80,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
-	config.showCountByRace = Logic.readBool(args.showCountByRace or args.count)
+	config.showCountByFaction = Logic.readBool(args.showCountByRace or args.count)
 	config.isRandomEvent = Logic.readBool(args.is_random_event)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
@@ -92,7 +92,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 		config.manualFactionCounts[faction] = tonumber(args[Faction.toName(faction):lower()])
 	end)
 
-	config.soloAsRaceTable = not Logic.readBool(args.soloNotAsRaceTable)
+	config.soloAsFactionTable = not Logic.readBool(args.soloNotAsRaceTable)
 
 	return config
 end
@@ -117,7 +117,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		team = valueFromArgs('team'),
 		dq = valueFromArgs('dq'),
 		note = valueFromArgs('note'),
-		race = valueFromArgs('race'),
+		faction = valueFromArgs('race'),
 	}
 
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
@@ -187,7 +187,7 @@ function StarcraftParticipantTable.isPureSolo(sections)
 end
 
 ---@return Html?
-function StarcraftParticipantTable:createSoloRaceTable()
+function StarcraftParticipantTable:createSoloFactionTable()
 	local config = self.config
 
 	if not config.display then return end
@@ -217,7 +217,7 @@ function StarcraftParticipantTable:createSoloRaceTable()
 		:css('width', (colSpan * config.soloColumnWidth) .. 'px')
 		:node(self:_displayHeader(factionColumns, factioNumbers))
 
-	Array.forEach(self.sections, function(section) self:_displaySoloRaceTableSection(section, factionColumns) end)
+	Array.forEach(self.sections, function(section) self:_displaySoloFactionTableSection(section, factionColumns) end)
 
 	return mw.html.create('div')
 		:addClass('table-responsive')
@@ -232,9 +232,9 @@ function StarcraftParticipantTable:_getFactionNumbers()
 		section.entries = section.config.onlyNotable and self.filterOnlyNotables(section.entries) or section.entries
 
 		Array.forEach(section.entries, function(entry)
-			local faction = entry.opponent.players[1].race or Faction.defaultFaction
+			local faction = entry.opponent.players[1].faction or Faction.defaultFaction
 			--if we have defaultFaction push it into the entry too
-			entry.opponent.players[1].race = faction
+			entry.opponent.players[1].faction = faction
 			calculatedNumbers[faction] = (calculatedNumbers[faction] or 0) + 1
 			if entry.dq then
 				calculatedNumbers[faction .. 'Dq'] = (calculatedNumbers[faction .. 'Dq'] or 0) + 1
@@ -265,7 +265,7 @@ function StarcraftParticipantTable:_displayHeader(factionColumns, factioNumbers)
 			faction ~= Faction.defaultFaction and Faction.Icon{faction = faction} or nil,
 			' ' .. Faction.toName(faction),
 			config.isRandomEvent and ' Main' or nil,
-			config.showCountByRace and " ''(" .. factioNumbers[faction .. 'Display'] .. ")''" or nil
+			config.showCountByFaction and " ''(" .. factioNumbers[faction .. 'Display'] .. ")''" or nil
 		)
 
 		header:tag('div')
@@ -280,7 +280,7 @@ end
 
 ---@param section StarcraftParticipantTableSection
 ---@param factionColumns table
-function StarcraftParticipantTable:_displaySoloRaceTableSection(section, factionColumns)
+function StarcraftParticipantTable:_displaySoloFactionTableSection(section, factionColumns)
 	local sectionEntryCount = #Array.filter(section.entries, function(entry) return not entry.dq end)
 
 	self.display:node(self.newSectionNode():node(self:sectionTitle(section, sectionEntryCount)))
@@ -291,19 +291,19 @@ function StarcraftParticipantTable:_displaySoloRaceTableSection(section, faction
 	end
 
 	-- Group entries by faction
-	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].race end)
+	local _, byFaction = Array.groupBy(section.entries, function(entry) return entry.opponent.players[1].faction end)
 
-	-- Find the race with the most players
-	local maxRaceLength = Array.max(
+	-- Find the faction with the most players
+	local maxFactionLength = Array.max(
 		Array.map(factionColumns, function(faction) return #(byFaction[faction] or {}) end)
 	) or 0
 
-	Array.forEach(Array.range(1, maxRaceLength), function(rowIndex)
+	Array.forEach(Array.range(1, maxFactionLength), function(rowIndex)
 		local sectionNode = self.newSectionNode()
 		Array.forEach(factionColumns, function(faction)
 			local entry = byFaction[faction] and byFaction[faction][rowIndex]
 			sectionNode:node(
-				entry and self:displayEntry(entry, {showRace = false}) or
+				entry and self:displayEntry(entry, {showFaction = false}) or
 				mw.html.create('div'):addClass('participantTable-entry')
 			)
 		end)
