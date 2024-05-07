@@ -15,6 +15,8 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class BrawlHallaBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
+---@param match table
+---@return boolean
 function WikiSpecific.defaultMatchHasDetails(match)
 	return match.dateIsExact
 		or Logic.isNotEmpty(match.vod)
