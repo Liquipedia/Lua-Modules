@@ -23,11 +23,13 @@ local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
 
 local BigMatch = Class.new()
 
-local _ROUND_ONE = 1
-local _ROUNDS_PER_HALF = 12
-local _COLOR_FIRST_TEAM = '#B12A2A'
-local _COLOR_SECOND_TEAM = '#1E7D7D'
+local ROUND_ONE = 1
+local ROUNDS_PER_HALF = 12
+local COLOR_FIRST_TEAM = '#B12A2A'
+local COLOR_SECOND_TEAM = '#1E7D7D'
 
+---@param frame Frame
+---@return Html
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 	local bigMatch = BigMatch()
@@ -59,6 +61,9 @@ function BigMatch.run(frame)
 	return bigMatch:render(match, tournament)
 end
 
+---@param match table
+---@param tournament {name: string?, link: string?}
+---@return Html
 function BigMatch:render(match, tournament)
 	local overall = mw.html.create('div'):addClass('fb-match-page-overall')
 
@@ -80,6 +85,11 @@ function BigMatch:render(match, tournament)
 	return overall
 end
 
+---@param match table
+---@param opponent1 table
+---@param opponent2 table
+---@param tournament {name: string?, link: string?}
+---@return Html
 function BigMatch:header(match, opponent1, opponent2, tournament)
 	local teamLeft = self:_createTeamContainer('left', opponent1.name, opponent1.score, false)
 	local teamRight = self:_createTeamContainer('right', opponent2.name, opponent2.score, false)
@@ -99,6 +109,8 @@ function BigMatch:header(match, opponent1, opponent2, tournament)
 								:node(teamsRow)
 end
 
+---@param match table
+---@return Html
 function BigMatch:overview(match)
 	local boxLeft = DivTable.create():setStriped(true)
 
@@ -155,6 +167,10 @@ function BigMatch:overview(match)
 		:node(boxRight)
 end
 
+---@param match table
+---@param playerLookUp table<string, table>
+---@param opponents table[]
+---@return (string|Html)?
 function BigMatch:stats(match, playerLookUp, opponents)
 	---@type table<string, any>
 	local tabs = {
@@ -231,6 +247,10 @@ function BigMatch:stats(match, playerLookUp, opponents)
 	return Tabs.dynamic(tabs)
 end
 
+---@param match table
+---@param opponent1 table
+---@param opponent2 table
+---@return (string|Html)?
 function BigMatch:economy(match, opponent1, opponent2)
 	---@type table<string, any>
 	local tabs = {
@@ -251,21 +271,21 @@ function BigMatch:economy(match, opponent1, opponent2)
 		local chart = ''
 		local data
 		-- First half
-		data = self:_processHalf(map, _ROUND_ONE, math.min(#map.rounds, _ROUNDS_PER_HALF))
+		data = self:_processHalf(map, ROUND_ONE, math.min(#map.rounds, ROUNDS_PER_HALF))
 		if #data > 0 then
-			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{COLOR_FIRST_TEAM, COLOR_SECOND_TEAM})
 		end
 
 		-- Second half
-		data = self:_processHalf(map, _ROUND_ONE+_ROUNDS_PER_HALF, math.min(#map.rounds, _ROUNDS_PER_HALF*2))
+		data = self:_processHalf(map, ROUND_ONE+ROUNDS_PER_HALF, math.min(#map.rounds, ROUNDS_PER_HALF*2))
 		if #data > 0 then
-			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_SECOND_TEAM, _COLOR_FIRST_TEAM})
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{COLOR_SECOND_TEAM, COLOR_FIRST_TEAM})
 		end
 
 		-- OT
-		data = self:_processHalf(map, _ROUND_ONE+_ROUNDS_PER_HALF*2, #map.rounds)
+		data = self:_processHalf(map, ROUND_ONE+ROUNDS_PER_HALF*2, #map.rounds)
 		if #data > 0 then
-			chart = chart .. self:_createChart(data, {opponent1, opponent2},{_COLOR_FIRST_TEAM, _COLOR_SECOND_TEAM})
+			chart = chart .. self:_createChart(data, {opponent1, opponent2},{COLOR_FIRST_TEAM, COLOR_SECOND_TEAM})
 		end
 
 		local chartContainer = mw.html.create('div'):addClass('fb-match-page-economy-timeline')
@@ -279,6 +299,10 @@ function BigMatch:economy(match, opponent1, opponent2)
 	return Tabs.dynamic(tabs)
 end
 
+---@param map table
+---@param startRound integer
+---@param endRound integer
+---@return table
 function BigMatch:_processHalf(map, startRound, endRound)
 	local roundData = {}
 	for round = startRound, endRound do
@@ -287,6 +311,9 @@ function BigMatch:_processHalf(map, startRound, endRound)
 	return roundData
 end
 
+---@param map table
+---@param roundIndex integer
+---@return table
 function BigMatch:_processRound(map, roundIndex)
 	local round = map.rounds[roundIndex]
 
@@ -299,6 +326,10 @@ function BigMatch:_processRound(map, roundIndex)
 	}
 end
 
+---@param data table
+---@param opponents table[]
+---@param colors string[]
+---@return unknown
 function BigMatch:_createChart(data, opponents, colors)
 	return mw.ext.Charts.economytimeline({
 		size = {
@@ -317,6 +348,9 @@ function BigMatch:_createChart(data, opponents, colors)
 	})
 end
 
+---@param format string?
+---@param match table
+---@return Html
 function BigMatch:_createTeamSeparator(format, match)
 	local countdown = mw.html.create('div')
 		:addClass('fb-match-page-header-live')
@@ -329,16 +363,20 @@ function BigMatch:_createTeamSeparator(format, match)
 	local divider = mw.html.create('div')
 		:addClass('fb-match-page-header-divider')
 		:wikitext(':')
-	format = mw.html.create('div')
+	local formatDisplay = mw.html.create('div')
 		:addClass('fb-match-page-header-format')
 		:wikitext(format)
 	return mw.html.create('div')
 		:addClass('fb-match-page-header-separator')
 		:node(countdown)
 		:node(divider)
-		:node(format)
+		:node(formatDisplay)
 end
 
+---@param teamName string?
+---@param side string?
+---@param isFirstTeam boolean
+---@return Html
 function BigMatch:_createTeamStatsBanner(teamName, side, isFirstTeam)
 	local banner = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner')
 	local team = mw.html.create('div'):addClass('fb-match-page-valorant-stats-banner-team'):wikitext(teamName)
@@ -357,24 +395,29 @@ function BigMatch:_createTeamStatsBanner(teamName, side, isFirstTeam)
 	return banner:node(team):node(sideIndicator)
 end
 
-
+---@param side string
+---@param teamName string
+---@param score integer|string?
+---@param hasWon boolean?
+---@return Html
 function BigMatch:_createTeamContainer(side, teamName, score, hasWon)
 	local link = '[[' .. teamName .. ']]'
 	local team = mw.html.create('div')	:addClass('fb-match-page-header-team')
 										:wikitext(mw.ext.TeamTemplate.teamicon(teamName) .. '<br/>' .. link)
-	score = mw.html.create('div'):addClass('fb-match-page-header-score'):wikitext(score)
+	local scoreDisplay = mw.html.create('div'):addClass('fb-match-page-header-score'):wikitext(score)
 
 	local container = mw.html.create('div') :addClass('fb-match-page-header-team-container')
 											:addClass('col-sm-4 col-xs-6 col-sm-pull-4')
 	if side == 'left' then
-		container:node(team):node(score)
+		container:node(team):node(scoreDisplay)
 	else
-		container:node(score):node(team)
+		container:node(scoreDisplay):node(team)
 	end
 
 	return container
 end
 
+---@return string[]
 function BigMatch:_getId()
 	local title = mw.title.getCurrentTitle().text
 
@@ -386,6 +429,9 @@ function BigMatch:_getId()
 	return {fullBracketId, matchId}
 end
 
+---@param opponent1Players table[]
+---@param opponent2Players table[]
+---@return table
 function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 	local playerLookUp = {}
 
@@ -400,6 +446,8 @@ function BigMatch:_createPlayerLookUp(opponent1Players, opponent2Players)
 	return playerLookUp
 end
 
+---@param page string?
+---@return tournament
 function BigMatch:_fetchTournamentInfo(page)
 	if not page then
 		return {}
@@ -411,6 +459,8 @@ function BigMatch:_fetchTournamentInfo(page)
 	})[1] or {}
 end
 
+---@param identifiers string[]
+---@return string?
 function BigMatch:_fetchTournamentLinkFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		query = 'parent, pagename',

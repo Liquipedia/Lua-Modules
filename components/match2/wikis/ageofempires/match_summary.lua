@@ -179,6 +179,7 @@ function CustomMatchSummary._createGame(row, game, props)
 	end
 
 	row
+			:css('flex-wrap', 'nowrap')
 			:addElement(faction1)
 			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1, props.soloMode))
 			:addElement(mw.html.create('div')
