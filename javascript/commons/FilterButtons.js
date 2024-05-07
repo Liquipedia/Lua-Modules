@@ -127,7 +127,9 @@ liquipedia.filterButtons = {
 				element: templateExpansion,
 				groups: templateExpansion.dataset.filterGroups.split( ',' ),
 				template: templateExpansion.dataset.filterExpansionTemplate,
-				defaultContent: templateExpansion.innerHTML
+				cache: {
+					default: templateExpansion.innerHTML
+				}
 			} );
 		} );
 	},
@@ -243,7 +245,7 @@ liquipedia.filterButtons = {
 				} );
 			} );
 			if ( isDefault ) {
-				templateExpansion.element.innerHTML = templateExpansion.defaultContent;
+				templateExpansion.element.innerHTML = templateExpansion.cache.default;
 				return;
 			}
 			const parameters = templateExpansion.groups.map( ( group ) => {
@@ -257,6 +259,12 @@ liquipedia.filterButtons = {
 				return group + '=' + activeFilters.toString();
 			} );
 			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join( '|' ) + '}}';
+
+			if ( wikitext in templateExpansion.cache ) {
+				templateExpansion.element.innerHTML = templateExpansion.cache[ wikitext ];
+				return;
+			}
+
 			mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
 				const api = new mw.Api();
 				api.get( {
@@ -266,11 +274,13 @@ liquipedia.filterButtons = {
 					maxage: 600,
 					smaxage: 600,
 					disablelimitreport: true,
+					uselang: 'content',
 					prop: 'text',
 					text: wikitext
 				} ).done( ( data ) => {
 					if ( data.parse?.text?.[ '*' ] ) {
 						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
+						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
 					}
 				} );
 			} );
