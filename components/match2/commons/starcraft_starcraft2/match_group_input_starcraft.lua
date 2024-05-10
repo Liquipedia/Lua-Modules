@@ -446,14 +446,14 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	) or ''
 	local link = Logic.emptyOr(opponent.link, Variables.varDefault(name .. '_page')) or name
 	link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
-	local faction = Logic.emptyOr(opponent.race, StarcraftMatchGroupInput._getFactionVariable(name))
+	local race = Logic.emptyOr(opponent.race, Variables.varDefault(name .. '_race'), '')
 	local players = {}
 	local flag = Logic.emptyOr(opponent.flag, Variables.varDefault(name .. '_flag'))
 	players[1] = {
 		displayname = name,
 		name = link,
 		flag = Flags.CountryName(flag),
-		extradata = {faction = Faction.read(faction) or Faction.defaultFaction}
+		extradata = {faction = Faction.read(race) or Faction.defaultFaction}
 	}
 
 	return {
@@ -484,11 +484,11 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 	else
 		opponent.p1race = Faction.read(Logic.emptyOr(
 				opponent.p1race,
-				StarcraftMatchGroupInput._getFactionVariable(opponent.p1)
+				Variables.varDefault(opponent.p1 .. '_race')
 			)) or Faction.defaultFaction
 		opponent.p2race = Faction.read(Logic.emptyOr(
 				opponent.p2race,
-				StarcraftMatchGroupInput._getFactionVariable(opponent.p2)
+				Variables.varDefault(opponent.p2 .. '_race')
 			)) or Faction.defaultFaction
 	end
 
@@ -532,7 +532,7 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 			) or playerName):gsub(' ', '_')
 		local race = Logic.emptyOr(
 			opponent['p' .. playerIndex .. 'race'],
-			StarcraftMatchGroupInput._getFactionVariable(playerName),
+			Variables.varDefault(playerName .. '_race'),
 			''
 		)
 		name = name .. (playerIndex ~= 1 and ' / ' or '') .. link
@@ -626,7 +626,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 				name = name:gsub(' ', '_'),
 				displayname = Variables.varDefault(prefix .. 'dn'),
 				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
-				extradata = {faction = Variables.varDefault(prefix .. 'faction', Variables.varDefault(prefix .. 'race'))}
+				extradata = {faction = Variables.varDefault(prefix .. 'race')}
 			}
 			if player.displayname then
 				Variables.varDefine(player.displayname .. '_page', player.name)
@@ -1057,14 +1057,6 @@ function StarcraftMatchGroupInput._placementSortFunction(tbl, key1, key2)
 		elseif Table.includes(DEFAULT_LOSS_STATUSES, opponent2.status) then return true
 		else return true end
 	end
-end
-
--- temporary function for switching wiki vars from race to faction
----@param prefix string
----@return string?
-function StarcraftMatchGroupInput._getFactionVariable(prefix)
-	prefix = prefix .. (noUnderScore and '' or '_')
-	return Variables.varDefault(prefix .. 'faction', Variables.varDefault(prefix .. 'race'))
 end
 
 return StarcraftMatchGroupInput
