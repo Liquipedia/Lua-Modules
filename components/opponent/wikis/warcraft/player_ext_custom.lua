@@ -99,7 +99,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 	player = PlayerExt.syncPlayer(player, options) --[[@as WarcraftStandardPlayer]]
 
 	player.faction = player.faction
-		or globalVars:get(player.displayName .. '_race')
+		or globalVars:get(player.displayName .. '_faction')
 		or options.fetchPlayer ~= false and CustomPlayerExt.fetchPlayerFaction(player.pageName, options.date)
 		or Faction.defaultFaction
 
@@ -110,10 +110,18 @@ function CustomPlayerExt.syncPlayer(player, options)
 	return player
 end
 
+---Same as PlayerExt.syncPlayer, except it does not save the player's flag to page variables.
+---@param player WarcraftStandardPlayer
+---@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
+---@return WarcraftStandardPlayer
+function CustomPlayerExt.populatePlayer(player, options)
+	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
+end
+
 ---@param player WarcraftStandardPlayer
 function CustomPlayerExt.saveToPageVars(player)
 	if player.faction and player.faction ~= Faction.defaultFaction then
-		globalVars:set(player.displayName .. '_race', player.faction)
+		globalVars:set(player.displayName .. '_faction', player.faction)
 	end
 
 	PlayerExt.saveToPageVars(player)
