@@ -1,0 +1,64 @@
+.heroes-panel {
+	&__heading {
+		display: flex;
+		align-items: center;
+		margin-bottom: 1rem;
+
+		&-title {
+			font-weight: bold;
+			display: inline-flex;
+
+			&__number {
+				font-weight: normal;
+				margin-left: 0.5rem;
+			}
+		}
+
+		ul&-links {
+			margin: 0 0 0 auto;
+			list-style: none;
+			display: inline-flex;
+
+			> li:not(:first-child) {
+				margin-left: 1.375rem;
+
+				> a {
+					&::before {
+						content: '';
+						width: 0.125rem;
+						height: 0.125rem;
+						background-color: #000;
+						border-radius: 100%;
+						display: block;
+					}
+				}
+			}
+		}
+	}
+
+	&__filter {}
+
+	&__category {
+		&.category--strength {}
+		&.category--agility {}
+		&.category--intelligence {}
+		&.category--universal {}
+		&.category--upcoming {}
+
+		&-title {
+			display: flex;
+			justify-content: center;
+			border-bottom: 0.5rem solid;
+
+			.category--strength & {
+				border-bottom-color: var( --clr-california-40 );
+			}
+		}
+
+		&__list {
+			display: grid;
+			margin: 0;
+			list-style: none;
+		}
+	}
+}
