@@ -626,7 +626,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 				name = name:gsub(' ', '_'),
 				displayname = Variables.varDefault(prefix .. 'dn'),
 				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
-				extradata = {faction = Variables.varDefault(prefix .. 'race')}
+				extradata = {faction = Variables.varDefault(prefix .. 'faction', Variables.varDefault(prefix .. 'race'))}
 			}
 			if player.displayname then
 				Variables.varDefine(player.displayname .. '_page', player.name)
