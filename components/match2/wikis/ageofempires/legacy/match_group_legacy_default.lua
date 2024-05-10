@@ -29,7 +29,7 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 			MatchGroupLegacyDefault.getMatchMapping(match, bracketData, bracketType, LowerHeader)
 	end
 
-    bracketData['hideRoundTitles'] = 'hideroundtitles'
+	bracketData['hideRoundTitles'] = 'hideroundtitles'
 
 	-- add reference for map mappings
 	bracketData['$$map'] = {
@@ -40,9 +40,12 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 		civs1 = 'map$1$p1civ',
 		civs2 = 'map$1$p2civ',
 		vod = 'vodgame$1$',
+		date = 'date$1$',
 	}
 
 	if bracketType == 'team' then
+		-- Original input happens as |matchX={{MatchTeam|...}}
+		-- and is already flattened in BracketMatchSummary
 		bracketData['$$map'] = {
 			['$notEmpty$'] = 'match$1$map',
 			map = 'match$1$map',
@@ -53,6 +56,7 @@ function MatchGroupLegacyDefault.get(templateid, bracketType)
 			civs1 = 'match$1$t1civs',
 			civs2 = 'match$1$t2civs',
 			vod = 'vodgame$1$',
+			date = 'date$1$',
 		}
 	end
 
