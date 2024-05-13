@@ -101,13 +101,14 @@ end
 --
 -- function to check for draws
 ---@param tbl table[]
+---@param winner integer?
 ---@return boolean
-function CustomMatchGroupInput.placementCheckDraw(tbl)
+function CustomMatchGroupInput.placementCheckDraw(tbl, winner)
 	if #tbl < MAX_NUM_OPPONENTS then
 		return false
 	end
 
-	return MatchGroupInput.isDraw(tbl)
+	return MatchGroupInput.isDraw(tbl, winner)
 end
 
 ---@param data table
@@ -119,7 +120,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	local winner = tonumber(data.winner)
 	if Logic.readBool(data.finished) then
-		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+		if CustomMatchGroupInput.placementCheckDraw(indexedScores, tonumber(data.winner)) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
