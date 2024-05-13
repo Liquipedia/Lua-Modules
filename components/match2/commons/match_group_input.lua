@@ -780,9 +780,11 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 end
 
 ---@param opponents table[]
+---@param winner integer?
 ---@return boolean
-function MatchGroupInput.isDraw(opponents)
-	if Logic.isEmpty(opponents) then return true end
+function MatchGroupInput.isDraw(opponents, winner)
+	if winner and winner ~= 0 then return false end
+	if winner == 0 or Logic.isEmpty(opponents) then return true end
 	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' and opponent.status ~= 'D' end) then
 		return false
 	end
