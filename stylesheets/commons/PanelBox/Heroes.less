@@ -19,7 +19,7 @@
 			list-style: none;
 			display: inline-flex;
 
-			> li:not(:first-child) {
+			> li:not( :first-child ) {
 				margin-left: 1.375rem;
 
 				> a {
@@ -40,18 +40,46 @@
 		&-group {}
 
 		&-button {
-			@color: var( --clr-wiki-theme-primary );
-			min-height: 32px;
-			//background-color: rgba( 184, 20, 20, 0.12 );
-			background-color: fade(@color, 12%);
+			min-height: 2rem;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
-			padding: 0 12px;
-			border-radius: 8px;
-			font-size: 14px;
+			padding: 0 0.75rem;
+			border-radius: 0.5rem;
+			font-size: 0.875rem;
 			font-weight: bold;
 			color: var( --clr-wiki-theme-primary );
+			position: relative;
+			z-index: 0;
+			cursor: pointer;
+			margin-right: 0.5rem;
+
+			&::after {
+				content: '';
+				background-color: var( --clr-wiki-theme-primary );
+				opacity: 0.12;
+				position: absolute;
+				inset: 0;
+				z-index: -1;
+				border-radius: 0.5rem;
+			}
+
+			@media ( hover: hover ) {
+				&:hover {
+					&::after {
+						opacity: 0.24;
+					}
+				}
+			}
+
+			&.is--active {
+				background-color: var( --clr-wiki-theme-primary );
+				color: #fff;
+			}
+
+			> .icon-left {
+				margin-right: 0.25rem;
+			}
 		}
 	}
 
@@ -68,27 +96,27 @@
 			border-bottom: 0.5rem solid;
 
 			.category--strength & {
-				border-bottom-color: var(--clr-california-40);
+				border-bottom-color: var( --clr-california-40 );
 			}
 		}
 
 		ul&-list {
 			display: grid;
-			grid-template-columns: repeat(9, 1fr);
+			grid-template-columns: repeat( 9, 1fr );
 			gap: 0.5rem;
 			margin: 0;
 			list-style: none;
 
 			> li {
 				padding: 0;
-				border: 0.125rem solid rgba(0, 0, 0, 0.7);
+				border: 0.125rem solid rgba( 0, 0, 0, 0.7 );
 				border-radius: 0.25rem;
 				overflow: hidden;
 			}
 
 			&__title {
 				color: #fff;
-				box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 1), 0 0 2px 0 rgba(0, 0, 0, 1);
+				box-shadow: 0 0.0625rem 0.0625rem 0 rgba( 0, 0, 0, 1 ), 0 0 0.125rem 0 rgba( 0, 0, 0, 1 );
 			}
 		}
 	}
