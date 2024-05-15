@@ -36,7 +36,24 @@
 		}
 	}
 
-	&__filter {}
+	&__filter {
+		&-group {}
+
+		&-button {
+			@color: var( --clr-wiki-theme-primary );
+			min-height: 32px;
+			//background-color: rgba( 184, 20, 20, 0.12 );
+			background-color: fade(@color, 12%);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0 12px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: bold;
+			color: var( --clr-wiki-theme-primary );
+		}
+	}
 
 	&__category {
 		&.category--strength {}
