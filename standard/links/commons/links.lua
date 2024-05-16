@@ -44,6 +44,7 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	boosty = {'https://boosty.to/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	cc = {'https://cc.163.com/'},
