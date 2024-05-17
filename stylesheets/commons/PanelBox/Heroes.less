@@ -91,6 +91,7 @@
 			align-items: center;
 			border-bottom: 0.5rem solid;
 			padding: 0.5rem 0;
+			margin-bottom: 0.25rem;
 
 			.category--strength & {
 				.theme--light & {
@@ -149,21 +150,21 @@
 		}
 
 		ul&-list {
-			@--bs-gutter-y: 0.5rem;
-			@--bs-gutter-x: 0.5rem;
+			@--gutter-y: 0.5rem;
+			@--gutter-x: 0.5rem;
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
 			list-style: none;
-			margin: calc(-1* @--bs-gutter-y) calc(-.5* @--bs-gutter-x) 0 calc(-.5* @--bs-gutter-x);
+			margin: calc(-.5* @--gutter-y) calc(-.5* @--gutter-x) 0.5rem calc(-.5* @--gutter-x);
 
 			> li {
 				flex: 0 0 auto;
 				width: calc( 100% / 3 );
 				max-width: 100%;
-				padding-right: calc(@--bs-gutter-x* .5);
-				padding-left: calc(@--bs-gutter-x* .5);
-				margin-top: @--bs-gutter-y;
+				padding-right: calc(@--gutter-x* .5);
+				padding-left: calc(@--gutter-x* .5);
+				margin-top: @--gutter-y;
 				margin-bottom: 0;
 
 				@media ( min-width: 576px ) {
@@ -177,35 +178,30 @@
 				@media ( min-width: 1024px ) {
 					width: calc( 100% / 8 );
 				}
-
-				> img {
-					display: flex;
-					object-fit: cover;
-					width: 100%;
-					height: 100%;
-				}
-
-				> a {
-					width: 100%;
-					height: 100%;
-
-					> img {
-						display: flex;
-						object-fit: cover;
-						width: 100%;
-						height: 100%;
-					}
-				}
 			}
 		}
 	}
 
 	&__hero-card {
-		box-shadow: inset 0 0 0 0.125rem rgba(0, 0, 0, 0.7);
 		display: flex;
 		position: relative;
 		flex: 1;
 		height: 3.5rem;
+
+		&::before {
+			content: "";
+			box-shadow: inset 0 0 0 0.125rem rgba(0, 0, 0, 0.7);
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+		}
+
+		> img {
+			display: flex;
+			object-fit: cover;
+			width: 100%;
+			height: 100%;
+		}
 
 		&__title {
 			color: #fff;
@@ -217,6 +213,10 @@
 			bottom: 0.25rem;
 			left: 0;
 			text-align: center;
+
+			> a {
+				color: inherit;
+			}
 		}
 	}
 }
