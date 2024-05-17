@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
+local References = Lua.import('Module:Transfer/Refences')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local VALID_CONFIDENCES = {
@@ -282,19 +283,7 @@ function TransferRow:_readReferences(numberOfPlayers)
 		return {}
 	end
 
-	local references = Array.parseCommaSeparatedString(self.args.ref, ';;;')
-
-	---@type {type: string, url: string?}[]
-	references = Array.map(references, function(ref)
-		local reference = Json.parseIfTable(ref) or {}
-		local url = String.nilIfEmpty(reference.url)
-		local refType = (String.nilIfEmpty(reference.type) or 'web source'):lower()
-		if not url and (refType == 'web source' or refType == 'tournament source') then
-			return nil
-		end
-
-		return {type = refType, url = url}
-	end)
+	local references = References.read(self.args.ref)
 
 	-- same amount of players and references? individually allocate them for LPDB storage
 	-- special case: 2 refs/players (often times this will be a reference from both teams)
@@ -303,17 +292,11 @@ function TransferRow:_readReferences(numberOfPlayers)
 
 	if not allRef then
 		return Array.map(references, function(ref)
-			return {reference1 = ref.url, reference1type = ref.type}
+			return References.addReferenceToStorageData({}, ref, 1)
 		end)
 	end
 
-	local allReferences = {}
-	Array.forEach(references, function(reference, referenceIndex)
-		allReferences['reference' .. referenceIndex .. 'type'] = reference.type
-		allReferences['reference' .. referenceIndex] = reference.url or ''
-	end)
-
-	return {all = allReferences}
+	return {all = References.toStorageData(references)}
 end
 
 ---@return self

@@ -20,6 +20,7 @@ local Table = require('Module:Table')
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
+local TransferRef = Lua.import('Module:Transfer/Refences')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
@@ -140,22 +141,13 @@ end
 function TransferRowDisplay:_getReferences(transfers)
 	local references = {}
 	Array.forEach(transfers, function(transfer)
-		transfer.reference = transfer.reference or {}
-		Array.forEach(Array.mapIndexes(function(referenceIndex)
-			local prefix = 'reference' .. referenceIndex
-			local referenceUrl = String.nilIfEmpty(transfer.reference[prefix])
-			local referenceType = String.nilIfEmpty(transfer.reference[prefix .. 'type'])
-			return (referenceUrl or referenceType) and {url = referenceUrl, type = referenceType}
-		end), function(reference)
-			if Array.all(references, function(ref) return not Table.deepEquals(ref, reference) end) then
-				table.insert(references, reference)
-			end
-		end)
+		Array.extendWith(references, TransferRef.fromStorageData(transfer.reference))
 	end)
+	references = TransferRef.makeUnique(references)
 
 	return Array.map(references, function(reference)
-		local refType = reference.type
-		local link = reference.url
+		local refType = reference.refType
+		local link = reference.link
 		if refType == 'web source' then
 			return Page.makeExternalLink(Icon.makeIcon{
 				iconName = 'reference',
