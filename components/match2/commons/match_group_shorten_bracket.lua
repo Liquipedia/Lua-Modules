@@ -73,40 +73,42 @@ end
 function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId, bracketDatasById)
 	local newMatches = {}
 
-	for _, match in ipairs(matches) do
-		local matchId = string.sub(match.match2id, idLength + 2)
+	Array.forEach(matches, function(match)
+		local originalMatchId = match.match2id
+		local matchId = string.sub(originalMatchId, idLength + 2)
 		local round = tonumber(string.sub(matchId, 2, 3))
 
 		-- keep reset/3rd place match, i.e. last round
 		if not round then
 			match.match2id = newBracketId .. '_' .. matchId
 			table.insert(newMatches, match)
+		elseif round <= skipRounds then return end
 
-		-- valid match we want to keep
-		elseif round > skipRounds then
-			local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
+		local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
-			assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
-				.. newMatchId .. ' (calculated from ' .. matchId .. ')')
+		assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
+			.. newMatchId .. ' (calculated from ' .. matchId .. ')')
 
-			match.match2id = newBracketId .. '_' .. newMatchId
+		match.match2id = newBracketId .. '_' .. newMatchId
 
-			-- nil some stuff before merge since it doesn't get nil-ed in merge
-			match.match2bracketdata.loweredges = nil
-			match.match2bracketdata.skipround = nil
+		-- nil some stuff before merge since it doesn't get nil-ed in merge
+		match.match2bracketdata.loweredges = nil
+		match.match2bracketdata.skipround = nil
 
-			match.match2bracketdata = Table.merge(match.match2bracketdata, bracketDatasById[newMatchId], {
-				header = match.match2bracketdata.header
-			})
+		match.match2bracketdata = Table.merge(match.match2bracketdata, bracketDatasById[newMatchId], {
+			header = match.match2bracketdata.header
+		})
 
-			-- have to do this after the merge so that correct `match.match2bracketdata.lowerMatchIds` is available
-			match.match2bracketdata.loweredges = ShortenBracket._calculateLowerEdges(match)
+		-- have to do this after the merge so that correct `match.match2bracketdata.lowerMatchIds` is available
+		match.match2bracketdata.loweredges = ShortenBracket._calculateLowerEdges(match)
 
-			match.match2bracketid = newBracketId
+		-- add the original match id for reference and to be able to use it in e.g. BigMatch linking
+		match.extradata.originalmatchid = originalMatchId
 
-			table.insert(newMatches, match)
-		end
-	end
+		match.match2bracketid = newBracketId
+
+		table.insert(newMatches, match)
+	end)
 
 	return newMatches
 end
