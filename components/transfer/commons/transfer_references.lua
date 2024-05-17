@@ -206,13 +206,6 @@ function TransferRef.useReferences(references, date)
 	return table.concat(refs)
 end
 
----@param references table
----@param date string
----@return string
-function TransferRef.useFirstReference(references, date)
-	return TransferRef.useReference(TransferRef.fromStorageData(references)[1], date)
-end
-
 ---@param reference TransferReference
 ---@param date string
 ---@return string
