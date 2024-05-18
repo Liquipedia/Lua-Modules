@@ -60,8 +60,6 @@ function WikiCopyPaste.getStart(template, id, modus, args)
 
 	local start = '{{' .. WikiCopyPaste.getMatchGroupTypeCopyPaste(modus, template) .. '|id=' .. id
 
-	args.customHeader = false
-
 	return start, args
 end
 
