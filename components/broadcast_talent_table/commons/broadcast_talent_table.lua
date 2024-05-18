@@ -140,6 +140,10 @@ function BroadcastTalentTable:_fetchTournaments()
 		end
 	end
 
+	if args.isAchievementsTable then
+		conditions:add{ConditionNode(ColumnName('extradata_status'), Comparator.eq, '')}
+	end
+
 	-- double the limit for the query due to potentional merging of results further down the line
 	local queryLimit = args.limit * 2
 
