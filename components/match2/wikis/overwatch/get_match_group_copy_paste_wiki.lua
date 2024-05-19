@@ -55,7 +55,6 @@ end
 ---@return table
 function WikiCopyPaste.getStart(template, id, modus, args)
 	args.namedMatchParams = false
-	
 	return BaseCopyPaste.getStart(template, id, modus, args)
 end
 
