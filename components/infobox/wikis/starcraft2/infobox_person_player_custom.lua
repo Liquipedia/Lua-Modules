@@ -28,7 +28,7 @@ local YearsActive = require('Module:YearsActive')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 local Opponent = Lua.import('Module:Opponent/Starcraft')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
