@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=callofduty
--- page=Module:MatchMaps/Legacy/Store
+-- page=Module:MatchMaps/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
