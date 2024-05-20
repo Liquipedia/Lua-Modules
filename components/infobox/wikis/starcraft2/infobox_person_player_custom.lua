@@ -14,6 +14,7 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Custom')
@@ -75,6 +76,7 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
+	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
 
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)
