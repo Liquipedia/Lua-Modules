@@ -47,15 +47,4 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
----@param template string
----@param id string
----@param modus string
----@param args table
----@return string
----@return table
-function WikiCopyPaste.getStart(template, id, modus, args)
-	args.namedMatchParams = false
-	return BaseCopyPaste.getStart(template, id, modus, args)
-end
-
 return WikiCopyPaste
