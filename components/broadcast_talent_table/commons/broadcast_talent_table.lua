@@ -37,6 +37,7 @@ local DASH = '&#8211;'
 local DEFAULT_TIERTYPE = 'General'
 local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
+local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
 local RESULTS_SORT_ORDER = 'date desc'
 
 ---@class BroadcastTalentTable
@@ -141,8 +142,7 @@ function BroadcastTalentTable:_fetchTournaments()
 	end
 
 	if args.isAchievementsTable then
-		local IGNORED_STATUSES = {'cancelled', 'postponed'}
-		Array.forEach(IGNORED_STATUSES, function(ignoredStatus)
+		Array.forEach(ACHIEVEMENTS_IGNORED_STATUSES, function(ignoredStatus)
 			conditions:add{ConditionNode(ColumnName('extradata_status'), Comparator.neq, ignoredStatus)}
 		end)
 	end
