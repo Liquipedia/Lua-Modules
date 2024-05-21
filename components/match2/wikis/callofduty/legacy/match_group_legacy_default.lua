@@ -8,8 +8,8 @@
 
 local MatchGroupLegacyDefault = {}
 
-local String = require('Module:StringUtils')
 local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
@@ -174,7 +174,7 @@ function MatchGroupLegacyDefault.matchMappingFromCustom(data, bracketType)
 		['$flatten$'] = {data.details .. 'details'},
 		['finished'] = data.opp1 .. 'win|' .. data.opp2 .. 'win',
 		opponent1 = MatchGroupLegacyDefault._readOpponent(data.opp1, 'score', bracketType),
-		opponent2 =  MatchGroupLegacyDefault._readOpponent(data.opp2, 'score', bracketType),
+		opponent2 = MatchGroupLegacyDefault._readOpponent(data.opp2, 'score', bracketType),
 	}
 	mapping = MatchGroupLegacyDefault.addMaps(mapping)
 

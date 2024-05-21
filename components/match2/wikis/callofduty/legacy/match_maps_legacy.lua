@@ -45,7 +45,7 @@ function MatchMapsLegacy.init(frame)
 	matchlistVars:set('bracketid', args.id)
 	matchlistVars:set('matchListTitle', args.title or args[1] or 'Match List')
 	matchlistVars:set('width', args.width)
-	matchlistVars:set('hide', args.hide or 'true' )
+	matchlistVars:set('hide', args.hide or 'true')
 	matchlistVars:set('store', store and 'true' or nil)
 end
 
@@ -57,6 +57,7 @@ function MatchMapsLegacy.match(frame)
 
 	Template.stashReturnValue(matchArgs, 'LegacyMatchlist')
 end
+
 ---@param args table
 ---@return table
 function MatchMapsLegacy._mergeDetailsIntoArgs(args)
@@ -114,7 +115,7 @@ function MatchMapsLegacy.close()
 		matchListArgs['M' .. matchIndex] = Match.makeEncodedJson(match)
 	end)
 
-	if matchlistVars:get('hide') == 'true' then
+	if Logic.readBool(matchlistVars:get('hide')) then
 		matchListArgs.collapsed = true
 		matchListArgs.attached = true
 	else
