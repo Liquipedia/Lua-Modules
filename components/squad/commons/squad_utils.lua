@@ -96,7 +96,7 @@ function SquadUtils.convertAutoParameters(player)
 	-- Map between formats
 	newPlayer.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
 	newPlayer.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-	newPlayer.inactivedate = player.leavedate
+	newPlayer.inactivedate = newPlayer.leavedate
 
 	newPlayer.link = player.page
 	newPlayer.role = player.thisTeam.role
