@@ -92,7 +92,7 @@ function MatchMapsLegacy._readOpponents(matchArgs)
 		matchArgs['opponent' .. opponentIndex] = {
 			template = template,
 			type = template == TBD and Opponent.literal or Opponent.team,
-			score = tonumber(Table.extract(matchArgs, 'games' .. opponentIndex)) or
+			score = Logic.nilIfEmpty(Table.extract(matchArgs, 'games' .. opponentIndex)) or
 				(walkover and walkover ~= 0 and (walkover == opponentIndex and DEFAULT_WIN or DEFAULT_LOSS))
 		}
 	end)
