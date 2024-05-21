@@ -245,11 +245,11 @@ function StarcraftMatchSummary.Game(game, options)
 		local opponent = game.opponents ~= nil and game.opponents[opponentIndex] or nil
 
 		if offFactions and opponent and opponent.isArchon then
-			return StarcraftMatchSummary.offFactionIcons({offFactions[1]})
+			return StarcraftMatchSummary.OffFactionIcons({offFactions[1]})
 		elseif offFactions and opponent then
-			return StarcraftMatchSummary.offFactionIcons(offFactions)
+			return StarcraftMatchSummary.OffFactionIcons(offFactions)
 		elseif showOffFactionIcons then
-			return StarcraftMatchSummary.offFactionIcons({})
+			return StarcraftMatchSummary.OffFactionIcons({})
 		else
 			return nil
 		end
