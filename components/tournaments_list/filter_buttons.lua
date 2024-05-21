@@ -117,6 +117,10 @@ function FilterButtons.getButtonRow(category)
 				:css('padding-right','2px')
 				:attr('data-filter-on', 'dropdown-' .. category.expandKey)
 				:wikitext(DROPDOWN_ARROW))
+			:node(mw.html.create('span')
+				:addClass('filter-button')
+				:css('display','none')
+				:attr('data-filter-on', 'all'))
 		buttons:node(dropdownButton)
 	end
 
