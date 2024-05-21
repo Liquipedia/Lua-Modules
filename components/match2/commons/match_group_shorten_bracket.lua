@@ -71,9 +71,7 @@ end
 ---@param bracketDatasById table<string, table>
 ---@return match2[]
 function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId, bracketDatasById)
-	local newMatches = {}
-
-	Array.forEach(matches, function(match)
+	return Array.map(matches, function(match)
 		local originalMatchId = match.match2id
 		local matchId = string.sub(originalMatchId, idLength + 2)
 		local round = tonumber(string.sub(matchId, 2, 3))
@@ -81,8 +79,8 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 		-- keep reset/3rd place match, i.e. last round
 		if not round then
 			match.match2id = newBracketId .. '_' .. matchId
-			table.insert(newMatches, match)
-		elseif round <= skipRounds then return end
+			return match
+		elseif round <= skipRounds then return nil end
 
 		local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
@@ -107,10 +105,8 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 
 		match.match2bracketid = newBracketId
 
-		table.insert(newMatches, match)
+		return match
 	end)
-
-	return newMatches
 end
 
 ---@param match match2
