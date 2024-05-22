@@ -313,8 +313,13 @@ end
 ---@param lpdbData table
 ---@return string
 function ParticipantTable:objectName(lpdbData)
-	local objectName = Logic.emptyOr(lpdbData.objectName, lpdbData.objectname)
-	if objectName then return objectName end
+	if Logic.isNotEmpty(lpdbData.objectName) then return lpdbData.objectName end
+
+	if Logic.isNotEmpty(lpdbData.objectname) then
+		--remove then prefixed pageid from the objectName
+		local objectName = lpdbData.objectname:gsub('^%d*_', '')
+		return objectName
+	end
 
 	local lpdbPrefix = self.config.lpdbPrefix and ('_' .. self.config.lpdbPrefix) or ''
 	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
