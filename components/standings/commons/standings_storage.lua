@@ -208,9 +208,9 @@ function StandingsStorage.fromTemplateEntry(frame)
 			flag = data.participantflag or data.flag,
 			team = data.team
 		}
-		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
-		if String.isNotEmpty(race) then
-			opponentArgs.race = race:sub(1, 1):lower()
+		local faction = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		if String.isNotEmpty(faction) then
+			opponentArgs.faction = faction:sub(1, 1):lower()
 		end
 
 	elseif data.team then

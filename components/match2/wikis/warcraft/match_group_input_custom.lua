@@ -360,7 +360,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		insertIntoPlayers{
 			name = name,
 			displayName = Variables.varDefault(varPrefix .. 'dn'),
-			race = Variables.varDefault(varPrefix .. 'race'),
+			faction = Variables.varDefault(varPrefix .. 'faction'),
 			flag = Variables.varDefault(varPrefix .. 'flag'),
 		}
 		playerIndex = playerIndex + 1
@@ -378,13 +378,13 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		insertIntoPlayers({
 			name = playerName,
 			displayName = playersData[playerPrefix .. 'dn'],
-			race = playersData[playerPrefix .. 'race'],
+			faction = playersData[playerPrefix .. 'faction'],
 			flag = playersData[playerPrefix .. 'flag'],
 		})
 	end
 
 	opponent.match2players = Array.extractValues(players)
-	--set default race for unset races
+	--set default faction for unset factions
 	Array.forEach(opponent.match2players, function(player)
 		player.extradata.faction = player.extradata.faction or Faction.defaultFaction
 	end)
@@ -395,18 +395,18 @@ end
 ---@param opponent table
 ---@return table
 function CustomMatchGroupInput.ProcessLiteralOpponentInput(opponent)
-	local race = opponent.race
+	local faction = opponent.race
 	local flag = opponent.flag
 	local name = opponent.name or opponent[1]
 	local extradata = opponent.extradata
 
 	local players = {}
-	if String.isNotEmpty(race) or String.isNotEmpty(flag) then
+	if String.isNotEmpty(faction) or String.isNotEmpty(flag) then
 		players[1] = {
 			displayname = name,
 			name = TBD:upper(),
 			flag = Flags.CountryName(flag),
-			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
+			extradata = {faction = Faction.read(faction) or Faction.defaultFaction}
 		}
 		extradata.hasFactionOrFlag = true
 	end
@@ -444,7 +444,7 @@ function CustomMatchGroupInput.processPartyOpponentInput(opponent, partySize)
 				)),
 			extradata = {faction = Faction.read(Logic.emptyOr(
 					opponent['p' .. playerIndex .. 'race'],
-					Variables.varDefault(name .. '_race')
+					Variables.varDefault(name .. '_faction')
 				)) or Faction.defaultFaction}
 		})
 	end
@@ -504,7 +504,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
-	--(w/l race stuff only for 1v1 maps)
+	--(w/l faction stuff only for 1v1 maps)
 	CustomMatchGroupInput.ProcessPlayerMapData(map, match, 2)
 
 	--adjust sumscore for winner opponent
@@ -624,15 +624,15 @@ function CustomMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOpponent
 		return
 	end
 
-	local opponentRaces, playerNameArray, heroesData
+	local opponentFactions, playerNameArray, heroesData
 		= CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
 	map.extradata = Table.merge(map.extradata, heroesData)
 	if tonumber(map.winner) == 1 then
-		map.extradata.winnerfaction = opponentRaces[1]
-		map.extradata.loserfaction = opponentRaces[2]
+		map.extradata.winnerfaction = opponentFactions[1]
+		map.extradata.loserfaction = opponentFactions[2]
 	elseif tonumber(map.winner) == 2 then
-		map.extradata.winnerfaction = opponentRaces[2]
-		map.extradata.loserfaction = opponentRaces[1]
+		map.extradata.winnerfaction = opponentFactions[2]
+		map.extradata.loserfaction = opponentFactions[1]
 	end
 	map.extradata.opponent1 = playerNameArray[1]
 	map.extradata.opponent2 = playerNameArray[2]
@@ -643,19 +643,19 @@ end
 ---@return table<integer, string>
 ---@return table<string, string>
 function CustomMatchGroupInput._fetchOpponentMapParticipantData(participants)
-	local opponentRaces, playerNameArray, heroesData = {}, {}, {}
+	local opponentFactions, playerNameArray, heroesData = {}, {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
 		-- opponentIndex can not be nil due to the format of the participants keys
 		---@cast opponentIndex -nil
-		opponentRaces[opponentIndex] = participantData.faction
+		opponentFactions[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
 		Array.forEach(participantData.heroes or {}, function(hero, heroIndex)
 			heroesData['opponent' .. opponentIndex .. 'hero' .. heroIndex] = hero
 		end)
 	end
 
-	return opponentRaces, playerNameArray, heroesData
+	return opponentFactions, playerNameArray, heroesData
 end
 
 ---@param players table[]
