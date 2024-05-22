@@ -63,7 +63,10 @@ end
 function MatchMapsLegacy._mergeDetailsIntoArgs(args)
 	local details = Json.parseIfTable(Table.extract(args, 'details')) or {}
 
-	return Table.merge({}, details, args)
+	return Table.merge(details, args, {
+		date = details.date or args.date,
+		dateheader = Logic.isNotEmpty(args.date)
+	})
 end
 
 ---@param matchArgs table
