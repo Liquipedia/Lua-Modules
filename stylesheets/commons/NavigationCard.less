@@ -27,6 +27,14 @@
 	min-width: 0;
 	position: relative;
 
+	@media ( hover: hover ) {
+		&:hover {
+			.navigation-card__image img {
+				transform: scale( 1.1 );
+			}
+		}
+	}
+
 	.theme--light & {
 		background-color: #ffffff;
 	}
@@ -47,6 +55,7 @@
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
+			transition: transform 0.2s linear;
 		}
 	}
 
