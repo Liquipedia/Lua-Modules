@@ -90,6 +90,19 @@ return {
 				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
+		bo6 = {
+			abbreviation = 'BO6',
+			name = 'Black Ops 6',
+			link = 'Call of Duty: Black Ops 6',
+			logo = {
+				darkMode = 'Call of Duty Black Ops 6 allmode.png',
+				lightMode = 'Call of Duty Black Ops 6 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
+			},
+		},
 		cod = {
 			abbreviation = 'COD',
 			name = 'Call of Duty',
