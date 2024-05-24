@@ -275,14 +275,20 @@ function ParticipantTable:store()
 	Array.forEach(self.sections, function(section) Array.forEach(section.entries, function(entry)
 		local lpdbData = Opponent.toLpdbStruct(entry.opponent)
 
-		if placements[lpdbData.opponentname] or section.config.noStorage or
-			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
+		if section.config.noStorage or Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-		lpdbData = Table.merge(
-			lpdbTournamentData,
-			lpdbData,
-			{date = section.config.resolveDate, extradata = {dq = entry.dq and 'true' or nil}}
-		)
+		if placements[lpdbData.opponentname] then
+			lpdbData = Table.deepMerge(
+				lpdbData,
+				placements[lpdbData.opponentname]
+			)
+		else
+			lpdbData = Table.merge(
+				lpdbTournamentData,
+				lpdbData,
+				{date = section.config.resolveDate, extradata = {dq = entry.dq and 'true' or nil}}
+			)
+		end
 
 		self:adjustLpdbData(lpdbData, entry, section.config)
 
@@ -299,7 +305,7 @@ function ParticipantTable:getPlacements()
 	Array.forEach(mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
 		conditions = '[[placement::!]] AND [[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']]',
-	}), function(placement) placements[placement.opponentname] = true end)
+	}), function(placement) placements[placement.opponentname] = placement end)
 
 	return placements
 end
@@ -307,6 +313,16 @@ end
 ---@param lpdbData table
 ---@return string
 function ParticipantTable:objectName(lpdbData)
+	--this objectName comes from lpdbData passed along as wiki vars, e.g. sc, sc2, sg
+	if Logic.isNotEmpty(lpdbData.objectName) then return lpdbData.objectName end
+
+	--this objectName comes from queried lpdb data and has a prefixed pageid
+	if Logic.isNotEmpty(lpdbData.objectname) then
+		--remove then prefixed pageid from the objectName
+		local objectName = lpdbData.objectname:gsub('^%d*_', '')
+		return objectName
+	end
+
 	local lpdbPrefix = self.config.lpdbPrefix and ('_' .. self.config.lpdbPrefix) or ''
 	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
 end

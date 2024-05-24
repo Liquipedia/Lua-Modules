@@ -446,14 +446,14 @@ function StarcraftMatchGroupInput.ProcessSoloOpponentInput(opponent)
 	) or ''
 	local link = Logic.emptyOr(opponent.link, Variables.varDefault(name .. '_page')) or name
 	link = mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_')
-	local race = Logic.emptyOr(opponent.race, Variables.varDefault(name .. '_race'), '')
+	local faction = Logic.emptyOr(opponent.race, Variables.varDefault(name .. '_faction'))
 	local players = {}
 	local flag = Logic.emptyOr(opponent.flag, Variables.varDefault(name .. '_flag'))
 	players[1] = {
 		displayname = name,
 		name = link,
 		flag = Flags.CountryName(flag),
-		extradata = {faction = Faction.read(race) or Faction.defaultFaction}
+		extradata = {faction = Faction.read(faction) or Faction.defaultFaction}
 	}
 
 	return {
@@ -479,16 +479,16 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			Variables.varDefault(opponent.p2 .. '_page')
 		) or opponent.p2):gsub(' ', '_')
 	if Logic.readBool(opponent.extradata.isarchon) then
-		opponent.p1race = Faction.read(opponent.race) or Faction.defaultFaction
-		opponent.p2race = opponent.p1race
+		opponent.p1faction = Faction.read(opponent.race) or Faction.defaultFaction
+		opponent.p2faction = opponent.p1faction
 	else
-		opponent.p1race = Faction.read(Logic.emptyOr(
+		opponent.p1faction = Faction.read(Logic.emptyOr(
 				opponent.p1race,
-				Variables.varDefault(opponent.p1 .. '_race')
+				Variables.varDefault(opponent.p1 .. '_faction')
 			)) or Faction.defaultFaction
-		opponent.p2race = Faction.read(Logic.emptyOr(
+		opponent.p2faction = Faction.read(Logic.emptyOr(
 				opponent.p2race,
-				Variables.varDefault(opponent.p2 .. '_race')
+				Variables.varDefault(opponent.p2 .. '_faction')
 			)) or Faction.defaultFaction
 	end
 
@@ -530,9 +530,9 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 				opponent['p' .. playerIndex .. 'link'],
 				Variables.varDefault(playerName .. '_page')
 			) or playerName):gsub(' ', '_')
-		local race = Logic.emptyOr(
+		local faction = Logic.emptyOr(
 			opponent['p' .. playerIndex .. 'race'],
-			Variables.varDefault(playerName .. '_race'),
+			Variables.varDefault(playerName .. '_faction'),
 			''
 		)
 		name = name .. (playerIndex ~= 1 and ' / ' or '') .. link
@@ -545,7 +545,7 @@ function StarcraftMatchGroupInput.ProcessOpponentInput(opponent, playernumber)
 			displayname = playerName,
 			name = link,
 			flag = Flags.CountryName(flag),
-			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
+			extradata = {faction = Faction.read(faction) or Faction.defaultFaction}
 		}
 	end
 
@@ -561,16 +561,16 @@ end
 ---@param opponent table
 ---@return table
 function StarcraftMatchGroupInput.ProcessLiteralOpponentInput(opponent)
-	local race = opponent.race or ''
+	local faction = opponent.race or ''
 	local flag = opponent.flag or ''
 
 	local players = {}
-	if String.isNotEmpty(race) or String.isNotEmpty(flag) then
+	if String.isNotEmpty(faction) or String.isNotEmpty(flag) then
 		players[1] = {
 			displayname = opponent[1],
 			name = '',
 			flag = Flags.CountryName(flag),
-			extradata = {faction = Faction.read(race) or Faction.defaultFaction}
+			extradata = {faction = Faction.read(faction) or Faction.defaultFaction}
 		}
 		local extradata = opponent.extradata or {}
 		extradata.hasFactionOrFlag = true
@@ -626,7 +626,7 @@ function StarcraftMatchGroupInput._getPlayersFromVariables(teamName)
 				name = name:gsub(' ', '_'),
 				displayname = Variables.varDefault(prefix .. 'dn'),
 				flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag')),
-				extradata = {faction = Variables.varDefault(prefix .. 'race')}
+				extradata = {faction = Variables.varDefault(prefix .. 'faction')}
 			}
 			if player.displayname then
 				Variables.varDefine(player.displayname .. '_page', player.name)
@@ -721,7 +721,7 @@ function StarcraftMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = StarcraftMatchGroupInput._mapWinnerProcessing(map)
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
-	--(w/l race stuff only for 1v1 maps)
+	--(w/l faction stuff only for 1v1 maps)
 	map = StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, 2)
 
 	-- set sumscore to 0 if it isn't a number
@@ -873,13 +873,13 @@ function StarcraftMatchGroupInput.ProcessPlayerMapData(map, match, numberOfOppon
 		mapMode = mapMode .. (opponentIndex ~= 1 and 'v' or '') .. opponentMapMode
 
 		if mapMode == '1v1' and numberOfOpponents == 2 then
-			local opponentRaces, playerNameArray = StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
+			local opponentFactions, playerNameArray = StarcraftMatchGroupInput._fetchOpponentMapFactionsAndNames(participants)
 			if tonumber(map.winner or 0) == 1 then
-				map.extradata.winnerfaction = opponentRaces[1]
-				map.extradata.loserfaction = opponentRaces[2]
+				map.extradata.winnerfaction = opponentFactions[1]
+				map.extradata.loserfaction = opponentFactions[2]
 			elseif tonumber(map.winner or 0) == 2 then
-				map.extradata.winnerfaction = opponentRaces[2]
-				map.extradata.loserfaction = opponentRaces[1]
+				map.extradata.winnerfaction = opponentFactions[2]
+				map.extradata.loserfaction = opponentFactions[1]
 			end
 			map.extradata.opponent1 = playerNameArray[1]
 			map.extradata.opponent2 = playerNameArray[2]
@@ -896,17 +896,17 @@ end
 ---@param participants table
 ---@return table
 ---@return table
-function StarcraftMatchGroupInput._fetchOpponentMapRacesAndNames(participants)
-	local opponentRaces, playerNameArray = {}, {}
+function StarcraftMatchGroupInput._fetchOpponentMapFactionsAndNames(participants)
+	local opponentFactions, playerNameArray = {}, {}
 	for participantKey, participantData in pairs(participants) do
 		local opponentIndex = tonumber(string.sub(participantKey, 1, 1))
 		-- opponentIx can not be nil due to the format of the participants keys
 		---@cast opponentIndex -nil
-		opponentRaces[opponentIndex] = participantData.faction
+		opponentFactions[opponentIndex] = participantData.faction
 		playerNameArray[opponentIndex] = participantData.player
 	end
 
-	return opponentRaces, playerNameArray
+	return opponentFactions, playerNameArray
 end
 
 ---@param players table

@@ -109,8 +109,9 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	if BigMatch.isEnabledFor(match) then
+		local matchId = match.extradata.originalmatchid or match.matchId
 		local matchPageElement = mw.html.create('center')
-		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+		matchPageElement:wikitext('[[Match:ID_' .. matchId .. '|Match Page]]')
 						:css('display', 'block')
 						:css('margin', 'auto')
 		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement):addClass('brkts-popup-mvp'))

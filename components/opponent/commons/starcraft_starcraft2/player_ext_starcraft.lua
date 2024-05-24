@@ -174,7 +174,7 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 		or match2Player() and match2Player().flag
 
 	player.faction = player.faction
-		or globalVars:get(player.displayName .. '_race')
+		or globalVars:get(player.displayName .. '_faction')
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerFaction(player.pageName, options.date)
 		or match2Player() and match2Player().faction
 		or Faction.defaultFaction
@@ -205,7 +205,7 @@ function StarcraftPlayerExt.saveToPageVars(player)
 		globalVars:set(player.displayName .. '_flag', player.flag)
 	end
 	if player.faction and player.faction ~= Faction.defaultFaction then
-		globalVars:set(player.displayName .. '_race', player.faction)
+		globalVars:set(player.displayName .. '_faction', player.faction)
 	end
 end
 

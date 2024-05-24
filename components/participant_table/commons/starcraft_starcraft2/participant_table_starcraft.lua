@@ -125,7 +125,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 
 	--unset wiki var for random events to not read players as random if prize pool already sets them as random
 	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
-		Variables.varDefine(opponentArgs.name .. '_race', '')
+		Variables.varDefine(opponentArgs.name .. '_faction', '')
 	end
 
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
@@ -171,7 +171,7 @@ function StarcraftParticipantTable:getPlacements()
 
 	for prizePoolIndex = 1, maxPrizePoolIndex do
 		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
-			placements[placement.opponentname] = true
+			placements[placement.opponentname] = placement
 		end)
 	end
 
@@ -315,7 +315,7 @@ end
 ---@param config StarcraftParticipantTableConfig
 function StarcraftParticipantTable:setCustomPageVariables(entry, config)
 	if config.isRandomEvent then
-		Variables.varDefine(entry.opponent.players[1].displayName .. '_race', Faction.read('r'))
+		Variables.varDefine(entry.opponent.players[1].displayName .. '_faction', Faction.read('r'))
 	end
 end
 

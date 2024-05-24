@@ -44,10 +44,9 @@ function BracketTemplate.BracketDocumentation(props)
 		BracketTemplate.BracketContainer({bracketId = props.templateId}),
 		[[
 
-==Template==
-Refresh the page to generate a new ID.
+==Copy-Paste==
+For copy-pastable code please use <code>Special:RunQuery/BracketCopyPaste</code> on the respective wiki(s).
 ]],
-		mw.html.create('pre'):addClass('brkts-template-container'),
 	}
 	return table.concat(Array.map(parts, tostring))
 end
