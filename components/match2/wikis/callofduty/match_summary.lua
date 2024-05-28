@@ -20,7 +20,11 @@ local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
-	cdl = {icon = 'File:Call of Duty League Logo Small.png', text = 'Call of Duty League matchpage'},
+	cdl = {
+		icon = 'File:Call of Duty League lightmode.png',
+		iconDark = 'File:Call of Duty League darkmode.png',
+		text = 'Call of Duty League matchpage'
+	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
