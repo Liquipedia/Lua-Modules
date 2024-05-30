@@ -1,98 +1,4 @@
 .heroes-panel {
-	&__heading {
-		display: flex;
-		align-items: center;
-		margin-bottom: 1rem;
-
-		&-title {
-			font-weight: bold;
-			display: inline-flex;
-
-			&__number {
-				font-weight: normal;
-				margin-left: 0.5rem;
-			}
-		}
-
-		ul&-links {
-			margin: 0 0 0 auto;
-			list-style: none;
-			display: inline-flex;
-
-			> li:not( :first-child ) {
-				margin-left: 0.5rem;
-				display: flex;
-				align-items: center;
-
-				&::before {
-					content: '';
-					width: 0.25rem;
-					height: 0.25rem;
-					background-color: #000;
-					border-radius: 100%;
-					display: block;
-					margin-right: 0.5rem;
-				}
-			}
-		}
-	}
-
-	&__filter {
-		&-group {
-			margin-bottom: 1rem;
-		}
-
-		&-button {
-			min-height: 2rem;
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0 0.75rem;
-			border-radius: 0.5rem;
-			font-size: 0.875rem;
-			font-weight: bold;
-			color: var( --clr-wiki-theme-primary );
-			position: relative;
-			z-index: 0;
-			cursor: pointer;
-			margin-right: 0.5rem;
-
-			&::after {
-				content: '';
-				opacity: 0.12;
-				position: absolute;
-				inset: 0;
-				z-index: -1;
-				border-radius: 0.5rem;
-
-				.theme--light & {
-					background-color: var( --clr-wiki-theme-primary );
-				}
-
-				.theme--dark & {
-					background-color: #fff;
-				}
-			}
-
-			@media ( hover: hover ) {
-				&:hover {
-					&::after {
-						opacity: 0.24;
-					}
-				}
-			}
-
-			&.is--active {
-				background-color: var( --clr-wiki-theme-primary );
-				color: #fff;
-			}
-
-			> .icon-left {
-				margin-right: 0.25rem;
-			}
-		}
-	}
-
 	&__category {
 		&-title {
 			display: flex;
@@ -159,21 +65,21 @@
 		}
 
 		ul&-list {
-			@--gutter-y: 0.5rem;
-			@--gutter-x: 0.5rem;
+			@_gutter-y: 0.5rem;
+			@_gutter-x: 0.5rem;
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
 			list-style: none;
-			margin: calc(-.5* @--gutter-y) calc(-.5* @--gutter-x) 0.5rem calc(-.5* @--gutter-x);
+			margin: calc(-.5* @_gutter-y) calc(-.5* @_gutter-x) 0.5rem calc(-.5* @_gutter-x);
 
 			> li {
 				flex: 0 0 auto;
 				width: calc( 100% / 3 );
 				max-width: 100%;
-				padding-right: calc(@--gutter-x* .5);
-				padding-left: calc(@--gutter-x* .5);
-				margin-top: @--gutter-y;
+				padding-right: calc(@_gutter-x* .5);
+				padding-left: calc(@_gutter-x* .5);
+				margin-top: @_gutter-y;
 				margin-bottom: 0;
 
 				@media ( min-width: 576px ) {
@@ -191,11 +97,12 @@
 		}
 	}
 
-	&__hero-card {
+	div.heroes-panel &__hero-card {
+		@_border-radius: 0.25rem;
 		display: flex;
 		position: relative;
-		flex: 1;
 		height: 3.5rem;
+		border-radius: @_border-radius;
 
 		&::before {
 			content: "";
@@ -203,10 +110,11 @@
 			position: absolute;
 			inset: 0;
 			z-index: 1;
+			border-radius: @_border-radius;
 		}
 
 		&.is--unselected {
-			filter: grayscale(1);
+			filter: grayscale( 1 );
 		}
 
 		> img {
@@ -214,6 +122,7 @@
 			object-fit: cover;
 			width: 100%;
 			height: 100%;
+			border-radius: @_border-radius;
 		}
 
 		&__title {
@@ -228,16 +137,24 @@
 			align-items: stretch;
 
 			& > a {
-				color: inherit;
+				color: #fff;
 				display: flex;
 				align-items: flex-end;
 				padding-bottom: 0.25rem;
+				flex: 1;
+				justify-content: center;
 
 				&::before {
 					content: '';
 					position: absolute;
 					inset: 0;
 					z-index: 1;
+				}
+
+				@media ( hover: hover ) {
+					&:hover {
+						background: linear-gradient( rgba( 0, 0, 0, 0 ), rgba( 0, 0, 0, 0.5 ) );
+					}
 				}
 			}
 		}
