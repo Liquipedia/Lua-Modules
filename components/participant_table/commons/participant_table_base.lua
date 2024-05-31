@@ -292,6 +292,8 @@ function ParticipantTable:store()
 
 		self:adjustLpdbData(lpdbData, entry, section.config)
 
+		self:_removeExtradataWhereApplicable(lpdbData, placements[lpdbData.opponentname])
+
 		mw.ext.LiquipediaDB.lpdb_placement(self:objectName(lpdbData), Json.stringifySubTables(lpdbData))
 	end) end)
 
@@ -299,15 +301,25 @@ function ParticipantTable:store()
 end
 
 ---Get placements already set on the page from prize pools
----@return table<string, true>
+---@return table<string, placement>
 function ParticipantTable:getPlacements()
 	local placements = {}
 	Array.forEach(mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
 		conditions = '[[placement::!]] AND [[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']]',
+		query = 'placement, opponentname, opponentplayers, extradata, objectname, date',
 	}), function(placement) placements[placement.opponentname] = placement end)
 
 	return placements
+end
+
+---@param lpdbData table
+---@param queriedData placement
+function ParticipantTable:_removeExtradataWhereApplicable(lpdbData, queriedData)
+	if not queriedData then return end
+	if Logic.isDeepEmpty(lpdbData.extradata) or Logic.deepEquals(lpdbData.extradata, queriedData.extradata) then
+		lpdbData.extradata = nil
+	end
 end
 
 ---@param lpdbData table
