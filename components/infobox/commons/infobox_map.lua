@@ -46,7 +46,11 @@ function Map:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Map') .. ' Information'},
 		Cell{name = 'Creator', content = {
-				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
+				args.creator or args['created-by'],
+				args.creator2 or args['created-by2'],
+				args.creator3 or args['created-by3'],
+			},
+			options = {makeLink = true}
 		},
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
