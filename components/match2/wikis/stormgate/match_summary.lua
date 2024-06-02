@@ -165,9 +165,9 @@ function CustomMatchSummary.createBody(match)
 	if match.casters then
 		local casters = Json.parseIfString(match.casters)
 		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
+		Array.forEach(casters, function(caster)
+				casterRow:addCaster(caster)
+		end)
 
 		body:addRow(casterRow)
 	end
