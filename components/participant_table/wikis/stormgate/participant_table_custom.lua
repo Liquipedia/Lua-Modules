@@ -154,14 +154,14 @@ function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@return table<string, true>
+---@return table<string, placement>
 function StormgateParticipantTable:getPlacements()
 	local placements = {}
 	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 
 	for prizePoolIndex = 1, maxPrizePoolIndex do
 		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
-			placements[placement.opponentname] = true
+			placements[placement.opponentname] = placement
 		end)
 	end
 

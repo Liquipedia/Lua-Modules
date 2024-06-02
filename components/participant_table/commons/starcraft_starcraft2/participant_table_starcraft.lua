@@ -164,7 +164,7 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.qualified = isQualified and 1 or nil
 end
 
----@return table<string, true>
+---@return table<string, placement>
 function StarcraftParticipantTable:getPlacements()
 	local placements = {}
 	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
