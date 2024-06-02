@@ -55,7 +55,7 @@ function CustomTeam:createBottomContent()
 		return Template.expandTemplate(
 			mw.getCurrentFrame(),
 			'Upcoming and ongoing tournaments of',
-			{team = self.name or self.pagename}
+			{team = self.pagename}
 		)
 	end
 end
