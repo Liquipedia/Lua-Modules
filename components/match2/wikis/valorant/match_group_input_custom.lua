@@ -10,11 +10,11 @@ local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Opponent = Lua.import('Module:Opponent')
@@ -359,6 +359,7 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mapveto = matchFunctions.getMapVeto(match),
 		mvp = MatchGroupInput.readMvp(match),
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 	return match
 end
