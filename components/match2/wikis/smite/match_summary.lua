@@ -14,6 +14,7 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -24,19 +25,19 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Opponent = Lua.import('Module:Opponent')
 
 local MAX_NUM_BANS = 5
-local NUM_HEROES_PICK_TEAM = 5
-local NUM_HEROES_PICK_SOLO = 1
+local NUM_GODS_PICK_TEAM = 5
+local NUM_GODS_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
 
--- Hero Ban Class
----@class SmiteHeroBan: MatchSummaryRowInterface
----@operator call: SmiteHeroBan
+-- God Ban Class
+---@class SmiteGodBan: MatchSummaryRowInterface
+---@operator call: SmiteGodBan
 ---@field root Html
 ---@field table Html
 ---@field date string
-local HeroBan = Class.new(
+local GodBan = Class.new(
 	function(self, date)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
@@ -47,7 +48,7 @@ local HeroBan = Class.new(
 )
 
 ---@return self
-function HeroBan:createHeader()
+function GodBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width', '40%'):wikitext(''):done()
 		:tag('th'):css('width', '20%'):wikitext('Bans'):done()
@@ -59,10 +60,10 @@ end
 ---@param gameNumber integer
 ---@param numberOfBans integer
 ---@return self
-function HeroBan:banRow(banData, gameNumber, numberOfBans)
+function GodBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):css('float', 'left')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], numberOfBans, true, self.date))
+			:node(CustomMatchSummary._opponentGodsDisplay(banData[1], numberOfBans, true, self.date))
 		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
 			:wikitext(Abbreviation.make(
 				'Game ' .. gameNumber,
@@ -70,13 +71,13 @@ function HeroBan:banRow(banData, gameNumber, numberOfBans)
 			))
 		)
 		:tag('td'):css('float', 'right')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], numberOfBans, true, self.date))
+			:node(CustomMatchSummary._opponentGodsDisplay(banData[2], numberOfBans, true, self.date))
 	return self
 end
 
 
 ---@return Html
-function HeroBan:create()
+function GodBan:create()
 	return self.root
 end
 
@@ -103,8 +104,19 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(rowDisplay)
 	end
 
-	-- Pre-Process Hero Ban Data
-	local heroBans = {}
+	-- casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = MatchSummary.Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
+	end
+	
+	-- Pre-Process God Ban Data
+	local godBans = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
@@ -124,22 +136,22 @@ function CustomMatchSummary.createBody(match)
 			banData[1].side = extradata.team1side
 			banData[2].side = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			heroBans[gameIndex] = banData
+			godBans[gameIndex] = banData
 		end
 	end
 
-	-- Add the Hero Bans
-	if not Table.isEmpty(heroBans) then
-		local heroBan = HeroBan(match.date)
+	-- Add the God Bans
+	if not Table.isEmpty(godBans) then
+		local godBan = GodBan(match.date)
 
 		for gameIndex in ipairs(match.games) do
-			local banData = heroBans[gameIndex]
+			local banData = godBans[gameIndex]
 			if banData then
-				heroBan:banRow(banData, gameIndex, banData.numberOfBans)
+				godBan:banRow(banData, gameIndex, banData.numberOfBans)
 			end
 		end
 
-		body:addRow(heroBan)
+		body:addRow(godBan)
 	end
 
 	return body
@@ -153,21 +165,21 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local numberOfHeroes = NUM_HEROES_PICK_TEAM
+	local numberOfGods = NUM_GODS_PICK_TEAM
 	if game.mode == Opponent.solo then
-		numberOfHeroes = NUM_HEROES_PICK_SOLO
+		numberOfGods = NUM_GODS_PICK_SOLO
 	end
 
-	local heroesData = {{}, {}}
-	for heroIndex = 1, numberOfHeroes do
-		if String.isNotEmpty(extradata['team1hero' .. heroIndex]) then
-			heroesData[1][heroIndex] = extradata['team1hero' .. heroIndex]
+	local godsData = {{}, {}}
+	for godIndex = 1, numberOfGods do
+		if String.isNotEmpty(extradata['team1god' .. godIndex]) then
+			godsData[1][godIndex] = extradata['team1god' .. godIndex]
 		end
-		if String.isNotEmpty(extradata['team2hero' .. heroIndex]) then
-			heroesData[2][heroIndex] = extradata['team2hero' .. heroIndex]
+		if String.isNotEmpty(extradata['team2god' .. godIndex]) then
+			godsData[2][godIndex] = extradata['team2god' .. godIndex]
 		end
-		heroesData[1].side = extradata.team1side
-		heroesData[2].side = extradata.team2side
+		godsData[1].side = extradata.team1side
+		godsData[2].side = extradata.team2side
 	end
 
 	row:addClass('brkts-popup-body-game')
@@ -175,7 +187,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:css('padding', '4px')
 		:css('min-height', '32px')
 
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[1], numberOfHeroes, false, date))
+	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[1], numberOfGods, false, date))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -185,7 +197,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			))
 		)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentHeroesDisplay(heroesData[2], numberOfHeroes, true, date))
+	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[2], numberOfGods, true, date))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -216,34 +228,34 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
----@param opponentHeroesData table
----@param numberOfHeroes integer
+---@param opponentgodsData table
+---@param numberOfGods integer
 ---@param flip boolean?
 ---@param date string
 ---@return Html
-function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfHeroes, flip, date)
-	local opponentHeroesDisplay = {}
-	local color = opponentHeroesData.side or ''
+function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods, flip, date)
+	local opponentGodsDisplay = {}
+	local color = opponentgodsData.side or ''
 
-	for index = 1, numberOfHeroes do
-		local heroDisplay = mw.html.create('div')
+	for index = 1, numberOfGods do
+		local godDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:node(CharacterIcon.Icon{
-				character = opponentHeroesData[index] or NO_CHARACTER,
+				character = opponentgodsData[index] or NO_CHARACTER,
 				date = date
 			})
-		if numberOfHeroes == NUM_HEROES_PICK_SOLO then
+		if numberOfGods == NUM_GODS_PICK_SOLO then
 			if flip then
-				heroDisplay:css('margin-right', '70px')
+				godDisplay:css('margin-right', '70px')
 			else
-				heroDisplay:css('margin-left', '70px')
+				godDisplay:css('margin-left', '70px')
 			end
 		end
-		table.insert(opponentHeroesDisplay, heroDisplay)
+		table.insert(opponentGodsDisplay, godDisplay)
 	end
 
 	if flip then
-		opponentHeroesDisplay = Array.reverse(opponentHeroesDisplay)
+		opponentGodsDisplay = Array.reverse(opponentGodsDisplay)
 	end
 
 	local display = mw.html.create('div')
@@ -251,7 +263,7 @@ function CustomMatchSummary._opponentHeroesDisplay(opponentHeroesData, numberOfH
 		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 		:addClass('brkts-champion-icon')
 
-	for _, item in ipairs(opponentHeroesDisplay) do
+	for _, item in ipairs(opponentGodsDisplay) do
 		display:node(item)
 	end
 
