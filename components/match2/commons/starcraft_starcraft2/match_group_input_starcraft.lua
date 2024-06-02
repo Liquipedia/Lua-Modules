@@ -503,7 +503,7 @@ function StarcraftMatchGroupInput.ProcessDuoOpponentInput(opponent)
 			displayname = opponent['p' .. playerIndex],
 			name = opponent['link' .. playerIndex],
 			flag = Flags.CountryName(flag),
-			extradata = {faction = Faction.read(opponent['p' .. playerIndex .. 'race']) or Faction.defaultFaction}
+			extradata = {faction = Faction.read(opponent['p' .. playerIndex .. 'faction']) or Faction.defaultFaction}
 		}
 	end
 	local name = opponent.link1 .. ' / ' .. opponent.link2
