@@ -10,8 +10,10 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -25,6 +27,7 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local LINK_DATA = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
+	rib = {icon = 'File:RIB icon lightmode.png', text = 'Matchpage and Stats on RIB'},
 }
 
 ---@class ValorantAgents
@@ -326,6 +329,17 @@ function CustomMatchSummary.createBody(match)
 			body:addRow(mvp)
 		end
 
+	end
+
+	-- casters
+	if String.isNotEmpty(match.extradata.casters) then
+		local casters = Json.parseIfString(match.extradata.casters)
+		local casterRow = MatchSummary.Casters()
+		for _, caster in pairs(casters) do
+			casterRow:addCaster(caster)
+		end
+
+		body:addRow(casterRow)
 	end
 
 	-- Add Map Veto
