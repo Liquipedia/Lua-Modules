@@ -235,7 +235,7 @@ function Import:_computeGroupTablePlacementEntries(standingRecords, options)
 	for _, record in ipairs(standingRecords) do
 		if options.importWinners or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
-				date = record.extradata.enddate and DateExt.toYmdInUtc(record.extradata.enddate),
+				date = record.extradata.enddate,
 				hasDraw = record.hasDraw,
 				hasOvertime = record.hasOvertime,
 			}
@@ -330,7 +330,7 @@ end
 ---@return table
 function Import._makeEntryFromMatch(placementEntry, match)
 	local entry = {
-		date = DateExt.toYmdInUtc(match.date),
+		date = match.date,
 		matchId = match.matchId,
 	}
 
