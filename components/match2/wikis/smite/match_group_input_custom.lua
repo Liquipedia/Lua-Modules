@@ -8,7 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local HeroNames = mw.loadData('Module:GodNames')
+local GodNames = mw.loadData('Module:GodNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -65,6 +65,7 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
+	match = matchFunctions.getExtraData(match)
 
 	return match
 end
@@ -114,6 +115,27 @@ function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
+--
+-- function to check for draws
+--
+---@param scoreTable table[]
+---@return boolean
+function CustomMatchGroupInput.placementCheckDraw(scoreTable)
+	local last
+	for _, scoreInfo in pairs(scoreTable) do
+		if scoreInfo.status ~= STATUS_SCORE and scoreInfo.status ~= STATUS_DRAW then
+			return false
+		end
+		if last and last ~= scoreInfo.score then
+			return false
+		else
+			last = scoreInfo.score
+		end
+	end
+
+	return true
+end
+
 ---@param data table
 ---@param indexedScores table[]
 ---@return table
@@ -129,7 +151,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if MatchGroupInput.isDraw(indexedScores) then
+		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, STATUS_DRAW)
@@ -434,6 +456,17 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	return opponents
 end
 
+---@param match table
+---@return table
+function matchFunctions.getExtraData(match)
+	match.extradata = {
+		mvp = MatchGroupInput.readMvp(match),
+		mvpteam = match.mvpteam or match.winner,
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
+	}
+	return match
+end
+
 --
 -- map related functions
 --
@@ -452,17 +485,17 @@ end
 ---@param map table
 ---@return table
 function mapFunctions.getPicksAndBans(map)
-	local heroData = {}
+	local godData = {}
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local hero = map['t' .. opponentIndex .. 'g' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero and hero:lower()]
+			local god = map['t' .. opponentIndex .. 'g' .. playerIndex]
+			godData['team' .. opponentIndex .. 'god' .. playerIndex] = GodNames[god and god:lower()]
 
 			local ban = map['t' .. opponentIndex .. 'b' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'ban' .. playerIndex] = HeroNames[ban and ban:lower()]
+			godData['team' .. opponentIndex .. 'ban' .. playerIndex] = GodNames[ban and ban:lower()]
 		end
 	end
-	map.extradata = heroData
+	map.extradata = godData
 	return map
 end
 
