@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
@@ -441,9 +442,9 @@ function CustomMatchSummary.createBody(match)
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
 		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
+		Array.forEach(casters, function(caster)
 			casterRow:addCaster(caster)
-		end
+		end)
 
 		body:addRow(casterRow)
 	end
