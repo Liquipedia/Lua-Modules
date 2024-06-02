@@ -115,27 +115,6 @@ function CustomMatchGroupInput.processPlayer(player)
 	return player
 end
 
---
--- function to check for draws
---
----@param scoreTable table[]
----@return boolean
-function CustomMatchGroupInput.placementCheckDraw(scoreTable)
-	local last
-	for _, scoreInfo in pairs(scoreTable) do
-		if scoreInfo.status ~= STATUS_SCORE and scoreInfo.status ~= STATUS_DRAW then
-			return false
-		end
-		if last and last ~= scoreInfo.score then
-			return false
-		else
-			last = scoreInfo.score
-		end
-	end
-
-	return true
-end
-
 ---@param data table
 ---@param indexedScores table[]
 ---@return table
