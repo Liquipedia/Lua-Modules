@@ -13,6 +13,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -104,17 +105,29 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(rowDisplay)
 	end
 
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+	end
+
 	-- casters
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
 		local casterRow = MatchSummary.Casters()
-		Array.forEach(casters, function(caster)
-				casterRow:addCaster(caster)
-		end)
+		Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
 
 		body:addRow(casterRow)
 	end
-
+	
 	-- Pre-Process God Ban Data
 	local godBans = {}
 	for gameIndex, game in ipairs(match.games) do
