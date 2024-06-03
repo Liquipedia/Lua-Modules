@@ -51,8 +51,6 @@ function CustomCosmetic.run(frame)
 	return mw.html.create():node(cosmetic:createInfobox()):node(cosmetic:_createIntroText())
 end
 
--- TODO: Store LPDB
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -161,7 +159,7 @@ function CustomCosmetic._buyNow(marketable, defindex)
 	if marketable and defindex then
 		link = 'http://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex
 	elseif marketable then
-		link = 'http://steamcommunity.com/market/search/?q=appid:570+' .. mw.title.getCurrentTitle().fullText
+		link = 'http://steamcommunity.com/market/search/?q=appid:570+' .. (mw.title.getCurrentTitle().fullText:gsub(' ', '_'))
 	else
 		return
 	end
