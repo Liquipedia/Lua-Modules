@@ -10,7 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
-local HeroNames = mw.loadData('Module:ChampionNames')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -314,7 +314,7 @@ end
 ---@param map table
 function BigMatch._cleanChampions(map)
 	local cleanChampion = function(champion)
-		return HeroNames[champion and champion:lower()]
+		return ChampionNames[champion and champion:lower()]
 	end
 
 	Array.forEach(map.championVeto or {}, function(veto)
