@@ -127,7 +127,7 @@ function CustomMatchSummary.createBody(match)
 
 		body:addRow(casterRow)
 	end
-	
+
 	-- Pre-Process God Ban Data
 	local godBans = {}
 	for gameIndex, game in ipairs(match.games) do
