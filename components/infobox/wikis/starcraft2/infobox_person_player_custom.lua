@@ -51,10 +51,11 @@ local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class Starcraft2InfoboxPlayer: SC2CustomPerson
 ---@field shouldQueryData boolean

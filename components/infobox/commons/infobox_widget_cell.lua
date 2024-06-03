@@ -14,6 +14,7 @@ local Widget = Lua.import('Module:Infobox/Widget')
 ---@class CellWidgetOptions
 ---@field columns number?
 ---@field makeLink boolean?
+---@field surpressColon boolean?
 
 ---@class CellWidget: Widget
 ---@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
@@ -39,7 +40,8 @@ function Cell:_new(description)
 	self.description = mw.html.create('div')
 	self.description:addClass('infobox-cell-'.. self.options.columns)
 					:addClass('infobox-description')
-					:wikitext(description .. ':')
+					:wikitext(description)
+					:wikitext(not self.options.surpressColon and ':' or nil)
 	self.contentDiv = nil
 	return self
 end

@@ -41,10 +41,12 @@ local ROLES = {
 	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
+
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class StormgateInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)

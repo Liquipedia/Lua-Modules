@@ -10,12 +10,14 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local CharacterNames = require('Module:CharacterNames')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
+
+local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Cell = Widgets.Cell
 
 ---@class RainbowsixWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)

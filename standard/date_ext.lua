@@ -65,6 +65,13 @@ function DateExt.readTimestampOrNil(dateString)
 	return success and timestamp or nil
 end
 
+---@return number
+function DateExt.getCurrentTimestamp()
+	local ts = tonumber(mw.getContentLanguage():formatDate('U'))
+	---@cast ts -nil
+	return ts
+end
+
 --- Formats a timestamp according to the specified format.
 --- The format string is the same used by mw.language.formatDate and {{#time}}.
 ---@param format string
