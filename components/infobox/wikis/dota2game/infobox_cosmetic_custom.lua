@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CosmeticIcon = require('Module:Cosmetic')
 local DateExt = require('Module:Date/Ext')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -144,7 +145,7 @@ function CustomCosmetic._createSet(setName, manualItems)
 		return manualItems
 	end
 
-	return Array.parseCommaSeparatedString((mw.ext.LiquipediaDB.lpdb('datapoint', {
+	return Json.parseIfString((mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::cosmetic_item]] and [[name::'.. setName ..']]',
 		limit = 1,
 	})[1] or {extradata = {}}).extradata.setitems)
