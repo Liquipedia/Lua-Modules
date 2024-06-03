@@ -15,6 +15,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Header = Widgets.Header
+local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
@@ -24,6 +25,7 @@ local Cosmetic = Class.new(BasicInfobox)
 ---@return Html
 function Cosmetic:createInfobox()
 	local args = self.args
+	self:customParseArguments(args)
 
 	local widgets = {
 		Customizable{
@@ -31,11 +33,13 @@ function Cosmetic:createInfobox()
 			children = {
 				Header{
 					name = args.name,
+					subHeader = args.subHeader,
 					image = args.image,
 					imageDefault = args.default,
 					imageDark = args.imagedark or args.imagedarkmode,
 					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-					size = args.imagesize
+					size = args.imagesize,
+					imageText = args.imageText
 				},
 			}
 		},

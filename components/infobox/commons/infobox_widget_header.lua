@@ -20,6 +20,7 @@ local Widget = Lua.import('Module:Infobox/Widget')
 ---@field imageDark string?
 ---@field imageDefaultDark string?
 ---@field size number|string|nil
+---@field imageText string?
 local Header = Class.new(
 	Widget,
 	function(self, input)
@@ -30,6 +31,7 @@ local Header = Class.new(
 		self.imageDark = input.imageDark
 		self.imageDefaultDark = input.imageDefaultDark
 		self.size = input.size
+		self.imageText = input.imageText
 	end
 )
 
@@ -43,7 +45,8 @@ function Header:make(injector)
 			self.imageDark,
 			self.imageDefault,
 			self.imageDefaultDark,
-			self.size
+			self.size,
+			self.imageText
 		)
 	}
 
@@ -90,8 +93,9 @@ end
 ---@param default string?
 ---@param defaultDark string?
 ---@param size number|string|nil
+---@param imageText string?
 ---@return Html?
-function Header:_image(fileName, fileNameDark, default, defaultDark, size)
+function Header:_image(fileName, fileNameDark, default, defaultDark, size, imageText)
 	if (fileName == nil or fileName == '') and (default == nil or default == '') then
 		return nil
 	end
@@ -104,7 +108,9 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size)
 	---@cast imageName -nil
 	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
 
-	return mw.html.create('div'):node(infoboxImage):node(infoboxImageDark)
+	local imageTextNode = Header:_makeImageText(imageText)
+
+	return mw.html.create('div'):addClass('infobox-image-wrapper'):node(infoboxImage):node(infoboxImageDark):node(imageTextNode)
 end
 
 ---@param imageName string
@@ -168,6 +174,16 @@ function Header:_createInfoboxButtons()
 	buttons:node(mw.text.nowiki('[') .. '[[' .. moduleTitle ..'|h]]' .. mw.text.nowiki(']'))
 
 	return buttons
+end
+
+---@param text string?
+---@return Html?
+function Header:_makeImageText(text)
+	if not text then
+		return
+	end
+
+	return mw.html.create('div'):addClass('infobox-image-text'):wikitext(text)
 end
 
 return Header

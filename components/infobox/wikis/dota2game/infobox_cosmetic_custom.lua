@@ -34,6 +34,8 @@ local CustomInjector = Class.new(Injector)
 function CustomCosmetic.run(frame)
 	local cosmetic = CustomCosmetic(frame)
 	cosmetic:setWidgetInjector(CustomInjector(cosmetic))
+	cosmetic.args.subHeader = cosmetic.args.prefab
+	cosmetic.args.imageText = 'ID: ' .. (cosmetic.args.defindex or 'N/A')
 
 	return mw.html.create():node(cosmetic:createInfobox()):node(cosmetic:_createIntroText())
 end
@@ -56,9 +58,10 @@ function CustomInjector:parse(id, widgets)
 					args.slot and ('<b>Slot:</b> ' .. ((args.slot == 'Persona' and '[[Persona]]') or (args.slot and String.upperCaseFirst(args.slot)))) or nil,
 				}
 			},
-			Center{content = {args.description}}, -- TODO Small and Italic?
-			Title{name = 'Information'},
-			Cell{name = 'Type (ID)', content = {(args.prefab or '') .. ' (' .. (args.defindex or 'N/A') .. ')'}},
+			Center{content = {
+				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
+			}},
+			Title{name = 'Extra Information'},
 			Cell{name = 'Created By', content =
 				(args.creator == 'Valve' and {Template.safeExpand(mw.getCurrentFrame(), 'Valve icon')})
 				or self.caller:getAllArgsForBase(args, 'creator')
@@ -82,22 +85,18 @@ function CustomInjector:parse(id, widgets)
 			Builder{builder = function()
 				local orgins = Array.parseCommaSeparatedString(args.availability or 'Unavailable')
 				return {
-					Title{name = #orgins == 1 and 'Origin' or 'Origins'},
-					Center{content = {table.concat(orgins, '<br>')}}
+					Cell{name = #orgins == 1 and 'Origin' or 'Origins', content = orgins}
 				}
 			end},
-			Title{name = 'Properties'},
-			Cell{name = '[[Trading|Tradable]]', content = {
-				CustomCosmetic._ableCell(args.tradeable, args.marketlock)
+			Center{content = {args.description}},
+			Center{name = '[[Trading|Tradable]]', classes = {'infobox-cosmetic-tradeable'}, content = {
+				CustomCosmetic._ableText('TRADEABLE', args.tradeable, args.marketlock)
 			}},
-			Cell{name = '[[Steam Community Market|Marketable]]', content = {
-				CustomCosmetic._ableCell(args.marketable, args.marketlock)
+			Center{name = '[[Steam Community Market|Marketable]]', classes = {'infobox-cosmetic-marketable'}, content = {
+				CustomCosmetic._ableText('MARKETABLE', args.marketable, args.marketlock)
 			}},
-			Cell{name = '[[Deleting|Deletable]]', content = {
-				Logic.readBoolOrNil(args.deletable) == false and Icon.makeIcon{iconName = 'wrong'} or nil
-			}},
-			Center{content = {
-				CustomCosmetic._buyNow(Logic.readBool(args.purchasable or true), Logic.readBool(args.marketable or true), args.defindex)
+			Center{name = '[[Deleting|Deletable]]', classes = {'infobox-cosmetic-deletable'}, content = {
+				CustomCosmetic._ableText('DELETABLE', args.deletable)
 			}}
 		)
 		Array.extendWith(widgets, CustomCosmetic._displaySet(args.setname, self.caller:getAllArgsForBase(args, 'setitem')))
@@ -141,37 +140,31 @@ function CustomCosmetic._createSet(setName, manualItems)
 	})[1] or {extradata = {}}).extradata.setitems)
 end
 
----@param purchasable boolean
 ---@param marketable boolean
 ---@param defindex string?
 ---@return string?
-function CustomCosmetic._buyNow(purchasable, marketable, defindex)
-	if purchasable and defindex then
-		return '[https://www.dota2.com/store/itemdetailsbydefindex/' .. defindex ..' <span class="buynow_button buynow_store">Buy Now in Store</span>]'
-	elseif purchasable then
-		return
-	elseif marketable and defindex then
+function CustomCosmetic._buyNow(marketable, defindex)
+	if marketable and defindex then
 		return '[http://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex ..'<span class="buynow_button buynow_market">Buy Now on Market</span>]'
 	elseif marketable then
 		return '[http://steamcommunity.com/market/search/?q=appid:570+' .. mw.title.getCurrentTitle().fullText ..' <span class="buynow_button buynow_market">Buy Now on Market</span>]'
 	end
 end
 
+---@param name string
 ---@param input string?
 ---@param marketlock string?
 ---@return string?
-function CustomCosmetic._ableCell(input, marketlock)
-	if marketlock then
-		-- TODO: Format MarketLock
-		-- TODO: Check if Marketlock is still valid
-		return 'After ' .. marketlock
+function CustomCosmetic._ableText(name, input, marketlock)
+	if marketlock and DateExt.getCurrentTimestamp() < DateExt.readTimestamp(marketlock) then
+		return name .. ' after ' .. marketlock
 	end
-	--- TODO: Make look more like ingame
+
 	local canDo = Logic.readBoolOrNil(input or true)
 	if canDo == true then
-		return Icon.makeIcon{iconName = 'correct'}
+		return name
 	elseif canDo == false then
-		return Icon.makeIcon{iconName = 'wrong'}
+		return 'NOT ' .. name
 	end
 end
 
