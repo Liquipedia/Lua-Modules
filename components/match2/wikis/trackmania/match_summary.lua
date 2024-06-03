@@ -202,7 +202,7 @@ function CustomMatchSummary.createBody(match)
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
 		local casterRow = MatchSummary.Casters()
-		local FnUtil = require('Module:FnUtil')
+		Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
 
 		body:addRow(casterRow)
 	end
