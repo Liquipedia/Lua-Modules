@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local CosmeticIcon = require('Module:Cosmetic')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -49,13 +48,14 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
+		local slotText = ((args.slot == 'Persona' and '[[Persona]]') or (args.slot and String.upperCaseFirst(args.slot)))
 		Array.appendWith(widgets,
 			Cell{
 				options = {columns = args.hero and 3 or 10, surpressColon = true},
 				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
 				content = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),
-					args.slot and ('<b>Slot:</b> ' .. ((args.slot == 'Persona' and '[[Persona]]') or (args.slot and String.upperCaseFirst(args.slot)))) or nil,
+					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
 				}
 			},
 			Center{content = {
@@ -144,11 +144,17 @@ end
 ---@param defindex string?
 ---@return string?
 function CustomCosmetic._buyNow(marketable, defindex)
+	local link
+
 	if marketable and defindex then
-		return '[http://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex ..'<span class="buynow_button buynow_market">Buy Now on Market</span>]'
+		link = 'http://steamcommunity.com/market/search/?q=appid:570+prop_def_index:'.. defindex
 	elseif marketable then
-		return '[http://steamcommunity.com/market/search/?q=appid:570+' .. mw.title.getCurrentTitle().fullText ..' <span class="buynow_button buynow_market">Buy Now on Market</span>]'
+		link = 'http://steamcommunity.com/market/search/?q=appid:570+' .. mw.title.getCurrentTitle().fullText
+	else
+		return
 	end
+
+	return '['.. link .. ' <span class="buynow_button buynow_market">Buy Now on Market</span>]'
 end
 
 ---@param name string

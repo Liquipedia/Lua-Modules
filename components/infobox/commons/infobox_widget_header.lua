@@ -110,7 +110,10 @@ function Header:_image(fileName, fileNameDark, default, defaultDark, size, image
 
 	local imageTextNode = Header:_makeImageText(imageText)
 
-	return mw.html.create('div'):addClass('infobox-image-wrapper'):node(infoboxImage):node(infoboxImageDark):node(imageTextNode)
+	return mw.html.create('div'):addClass('infobox-image-wrapper')
+		:node(infoboxImage)
+		:node(infoboxImageDark)
+		:node(imageTextNode)
 end
 
 ---@param imageName string
