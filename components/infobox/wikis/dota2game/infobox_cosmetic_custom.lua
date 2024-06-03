@@ -24,6 +24,18 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
+local SpecialCategories = {
+	['Strange Modifier'] = 'Strange Modifier',
+	['Ethereal'] = 'Ethereal',
+	['Mastery'] = 'Mastery',
+	['Kinetic'] = 'Kinetic',
+	['Essence'] = 'Essence',
+	['Immortal Treasure I'] = 'Immortal Treasure',
+	['Trust of the Benefactor 20'] = 'Trust of the Benefactor',
+	['Treasure of the Crimson Witness 20'] = 'Crimson Witness',
+	['Baby Roshan'] = 'Baby Roshan',
+}
+
 ---@class Dota2CosmeticInfobox: CosmeticInfobox
 local CustomCosmetic = Class.new(Cosmetic)
 local CustomInjector = Class.new(Injector)
@@ -202,6 +214,50 @@ function CustomCosmetic:_createIntroText()
 	end
 
 	return output
+end
+
+function CustomCosmetic._getLpdbCategory(name)
+	for key, value in pairs(SpecialCategories) do
+		if string.find(key, name) then
+			return value
+		end
+	end
+end
+
+function CustomCosmetic:setLpdbData(args)
+	mw.ext.LiquipediaDB.lpdb_datapoint('cosmetic_item_' .. self.pagename, {
+		name = args.name or self.pagename,
+		type = 'cosmetic_item',
+		image = args.image,
+		imagedark = args.imagedark,
+		date = args.releasedate,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			description = args.description or '',
+			hero = args.hero or '',
+			prefab = args.prefab or '',
+			slot = args.slot or '',
+			type = args.type or '',
+			based_on = args['based on'] or '',
+			rarity = args.rarity or '',
+			creator = args.creator or '',
+			defindex = args.defindex or '',
+			availability = args.availability or '',
+			marketlock = args.marketlock or '',
+			setname = args.setname or '',
+			setname2 = args.setname2 or '',
+			setitems = self:getAllArgsForBase(args, 'setitem'),
+			releasedate = args.releasedate or '',
+			expiredate = args.expiredate or '',
+			purchasable = tostring(Logic.readBoolOrNil(args.purchasbale)),
+			tradeable = tostring(Logic.readBoolOrNil(args.tradeable)),
+			deletable = tostring(Logic.readBoolOrNil(args.deletable)),
+			marketable = tostring(Logic.readBoolOrNil(args.marketable)),
+			customizations = args.customizations or '',
+			dotaplus = string.find(args.availability or '', 'Dota Plus') and 'true' or 'false',
+			category = CustomCosmetic._getLpdbCategory(args.name or self.pagename),
+			game = args.game or '',
+		},
+	})
 end
 
 return CustomCosmetic
