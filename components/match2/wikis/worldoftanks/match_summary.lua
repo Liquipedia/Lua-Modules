@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -224,9 +225,7 @@ function CustomMatchSummary.createBody(match)
 	if String.isNotEmpty(match.extradata.casters) then
 		local casters = Json.parseIfString(match.extradata.casters)
 		local casterRow = MatchSummary.Casters()
-		Array.forEach(casters, function(caster)
-			casterRow:addCaster(caster)
-		end)
+		Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
 
 		body:addRow(casterRow)
 	end
