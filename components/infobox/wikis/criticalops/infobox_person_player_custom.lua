@@ -24,14 +24,10 @@ local ROLES = {
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
-	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
 	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
 	['host'] = {category = 'Host', variable = 'Host', talent = true},
 	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
 	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
 
 ---@class COPSInfoboxPlayer: Person
