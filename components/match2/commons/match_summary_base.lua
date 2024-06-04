@@ -9,6 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -257,9 +259,10 @@ function Body:addClass(cssClass)
 	return self
 end
 
----@param row MatchSummaryRowInterface
+---@param row MatchSummaryRowInterface?
 ---@return MatchSummaryBody
 function Body:addRow(row)
+	if not row then return self end
 	self.root:node(row:create())
 	return self
 end
@@ -695,6 +698,18 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	matchSummary:addMatch(createMatch(bracketResetMatch))
 
 	return matchSummary:create()
+end
+
+---Default getByMatchId function for usage in Custom MatchSummary
+---@param castersInput string?
+---@return MatchSummaryCasters?
+function MatchSummary.makeCastersRow(castersInput)
+	if String.isEmpty(castersInput) then return end
+	local casters = Json.parseIfString(castersInput)
+	if Logic.isEmpty(casters) then return end
+	local casterRow = Casters()
+	Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
+	return casterRow
 end
 
 return MatchSummary
