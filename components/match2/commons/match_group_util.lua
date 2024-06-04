@@ -67,6 +67,8 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field title string?
 ---@field type 'bracket'
 ---@field upperMatchId string?
+---@field matchId string?
+---@field qualifiedHeader boolean?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -114,6 +116,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
+---@field matchId string?
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -132,6 +135,7 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field pageName string?
 ---@field team string?
 ---@field extradata table?
+---@field pageIsResolved boolean?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -144,6 +148,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field advanceBg string?
 ---@field advances boolean?
 ---@field icon string?
+---@field icondark string?
 ---@field name string?
 ---@field placement number?
 ---@field placement2 number?
@@ -194,6 +199,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 ---@field header string?
 ---@field length number?
 ---@field map string?
+---@field mapDisplayName string?
 ---@field mode string?
 ---@field participants table
 ---@field resultType ResultType?
@@ -210,6 +216,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
+	mapDisplayName = 'string?',
 	mode = 'string?',
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
@@ -437,7 +444,7 @@ end
 
 ---Populate bracketData.coordinates if it is missing.
 ---This can happen if the bracket template has not been recently purged.
----@param matchGroup MatchGroupUtilMatchGroup
+---@param matchGroup MatchGroupUtilBracket
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
@@ -508,7 +515,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
-		timestamp = tonumber(Table.extract(extradata, 'timestamp')) or 0,
+		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
@@ -641,6 +648,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
+		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
@@ -806,7 +814,7 @@ end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
----@param recordExtradata any
+---@param recordExtradata table|string?
 ---@return table
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)

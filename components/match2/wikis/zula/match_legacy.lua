@@ -87,7 +87,7 @@ function MatchLegacy.convertParameters(match2)
 	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		local scores = ''
+		local scores = game.scores or {}
 		if type(scores) == 'string' then
 			scores = Json.parse(game.scores)
 		end
@@ -149,7 +149,7 @@ function MatchLegacy.convertParameters(match2)
 				opponentplayers['p' .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or '')
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 			end
-			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix .. 'players'] = opponentplayers
 		elseif opponent.type == Opponent.solo then
 			if String.isEmpty(opponent.name) then
 				match[prefix] = 'TBD'
@@ -165,9 +165,7 @@ function MatchLegacy.convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
-
-	return match
+	return Json.stringifySubTables(match)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -198,7 +196,6 @@ function MatchLegacy.storeGames(match, match2)
 
 		game.extradata.opponent1scores = table.concat(opponent1scores, ',')
 		game.extradata.opponent2scores = table.concat(opponent2scores, ',')
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
@@ -218,7 +215,7 @@ function MatchLegacy.storeGames(match, match2)
 
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
-			game
+			Json.stringifySubTables(game)
 		)
 		games = games .. res
 	end

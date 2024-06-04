@@ -22,8 +22,9 @@ local Chronology = Class.new(
 	end
 )
 
+---@param injector WidgetInjector?
 ---@return Html[]
-function Chronology:make()
+function Chronology:make(injector)
 	return Chronology:_chronology(self.links)
 end
 

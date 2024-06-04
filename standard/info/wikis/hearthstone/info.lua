@@ -10,23 +10,28 @@ return {
 	startYear = 2014,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
+	defaultGame = 'hs',
 	games = {
 		hs = {
 			abbreviation = 'hs',
 			name = 'Hearthstone',
 			link = 'Hearthstone',
 			logo = {
-				darkMode = 'Hearthstone logo.png',
-				lightMode = 'Hearthstone logo.png',
+				darkMode = 'Hearthstone default allmode.png',
+				lightMode = 'Hearthstone default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Hearthstone logo.png',
-				lightMode = 'Hearthstone logo.png',
+				darkMode = 'Hearthstone default allmode.png',
+				lightMode = 'Hearthstone default allmode.png',
 			},
 		},
 	},
-	defaultGame = 'hs',
-	defaultTeamLogo = 'Hearthstone logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Hearthstone logo.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

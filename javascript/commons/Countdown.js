@@ -6,8 +6,8 @@ liquipedia.countdown = {
 	init: function() {
 		liquipedia.countdown.timerObjectNodes = document.querySelectorAll( '.timer-object' );
 		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
-			mw.loader.using( 'user.options', function() {
-				liquipedia.countdown.timerObjectNodes.forEach( function( timerObjectNode ) {
+			mw.loader.using( 'user.options', () => {
+				liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 					const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
 					const dateChild = document.createElement( 'span' );
 					if ( typeof dateObject === 'object' ) {
@@ -38,7 +38,7 @@ liquipedia.countdown = {
 					timerObjectNode.appendChild( countdownChild );
 				} );
 				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
-				mw.loader.using( 'mediawiki.visibleTimeout' ).then( function( require ) {
+				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
 					liquipedia.countdown.runCountdown();
 				} );
@@ -54,7 +54,7 @@ liquipedia.countdown = {
 		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
 	},
 	runCountdown: function() {
-		liquipedia.countdown.timerObjectNodes.forEach( function( timerObjectNode ) {
+		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
 		liquipedia.countdown.timeoutFunctions.set( liquipedia.countdown.runCountdown, 1000 );
@@ -135,6 +135,9 @@ liquipedia.countdown = {
 		if ( timerObjectNode.dataset.streamHuya ) {
 			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huya/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuya ) + '"><i class="lp-icon lp-icon-21 lp-huyatv"></i></a>' );
 		}
+		if ( timerObjectNode.dataset.streamKick ) {
+			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/kick/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamKick ) + '"><i class="lp-icon lp-icon-21 lp-kick"></i></a>' );
+		}
 		if ( timerObjectNode.dataset.streamLoco ) {
 			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/loco/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamLoco ) + '"><i class="lp-icon lp-icon-21 lp-loco"></i></a>' );
 		}
@@ -179,6 +182,7 @@ liquipedia.countdown = {
 		[ 'Australian Eastern Daylight Time', 'AEDT' ],
 		[ 'Australian Eastern Standard Time', 'AEST' ],
 		[ 'Australian Western Standard Time', 'AWST' ],
+		[ 'Aqtobe Time', 'AQTT' ],
 		[ 'Azerbaijan Summer Time', 'AZST' ],
 		[ 'Azerbaijan Time', 'AZT' ],
 		[ 'Azores Summer Time', 'AZOST' ],
@@ -290,7 +294,7 @@ liquipedia.countdown = {
 		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
 		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			date = dateTimeFormat.formatToParts( dateObject );
-			date.forEach( function( element ) {
+			date.forEach( ( element ) => {
 				if ( element.type === 'timeZoneName' ) {
 					result = element.value;
 				}

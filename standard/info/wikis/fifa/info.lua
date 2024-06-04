@@ -10,6 +10,7 @@ return {
 	startYear = 2000,
 	wikiName = 'fifa',
 	name = 'FIFA',
+	defaultGame = 'fifa',
 	games = {
 		fifa = {
 			abbreviation = 'FIFA',
@@ -415,9 +416,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fifa',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'FIFA lightmode logo.png', ---@deprecated
-	defaultTeamLogoDark = 'FIFA darkmode logo.png', ---@deprecated
-	match2 = 1,
+	match2 = 2,
 }

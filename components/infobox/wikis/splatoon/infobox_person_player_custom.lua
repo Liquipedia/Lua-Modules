@@ -36,7 +36,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
+	player.args.history = TeamHistoryAuto.results{convertrole = true}
 
 	player.role = Role.run{role = player.args.role}
 	player.role2 = Role.run{role = player.args.role2}

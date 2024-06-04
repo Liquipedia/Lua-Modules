@@ -60,7 +60,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@param roleData any
+---@param roleData table
 ---@return string?
 function CustomPlayer:_createRole(roleData)
 	if not roleData then

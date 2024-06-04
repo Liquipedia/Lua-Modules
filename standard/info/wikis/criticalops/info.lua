@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'criticalops',
 	name = 'Critical Ops',
+	defaultGame = 'cops',
 	games = {
 		cops = {
 			abbreviation = 'Crit Ops',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cops',
-	defaultTeamLogo = 'Critical Ops allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Critical Ops allmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

@@ -126,9 +126,9 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
 				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
 			},
-			self.caller:addCellsFromDataTable(args, LADDER_HISTORY),
+			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
 			{hasCampData and Title{name = 'Camp Information'} or nil},
-			self.caller:addCellsFromDataTable(args, CAMPS)
+			self.caller:_addCellsFromDataTable(args, CAMPS)
 		)
 	end
 

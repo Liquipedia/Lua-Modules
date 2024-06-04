@@ -28,6 +28,7 @@ local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
 	banned = 'cinnabar-bg',
+	['passed away'] = 'gigas-bg',
 }
 
 local CustomPortalPlayers = {}
@@ -114,12 +115,12 @@ end
 ---@return string
 function CustomPortalPlayers._getAge(player)
 	local birthDate
-	if Date.readTimestamp(player.birthdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.birthdate) ~= Date.defaultTimestamp then
 		birthDate = player.birthdate
 	end
 
 	local deathDate
-	if Date.readTimestamp(player.deathdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.deathdate) ~= Date.defaultTimestamp then
 		deathDate = player.deathdate
 	end
 

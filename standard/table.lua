@@ -224,6 +224,9 @@ Table.deepMergeInto({a = {x = 3, y = 4}}, {a = {y = 5}})
 
 -- Returns {a = {x = 3, y = 5}}
 ]]
+---@param target table
+---@param ... table
+---@return table
 function Table.deepMergeInto(target, ...)
 	local tbls = Table.pack(...)
 
@@ -239,6 +242,12 @@ function Table.deepMergeInto(target, ...)
 		end
 	end
 	return target
+end
+
+---@param ... table
+---@return table
+function Table.deepMerge(...)
+	return Table.deepMergeInto({}, ...)
 end
 
 ---Applies a function to each entry in a table and places the results as entries

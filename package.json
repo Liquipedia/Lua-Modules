@@ -2,12 +2,15 @@
 	"private": true,
 	"devDependencies": {
 		"eslint-config-wikimedia": "*",
+		"jquery": "*",
 		"grunt": "*",
-		"grunt-eslint": "*",
-		"grunt-stylelint": "*",
-		"postcss-less": "*",
-		"stylelint-config-wikimedia": "*",
-		"stylelint-less": "2.x.x"
+		"grunt-eslint": "24.x.x",
+		"grunt-stylelint": "^0.20.x",
+		"postcss-less": "^6.0.0",
+		"stylelint": "^16.6.1",
+		"stylelint-config-wikimedia": "^0.17.0",
+		"stylelint-less": "^3.0.1",
+		"@stylistic/stylelint-plugin": "^2.1.2"
 	},
 	"scripts": {
 		"test": "grunt main",

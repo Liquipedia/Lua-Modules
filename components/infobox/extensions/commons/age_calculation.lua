@@ -8,15 +8,16 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local String = require('Module:StringUtils')
 
 local AgeCalculation = {}
 
-local _EPOCH_DATE = { year = 1970, month = 1, day = 1 }
-local _DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
-local _MAXIMUM_DAYS_IN_FEBRUARY = 29
-local _MONTH_DECEMBER = 12
-local _CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y')) --[[@as integer]]
+local DEFAULT_DATE = os.date('*t', DateExt.defaultTimestamp)
+local DEFAULT_DAYS_IN_MONTH = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 }
+local MAXIMUM_DAYS_IN_FEBRUARY = 29
+local MONTH_DECEMBER = 12
+local CURRENT_YEAR = tonumber(mw.getContentLanguage():formatDate('Y')) --[[@as integer]]
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
@@ -122,18 +123,18 @@ end
 ---@return integer
 function Date:getEarliestPossible()
 	return os.time({
-		year = self.year or _EPOCH_DATE.year,
-		month = self.month or _EPOCH_DATE.month,
-		day = self.day or _EPOCH_DATE.day,
+		year = self.year or DEFAULT_DATE.year,
+		month = self.month or DEFAULT_DATE.month,
+		day = self.day or DEFAULT_DATE.day,
 	})
 end
 
 ---@return integer
 function Date:getLatestPossible()
 	return os.time({
-		year = self.year or _CURRENT_YEAR,
-		month = self.month or _MONTH_DECEMBER,
-		day = self.day or _DEFAULT_DAYS_IN_MONTH[self.month or _MONTH_DECEMBER],
+		year = self.year or CURRENT_YEAR,
+		month = self.month or MONTH_DECEMBER,
+		day = self.day or DEFAULT_DAYS_IN_MONTH[self.month or MONTH_DECEMBER],
 	})
 end
 
@@ -225,7 +226,8 @@ end
 function AgeCalculation.run(args)
 	local birthLocation = args.birthlocation
 	local birthDate = BirthDate(args.birthdate, birthLocation)
-	local deathDate = DeathDate(args.deathdate)
+	local deathLocation = args.deathlocation
+	local deathDate = DeathDate(args.deathdate, deathLocation)
 
 	AgeCalculation._assertValidDates(birthDate, deathDate)
 
@@ -278,8 +280,8 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 		if
 			date.day and (
 				date.day == 0 or
-				(date.month == 2 and date.day > _MAXIMUM_DAYS_IN_FEBRUARY) or
-				(date.month ~= 2 and date.day > _DEFAULT_DAYS_IN_MONTH[date.month])
+				(date.month == 2 and date.day > MAXIMUM_DAYS_IN_FEBRUARY) or
+				(date.month ~= 2 and date.day > DEFAULT_DAYS_IN_MONTH[date.month])
 			)
 		then
 			error(dateType .. ' day out of allowed range. Please use ISO 8601 date format YYYY-MM-DD')

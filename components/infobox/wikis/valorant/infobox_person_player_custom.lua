@@ -7,11 +7,12 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayersSignatureAgents = require('Module:PlayersSignatureAgents')
 local Region = require('Module:Region')
+local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
@@ -26,22 +27,29 @@ local ROLES = {
 	-- Players
 	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
 
-	-- Staff and Talents
+	-- Staff
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
+	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
+	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
+	-- Talents
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
 	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
 	['host'] = {category = 'Host', variable = 'Host', talent = true},
 	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
 	['expert'] = {category = 'Experts', variable = 'Expert', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
 	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	['streamer'] = {category = 'Content Creators', variable = 'Streamer', talent = true},
+	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', talent = true},
 	['producer'] = {category = 'Production Staff', variable = 'Producer', talent = true},
+	['stats producer'] = {category = 'Production Staff', variable = 'Stats Producer', talent = true},
 	['director'] = {category = 'Production Staff', variable = 'Director', talent = true},
 	['interviewer'] = {category = 'Interviewers', variable = 'Interviewer', talent = true},
+	['translator'] = {category = 'Production Staff', variable = 'Translator', talent = true},
+	['interpreter'] = {category = 'Production Staff', variable = 'Interpreter', talent = true},
 }
 ROLES['in-game leader'] = ROLES.igl
+
+local SIZE_AGENT = '20px'
 
 ---@class ValorantInfoboxPlayer: Person
 ---@field role {category: string, variable: string, talent: boolean?, staff: boolean?}?
@@ -55,8 +63,9 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
+	player.args.history = TeamHistoryAuto.results{convertrole = true}
 	player.args.autoTeam = true
+	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 
@@ -71,12 +80,17 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Main Agents', content = {PlayersSignatureAgents.get{player = caller.pagename}}})
+		local icons = Array.map(args.agents, function(agent)
+			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
+		end)
+		return {
+			Cell{name = 'Signature Agent', content = {table.concat(icons, '&nbsp;')}}
+		}
 	elseif id == 'status' then
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (Org)', content = {args.years_active_manage}},
+			Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
 		}
@@ -133,9 +147,9 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
 	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
 
-	lpdbData.extradata.agent1 = Variables.varDefault('agent1')
-	lpdbData.extradata.agent2 = Variables.varDefault('agent2')
-	lpdbData.extradata.agent3 = Variables.varDefault('agent3')
+	Array.forEach(args.agents, function (agent, index)
+		lpdbData.extradata['agent' .. index] = agent
+	end)
 
 	lpdbData.region = Region.name({region = args.region, country = args.country})
 

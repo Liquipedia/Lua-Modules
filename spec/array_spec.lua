@@ -205,4 +205,12 @@ describe('array', function()
 			assert.are_same({'i', 'j', 'k', 'z'}, extractedKeys)
 		end)
 	end)
+
+	describe('ParseCommaSeparatedString', function()
+		it('check', function()
+			local a = {'test1', 'test2', 'test3'}
+			assert.are_same(a, Array.parseCommaSeparatedString('test1, test2,test3'))
+			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
+		end)
+	end)
 end)

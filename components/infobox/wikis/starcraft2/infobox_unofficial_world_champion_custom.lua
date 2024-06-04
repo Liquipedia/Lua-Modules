@@ -67,8 +67,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param base any
----@param title any
+---@param base string
+---@param title string?
 ---@return Widget[]
 function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 	local args = self.args

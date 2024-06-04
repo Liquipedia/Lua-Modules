@@ -13,15 +13,15 @@ local Widget = Lua.import('Module:Infobox/Widget')
 local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableRowInput
----@field cells WidgetTableCell[]?
+---@field cells Widget[]?
 ---@field classes string[]?
----@field css {[string]: string|number|nil}[]?
+---@field css {[string]: string|number|nil}?
 
 ---@class WidgetTableRow:Widget
 ---@operator call(WidgetTableRowInput): WidgetTableRow
----@field cells WidgetTableCell[]
+---@field cells Widget[]
 ---@field classes string[]
----@field css {[string]: string|number|nil}[]
+---@field css {[string]: string|number|nil}
 local TableRow = Class.new(
 	Widget,
 	function(self, input)
@@ -31,7 +31,7 @@ local TableRow = Class.new(
 	end
 )
 
----@param cell WidgetTableCell?
+---@param cell Widget?
 ---@return self
 function TableRow:addCell(cell)
 	table.insert(self.cells, cell)
@@ -45,13 +45,22 @@ function TableRow:addClass(class)
 	return self
 end
 
+---@param key string
+---@param value string|number|nil
+---@return self
+function TableRow:addCss(key, value)
+	self.css[key] = value
+	return self
+end
+
 ---@return integer
 function TableRow:getCellCount()
 	return #self.cells
 end
 
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function TableRow:make()
+function TableRow:make(injector)
 	local row = mw.html.create('div'):addClass('csstable-widget-row')
 
 	for _, class in ipairs(self.classes) do
@@ -61,7 +70,7 @@ function TableRow:make()
 	row:css(self.css)
 
 	for _, cell in ipairs(self.cells) do
-		for _, node in ipairs(WidgetFactory.work(cell, self.injector)) do
+		for _, node in ipairs(WidgetFactory.work(cell, injector)) do
 			row:node(node)
 		end
 	end

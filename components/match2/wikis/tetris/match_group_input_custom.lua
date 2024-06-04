@@ -29,7 +29,6 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local BYE = 'bye'
 local MAX_NUM_MAPS = 30
@@ -40,6 +39,8 @@ CustomMatchGroupInput.walkoverProcessing = {}
 local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
+---@param match table
+---@return table
 function CustomMatchGroupInput.processMatch(match)
 	if Logic.readBool(match.ffa) then
 		error('FFA matches are not yet supported')
@@ -48,10 +49,7 @@ function CustomMatchGroupInput.processMatch(match)
 		error('Unexpected number of opponents in a non-FFA match')
 	end
 
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
@@ -60,24 +58,16 @@ function CustomMatchGroupInput.processMatch(match)
 	return match
 end
 
-function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = EPOCH_TIME_EXTENDED,
-			dateexact = false,
-			timestamp = DateExt.epochZero,
-		}
-	end
-end
-
+---@param match table
+---@return table
 function CustomMatchGroupInput._getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod)
@@ -85,6 +75,8 @@ function CustomMatchGroupInput._getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._getExtraData(match)
 	match.extradata = {
 		casters = MatchGroupInput.readCasters(match, {noSort = true}),
@@ -99,6 +91,8 @@ function CustomMatchGroupInput._getExtraData(match)
 	return match
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._adjustData(match)
 	--parse opponents + set base sumscores
 	match = CustomMatchGroupInput._opponentInput(match)
@@ -128,6 +122,8 @@ function CustomMatchGroupInput._adjustData(match)
 	return match
 end
 
+---@param match table
+---@return table
 function CustomMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = tonumber(match.bestof) or Variables.varDefault('bestof', DEFAULT_BEST_OF)
 	match.bestof = bestof
@@ -184,6 +180,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	return match
 end
 
+---@param match table
 function CustomMatchGroupInput._checkFinished(match)
 	if Logic.readBoolOrNil(match.finished) == false then
 		match.finished = false
@@ -193,7 +190,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.epochZero then
+	if not match.finished and match.timestamp > DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -201,6 +198,8 @@ function CustomMatchGroupInput._checkFinished(match)
 	end
 end
 
+---@param match table
+---@param scores integer[]
 function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	local maxScore = math.max(unpack(scores) or 0)
 	-- if we have a positive score and the match is finished we also have a winner
@@ -219,6 +218,7 @@ function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	end
 end
 
+---@param match table
 function CustomMatchGroupInput._setPlacements(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local opponent = match['opponent' .. opponentIndex]
@@ -236,6 +236,9 @@ end
 OpponentInput functions
 
 ]]--
+
+---@param match table
+---@return table
 function CustomMatchGroupInput._opponentInput(match)
 	local opponentIndex = 1
 	local opponent = match['opponent' .. opponentIndex]
@@ -272,20 +275,20 @@ function CustomMatchGroupInput._opponentInput(match)
 	return match
 end
 
+---@param record table
+---@param timestamp integer
+---@return table
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
+	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
@@ -300,12 +303,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		record.name = record.name:gsub(' ', '_')
 	end
 
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		-- todo in sep pr:
-		--record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
-	end
-
 	return record
 end
 
@@ -314,6 +311,12 @@ end
 MapInput functions
 
 ]]--
+
+---@param match table
+---@param mapIndex integer
+---@param subGroupIndex integer
+---@return table
+---@return integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex])
 
@@ -329,10 +332,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map.extradata = {
 		comment = map.comment,
 	}
-
-	-- inherit stuff from match data
-	MatchGroupInput.getCommonTournamentVars(map, match)
-	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
@@ -359,6 +358,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	return match, subGroupIndex
 end
 
+---@param map table
+---@return table
 function CustomMatchGroupInput._mapWinnerProcessing(map)
 	if map.winner == 'skip' then
 		map.scores = {NO_SCORE, NO_SCORE}
@@ -399,6 +400,9 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 	return map
 end
 
+---@param map table
+---@param match table
+---@return table
 function CustomMatchGroupInput._processPlayerMapData(map, match)
 	local participants = {}
 
@@ -431,6 +435,10 @@ function CustomMatchGroupInput._processPlayerMapData(map, match)
 	return map
 end
 
+---@param players table[]
+---@param opponentIndex integer
+---@param map table
+---@param participants table<string, table>
 function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentIndex, map, participants)
 	for playerIndex = 1, #players do
 		participants[opponentIndex .. '_' .. playerIndex] = {
@@ -439,19 +447,14 @@ function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentInd
 	end
 end
 
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
-end
-
+---@param match table
+---@return boolean
 function CustomMatchGroupInput._hasTeamOpponent(match)
 	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
+---@param obj table
+---@param scores (string|number)[]
 function walkoverProcessing.walkover(obj, scores)
 	local walkover = obj.walkover
 
@@ -471,6 +474,8 @@ function walkoverProcessing.walkover(obj, scores)
 	end
 end
 
+---@param obj table
+---@param walkover number
 function walkoverProcessing.numericWalkover(obj, walkover)
 	local winner = tonumber(walkover)
 
@@ -480,6 +485,8 @@ function walkoverProcessing.numericWalkover(obj, walkover)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param walkover string
 function walkoverProcessing.nonNumericWalkover(obj, walkover)
 	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
 		error('Invalid walkover "' .. walkover .. '"')
@@ -493,6 +500,8 @@ function walkoverProcessing.nonNumericWalkover(obj, walkover)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param scores string[]
 function walkoverProcessing.scoreDoubleWalkover(obj, scores)
 	obj.winner = -1
 	obj.finished = true
@@ -500,6 +509,8 @@ function walkoverProcessing.scoreDoubleWalkover(obj, scores)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param obj table
+---@param scores (string|number)[]
 function walkoverProcessing.scoreWalkover(obj, scores)
 	local winner, status
 
@@ -524,6 +535,7 @@ function walkoverProcessing.scoreWalkover(obj, scores)
 	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
+---@param match table
 function walkoverProcessing.applyMatchWalkoverToOpponents(match)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local score = match['opponent' .. opponentIndex].score

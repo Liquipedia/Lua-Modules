@@ -39,7 +39,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'location' then
+	if id == 'location' and String.isNotEmpty(args.location) then
 		return {
 			Cell{
 				name = 'Location',
@@ -49,8 +49,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		return Array.append(widgets,
 			Cell{name = 'Map Season', content = {args.season}},
-			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
-			Cell{name = 'Battle Tier', content = {(args.btmin or '') .. '-' .. (args.btmax or '')}},
+			Cell{name = 'Size', content = {(args.width or '') .. ' x ' .. (args.height or '')}},
+			Cell{name = 'Battle Tier', content = {String.isNotEmpty(args.btmin) and
+				String.isNotEmpty(args.btmax) and (args.btmin .. ' - ' .. args.btmax) or nil}
+			},
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end

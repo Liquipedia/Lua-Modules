@@ -41,6 +41,8 @@ local _tournament_name
 local _series_number
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -89,11 +91,15 @@ function CustomPrizePool.run(frame)
 	return builtPrizePool
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- make these available for the stash further down
-	lpdbData.liquipediatier = _tier
-	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
-	lpdbData.type = Variables.varDefault('tournament_type')
+	lpdbData.liquipediatier = _tier or lpdbData.liquipediatier
+	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or lpdbData.liquipediatiertype
+	lpdbData.type = Variables.varDefault('tournament_type') or lpdbData.type
 
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney,
@@ -129,6 +135,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param lpdbData placement
+---@param prizePoolIndex integer
+---@return string
 function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	if lpdbData.opponenttype == Opponent.team then
 		return lpdbData.objectName .. '_' .. prizePoolIndex
@@ -137,6 +146,9 @@ function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	return lpdbData.objectName
 end
 
+---@param opponentType OpponentType
+---@param opponent StarcraftStandardOpponent
+---@return string
 function CustomPrizePool._getMode(opponentType, opponent)
 	if (opponent or {}).isArchon then
 		return 'archon'
@@ -145,6 +157,7 @@ function CustomPrizePool._getMode(opponentType, opponent)
 	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
 end
 
+---@return integer?
 function CustomPrizePool._defaultImportLimit()
 	if Info.wikiName ~= SC2 then
 		return
@@ -161,6 +174,7 @@ function CustomPrizePool._defaultImportLimit()
 		or nil
 end
 
+---@return string
 function CustomPrizePool._seriesNumber()
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	return seriesNumber and string.format('%05d', seriesNumber) or ''

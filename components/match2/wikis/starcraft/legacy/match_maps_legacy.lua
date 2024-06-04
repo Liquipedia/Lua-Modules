@@ -51,7 +51,7 @@ function MatchMapsLegacy._matchlist(args)
 			local header = string.match(args['match' .. inputIndex], '<tr.-> ?<td.->(.-)</td')
 			matches['M' .. matchIndex .. 'header'] = header
 		else
-			matches['M' .. matchIndex] = Match._toEncodedJson(match)
+			matches['M' .. matchIndex] = Match.makeEncodedJson(match)
 			matchIndex = matchIndex + 1
 		end
 

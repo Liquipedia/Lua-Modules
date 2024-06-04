@@ -35,7 +35,7 @@ local INFORMATIONTYPE_TO_CATEGORY = {
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return unknown
+---@return Html
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 

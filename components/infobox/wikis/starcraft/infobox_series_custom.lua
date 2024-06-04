@@ -52,7 +52,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'totalprizepool' then
 		if Logic.readBoolOrNil(args.prizepooltot) == false then return {} end
 		return {
-			Cell{name = 'Total prize money', content = {self.caller:_displaySeriesPrizepools()}},
+			Cell{name = 'Cumulative Prize Pool', content = {self.caller:_displaySeriesPrizepools()}},
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,

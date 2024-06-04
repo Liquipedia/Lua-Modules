@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
 		if currentYearEarnings then
 			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
 		return {
@@ -74,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto._results{
+		local automatedHistory = TeamHistoryAuto.results{
 			addlpdbdata = true,
 			convertrole = true,
 			player = self.caller.pagename

@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -15,31 +17,22 @@ local MapModes = require('Module:MapModes')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local EPOCH_TIME = '1970-01-01 00:00:00'
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-
 local htmlCreate = mw.html.create
 
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local ICONS = {
 	check = GREEN_CHECK,
 }
 
 local LINK_DATA = {
-	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
-		text = 'Match page on ESL'
-	},
 	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
-	owc = {icon = 'File:Overwatch Contenders logo.png', text = 'Overwatch Contenders matchpage'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	oceow = {icon = 'File:OCEOW-BMS icon.png', text = 'OCEOverwatch matchpage'},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
 	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
 	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
+	faceit = {icon = 'File:FACEIT icon allmode.png', text = 'FACEIT matchpage'},
 }
 
 local CustomMatchSummary = {}
@@ -64,9 +57,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or (match.date ~= EPOCH_TIME_EXTENDED and match.date ~= EPOCH_TIME) then
+	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default date, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))

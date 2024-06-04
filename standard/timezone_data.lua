@@ -39,6 +39,10 @@ return {
 		name = 'Alma-Ata Time',
 		offset = {6, 0},
 	},
+	AMT = {
+		name = 'Armenian Time',
+		offset = {4, 0},
+	},
 	ART = {
 		name = 'Argentina Time',
 		offset = {-3, 0},

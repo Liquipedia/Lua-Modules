@@ -4,8 +4,7 @@ describe('Icon Maker', function()
 
 	describe('font-awesome icon', function()
 		it('invalid input returns nil', function()
-			assert.is_nil(Icon.makeIcon{})
-			assert.is_nil(Icon.makeIcon{icon = 'foo bar'})
+			assert.is_nil(Icon.makeIcon{iconName = 'foo bar'})
 		end)
 
 		it('icon builds', function()

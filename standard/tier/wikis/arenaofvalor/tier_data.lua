@@ -102,7 +102,7 @@ return {
 			sort = 'B1',
 			name = 'Showmatch',
 			short = 'Showm.',
-			link = 'Showmatches',
+			link = 'Showmatch Tournaments',
 			category = 'Showmatch Tournaments',
 		},
 	},

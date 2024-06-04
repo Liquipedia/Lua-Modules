@@ -20,6 +20,7 @@ local utils = require('Module:LuaUtils')--only needed for utils.log
 local Match = Lua.import('Module:Match')
 
 -- store match to a var to later store them to LPDB
+---@param args table
 function TemplateMatch.storeVar(args)
 	local matchNum = tonumber(Variables.varDefault('numTempMatch', 0)) + 1
 	Variables.varDefine('numTempMatch', matchNum)
@@ -106,6 +107,12 @@ function TemplateMatch._getTrueID(id)
 end
 
 -- recursively sets which bracket the match is in
+---@param matches table[]
+---@param id string?
+---@param headerchild boolean
+---@param applied integer
+---@return table
+---@return integer
 function TemplateMatch._recursiveSetBracketIndex(matches, id, headerchild, applied)
 	if Logic.isEmpty(id) then
 		return matches, applied

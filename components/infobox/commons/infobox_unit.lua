@@ -65,7 +65,12 @@ function Unit:createInfobox()
 			}
 		},
 		Cell{name = 'Description', content = {args.description}},
-		Cell{name = 'Built From', content = {args.builtfrom}},
+		Customizable{
+			id = 'builtfrom',
+			children = {
+				Cell{name = 'Built From', content = {args.builtfrom}},
+			}
+		},
 		Customizable{
 			id = 'requirements',
 			children = {

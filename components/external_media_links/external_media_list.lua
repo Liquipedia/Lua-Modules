@@ -119,7 +119,9 @@ function MediaList._buildConditions(args)
 		table.insert(additionalConditions, '[[extradata_event_link::' .. args.event .. ']]')
 	end
 
-	table.insert(conditions, '(' .. table.concat(additionalConditions, args.booleanOperator) .. ')')
+	if Logic.isNotEmpty(additionalConditions) then
+		table.insert(conditions, '(' .. table.concat(additionalConditions, args.booleanOperator) .. ')')
+	end
 
 	return table.concat(conditions, ' AND ')
 end
@@ -137,7 +139,7 @@ end
 ---Builds the display for the dynamic tabs per year option
 ---@param data table[]
 ---@param args table
----@return Html
+---@return Html|string?
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 

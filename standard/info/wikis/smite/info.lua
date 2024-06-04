@@ -10,6 +10,7 @@ return {
 	startYear = 2013,
 	wikiName = 'smite',
 	name = 'SMITE',
+	defaultGame = 'smite',
 	games = {
 		smite = {
 			abbreviation = 'S1',
@@ -38,8 +39,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'smite',
-	defaultTeamLogo = 'SMITE default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'SMITE default darkmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

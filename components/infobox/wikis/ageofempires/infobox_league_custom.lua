@@ -338,9 +338,9 @@ function CustomLeague:_getMaps()
 	return maps
 end
 
----@param name any
----@param link any
----@param game any
+---@param name string?
+---@param link string
+---@param game string?
 function CustomLeague:_checkMapInformation(name, link, game)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',

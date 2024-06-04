@@ -12,6 +12,7 @@ local AllowedServers = require('Module:Server')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
@@ -375,9 +376,9 @@ function HiddenInfoboxLeague._setLpdbData()
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json(
 			HiddenInfoboxLeague._getNamedTableofAllArgsForBase('organizer')
 		),
-		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', '1970-01-01'),
-		enddate = Variables.varDefault('tournament_enddate', '1970-01-01'),
-		sortdate = Variables.varDefault('tournament_enddate', '1970-01-01'),
+		startdate = Variables.varDefaultMulti('tournament_startdate', 'tournament_enddate', DateExt.defaultDate),
+		enddate = Variables.varDefault('tournament_enddate', DateExt.defaultDate),
+		sortdate = Variables.varDefault('tournament_enddate', DateExt.defaultDate),
 		location = mw.text.decode(Locale.formatLocation({city = _args.city or _args.location, country = _args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = _args.city2 or _args.location2, country = _args.country2})),
 		venue = _args.venue,

@@ -52,6 +52,11 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 	return newBracketId
 end
 
+---@param shortTemplate string
+---@param bracketId string
+---@param firstMatch match2
+---@param bracketDatasById table<string, table>
+---@return integer
 function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch, bracketDatasById)
 	local newRoundCount = bracketDatasById[FIRST_MATCH_KEY].coordinates.roundCount
 	local oldRoundCount = firstMatch.match2bracketdata.coordinates.roundCount
@@ -59,47 +64,53 @@ function ShortenBracket._getSkipRoundValue(shortTemplate, bracketId, firstMatch,
 	return oldRoundCount - newRoundCount
 end
 
+---@param matches match2[]
+---@param idLength integer
+---@param skipRounds integer
+---@param newBracketId string
+---@param bracketDatasById table<string, table>
+---@return match2[]
 function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracketId, bracketDatasById)
-	local newMatches = {}
-
-	for _, match in ipairs(matches) do
-		local matchId = string.sub(match.match2id, idLength + 2)
+	return Array.map(matches, function(match)
+		local originalMatchId = match.match2id
+		local matchId = string.sub(originalMatchId, idLength + 2)
 		local round = tonumber(string.sub(matchId, 2, 3))
 
 		-- keep reset/3rd place match, i.e. last round
 		if not round then
 			match.match2id = newBracketId .. '_' .. matchId
-			table.insert(newMatches, match)
+			return match
+		elseif round <= skipRounds then return nil end
 
-		-- valid match we want to keep
-		elseif round > skipRounds then
-			local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
+		local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
-			assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
-				.. newMatchId .. ' (calculated from ' .. matchId .. ')')
+		assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
+			.. newMatchId .. ' (calculated from ' .. matchId .. ')')
 
-			match.match2id = newBracketId .. '_' .. newMatchId
+		match.match2id = newBracketId .. '_' .. newMatchId
 
-			-- nil some stuff before merge since it doesn't get nil-ed in merge
-			match.match2bracketdata.loweredges = nil
-			match.match2bracketdata.skipround = nil
+		-- nil some stuff before merge since it doesn't get nil-ed in merge
+		match.match2bracketdata.loweredges = nil
+		match.match2bracketdata.skipround = nil
 
-			match.match2bracketdata = Table.merge(match.match2bracketdata, bracketDatasById[newMatchId], {
-				header = match.match2bracketdata.header
-			})
+		match.match2bracketdata = Table.merge(match.match2bracketdata, bracketDatasById[newMatchId], {
+			header = match.match2bracketdata.header
+		})
 
-			-- have to do this after the merge so that correct `match.match2bracketdata.lowerMatchIds` is available
-			match.match2bracketdata.loweredges = ShortenBracket._calculateLowerEdges(match)
+		-- have to do this after the merge so that correct `match.match2bracketdata.lowerMatchIds` is available
+		match.match2bracketdata.loweredges = ShortenBracket._calculateLowerEdges(match)
 
-			match.match2bracketid = newBracketId
+		-- add the original match id for reference and to be able to use it in e.g. BigMatch linking
+		match.extradata.originalmatchid = originalMatchId
 
-			table.insert(newMatches, match)
-		end
-	end
+		match.match2bracketid = newBracketId
 
-	return newMatches
+		return match
+	end)
 end
 
+---@param match match2
+---@return table[]
 function ShortenBracket._calculateLowerEdges(match)
 	return Array.map(
 		MatchGroupUtil.autoAssignLowerEdges(#match.match2bracketdata.lowerMatchIds, #match.match2opponents),

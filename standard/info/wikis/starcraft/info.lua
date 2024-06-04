@@ -10,7 +10,7 @@ return {
 	startYear = 1998,
 	wikiName = 'starcraft',
 	name = 'Brood War',
-	maximumNumberOfPlayersInPlacements = 35,
+	defaultGame = 'bw',
 	games = {
 		bw = {
 			abbreviation = 'BW',
@@ -26,10 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'bw',
-	defaultTeamLogo = 'StarCraft default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'StarCraft default allmode.png', ---@deprecated
-
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
+	maximumNumberOfPlayersInPlacements = 35,
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
 	match2 = 1,

@@ -1,0 +1,186 @@
+/*******************************************************************************
+Template(s): Team Portal Boxes
+Author(s): salle
+*******************************************************************************/
+.team-portal-list {
+	max-width: 970px;
+}
+
+.team-portal-list .tp-rank-card {
+	min-height: 35px;
+	margin-bottom: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-rank-card-title {
+	border: 1px solid var( --clr-border, #d3d3d3 );
+	background-color: var( --table-header-background-color, #eeeeee );
+	padding: 5px 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-team-name {
+	font-size: 150%;
+}
+
+.team-portal-list .tp-rank-card .tp-rank-number {
+	font-size: 150%;
+	margin-right: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-total-earnings {
+	float: right;
+	margin-right: 10px;
+	font-size: 120%;
+	margin-top: 2px;
+}
+
+.team-portal-list .tp-rank-card .tp-total-earnings-text {
+	display: none;
+}
+
+.team-portal-list .tp-rank-card .tp-team-box {
+	background-color: var( --table-background-color, #f9f9f9 );
+	border-width: 0 1px 1px 1px;
+	border-style: solid;
+	border-color: var( --clr-border, #d3d3d3 );
+	min-height: 250px;
+	padding: 5px;
+}
+
+.team-portal-list .tp-rank-card .tp-player-row-5 {
+	display: flex;
+	justify-content: space-between;
+	padding-bottom: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-1,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-2,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-3,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-4,
+.team-portal-list .tp-rank-card .tp-player-row-5 .pt-player-5 {
+	width: 19.5%;
+	height: 0;
+	padding-bottom: 17.5%;
+}
+
+.team-portal-list .tp-rank-card .tp-photo {
+	height: calc( ~"19vw / 4 * 3 - 5px" );
+	width: calc( ~"19vw - 5px" );
+	text-align: center;
+	overflow: hidden;
+}
+
+.team-portal-list .tp-rank-card .tp-photo > a > img {
+	object-fit: contain;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
+
+.team-portal-list .tp-rank-card .tp-name {
+	text-align: center;
+	font-weight: bold;
+}
+
+.team-portal-list .tp-rank-card .tp-sub-title {
+	text-align: center;
+	font-size: 120%;
+	border-top: 1px solid var( --clr-border, #d3d3d3 );
+	padding-right: 5px;
+	padding-top: 5px;
+}
+
+.team-portal-list .tp-rank-card .tp-next-match .tp-sub-title {
+	margin-left: -5px;
+}
+
+.team-portal-list .tp-rank-card .tp-latest-transfer .tp-sub-title {
+	margin-right: -5px;
+}
+
+.team-portal-list .tp-rank-card .tp-tournament {
+	text-align: center;
+	font-size: 80%;
+}
+
+.team-portal-list .tp-rank-card .tp-countdown {
+	text-align: center;
+	font-size: 70%;
+}
+
+.team-portal-list .tp-rank-card .tp-transfer {
+	text-align: center;
+	font-size: 70%;
+}
+
+.team-portal-list .tp-rank-card .tp-next-match {
+	width: 50%;
+	float: left;
+}
+
+.team-portal-list .tp-rank-card .tp-latest-transfer {
+	width: 50%;
+	float: right;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row {
+	display: flex;
+	justify-content: space-between;
+	clear: both;
+	padding-top: 10px;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a {
+	width: 33%;
+	border: 1px solid var( --clr-border, #d3d3d3 );
+	background-color: var( --button-background-color, #eeeeee );
+	color: var( --button-color );
+	padding: 5px 10px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:hover {
+	background-color: var( --button-background-color-hover );
+	color: var( --button-color );
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:focus {
+	background-color: var( --button-background-color-focus );
+	color: var( --button-color );
+}
+
+.team-portal-list .tp-rank-card .tp-button-row > a:active {
+	background-color: var( --button-background-color-active );
+	color: var( --button-color );
+}
+
+@media ( min-width: 620px ) {
+	.team-portal-list .tp-rank-card .tp-total-earnings-text {
+		display: inline;
+	}
+}
+
+@media ( min-width: 1000px ) {
+	.team-portal-list .tp-rank-card .tp-photo {
+		width: 100%;
+		height: 140px;
+	}
+}
+
+.team-portal-list .tp-rank-card .br-tp-button-row {
+	display: flex;
+	justify-content: center;
+	clear: both;
+	padding-top: 10px;
+}
+
+.team-portal-list .tp-rank-card .br-tp-button-row > a {
+	width: 33%;
+	border: 1px solid #d3d3d3;
+	background-color: #eeeeee;
+	padding: 5px 10px;
+	text-align: center;
+	font-weight: bold;
+	margin-right: 5px;
+	margin-left: 5px;
+}

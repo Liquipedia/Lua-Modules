@@ -11,8 +11,10 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Custom')
@@ -26,6 +28,7 @@ local YearsActive = require('Module:YearsActive')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 local Opponent = Lua.import('Module:Opponent/Starcraft')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -48,10 +51,11 @@ local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class Starcraft2InfoboxPlayer: SC2CustomPerson
 ---@field shouldQueryData boolean
@@ -75,6 +79,16 @@ function CustomPlayer.run(frame)
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
 
+	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
+
+	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
+		player = player.pagename,
+		convertrole = true,
+		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
+		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
+		specialRoles = true,
+	}
+
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)
 	end
@@ -96,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.language.new('en'):formatNum(currentYearEarnings)) or nil}
+				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
 			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
@@ -194,7 +208,7 @@ function CustomPlayer:_getMatchupData(player)
 			'[[winner::!]]', -- expect a winner
 			'[[walkover::]]', -- exclude default wins/losses
 			'[[resulttype::!np]]', -- i.e. ignore not played matches
-			'[[date::!1970-01-01]]', --i.e. wrongly set up
+			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
 			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
 		}, ' AND '),
 		order = 'date desc',
@@ -317,7 +331,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{

@@ -38,9 +38,9 @@ local _processedMatches = 0
 local _allMatches = 0
 local _seenMatchIds = {}
 
----@param date osdate
+---@param date osdateparam
 ---@param customDays integer?
----@return osdate
+---@return osdateparam
 function Ratings._stepDate(date, customDays)
 	local newDate = Table.copy(date)
 	newDate.day = newDate.day + (customDays or 1)
@@ -321,9 +321,9 @@ end
 
 function Ratings._initStepDate(ratingTable, transfers, id)
 	local hasFirstMonth = false
-	---@param from osdate
-	---@param to osdate?
-	---@return osdate
+	---@param from osdateparam
+	---@param to osdateparam?
+	---@return osdateparam
 	return function(from, to)
 		if not to then
 			to = Ratings._stepDate(from)

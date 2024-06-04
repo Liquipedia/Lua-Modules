@@ -7,9 +7,10 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = require('Module:CharacterNames')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local OperatorIcon = require('Module:OperatorIcon')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -77,7 +78,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true', specialRoles = 'true'}
+	player.args.history = TeamHistoryAuto.results{addlpdbdata = true, specialRoles = true}
 	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
@@ -102,7 +103,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		-- Signature Operators
 		local operatorIcons = Array.map(caller:getAllArgsForBase(args, 'operator'), function(operator)
-			return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
+			return CharacterIcon.Icon{character = CharacterNames[operator:lower()], size = SIZE_OPERATOR}
 		end)
 		table.insert(widgets, Cell{
 			name = #operatorIcons > 1 and 'Signature Operators' or 'Signature Operator',
@@ -179,12 +180,9 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role = (self.role or {}).variable
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
-
-	lpdbData.extradata.signatureOperator1 = args.operator1 or args.operator
-	lpdbData.extradata.signatureOperator2 = args.operator2
-	lpdbData.extradata.signatureOperator3 = args.operator3
-	lpdbData.extradata.signatureOperator4 = args.operator4
-	lpdbData.extradata.signatureOperator5 = args.operator5
+	for _, operator, operatorIndex in Table.iter.pairsByPrefix(args, 'operator', {requireIndex = false}) do
+		lpdbData.extradata['signatureOperator' .. operatorIndex] = CharacterNames[operator:lower()]
+	end
 	lpdbData.type = self:_isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})

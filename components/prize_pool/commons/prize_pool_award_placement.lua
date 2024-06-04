@@ -27,9 +27,12 @@ local PRIZE_TYPE_POINTS = 'POINTS'
 --- @field parent AwardPrizePool
 --- @field parseOpponents function
 --- @field getPrizeRewardForOpponent function
+--- @field previousTotalNumberOfParticipants integer
+--- @field currentTotalNumberOfParticipants integer
 local AwardPlacement = Class.new(BasePlacement)
 
 --- @param award string Award of this slot/placement
+--- @return self
 function AwardPlacement:create(award)
 	self.award = award
 	self.count = tonumber(self.args.count)
@@ -40,10 +43,14 @@ function AwardPlacement:create(award)
 end
 
 --- No additionalData for awards so return empty table
+---@param args table
+---@return {}
 function AwardPlacement:readAdditionalData(args)
 	return {}
 end
 
+---@param ... string|number
+---@return placement[]
 function AwardPlacement:_getLpdbData(...)
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do

@@ -11,7 +11,14 @@ local Logic = require('Module:Logic')
 
 local Icon = {}
 
----@param args {iconName: string, color: string?, screenReaderHidden: boolean?, hover: string?, size: integer|string?}
+---@class IconArgs
+---@field iconName string
+---@field color string?
+---@field screenReaderHidden boolean?
+---@field hover string?
+---@field size integer|string|nil
+
+---@param args IconArgs
 ---@return string?
 function Icon.makeIcon(args)
 	local icon = IconData[(args.iconName or ''):lower()]

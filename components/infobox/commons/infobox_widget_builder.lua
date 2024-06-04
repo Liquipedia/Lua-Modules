@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -22,17 +23,13 @@ local Builder = Class.new(
 	end
 )
 
+---@param injector WidgetInjector?
 ---@return Widget[]
-function Builder:make()
+function Builder:make(injector)
 	local children = self.builder()
 	local widgets = {}
 	for _, child in ipairs(children or {}) do
-		child:setContext{injector = self.context.injector}
-		local childOutput = WidgetFactory.work(child, self.context.injector)
-		-- Our child might contain a list of children, so we need to iterate
-		for _, item in ipairs(childOutput) do
-			table.insert(widgets, item)
-		end
+		Array.extendWith(widgets, WidgetFactory.work(child, injector))
 	end
 	return widgets
 end

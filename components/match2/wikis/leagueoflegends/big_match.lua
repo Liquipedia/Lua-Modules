@@ -8,8 +8,9 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
-local HeroIcon = require('Module:ChampionIcon')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -25,8 +26,11 @@ local VodLink = require('Module:VodLink')
 local CustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Template = Lua.import('Module:BigMatch/Template')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
+
+local NO_CHARACTER = 'default'
 
 local BigMatch = {}
 
@@ -78,11 +82,15 @@ local AVAILABLE_FOR_TIERS = {1, 2, 3}
 
 local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
 
+---@param match table
+---@return boolean
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == 0 or match.timestamp > BIG_MATCH_START_TIME)
+			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > BIG_MATCH_START_TIME)
 end
 
+---@param frame Frame
+---@return Html
 function BigMatch.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -92,7 +100,8 @@ function BigMatch.run(frame)
 	local model = BigMatch._match2Director(args)
 
 	model.isBestOfOne = #model.games == 1
-	model.dateCountdown = model.timestamp ~= DateExt.epochZero and DisplayHelper.MatchCountdownBlock(model) or nil
+	model.dateCountdown = model.timestamp ~= DateExt.defaultTimestamp and
+		DisplayHelper.MatchCountdownBlock(model) or nil
 
 	-- Create an object array for links
 	model.links = Array.extractValues(Table.map(model.links, function (site, link)
@@ -181,21 +190,32 @@ function BigMatch.run(frame)
 		local champion = self
 		if type(self) == 'table' then
 			champion = self.champion
+			---@cast champion -table
 		end
-		return HeroIcon._getImage{champion, date = model.date}
+		return CharacterIcon.Icon{
+			character = champion or NO_CHARACTER,
+			date = model.date
+		}
 	end
 
 	return BigMatch.render(model)
 end
 
+---@param tbl table
+---@param item string
+---@return number
 function BigMatch._sumItem(tbl, item)
 	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
+---@param number number|string
+---@return string
 function BigMatch._abbreviateNumber(number)
 	return string.format('%.1fK', number / 1000)
 end
 
+---@param args table
+---@return table
 function BigMatch._contextualEnrichment(args)
 	-- Retrieve tournament info from the bracket/matchlist
 	if String.isEmpty(args.tournamentlink) then
@@ -211,6 +231,8 @@ function BigMatch._contextualEnrichment(args)
 	return args
 end
 
+---@param args table
+---@return table
 function BigMatch._match2Director(args)
 	local matchData = {}
 
@@ -243,6 +265,8 @@ function BigMatch._match2Director(args)
 		-- Match not found on the API
 		assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 
+		BigMatch._cleanChampions(map)
+
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)) or nil
 
@@ -274,6 +298,9 @@ function BigMatch._match2Director(args)
 	local match2input = Table.merge(args, Table.deepCopy(matchData))
 
 	local match = CustomMatchGroupInput.processMatch(match2input, {isStandalone = true})
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
+		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	end
 
 	local bracketId, matchId = BigMatch._getId()
 	match.bracketid, match.matchid = 'MATCH_' .. bracketId, matchId
@@ -284,17 +311,44 @@ function BigMatch._match2Director(args)
 	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
 end
 
+---@param map table
+function BigMatch._cleanChampions(map)
+	local cleanChampion = function(champion)
+		return ChampionNames[champion and champion:lower()]
+	end
+
+	Array.forEach(map.championVeto or {}, function(veto)
+		veto.champion = cleanChampion(veto.champion)
+	end)
+
+	Array.forEach(TEAMS, function(teamIndex)
+		local teamData = map['team' .. teamIndex]
+		teamData.ban = teamData.ban and Array.map(teamData.ban, cleanChampion) or nil
+		teamData.pick = teamData.ban and Array.map(teamData.pick, cleanChampion) or nil
+
+		Array.forEach(teamData.players, function(player)
+			player.champion = cleanChampion(player.champion)
+		end)
+	end)
+end
+
+---@param model table
+---@return Html
 function BigMatch.render(model)
 	return mw.html.create('div')
 		:wikitext(BigMatch.header(model))
-		:wikitext(BigMatch.games(model))
+		:node(BigMatch.games(model))
 		:wikitext(BigMatch.footer(model))
 end
 
+---@param model table
+---@return string
 function BigMatch.header(model)
 	return TemplateEngine():render(Template.header, model)
 end
 
+---@param model table
+---@return Html|string?
 function BigMatch.games(model)
 	local games = Array.map(Array.filter(model.games, function (game)
 		return game.resulttype ~= NOT_PLAYED
@@ -320,10 +374,14 @@ function BigMatch.games(model)
 	return Tabs.dynamic(tabs)
 end
 
+---@param model table
+---@return string
 function BigMatch.footer(model)
 	return TemplateEngine():render(Template.footer, model)
 end
 
+---@return string
+---@return string
 function BigMatch._getId()
 	local title = mw.title.getCurrentTitle().text
 
@@ -334,6 +392,8 @@ function BigMatch._getId()
 	return titleParts[2], titleParts[3]
 end
 
+---@param page string?
+---@return tournament|{}
 function BigMatch._fetchTournamentInfo(page)
 	if not page then
 		return {}
@@ -345,6 +405,8 @@ function BigMatch._fetchTournamentInfo(page)
 	})[1] or {}
 end
 
+---@param identifiers string[]
+---@return string?
 function BigMatch._fetchTournamentPageFromMatch(identifiers)
 	local data = mw.ext.LiquipediaDB.lpdb('match2', {
 		query = 'parent',

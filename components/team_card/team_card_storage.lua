@@ -13,8 +13,6 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Custom = Lua.import('Module:TeamCard/Custom')
--- TODO: Once the Template calls are not needed (when RL has been moved to Module), deprecate Qualifier Module
-local Qualifier = require('Module:TeamCard/Qualifier')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -37,8 +35,7 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 		end
 	end
 
-	local lpdbPrefix = args.lpdb_prefix or args.smw_prefix
-		or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix') or ''
+	local lpdbPrefix = args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or ''
 
 	-- Setup LPDB Data
 	local lpdbData = {}
@@ -90,7 +87,7 @@ function TeamCardStorage._addStandardLpdbFields(lpdbData, team, args, lpdbPrefix
 	lpdbData.date = args.date
 		or Variables.varDefault(lpdbData.objectName .. '_placementdate')
 		or endDate
-	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = Qualifier.parseQualifier(args.qualifier)
+	lpdbData.qualifier, lpdbData.qualifierpage, lpdbData.qualifierurl = TeamCardStorage._parseQualifier(args.qualifier)
 
 	if team ~= 'TBD' then
 		lpdbData.image = args.image1
@@ -126,5 +123,45 @@ function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	end
 	return storageName
 end
+
+--- Link internal and link external is mutually exclusive
+---@param rawQualifier string?
+---@return string? #link text
+---@return string? #internal link
+---@return string? #external link
+function TeamCardStorage._parseQualifier(rawQualifier)
+	if not rawQualifier then
+		return nil, nil, nil
+	end
+
+	local cleanQualifier = rawQualifier:gsub('%[', ''):gsub('%]', '')
+	if cleanQualifier:find('|') then
+		-- Internal link
+		local qualifier = mw.text.split(cleanQualifier, '|', true)
+		local qualifierLink, qualifierText = qualifier[1], qualifier[2]
+
+		if qualifierLink:sub(1, 1) == '/' then
+			-- Relative link
+			qualifierLink = mw.title.getCurrentTitle().fullText .. qualifierLink
+		end
+		qualifierLink = qualifierLink:gsub(' ', '_')
+		return qualifierText, qualifierLink, nil
+
+	elseif rawQualifier:sub(1, 1) == '[' then
+		-- Not internal link, but a link -> must be external link
+		local qualifier = mw.text.split(cleanQualifier, ' ', true)
+		local qualifierLink = qualifier[1]
+
+		table.remove(qualifier, 1)
+		local qualifierText = table.concat(qualifier, ' ')
+
+		return qualifierText, nil, qualifierLink
+
+	else
+		-- Just text
+		return rawQualifier, nil, nil
+	end
+end
+
 
 return TeamCardStorage

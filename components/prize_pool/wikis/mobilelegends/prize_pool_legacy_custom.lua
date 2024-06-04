@@ -13,10 +13,16 @@ local PrizePoolLegacy = Lua.import('Module:PrizePool/Legacy')
 local CustomLegacyPrizePool = {}
 
 -- Template entry point
+---@return Html
 function CustomLegacyPrizePool.run()
 	return PrizePoolLegacy.run(CustomLegacyPrizePool)
 end
 
+---@param opponentData table
+---@param CACHED_DATA table
+---@param slot table
+---@param opponentIndex integer
+---@return table
 function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, opponentIndex)
 	-- ML has use case of same placement but has different earnings
 
@@ -33,6 +39,9 @@ function CustomLegacyPrizePool.customOpponent(opponentData, CACHED_DATA, slot, o
 	return opponentData
 end
 
+---@param opponentData table
+---@param param string
+---@param value string
 function CustomLegacyPrizePool._setOpponentReward(opponentData, param, value)
 	if param == 'seed' then
 		PrizePoolLegacy.handleSeed(opponentData, value, 1)

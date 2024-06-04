@@ -7,154 +7,81 @@
 --
 
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Widget = require('Module:Infobox/Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
+local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
 
-local LANG = mw.getContentLanguage()
-
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
+function CustomInjector:parse(id, widgets)
+	if id == 'header_inactive' then
+		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
 	end
 
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader())
-		:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.TYPE_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-			:node(makeHeader('Active Team'))
-	end
-	if self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-			:node(makeHeader('Last Active Team'))
-	end
-	if self.type == Squad.TYPE_FORMER or self.type == Squad.TYPE_FORMER_INACTIVE then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
+	return self._base:parse(id, widgets)
 end
 
+---@class Dota2SquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
-function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Position')
+---@return self
+function ExtendedSquadRow:activeteam()
+	local activeTeam, activeTeamRole = self.model.extradata.activeteam, self.model.activeteamrole
+	local date = self.model.inactivedate
 
-	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
-
-		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
-			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
-			end
-		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
-		end
+	if not activeTeam then
+		return self
 	end
 
-	self.content:node(cell)
+	local content = {}
 
-	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role or self.lpdbData.role
+	table.insert(content, mw.ext.TeamTemplate.team(activeTeam, date))
+
+	if activeTeamRole then
+		table.insert(content, '&nbsp;')
+		table.insert(content, mw.html.create('i'):tag('small'):wikitext('(' .. activeTeamRole .. ')'))
+	end
+
+	table.insert(self.children,
+		Widget.TableCellNew{classes = {'NewTeam'}, content = content}
+	)
 
 	return self
 end
 
+---@param frame Frame
+---@return Html
 function CustomSquad.run(frame)
-	local squad = Squad()
+	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
+end
 
-	squad:init(frame):title()
+function CustomSquad._playerRow(person, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	squadPerson.extradata.activeteam = person.activeteam
+	squadPerson.extradata.activeteamrole = person.activeteamrole
+	SquadUtils.storeSquadPerson(squadPerson)
 
-	local args = squad.args
+	local row = ExtendedSquadRow(squadPerson)
+	row:id()
+	row:name()
+	row:position()
+	row:date('joindate', 'Join Date:&nbsp;')
 
-	if squad.type == Squad.TYPE_FORMER then
-		local index = 1
-		while args['p' .. index] ~= nil or args[index] do
-			local player = Json.parseIfString(args['p' .. index] or args[index])
-			if player.inactivedate then
-				squad.type = Squad.TYPE_FORMER_INACTIVE
-				break
-			end
-
-			index = index + 1
-		end
+	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+		row:activeteam()
+	end
+	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	end
 
-	squad.header = CustomSquad.header
-	squad:header()
-
-	local index = 1
-	while args['p' .. index] ~= nil or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
-		local row = ExtendedSquadRow()
-		row:status(squad.type)
-		row:id{
-			player.id,
-			flag = player.flag,
-			link = player.link,
-			captain = player.captain,
-			role = player.role,
-			team = player.team,
-			teamrole = player.teamrole,
-			date = player.leavedate or player.inactivedate or player.leavedate,
-		}
-			:name{name = player.name}
-			:position{position = player.position, role = player.role and LANG:ucfirst(player.role) or nil}
-			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
-
-		if squad.type == Squad.TYPE_INACTIVE or squad.type == Squad.TYPE_FORMER_INACTIVE then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-			row:newteam{
-				newteam = player.activeteam,
-				newteamrole = player.activeteamrole,
-				newteamdate = player.inactivedate
-			}
-		end
-		if squad.type == Squad.TYPE_FORMER or squad.type == Squad.TYPE_FORMER_INACTIVE then
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam{
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			}
-		end
-
-		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(player.link or player.id)
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. link .. '_'
-			.. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
-
-		index = index + 1
-	end
-
-	return squad:create()
+	return row:create()
 end
 
 return CustomSquad

@@ -281,12 +281,28 @@
 	text-align: center;
 }
 
-.brkts-cs-score-color-ct {
-	color: #0000ff;
-}
-
 .brkts-cs-score-color-t {
 	color: #ff0000;
+
+	.theme--light & {
+		color: var( --clr-sun-30, #ff0000 );
+	}
+
+	.theme--dark & {
+		color: var( --clr-sun-80, #ff0000 );
+	}
+}
+
+.brkts-cs-score-color-ct {
+	color: var( --clr-primary, #0000ff );
+}
+
+.brkts-valorant-score-color-def {
+	color: #46b09c;
+}
+
+.brkts-valorant-score-color-atk {
+	color: #c04845;
 }
 
 /**
@@ -430,10 +446,6 @@
 .brkts-matchlist-slot-winner {
 	font-weight: bold;
 	background-color: #ddf4dd;
-}
-
-.theme--dark .brkts-matchlist-slot-winner:not( .bg-draw ) {
-	box-shadow: inset 0 0 0 2px var( --table-green-border-color, transparent );
 }
 
 .brkts-matchlist-slot-winner .flag + .name {
@@ -784,6 +796,10 @@
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
+
+	.skin-lakesideview & {
+		font-weight: 800;
+	}
 }
 
 .brkts-popup-body-match-sidewins-overtime {
@@ -1586,9 +1602,9 @@ div.brkts-opponent-hover-active::after {
 
 .button-link {
 	background-color: #e6e6e6;
+	border: 1px solid transparent;
 	border-color: #e6e6e6;
 	border-radius: 0;
-	border: 1px solid transparent;
 	color: #212529;
 	font-size: 1rem;
 	font-weight: normal;

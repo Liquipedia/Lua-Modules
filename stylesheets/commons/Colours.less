@@ -35,7 +35,11 @@ Besides these twelve there is Gray which will fit in with them very well. There 
 .gray-theme-light-alt-bg,
 ul.nav-tabs li.game-none,
 .overview.game-none {
-	background-color: #d3d3d3;
+	background-color: var( --clr-moon-80, #d3d3d3 );
+
+	.theme--dark & {
+		background: var( --clr-moon-30 );
+	}
 }
 
 .gray-bg-alt,
@@ -102,19 +106,19 @@ div.NavPic,
 
 /* BLACK */
 .black-text {
-	color: #272727;
+	color: var( --clr-on-surface, #272727 );
 }
 
 .black-non-text {
-	color: #2c2c2c;
+	color: var( --clr-on-surface, #2c2c2c );
 }
 
 .black-bg {
-	background-color: #272727;
+	background-color: var( --clr-on-surface, #272727 );
 }
 
 .black-border {
-	border-color: #272727;
+	border-color: var( --clr-on-surface, #272727 );
 }
 
 /* CINNABAR */
@@ -523,6 +527,7 @@ ul.nav-tabs li.game-64,
 .bright-theme-light-alt-bg,
 .bg-s,
 .bg-stay,
+.fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header {
 	background-color: var( --clr-sun-background-color, #f9f0c7 );
 }

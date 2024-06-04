@@ -10,6 +10,7 @@ return {
 	startYear = 2006,
 	wikiName = 'trackmania',
 	name = 'Trackmania',
+	defaultGame = 'tm',
 	games = {
 		tm = {
 			abbreviation = 'TM',
@@ -142,9 +143,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tm',
-	defaultTeamLogo = 'Trackmania logo lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Trackmania logo darkmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 1,

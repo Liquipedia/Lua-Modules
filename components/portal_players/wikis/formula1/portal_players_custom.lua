@@ -114,12 +114,12 @@ end
 ---@return string
 function CustomPortalPlayers._getAge(player)
 	local birthDate
-	if Date.readTimestamp(player.birthdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.birthdate) ~= Date.defaultTimestamp then
 		birthDate = player.birthdate
 	end
 
 	local deathDate
-	if Date.readTimestamp(player.deathdate) ~= Date.epochZero then
+	if Date.readTimestamp(player.deathdate) ~= Date.defaultTimestamp then
 		deathDate = player.deathdate
 	end
 

@@ -39,6 +39,7 @@ local HorizontallistDisplay = {propTypes = {}, types = {}}
 ---@class HorizontallistBracket
 ---@field bracket MatchGroupUtilMatchGroup
 ---@field config HorizontallistConfigOptions?
+---@field bracketId string
 
 ---@param args table
 ---@return HorizontallistConfigOptions

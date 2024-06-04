@@ -7,10 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = mw.loadData('Module:CharacterNames')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local User = Lua.import('Module:Infobox/Person/User')
@@ -19,6 +20,8 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+
+local SIZE_HERO = '25x25px'
 
 ---@class OverwatchInfoboxUser: InfoboxUser
 local CustomUser = Class.new(User)
@@ -66,7 +69,7 @@ function CustomUser:addCustomCells(widgets)
 		Cell{name = 'Gender', content = {args.gender}},
 		Cell{name = 'Languages', content = {args.languages}},
 		Cell{name = 'BattleTag', content = {args.battletag}},
-		Cell{name = 'Main Hero', content = self:_getHeroes()},
+		Cell{name = 'Main Hero', content = {self:_getHeroes()}},
 		Cell{name = 'Favorite players', content = self:_getArgsfromBaseDefault('fav-player', 'fav-players')},
 		Cell{name = 'Favorite casters', content = self:_getArgsfromBaseDefault('fav-caster', 'fav-casters')},
 		Cell{name = 'Favorite teams', content = {args['fav-teams']}}
@@ -96,18 +99,13 @@ function CustomUser:addCustomCells(widgets)
 	return widgets
 end
 
----@return string[]
+---@return string
 function CustomUser:_getHeroes()
-	local foundArgs = self:getAllArgsForBase(self.args, 'hero')
+	local icons = Array.map(self:getAllArgsForBase(self.args, 'hero'), function(hero)
+		return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
+	end)
 
-	local heroes = {}
-	for _, item in ipairs(foundArgs) do
-		local hero = Template.safeExpand(mw.getCurrentFrame(), 'Hero/' .. item, nil, '')
-		if not String.isEmpty(hero) then
-			table.insert(heroes, hero)
-		end
-	end
-	return heroes
+	return table.concat(icons, '&nbsp;')
 end
 
 return CustomUser

@@ -16,19 +16,19 @@ local Namespace = Class.new(function(self, prefix)
 	self.prefix = prefix
 end)
 
----@param key wikiVaribleKey
+---@param key wikiVariableKey
 ---@return string?
 function Namespace:get(key)
 	return StringUtils.nilIfEmpty(mw.ext.VariablesLua.var(self.prefix .. key))
 end
 
----@param key wikiVaribleKey
+---@param key wikiVariableKey
 ---@param value wikiVariableValue
 function Namespace:set(key, value)
 	mw.ext.VariablesLua.vardefine(self.prefix .. key, Logic.emptyOr(value))
 end
 
----@param key wikiVaribleKey
+---@param key wikiVariableKey
 function Namespace:delete(key)
 	self:set(key, nil)
 end
@@ -36,9 +36,9 @@ end
 ---@class PageVariableNamespaceCachedTable
 ---@field results table
 ---@field table table
-local CachedTable = Class.new(function(self, table)
+local CachedTable = Class.new(function(self, tbl)
 	self.results = {}
-	self.table = table
+	self.table = tbl
 end)
 
 ---@param key string|number

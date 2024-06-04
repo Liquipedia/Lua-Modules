@@ -10,7 +10,7 @@ local AnOrA = require('Module:A or an')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
-local Games = mw.loadData('Module:Games')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier/Utils')
@@ -58,12 +58,7 @@ function MetadataGenerator.tournament(args)
 	local teams = args.team_number
 	local players = args.player_number
 
-	local game
-	if type(Games.abbr) == 'table' and args.primarygame and String.isNotEmpty(args.game)
-		and args.game == args.primarygame then
-
-		game = Games.abbr[args.game]
-	end
+	local game = Game.abbreviation({game = args.game, useDefault = true})
 
 	local prizepoolusd = args.prizepoolusd and ('$' .. args.prizepoolusd .. ' USD') or nil
 	local prizepool = prizepoolusd or (args.prizepool and args.localcurrency and

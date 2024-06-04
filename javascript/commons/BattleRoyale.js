@@ -9,26 +9,74 @@ liquipedia.battleRoyale = {
 	ICON_SORT: 'fa-arrows-alt-v',
 	ICON_SORT_UP: 'fa-long-arrow-alt-up',
 	ICON_SORT_DOWN: 'fa-long-arrow-alt-down',
+	instancesLoaded: {},
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 
+	isMobile: function() {
+		return window.matchMedia( '(max-width: 767px)' ).matches;
+	},
+
+	implementOnElementResize: function( instanceId ) {
+		this.instancesLoaded[ instanceId ] = false;
+
+		// eslint-disable-next-line compat/compat
+		const obs = new ResizeObserver( ( entries ) => {
+			for ( const entry of entries ) {
+				if ( entry.borderBoxSize[ 0 ].blockSize > 0 && !this.instancesLoaded[ instanceId ] ) {
+					this.instancesLoaded[ instanceId ] = true;
+					this.recheckNavigationStates( instanceId );
+				}
+			}
+		} );
+		obs.observe( document.querySelector( `[data-js-battle-royale-id=${ instanceId }]` ) );
+	},
+
 	implementOnWindowResize: function( instanceId ) {
 		window.addEventListener( 'resize', () => {
-			this.battleRoyaleInstances[ instanceId ].querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
-				.forEach( ( tableEl ) => {
-					this.recheckSideScrollButtonStates( tableEl );
-				} );
+			this.recheckNavigationStates( instanceId );
 		} );
+	},
+
+	hasVisibleSideScrollButtons: function( table ) {
+		const el = table.querySelector(
+			'[data-js-battle-royale="game-nav-holder"] > [data-js-battle-royale="game-container"]'
+		);
+		return el.scrollWidth > el.offsetWidth;
+	},
+
+	handleWheelEvent: function( e, table ) {
+		if ( this.hasVisibleSideScrollButtons( table ) ) {
+			const delta = e.deltaY || e.detail || e.wheelDelta;
+			const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
+
+			const gameContainer = table.querySelector( '[data-js-battle-royale="game-container"]' );
+
+			if ( dir === this.DIRECTION_RIGHT && (
+				gameContainer.scrollWidth <= gameContainer.scrollLeft + gameContainer.offsetWidth ) ||
+				dir === this.DIRECTION_LEFT && gameContainer.scrollLeft === 0
+			) {
+				// Resume default browser scroll behavior if scrolling down and the table is already at the far right
+				// or scrolling up and the table is at the far left
+				return;
+			}
+
+			e.preventDefault();
+			this.handleTableSideScroll( table, dir );
+		}
 	},
 
 	implementScrollWheelEvent: function() {
 		document.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' ).forEach( ( el ) => {
-			el.addEventListener( 'wheel', ( e ) => {
-				e.preventDefault();
-				const delta = e.deltaY || e.detail || e.wheelDelta;
-				const dir = delta > 0 ? this.DIRECTION_RIGHT : this.DIRECTION_LEFT;
-				this.handleTableSideScroll( el.closest( '[data-js-battle-royale="table"]' ), dir );
+			const table = el.closest( '[data-js-battle-royale="table"]' );
+			const gameContainerElements = table.querySelectorAll(
+				'[data-js-battle-royale="row"] > [data-js-battle-royale="game-container"]'
+			);
+
+			el.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
+			gameContainerElements.forEach( ( gameContainer ) => {
+				gameContainer.addEventListener( 'wheel', ( e ) => this.handleWheelEvent( e, table ) );
 			} );
 		} );
 	},
@@ -87,6 +135,19 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
+	recheckNavigationStates: function( instanceId ) {
+		if ( this.isMobile() ) {
+			return;
+		}
+		this.battleRoyaleInstances[ instanceId ]
+			.querySelectorAll( '[data-js-battle-royale="game-nav-holder"]' )
+			.forEach( ( tableEl ) => {
+				this.recheckSideScrollButtonStates( tableEl );
+				this.recheckSideScrollHintElements( tableEl.closest( '[data-js-battle-royale="table"]' ) );
+			} );
+
+	},
+
 	recheckSideScrollButtonStates: function( tableElement ) {
 		const navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
 		const navRight = tableElement.querySelector( '[data-js-battle-royale="navigate-right"]' );
@@ -128,6 +189,8 @@ liquipedia.battleRoyale = {
 				content.classList.add( 'is--hidden' );
 			}
 		} );
+
+		this.recheckNavigationStates( instanceId );
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
@@ -151,6 +214,8 @@ liquipedia.battleRoyale = {
 				contents[ panelId ].classList.add( 'is--hidden' );
 			}
 		} );
+
+		this.recheckNavigationStates( instanceId );
 	},
 
 	buildBattleRoyaleMap: function( id ) {
@@ -213,6 +278,58 @@ liquipedia.battleRoyale = {
 				} );
 			}
 		} );
+	},
+
+	createScrollHintElement: function( dir ) {
+		const element = document.createElement( 'div' );
+		element.classList.add( 'panel-table__swipe-hint', `swipe-hint--${ dir }`, 'd-none' );
+		element.setAttribute( 'data-js-battle-royale', 'swipe-hint-' + dir );
+
+		const icon = document.createElement( 'i' );
+		icon.classList.add( 'fas', `fa-chevron-${ dir }` );
+		element.append( icon );
+		return element;
+	},
+
+	makeTableScrollHint: function( instanceId ) {
+		this.battleRoyaleInstances[ instanceId ]
+			.querySelectorAll( '[data-js-battle-royale="table"]' ).forEach( ( table ) => {
+				const swipeHintLeft = this.createScrollHintElement( this.DIRECTION_LEFT );
+				const swipeHintRight = this.createScrollHintElement( this.DIRECTION_RIGHT );
+				table.prepend( swipeHintLeft, swipeHintRight );
+
+				table.addEventListener( 'scroll', () => {
+					this.recheckSideScrollHintElements( table );
+				} );
+				this.recheckSideScrollHintElements( table );
+			} );
+	},
+
+	recheckSideScrollHintElements: function( table ) {
+		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
+		const swipeHintRight = table.querySelector( '[data-js-battle-royale="swipe-hint-right"]' );
+
+		// Added a padding of 5px to prevent rounding errors
+		if ( table.scrollLeft > 5 ) {
+			swipeHintLeft.style.left = table.scrollLeft + 'px';
+			if ( swipeHintLeft.classList.contains( 'd-none' ) ) {
+				swipeHintLeft.classList.remove( 'd-none' );
+			}
+		} else {
+			if ( !swipeHintLeft.classList.contains( 'd-none' ) ) {
+				swipeHintLeft.classList.add( 'd-none' );
+			}
+		}
+		if ( table.scrollLeft >= table.scrollWidth - table.offsetWidth - 5 ) {
+			if ( !swipeHintRight.classList.contains( 'd-none' ) ) {
+				swipeHintRight.classList.add( 'd-none' );
+			}
+		} else {
+			swipeHintRight.style.right = ( table.scrollLeft * -1 ) + 'px';
+			if ( swipeHintRight.classList.contains( 'd-none' ) ) {
+				swipeHintRight.classList.remove( 'd-none' );
+			}
+		}
 	},
 
 	createNavigationElement: function( dir ) {
@@ -295,9 +412,7 @@ liquipedia.battleRoyale = {
 					this.changeButtonStyle( b, 'default' );
 				}
 				this.changeButtonStyle( button, newOrder );
-				const sorted = sortableRows.sort( function( a, b ) {
-					return this.comparator( a, b, newOrder, sortType );
-				}.bind( this ) );
+				const sorted = sortableRows.sort( ( a, b ) => this.comparator( a, b, newOrder, sortType ) );
 
 				sorted.forEach( ( element, index ) => {
 					if ( element.style.order ) {
@@ -310,7 +425,6 @@ liquipedia.battleRoyale = {
 	},
 
 	createBottomNav( instanceId, navigationTab, currentPanelIndex ) {
-		// eslint-disable-next-line es-x/no-object-values
 		const contentPanel = Object.values(
 			this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ navigationTab ]
 		)[ currentPanelIndex ];
@@ -362,19 +476,22 @@ liquipedia.battleRoyale = {
 	},
 
 	init: function() {
-		Array.from( document.querySelectorAll( '[data-js-battle-royale-id]' ) ).forEach( ( instance ) => {
+		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( instance ) => {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
 
 			this.makeSortableTable( instance );
 		} );
 
-		Object.keys( this.battleRoyaleInstances ).forEach( function( instanceId ) {
+		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
-			this.makeSideScrollElements( instanceId );
+			if ( !this.isMobile() ) {
+				this.makeSideScrollElements( instanceId );
+				this.makeTableScrollHint( instanceId );
+			}
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
@@ -390,14 +507,16 @@ liquipedia.battleRoyale = {
 				panels.forEach( ( panel, index ) => {
 					this.createBottomNav( instanceId, target, index );
 				} );
-
 			} );
 
-			this.implementScrollendEvent( instanceId );
-			this.implementOnWindowResize( instanceId );
-			this.implementScrollWheelEvent();
+			if ( !this.isMobile() ) {
+				this.implementScrollendEvent( instanceId );
+				this.implementOnWindowResize( instanceId );
+				this.implementOnElementResize( instanceId );
+				this.implementScrollWheelEvent();
+			}
 
-		}.bind( this ) );
+		} );
 	}
 };
 liquipedia.core.modules.push( 'battleRoyale' );

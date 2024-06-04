@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
-local Data = Lua.requireIfExists('Module:Faction/Data', {loadData = true})
+local Data = Lua.import('Module:Faction/Data', {loadData = true})
 local IconData = Lua.requireIfExists('Module:Faction/IconData', {loadData = true})
 	or {byFaction = {}}
 
@@ -207,7 +207,7 @@ function Faction.Icon(props)
 
 	return '[['
 		.. iconName
-		.. '|link=' .. (props.showLink and factionProps.pageName or '')
+		.. '|link=' .. (props.showLink and (factionProps.pageName or factionProps.name) or '')
 		.. '|' .. size
 		.. (props.showTitle ~= false and '|' .. (props.title or factionProps.name) or '')
 		.. ']]'

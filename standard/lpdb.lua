@@ -145,7 +145,6 @@ end
 
 ---@param key string
 ---@param value any
----@return self
 function ModelRow:__newindex(key, value)
 	if key ~= 'extradata' then
 		-- Strip HTML from strings
@@ -165,21 +164,24 @@ function ModelRow:__newindex(key, value)
 	end
 
 	self.fields[key] = value
-	return self
+end
+
+function ModelRow:__index(key)
+	return ModelRow[key] or rawget(self, 'fields')[key]
 end
 
 ---@param key string
 ---@param value any
 ---@return self
 function ModelRow:set(key, value)
-	self:__newindex(key, value)
+	self[key] = value
 	return self
 end
 
 ---@param tbl table<string, any>
 ---@return self
 function ModelRow:setMany(tbl)
-	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.__newindex, self))
+	Table.iter.forEachPair(tbl, FnUtil.curry(ModelRow.set, self))
 	return self
 end
 
@@ -193,7 +195,7 @@ Lpdb.Match2 = Model('match2', {
 		end
 	},
 	{name = 'match2id', fieldType = 'string'},
-	{name = 'match2bracketid', fieldType = 'struct'},
+	{name = 'match2bracketid', fieldType = 'string'},
 	{name = 'winner', fieldType = 'string', default = ''},
 	{name = 'walkover', fieldType = 'string', default = ''},
 	{name = 'resulttype', fieldType = 'string', default = ''},
@@ -223,6 +225,65 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'match2bracketdata', fieldType = 'struct', default = {}},
 	{name = 'match2opponents', fieldType = 'array', default = {}},
 	{name = 'match2games', fieldType = 'array', default = {}},
+})
+
+---@class PlacementModel:Model
+Lpdb.Placement = Model('placement', {
+	{name = 'objectname', fieldType = 'string'},
+	{name = 'tournament', fieldType = 'string', default = ''},
+	{name = 'series', fieldType = 'string', default = ''},
+	{name = 'parent', fieldType = 'pagename', default = ''},
+	{name = 'shortname', fieldType = 'string', default = ''},
+	{name = 'startdate', fieldType = 'string', default = 0},
+	{name = 'date', fieldType = 'string', default = 0},
+	{name = 'placement', fieldType = 'string', default = ''},
+	{name = 'prizemoney', fieldType = 'number', default = 0},
+	{name = 'individualprizemoney', fieldType = 'number', default = 0},
+	{name = 'prizepoolindex', fieldType = 'number'},
+	{name = 'weight', fieldType = 'number', default = 0},
+	{name = 'mode', fieldType = 'string', default = ''},
+	{name = 'type', fieldType = 'string', default = ''},
+	{name = 'liquipediatier', fieldType = 'string|number', default = ''},
+	{name = 'liquipediatiertype', fieldType = 'string', default = ''},
+	{name = 'publishertier', fieldType = 'string', default = ''},
+	{name = 'icon', fieldType = 'string', default = ''},
+	{name = 'icondark', fieldType = 'string', default = ''},
+	{name = 'game', fieldType = 'string', default = ''},
+	{name = 'lastvsdata', fieldType = 'struct', default = {}},
+	{name = 'opponentname', fieldType = 'string', default = ''},
+	{name = 'opponenttemplate', fieldType = 'string', default = ''},
+	{name = 'opponenttype', fieldType = 'string', default = ''},
+	{name = 'opponentplayers', fieldType = 'struct', default = {}},
+	{name = 'qualifier', fieldType = 'string', default = ''},
+	{name = 'qualifierpage', fieldType = 'string', default = ''},
+	{name = 'qualifierurl', fieldType = 'string', default = ''},
+	{name = 'extradata', fieldType = 'struct', default = {}},
+})
+
+---@class SquadPlayerModel:Model
+Lpdb.SquadPlayer = Model('squadplayer', {
+	{
+		name = 'objectname',
+		fieldType = 'string',
+		default = function(fields)
+			return fields.link .. '_' .. (fields.joindate or '') .. '_' .. (fields.role or '') .. '_' .. (fields.status or '')
+		end
+	},
+	{name = 'id', fieldType = 'string'},
+	{name = 'link', fieldType = 'string'},
+	{name = 'name', fieldType = 'string', default = ''},
+	{name = 'nationality', fieldType = 'string', default = ''},
+	{name = 'position', fieldType = 'string', default = ''},
+	{name = 'role', fieldType = 'string', default = ''},
+	{name = 'type', fieldType = 'string', default = 'player'},
+	{name = 'newteam', fieldType = 'string', default = ''},
+	{name = 'teamtemplate', fieldType = 'string', default = ''},
+	{name = 'newteamtemplate', fieldType = 'string', default = ''},
+	{name = 'status', fieldType = 'string'},
+	{name = 'joindate', fieldType = 'string', default = ''},
+	{name = 'leavedate', fieldType = 'string', default = ''},
+	{name = 'inactivedate', fieldType = 'string', default = ''},
+	{name = 'extradata', fieldType = 'struct', default = {}},
 })
 
 return Lpdb

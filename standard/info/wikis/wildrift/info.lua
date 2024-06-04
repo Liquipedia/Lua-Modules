@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'wildrift',
 	name = 'Wild Rift',
+	defaultGame = 'wildrift',
 	games = {
 		wildrift = {
 			abbreviation = 'WR',
@@ -25,8 +26,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'wildrift',
-	defaultTeamLogo = 'Wild Rift Teamcard.png', ---@deprecated
-	defaultTeamLogoDark = 'Wild Rift Teamcard.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 2,
 }

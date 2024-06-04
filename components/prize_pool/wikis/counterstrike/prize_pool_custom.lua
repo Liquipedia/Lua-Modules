@@ -28,6 +28,8 @@ local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'
 local HEADER_DATA = {}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -62,6 +64,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	if not placement.specialStatuses.DQ.active(placement.args) then
 		lpdbData.weight = CustomPrizePool.calculateWeight(

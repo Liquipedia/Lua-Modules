@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:MathUtil')
@@ -17,8 +18,6 @@ local Team = require('Module:Team')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
-
-local DEFAULT_DATE = '1970-01-01 00:00:00'
 
 local Earnings = {}
 
@@ -191,7 +190,7 @@ end
 ---@param mode string?
 ---@return string
 function Earnings._buildConditions(conditions, year, mode)
-	conditions = '[[date::!' .. DEFAULT_DATE .. ']] AND [[prizemoney::>0]] AND ' .. conditions
+	conditions = '[[date::!' .. DateExt.defaultDateTime .. ']] AND [[prizemoney::>0]] AND ' .. conditions
 	if Logic.isNotEmpty(year) then
 		conditions = conditions .. ' AND ([[date_year::' .. year .. ']])'
 	end

@@ -59,12 +59,12 @@ end
 
 function CustomFfaMatchSummary.GamePlacement(props)
 	local opponent = props.opponent
-	local offraces = StarcraftMatchGroupUtil.computeOffraces(opponent, props.matchOpponent)
+	local offFactions = StarcraftMatchGroupUtil.computeOffFactions(opponent, props.matchOpponent)
 
 	return mw.html.create('div'):addClass('ffa-match-summary-cell')
 		:addClass('ffa-match-summary-game-placement')
 		:addClass(opponent.placement and Placement.getBgClass(opponent.placement))
-		:node(offraces and StarcraftMatchSummary.OffraceIcons(offraces) or nil)
+		:node(offFactions and StarcraftMatchSummary.OffFactionIcons(offFactions) or nil)
 		:node(opponent.placement and tostring(opponent.placement) .. '.' or '')
 end
 

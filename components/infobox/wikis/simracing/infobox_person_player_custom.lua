@@ -6,11 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
+local GameAppearances = Lua.import('Module:Infobox/Extension/GameAppearances')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
@@ -34,16 +33,10 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local caller = self.caller
-	local args = caller.args
-
 	if id == 'custom' then
-		local games = Array.map(caller:getAllArgsForBase(args, 'game'),
-			function(game)
-				return Template.safeExpand(mw.getCurrentFrame(), 'Game/' .. game)
-			end
-		)
-		table.insert(widgets, Cell{name = 'Games', content = {table.concat(games, '&nbsp;')}})
+		return {
+			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
+		}
 	end
 
 	return widgets

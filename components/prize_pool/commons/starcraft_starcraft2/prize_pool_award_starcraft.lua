@@ -39,6 +39,8 @@ local _tournament_name
 local _series_number
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -75,16 +77,20 @@ function CustomPrizePool.run(frame)
 	return builtPrizePool
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- make these available for the stash further down
-	lpdbData.liquipediatier = _tier
-	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
-	lpdbData.type = Variables.varDefault('tournament_type')
+	lpdbData.liquipediatier = _tier or lpdbData.liquipediatier
+	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or lpdbData.liquipediatiertype
+	lpdbData.type = Variables.varDefault('tournament_type') or lpdbData.type
 
 	Table.mergeInto(lpdbData.extradata, {
 		seriesnumber = _series_number,
 
-		 -- to be removed once poinst storage is standardized
+		-- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
 		points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2),
 	})
@@ -100,6 +106,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param lpdbData placement
+---@param prizePoolIndex integer
+---@return string
 function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	if lpdbData.opponenttype == Opponent.team then
 		return lpdbData.objectName .. '_' .. prizePoolIndex
@@ -108,6 +117,7 @@ function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	return lpdbData.objectName
 end
 
+---@return string
 function CustomPrizePool._seriesNumber()
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	return seriesNumber and string.format('%05d', seriesNumber) or ''

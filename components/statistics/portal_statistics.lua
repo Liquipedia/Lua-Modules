@@ -17,7 +17,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
-local Medal = require('Module:Medal')
+local Medals = require('Module:Medals')
 local Operator = require('Module:Operator')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -40,7 +40,6 @@ local Count = Lua.import('Module:Count')
 local CURRENCY_FORMAT_OPTIONS = {dashIfZero = true, displayCurrencyCode = false, formatValue = true}
 local CURRENT_YEAR = tonumber(os.date('%Y')) --[[@as integer]]
 local DATE = os.date('%F') --[[@as string]]
-local EPOCH_DATE = '1970-01-01'
 local TIMESTAMP = DateExt.readTimestamp(DATE) --[[@as integer]]
 local DEFAULT_ALLOWED_PLACES = {'1', '2', '3', '1-2', '1-3', '2-3', '2-4', '3-4'}
 local DEFAULT_ROUND_PRECISION = Info.defaultRoundPrecision or 2
@@ -745,8 +744,8 @@ function StatisticsPortal.playerAgeTable(args)
 
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, '')}
-		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, EPOCH_DATE)}
-		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, EPOCH_DATE)}
+		:add{ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate)}
+		:add{ConditionNode(ColumnName('deathdate'), Comparator.eq, DateExt.defaultDate)}
 		:add{ConditionNode(ColumnName('earnings'), Comparator.gt, args.earnings)}
 
 	if Logic.readBool(args.isActive) then
@@ -946,7 +945,7 @@ end
 function StatisticsPortal._cacheModeEarningsData(config)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('prizemoney'), Comparator.gt, 0)}
-		:add{ConditionNode(ColumnName('date'), Comparator.neq, EPOCH_DATE)}
+		:add{ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate)}
 		:add{ConditionNode(ColumnName('date'), Comparator.lt, DATE)}
 
 	if String.isNotEmpty(config.startYear) then
@@ -1097,9 +1096,9 @@ function StatisticsPortal._earningsTableHeader(args)
 		:tag('th'):wikitext('#'):addClass('unsortable'):done()
 		:tag('th'):wikitext(columnText):addClass('unsortable'):done()
 		:tag('th'):wikitext('Achievements'):css('width', '200px'):addClass('unsortable'):done()
-		:tag('th'):wikitext(Medal['1']):done()
-		:tag('th'):wikitext(Medal['2']):done()
-		:tag('th'):wikitext(Medal['3']):done()
+		:tag('th'):node(Medals.display{medal = 1}):done()
+		:tag('th'):node(Medals.display{medal = 2}):done()
+		:tag('th'):node(Medals.display{medal = 3}):done()
 
 	if Logic.readBool(args.displayShowMatches) then
 		row:tag('th'):wikitext('Show<br>Match')

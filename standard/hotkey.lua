@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Hotkeys = {}
 
-local _SEPERATORS = {
+local SEPERATORS = {
 	['->'] = '&nbsp;→&nbsp;',
 	['then'] = '&nbsp;→&nbsp;',
 	['arrow'] = '&nbsp;→&nbsp;',
@@ -41,7 +41,7 @@ end
 function Hotkeys.hotkey2(hotkey1, hotkey2, seperator)
 	hotkey1 = Hotkeys.hotkey(hotkey1)
 	hotkey2 = Hotkeys.hotkey(hotkey2)
-	seperator = _SEPERATORS[string.lower(seperator or '')] or
+	seperator = SEPERATORS[string.lower(seperator or '')] or
 		seperator or ''
 
 	return '<b>' .. hotkey1 .. seperator .. hotkey2 .. '</b>'

@@ -30,6 +30,7 @@ StreamLinks.countdownPlatformNames = {
 	'facebook',
 	'huomao',
 	'huya',
+	'kick',
 	'loco',
 	'mildom',
 	'nimo',

@@ -6,52 +6,45 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local DisplayUtil = require('Module:DisplayUtil')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local TypeUtil = require('Module:TypeUtil')
-local Abbreviation = require('Module:Abbreviation')
+local Table = require('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
-local PlayerExt = Lua.import('Module:Player/Ext')
-local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
 local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
 
-local html = mw.html
+---Display components for players used in the starcraft and starcraft2 wikis.
+---@class StarcraftPlayerDisplay: PlayerDisplay
+local StarcraftPlayerDisplay = Table.copy(PlayerDisplay)
 
---[[
-Display components for players used in the starcraft and starcraft2 wikis.
-]]
-local StarcraftPlayerDisplay = {propTypes = {}}
+---@class StarcraftBlockPlayerProps: BlockPlayerProps
+---@field player StarcraftStandardPlayer
+---@field showFaction boolean?
 
-StarcraftPlayerDisplay.propTypes.BlockPlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	player = StarcraftMatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showPlayerTeam = 'boolean?',
-	showRace = 'boolean?',
-	abbreviateTbd = 'boolean?',
-	note = 'string?',
-}
+---@class StarcraftInlinePlayerProps: InlinePlayerProps
+---@field player StarcraftStandardPlayer
+---@field showFaction boolean?
 
---[[
-Displays a player as a block element. The width of the component is
-determined by its layout context, and not by the player name.
-]]
+---@class InlinePlayerContainerProps: StarcraftInlinePlayerProps
+---@field date string?
+---@field savePageVar boolean?
+
+---Displays a player as a block element.
+---The width of the component is determined by its layout context, and not by the player name.
+---@param props StarcraftBlockPlayerProps
+---@return Html
 function StarcraftPlayerDisplay.BlockPlayer(props)
-	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = html.create(props.dq and 's' or 'span')
+	local nameNode = mw.html.create(props.dq and 's' or 'span')
 		:wikitext(
 			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and player.pageName
@@ -73,36 +66,39 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
 
-	local raceNode
-	if props.showRace ~= false and player.race ~= Faction.defaultFaction then
-		raceNode = html.create('span'):addClass('race')
-			:wikitext(Faction.Icon{faction = player.race})
+	local factionNode
+	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
+		factionNode = mw.html.create('span'):addClass('race')
+			:wikitext(Faction.Icon{faction = player.faction})
 	end
 
 	local teamNode
 	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
-		teamNode = html.create('span')
+		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
-	return html.create('div'):addClass('block-player starcraft-block-player')
+	return mw.html.create('div'):addClass('block-player starcraft-block-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
-		:node(raceNode)
+		:node(factionNode)
 		:node(nameNode)
 		:node(teamNode)
 end
 
--- Called from Template:Player and Template:Player2
+---Called from Template:Player and Template:Player2
+---Only for non git usage!
+---@param frame Frame
+---@return string
 function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	local args = require('Module:Arguments').getArgs(frame)
 
 	local pageName
 	local displayName
 	if not args.noclean then
-		pageName, displayName = PlayerExt.extractFromLink(args[1])
+		pageName, displayName = StarcraftPlayerExt.extractFromLink(args[1])
 		if args.link == 'true' then
 			pageName = displayName
 		elseif args.link then
@@ -117,7 +113,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		displayName = displayName,
 		flag = String.nilIfEmpty(args.flag),
 		pageName = pageName,
-		race = String.nilIfEmpty(args.race) or Faction.defaultFaction,
+		faction = String.nilIfEmpty(args.race) or String.nilIfEmpty(args.faction) or Faction.defaultFaction,
 	}
 
 	if not args.novar then
@@ -125,18 +121,21 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	end
 
 	local hiddenSortNode = args.hs
-		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.race, args.hs)
+		and StarcraftPlayerDisplay.HiddenSort(player.displayName, player.flag, player.faction, args.hs)
 		or ''
 	local playerNode = StarcraftPlayerDisplay.InlinePlayer({
 		dq = Logic.readBoolOrNil(args.dq),
 		flip = Logic.readBoolOrNil(args.flip),
 		player = player,
-		showRace = (args.showRace or 'true') == 'true',
+		showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction), true),
 	})
 	return tostring(hiddenSortNode) .. tostring(playerNode)
 end
 
--- Called from Template:InlinePlayer
+---Called from Template:InlinePlayer
+---Only for non git usage!
+---@param frame Frame
+---@return Html
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 	local args = require('Module:Arguments').getArgs(frame)
 
@@ -144,7 +143,7 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		displayName = args[1],
 		flag = args.flag,
 		pageName = args.link,
-		race = Faction.read(args.race),
+		faction = Faction.read(args.race or args.faction),
 	}
 	return StarcraftPlayerDisplay.InlinePlayerContainer({
 		date = args.date,
@@ -154,29 +153,19 @@ function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
 		savePageVar = not Logic.readBool(args.novar),
 		showFlag = Logic.readBoolOrNil(args.showFlag),
 		showLink = Logic.readBoolOrNil(args.showLink),
-		showRace = Logic.readBoolOrNil(args.showRace),
+		showFaction = Logic.nilOr(Logic.readBoolOrNil(args.showRace), Logic.readBoolOrNil(args.showFaction)),
 	})
 end
 
-StarcraftPlayerDisplay.propTypes.InlinePlayerContainer = {
-	date = 'string?',
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = 'table',
-	savePageVar = 'boolean?',
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showRace = 'boolean?',
-}
-
 --[[
 Displays a player as an inline element. Useful for referencing players in
-prose. This container will automatically look up the pageName, race, and flag
+prose. This container will automatically look up the pageName, race/faction, and flag
 of the player from page variables or LPDB, and save the results to page
 variables.
 ]]
+---@param props InlinePlayerContainerProps
+---@return Html
 function StarcraftPlayerDisplay.InlinePlayerContainer(props)
-	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.InlinePlayerContainer)
 	StarcraftPlayerExt.syncPlayer(props.player, {
 		date = props.date,
 		savePageVar = props.savePageVar,
@@ -185,28 +174,18 @@ function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	return StarcraftPlayerDisplay.InlinePlayer(props)
 end
 
---[[
-Displays a player as an inline element. Useful for referencing players in
-prose.
-]]
-StarcraftPlayerDisplay.propTypes.InlinePlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = StarcraftMatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showRace = 'boolean?',
-}
+---Displays a player as an inline element. Useful for referencing players in prose.
+---@param props StarcraftInlinePlayerProps
+---@return Html
 function StarcraftPlayerDisplay.InlinePlayer(props)
-	DisplayUtil.assertPropTypes(props, StarcraftPlayerDisplay.propTypes.InlinePlayer)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
 		and PlayerDisplay.Flag(player.flag)
 		or nil
 
-	local race = props.showRace ~= false and player.race ~= Faction.defaultFaction
-		and Faction.Icon{faction = player.race}
+	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
+		and Faction.Icon{faction = player.faction}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -219,23 +198,28 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 	local text
 	if props.flip then
 		text = nameAndLink
-			.. (race and '&nbsp;' .. race or '')
+			.. (faction and '&nbsp;' .. faction or '')
 			.. (flag and '&nbsp;' .. flag or '')
 	else
 		text = (flag and flag .. '&nbsp;' or '')
-			.. (race and race .. '&nbsp;' or '')
+			.. (faction and faction .. '&nbsp;' or '')
 			.. nameAndLink
 	end
 
-	return html.create('span'):addClass('starcraft-inline-player')
+	return mw.html.create('span'):addClass('starcraft-inline-player')
 		:addClass(props.flip and 'flipped' or nil)
 		:wikitext(text)
 end
 
-function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
+---@param name string?
+---@param flag string?
+---@param faction string?
+---@param field string?
+---@return Html
+function StarcraftPlayerDisplay.HiddenSort(name, flag, faction, field)
 	local text
-	if field == 'race' then
-		text = race
+	if field == 'race' or field == 'faction' then
+		text = faction
 	elseif field == 'name' then
 		text = name
 	elseif field == 'flag' then
@@ -244,7 +228,7 @@ function StarcraftPlayerDisplay.HiddenSort(name, flag, race, field)
 		text = field
 	end
 
-	return html.create('span')
+	return mw.html.create('span')
 		:css('display', 'none')
 		:wikitext(text)
 end

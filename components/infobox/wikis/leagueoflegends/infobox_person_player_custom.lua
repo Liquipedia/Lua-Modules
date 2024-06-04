@@ -8,8 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -70,11 +70,11 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = Logic.emptyOr(player.args.history, TeamHistoryAuto._results{
-		hiderole = 'true',
+	player.args.history = String.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
+		hiderole = true,
 		iconModule = 'Module:PositionIcon/data',
-		addlpdbdata = 'true'
-	})
+		addlpdbdata = true,
+	}
 	player.args.autoTeam = true
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
@@ -175,8 +175,8 @@ end
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return tostring(MatchTicker.participant({team = teamPage}))
+			.. Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 

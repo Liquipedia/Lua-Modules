@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'arenaofvalor',
 	name = 'Arena of Valor',
+	defaultGame = 'aov',
 
 	games = {
 		aov = {
@@ -65,15 +66,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'aov',
 
-	defaultTeamLogo = {
-		aov = 'Arena of ValorLogo.png', --Arena of Valor
-		hok = 'Honor of Kings 2018-12-24 Logo.png', --Honor of Kings
-	}, ---@deprecated
-	defaultTeamLogoDark = {
-		aov = 'Arena of ValorLogo.png', --Arena of Valor
-		hok = 'Honor of Kings 2018-12-24 Logo.png', --Honor of Kings
-	}, ---@deprecated
-	match2 = 1,
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
+	match2 = 2,
 }

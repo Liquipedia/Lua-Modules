@@ -16,7 +16,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.liquipediatier = Tier.toNumber(args.liquipediatier)

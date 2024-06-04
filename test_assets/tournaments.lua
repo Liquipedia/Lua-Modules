@@ -21,7 +21,7 @@ return {
 		country = 'The Netherlands',
 		city = 'Utrecht',
 		venue = 'AWTF EU',
-		game = 'LP',
+		game = 'commons',
 		sdate = '2022-10-13',
 		edate = '2022-10-15',
 	}

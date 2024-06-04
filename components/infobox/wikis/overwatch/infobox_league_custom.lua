@@ -29,6 +29,8 @@ local CustomInjector = Class.new(Injector)
 local BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
+	owcs = 'Overwatch Champions Series',
+	owwc = 'Overwatch World Cup',
 }
 
 ---@param frame Frame
@@ -38,6 +40,11 @@ function CustomLeague.run(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
+end
+
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = self:_validPublisherTier(args.blizzardtier) and args.blizzardtier:lower()
 end
 
 ---@param id string

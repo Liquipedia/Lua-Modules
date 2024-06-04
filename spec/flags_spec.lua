@@ -33,10 +33,10 @@ describe('flags', function()
 			local TemplateMock = stub(Template, "safeExpand")
 
 			Flags.Icon{shouldLink = true, flag = 'dummy'}
-			assert.stub(TemplateMock).was.called_with(nil, 'Flag/dummy')
+			assert.stub(TemplateMock).was.called_with(mw.getCurrentFrame(), 'Flag/dummy')
 
 			Flags.Icon{shouldLink = false, flag = 'dummy'}
-			assert.stub(TemplateMock).was.called_with(nil, 'FlagNoLink/dummy')
+			assert.stub(TemplateMock).was.called_with(mw.getCurrentFrame(), 'FlagNoLink/dummy')
 
 			TemplateMock:revert()
 		end)

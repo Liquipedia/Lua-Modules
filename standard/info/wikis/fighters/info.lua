@@ -10,6 +10,7 @@ return {
 	startYear = 1996,
 	wikiName = 'fighters',
 	name = 'Fighting Games',
+	defaultGame = 'fighters',
 	games = {
 		fighters = {
 			abbreviation = 'Fighters',
@@ -646,6 +647,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'KILL la KILL - IF default allmode.png',
 				lightMode = 'KILL la KILL - IF default allmode.png',
+			},
+		},
+		koihime = {
+			abbreviation = 'Koihime Enbu',
+			name = 'Koihime Enbu',
+			link = 'Koihime Enbu',
+			logo = {
+				darkMode = 'Koihime Enbu default allmode.png',
+				lightMode = 'Koihime Enbu default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Koihime Enbu default allmode.png',
+				lightMode = 'Koihime Enbu default allmode.png',
 			},
 		},
 		hnk = {
@@ -1650,8 +1664,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'fighters',
-	defaultTeamLogo = 'Fighters default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Fighters default darkmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
+	opponentLibrary = 'Opponent/Custom',
 	match2 = 0,
 }

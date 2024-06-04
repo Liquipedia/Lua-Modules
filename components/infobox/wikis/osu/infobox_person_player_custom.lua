@@ -48,7 +48,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
+	player.args.history = TeamHistoryAuto.results{convertrole = true}
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 
@@ -63,10 +63,7 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'status' then
-		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active', content = {args.years_active}},
-		}
+		table.insert(widgets, Cell{name = 'Years Active', content = {args.years_active}})
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
@@ -81,11 +78,6 @@ function CustomInjector:parse(id, widgets)
 		})
 	end
 	return widgets
-end
-
----@return string[]
-function CustomPlayer:_getStatusContents()
-	return {Page.makeInternalLink({onlyIfExists = true}, self.args.status) or self.args.status}
 end
 
 ---@param role string?

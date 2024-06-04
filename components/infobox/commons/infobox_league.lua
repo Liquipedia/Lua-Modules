@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -32,7 +33,6 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local DEFAULT_DATE = '1970-01-01'
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -505,9 +505,9 @@ function League:_setLpdbData(args, links)
 			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = self.data.startDate or self.data.endDate or DEFAULT_DATE,
-		enddate = self.data.endDate or DEFAULT_DATE,
-		sortdate = self.data.endDate or DEFAULT_DATE,
+		startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
+		enddate = self.data.endDate or DateExt.defaultDate,
+		sortdate = self.data.endDate or DateExt.defaultDate,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,

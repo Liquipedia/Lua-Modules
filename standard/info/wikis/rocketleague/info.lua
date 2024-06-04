@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'rocketleague',
 	name = 'Rocket League',
+	defaultGame = 'rl',
 	games = {
 		rl = {
 			abbreviation = '',
@@ -38,9 +39,13 @@ return {
 			},
 		},
 	},
-	defaultGame = 'rl',
-	defaultTeamLogo = 'Rocket League.png', ---@deprecated
-	defaultTeamLogoDark = 'Rocket League.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,
 }

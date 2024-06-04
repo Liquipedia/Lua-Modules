@@ -10,6 +10,7 @@ return {
 	startYear = 2023,
 	wikiName = 'stormgate',
 	name = 'Stormgate',
+	defaultGame = 'stormgate',
 	games = {
 		stormgate = {
 			abbreviation = 'SG',
@@ -25,11 +26,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'stormgate',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Stormgate default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Stormgate default darkmode.png', ---@deprecated
-	opponentLibrary = 'Opponent/Starcraft',
-	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
+	opponentLibrary = 'Opponent/Custom',
+	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 	match2 = 2,
 }

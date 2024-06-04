@@ -51,7 +51,9 @@ return {
 	aliases = {
 		[Info.defaultGame] = {
 			human = 'v',
+			van = 'v',
 			host = 'i',
+			inf = 'i',
 		},
 	}
 }

@@ -16,10 +16,10 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
-	args.game = Game.name{game = args.game}
+	args.game = Game.name{game = args.game, useDefault = false}
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 

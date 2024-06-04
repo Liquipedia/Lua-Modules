@@ -69,4 +69,11 @@ return {
 	activeroster = 'fas fa-users',
 	history = 'fas fa-books',
 	media = 'fas fa-newspaper',
+
+	-- Usage: buildtime, duration, cooldown, ...
+	time = 'far fa-clock',
+
+	-- Usage: Sqaud Table
+	captain = 'fas fa-crown',
+	substitute = 'fas fa-people-arrows',
 }

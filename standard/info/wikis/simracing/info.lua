@@ -10,6 +10,7 @@ return {
 	startYear = 2000,
 	wikiName = 'simracing',
 	name = 'Sim Racing',
+	defaultGame = 'sr',
 	games = {
 		sr = {
 			abbreviation = 'SR',
@@ -805,8 +806,12 @@ return {
 			},
 		},
 	},
-	defaultGame = 'sr',
-	defaultTeamLogo = 'Sim Racing default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Sim Racing default darkmode.png', ---@deprecated
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+	},
 	match2 = 0,
 }

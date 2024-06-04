@@ -333,9 +333,9 @@ return {
 	},
 	idr = {
 		code = 'IDR',
-		name = 'Indonesian Rupee',
+		name = 'Indonesian rupiah',
 		symbol = {
-			hasSpace = true,
+			hasSpace = false,
 			isAfter = false,
 			text = 'Rp',
 		},
@@ -383,6 +383,15 @@ return {
 			hasSpace = true,
 			isAfter = true,
 			text = 'kr',
+		},
+	},
+	jod = {
+		code = 'JOD',
+		name = 'Jordanian Dinar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'د.أ',
 		},
 	},
 	jpy = {

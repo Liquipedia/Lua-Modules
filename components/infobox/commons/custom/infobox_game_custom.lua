@@ -11,12 +11,13 @@ local Lua = require('Module:Lua')
 
 local Game = Lua.import('Module:Infobox/Game')
 
-local CustomGame = Class.new()
+---@class CustomGameInfobox: GameInfobox
+local CustomGame = Class.new(Game)
 
 ---@param frame Frame
 ---@return Html
 function CustomGame.run(frame)
-	local customGame = Game(frame)
+	local customGame = CustomGame(frame)
 	return customGame:createInfobox()
 end
 

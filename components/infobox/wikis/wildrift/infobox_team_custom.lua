@@ -49,7 +49,7 @@ end
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(id, widgets)
+function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
