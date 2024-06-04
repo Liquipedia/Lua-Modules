@@ -3,7 +3,7 @@
 	"devDependencies": {
 		"eslint-config-wikimedia": "*",
 		"grunt": "*",
-		"grunt-eslint": "*",
+		"grunt-eslint": "24.x.x",
 		"grunt-stylelint": "*",
 		"jquery": "*",
 		"postcss-less": "*",
