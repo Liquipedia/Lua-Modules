@@ -162,15 +162,7 @@ function CustomMatchSummary.createBody(match)
 		Array.forEach(Array.map(match.vetoes, CustomMatchSummary.Veto), FnUtil.curry(body.addRow, body))
 	end
 
-	if match.casters then
-		local casters = Json.parseIfString(match.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.casters))
 
 	return body
 end

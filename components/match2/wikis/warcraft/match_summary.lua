@@ -165,15 +165,7 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(CustomMatchSummary.Veto(veto))
 	end)
 
-	if match.casters then
-		local casters = Json.parseIfString(match.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.casters))
 
 	return body
 end
