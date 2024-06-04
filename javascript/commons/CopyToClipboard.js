@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.copytoclipboard = {
 	init: function() {
-		document.querySelectorAll( '.copy-to-clipboard' ).forEach( function( copy ) {
+		document.querySelectorAll( '.copy-to-clipboard' ).forEach( ( copy ) => {
 			const button = copy.querySelector( '.see-this' );
 			if ( button !== null ) {
 				button.addEventListener( 'click', liquipedia.copytoclipboard.buttonEventListener );
@@ -56,7 +56,7 @@ liquipedia.copytoclipboard = {
 			trigger: 'manual'
 		} );
 		$copy.tooltip( 'show' );
-		window.setTimeout( function() {
+		window.setTimeout( () => {
 			$copy.tooltip( 'hide' );
 		}, timeout );
 	}

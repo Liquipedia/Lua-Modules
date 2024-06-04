@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.prizepooltable = {
 	init: function() {
-		document.querySelectorAll( '.prizepooltable' ).forEach( function( prizepooltable ) {
+		document.querySelectorAll( '.prizepooltable' ).forEach( ( prizepooltable ) => {
 			let cutAfter;
 			if ( typeof prizepooltable.dataset.cutafter !== 'undefined' ) {
 				cutAfter = parseInt( prizepooltable.dataset.cutafter );
@@ -32,7 +32,7 @@ liquipedia.prizepooltable = {
 				}
 			}
 		} );
-		document.querySelectorAll( '.prizepooltabletoggle' ).forEach( function( prizepooltabletogglebutton ) {
+		document.querySelectorAll( '.prizepooltabletoggle' ).forEach( ( prizepooltabletogglebutton ) => {
 			prizepooltabletogglebutton.onclick = function() {
 				this.closest( '.prizepooltable' ).classList.toggle( 'collapsed' );
 			};
