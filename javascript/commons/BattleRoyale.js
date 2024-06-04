@@ -412,9 +412,7 @@ liquipedia.battleRoyale = {
 					this.changeButtonStyle( b, 'default' );
 				}
 				this.changeButtonStyle( button, newOrder );
-				const sorted = sortableRows.sort( function( a, b ) {
-					return this.comparator( a, b, newOrder, sortType );
-				}.bind( this ) );
+				const sorted = sortableRows.sort( ( a, b ) => this.comparator( a, b, newOrder, sortType ) );
 
 				sorted.forEach( ( element, index ) => {
 					if ( element.style.order ) {
@@ -484,7 +482,7 @@ liquipedia.battleRoyale = {
 			this.makeSortableTable( instance );
 		} );
 
-		Object.keys( this.battleRoyaleInstances ).forEach( function ( instanceId ) {
+		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
 
@@ -518,7 +516,7 @@ liquipedia.battleRoyale = {
 				this.implementScrollWheelEvent();
 			}
 
-		}.bind( this ) );
+		} );
 	}
 };
 liquipedia.core.modules.push( 'battleRoyale' );
