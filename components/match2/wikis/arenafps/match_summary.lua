@@ -8,12 +8,10 @@
 
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')

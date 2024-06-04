@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
