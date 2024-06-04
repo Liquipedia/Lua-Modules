@@ -26,6 +26,7 @@ local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
 	banned = 'cinnabar-bg',
+	['passed away'] = 'gigas-bg',
 }
 
 local PortalPlayers = Lua.import('Module:PortalPlayers')
