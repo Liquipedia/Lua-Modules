@@ -16,7 +16,7 @@
 		"no-duplicate-selectors": null,
 		"function-url-no-scheme-relative": null,
 		"declaration-no-important": null,
-		"stylistic/string-quotes": "single",
+		"stylistic/string-quotes": "double",
 		"function-no-unknown": null
 	}
 }
