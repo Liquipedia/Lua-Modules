@@ -33,7 +33,7 @@ liquipedia.commonstools = {
 			const api = new mw.ForeignApi( '/api.php' );
 			api.get( {
 				action: 'listwikis'
-			} ).done( function( data ) {
+			} ).done( ( data ) => {
 				liquipedia.commonstools.wikis = data.allwikis;
 				callback();
 			} );
@@ -43,7 +43,7 @@ liquipedia.commonstools = {
 	},
 	checkForPageExistence: function( ev ) {
 		ev.preventDefault();
-		mw.loader.using( [ 'mediawiki.ForeignApi', 'mediawiki.api' ], function() {
+		mw.loader.using( [ 'mediawiki.ForeignApi', 'mediawiki.api' ], () => {
 			liquipedia.commonstools.setupWikisWithCallback( liquipedia.commonstools.checkForPageExistenceReal );
 		} );
 	},
@@ -76,7 +76,7 @@ liquipedia.commonstools = {
 			format: 'json',
 			formatversion: 2,
 			titles: title
-		} ).done( function( data ) {
+		} ).done( ( data ) => {
 			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
@@ -110,7 +110,7 @@ liquipedia.commonstools = {
 	},
 	checkPageText: function( ev ) {
 		ev.preventDefault();
-		mw.loader.using( [ 'mediawiki.ForeignApi', 'mediawiki.api' ], function() {
+		mw.loader.using( [ 'mediawiki.ForeignApi', 'mediawiki.api' ], () => {
 			liquipedia.commonstools.setupWikisWithCallback( liquipedia.commonstools.checkPageTextReal );
 		} );
 	},
@@ -133,7 +133,7 @@ liquipedia.commonstools = {
 				format: 'json',
 				formatversion: 2,
 				titles: title
-			} ).done( function( data ) {
+			} ).done( ( data ) => {
 				if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 					listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 				} else {
@@ -170,7 +170,7 @@ liquipedia.commonstools = {
 			format: 'json',
 			formatversion: 2,
 			titles: title
-		} ).done( function( data ) {
+		} ).done( ( data ) => {
 			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
@@ -203,12 +203,12 @@ liquipedia.commonstools = {
 						listElement.append( postButton );
 					}
 				}
-				postButton.addEventListener( 'click', function() {
+				postButton.addEventListener( 'click', () => {
 					const api2 = new mw.Api( { ajax: { url: wikiData.api } } );
 					api2.get( {
 						action: 'query',
 						meta: 'tokens'
-					} ).done( function( data2 ) {
+					} ).done( ( data2 ) => {
 						const editToken = data2.query.tokens.csrftoken;
 						if ( editToken === '+\\' ) {
 							const errorMessage = document.createElement( 'p' );
@@ -221,7 +221,7 @@ liquipedia.commonstools = {
 								title: title,
 								text: liquipedia.commonstools.checkPageTextRealSourceText,
 								token: editToken
-							} ).done( function() {
+							} ).done( () => {
 								const successMessage = document.createElement( 'p' );
 								successMessage.style.color = '#006400';
 								successMessage.innerHTML = 'Transferred!';
@@ -234,12 +234,12 @@ liquipedia.commonstools = {
 		} );
 	},
 	timeoutPageExistenceApi: function( i, wiki, wikiData, title, listElement ) {
-		setTimeout( function() {
+		setTimeout( () => {
 			liquipedia.commonstools.checkForPageExistenceApiCall( wiki, wikiData, title, listElement );
 		}, i * 1000 );
 	},
 	timeoutPageTextApi: function( i, wiki, wikiData, title, sourceWiki, listElement ) {
-		setTimeout( function() {
+		setTimeout( () => {
 			liquipedia.commonstools.checkPageTextApiCall( wiki, wikiData, title, sourceWiki, listElement );
 		}, i * 1000 );
 	}
