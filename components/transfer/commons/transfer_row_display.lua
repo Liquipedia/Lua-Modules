@@ -314,7 +314,7 @@ function TransferRowDisplay:_displayTeam(args)
 
 	teamCell:node(table.concat(Array.map(data.teams, function(team)
 		return displayTeam(team, args.date)
-	end), '/'))
+	end), ' / '))
 
 	local roleCell = self:_createRole(data.roles, data.teams[1])
 
