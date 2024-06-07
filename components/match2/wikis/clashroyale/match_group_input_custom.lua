@@ -17,8 +17,8 @@ local Table = require('Module:Table')
 local CardNames = mw.loadData('Module:CardNames')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input', {requireDevIfEnabled = true})
-local Streams = Lua.import('Module:Links/Stream', {requireDevIfEnabled = true})
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local Streams = Lua.import('Module:Links/Stream')
 
 local Opponent = require('Module:OpponentLibraries').Opponent
 
@@ -30,8 +30,7 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local EPOCH_TIME_EXTENDED = '1970-01-01T00:00:00+00:00'
-local NOW = os.time(os.date('!*t'))
+local NOW = os.time(os.date('!*t')) --[[@as osdateparam]]
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 local MAX_NUM_PLAYERS_PER_MAP = 2
 local TBD = 'tbd'
@@ -44,11 +43,10 @@ CustomMatchGroupInput.walkoverProcessing = {}
 local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
+---@param match table
+---@return table
 function CustomMatchGroupInput.processMatch(match)
-	Table.mergeInto(
-		match,
-		CustomMatchGroupInput._readDate(match)
-	)
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = CustomMatchGroupInput._getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
@@ -58,16 +56,143 @@ function CustomMatchGroupInput.processMatch(match)
 	return match
 end
 
-function CustomMatchGroupInput._readDate(matchArgs)
-	if matchArgs.date then
-		return MatchGroupInput.readDate(matchArgs.date)
-	else
-		return {
-			date = EPOCH_TIME_EXTENDED,
-			dateexact = false,
-			timestamp = DateExt.epochZero,
-		}
+function CustomMatchGroupInput.getIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
 	end
+end
+
+function CustomMatchGroupInput.processOpponent(record, timestamp)
+	local opponent = Opponent.readOpponentArgs(record)
+		or Opponent.blank()
+
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is epoch, resolve using tournament dates instead
+	-- Epoch indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+	end
+
+	Opponent.resolve(opponent, teamTemplatedate)---, {syncPlayer=true})
+
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+
+	for _, player in pairs(record.players or {}) do
+		player.name = player.name:gsub(' ', '_')
+	end
+
+	if record.name then
+		record.name = record.name:gsub(' ', '_')
+	end
+
+	if record.type == Opponent.team then
+		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
+		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
+	end
+
+	return record
+end
+
+function walkoverProcessing.walkover(obj, scores)
+	local walkover = obj.walkover
+
+	if Logic.isNumeric(walkover) then
+		walkoverProcessing.numericWalkover(obj, walkover)
+	elseif walkover then
+		walkoverProcessing.nonNumericWalkover(obj, walkover)
+	elseif #scores ~=2 then -- since we always have 2 opponents
+		error('Unexpected number of opponents when calculating winner')
+	elseif Array.all(scores, function(score)
+			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
+		end) then
+
+		walkoverProcessing.scoreDoubleWalkover(obj, scores)
+	elseif Array.any(scores, function(score) return Table.includes(ALLOWED_STATUSES, score) end) then
+		walkoverProcessing.scoreWalkover(obj, scores)
+	end
+end
+
+function walkoverProcessing.numericWalkover(obj, walkover)
+	local winner = tonumber(walkover)
+
+	obj.winner = winner
+	obj.finished = true
+	obj.walkover = UNKNOWN_REASON_LOSS_STATUS
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.nonNumericWalkover(obj, walkover)
+	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
+		error('Invalid walkover "' .. walkover .. '"')
+	elseif not Logic.isNumeric(obj.winner) then
+		error('Walkover without winner specified')
+	end
+
+	obj.winner = tonumber(obj.winner)
+	obj.finished = true
+	obj.walkover = walkover:upper()
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.scoreDoubleWalkover(obj, scores)
+	obj.winner = -1
+	obj.finished = true
+	obj.walkover = scores[1]
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.scoreWalkover(obj, scores)
+	local winner, status
+
+	for scoreIndex, score in pairs(scores) do
+		score = string.upper(score)
+		if score == DEFAULT_WIN_STATUS then
+			winner = scoreIndex
+		elseif Table.includes(ALLOWED_STATUSES, score) then
+			status = score
+		else
+			status = UNKNOWN_REASON_LOSS_STATUS
+		end
+	end
+
+	if not winner then
+		error('Invalid score combination "{' .. scores[1] .. ', ' .. scores[2] .. '}"')
+	end
+
+	obj.winner = winner
+	obj.finished = true
+	obj.walkover = status
+	obj.resulttype = DEFAULT_WIN_RESULTTYPE
+end
+
+function walkoverProcessing.applyMatchWalkoverToOpponents(match)
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		local score = match['opponent' .. opponentIndex].score
+
+		if Logic.isNumeric(score) or String.isEmpty(score) then
+			match['opponent' .. opponentIndex].score = String.isNotEmpty(score) and score or NO_SCORE
+			match['opponent' .. opponentIndex].status = match.walkover
+		elseif score and Table.includes(ALLOWED_STATUSES, score:upper()) then
+			match['opponent' .. opponentIndex].score = NO_SCORE
+			match['opponent' .. opponentIndex].status = score
+		else
+			error('Invalid score "' .. score .. '"')
+		end
+	end
+
+	-- neither match.opponent0 nor match['opponent-1'] does exist hence the if
+	if match['opponent' .. match.winner] then
+		match['opponent' .. match.winner].status = DEFAULT_WIN_STATUS
+	end
+end
+
+function CustomMatchGroupInput._hasTeamOpponent(match)
+	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
 function CustomMatchGroupInput._getTournamentVars(match)
@@ -139,8 +264,6 @@ function CustomMatchGroupInput._adjustData(match)
 
 	if CustomMatchGroupInput._hasTeamOpponent(match) then
 		match = CustomMatchGroupInput._subMatchStructure(match)
-	else
-		mw.logObject(match)
 	end
 
 	if Logic.isNumeric(match.winner) then
@@ -215,7 +338,7 @@ function CustomMatchGroupInput._checkFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	if not match.finished and match.timestamp > DateExt.epochZero then
+	if not match.finished and match.timestamp > DateExt.defaultTimestamp then
 		local threshold = match.dateexact and 30800 or 86400
 		if match.timestamp + threshold < NOW then
 			match.finished = true
@@ -333,42 +456,6 @@ function CustomMatchGroupInput._opponentInput(match)
 	end
 
 	return match
-end
-
-function CustomMatchGroupInput.processOpponent(record, timestamp)
-	local opponent = Opponent.readOpponentArgs(record)
-		or Opponent.blank()
-
-	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not 1970-01-01
-	if teamTemplateDate == DateExt.epochZero then
-		teamTemplateDate = Variables.varDefaultMulti(
-			'tournament_enddate',
-			'tournament_startdate',
-			NOW
-		)
-	end
-
-	Opponent.resolve(opponent, teamTemplatedate, {syncPlayer=true})
-
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-
-	for _, player in pairs(record.players or {}) do
-		player.name = player.name:gsub(' ', '_')
-	end
-
-	if record.name then
-		record.name = record.name:gsub(' ', '_')
-	end
-
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
-	end
-
-	return record
 end
 
 function CustomMatchGroupInput._readTeamPlayers(opponent, playerData)
@@ -634,114 +721,6 @@ function CustomMatchGroupInput._readCards(input)
 	end
 
 	return cards
-end
-
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
-end
-
-function CustomMatchGroupInput._hasTeamOpponent(match)
-	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
-end
-
-
-
-function walkoverProcessing.walkover(obj, scores)
-	local walkover = obj.walkover
-
-	if Logic.isNumeric(walkover) then
-		walkoverProcessing.numericWalkover(obj, walkover)
-	elseif walkover then
-		walkoverProcessing.nonNumericWalkover(obj, walkover)
-	elseif #scores ~=2 then -- since we always have 2 opponents
-		error('Unexpected number of opponents when calculating winner')
-	elseif Array.all(scores, function(score)
-			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
-		end) then
-
-		walkoverProcessing.scoreDoubleWalkover(obj, scores)
-	elseif Array.any(scores, function(score) return Table.includes(ALLOWED_STATUSES, score) end) then
-		walkoverProcessing.scoreWalkover(obj, scores)
-	end
-end
-
-function walkoverProcessing.numericWalkover(obj, walkover)
-	local winner = tonumber(walkover)
-
-	obj.winner = winner
-	obj.finished = true
-	obj.walkover = UNKNOWN_REASON_LOSS_STATUS
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
-end
-
-function walkoverProcessing.nonNumericWalkover(obj, walkover)
-	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
-		error('Invalid walkover "' .. walkover .. '"')
-	elseif not Logic.isNumeric(obj.winner) then
-		error('Walkover without winner specified')
-	end
-
-	obj.winner = tonumber(obj.winner)
-	obj.finished = true
-	obj.walkover = walkover:upper()
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
-end
-
-function walkoverProcessing.scoreDoubleWalkover(obj, scores)
-	obj.winner = -1
-	obj.finished = true
-	obj.walkover = scores[1]
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
-end
-
-function walkoverProcessing.scoreWalkover(obj, scores)
-	local winner, status
-
-	for scoreIndex, score in pairs(scores) do
-		score = string.upper(score)
-		if score == DEFAULT_WIN_STATUS then
-			winner = scoreIndex
-		elseif Table.includes(ALLOWED_STATUSES, score) then
-			status = score
-		else
-			status = UNKNOWN_REASON_LOSS_STATUS
-		end
-	end
-
-	if not winner then
-		error('Invalid score combination "{' .. scores[1] .. ', ' .. scores[2] .. '}"')
-	end
-
-	obj.winner = winner
-	obj.finished = true
-	obj.walkover = status
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
-end
-
-function walkoverProcessing.applyMatchWalkoverToOpponents(match)
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local score = match['opponent' .. opponentIndex].score
-
-		if Logic.isNumeric(score) or String.isEmpty(score) then
-			match['opponent' .. opponentIndex].score = String.isNotEmpty(score) and score or NO_SCORE
-			match['opponent' .. opponentIndex].status = match.walkover
-		elseif score and Table.includes(ALLOWED_STATUSES, score:upper()) then
-			match['opponent' .. opponentIndex].score = NO_SCORE
-			match['opponent' .. opponentIndex].status = score
-		else
-			error('Invalid score "' .. score .. '"')
-		end
-	end
-
-	-- neither match.opponent0 nor match['opponent-1'] does exist hence the if
-	if match['opponent' .. match.winner] then
-		match['opponent' .. match.winner].status = DEFAULT_WIN_STATUS
-	end
 end
 
 return CustomMatchGroupInput
