@@ -23,6 +23,7 @@ local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 local TransferRef = Lua.import('Module:Transfer/Refences')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
+local EMPTY_POSITION_ICON = '[[File:Logo filler event.png|16px|link=]]'
 local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
 local TRANSFER_ARROW = '&#x21d2;'
 local RUMOUR_STATUS_TO_ICON_ARGS = {
@@ -364,18 +365,25 @@ function TransferRowDisplay:icon()
 	---@param iconInput string?
 	---@return string
 	local getIcon = function(iconInput)
-		local icon = IconModule[string.lower(iconInput or '')]
+		if Logic.isEmpty(iconInput) then
+			return EMPTY_POSITION_ICON
+		end
+		---@cast iconInput -nil
+		local icon = IconModule[iconInput:lower()]
 		if not icon then
 			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
-			return '[[File:Logo filler event.png|16px|link=]][[Category:Pages with transfer errors]]'
+			mw.ext.TeamLiquidIntegration.add_category('Pages with transfer errors')
+			return EMPTY_POSITION_ICON
 		end
 
 		return icon
 	end
 
+	local targetRoleIsSpecialRole = TransferRowDisplay:_isSpecialRole(self.transfer.to.roles[1])
+
 	local iconRows = Array.map(self.transfer.players, function(player)
 		return getIcon(player.icons[1]) .. '&nbsp;' .. TRANSFER_ARROW ..
-			'&nbsp;' .. getIcon(player.icons[2] or player.icons[1])
+			'&nbsp;' .. getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
 	end)
 	iconCell:wikitext(table.concat(iconRows, '<br>'))
 
