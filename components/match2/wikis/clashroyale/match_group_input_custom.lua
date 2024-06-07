@@ -37,6 +37,9 @@ local TBD = 'tbd'
 local TBA = 'tba'
 local MAX_NUM_MAPS = 30
 
+-- containers for process helper functions
+local matchFunctions = {}
+
 local CustomMatchGroupInput = {}
 
 CustomMatchGroupInput.walkoverProcessing = {}
@@ -47,11 +50,10 @@ local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 ---@return table
 function CustomMatchGroupInput.processMatch(match)
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
-	match = CustomMatchGroupInput._getExtraData(match)
+	match = matchFunctions.getExtraData(match)
 	match = CustomMatchGroupInput._getTournamentVars(match)
 	match = CustomMatchGroupInput._adjustData(match)
-	match = CustomMatchGroupInput._getVodStuff(match)
-	match = CustomMatchGroupInput._getLinks(match)
+	match = matchFunctions.getVodStuff(match)
 
 	return match
 end
@@ -201,21 +203,20 @@ function CustomMatchGroupInput._getTournamentVars(match)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
-function CustomMatchGroupInput._getVodStuff(match)
+function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
-	match.vod = Logic.emptyOr(match.vod)
+	match.vod = Logic.nilIfEmpty(match.vod)
 
-	return match
-end
-
-function CustomMatchGroupInput._getLinks(match)
 	match.links = {
 		royaleapi = match.royaleapi and (ROYALE_API_PREFIX .. match.royaleapi) or nil,
 	}
+
 	return match
 end
 
-function CustomMatchGroupInput._getExtraData(match)
+---@param match table
+---@return table
+function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
 		mvpteam = match.mvpteam or match.winner,
@@ -227,7 +228,7 @@ function CustomMatchGroupInput._getExtraData(match)
 	for subGroupIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'subgroup' .. subGroupIndex
 
-		match.extradata[prefix .. 'header'] = CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
+		match.extradata[prefix .. 'header'] = String.nilIfEmpty(match['subgroup' .. subGroupIndex .. 'header'])
 		match.extradata[prefix .. 'iskoth'] = Logic.readBool(match[prefix .. 'iskoth']) or nil
 		match.extradata[prefix .. 't1bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't1bans'])
 		match.extradata[prefix .. 't2bans'] = CustomMatchGroupInput._readBans(match[prefix .. 't2bans'])
@@ -236,16 +237,10 @@ function CustomMatchGroupInput._getExtraData(match)
 	return match
 end
 
-function CustomMatchGroupInput._getSubGroupHeader(subGroupIndex, match)
-	local header = match['subgroup' .. subGroupIndex .. 'header']
-
-	return String.isNotEmpty(header) and header or nil
-end
-
 function CustomMatchGroupInput._readBans(bansInput)
 	local bans = CustomMatchGroupInput._readCards(bansInput)
 
-	return Table.isNotEmpty(bans) and bans or nil
+	return Logic.nilIfEmpty(bans)
 end
 
 function CustomMatchGroupInput._adjustData(match)
