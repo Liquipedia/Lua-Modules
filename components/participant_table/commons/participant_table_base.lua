@@ -30,6 +30,7 @@ local PlayerExt = Lua.import('Module:Player/Ext')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
+local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
@@ -298,14 +299,17 @@ function ParticipantTable:store()
 	return self
 end
 
----Get placements already set on the page from prize pools
----@return table<string, true>
+---Get placements already set on the page from prize pools ABOVE the participant table
+---@return table<string, placement>
 function ParticipantTable:getPlacements()
 	local placements = {}
-	Array.forEach(mw.ext.LiquipediaDB.lpdb('placement', {
-		limit = 5000,
-		conditions = '[[placement::!]] AND [[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']]',
-	}), function(placement) placements[placement.opponentname] = placement end)
+	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+
+	for prizePoolIndex = 1, maxPrizePoolIndex do
+		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
+			placements[placement.opponentname] = placement
+		end)
+	end
 
 	return placements
 end

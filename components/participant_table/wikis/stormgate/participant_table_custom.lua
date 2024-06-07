@@ -11,7 +11,6 @@ local Json = require('Module:Json')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -44,8 +43,6 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local prizePoolVars = PageVariableNamespace('PrizePool')
-
 local StormgateParticipantTable = {}
 
 ---@param frame Frame
@@ -56,7 +53,6 @@ function StormgateParticipantTable.run(frame)
 	participantTable.readConfig = StormgateParticipantTable.readConfig
 	participantTable.readEntry = StormgateParticipantTable.readEntry
 	participantTable.adjustLpdbData = StormgateParticipantTable.adjustLpdbData
-	participantTable.getPlacements = StormgateParticipantTable.getPlacements
 	participantTable._displaySoloFactionTableSection = StormgateParticipantTable._displaySoloFactionTableSection
 	participantTable._displayHeader = StormgateParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StormgateParticipantTable._getFactionNumbers
@@ -152,20 +148,6 @@ function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.extradata.isqualified = tostring(isQualified)
 
 	lpdbData.qualified = isQualified and 1 or nil
-end
-
----@return table<string, placement>
-function StormgateParticipantTable:getPlacements()
-	local placements = {}
-	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-
-	for prizePoolIndex = 1, maxPrizePoolIndex do
-		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
-			placements[placement.opponentname] = placement
-		end)
-	end
-
-	return placements
 end
 
 ---@param sections StormgateParticipantTableSection[]
