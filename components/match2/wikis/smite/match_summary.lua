@@ -120,13 +120,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Pre-Process God Ban Data
 	local godBans = {}
