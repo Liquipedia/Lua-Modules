@@ -18,6 +18,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
+local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
 local TransferRef = Lua.import('Module:Transfer/Refences')
@@ -59,11 +60,15 @@ local CONFIDENCE_TO_COLOR = {
 
 ---@class TransferRowDisplay: BaseClass
 ---@field transfer enrichedTransfer
+---@field config {showTeamName: boolean?}
 ---@field display Html
 local TransferRowDisplay = Class.new(
 	---@param transfers transfer[]
 	---@return self
 	function(self, transfers)
+		self.config = {
+			showTeamName = (Info.config.transfers or {}).showTeamName,
+		}
 		self.transfer = self:_enrichTransfers(transfers)
 		self.display = mw.html.create('div')
 
@@ -300,18 +305,24 @@ end
 ---@param args {isOldTeam: boolean, date: string, data: {teams: string[], roles: string[]}}
 ---@return Html
 function TransferRowDisplay:_displayTeam(args)
+	local showTeamName = self.config.showTeamName
 	local isOldTeam = args.isOldTeam
 	local data = args.data
 	local align = isOldTeam and 'right' or 'left'
 	local teamCell = mw.html.create('div')
 		:addClass('divCell Team ' .. (isOldTeam and 'OldTeam' or 'NewTeam'))
-		:css('text-align', align)
 
-	if not data.teams[1] and not data.roles[1] then
-		return teamCell:node(self:_createRole{'&nbsp;None&nbsp;'}:css('margin-' .. align, '60px'))
+	if showTeamName then
+		teamCell:css('text-align', align)
 	end
 
-	local displayTeam = isOldTeam and mw.ext.TeamTemplate.team2short or mw.ext.TeamTemplate.teamshort
+	if not data.teams[1] and not data.roles[1] then
+		return teamCell:node(self:_createRole{'&nbsp;None&nbsp;'}:css('margin-' .. align, showTeamName and '60px' or nil))
+	end
+
+	local displayTeam = showTeamName and
+		(isOldTeam and mw.ext.TeamTemplate.team2short or mw.ext.TeamTemplate.teamshort) or
+		mw.ext.TeamTemplate.teamicon
 
 	teamCell:node(table.concat(Array.map(data.teams, function(team)
 		return displayTeam(team, args.date)
@@ -319,7 +330,7 @@ function TransferRowDisplay:_displayTeam(args)
 
 	local roleCell = self:_createRole(data.roles, data.teams[1])
 
-	if roleCell and not data.teams[1] then
+	if roleCell and showTeamName and not data.teams[1] then
 		roleCell:css('margin-' .. align, '60px')
 	end
 
