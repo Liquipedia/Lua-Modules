@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local HeroData = mw.loadData('Module:HeroData')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -162,15 +161,7 @@ function CustomMatchSummary.createBody(match)
 		Array.forEach(Array.map(match.vetoes, CustomMatchSummary.Veto), FnUtil.curry(body.addRow, body))
 	end
 
-	if match.casters then
-		local casters = Json.parseIfString(match.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.casters))
 
 	return body
 end

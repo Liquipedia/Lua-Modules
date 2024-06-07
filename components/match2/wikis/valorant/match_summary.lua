@@ -349,6 +349,8 @@ function CustomMatchSummary.createBody(match)
 		end
 	end
 
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+
 	return body
 end
 
