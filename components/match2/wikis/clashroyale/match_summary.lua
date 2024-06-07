@@ -136,6 +136,21 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		date = date,
 	})
 
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+
+	end
+
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
