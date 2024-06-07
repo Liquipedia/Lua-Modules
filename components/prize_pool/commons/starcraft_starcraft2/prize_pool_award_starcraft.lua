@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
