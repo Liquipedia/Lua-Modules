@@ -240,9 +240,7 @@ liquipedia.filterButtons = {
 				if ( filterGroup.curated || filterGroup.defaultCurated ) {
 					return filterGroup.curated === filterGroup.defaultCurated;
 				}
-				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => {
-					return filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ];
-				} );
+				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ] );
 			} );
 			if ( isDefault ) {
 				templateExpansion.element.innerHTML = templateExpansion.cache.default;

@@ -4,8 +4,8 @@
  ******************************************************************************/
 liquipedia.crosstable = {
 	init: function() {
-		document.querySelectorAll( '.crosstable' ).forEach( function( crosstable ) {
-			crosstable.querySelectorAll( 'td, th' ).forEach( function( cell ) {
+		document.querySelectorAll( '.crosstable' ).forEach( ( crosstable ) => {
+			crosstable.querySelectorAll( 'td, th' ).forEach( ( cell ) => {
 				cell.onmouseover = function() {
 					const row = this.closest( 'tr' );
 					crosstable.classList.add( 'crosstable-row-' + ( row.rowIndex + 1 ) );

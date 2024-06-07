@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local ChampionNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -264,6 +265,8 @@ function BigMatch._match2Director(args)
 		-- Match not found on the API
 		assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 
+		BigMatch._cleanChampions(map)
+
 		-- Convert seconds to minutes and seconds
 		map.length = map.length and (math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)) or nil
 
@@ -306,6 +309,27 @@ function BigMatch._match2Director(args)
 	Match.store(match, {storeMatch1 = false})
 
 	return Table.merge(matchData, WikiSpecific.matchFromRecord(match))
+end
+
+---@param map table
+function BigMatch._cleanChampions(map)
+	local cleanChampion = function(champion)
+		return ChampionNames[champion and champion:lower()]
+	end
+
+	Array.forEach(map.championVeto or {}, function(veto)
+		veto.champion = cleanChampion(veto.champion)
+	end)
+
+	Array.forEach(TEAMS, function(teamIndex)
+		local teamData = map['team' .. teamIndex]
+		teamData.ban = teamData.ban and Array.map(teamData.ban, cleanChampion) or nil
+		teamData.pick = teamData.ban and Array.map(teamData.pick, cleanChampion) or nil
+
+		Array.forEach(teamData.players, function(player)
+			player.champion = cleanChampion(player.champion)
+		end)
+	end)
 end
 
 ---@param model table

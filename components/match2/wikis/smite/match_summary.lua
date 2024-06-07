@@ -14,7 +14,9 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
+local Json = require('Module:Json')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -28,6 +30,8 @@ local Opponent = Lua.import('Module:Opponent')
 local MAX_NUM_BANS = 5
 local NUM_GODS_PICK_TEAM = 5
 local NUM_GODS_PICK_SOLO = 1
+local NUM_GODS_PICK_TEAM = 5
+local NUM_GODS_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
@@ -35,9 +39,13 @@ local NO_CHARACTER = 'default'
 -- God Ban Class
 ---@class SmiteGodBan: MatchSummaryRowInterface
 ---@operator call: SmiteGodBan
+-- God Ban Class
+---@class SmiteGodBan: MatchSummaryRowInterface
+---@operator call: SmiteGodBan
 ---@field root Html
 ---@field table Html
 ---@field date string
+local GodBan = Class.new(
 local GodBan = Class.new(
 	function(self, date)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
@@ -49,6 +57,7 @@ local GodBan = Class.new(
 )
 
 ---@return self
+function GodBan:createHeader()
 function GodBan:createHeader()
 	self.table:tag('tr')
 		:tag('th'):css('width', '40%'):wikitext(''):done()
@@ -62,8 +71,10 @@ end
 ---@param numberOfBans integer
 ---@return self
 function GodBan:banRow(banData, gameNumber, numberOfBans)
+function GodBan:banRow(banData, gameNumber, numberOfBans)
 	self.table:tag('tr')
 		:tag('td'):css('float', 'left')
+			:node(CustomMatchSummary._opponentGodsDisplay(banData[1], numberOfBans, true, self.date))
 			:node(CustomMatchSummary._opponentGodsDisplay(banData[1], numberOfBans, true, self.date))
 		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
 			:wikitext(Abbreviation.make(
@@ -73,11 +84,13 @@ function GodBan:banRow(banData, gameNumber, numberOfBans)
 		)
 		:tag('td'):css('float', 'right')
 			:node(CustomMatchSummary._opponentGodsDisplay(banData[2], numberOfBans, true, self.date))
+			:node(CustomMatchSummary._opponentGodsDisplay(banData[2], numberOfBans, true, self.date))
 	return self
 end
 
 
 ---@return Html
+function GodBan:create()
 function GodBan:create()
 	return self.root
 end
@@ -144,20 +157,27 @@ function CustomMatchSummary.createBody(match)
 			banData[2].side = extradata.team2side
 			banData.numberOfBans = numberOfBans
 			godBans[gameIndex] = banData
+			godBans[gameIndex] = banData
 		end
 	end
 
 	-- Add the God Bans
 	if not Table.isEmpty(godBans) then
 		local godBan = GodBan(match.date)
+	-- Add the God Bans
+	if not Table.isEmpty(godBans) then
+		local godBan = GodBan(match.date)
 
 		for gameIndex in ipairs(match.games) do
 			local banData = godBans[gameIndex]
+			local banData = godBans[gameIndex]
 			if banData then
+				godBan:banRow(banData, gameIndex, banData.numberOfBans)
 				godBan:banRow(banData, gameIndex, banData.numberOfBans)
 			end
 		end
 
+		body:addRow(godBan)
 		body:addRow(godBan)
 	end
 
@@ -173,7 +193,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local extradata = game.extradata or {}
 
 	local numberOfGods = NUM_GODS_PICK_TEAM
+	local numberOfGods = NUM_GODS_PICK_TEAM
 	if game.mode == Opponent.solo then
+		numberOfGods = NUM_GODS_PICK_SOLO
 		numberOfGods = NUM_GODS_PICK_SOLO
 	end
 
@@ -181,10 +203,18 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	for godIndex = 1, numberOfGods do
 		if String.isNotEmpty(extradata['team1god' .. godIndex]) then
 			godsData[1][godIndex] = extradata['team1god' .. godIndex]
+	local godsData = {{}, {}}
+	for godIndex = 1, numberOfGods do
+		if String.isNotEmpty(extradata['team1god' .. godIndex]) then
+			godsData[1][godIndex] = extradata['team1god' .. godIndex]
 		end
 		if String.isNotEmpty(extradata['team2god' .. godIndex]) then
 			godsData[2][godIndex] = extradata['team2god' .. godIndex]
+		if String.isNotEmpty(extradata['team2god' .. godIndex]) then
+			godsData[2][godIndex] = extradata['team2god' .. godIndex]
 		end
+		godsData[1].side = extradata.team1side
+		godsData[2].side = extradata.team2side
 		godsData[1].side = extradata.team1side
 		godsData[2].side = extradata.team2side
 	end
@@ -195,6 +225,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		:css('min-height', '32px')
 
 	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[1], numberOfGods, false, date))
+	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[1], numberOfGods, false, date))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -204,6 +235,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			))
 		)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[2], numberOfGods, true, date))
 	row:addElement(CustomMatchSummary._opponentGodsDisplay(godsData[2], numberOfGods, true, date))
 
 	-- Add Comment
@@ -237,24 +269,35 @@ end
 
 ---@param opponentgodsData table
 ---@param numberOfGods integer
+---@param opponentgodsData table
+---@param numberOfGods integer
 ---@param flip boolean?
 ---@param date string
 ---@return Html
 function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods, flip, date)
 	local opponentGodsDisplay = {}
 	local color = opponentgodsData.side or ''
+function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods, flip, date)
+	local opponentGodsDisplay = {}
+	local color = opponentgodsData.side or ''
 
+	for index = 1, numberOfGods do
+		local godDisplay = mw.html.create('div')
 	for index = 1, numberOfGods do
 		local godDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. color)
 			:node(CharacterIcon.Icon{
 				character = opponentgodsData[index] or NO_CHARACTER,
+				character = opponentgodsData[index] or NO_CHARACTER,
 				date = date
 			})
 		if numberOfGods == NUM_GODS_PICK_SOLO then
+		if numberOfGods == NUM_GODS_PICK_SOLO then
 			if flip then
 				godDisplay:css('margin-right', '70px')
+				godDisplay:css('margin-right', '70px')
 			else
+				godDisplay:css('margin-left', '70px')
 				godDisplay:css('margin-left', '70px')
 			end
 		end
@@ -263,6 +306,7 @@ function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods,
 
 	if flip then
 		opponentGodsDisplay = Array.reverse(opponentGodsDisplay)
+		opponentGodsDisplay = Array.reverse(opponentGodsDisplay)
 	end
 
 	local display = mw.html.create('div')
@@ -270,6 +314,7 @@ function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods,
 		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
 		:addClass('brkts-champion-icon')
 
+	for _, item in ipairs(opponentGodsDisplay) do
 	for _, item in ipairs(opponentGodsDisplay) do
 		display:node(item)
 	end
