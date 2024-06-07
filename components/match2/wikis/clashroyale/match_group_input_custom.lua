@@ -719,3 +719,4 @@ function CustomMatchGroupInput._readCards(input)
 end
 
 return CustomMatchGroupInput
+
