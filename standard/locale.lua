@@ -59,25 +59,24 @@ function Locale.formatLocations(args)
 			return
 		end
 
-		-- Always normalize region name
-		if not location.region and location.country then
-			-- Check if the country provided is actually a region
-			location.region = String.nilIfEmpty(Region.name{region = location.country})
-
-			-- If it actually was a region, it's no longer a country, otherwise get the Region from the country
-			if location.region then
-				location.country = nil
-			else
-				location.region = String.nilIfEmpty(Region.name{country = location.country})
-			end
-
-		elseif location.region then
-			location.region = String.nilIfEmpty(Region.name{region = location.region})
-		end
-
+		-- Keep unresolved country as it might be a region instead
+		local unresolvedCountry = location.country
 		-- Convert country to alpha2
 		if location.country then
 			location.country = String.nilIfEmpty(Flags.CountryCode(location.country))
+		end
+
+		-- Always normalize region name
+		if not location.region and unresolvedCountry then
+			-- Check if the country provided is actually a region
+			location.region = String.nilIfEmpty(Region.name{region = unresolvedCountry})
+
+			-- Get the Region from the country if still unknown
+			if not location.region then
+				location.region = String.nilIfEmpty(Region.name{country = location.country})
+			end
+		elseif location.region then
+			location.region = String.nilIfEmpty(Region.name{region = location.region})
 		end
 
 		return location
