@@ -16,7 +16,7 @@ local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 ---@class RainbowsixMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-local INDENT = WikiCopyPaste.Indent
+local INDENT = '\t'
 
 local VETOES = {
 	[0] = '',
@@ -40,15 +40,31 @@ local VETOES = {
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.readBool(args.score)
+	local mapScore = Logic.readBool(args.mapScore)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local mapVeto = Logic.readBool(args.mapVeto)
+	local matchMatchpages = args.matchMatchpages and Array.unique(mw.text.split(args.matchMatchpages, ', ')) or {}
 	local streams = Logic.readBool(args.streams)
+	local casters = Logic.readBool(args.casters)
+
+	---@param list string[]
+	---@param indents integer
+	---@return string?
+	local buildListLine = function(list, indents)
+		if #list == 0 then return nil end
+
+		return string.rep(INDENT, indents) .. table.concat(Array.map(list, function(elemenmt)
+			return '|' .. elemenmt:lower() .. '='
+		end))
+	end
 
 	local lines = Array.extend(
 		'{{Match',
 		INDENT .. '|date=|finished=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		Array.appendWith(buildListLine(matchMatchpages, 1)),
+		casters and (INDENT .. '|caster1=|caster2=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end)
@@ -68,7 +84,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		)
 	end
 
-	local score = showScore and '|score1=|score2=' or ''
+	local score = mapScore and '|score1=|score2=' or ''
 	local atkDefParams = function(opponentIndex)
 		local prefix = '|t' .. opponentIndex
 		return table.concat(Array.extend(
