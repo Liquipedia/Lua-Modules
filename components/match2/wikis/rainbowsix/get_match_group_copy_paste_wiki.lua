@@ -39,14 +39,15 @@ local VETOES = {
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local showScore = Logic.readBool(args.score)
-	local mapScore = Logic.readBool(args.mapScore)
+	local casters = Logic.readBool(args.casters)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
+	local mapScore = Logic.readBool(args.mapScore)
 	local mapVeto = Logic.readBool(args.mapVeto)
 	local matchMatchpages = args.matchMatchpages and Array.unique(mw.text.split(args.matchMatchpages, ', ')) or {}
+	local mvps = Logic.readBool(args.mvp)
+	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
-	local casters = Logic.readBool(args.casters)
 
 	---@param list string[]
 	---@param indents integer
@@ -65,6 +66,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		Array.appendWith(buildListLine(matchMatchpages, 1)),
 		casters and (INDENT .. '|caster1=|caster2=') or nil,
+		mvps and (INDENT .. '|mvp=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end)
