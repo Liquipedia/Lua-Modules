@@ -9,9 +9,14 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
+local Operator = require('Module:Operator')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+-- ISO 3166-1 alpha-2 Exceptional Reservations
+local EXCEPTIONAL_RESERVATIONS = {'eu', 'un'}
 
 local Locale = {}
 
@@ -64,6 +69,11 @@ function Locale.formatLocations(args)
 		-- Convert country to alpha2
 		if location.country then
 			location.country = String.nilIfEmpty(Flags.CountryCode(location.country))
+		end
+
+		-- Remove country if it is actually a region
+		if Array.find(EXCEPTIONAL_RESERVATIONS, FnUtil.curry(Operator.eq, location.country)) then
+			location.country = nil
 		end
 
 		-- Always normalize region name
