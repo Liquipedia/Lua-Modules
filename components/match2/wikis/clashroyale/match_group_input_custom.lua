@@ -20,7 +20,8 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local Streams = Lua.import('Module:Links/Stream')
 
-local Opponent = require('Module:OpponentLibraries').Opponent
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local UNKNOWN_REASON_LOSS_STATUS = 'L'
 local DEFAULT_WIN_STATUS = 'W'
@@ -30,7 +31,7 @@ local SCORE_STATUS = 'S'
 local ALLOWED_STATUSES = {DEFAULT_WIN_STATUS, 'FF', 'DQ', UNKNOWN_REASON_LOSS_STATUS}
 local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
-local NOW = os.time(os.date('!*t')) --[[@as osdateparam]]
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 local MAX_NUM_PLAYERS_PER_MAP = 2
 local TBD = 'tbd'
@@ -58,29 +59,23 @@ function CustomMatchGroupInput.processMatch(match)
 	return match
 end
 
-function CustomMatchGroupInput.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
-end
-
+---@param record table
+---@param timestamp integer
+---@return table
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
 	---@type number|string
 	local teamTemplateDate = timestamp
-	-- If date is epoch, resolve using tournament dates instead
-	-- Epoch indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not default date
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
-	Opponent.resolve(opponent, teamTemplatedate)---, {syncPlayer=true})
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
@@ -98,6 +93,15 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	return record
+end
+
+function CustomMatchGroupInput.getIcon(template)
+	local raw = mw.ext.TeamTemplate.raw(template)
+	if raw then
+		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+		return icon, iconDark
+	end
 end
 
 function walkoverProcessing.walkover(obj, scores)
@@ -219,7 +223,6 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
-		mvpteam = match.mvpteam or match.winner,
 		casters = match.casters,
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
