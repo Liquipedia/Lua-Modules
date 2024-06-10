@@ -163,8 +163,7 @@ function MedalStats:_getConditions()
 	addOrCondition('placement', config.placements)
 	addOrCondition('opponenttype', config.opponentTypes)
 
-	local endDate = config.endDate or TODAY
-	addOrCondition('date', {endDate, '<' .. endDate})
+	conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, (config.endDate or TODAY) .. 'T23:59:59')}
 
 	if not config.external then
 		conditions:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1)}

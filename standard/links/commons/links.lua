@@ -167,6 +167,7 @@ local PREFIXES = {
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
+	soop = {'https://www.sooplive.com/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
 		'https://start.gg/',
