@@ -232,7 +232,7 @@ function CustomItem._positivePercentDisplay(caller, base)
 		error('"' .. base .. '" has to be numerical')
 	end
 	---@cast base -nil
-	return '+ ' .. (tonumber(caller.args[base])) .. '%'
+	return '+ ' .. caller.args[base] .. '%'
 end
 
 ---@return string?
