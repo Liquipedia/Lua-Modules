@@ -439,8 +439,6 @@ end
 ---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match),
-		mvpteam = match.mvpteam or match.winner,
 		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 	return match
