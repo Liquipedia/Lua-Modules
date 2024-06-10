@@ -31,8 +31,8 @@ describe('Variables', function()
 			local result4 = {country1 = 'cn', region1 = 'China'}
 
 			-- Normal region
-			local test5 = {country1 = 'Asia-Pacific'}
-			local result5 = {region1 = 'apac'}
+			local test5 = {country1 = 'apac'}
+			local result5 = {region1 = 'Asia-Pacific'}
 
 			assert.are_same(result1, Locale.formatLocations(test1))
 			assert.are_same(result2, Locale.formatLocations(test2))
