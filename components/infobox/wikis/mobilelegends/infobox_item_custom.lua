@@ -172,7 +172,6 @@ function CustomItem:getWikiCategories(args)
 			table.insert(categories, category)
 		end
 	end
-	
 	return categories
 end
 
