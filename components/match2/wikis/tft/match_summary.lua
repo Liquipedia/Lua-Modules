@@ -46,7 +46,7 @@ local VETO_TYPE_TO_TEXT = {
 local CustomMatchSummary = {}
 
 -- Map Veto Class
----@class FortniteMapVeto: MatchSummaryRowInterface
+---@class TftMapVeto: MatchSummaryRowInterface
 ---@operator call: self
 ---@field root Html
 ---@field table Html
@@ -219,16 +219,8 @@ function CustomMatchSummary.createBody(match)
 
 	end
 
-	-- Add casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	-- casters
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Map Vetoes
 	if match.extradata.mapveto then
