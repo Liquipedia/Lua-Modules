@@ -79,14 +79,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'attributes' then
 		local attributeCells = {
 			{name = 'Health', parameter = 'hp'},
-			{name = 'Max Health', parameter = 'maxhealth'},
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
-			{name = 'Mana Loss', parameter = 'manaloss'},
 			{name = 'Lifesteal', parameter = 'lifesteal', funct = '_positivePercentDisplay'},
-			{name = 'Physical Lifesteal', parameter = 'physsteal'},
-			{name = 'Magic Lifesteal', parameter = 'magicsteal'},
 			{name = 'Hybrid Lifesteal', parameter = 'hybridsteal', funct = '_positivePercentDisplay'},
 			{name = 'Healing Effect', parameter = 'healeffect'},
 			{name = 'Spell Vamp', parameter = 'spellvamp', funct = '_positivePercentDisplay'},
