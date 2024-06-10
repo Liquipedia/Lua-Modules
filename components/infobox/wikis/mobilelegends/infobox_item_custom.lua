@@ -92,7 +92,6 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Magic Resistance', parameter = 'magicresist'},
 			{name = 'Status Resistance', parameter = 'statusresist', funct = '_positivePercentDisplay'},
 			{name = 'Attack Speed', parameter = 'attackspeed'},
-			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
 			{name = 'Magic Power', parameter = 'mp'},
 			{name = 'Attack Damage', parameter = 'ad'},
 			{name = 'Physical Attack', parameter = 'physatk'},
