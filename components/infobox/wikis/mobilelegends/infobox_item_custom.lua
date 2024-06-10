@@ -83,23 +83,26 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
-			{name = 'Mana Loss', parameter = 'manaloss', funct = '_positivePercentDisplay'},
-			{name = 'Lifesteal', parameter = 'lifesteal'},
+			{name = 'Mana Loss', parameter = 'manaloss'},
+			{name = 'Lifesteal', parameter = 'lifesteal', funct = '_positivePercentDisplay'},
 			{name = 'Physical Lifesteal', parameter = 'physsteal'},
-			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
-			{name = 'Armor', parameter = 'armor'},
-			{name = 'Evasion', parameter = 'evasion', funct = '_positivePercentDisplay'},
-			{name = 'Magic Resistance', parameter = 'magicresist'},
-			{name = 'Status Resistance', parameter = 'statusresist', funct = '_positivePercentDisplay'},
-			{name = 'Attack Speed', parameter = 'attackspeed'},
-			{name = 'Magic Power', parameter = 'mp'},
-			{name = 'Attack Damage', parameter = 'ad'},
+			{name = 'Magic Lifesteal', parameter = 'magicsteal'},
+			{name = 'Hybrid Lifesteal', parameter = 'hybridsteal', funct = '_positivePercentDisplay'},
+			{name = 'Healing Effect', parameter = 'healeffect'},
+			{name = 'Spell Vamp', parameter = 'spellvamp', funct = '_positivePercentDisplay'},
+			{name = 'Physical Defense', parameter = 'physdefense'},
+			{name = 'Magic Defense', parameter = 'magicdefense'},
+			{name = 'Attack Speed', parameter = 'attackspeed', funct = '_positivePercentDisplay'},
 			{name = 'Physical Attack', parameter = 'physatk'},
+			{name = 'Magic Power', parameter = 'mp'},
+			{name = 'Adaptive Attack', parameter = 'adaptiveatk'},
 			{name = 'Physical Penetration', parameter = 'physpen'},
-			{name = 'Magical Penetration', parameter = 'magicpen'},
-			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
-			{name = 'Critical Chance', parameter = 'critchance'},
-			{name = 'Movement Speed', funct = '_movementSpeedDisplay'},
+			{name = 'Magic Penetration', parameter = 'magicpen'},
+			{name = 'Cooldown Reduction', parameter = 'cdreduction', funct = '_positivePercentDisplay'},
+			{name = 'Critical Chance', parameter = 'critchance', funct = '_positivePercentDisplay'},
+			{name = 'Critical Damage', parameter = 'critdmg'},
+			{name = 'Movement Speed', parameter = 'movespeed'},
+			{name = 'Slow Reduction', parameter = 'slowreduction'},
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
@@ -154,16 +157,12 @@ function CustomItem:getWikiCategories(args)
 	end
 
 	local possibleCategories = {
-		['Strength Items'] = 'str',
-		['Agility Items'] = 'agi',
-		['Intelligence Items'] = 'int',
 		['Health Items'] = 'hp',
 		['Mana Pool Items'] = 'mana',
 		['Health Regeneration Items'] = 'hpregen',
 		['Mana Regeneration Items'] = 'manaregen',
-		['Armor Bonus Items'] = 'armor',
-		['Evasion Items'] = 'evasion',
-		['Magic Resistance Items'] = 'magicresist',
+		['Physical Defense Items'] = 'physicaldefense',
+		['Magic Defense Items'] = 'magicdefense',
 		['Damage Items'] = 'damage',
 		['Items with Active Abilities'] = 'active',
 		['Items with Passive Abilities'] = 'passive',
@@ -173,12 +172,7 @@ function CustomItem:getWikiCategories(args)
 			table.insert(categories, category)
 		end
 	end
-
-	if not self:_categoryDisplay() then
-		table.insert(categories, 'Unknown Type')
-	end
-
-
+	
 	return categories
 end
 
@@ -239,19 +233,7 @@ function CustomItem._positivePercentDisplay(caller, base)
 		error('"' .. base .. '" has to be numerical')
 	end
 	---@cast base -nil
-	return '+ ' .. (tonumber(caller.args[base]) * 100) .. '%'
-end
-
----@param caller MobilelegendsItemInfobox
----@param base string?
----@return string?
-function CustomItem._movementSpeedDisplay(caller, base)
-	local display = Array.append({},
-		String.nilIfEmpty(caller.args.movespeed),
-		Logic.isNumeric(caller.args.movespeedmult) and ((tonumber(caller.args.movespeedmult) + 100) .. '%') or nil
-	)
-	if Table.isEmpty(display) then return end
-	return '+ ' .. table.concat(display)
+	return '+ ' .. (tonumber(caller.args[base])) .. '%'
 end
 
 ---@return string?
