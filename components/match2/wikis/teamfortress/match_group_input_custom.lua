@@ -266,7 +266,7 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 
-	for key, prefix in pairs(LINK_PREFIXES) do
+	for key, _prefix in pairs(LINK_PREFIXES) do
 		if match[key] then links[key] = LINK_PREFIXES[key] .. match[key] end
 	end
 
