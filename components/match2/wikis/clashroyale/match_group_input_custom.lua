@@ -40,11 +40,9 @@ local MAX_NUM_MAPS = 30
 
 -- containers for process helper functions
 local matchFunctions = {}
+local walkoverProcessing = {}
 
 local CustomMatchGroupInput = {}
-
-CustomMatchGroupInput.walkoverProcessing = {}
-local walkoverProcessing = CustomMatchGroupInput.walkoverProcessing
 
 -- called from Module:MatchGroup
 ---@param match table
@@ -72,10 +70,10 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+		teamTemplateDate = DateExt.getContextualDateOrNow()
 	end
 
-	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
@@ -89,7 +87,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	if record.type == Opponent.team then
 		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		record.match2players = CustomMatchGroupInput._readTeamPlayers(record, record.players)
+		record.match2players = MatchGroupInput.readPlayersOfTeam(record, record.players, opponent.template)
 	end
 
 	return record
@@ -111,7 +109,7 @@ function walkoverProcessing.walkover(obj, scores)
 		walkoverProcessing.numericWalkover(obj, walkover)
 	elseif walkover then
 		walkoverProcessing.nonNumericWalkover(obj, walkover)
-	elseif #scores ~=2 then -- since we always have 2 opponents
+	elseif #scores ~= 2 then -- since we always have 2 opponents
 		error('Unexpected number of opponents when calculating winner')
 	elseif Array.all(scores, function(score)
 			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
@@ -301,20 +299,19 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 		match.winner = 0
 	end
 
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		local opponent = match['opponent' .. opponentIndex]
-		if Logic.isNotEmpty(opponent) then
-			opponent.status = SCORE_STATUS
-			if opponent.score > bestof / 2 then
-				match.finished = Logic.emptyOr(match.finished, true)
-				match.winner = tonumber(match.winner) or opponentIndex
-			elseif match.winner == 0 or (opponent.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
-				match.finished = Logic.emptyOr(match.finished, true)
-				match.winner = 0
-				match.resulttype = 'draw'
-			end
+		if Logic.isEmpty(opponent) then return end
+		opponent.status = SCORE_STATUS
+		if opponent.score > bestof / 2 then
+			match.finished = Logic.emptyOr(match.finished, true)
+			match.winner = tonumber(match.winner) or opponentIndex
+		elseif match.winner == 0 or (opponent.score == bestof / 2 and match.opponent1.score == match.opponent2.score) then
+			match.finished = Logic.emptyOr(Logic.readBoolOrNil(match.finished), true)
+			match.winner = 0
+			match.resulttype = 'draw'
 		end
-	end
+	end)
 
 	match.winner = tonumber(match.winner)
 
@@ -454,62 +451,6 @@ function CustomMatchGroupInput._opponentInput(match)
 	end
 
 	return match
-end
-
-function CustomMatchGroupInput._readTeamPlayers(opponent, playerData)
-	local players = CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
-
-	if Table.isEmpty(players) then
-		players = CustomMatchGroupInput._getPlayersFromVariables(opponent.name)
-	end
-
-	return players
-end
-
-function CustomMatchGroupInput._getManuallyEnteredPlayers(playerData)
-	local players = {}
-	playerData = Json.parseIfString(playerData) or {}
-
-	for prefix, displayName in Table.iter.pairsByPrefix(playerData, 'p') do
-		local name = mw.ext.TeamLiquidIntegration.resolve_redirect(Logic.emptyOr(
-			playerData[prefix .. 'link'],
-			displayName
-		)):gsub(' ', '_')
-
-		table.insert(players, {
-			name = name,
-			displayname = displayName,
-			flag = Flags.CountryName(playerData[prefix .. 'flag']),
-		})
-	end
-
-	return players
-end
-
-function CustomMatchGroupInput._getPlayersFromVariables(teamName)
-	teamName = teamName:gsub(' ', '_')
-	local teamNameWithSpaces = teamName:gsub('_', ' ')
-	local players = {}
-
-	local playerIndex = 1
-	while true do
-		local prefix = teamName .. '_p' .. playerIndex
-		local prefixWithSpaces = teamNameWithSpaces .. '_p' .. playerIndex
-
-		local playerName = Variables.varDefault(prefix) or Variables.varDefault(prefixWithSpaces)
-		if String.isEmpty(playerName) then
-			break
-		end
-		table.insert(players, {
-			name = playerName:gsub(' ', '_'),
-			displayname = Variables.varDefault(prefix .. 'dn',
-				Variables.varDefault(prefixWithSpaces .. 'dn', playerName:gsub('_', ' '))),
-			flag = Flags.CountryName(Variables.varDefault(prefix .. 'flag', Variables.varDefault(prefixWithSpaces .. 'flag'))),
-		})
-		playerIndex = playerIndex + 1
-	end
-
-	return players
 end
 
 --[[
