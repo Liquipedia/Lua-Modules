@@ -26,14 +26,14 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- staff
-	coach = {category = 'Coaches', variable = 'Coach', isplayer = false, personType = 'staff'},
+	coach = {category = 'Coache', variable = 'Coach', isplayer = false, personType = 'staff'},
 	manager = {category = 'Manager', variable = 'Manager', isplayer = false, personType = 'staff'},
 
 	-- talent
-	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false, personType = 'talent'},
-	caster = {category = 'Casters', variable = 'Caster', isplayer = false, personType = 'talent'},
+	analyst = {category = 'Analyst', variable = 'Analyst', isplayer = false, personType = 'talent'},
+	caster = {category = 'Caster', variable = 'Caster', isplayer = false, personType = 'talent'},
 	['content creator'] = {
-		category = 'Content Creators', variable = 'Content Creator', isplayer = false, personType = 'talent'},
+		category = 'Content Creator', variable = 'Content Creator', isplayer = false, personType = 'talent'},
 	host = {category = 'Host', variable = 'Host', isplayer = false, personType = 'talent'},
 }
 ROLES['assistant coach'] = ROLES.coach
@@ -205,15 +205,6 @@ function CustomPlayer:defineCustomPageVariables(args)
 		Variables.varDefine('role2', self.role2.variable)
 		Variables.varDefine('type2', self.role2.personType)
 	end
-end
-
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
 end
 
 return CustomPlayer
