@@ -47,7 +47,11 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	cc = {'https://cc.163.com/'},
-	challengermode = {'https://www.challengermode.com/tournaments/'},
+	challengermode = {
+		'https://www.challengermode.com/tournaments/',
+		player = 'https://www.challengermode.com/users/',
+		team = 'https://www.challengermode.com/teams/'
+	},
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',

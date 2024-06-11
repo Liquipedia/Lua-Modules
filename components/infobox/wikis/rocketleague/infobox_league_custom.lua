@@ -12,7 +12,6 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
@@ -36,8 +35,6 @@ local MODE_2v2 = '2v2'
 local TIER_1 = 1
 local MISC_TIER = -1
 local H2H_TIER_THRESHOLD = 5
-
-local PSYONIX = 'Psyonix'
 
 ---@param frame Frame
 ---@return Html
@@ -107,29 +104,13 @@ end
 ---@param args table
 ---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
-	if (
-		String.isNotEmpty(args.liquipediatiertype) or
-		tonumber(args.liquipediatier) ~= TIER_1
-	) then
-		return false
-	end
-
-	return self:containsPsyonix('organizer') or
-		self:containsPsyonix('sponsor')
-end
-
----@param prefix string
----@return boolean
-function CustomLeague:containsPsyonix(prefix)
-	return Table.any(
-		League:getAllArgsForBase(self.args, prefix),
-		function (_, value) return value == PSYONIX end
-	)
+	return Logic.readBool(self.data.publishertier)
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.rlcsPremier = args.series == SERIES_RLCS and 1 or 0
+	self.data.publishertier = tostring(args.series == SERIES_RLCS and self.data.liquipediatier == TIER_1)
 end
 
 ---@param args table
@@ -186,7 +167,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.notabilitymod = args.notabilitymod
 	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
 	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
-	lpdbData.extradata['is rlcs'] = self.data.rlcsPremier
 
 	return lpdbData
 end
