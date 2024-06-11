@@ -6,16 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -69,7 +66,6 @@ function CustomMatchSummary.addToFooter(match, footer)
 		local extradata = game.extradata or {}
 		addLink(extradata.logstf, 'logstf', gameIndex)
 		addLink(extradata.logstfgold, 'logstfgold', gameIndex)
-		--add further such game specific stuff here if there is ...
 	end)
 
 	return footer
