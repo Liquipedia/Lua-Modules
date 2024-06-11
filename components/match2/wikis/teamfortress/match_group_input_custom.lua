@@ -19,13 +19,21 @@ local Streams = require('Module:Links/Stream')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
-local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
 local DEFAULT_BESTOF = 3
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+
+local LINK_PREFIXES = {
+	rgl = 'https://rgl.gg/Public/Match.aspx?m=',
+	ozf = 'https://warzone.ozfortress.com/matches/',
+	etf2l = 'http://etf2l.org/matches/',
+	tftv = 'http://tf.gg/',
+	esl = 'https://play.eslgaming.com/match/',
+	esea = 'https://play.esea.net/match/',
+}
 
 -- containers for process helper functions
 local matchFunctions = {}
@@ -258,12 +266,9 @@ function matchFunctions.getVodStuff(match)
 	match.links = {}
 	local links = match.links
 
-	if match.rgl then links.rgl = 'https://rgl.gg/Public/Match.aspx?m=' .. match.rgl end
-	if match.ozf then links.ozf = 'https://warzone.ozfortress.com/matches/' .. match.ozf end
-	if match.etf2l then links.etf2l = 'http://etf2l.org/matches/' .. match.etf2l end
-	if match.tftv then links.tftv = 'http://tf.gg/' .. match.tftv end
-	if match.esl then links.esl = 'https://play.eslgaming.com/match/' .. match.esl end
-	if match.esea then links.esea = 'https://play.esea.net/match/' .. match.esea end
+	for key, prefix in pairs(LINK_PREFIXES) do
+		if match[key] then links[key] = LINK_PREFIXES[key] .. match[key] end
+	end
 
 	return match
 end
@@ -273,7 +278,6 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
-		mapveto = MatchGroupInput.getMapVeto(match, ALLOWED_VETOES),
 		casters = MatchGroupInput.readCasters(match),
 	}
 	return match
