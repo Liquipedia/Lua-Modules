@@ -130,24 +130,24 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if CustomMatchGroupInput.placementCheckDraw(indexedScores) then
+		if MatchGroupInput.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, STATUS_DRAW)
-		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
-			data.winner = CustomMatchGroupInput.getDefaultWinner(indexedScores)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
+		elseif MatchGroupInput.hasSpecialStatus(indexedScores) then
+			data.winner = MatchGroupInput.hasDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
-			if CustomMatchGroupInput.placementCheckFF(indexedScores) then
+			if MatchGroupInput.hasForfeit(indexedScores) then
 				data.walkover = 'ff'
-			elseif CustomMatchGroupInput.placementCheckDQ(indexedScores) then
+			elseif MatchGroupInput.hasDisqualified(indexedScores) then
 				data.walkover = 'dq'
-			elseif CustomMatchGroupInput.placementCheckWL(indexedScores) then
+			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, DEFAULT_RESULT_TYPE)
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		else
 			local winner
-			indexedScores, winner = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
+			indexedScores, winner = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 			data.winner = data.winner or winner
 		end
 	end
@@ -211,50 +211,6 @@ function CustomMatchGroupInput.placementSortFunction(tbl, key1, key2)
 	local value1 = tonumber(tbl[key1].score or NO_SCORE) or NO_SCORE
 	local value2 = tonumber(tbl[key2].score or NO_SCORE) or NO_SCORE
 	return value1 > value2
-end
-
--- Check if any opponent has a none-standard status
----@param tbl table[]
----@return boolean
-function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
-	return Table.any(tbl,
-		function (_, scoreinfo)
-			return scoreinfo.status ~= STATUS_SCORE and String.isNotEmpty(scoreinfo.status)
-		end
-	)
-end
-
--- function to check for forfeits
----@param tbl table[]
----@return boolean
-function CustomMatchGroupInput.placementCheckFF(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_FORFEIT end)
-end
-
--- function to check for DQ's
----@param tbl table[]
----@return boolean
-function CustomMatchGroupInput.placementCheckDQ(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DISQUALIFIED end)
-end
-
--- function to check for W/L
----@param tbl table[]
----@return boolean
-function CustomMatchGroupInput.placementCheckWL(tbl)
-	return Table.any(tbl, function (_, scoreinfo) return scoreinfo.status == STATUS_DEFAULT_LOSS end)
-end
-
--- Get the winner when resulttype=default
----@param tbl table[]
----@return number
-function CustomMatchGroupInput.getDefaultWinner(tbl)
-	for index, scoreInfo in pairs(tbl) do
-		if scoreInfo.status == STATUS_DEFAULT_WIN then
-			return index
-		end
-	end
-	return NO_WINNER
 end
 
 --
@@ -380,7 +336,7 @@ function matchFunctions.getOpponents(match)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(match.finished) then
-		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
+		match, opponents = MatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
 	-- Update all opponents with new values
