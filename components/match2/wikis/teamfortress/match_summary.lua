@@ -195,7 +195,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		:addLinks(LINK_DATA, match.links)
 
 	---@param link string?
-	---@param linkType string 
+	---@param linkType string
 	---@param gameIndex integer
 	local addLink = function(link, linkType, gameIndex)
 		if Logic.isEmpty(link) then return end
