@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -105,7 +106,11 @@ function Map:_setLpdbData(args)
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
-		extradata = {creator = self.creators[1]}
+		extradata = Table.merge(Table.map(Array.sub(self.creators, 2, #self.creators), function(index, value)
+			return 'creator' .. index, value
+		end), {
+			creator = self.creators[1],
+		})
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
