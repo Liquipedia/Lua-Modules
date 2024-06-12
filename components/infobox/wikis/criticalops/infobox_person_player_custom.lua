@@ -47,11 +47,11 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local self = self.caller
+	local caller  = self.caller
 
 	if id == 'role' then
 		return {
-			Cell{name = 'Role', content = {(self.role or {}).name, (self.role2 or {}).name}},
+			Cell{name = 'Role', content = {(caller.role or {}).name, (caller.role2 or {}).name}},
 		}
 	end
 	return widgets
