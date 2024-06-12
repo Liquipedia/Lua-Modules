@@ -90,24 +90,6 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(rowDisplay)
 	end
 
-	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
-	end
-
-	-- Add casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
-
 	return body
 end
 ---@param game MatchGroupUtilGame
