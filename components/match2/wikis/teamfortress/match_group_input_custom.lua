@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
@@ -22,7 +23,6 @@ local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 20
-local DEFAULT_BESTOF = 3
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
@@ -54,7 +54,6 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
 	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getExtraData(match)
 
 	return match
 end
@@ -206,8 +205,7 @@ end
 ---@param match table
 ---@return table
 function matchFunctions.getBestOf(match)
-	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', DEFAULT_BESTOF))
-	Variables.varDefine('bestof', match.bestof)
+	match.bestof = #Array.filter(Array.range(1, MAX_NUM_MAPS), function(idx) return match['map'.. idx] end)
 	return match
 end
 
@@ -252,8 +250,7 @@ end
 ---@param match table
 ---@return table
 function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '6v6'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -263,23 +260,10 @@ function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
-	match.links = {}
-	local links = match.links
+	match.links = Table.map(LINK_PREFIXES, function(prefix, link)
+		return prefix, match[prefix] and (link .. match[prefix]) or nil
+	end)
 
-	for key in pairs(LINK_PREFIXES) do
-		if match[key] then links[key] = LINK_PREFIXES[key] .. match[key] end
-	end
-
-	return match
-end
-
----@param match table
----@return table
-function matchFunctions.getExtraData(match)
-	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match),
-		casters = MatchGroupInput.readCasters(match),
-	}
 	return match
 end
 
@@ -308,15 +292,11 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- see if match should actually be finished if bestof limit was reached
-	if isScoreSet and not Logic.readBool(match.finished) then
-		local firstTo = math.ceil(match.bestof/2)
-		for _, item in pairs(opponents) do
-			if (tonumber(item.score) or 0) >= firstTo then
-				match.finished = true
-				break
-			end
-		end
-	end
+	match.finished = Logic.readBool(match.finished)
+		or isScoreSet and (
+			Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > match.bestof/2 end)
+			or Array.all(opponents, function(opponent) return (tonumber(opponent.score) or 0) == match.bestof/2 end)
+		)
 
 	-- see if match should actually be finished if score is set
 	if isScoreSet and not Logic.readBool(match.finished) and match.timestamp ~= DateExt.defaultTimestamp then
