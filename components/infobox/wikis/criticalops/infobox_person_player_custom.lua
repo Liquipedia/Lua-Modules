@@ -47,7 +47,7 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local caller  = self.caller
+	local caller = self.caller
 
 	if id == 'role' then
 		return {
