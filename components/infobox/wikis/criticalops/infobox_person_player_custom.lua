@@ -19,9 +19,9 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
-	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', staff = true},
+	['analyst'] = {category = 'Analysts', name = 'Analyst', staff = true},
+	['broadcast analyst'] = {category = 'Broadcast Analysts', name = 'Broadcast Analyst', talent = true},
+	['caster'] = {category = 'Casters', name = 'Caster', staff = true},
 }
 
 ---@class COPSInfoboxPlayer: Person
@@ -51,7 +51,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'role' then
 		return {
-			Cell{name = 'Role', content = {caller.role, caller.role2}},
+			Cell{name = 'Role', content = {caller.role.name, caller.role2.name}},
 		}
 	end
 	return widgets
@@ -65,12 +65,6 @@ function CustomPlayer:getWikiCategories(categories)
 		(self.role or {}).category,
 		(self.role2 or {}).category
 	)
-end
-
----@param role string?
----@return {category: string, variable: string, staff: boolean?, talent: boolean?}?
-function CustomPlayer:_getRoleData(role)
-	return ROLES[(role or ''):lower()]
 end
 
 ---@param args table
