@@ -57,6 +57,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param role string?
+---@return {category: string, variable: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
+end
 
 ---@param categories string[]
 ---@return string[]
