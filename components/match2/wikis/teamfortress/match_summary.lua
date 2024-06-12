@@ -84,9 +84,10 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createMapRow(game, gameIndex, match.date)
-		body:addRow(rowDisplay)
+	for _, game in ipairs(match.games) do
+		if game.map then
+			body:addRow(CustomMatchSummary._createMapRow(game))
+		end
 	end
 
 	return body
