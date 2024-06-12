@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -29,6 +30,8 @@ local WidgetFactory = require('Module:Infobox/Widget/Factory')
 local WidgetTable = require('Module:Widget/Table')
 local TableRow = require('Module:Widget/Table/Row')
 local TableCell = require('Module:Widget/Table/Cell')
+
+local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -898,6 +901,10 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
+	end
+
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self
