@@ -167,7 +167,7 @@ function MatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 		local temporaryScore
 		local temporaryPlace = -99
 		local counter = 0
-		for scoreIndex, opp in Table.iter.spairs(opponents, MatchGroupInput.placementSortFunction) do
+		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score) or ''
 			counter = counter + 1
 			if counter == 1 and Logic.isEmpty(winner) then
