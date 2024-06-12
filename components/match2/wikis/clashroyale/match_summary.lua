@@ -108,9 +108,9 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
 		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
 		participantData.cards = participantData.cards or {}
+		---@type table
 		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 			return participantData.cards[idx] or DEFAULT_CARD end)
-		---@cast cards table
 		cards.tower = participantData.cards.tower
 		table.insert(cardData[opponentIndex], cards)
 	end
