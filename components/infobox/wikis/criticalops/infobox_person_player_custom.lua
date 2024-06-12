@@ -51,7 +51,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'role' then
 		return {
-			Cell{name = 'Role', content = {caller.role.name, caller.role2.name}},
+			Cell{name = 'Role', content = {(self.role or {}).name, (self.role2 or {}).name}},
 		}
 	end
 	return widgets
