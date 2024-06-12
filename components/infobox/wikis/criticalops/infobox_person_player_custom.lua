@@ -25,8 +25,8 @@ local ROLES = {
 }
 
 ---@class COPSInfoboxPlayer: Person
----@field role {category: string, variable: string, staff: boolean?, talent: boolean?}?
----@field role2 {category: string, variable: string, staff: boolean?, talent: boolean?}?
+---@field role {category: string, name: string, staff: boolean?, talent: boolean?}?
+---@field role2 {category: string, name: string, staff: boolean?, talent: boolean?}?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
