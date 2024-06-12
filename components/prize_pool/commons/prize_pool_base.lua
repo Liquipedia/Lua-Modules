@@ -877,17 +877,24 @@ function BasePrizePool:storeData()
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		prizepoolindex = prizePoolIndex,
-		lastvsdata = {},
-		opponentplayers = {},
-		players = {},
-		extradata = {},
 	}
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
 		local lpdbEntries = placement:_getLpdbData(prizePoolIndex, self.options.lpdbPrefix)
 
-		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry) return Table.merge(lpdbTournamentData, lpdbEntry) end)
+		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry)
+			return Table.merge(
+				lpdbTournamentData,
+				{
+					lastvsdata = {},
+					opponentplayers = {},
+					players = {},
+					extradata = {},
+				},
+				lpdbEntry
+			)
+		end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
