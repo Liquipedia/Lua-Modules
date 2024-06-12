@@ -20,16 +20,10 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
-	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
-
 	-- Staff and Talents
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
-	['host'] = {category = 'Host', variable = 'Host', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
+	['caster'] = {category = 'Casters', variable = 'Caster', staff = true},
 }
 
 ---@class COPSInfoboxPlayer: Person
@@ -56,37 +50,15 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
-	local args = caller.args
 
-	if id == 'status' then
+	if id == 'role' then
 		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-			Cell{name = 'Years Active', content = {args.years_active}},
+			Cell{name = 'Role', content = {caller.role, caller.role2}},
 		}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role', content = {
-				caller:_displayRole(caller.role),
-				caller:_displayRole(caller.role2)
-			}},
-		}
-	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
-
 	return widgets
 end
 
----@return string[]
-function CustomPlayer:_getStatusContents()
-	return {Page.makeInternalLink({onlyIfExists = true}, self.args.status) or self.args.status}
-end
-
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
-end
 
 ---@param categories string[]
 ---@return string[]
@@ -101,18 +73,6 @@ end
 ---@return {category: string, variable: string, staff: boolean?, talent: boolean?}?
 function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
-end
-
----@param roleData {category: string, variable: string, staff: boolean?, talent: boolean?}?
----@return string?
-function CustomPlayer:_displayRole(roleData)
-	if not roleData then return end
-
-	if not self:shouldStoreData(self.args) then
-		return roleData.variable
-	end
-
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
 ---@param args table
