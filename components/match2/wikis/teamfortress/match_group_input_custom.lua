@@ -118,7 +118,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if MatchGroupInput.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
 		elseif MatchGroupInput.hasSpecialStatus(indexedScores) then
 			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
 			data.resulttype = 'default'
@@ -129,10 +129,10 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'default')
+			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 'default')
 		else
 			local winner
-			indexedScores, winner = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
+			indexedScores, winner = MatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
 			data.winner = data.winner or winner
 		end
 	end
@@ -151,7 +151,7 @@ end
 ---@param finished boolean|string?
 ---@return table[]
 ---@return integer?
-function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)
+function MatchGroupInput.setPlacement(opponents, winner, specialType, finished)
 	if specialType == 'draw' then
 		for key, _ in pairs(opponents) do
 			opponents[key].placement = 1
@@ -168,7 +168,7 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, fini
 		local temporaryScore
 		local temporaryPlace = -99
 		local counter = 0
-		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
+		for scoreIndex, opp in Table.iter.spairs(opponents, MatchGroupInput.placementSortFunction) do
 			local score = tonumber(opp.score) or ''
 			counter = counter + 1
 			if counter == 1 and Logic.isEmpty(winner) then
