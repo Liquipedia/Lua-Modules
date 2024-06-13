@@ -30,7 +30,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
-local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
+local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
 	order = 'desc',

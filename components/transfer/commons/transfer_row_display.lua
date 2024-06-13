@@ -25,7 +25,7 @@ local TransferRef = Lua.import('Module:Transfer/Refences')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local EMPTY_POSITION_ICON = '[[File:Logo filler event.png|16px|link=]]'
-local SPECIAL_ROLES = {'retired', 'retirement', 'inactive', 'military', 'passed away'}
+local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
 local TRANSFER_ARROW = '&#x21d2;'
 local RUMOUR_STATUS_TO_ICON_ARGS = {
 	correct = {iconName = 'correct', color = 'forest-green-text'},
