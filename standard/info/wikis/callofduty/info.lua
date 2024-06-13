@@ -300,24 +300,11 @@ return {
 		},
 		wz = {
 			abbreviation = 'WZ',
-			name = 'Warzone 1.0',
+			name = 'Warzone',
 			link = 'Call of Duty: Warzone',
 			logo = {
 				darkMode = 'COD Warzone 1.0 default darkmode.png',
 				lightMode = 'COD Warzone 1.0 default lightmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default lightmode.png',
-			},
-		},
-		wz2 = {
-			abbreviation = 'WZ2',
-			name = 'Warzone 2.0',
-			link = 'Call of Duty: Warzone 2.0',
-			logo = {
-				darkMode = 'COD Warzone 2.0 default allmode.png',
-				lightMode = 'COD Warzone 2.0 default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
