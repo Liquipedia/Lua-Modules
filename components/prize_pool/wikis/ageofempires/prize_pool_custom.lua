@@ -54,7 +54,8 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
-		Variables.varDefault('tournament_type')
+		Variables.varDefault('tournament_type'),
+		Variables.varDefault('tournament_liquipediatiertype')
 	)
 	if opponent.opponentData.type == Opponent.solo then
 		-- legacy extradata, to be removed once unused
@@ -98,13 +99,17 @@ end
 ---@param tier string?
 ---@param place integer
 ---@param type string?
+---@param tiertype string?
 ---@return integer
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tiertype)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
+	if tiertype == QUALIFIER then
+		tierValue = tierValue * 0.1
+	end
 	local onlineFactor = type == 'Online' and 0.65 or 1
 
 	return tierValue * math.max(prizeMoney, 0.001) / place * onlineFactor
