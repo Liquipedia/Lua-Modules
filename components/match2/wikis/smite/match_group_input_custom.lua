@@ -336,7 +336,7 @@ function matchFunctions.getOpponents(match)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(match.finished) then
-		match, opponents = MatchGroupInput.getResultTypeAndWinner(match, opponents)
+		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
 	-- Update all opponents with new values
