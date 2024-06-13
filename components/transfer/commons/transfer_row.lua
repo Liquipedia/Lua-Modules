@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -114,10 +115,10 @@ function TransferRow:_readBaseData()
 	local date = args.date_est or args.date
 	local fromDate = TransferRow._shiftDate(date)
 
-	---@param teamInput string
 	---@param dateInput string?
+	---@param teamInput string
 	---@return {name: string?, template: string?}
-	local checkTeam = function(teamInput, dateInput)
+	local checkTeam = function(dateInput, teamInput)
 		if Logic.isEmpty(teamInput) or not mw.ext.TeamTemplate.teamexists(teamInput) then
 			return {}
 		end
@@ -125,12 +126,8 @@ function TransferRow:_readBaseData()
 		return {name = teamData.page, template = teamData.templatename}
 	end
 
-	local toTeam = Array.map({args.team2 or '', args.team2_2 or ''}, function(input)
-		return checkTeam(input, date)
-	end)
-	local fromTeam = Array.map({args.team1 or '', args.team1_2 or ''}, function(input)
-		return checkTeam(input, fromDate)
-	end)
+	local toTeam = Array.map({args.team2 or '', args.team2_2 or ''}, FnUtil.curry(checkTeam, date))
+	local fromTeam = Array.map({args.team1 or '', args.team1_2 or ''}, FnUtil.curry(checkTeam, fromDate))
 
 	return {
 		date = date,
