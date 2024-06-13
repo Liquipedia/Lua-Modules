@@ -124,7 +124,7 @@ function TransferRow:_readBaseData()
 		if data[1] ~= 'Inactive' or Logic.isEmpty(data[2]) or data[2] == 'Inactive' then
 			return data
 		end
-		teamData = {toTeam[2], teamData[1]}
+		teamData = {teamData[2], teamData[1]}
 		return {data[2], data[1]}
 	end
 
