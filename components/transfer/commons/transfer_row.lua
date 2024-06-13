@@ -120,16 +120,17 @@ function TransferRow:_readBaseData()
 	---@param data {name: string?, template: string?}[]
 	---@param teamData string[]
 	---@return string[]
+	---@return {name: string?, template: string?}[]
 	local switchInactiveIfAppropriate = function(data, teamData)
 		if data[1] ~= 'Inactive' or Logic.isEmpty(data[2]) or data[2] == 'Inactive' then
-			return data
+			return data, teamData
 		end
-		teamData = {teamData[2], teamData[1]}
-		return {data[2], data[1]}
+		return {data[2], data[1]}, {teamData[2], teamData[1]}
 	end
 
-	local fromRole = switchInactiveIfAppropriate(Array.map({args.role1, args.role1_2}, ucFirst), fromTeam)
-	local toRole = switchInactiveIfAppropriate(Array.map({args.role2, args.role2_2}, ucFirst), toTeam)
+	local fromRole, toRole
+	fromRole, fromTeam = switchInactiveIfAppropriate(Array.map({args.role1, args.role1_2}, ucFirst), fromTeam)
+	toRole, toTeam = switchInactiveIfAppropriate(Array.map({args.role2, args.role2_2}, ucFirst), toTeam)
 
 	return {
 		date = date,
