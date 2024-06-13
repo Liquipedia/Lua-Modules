@@ -94,24 +94,6 @@ end
 function TransferRow:_readBaseData()
 	local args = self.args
 
-	---@param str string?
-	---@return string?
-	local ucFirst = function(str)
-		return str and String.upperCaseFirst(str) or nil
-	end
-
-	---@param data string[]
-	---@return string[]
-	local switchInactiveIfAppropriate = function(data)
-		if data[1] ~= 'Inactive' or Logic.isEmpty(data[2]) or data[2] == 'Inactive' then
-			return data
-		end
-		return {data[2], data[1]}
-	end
-
-	local fromRole = switchInactiveIfAppropriate(Array.map({args.role1, args.role1_2}, ucFirst))
-	local toRole = switchInactiveIfAppropriate(Array.map({args.role2, args.role2_2}, ucFirst))
-
 	local date = args.date_est or args.date
 	local fromDate = TransferRow._shiftDate(date)
 
@@ -128,6 +110,26 @@ function TransferRow:_readBaseData()
 
 	local toTeam = Array.map({args.team2 or '', args.team2_2 or ''}, FnUtil.curry(checkTeam, date))
 	local fromTeam = Array.map({args.team1 or '', args.team1_2 or ''}, FnUtil.curry(checkTeam, fromDate))
+
+	---@param str string?
+	---@return string?
+	local ucFirst = function(str)
+		return str and String.upperCaseFirst(str) or nil
+	end
+
+	---@param data {name: string?, template: string?}[]
+	---@param teamData string[]
+	---@return string[]
+	local switchInactiveIfAppropriate = function(data, teamData)
+		if data[1] ~= 'Inactive' or Logic.isEmpty(data[2]) or data[2] == 'Inactive' then
+			return data
+		end
+		teamData = {toTeam[2], teamData[1]}
+		return {data[2], data[1]}
+	end
+
+	local fromRole = switchInactiveIfAppropriate(Array.map({args.role1, args.role1_2}, ucFirst), fromTeam)
+	local toRole = switchInactiveIfAppropriate(Array.map({args.role2, args.role2_2}, ucFirst), toTeam)
 
 	return {
 		date = date,
