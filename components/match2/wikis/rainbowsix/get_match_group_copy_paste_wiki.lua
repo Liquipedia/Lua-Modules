@@ -37,7 +37,7 @@ local VETOES = {
 ---@param opponents integer
 ---@param args table
 ---@return string
-function WikiCopyPaste.getMatchCode(bestof, mode, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = Logic.readBool(args.casters)
 	local mapDetails = Logic.readBool(args.detailedMap)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
