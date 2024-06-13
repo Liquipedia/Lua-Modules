@@ -143,10 +143,10 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
-			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		else
 			local winner
-			indexedScores, winner = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores, winner = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
 			data.winner = data.winner or winner
 		end
 	end
@@ -356,7 +356,7 @@ function matchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- If special status has been applied to a team
-	if CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
+	if MatchGroupInput.hasSpecialStatus(opponents) then
 		match.finished = true
 	end
 
