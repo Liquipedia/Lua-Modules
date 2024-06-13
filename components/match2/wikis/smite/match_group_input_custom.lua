@@ -41,7 +41,6 @@ local NO_SCORE = -99
 local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
 local DEFAULT_RESULT_TYPE = 'default'
 local NOT_PLAYED_SCORE = -1
-local NO_WINNER = -1
 local SECONDS_UNTIL_FINISHED_EXACT = 30800
 local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local DUMMY_MAP = 'default'
