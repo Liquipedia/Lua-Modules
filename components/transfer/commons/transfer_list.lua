@@ -85,7 +85,7 @@ function TransferList.run(frame)
 end
 
 ---@param args table
----@return self
+---@return TransferListConfig
 function TransferList:parseArgs(args)
 	local players = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.players)) or {args.player}
 	local roles = Array.parseCommaSeparatedString(args.role)

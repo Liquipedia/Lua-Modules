@@ -121,7 +121,7 @@ end
 ---@param platform string
 ---@return string?
 function TransferRowDisplay:_displayPlatform(platform)
-	if not Platform then return end
+	if not HAS_PLATFORM_ICONS then return end
 	if Logic.isEmpty(platform) then return '' end
 	return Platform._getIcon(platform) or ''
 end
