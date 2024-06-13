@@ -209,7 +209,7 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	if (self.role2 or {}).category then
+	if self.role2.category then
 		table.insert(categories, self.role2.category .. 's')
 	end
 	return categories
