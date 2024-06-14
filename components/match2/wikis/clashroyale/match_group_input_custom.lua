@@ -481,9 +481,9 @@ function CustomMatchGroupInput._opponentInput(match)
 	return match
 end
 
----@param match table 
----@param mapIndex integer 
----@param subGroupIndex integer 
+---@param match table
+---@param mapIndex integer
+---@param subGroupIndex integer
 ---@return table, integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	local map = Json.parseIfString(match['map' .. mapIndex]) or {}
