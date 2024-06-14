@@ -132,7 +132,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 		if MatchGroupInput.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
-			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 1)
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, STATUS_DRAW)
 		elseif MatchGroupInput.hasSpecialStatus(indexedScores) then
 			data.winner = MatchGroupInput.hasDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
@@ -143,7 +143,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
-			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
+			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, DEFAULT_RESULT_TYPE)
 		else
 			local winner
 			indexedScores, winner = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, nil, data.finished)
