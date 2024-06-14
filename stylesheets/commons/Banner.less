@@ -1,0 +1,36 @@
+.banner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 1.5rem;
+	height: 8.875rem;
+	position: relative;
+	border-radius: 0.25rem;
+	overflow: hidden;
+	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+
+	&__logo {
+		position: relative;
+		z-index: 1;
+	}
+
+	&__bg {
+		position: absolute;
+		inset: 0;
+
+		&::before {
+			content: '';
+			background-color: #000000;
+			opacity: 0.5;
+			position: absolute;
+			inset: 0;
+			z-index: 0;
+		}
+
+		> img {
+			object-fit: cover;
+			width: 100%;
+			height: 100%;
+		}
+	}
+}
