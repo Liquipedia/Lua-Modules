@@ -367,12 +367,29 @@ end
 ---@param participants table<string, table>
 ---@return table<string, table>
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
-	local char = map['char' .. opponentIndex] or '' -- TODO json parse
-	-- TODO: change format to "character,remainingLife,startingLife" per index
-	char = CharacterStandardization[char:lower()]
+	local function characterAlive(startingLife, remainingLife, pos)
+		return startingLife - pos < remainingLife
+	end
+	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {}
+	local characters = Array.flatMap(charInputs, function (input)
+		---@type [string, string?, string?]
+		local splitInput = Array.parseCommaSeparatedString(input)
+		local character = CharacterStandardization[splitInput[1]:lower()]
+		local remainingLife, startingLife = tonumber(splitInput[2]) or 0, tonumber(splitInput[3]) or 1
+		if not character then
+			return nil
+		end
+		if remainingLife > startingLife then
+			mw.log('Warning: ' .. player.name .. ' has more life remaining than starting.')
+			return nil
+		end
+		return Array.map(Array.range(1, startingLife), function (pos)
+			return {name = character, active = characterAlive(startingLife, remainingLife, pos)}
+		end)
+	end)
 
 	participants[opponentIndex .. '_1'] = {
-		char = char,
+		characters = characters,
 		player = player.name,
 	}
 

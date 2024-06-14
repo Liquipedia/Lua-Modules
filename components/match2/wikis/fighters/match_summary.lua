@@ -92,7 +92,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param paricipantId string
----@return {displayName: string?, pageName: string?, flag: string?, char: string?}
+---@return {displayName: string?, pageName: string?, flag: string?, characters: {name: string, active: boolean}[]?}
 function CustomMatchSummary._getPlayerData(game, paricipantId)
 	if not game or not game.participants then
 		return {}
@@ -106,29 +106,36 @@ end
 function CustomMatchSummary._createGame(row, game, props)
 	game.extradata = game.extradata or {}
 
-	local char1 = CustomMatchSummary._createCharacterIcon(CustomMatchSummary._getPlayerData(game, '1_1').char)
-	local char2 = CustomMatchSummary._createCharacterIcon(CustomMatchSummary._getPlayerData(game, '2_1').char)
+	local chars1 = CustomMatchSummary._createCharacterIcons(CustomMatchSummary._getPlayerData(game, '1_1').characters)
+	local chars2 = CustomMatchSummary._createCharacterIcons(Array.reverse(CustomMatchSummary._getPlayerData(game, '2_1').characters))
 
-	row:addElement(char1)
+	row:addElement(chars1)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced'):css('flex-grow', '1')
 			:wikitext(DisplayHelper.MapAndStatus(game))
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-	row:addElement(char2)
+	row:addElement(chars2)
 end
 
---- TODO: The data struc will be more complex. Also add support for greyed out
----@param char string?
+---@param characters {name: string, active: boolean}[]?
 ---@return Html
-function CustomMatchSummary._createCharacterIcon(char)
-	return mw.html.create('span')
-		:addClass('draft faction')
-		:wikitext(CharacterIcon.Icon{
-			character = char,
+function CustomMatchSummary._createCharacterIcons(characters)
+	local wrapper = mw.html.create('div')
+	Array.forEach(characters or {}, function (character, index)
+		local characterDisplay = mw.html.create('span'):addClass('draft faction')
+		if character.active then
+			characterDisplay:addClass('bans-filter') -- TODO CSS class name
+		end
+		characterDisplay:wikitext(CharacterIcon.Icon{
+			character = character.name,
 			size = '18px',
 		})
+		wrapper:node(characterDisplay)
+	end)
+	return wrapper
+
 end
 
 ---@param winner integer|string
