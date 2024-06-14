@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -474,13 +473,6 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		comment = map.comment,
 		header = map.header,
 	}
-
-	-- inherit stuff from match data
-	map.type = Logic.emptyOr(map.type, match.type)
-	map.liquipediatier = match.liquipediatier
-	map.liquipediatiertype = match.liquipediatiertype
-	map.game = Logic.emptyOr(map.game, match.game)
-	map.date = Logic.emptyOr(map.date, match.date)
 
 	-- determine score, resulttype, walkover and winner
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
