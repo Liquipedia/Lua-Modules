@@ -3,22 +3,21 @@
 	flex-direction: column;
 	align-items: center;
 	margin-bottom: 1.5rem;
-	height: 8.875rem;
 	position: relative;
 	border-radius: 0.25rem;
 	overflow: hidden;
-	box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
 
-	&__logo {
-		position: relative;
-		z-index: 1;
+	@media ( min-width: 768px ) {
+		background: url("https://liquipedia.net/commons/images/1/19/Bgdota2.jpg") no-repeat center / cover;
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		height: 8.875rem;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 0 2.5rem;
 	}
 
-	&__bg {
-		position: absolute;
-		inset: 0;
-
-		&::before {
+	&::before {
+		@media ( min-width: 768px ) {
 			content: '';
 			background-color: #000000;
 			opacity: 0.5;
@@ -26,11 +25,34 @@
 			inset: 0;
 			z-index: 0;
 		}
+	}
 
-		> img {
-			object-fit: cover;
-			width: 100%;
-			height: 100%;
+	> * {
+		z-index: 1;
+	}
+
+	&__logo {
+		position: relative;
+
+		img {
+			max-height: 36px;
+			width: auto;
+		}
+	}
+
+	.searchbox {
+		@media ( max-width: 768px ) {
+			margin-top: 1.5rem;
+		}
+
+		@media ( min-width: 768px ) {
+			margin-top: 0;
+		}
+
+		&-text {
+			@media ( min-width: 768px ) {
+				width: 25rem;
+			}
 		}
 	}
 }
