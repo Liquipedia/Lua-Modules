@@ -13,6 +13,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+local Tier = require('Module:Tier/Utils')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -76,6 +77,8 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field showInfoForEmptyResults boolean
 ---@field wrapperClasses string[]?
 ---@field onlyHighlightOnValue string?
+---@field tiers string[]?
+---@field tierTypes string[]?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -113,6 +116,13 @@ function MatchTicker:init(args)
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
+		tiers = args.tiers and Array.filter(Array.parseCommaSeparatedString(args.tiers), function (tier)
+					local identifier = Tier.toIdentifier(tier)
+					return type(identifier) == 'number' and Tier.isValid(identifier)
+				end) or nil,
+		tierTypes = args.tiertypes and Array.filter(Array.parseCommaSeparatedString(args.tiertypes), function(tiertype)
+					return Tier.isValid(1, tiertype)
+				end) or nil,
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -215,6 +225,26 @@ function MatchTicker:buildQueryConditions()
 		end)
 
 		conditions:add(teamConditions)
+	end
+
+	if Table.isNotEmpty(config.tiers) then
+		local tierConditions = ConditionTree(BooleanOperator.any)
+
+		Array.forEach(config.tiers, function(tier)
+			tierConditions:add { ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tonumber(tier)) }
+		end)
+
+		conditions:add(tierConditions)
+	end
+
+	if Table.isNotEmpty(config.tierTypes) then
+		local tierTypeConditions = ConditionTree(BooleanOperator.any)
+
+		Array.forEach(config.tierTypes, function(tierType)
+			tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tierType) }
+		end)
+
+		conditions:add(tierTypeConditions)
 	end
 
 	conditions:add(self:dateConditions())
