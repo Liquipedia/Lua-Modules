@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -370,11 +369,12 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 	local function characterAlive(startingLife, remainingLife, pos)
 		return startingLife - pos < remainingLife
 	end
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. Variables.varDefault('tournament_game'))
 	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {}
 	local characters = Array.flatMap(charInputs, function (input)
 		---@type [string, string?, string?]
 		local splitInput = Array.parseCommaSeparatedString(input)
-		local character = CharacterStandardization[splitInput[1]:lower()]
+		local character = CharacterStandardizationData[splitInput[1]:lower()]
 		local remainingLife, startingLife = tonumber(splitInput[2]) or 0, tonumber(splitInput[3]) or 1
 		if not character then
 			return nil

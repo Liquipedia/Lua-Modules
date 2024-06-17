@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local CharacterIcon = require('Module:CharacterIcon')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 
@@ -106,8 +105,14 @@ end
 function CustomMatchSummary._createGame(row, game, props)
 	game.extradata = game.extradata or {}
 
-	local chars1 = CustomMatchSummary._createCharacterIcons(CustomMatchSummary._getPlayerData(game, '1_1').characters)
-	local chars2 = CustomMatchSummary._createCharacterIcons(Array.reverse(CustomMatchSummary._getPlayerData(game, '2_1').characters))
+	local chars1 = CustomMatchSummary._createCharacterIcons(
+		CustomMatchSummary._getPlayerData(game, '1_1').characters,
+		props.game
+	)
+	local chars2 = CustomMatchSummary._createCharacterIcons(
+		Array.reverse(CustomMatchSummary._getPlayerData(game, '2_1').characters),
+		props.game
+	)
 
 	row:addElement(chars1)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
@@ -120,18 +125,17 @@ function CustomMatchSummary._createGame(row, game, props)
 end
 
 ---@param characters {name: string, active: boolean}[]?
+---@param game string?
 ---@return Html
-function CustomMatchSummary._createCharacterIcons(characters)
+function CustomMatchSummary._createCharacterIcons(characters, game)
+	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 	local wrapper = mw.html.create('div')
 	Array.forEach(characters or {}, function (character, index)
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
 		if character.active then
 			characterDisplay:addClass('bans-filter') -- TODO CSS class name
 		end
-		characterDisplay:wikitext(CharacterIcon.Icon{
-			character = character.name,
-			size = '18px',
-		})
+		characterDisplay:wikitext(CharacterIcons[character.name] or CharacterIcons.Unknown)
 		wrapper:node(characterDisplay)
 	end)
 	return wrapper
