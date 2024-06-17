@@ -39,25 +39,25 @@ end
 ---@param categories FilterButtonCategory[]
 ---@return Html
 function FilterButtons.get(categories)
-	Array.mapValues(categories, FilterButtons._loadCategory)
+	Array.forEach(categories, FilterButtons._loadCategories)
 
 	local div = mw.html.create('div')
 
-	Array.forEach(categories, function(category)
+	for index, category in ipairs(categories) do
 		-- Variable used to pass default values on to other modules using these.
+		assert(Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load')
 		Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
-		div:node(FilterButtons.getButtonRow(category))
-	end)
+		local buttons = FilterButtons.getButtonRow(category)
+		div:node(buttons)
+	end
 
 	return div
 end
 
 ---@param category FilterButtonCategory
----@return FilterButtonCategory
-function FilterButtons._loadCategory(category)
+function FilterButtons._loadCategories(category)
 	if category.load then
-		category = category.load(category)
-		return category
+		category.load(category)
 	end
 
 	if category.order then
@@ -65,8 +65,6 @@ function FilterButtons._loadCategory(category)
 	end
 
 	category.defaultItems = Logic.emptyOr(category.defaultItems, category.items)
-
-	return category
 end
 
 ---@param category FilterButtonCategory
@@ -88,13 +86,6 @@ function FilterButtons.getButtonRow(category)
 		local text = category.transform and category.transform(value) or value
 		local button = mw.html.create('span')
 			:addClass('filter-button')
-			:css('font-size','10pt')
-			:css('flex-grow','1')
-			:css('max-width','33%')
-			:css('text-overflow','ellipsis')
-			:css('overflow','hidden')
-			:css('text-align','center')
-			:css('padding', '2px')
 			:attr('data-filter-on', value)
 			:wikitext(text)
 		if Table.includes(category.defaultItems, value) then
@@ -106,15 +97,12 @@ function FilterButtons.getButtonRow(category)
 	if String.isNotEmpty(category.expandKey) then
 		local dropdownButton = mw.html.create('div')
 			:addClass('filter-buttons')
-			:addClass('filter-buttons-dropdown')
 			:attr('data-filter', 'data-filter')
 			:attr('data-filter-effect','fade')
 			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.expandKey)
 			:node(mw.html.create('span')
 				:addClass('filter-button')
-				:css('font-size','8pt')
-				:css('padding-left','2px')
-				:css('padding-right','2px')
+				:addClass('filter-button-dropdown')
 				:attr('data-filter-on', 'dropdown-' .. category.expandKey)
 				:wikitext(DROPDOWN_ARROW))
 			:node(mw.html.create('span')
@@ -129,7 +117,6 @@ function FilterButtons.getButtonRow(category)
 			:addClass('filter-category--hidden')
 			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.name)
 			:attr('data-filter-category', 'dropdown-' .. category.name)
-			:css('margin-top','-8px')
 			:node(buttons)
 		return section
 	end
