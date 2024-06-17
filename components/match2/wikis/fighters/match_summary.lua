@@ -129,11 +129,12 @@ end
 ---@return Html
 function CustomMatchSummary._createCharacterIcons(characters, game)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
+
 	local wrapper = mw.html.create('div')
 	Array.forEach(characters or {}, function (character, index)
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
-		if character.active then
-			characterDisplay:addClass('bans-filter') -- TODO CSS class name
+		if not character.active then
+			characterDisplay:css('opacity', '0.3')
 		end
 		characterDisplay:wikitext(CharacterIcons[character.name] or CharacterIcons.Unknown)
 		wrapper:node(characterDisplay)
