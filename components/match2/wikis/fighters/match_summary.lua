@@ -139,8 +139,8 @@ function CustomMatchSummary._createCharacterIcons(characters, game)
 		characterDisplay:wikitext(CharacterIcons[character.name] or CharacterIcons.Unknown)
 		wrapper:node(characterDisplay)
 	end)
-	return wrapper
 
+	return wrapper
 end
 
 ---@param winner integer|string

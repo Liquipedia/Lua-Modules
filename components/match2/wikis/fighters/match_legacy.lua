@@ -9,8 +9,10 @@
 local MatchLegacy = {}
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Set = require('Module:Set')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -63,8 +65,11 @@ function MatchLegacy._convertParameters(match2)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
 			local participants = Json.parseIfString(game.participants) or {}
-			if participants[participant] then
-				heads:add(participants[participant].char)
+			if participants[participant] and participants[participant].characters then
+				Array.forEach(
+					Array.map(participants[participant].characters, Operator.property('name')),
+					FnUtil.curry(heads.add, heads)
+				)
 			end
 		end)
 		return heads:toArray()
