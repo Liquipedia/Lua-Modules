@@ -43,9 +43,11 @@ function FilterButtons.get(categories)
 
 	local div = mw.html.create('div')
 
-	for index, category in ipairs(categories) do
+	for _, category in ipairs(categories) do
 		-- Variable used to pass default values on to other modules using these.
-		assert(Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load')
+		assert(
+			Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load'
+		)
 		Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
 		local buttons = FilterButtons.getButtonRow(category)
 		div:node(buttons)
