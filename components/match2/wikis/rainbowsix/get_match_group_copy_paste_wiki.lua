@@ -44,7 +44,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local mapScore = Logic.readBool(args.mapScore)
 	local mapVeto = Logic.readBool(args.mapVeto)
-	local matchLinks = args.matchLinks and Array.unique(mw.text.split(args.matchLinks, ', ')) or {}
+	local matchLinks = args.matchLinks and Array.unique(Array.parseCommaSeparatedString(args.matchLinks)) or {}
 	local mvps = Logic.readBool(args.mvp)
 	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
