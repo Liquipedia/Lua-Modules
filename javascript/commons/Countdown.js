@@ -3,7 +3,15 @@
  * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
 liquipedia.countdown = {
+	timeoutFunctions: null,
+	timerObjectNodes: null,
+	lastCountdownId: null,
 	init: function() {
+		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
+		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
+			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
+		}
+
 		liquipedia.countdown.timerObjectNodes = document.querySelectorAll( '.timer-object' );
 		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
 			mw.loader.using( 'user.options', () => {
@@ -45,8 +53,6 @@ liquipedia.countdown = {
 			} );
 		}
 	},
-	timeoutFunctions: null,
-	timerObjectNodes: null,
 	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
 			return false;
@@ -57,7 +63,11 @@ liquipedia.countdown = {
 		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
-		liquipedia.countdown.timeoutFunctions.set( liquipedia.countdown.runCountdown, 1000 );
+
+		liquipedia.countdown.lastCountdownId = liquipedia.countdown.timeoutFunctions.set(
+			liquipedia.countdown.runCountdown,
+			1000
+		);
 	},
 	setCountdownString: function( timerObjectNode ) {
 		const streamsarr = [ ];
