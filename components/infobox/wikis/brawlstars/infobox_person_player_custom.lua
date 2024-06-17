@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -26,14 +25,14 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- staff
-	coach = {category = 'Coaches', variable = 'Coach', isplayer = false, personType = 'staff'},
+	coach = {category = 'Coache', variable = 'Coach', isplayer = false, personType = 'staff'},
 	manager = {category = 'Manager', variable = 'Manager', isplayer = false, personType = 'staff'},
 
 	-- talent
-	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false, personType = 'talent'},
-	caster = {category = 'Casters', variable = 'Caster', isplayer = false, personType = 'talent'},
+	analyst = {category = 'Analyst', variable = 'Analyst', isplayer = false, personType = 'talent'},
+	caster = {category = 'Caster', variable = 'Caster', isplayer = false, personType = 'talent'},
 	['content creator'] = {
-		category = 'Content Creators', variable = 'Content Creator', isplayer = false, personType = 'talent'},
+		category = 'Content Creator', variable = 'Content Creator', isplayer = false, personType = 'talent'},
 	host = {category = 'Host', variable = 'Host', isplayer = false, personType = 'talent'},
 }
 ROLES['assistant coach'] = ROLES.coach
@@ -210,10 +209,10 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
+	if self.role2 then
+		table.insert(categories, self.role2.category .. 's')
+	end
+	return categories
 end
 
 return CustomPlayer
