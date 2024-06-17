@@ -369,7 +369,8 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 	local function characterAlive(startingLife, remainingLife, pos)
 		return startingLife - pos < remainingLife
 	end
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. Variables.varDefault('tournament_game'))
+	local game = Variables.varDefault('tournament_game') or ''
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {}
 	local characters = Array.flatMap(charInputs, function (input)
 		---@type [string, string?, string?]
