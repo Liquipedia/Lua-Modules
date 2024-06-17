@@ -58,6 +58,53 @@ Author(s): Elysienna
 	animation-duration: 0.8s;
 }
 
+.dota2-test {
+	.filter-buttons {
+		display: flex;
+		justify-content: start;
+		flex-flow: row wrap;
+		font-size: 10pt;
+		margin: 0.125rem;
+		align-items: center;
+	}
+
+	.filter-button {
+		display: flex;
+		align-items: center;
+		border-radius: 8px;
+		padding: 6px 12px;
+		font-weight: 700;
+		flex-grow: initial;
+
+		.theme--light & {
+			color: var(--clr-on-primary-container,#ffffff);
+			background-color: var(--clr-primary-container,#1f3d7a);
+			border-color: var(--clr-primary-container,#1f3d7a);
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+			background-color: var( --clr-surface-3, #282828 );
+			border-color: var( --clr-surface-3, #282828 );
+		}
+	}
+
+	.filter-button--active {
+
+		.theme--light & {
+			color: #ffffff;
+			background-color: var(--clr-wiki-primary,#1f3d7a);
+			border-color: var(--clr-wiki-primary,#1f3d7a);
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+			background-color: var(--clr-wiki-theme-primary,#1f3d7a);
+			border-color: var(--clr-wiki-theme-primary,#1f3d7a);
+		}
+	}
+}
+
 /* Keyframes filter effects */
 
 @keyframes fadeIn {
