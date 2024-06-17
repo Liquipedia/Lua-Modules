@@ -1,6 +1,6 @@
 /*******************************************************************************
 Template(s): Filter buttons
-Author(s): Elysienna
+Author(s): Elysienna, Nadox
 *******************************************************************************/
 .filter-category--hidden {
 	clip: rect( 0 0 0 0 );
@@ -73,13 +73,13 @@ Author(s): Elysienna
 		align-items: center;
 		border-radius: 8px;
 		padding: 6px 12px;
-		font-weight: 700;
+		font-weight: bold;
 		flex-grow: initial;
 
 		.theme--light & {
-			color: var(--clr-on-primary-container,#ffffff);
-			background-color: var(--clr-primary-container,#1f3d7a);
-			border-color: var(--clr-primary-container,#1f3d7a);
+			color: var( --clr-on-primary-container, #ffffff );
+			background-color: var( --clr-primary-container, #1f3d7a );
+			border-color: var( --clr-primary-container, #1f3d7a );
 		}
 
 		.theme--dark & {
@@ -87,20 +87,11 @@ Author(s): Elysienna
 			background-color: var( --clr-surface-3, #282828 );
 			border-color: var( --clr-surface-3, #282828 );
 		}
-	}
 
-	.filter-button--active {
-
-		.theme--light & {
+		&.filter-button--active {
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+			border-color: var( --clr-wiki-theme-primary, #1f3d7a );
 			color: #ffffff;
-			background-color: var(--clr-wiki-primary,#1f3d7a);
-			border-color: var(--clr-wiki-primary,#1f3d7a);
-		}
-
-		.theme--dark & {
-			color: #ffffff;
-			background-color: var(--clr-wiki-theme-primary,#1f3d7a);
-			border-color: var(--clr-wiki-theme-primary,#1f3d7a);
 		}
 	}
 }
