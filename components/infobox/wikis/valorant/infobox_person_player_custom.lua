@@ -192,9 +192,9 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		return
-			tostring(MatchTicker.participant({team = teamPage, recentLimit = 3})) ..
+			tostring(MatchTicker.participant{team = teamPage, recentLimit = 3}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
