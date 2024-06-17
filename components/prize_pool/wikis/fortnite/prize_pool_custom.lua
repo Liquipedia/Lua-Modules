@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
@@ -45,7 +46,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.players = lpdbData.opponentplayers
+	lpdbData.players = Table.copy(lpdbData.opponentplayers or {})
 
 	local team = lpdbData.participant or ''
 	local lpdbPrefix = Variables.varDefault('lpdb_prefix') or ''

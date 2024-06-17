@@ -82,6 +82,7 @@ return {
 		'youtube',
 		'stream',
 		'afreeca',
+		'soop',
 		'dlive',
 		'facebook-gaming',
 		'vidio',

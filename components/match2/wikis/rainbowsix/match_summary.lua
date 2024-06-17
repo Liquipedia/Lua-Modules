@@ -9,11 +9,9 @@
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local OperatorIcon = require('Module:OperatorIcon')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -438,15 +436,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Map Vetoes
 	if match.extradata.mapveto then

@@ -47,7 +47,11 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	cc = {'https://cc.163.com/'},
-	challengermode = {'https://www.challengermode.com/tournaments/'},
+	challengermode = {
+		'https://www.challengermode.com/tournaments/',
+		player = 'https://www.challengermode.com/users/',
+		team = 'https://www.challengermode.com/teams/'
+	},
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
@@ -167,6 +171,7 @@ local PREFIXES = {
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
+	soop = {'https://www.sooplive.com/'},
 	sostronk = {'https://www.sostronk.com/tournament/'},
 	['start-gg'] = {
 		'https://start.gg/',
