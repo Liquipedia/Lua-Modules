@@ -260,6 +260,7 @@ liquipedia.filterButtons = {
 
 			if ( wikitext in templateExpansion.cache ) {
 				templateExpansion.element.innerHTML = templateExpansion.cache[ wikitext ];
+				this.refreshScriptsAfterContentUpdate();
 				return;
 			}
 
@@ -279,10 +280,15 @@ liquipedia.filterButtons = {
 					if ( data.parse?.text?.[ '*' ] ) {
 						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
 						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
+						this.refreshScriptsAfterContentUpdate();
 					}
 				} );
 			} );
 		} );
+	},
+
+	refreshScriptsAfterContentUpdate: function() {
+		liquipedia.countdown.init();
 	},
 
 	buildLocalStorageKey: function() {
