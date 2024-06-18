@@ -75,9 +75,9 @@ end
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
+	if match.dateIsExact or DateExt.isDefaultTimestamp(match.timestamp) then
 		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
+		-- if match is not default timestamp, we have a date, so display the date
 		body:addRow(MatchSummary.Row():addElement(
 			DisplayHelper.MatchCountdownBlock(match)
 		))
@@ -156,7 +156,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param iconType TFMatchIcons?
+---@param iconType strings?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
