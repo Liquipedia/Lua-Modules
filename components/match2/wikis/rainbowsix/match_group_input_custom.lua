@@ -324,12 +324,12 @@ function mapFunctions.getExtraData(map)
 		pick = map.pick
 	}
 
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for banIndex = 1, MAX_NUM_BANS do
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
+		map.extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function (banIndex)
 			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
-			table.insert(map.extradata['t' .. opponentIndex .. 'bans'], CharacterNames[ban and ban:lower()])
-		end
-	end
+			return CharacterNames[ban and ban:lower()] or ''
+		end)
+	end)
 	return map
 end
 
