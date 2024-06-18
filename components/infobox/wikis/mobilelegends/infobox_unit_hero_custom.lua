@@ -12,6 +12,8 @@ local Class = require('Module:Class')
 local ClassIcon = require('Module:ClassIcon')
 local ClassIconData = require('Module:ClassIcon/Data')
 local Flags = require('Module:Flags')
+local Image = require('Module:Image')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
@@ -31,10 +33,12 @@ local Title = Widgets.Title
 local CustomHero = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local BATTLE_POINTS_ICON = '[[File:Mobile Legends BP icon.png|x16px|Battle Points|link=Battle Points]]'
-local DIAMONDS_ICON = '[[File:Mobile Legends Diamond icon.png|16px|Diamonds|link=Diamonds]]'
-local LUCKY_GEM_ICON = '[[File:Mobile Legends Lucky Gem.png|x16px|Lucky Gem|link=Lucky Gem]]'
-local TICKET_ICON = '[[File:Mobile Legends Ticket icon.png|x16px|Ticket|link=Ticket]]'
+local ICON_DATA = {
+	battlePoints = {icon = 'Mobile Legends BP icon.png', link = '', caption = 'Battle Points'},
+	diamonds = {icon = 'Mobile Legends Diamond icon.png', link = '', caption = 'Diamonds'},
+	luckyGem = {icon = 'Mobile Legends Lucky Gem.png', link = '', caption = 'Lucky Gem'},
+	ticket = {icon = 'Mobile Legends Ticket icon.png', link = '', caption = 'Ticket'}
+}
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
@@ -44,6 +48,7 @@ function CustomHero.run(frame)
 	local unit = CustomHero(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Hero'
+	
 	return unit:createInfobox()
 end
 
@@ -70,10 +75,10 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},
-			String.isNotEmpty(args.costbp) and (BATTLE_POINTS_ICON .. ' ' .. args.costbp) or nil,
-			String.isNotEmpty(args.costdia) and (DIAMONDS_ICON .. ' ' .. args.costdia) or nil,
-			String.isNotEmpty(args.costlg) and (LUCKY_GEM_ICON .. ' ' .. args.costlg) or nil,
-			String.isNotEmpty(args.costticket) and (TICKET_ICON .. ' ' .. args.costticket) or nil
+			CustomHero.getIcon('battlePoints', args.costbp),
+			CustomHero.getIcon('diamonds', args.costdia),
+			CustomHero.getIcon('luckyGem', args.costlg),
+			CustomHero.getIcon('ticket', args.costticket)
 		)
 		return {
 			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
@@ -100,26 +105,29 @@ function CustomHero:addCustomCells(widgets)
 		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors(args)}
 	)
 	
-	if Array.any({'hp', 'hpreg'}, function(key) return String.isNotEmpty(args[key]) end) then
+	local baseStats = {
+		{name = 'Health', value = args.hp},
+		{name = 'Health Regen', value = args.hpreg},
+		{name = 'Mana', value = args.mana},
+		{name = 'Mana Regen', value = args.manareg},
+		{name = 'Energy', value = args.energy},
+		{name = 'Energy Regen', value = args.energyreg},
+		{name = 'Physical Attack', value = args.phyatk},
+		{name = 'Physical Defense', value = args.phydef},
+		{name = 'Magic Power', value = args.mp},
+		{name = 'Magic Defense', value = args.magdef},
+		{name = 'Attack Speed', value = args.atkspeed},
+		{name = 'Attack Speed Ratio', value = args.atkspeedratio},
+		{name = 'Movement Speed', value = args.movespeed}
+	}
+
+	if Array.any(baseStats, function(item) return Logic.isNotEmpty(item.value) end) then
 		table.insert(widgets, Title{name = 'Base Statistics'})
 	end
 
-	Array.appendWith(
-		widgets,
-		Cell{name = 'Health', content = {args.hp}},
-		Cell{name = 'Health Regen', content = {args.hpreg}},
-		Cell{name = 'Mana', content = {args.mana}},
-		Cell{name = 'Mana Regen', content = {args.manareg}},
-		Cell{name = 'Energy', content = {args.energy}},
-		Cell{name = 'Energy Regen', content = {args.energyreg}},
-		Cell{name = 'Physical Attack', content = {args.phyatk}},
-		Cell{name = 'Physical Defense', content = {args.phydef}},
-		Cell{name = 'Magic Power', content = {args.mp}},
-		Cell{name = 'Magic Defense', content = {args.magdef}},
-		Cell{name = 'Attack Speed', content = {args.atkspeed}},
-		Cell{name = 'Attack Speed Ratio', content = {args.atkspeedratio}},
-		Cell{name = 'Movement Speed', content = {args.movespeed}}
-	)
+	Array.extendWith(widgets, Array.map(baseStats, function(item)
+		return Cell{name = item.name, content = {item.value}}
+	end))
 	
 	local wins, loses = CharacterWinLoss.run()
 	if wins + loses == 0 then return widgets end
@@ -130,6 +138,23 @@ function CustomHero:addCustomCells(widgets)
 		Title{name = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
+end
+
+---@param iconKey string
+---@param value string|number?
+---@return string?
+function CustomHero.getIcon(iconKey, value)
+	if Logic.isEmpty(value) then return nil end
+
+	local iconData = ICON_DATA[iconKey]
+	assert(iconData, 'Invalid iconKey "' .. iconKey .. '"')
+
+	return Image.display(iconData.icon, iconData.iconDark, {
+			size = '16x16px',
+			link = iconData.link,
+			caption = iconData.caption
+		}
+	) .. ' ' .. value
 end
 
 ---@param args table
