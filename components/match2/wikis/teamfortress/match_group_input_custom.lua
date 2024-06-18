@@ -80,13 +80,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	---@type number|string
-	local teamTemplateDate = timestamp
-	-- If date is default date, resolve using tournament dates instead
-	-- default date indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not the default date
-	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
-	end
+	local teamTemplateDate = DateExt.nilIfDefaultTimestamp(timestamp) or
+		Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
@@ -226,7 +221,7 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local foundScores = false
 
-	for i = 1, MAX_NUM_MAPS do
+	for _, map, i in Table.iter.pairsByPrefix(match, 'map') do
 		if match['map'..i] then
 			local winner = tonumber(match['map'..i].winner)
 			foundScores = true
@@ -238,11 +233,11 @@ function matchFunctions.getScoreFromMapWinners(match)
 		end
 	end
 
-	for index = 1, opponentNumber do
+	Array.forEach(Array.range(1, opponentNumber), function(index)
 		if not match['opponent' .. index].score and foundScores then
 			match['opponent' .. index].score = newScores[index] or 0
 		end
-	end
+	end)
 
 	return match
 end
@@ -273,23 +268,22 @@ function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		-- read opponent
 		local opponent = match['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
+		if Logic.isEmpty(opponent) then return end
+		CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
-			-- apply status
-			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = 'S'
-				isScoreSet = true
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
-				opponent.status = opponent.score
-				opponent.score = -1
-			end
-			opponents[opponentIndex] = opponent
+		-- apply status
+		if TypeUtil.isNumeric(opponent.score) then
+			opponent.status = 'S'
+			isScoreSet = true
+		elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
+			opponent.status = opponent.score
+			opponent.score = -1
 		end
-	end
+		opponents[opponentIndex] = opponent
+	end)
 
 	-- see if match should actually be finished if bestof limit was reached
 	match.finished = Logic.readBool(match.finished)
