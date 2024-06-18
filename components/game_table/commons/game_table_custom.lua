@@ -9,14 +9,14 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local MatchTable = Lua.import('Module:GameTable')
+local GameTable = Lua.import('Module:GameTable')
 
-local CustomMatchTable = {}
+local CustomGameTable = {}
 
 ---@param args table
 ---@return Html
-function CustomMatchTable.results(args)
-	return MatchTable(args):readConfig():query():build()
+function CustomGameTable.results(args)
+	return GameTable(args):readConfig():query():build()
 end
 
-return Class.export(CustomMatchTable)
+return Class.export(CustomGameTable)
