@@ -78,7 +78,7 @@ function CharacterIcon.Icon(args)
 	assert(iconInfo.file, 'Character:"' .. args.character .. '" has no file set')
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
-		.. (args.addTextLink and ('&nbsp;' .. Page.makeInternalLink(args.character, iconInfo.link or args.character)) or '')
+		.. (Logic.readBool(args.addTextLink) and ('&nbsp;' .. Page.makeInternalLink(args.character, iconInfo.link or args.character)) or '')
 end
 
 return Class.export(CharacterIcon)
