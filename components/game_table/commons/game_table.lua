@@ -72,10 +72,7 @@ end
 function GameTable:_displayGameScore(result, game)
 	local toScore = function(opponentRecord)
 		local isWinner = opponentRecord.id == tonumber(game.winner)
-		local score = isWinner and 1 or 0
-		if Table.isNotEmpty(game.scores) then
-			score = game.scores[opponentRecord.id]
-		end
+		local score = (game.scores or {})[opponentRecord.id] or (isWinner and 1) or 0
 		return mw.html.create(isWinner and 'b' or nil)
 			:wikitext(score)
 	end
