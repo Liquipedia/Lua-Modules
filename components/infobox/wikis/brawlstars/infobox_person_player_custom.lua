@@ -39,8 +39,8 @@ ROLES['assistant coach'] = ROLES.coach
 ROLES.commentator = ROLES.caster
 
 ---@class BrawlstarsInfoboxPlayer: Person
----@field role {category: string, variable: string, isplayer: boolean?, personType: string}?
----@field role2 {category: string, variable: string, isplayer: boolean?, personType: string}?
+---@field role {category?: string, variable: string?, isplayer: boolean?, personType: string?}
+---@field role2 {category?: string, variable: string?, isplayer: boolean?, personType: string?}
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
