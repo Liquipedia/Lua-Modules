@@ -8,11 +8,20 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
+
+local PAGE_TO_SECTION = {
+	['Pools'] = 'Pools',
+	['Singles Pools'] = 'Pools',
+	['Round 1 Pools'] = 'R1 Pools',
+	['Round 2 Pools'] = 'R2 Pools',
+	['Round 3 Pools'] = 'R3 Pools',
+}
 
 ---@param args table
 ---@return Html
@@ -51,6 +60,26 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_tiertype', Variables.varDefault('tournament_liquipediatiertype'))
 
 	Variables.varDefine('tournament_game', args.game or queryResult.game)
+
+	Variables.varDefine('matchsection',
+		args.section or CustomHiddenDataBox._determineMatchSection(mw.title.getCurrentTitle())
+	)
+end
+
+---@param page Title
+---@return string?
+function CustomHiddenDataBox._determineMatchSection(page)
+	if page.subpageText == 'Bracket' then
+		return 'Bracket'
+	end
+
+	local titleParts = mw.text.split(page.text , '/', true)
+
+	for key, section in pairs(PAGE_TO_SECTION) do
+		if Table.includes(titleParts, key) then
+			return section
+		end
+	end
 end
 
 return Class.export(CustomHiddenDataBox)
