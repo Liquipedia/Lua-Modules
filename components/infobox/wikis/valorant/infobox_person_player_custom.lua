@@ -10,11 +10,14 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
+local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
@@ -184,6 +187,16 @@ function CustomPlayer:getPersonType(args)
 		end
 	end
 	return {store = 'player', category = 'Player'}
+end
+
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		return
+			tostring(MatchTicker.player{recentLimit = 3}) ..
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+	end
 end
 
 return CustomPlayer
