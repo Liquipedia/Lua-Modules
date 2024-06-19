@@ -58,15 +58,15 @@ function CustomInjector:parse(id, widgets)
 	if id == 'caption' then
 		table.insert(widgets, Center{content = {args.quote}})
 	elseif id == 'type' then
-		local toBreakDownCell = function(key, title, dataModule)
+		local toBreakDownCell = function(key, title)
 			if String.isEmpty(args[key]) then return end
 			return '<b>' .. title .. '</b><br>' .. ClassIcon.display({}, args[key])
 		end
 
 		local breakDownContents = Array.append({},
-			toBreakDownCell('lane', 'Lane', 'ClassIcon/Data'),
-			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon/Data'),
-			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon/Data')
+			toBreakDownCell('lane', 'Lane'),
+			toBreakDownCell('primaryrole', 'Primary Role'),
+			toBreakDownCell('secondaryrole', 'Secondary Role')
 		)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
