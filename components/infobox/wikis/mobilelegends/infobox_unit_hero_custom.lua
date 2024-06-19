@@ -18,7 +18,6 @@ local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local ClassIconData = mw.loadData('Module:ClassIcon/Data')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -65,9 +64,9 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		local breakDownContents = Array.append({},
-			toBreakDownCell('lane', 'Lane', 'ClassIconData'),
-			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIconData'),
-			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIconData')
+			toBreakDownCell('lane', 'Lane', 'ClassIcon/Data'),
+			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon/Data'),
+			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon/Data')
 		)
 		return {
 			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
