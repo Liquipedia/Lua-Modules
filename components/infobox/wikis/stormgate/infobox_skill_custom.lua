@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local messageBox = require('Module:Message box')
+local MessageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
@@ -86,7 +86,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
-		local introduced = args.introduced and '[['.. CustomSkill._getPatchName(args.introduced) .. '|' .. args.introduced .. ']]'
+		local introduced = args.introduced and
+			Page.makeInternalLink(args.introduced,CustomSkill._getPatchName(args.introduced))
 
 		---@param arr string[]
 		---@param trimPattern string?
@@ -119,11 +120,11 @@ function CustomInjector:parse(id, widgets)
 			caller:_damageHealDisplay('heal')
 		)
 		if args.deprecated then
-			local patch = '[['.. CustomSkill._getPatchName(args.deprecated) .. '|' .. args.deprecated .. ']]'
-			local box = messageBox.main( 'ambox', {
+			local box = MessageBox.main( 'ambox', {
 				image= ICON_DEPRECATED,
 				class='ambox-red',
-				text= 'This has been removed from 1v1 with Patch ' .. patch
+				text= 'This has been removed from 1v1 with Patch ' ..
+				Page.makeInternalLink({},args.deprecated,CustomSkill._getPatchName(args.deprecated))
 			})
 			table.insert(widgets, Center{content = {box}})
 		end

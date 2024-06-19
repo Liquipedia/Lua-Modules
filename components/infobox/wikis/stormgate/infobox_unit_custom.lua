@@ -18,7 +18,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local messageBox = require('Module:Message box')
+local MessageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -100,7 +100,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
 	elseif id == 'custom' then
-		local introduced = args.introduced and '[['.. CustomUnit._getPatchName(args.introduced) .. '|' .. args.introduced .. ']]'
+		local introduced = args.introduced and
+			Page.makeInternalLink(args.introduced,CustomUnit._getPatchName(args.introduced))
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
@@ -111,11 +112,11 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if args.deprecated then
-			local patch = '[['.. CustomUnit._getPatchName(args.deprecated) .. '|' .. args.deprecated .. ']]'
-			local box = messageBox.main( 'ambox', {
+			local box = MessageBox.main( 'ambox', {
 				image= ICON_DEPRECATED,
 				class='ambox-red',
-				text= 'This unit has been removed from 1v1 with Patch ' .. patch
+				text= 'This unit has been removed from 1v1 with Patch ' ..
+				Page.makeInternalLink({},args.deprecated,CustomUnit._getPatchName(args.deprecated))
 			})
 			table.insert(widgets, Center{content = {box}})
 		end
