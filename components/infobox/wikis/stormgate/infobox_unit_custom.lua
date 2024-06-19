@@ -18,12 +18,14 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local messageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
 
 ---@class Stormgate2UnitInfobox: UnitInfobox
 ---@field faction string?
@@ -33,6 +35,7 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 
 ---@param frame Frame
 ---@return Html
@@ -97,13 +100,25 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
 	elseif id == 'custom' then
+		local introduced = args.introduced and '[['.. CustomUnit._getPatchName(args.introduced) .. '|' .. args.introduced .. ']]'
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
 			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)},
+			Cell{name = 'Introduced', content = {introduced}}
 		)
+
+		if args.deprecated then
+			local patch = '[['.. CustomUnit._getPatchName(args.deprecated) .. '|' .. args.deprecated .. ']]'
+			local box = messageBox.main( 'ambox', {
+				image= ICON_DEPRECATED,
+				class='ambox-red',
+				text= 'This unit has been removed from 1v1 with Patch ' .. patch
+			})
+			table.insert(widgets, Center{content = {box}})
+		end
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
@@ -180,6 +195,13 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			deprecated = args.deprecated or '',
+			introduced = tostring(args.introduced),
+			subfaction = Array.parseCommaSeparatedString(args.subfaction),
+			veterancybonushealth = Array.parseCommaSeparatedString(args.veterancybonushealth),
+			veterancybonusdamage = Array.parseCommaSeparatedString(args.veterancybonusdamage),
+			veterancybonusattackspeed = Array.parseCommaSeparatedString(args.veterancybonusattackspeed),
+			veterancyxp = Array.parseCommaSeparatedString(args.veterancyxp),
 			type = Array.parseCommaSeparatedString(args.type),
 			builtfrom = Array.parseCommaSeparatedString(args.built),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
@@ -247,6 +269,19 @@ function CustomUnit:_displayCommaSeparatedString(inputString)
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
 		return Page.makeInternalLink({}, value)
 	end)
+end
+
+---@param patchName string
+---@return string
+function CustomUnit._getPatchName(patchName)
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+	local patch = Array.filter(patches, function(patch)
+		return String.contains(patch.pagename, patchName)
+	end)
+	return patch[1].pagename
 end
 
 return CustomUnit

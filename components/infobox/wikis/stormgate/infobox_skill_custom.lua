@@ -15,12 +15,14 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local messageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Center = Widgets.Center
 
 ---@class StormgateSkillInfobox: SkillInfobox
 ---@field faction string?
@@ -28,6 +30,7 @@ local CustomSkill = Class.new(Skill)
 local CustomInjector = Class.new(Injector)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_SKILLS = {
 	'Spell',
 	'Ability',
@@ -83,17 +86,18 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
+		local introduced = args.introduced and '[['.. CustomSkill._getPatchName(args.introduced) .. '|' .. args.introduced .. ']]'
 
 		---@param arr string[]
-		---@param trimPattern string?
+		---@param trim string?
 		---@return string[]
-		local makeArrayLinks = function(arr, trimPattern)
+		local makeArrayLinks = function(arr, trim)
 			return Array.map(arr, function(value)
-				local display = value
-				if trimPattern then
-					display = display:gsub(trimPattern, '')
+				local dispaly = value
+				if trim then
+					dispaly = dispaly:gsub(trim, '')
 				end
-				return Page.makeInternalLink({}, display, value)
+				return Page.makeInternalLink({}, dispaly, value)
 			end)
 		end
 
@@ -109,10 +113,20 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
 				Cell{name = 'Trigger', content = {args.trigger}},
 				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
+				Cell{name = 'Introduced', content = {introduced}}
 			},
 			caller:_damageHealDisplay('damage'),
 			caller:_damageHealDisplay('heal')
 		)
+		if args.deprecated then
+			local patch = '[['.. CustomSkill._getPatchName(args.deprecated) .. '|' .. args.deprecated .. ']]'
+			local box = messageBox.main( 'ambox', {
+				image= ICON_DEPRECATED,
+				class='ambox-red',
+				text= 'This has been removed from 1v1 with Patch ' .. patch
+			})
+			table.insert(widgets, Center{content = {box}})
+		end
 	end
 
 	return widgets
@@ -170,6 +184,8 @@ end
 function CustomSkill:addToLpdb(lpdbData, args)
 	lpdbData.information = self.faction
 	lpdbData.extradata = {
+		deprecated = args.deprecated or '',
+		introduced = tostring(args.introduced),
 		luminite = tonumber(args.luminite),
 		totalluminite = tonumber(args.totalluminite),
 		therium = tonumber(args.therium),
@@ -245,6 +261,19 @@ function CustomSkill._hotkeys(hotkey1, hotkey2)
 		return Hotkeys.hotkey(hotkey1)
 	end
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+end
+
+---@param patchName string
+---@return string
+function CustomSkill._getPatchName(patchName)
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+	local patch = Array.filter(patches, function(patch)
+		return String.contains(patch.pagename, patchName)
+	end)
+	return patch[1].pagename
 end
 
 return CustomSkill
