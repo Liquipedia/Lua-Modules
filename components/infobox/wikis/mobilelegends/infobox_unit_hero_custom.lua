@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local CharacterWinLoss = require('Module:CharacterWinLoss')
 local Class = require('Module:Class')
 local ClassIcon = require('Module:ClassIcon')
-local ClassIconData = require('Module:ClassIcon/Data')
 local Flags = require('Module:Flags')
 local Image = require('Module:Image')
 local Logic = require('Module:Logic')
@@ -19,6 +18,7 @@ local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local ClassIconData = mw.loadData('Module:ClassIcon/Data')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -48,7 +48,6 @@ function CustomHero.run(frame)
 	local unit = CustomHero(frame)
 	unit:setWidgetInjector(CustomInjector(unit))
 	unit.args.informationType = 'Hero'
-	
 	return unit:createInfobox()
 end
 
@@ -104,7 +103,6 @@ function CustomHero:addCustomCells(widgets)
 		Cell{name = 'Release Date', content = {args.releasedate}},
 		Cell{name = 'Voice Actor(s)', content = CustomHero._voiceActors(args)}
 	)
-	
 	local baseStats = {
 		{name = 'Health', value = args.hp},
 		{name = 'Health Regen', value = args.hpreg},
@@ -128,7 +126,6 @@ function CustomHero:addCustomCells(widgets)
 	Array.extendWith(widgets, Array.map(baseStats, function(item)
 		return Cell{name = item.name, content = {item.value}}
 	end))
-	
 	local wins, loses = CharacterWinLoss.run()
 	if wins + loses == 0 then return widgets end
 
