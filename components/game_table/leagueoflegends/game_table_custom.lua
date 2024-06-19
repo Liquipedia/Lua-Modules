@@ -14,21 +14,12 @@ local Table = require('Module:Table')
 
 local GameTable = Lua.import('Module:GameTable')
 
-local CustomGameTable = {}
+local CustomGameTable = Class.new(GameTable)
 
 ---@param args table
 ---@return Html
 function CustomGameTable.results(args)
-	local gameTable = GameTable(args)
-
-	gameTable.headerRow = CustomGameTable.headerRow
-	gameTable._displayCharacters = CustomGameTable._displayCharacters
-	gameTable._displayDraft = CustomGameTable._displayDraft
-	gameTable._displayGame = CustomGameTable._displayGame
-	gameTable._displayLength = CustomGameTable._displayLength
-	gameTable.gameRow = CustomGameTable.gameRow
-
-	return gameTable:readConfig():query():build()
+	return GameTable(args):readConfig():query():build()
 end
 
 ---@return Html
