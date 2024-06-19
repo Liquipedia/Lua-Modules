@@ -35,8 +35,15 @@
 		position: relative;
 
 		img {
-			max-height: 36px;
 			width: auto;
+
+			@media ( max-width: 767px ) {
+				max-height: 2.375rem;
+			}
+
+			@media ( min-width: 768px ) {
+				max-height: 3.25rem;
+			}
 		}
 
 		.logo--light-theme {
