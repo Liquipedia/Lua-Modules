@@ -105,11 +105,11 @@ end
 function CustomMatchSummary._createGame(row, game, props)
 	game.extradata = game.extradata or {}
 
-	local chars1 = CustomMatchSummary._createCharacterIcons(
+	local chars1 = CustomMatchSummary._createCharacterDisplay(
 		CustomMatchSummary._getPlayerData(game, '1_1').characters,
 		props.game
 	)
-	local chars2 = CustomMatchSummary._createCharacterIcons(
+	local chars2 = CustomMatchSummary._createCharacterDisplay(
 		Array.reverse(CustomMatchSummary._getPlayerData(game, '2_1').characters),
 		props.game
 	)
@@ -118,7 +118,7 @@ function CustomMatchSummary._createGame(row, game, props)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced'):css('flex-grow', '1')
-			:wikitext(DisplayHelper.MapAndStatus(game))
+			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(chars2)
@@ -127,7 +127,7 @@ end
 ---@param characters {name: string, active: boolean}[]?
 ---@param game string?
 ---@return Html
-function CustomMatchSummary._createCharacterIcons(characters, game)
+function CustomMatchSummary._createCharacterDisplay(characters, game)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 
 	local wrapper = mw.html.create('div')
@@ -136,7 +136,7 @@ function CustomMatchSummary._createCharacterIcons(characters, game)
 		if not character.active then
 			characterDisplay:css('opacity', '0.3')
 		end
-		characterDisplay:wikitext(CharacterIcons[character.name] or CharacterIcons.Unknown)
+		characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		wrapper:node(characterDisplay)
 	end)
 
