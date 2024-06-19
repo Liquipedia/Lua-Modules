@@ -121,7 +121,9 @@ function MatchTicker:init(args)
 					local identifier = Tier.toIdentifier(tier)
 					return type(identifier) == 'number' and Tier.isValid(identifier)
 				end) or nil,
-		tierTypes = args.tiertypes and Array.filter(Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)) or nil,
+		tierTypes = args.tiertypes and Array.filter(
+					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
+				) or nil,
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
