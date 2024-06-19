@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local CharacterNames = require('Module:CharacterNames')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -21,6 +22,7 @@ local Opponent = Lua.import('Module:Opponent')
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L', 'D' }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
+local MAX_NUM_BANS = 2
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
@@ -317,10 +319,17 @@ function mapFunctions.getExtraData(map)
 		t1firstside = {rt = map.t1firstside, ot = map.t1firstsideot},
 		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
-		t1bans = {map.t1ban1, map.t1ban2},
-		t2bans = {map.t2ban1, map.t2ban2},
+		t1bans = {},
+		t2bans = {},
 		pick = map.pick
 	}
+
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
+		map.extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function (banIndex)
+			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
+			return CharacterNames[ban and ban:lower()] or ''
+		end)
+	end)
 	return map
 end
 
