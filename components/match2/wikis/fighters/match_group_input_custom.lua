@@ -378,7 +378,7 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 			return nil
 		end
 
-		return {name = character:lower(), active = true}
+		return {name = character, active = true}
 	end)
 
 	participants[opponentIndex .. '_1'] = {
