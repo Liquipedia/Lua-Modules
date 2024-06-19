@@ -221,15 +221,11 @@ function matchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local foundScores = false
 
-	for _, map, i in Table.iter.pairsByPrefix(match, 'map') do
-		if match['map'..i] then
-			local winner = tonumber(match['map'..i].winner)
-			foundScores = true
-			if winner and winner > 0 and winner <= opponentNumber then
-				newScores[winner] = (newScores[winner] or 0) + 1
-			end
-		else
-			break
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+    	local winner = tonumber(map.winner)
+		foundScores = true
+    	if winner and winner > 0 and winner <= opponentNumber then
+        	newScores[winner] = (newScores[winner] or 0) + 1
 		end
 	end
 
