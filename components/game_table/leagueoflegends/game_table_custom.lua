@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
@@ -16,10 +17,12 @@ local GameTable = Lua.import('Module:GameTable')
 
 local CustomGameTable = Class.new(GameTable)
 
----@param args table
+---@param frame Frame
 ---@return Html
-function CustomGameTable.results(args)
-	return GameTable(args):readConfig():query():build()
+function CustomGameTable.results(frame)
+	local args = Arguments.getArgs(frame)
+
+	return CustomGameTable(args):readConfig():query():build()
 end
 
 ---@return Html
@@ -108,4 +111,4 @@ function CustomGameTable:gameRow(match, game)
 		:node(self:_displayGameVod(game.vod))
 end
 
-return Class.export(CustomGameTable)
+return CustomGameTable
