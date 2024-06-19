@@ -14,6 +14,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Utils')
+local FnUtil = require('Module:FnUtil')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -120,7 +121,7 @@ function MatchTicker:init(args)
 					local identifier = Tier.toIdentifier(tier)
 					return type(identifier) == 'number' and Tier.isValid(identifier)
 				end) or nil,
-		tierTypes = args.tiertypes and Array.filter(Array.parseCommaSeparatedString(args.tiertypes), FnUtils.curry(Tier.isValid, 1)) or nil,
+		tierTypes = args.tiertypes and Array.filter(Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)) or nil,
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
