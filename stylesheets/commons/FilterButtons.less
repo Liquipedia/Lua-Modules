@@ -1,6 +1,6 @@
 /*******************************************************************************
 Template(s): Filter buttons
-Author(s): Elysienna
+Author(s): Elysienna, Nadox
 *******************************************************************************/
 .filter-category--hidden {
 	clip: rect( 0 0 0 0 );
@@ -56,6 +56,64 @@ Author(s): Elysienna
 .filter-effect-bounce {
 	animation-name: bounceIn;
 	animation-duration: 0.8s;
+}
+
+.dota2-test {
+	.filter-button {
+		display: flex;
+		align-items: center;
+		border-radius: 0.5rem;
+		padding: 0 0.75rem;
+		font-weight: bold;
+		flex-grow: initial;
+		position: relative;
+		border: 0;
+		min-height: 2rem;
+		color: #3366cc;
+		font-size: 0.875rem;
+
+		.theme--light & {
+			color: var( --clr-wiki-theme-primary );
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+		}
+
+		&:not( .is--active )::after {
+			content: "";
+			opacity: 0.12;
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: 0.5rem;
+			background-color: #c1cee8;
+
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-primary );
+			}
+
+			.theme--dark & {
+				background-color: #ffffff;
+			}
+		}
+
+		@media ( hover: hover ) {
+			&:hover {
+				color: #ffffff;
+				background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+
+				&::after {
+					opacity: 0.24;
+				}
+			}
+		}
+
+		&.filter-button--active {
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+			color: #ffffff;
+		}
+	}
 }
 
 /* Keyframes filter effects */
