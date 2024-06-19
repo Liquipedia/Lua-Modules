@@ -36,7 +36,7 @@ function Tier.toIdentifier(input)
 end
 
 --- Retrieves the raw data for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer?
 ---@param tierType string?
 ---@return table?, table?
 function Tier.raw(tier, tierType)
@@ -58,6 +58,16 @@ function Tier.isValid(tier, tierType)
 	end
 
 	return true
+end
+
+--- Checks if a valid tierType is provided
+---@param tierType string?
+---@return boolean
+function Tier.isValidTierType(tierType)
+	if String.isEmpty(tierType) then return true end
+
+	local _, tierTypeData = Tier.raw(nil, tierType)
+	return tierTypeData ~= nil
 end
 
 --- Converts input to (storage) values for a given (tier, tierType) tuple
