@@ -5,7 +5,6 @@
 	margin-bottom: 1.5rem;
 	position: relative;
 	border-radius: 0.25rem;
-	overflow: hidden;
 
 	@media ( min-width: 768px ) {
 		background: url("https://liquipedia.net/commons/images/1/19/Bgdota2.jpg") no-repeat center / cover;
@@ -14,6 +13,7 @@
 		flex-direction: row;
 		justify-content: space-between;
 		padding: 0 2.5rem;
+		overflow: hidden;
 	}
 
 	&::before {
@@ -38,10 +38,32 @@
 			max-height: 36px;
 			width: auto;
 		}
+
+		.logo--light-theme {
+			display: none;
+
+			.theme--light & {
+				@media ( max-width: 767px ) {
+					display: block;
+				}
+			}
+		}
+
+		.logo--dark-theme {
+			display: block;
+
+			.theme--light & {
+				@media ( max-width: 767px ) {
+					display: none;
+				}
+			}
+		}
 	}
 
-	.searchbox {
-		@media ( max-width: 768px ) {
+	form.searchbox {
+		display: flex;
+
+		@media ( max-width: 767px ) {
 			margin-top: 1.5rem;
 		}
 
@@ -49,10 +71,27 @@
 			margin-top: 0;
 		}
 
-		&-text {
+		// needed higher specificity to override the default input styles
+		input.searchbox-text:not( .search-input ):not( .oo-ui-inputWidget-input ) {
+			min-height: 2.75rem;
+			border-radius: 0.5rem;
+			box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+			border: 0.0625rem solid rgba( 0, 0, 0, 0.12 );
+
+			@media ( max-width: 767px ) {
+				flex-grow: 1;
+			}
+
 			@media ( min-width: 768px ) {
 				width: 25rem;
 			}
+		}
+
+		button.searchbox-button {
+			min-height: 2.75rem;
+			margin-left: 0.5rem;
+			padding: 0 1rem;
+			border: 0;
 		}
 	}
 }
