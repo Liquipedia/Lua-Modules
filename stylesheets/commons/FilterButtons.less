@@ -59,38 +59,56 @@ Author(s): Elysienna, Nadox
 }
 
 .dota2-test {
-	.filter-buttons {
-		display: flex;
-		justify-content: start;
-		flex-flow: row wrap;
-		font-size: 0.825rem;
-		margin: 0.125rem;
-		align-items: center;
-	}
-
 	.filter-button {
 		display: flex;
 		align-items: center;
 		border-radius: 0.5rem;
-		padding: 0.375rem 0.75rem;
+		padding: 0 0.75rem;
 		font-weight: bold;
 		flex-grow: initial;
+		position: relative;
+		border: 0;
+		min-height: 2rem;
+		color: #3366cc;
+		font-size: 0.875rem;
 
 		.theme--light & {
-			color: var( --clr-on-primary-container, #ffffff );
-			background-color: var( --clr-primary-container, #1f3d7a );
-			border-color: var( --clr-primary-container, #1f3d7a );
+			color: var( --clr-wiki-theme-primary );
 		}
-
 		.theme--dark & {
 			color: #ffffff;
-			background-color: var( --clr-surface-3, #282828 );
-			border-color: var( --clr-surface-3, #282828 );
 		}
+		
+		&:not( .is--active )::after {
+			content: '';
+			opacity: 0.12;
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: 0.5rem;
+			background-color: #c1cee8;
 
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-primary );
+			}
+			.theme--dark & {
+				background-color: #fff;
+			}
+		}
+		
+		@media ( hover: hover ) {
+			&:hover {
+				color: #ffffff;
+				background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+
+				&::after {
+					opacity: 0.24;
+				}
+			}
+		}
+		
 		&.filter-button--active {
 			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
-			border-color: var( --clr-wiki-theme-primary, #1f3d7a );
 			color: #ffffff;
 		}
 	}
