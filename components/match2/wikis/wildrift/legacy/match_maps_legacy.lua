@@ -159,16 +159,17 @@ function MatchMapsLegacy.handleDetails(args, details)
 		}
 	end
 
-	Array.mapIndexes(function (index)
-		local map = getMapFromDetails(index) or getMapOnlyWithWinner(index)
+	Array.forEach(Array.mapIndexes(function (index)
+		return getMapFromDetails(index) or getMapOnlyWithWinner(index)
+	end), function(map, index)
 		if map and map.winner then
 			args.mapWinnersSet = true
 		end
 		args['map' .. index] = map
 		args['map' .. index .. 'win'] = nil
 		details['match' .. index] = nil
-		return map
 	end)
+
 	return args, details
 end
 

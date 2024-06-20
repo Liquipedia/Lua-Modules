@@ -133,7 +133,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 	local bestof = match.bestof or DEFAULT_BEST_OF
 	local numberofOpponents = 0
 
-	Array.map(Array.range(1, MAX_NUM_OPPONENTS),function(opponentIndex)
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS),function(opponentIndex)
 		local opponent = match['opponent' .. opponentIndex]
 
 		if Logic.isEmpty(opponent) then return end
@@ -167,9 +167,6 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 				opponent.score = opponent.score or -1
 			end
 		end
-
-		-- to not break the loop
-		return true
 	end)
 
 	CustomMatchGroupInput._determineWinnerIfMissing(match)
