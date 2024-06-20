@@ -101,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local introduced = args.introduced and
-			Page.makeInternalLink(args.introduced,CustomUnit._getPatchName(args.introduced))
+		Page.makeInternalLink(args.introduced,CustomUnit._getPatchName(args.introduced))
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
@@ -280,7 +280,7 @@ function CustomUnit._getPatchName(patchName)
 		limit = 5000,
 	})
 	local patch = Array.filter(patches, function(patch)
-		return String.contains(patch.pagename, patchName)
+		return String.endsWith(patch.pagename, '/' .. patchName)
 	end)
 	return patch[1].pagename
 end
