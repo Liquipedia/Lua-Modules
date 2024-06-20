@@ -270,9 +270,9 @@ function CustomSkill:_processPatchFromId(key)
 		limit = 5000,
 	})
 
-	local patch = Array.filter(patches, function(patch)
+	local patch = (Array.filter(patches, function(patch)
 		return String.endsWith(patch.pagename, '/' .. value)
-	end)[1]
+	end)[1] or {}).pagename
 	assert(patch, 'Invalid patch "' .. value .. '"')
 
 	args[key] = patch
