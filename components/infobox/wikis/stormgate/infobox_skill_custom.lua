@@ -271,7 +271,7 @@ function CustomSkill:_processPatchFromId(key)
 	})
 
 	args[key] = (Array.filter(patches, function(patch)
-		return String.endsWith(patch.pagename, '/' .. input
+		return String.endsWith(patch.pagename, '/' .. input)
 	end)[1] or {}).pagename
 	assert(args[key], 'Invalid patch "' .. input .. '"')
 
