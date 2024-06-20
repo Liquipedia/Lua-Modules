@@ -6,12 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -91,7 +91,10 @@ function OperatorBans:add(operator)
 			:tag('td')
 				:css('padding', '0')
 				:tag('div')
-					:wikitext(OperatorIcon.getImage{operator,'50x50px'})
+					:wikitext(CharacterIcon.Icon{
+						character = operator,
+						size = '50x50px'
+					})
 	return self
 end
 
