@@ -46,7 +46,14 @@ function CustomUnit.run(frame)
 	unit.faction = Faction.read(unit.args.faction)
 	unit.args.informationType = unit.args.informationType or 'Unit'
 
-	return unit:createInfobox()
+	unit:_processPatchFromId('introduced')
+	unit:_processPatchFromId('deprecated')
+
+	local builtInfobox = unit:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay))
 end
 
 ---@param id string
@@ -100,26 +107,14 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
 		}
 	elseif id == 'custom' then
-		local introduced = args.introduced and
-		Page.makeInternalLink(args.introduced,CustomUnit._getPatchName(args.introduced))
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
 			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
 			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)},
-			Cell{name = 'Introduced', content = {introduced}}
+			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
-
-		if args.deprecated then
-			local box = MessageBox.main( 'ambox', {
-				image= ICON_DEPRECATED,
-				class='ambox-red',
-				text= 'This unit has been removed from 1v1 with Patch ' ..
-				Page.makeInternalLink({},args.deprecated,CustomUnit._getPatchName(args.deprecated))
-			})
-			table.insert(widgets, Center{content = {box}})
-		end
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
@@ -272,17 +267,35 @@ function CustomUnit:_displayCommaSeparatedString(inputString)
 	end)
 end
 
----@param patchName string
----@return string
-function CustomUnit._getPatchName(patchName)
+---@param key string
+function CustomUnit:_processPatchFromId(key)
+	local args = self.args
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
+
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::patch]]',
 		limit = 5000,
 	})
-	local patch = Array.filter(patches, function(patch)
-		return String.endsWith(patch.pagename, '/' .. patchName)
-	end)
-	return patch[1].pagename
+
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input)
+	end)[1] or {}).pagename
+	assert(args[key], 'Invalid patch "' .. input .. '"')
+
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+end
+
+---@param patch string?
+---@return Html? -would need to check what warningbox actually returns ... am on phone ...
+function CustomUnit._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomUnit
