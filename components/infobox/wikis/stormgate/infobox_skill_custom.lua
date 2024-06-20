@@ -262,21 +262,20 @@ end
 ---@param key string
 function CustomSkill:_processPatchFromId(key)
 	local args = self.args
-	local value = Table.extract(args, key)
-	if String.isEmpty(value) then return end
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
 
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::patch]]',
 		limit = 5000,
 	})
 
-	local patch = (Array.filter(patches, function(patch)
-		return String.endsWith(patch.pagename, '/' .. value)
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input
 	end)[1] or {}).pagename
-	assert(patch, 'Invalid patch "' .. value .. '"')
+	assert(args[key], 'Invalid patch "' .. input .. '"')
 
-	args[key] = patch
-	args[key .. 'Display'] = Page.makeInternalLink(args.introduced, patch)
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
 end
 
 ---@param patch string?
