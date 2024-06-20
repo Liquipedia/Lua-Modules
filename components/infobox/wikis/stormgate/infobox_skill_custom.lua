@@ -22,7 +22,6 @@ local Skill = Lua.import('Module:Infobox/Skill')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
 
 ---@class StormgateSkillInfobox: SkillInfobox
 ---@field faction string?
@@ -272,7 +271,7 @@ function CustomSkill:_processPatchFromId(key)
 	})
 
 	local patch = Array.filter(patches, function(patch)
-		return String.endsWith(patch.pagename, '/' .. patchName)
+		return String.endsWith(patch.pagename, '/' .. value)
 	end)[1]
 	assert(patch, 'Invalid patch "' .. value .. '"')
 
