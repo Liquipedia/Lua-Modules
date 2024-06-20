@@ -52,7 +52,14 @@ function CustomSkill.run(frame)
 	skill:_calculateDamageHealTotalAndDps('damage')
 	skill:_calculateDamageHealTotalAndDps('heal')
 
-	return skill:createInfobox()
+	skill:_processPatchFromId('introduced')
+	skill:_processPatchFromId('deprecated')
+
+	local builtInfobox = skill:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay))
 end
 
 ---@param args table
@@ -86,8 +93,6 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		local castingTime = tonumber(args.casting_time)
-		local introduced = args.introduced and
-		Page.makeInternalLink(args.introduced,CustomSkill._getPatchName(args.introduced))
 
 		---@param arr string[]
 		---@param trimPattern string?
@@ -114,20 +119,11 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
 				Cell{name = 'Trigger', content = {args.trigger}},
 				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
-				Cell{name = 'Introduced', content = {introduced}}
+				Cell{name = 'Introduced', content = {args.introducedDisplay}}
 			},
 			caller:_damageHealDisplay('damage'),
 			caller:_damageHealDisplay('heal')
 		)
-		if args.deprecated then
-			local box = MessageBox.main( 'ambox', {
-				image= ICON_DEPRECATED,
-				class='ambox-red',
-				text= 'This has been removed from 1v1 with Patch ' ..
-				Page.makeInternalLink({},args.deprecated,CustomSkill._getPatchName(args.deprecated))
-			})
-			table.insert(widgets, Center{content = {box}})
-		end
 	end
 
 	return widgets
@@ -186,7 +182,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 	lpdbData.information = self.faction
 	lpdbData.extradata = {
 		deprecated = args.deprecated or '',
-		introduced = tostring(args.introduced),
+		introduced = args.introduced or '',
 		luminite = tonumber(args.luminite),
 		totalluminite = tonumber(args.totalluminite),
 		therium = tonumber(args.therium),
@@ -264,17 +260,36 @@ function CustomSkill._hotkeys(hotkey1, hotkey2)
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
 end
 
----@param patchName string
----@return string
-function CustomSkill._getPatchName(patchName)
+---@param key string
+function CustomSkill:_processPatchFromId(key)
+	local args = self.args
+	local value = Table.extract(args, key)
+	if String.isEmpty(value) then return end
+
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::patch]]',
 		limit = 5000,
 	})
+
 	local patch = Array.filter(patches, function(patch)
 		return String.endsWith(patch.pagename, '/' .. patchName)
-	end)
-	return patch[1].pagename
+	end)[1]
+	assert(patch, 'Invalid patch "' .. value .. '"')
+
+	args[key] = patch
+	args[key .. 'Display'] = Page.makeInternalLink(args.introduced, patch)
+end
+
+---@param patch string?
+---@return Html? -would need to check what warningbox actually returns ... am on phone ...
+function CustomSkill._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomSkill
