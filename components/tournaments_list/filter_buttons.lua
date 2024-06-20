@@ -19,7 +19,6 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 
 ---@class FilterButtonCategory
 ---@field name string
----@field query string?
 ---@field items string[]?
 ---@field defaultItems string[]?
 ---@field transform? fun(item: string): string
