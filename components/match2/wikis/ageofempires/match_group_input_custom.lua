@@ -7,6 +7,7 @@
 --
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -46,6 +47,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 	CustomMatchGroupInput._getExtraData(match)
 	return match
 end
+
+--- Only used in MatchGroup/Legacy/Default
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
