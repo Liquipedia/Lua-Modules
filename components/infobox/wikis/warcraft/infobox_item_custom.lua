@@ -151,7 +151,7 @@ function CustomItem:setLpdbData(args)
 		stock = args.stock,
 		stockstart = args.stockstart,
 		stockreplenish = args.stockreplenish,
-		requirement = args.requirement,
+		requirement = args.requires,
 		purchasedfromgoblinshop = tostring(class == PURCHASABLE and String.contains(args.soldfrom, GOBLIN_MERCHANT)),
 	}
 
