@@ -45,9 +45,6 @@ liquipedia.countdown = {
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
-
-				liquipedia.countdown.setupCountdownsIfSwitchExists();
-
 				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
 				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
@@ -55,29 +52,6 @@ liquipedia.countdown = {
 				} );
 			} );
 		}
-	},
-	setupCountdownsIfSwitchExists: function() {
-		const switchElements = document.querySelectorAll( '.switch[data-trigger-event]' );
-
-		switchElements.forEach( ( switchElem ) => {
-			if ( switchElem.dataset && switchElem.dataset.triggerEvent === 'countdown' ) {
-				const isChecked = switchElem.classList.contains( 'switch-on' );
-				liquipedia.countdown.toggleCountdowns( isChecked );
-			
-				document.addEventListener('switchTriggered', function(event) {
-					console.log('SWITCH TRIGGERED!');
-					if (event.detail.event === 'countdown') {
-						liquipedia.countdown.toggleCountdowns(event.detail.value);
-					}
-				});
-			}
-		});
-	},
-	toggleCountdowns: function( isCountdownToggled ) {
-		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( 'timer-hidden', isCountdownToggled );
-			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( 'timer-hidden', !isCountdownToggled );
-		});
 	},
 	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
@@ -197,7 +171,6 @@ liquipedia.countdown = {
 		if ( timerObjectNode.dataset.finished !== 'finished' ) {
 			html += streamsarr.join( ' ' );
 		}
-		console.log(html);
 		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
 	},
 	getStreamName: function( url ) {
