@@ -165,9 +165,9 @@ function MatchTicker:init(args)
 	config.wrapperClasses = wrapperClasses
 
 	if config.newStyle then
-		self.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents/New')
+		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents/New')
 	else
-		self.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
+		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 	end
 
 	self.config = config
