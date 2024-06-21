@@ -3,8 +3,8 @@ Template(s): Filter buttons
 Author(s): Elysienna, Nadox
 *******************************************************************************/
 .filter-category--hidden {
-	clip: rect(0 0 0 0);
-	clip-path: inset(50%);
+	clip: rect( 0 0 0 0 );
+	clip-path: inset( 50% );
 	height: 1px;
 	overflow: hidden;
 	position: absolute;
@@ -29,11 +29,10 @@ Author(s): Elysienna, Nadox
 	overflow: hidden;
 	text-align: center;
 	background-color: transparent;
-	border: 0.125rem solid var(--clr-primary-container, #c1cee8);
-	color: var(--clr-primary, #3366cc);
+	border: 0.125rem solid var( --clr-primary-container, #c1cee8 );
+	color: var( --clr-primary, #3366cc );
 	border-radius: 0.25rem;
-	transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out,
-		color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .filter-button-all {
@@ -42,32 +41,31 @@ Author(s): Elysienna, Nadox
 	margin-right: 0.5rem;
 }
 
-.filter-button:not(:first-child) {
+.filter-button:not( :first-child ) {
 	flex-grow: 1;
 	max-width: 33%;
 }
 
-.filter-button:not(:last-child) {
+.filter-button:not( :last-child ) {
 	margin-right: 0.5rem;
 }
 
 .filter-button:hover {
-	background-color: var(--clr-primary, #3366cc);
-	border-color: var(--clr-primary, #3366cc);
-	color: var(--clr-on-primary, #ffffff);
+	background-color: var( --clr-primary, #3366cc );
+	border-color: var( --clr-primary, #3366cc );
+	color: var( --clr-on-primary, #ffffff );
 	cursor: pointer;
 }
 
 .filter-button:focus {
 	outline: 0;
-	box-shadow: 0 0.5rem 0.625rem 0.125rem rgba(0, 0, 0, 0.1),
-		0 0 0 0.1875rem #c2d1f0;
+	box-shadow: 0 0.5rem 0.625rem 0.125rem rgba( 0, 0, 0, 0.1 ), 0 0 0 0.1875rem #c2d1f0;
 }
 
 .filter-button--active {
-	color: var(--clr-on-primary-container, #ffffff);
-	background-color: var(--clr-primary-container, #1f3d7a);
-	border-color: var(--clr-primary-container, #1f3d7a);
+	color: var( --clr-on-primary-container, #ffffff );
+	background-color: var( --clr-primary-container, #1f3d7a );
+	border-color: var( --clr-primary-container, #1f3d7a );
 }
 
 .filter-effect-fade {
@@ -95,14 +93,14 @@ Author(s): Elysienna, Nadox
 		font-size: 0.875rem;
 
 		.theme--light & {
-			color: var(--clr-wiki-theme-primary);
+			color: var( --clr-wiki-theme-primary );
 		}
 
 		.theme--dark & {
 			color: #ffffff;
 		}
 
-		&:not(.is--active)::after {
+		&:not( .is--active )::after {
 			content: "";
 			opacity: 0.12;
 			position: absolute;
@@ -112,7 +110,7 @@ Author(s): Elysienna, Nadox
 			background-color: #c1cee8;
 
 			.theme--light & {
-				background-color: var(--clr-wiki-theme-primary);
+				background-color: var( --clr-wiki-theme-primary );
 			}
 
 			.theme--dark & {
@@ -122,7 +120,7 @@ Author(s): Elysienna, Nadox
 
 		&:hover {
 			color: #ffffff;
-			background-color: var(--clr-wiki-theme-primary, #1f3d7a);
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
 
 			&::after {
 				opacity: 0.24;
@@ -130,7 +128,7 @@ Author(s): Elysienna, Nadox
 		}
 
 		&.filter-button--active {
-			background-color: var(--clr-wiki-theme-primary, #1f3d7a);
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
 			color: #ffffff;
 		}
 	}
@@ -150,39 +148,39 @@ Author(s): Elysienna, Nadox
 
 @keyframes bounceIn {
 	from {
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	0% {
 		opacity: 0;
-		transform: scale3d(0.3, 0.3, 0.3);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 0.3, 0.3, 0.3 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	20% {
-		transform: scale3d(1.1, 1.1, 1.1);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 1.1, 1.1, 1.1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	40% {
-		transform: scale3d(0.9, 0.9, 0.9);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 0.9, 0.9, 0.9 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	60% {
 		opacity: 1;
-		transform: scale3d(1.03, 1.03, 1.03);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 1.03, 1.03, 1.03 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	80% {
-		transform: scale3d(0.97, 0.97, 0.97);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 0.97, 0.97, 0.97 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 
 	to {
 		opacity: 1;
-		transform: scale3d(1, 1, 1);
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+		transform: scale3d( 1, 1, 1 );
+		animation-timing-function: cubic-bezier( 0.215, 0.61, 0.355, 1 );
 	}
 }
