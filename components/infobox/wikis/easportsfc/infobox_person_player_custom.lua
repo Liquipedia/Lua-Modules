@@ -1,31 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=fifa
--- page=Module:Infobox/Company/Custom
+-- wiki=easportsfc
+-- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 
-local Company = Lua.import('Module:Infobox/Company')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class FifaCompanyInfobox: CompanyInfobox
-local CustomCompany = Class.new(Company)
+---@class FifaInfoboxPlayer: Person
+local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
 ---@return Html
-function CustomCompany.run(frame)
-	local company = CustomCompany(frame)
-	company:setWidgetInjector(CustomInjector(company))
+function CustomPlayer.run(frame)
+	local player = CustomPlayer(frame)
+	player:setWidgetInjector(CustomInjector(player))
 
-	return company:createInfobox()
+	return player:createInfobox()
 end
 
 ---@param id string
@@ -33,11 +34,12 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'parent' then
-		table.insert(widgets, Cell{name = 'Focus', content = {args.focus}})
+
+	if id == 'custom' then
+		table.insert(widgets, Cell{name = 'Agency', content = {Page.makeInternalLink(args.agency)}})
 	end
 
 	return widgets
 end
 
-return CustomCompany
+return CustomPlayer
