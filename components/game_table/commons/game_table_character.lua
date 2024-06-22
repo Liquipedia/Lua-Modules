@@ -33,19 +33,19 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.iconSize = self.args.iconSize or '27px'
-	mw.logObject(self)
 end)
 
 function CharacterGameTable:readConfig()
 	if not self.isCharacterTable then
 		self.resultFromRecord = GameTable.resultFromRecord
+		self.buildConditions = GameTable.buildConditions
 		self.gameFromRecord = GameTable.gameFromRecord
+		self.statsFromMatches = GameTable.statsFromMatches
 		return GameTable.readConfig(self)
 	end
 
-	self.buildConditions = self.buildMatchConditions
+	self.args.showOnlyGameStats = true
 	self.config = self:_readDefaultConfig()
-
 	return self
 end
 
@@ -80,7 +80,7 @@ function CharacterGameTable:_applyFunctionToPlayers(opponentIndex, funct)
 end
 
 ---@return string
-function CharacterGameTable:_buildGameConditions()
+function CharacterGameTable:_buildMatchConditions()
 	return ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('winner'), Comparator.notEquals, '')}
 		:add{ConditionNode(ColumnName('mode'), Comparator.equals, 'team')}
@@ -111,9 +111,9 @@ function CharacterGameTable:_buildCharacterConditions()
 end
 
 ---@return string
-function CharacterGameTable:buildMatchConditions()
+function CharacterGameTable:buildConditions()
 	local lpdbData = mw.ext.LiquipediaDB.lpdb('match2game', {
-		conditions = self:_buildGameConditions(),
+		conditions = self:_buildMatchConditions(),
 		query = 'match2id',
 		order = 'date desc',
 		groupby = 'match2id asc',
@@ -163,6 +163,27 @@ function CharacterGameTable:resultFromRecord(record)
 		winner = tonumber(record.winner),
 		resultType = record.resultType,
 		countGames = true,
+	}
+end
+
+---@return {games: {w: number, d: number, l: number}}
+function CharacterGameTable:statsFromMatches()
+	local totalGames = {w = 0, d = 0, l = 0}
+
+	Array.forEach(self.matches, function(match)
+		---@cast match GameTableMatch
+		Array.forEach(match.games, function (game, index)
+			local winner = tonumber(game.winner)
+			if game.extradata.pickedBy == winner then
+				totalGames.w = totalGames.w + 1
+			elseif game.extradata.pickedBy == 2 then
+				totalGames.l = totalGames.l + 1
+			end
+		end)
+	end)
+
+	return {
+		games = totalGames,
 	}
 end
 
