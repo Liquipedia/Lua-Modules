@@ -99,7 +99,7 @@ liquipedia.filterButtons = {
 				defaultCurated: buttonsDiv.dataset.filterDefaultCurated === 'true'
 			};
 
-			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
+			Array.from( buttonsDiv.querySelectorAll( ':scope > .filter-button' ) ).forEach(
 				( /** @type {HTMLElement} */ buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
 					const defaultState = !(
@@ -131,7 +131,7 @@ liquipedia.filterButtons = {
 	},
 
 	generateFilterableObjects: function() {
-		document.querySelectorAll( '[data-filter-category]' ).forEach(
+		Array.from( document.querySelectorAll( '[data-filter-category]' ) ).forEach(
 			/** @param {HTMLElement} filterableItem */
 			( filterableItem ) => {
 				const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
@@ -144,7 +144,7 @@ liquipedia.filterButtons = {
 			}
 		);
 
-		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach(
+		Array.from( document.querySelectorAll( '[data-filter-expansion-template]' ) ).forEach(
 			/** @param {HTMLElement} templateExpansion */
 			( templateExpansion ) => {
 				this.templateExpansions.push( {
