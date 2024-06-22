@@ -192,7 +192,7 @@ function CustomUnit:setLpdbData(args)
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			deprecated = args.deprecated or '',
-			introduced = tostring(args.introduced),
+			introduced = args.introduced or '',
 			subfaction = Array.parseCommaSeparatedString(args.subfaction),
 			veterancybonushealth = Array.parseCommaSeparatedString(args.veterancybonushealth),
 			veterancybonusdamage = Array.parseCommaSeparatedString(args.veterancybonusdamage),
