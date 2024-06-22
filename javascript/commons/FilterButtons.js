@@ -141,16 +141,18 @@ liquipedia.filterButtons = {
 			} );
 		} );
 
-		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach( ( /** @type HTMLElement */ templateExpansion ) => {
-			this.templateExpansions.push( {
-				element: templateExpansion,
-				groups: templateExpansion.dataset.filterGroups.split( ',' ),
-				template: templateExpansion.dataset.filterExpansionTemplate,
-				cache: {
-					default: templateExpansion.innerHTML
-				}
-			} );
-		} );
+		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach(
+			( /** @type HTMLElement */ templateExpansion ) => {
+				this.templateExpansions.push( {
+					element: templateExpansion,
+					groups: templateExpansion.dataset.filterGroups.split( ',' ),
+					template: templateExpansion.dataset.filterExpansionTemplate,
+					cache: {
+						default: templateExpansion.innerHTML
+					}
+				} );
+			}
+		);
 
 		this.hideableGroups = Array.from( document.querySelectorAll( '[data-filter-hideable-group]' ) );
 	},
@@ -272,7 +274,9 @@ liquipedia.filterButtons = {
 				if ( filterGroup.curated || filterGroup.defaultCurated ) {
 					return filterGroup.curated === filterGroup.defaultCurated;
 				}
-				return Object.keys( filterGroup.filterStates ).every( ( filterState ) => filterGroup.filterStates[ filterState ] === filterGroup.defaultStates[ filterState ] );
+				return Object.keys( filterGroup.filterStates ).every(
+					( filter ) => filterGroup.filterStates[ filter ] === filterGroup.defaultStates[ filter ]
+				);
 			} );
 			if ( isDefault ) {
 				templateExpansion.element.innerHTML = templateExpansion.cache.default;
