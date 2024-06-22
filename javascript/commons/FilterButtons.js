@@ -58,7 +58,7 @@ liquipedia.filterButtons = {
 
 		this.localStorageKey = this.buildLocalStorageKey();
 		this.generateFilterGroups( filterButtonGroups );
-		this.generateFilterableItems();
+		this.generateFilterableObjects();
 		this.initializeButtons();
 		this.performUpdate();
 	},
@@ -114,7 +114,7 @@ liquipedia.filterButtons = {
 		} );
 	},
 
-	generateFilterableItems: function() {
+	generateFilterableObjects: function() {
 		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
 			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
 			filterGroup.filterableItems.push( {
