@@ -67,7 +67,7 @@ liquipedia.filterButtons = {
 	hideableGroups: [],
 
 	init: function() {
-		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
+		const filterButtonGroups = Array.from( document.querySelectorAll( '.filter-buttons[data-filter]' ) );
 		if ( filterButtonGroups.length === 0 ) {
 			return;
 		}
@@ -80,7 +80,7 @@ liquipedia.filterButtons = {
 	},
 
 	/**
-	 * @param {NodeListOf<HTMLElement>} filterButtonGroups
+	 * @param {HTMLElement[]} filterButtonGroups
 	 */
 	generateFilterGroups: function( filterButtonGroups ) {
 		const localStorage = this.getLocalStorage();
@@ -100,7 +100,7 @@ liquipedia.filterButtons = {
 			};
 
 			buttonsDiv.querySelectorAll( ':scope > .filter-button' ).forEach(
-				( /** @type HTMLElement */ buttonElement ) => {
+				( /** @type {HTMLElement} */ buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
 					const defaultState = !(
 						buttonElement.dataset.filterDefault === 'false' ||
@@ -131,18 +131,22 @@ liquipedia.filterButtons = {
 	},
 
 	generateFilterableObjects: function() {
-		document.querySelectorAll( '[data-filter-category]' ).forEach( ( /** @type HTMLElement */ filterableItem ) => {
-			const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
-			filterGroup.filterableItems.push( {
-				element: filterableItem,
-				value: filterableItem.dataset.filterCategory,
-				curated: filterableItem.dataset.curated !== undefined,
-				hidden: false
-			} );
-		} );
+		document.querySelectorAll( '[data-filter-category]' ).forEach(
+			/** @param {HTMLElement} filterableItem */
+			( filterableItem ) => {
+				const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
+				filterGroup.filterableItems.push( {
+					element: filterableItem,
+					value: filterableItem.dataset.filterCategory,
+					curated: filterableItem.dataset.curated !== undefined,
+					hidden: false
+				} );
+			}
+		);
 
 		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach(
-			( /** @type HTMLElement */ templateExpansion ) => {
+			/** @param {HTMLElement} templateExpansion */
+			( templateExpansion ) => {
 				this.templateExpansions.push( {
 					element: templateExpansion,
 					groups: templateExpansion.dataset.filterGroups.split( ',' ),
