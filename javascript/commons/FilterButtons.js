@@ -47,6 +47,8 @@ liquipedia.filterButtons = {
 
 	filterGroups: {},
 	templateExpansions: [],
+	/** @type {HTMLElement[]} */
+	hideableGroups: [],
 
 	init: function() {
 		const filterButtonGroups = document.querySelectorAll( '.filter-buttons[data-filter]' );
@@ -122,6 +124,7 @@ liquipedia.filterButtons = {
 				hidden: false
 			} );
 		} );
+
 		document.querySelectorAll( '[data-filter-expansion-template]' ).forEach( ( /** @type HTMLElement */ templateExpansion ) => {
 			this.templateExpansions.push( {
 				element: templateExpansion,
@@ -132,6 +135,8 @@ liquipedia.filterButtons = {
 				}
 			} );
 		} );
+
+		this.hideableGroups = Array.from( document.querySelectorAll( '[data-filter-hideable-group]' ) );
 	},
 
 	initializeButtons: function() {
@@ -234,6 +239,17 @@ liquipedia.filterButtons = {
 			} );
 		} );
 
+		this.hideableGroups.forEach( ( hideableGroup ) => {
+			const filerableItems = this.getTopLevelFilterableItems( hideableGroup );
+			const effectClass = 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect );
+			if ( !filerableItems.every( this.isFilterableVisible, this ) ) {
+				hideableGroup.classList.remove( effectClass );
+				hideableGroup.classList.add( this.hiddenCategoryClass );
+			} else {
+				hideableGroup.classList.replace( this.hiddenCategoryClass, effectClass );
+			}
+		} );
+
 		this.templateExpansions.forEach( ( templateExpansion ) => {
 			const isDefault = templateExpansion.groups.every( ( group ) => {
 				const filterGroup = this.filterGroups[ group ];
@@ -310,6 +326,31 @@ liquipedia.filterButtons = {
 			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates, curated: filterGroup.curated };
 		} );
 		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
+	},
+
+	/**
+	 * @param {HTMLElement} element
+	 * @return {HTMLElement[]}
+	 */
+	getTopLevelFilterableItems: function ( element ) {
+		return Array.from(
+			element.querySelectorAll(
+				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])'
+			)
+		);
+	},
+
+	/**
+	 * @param {HTMLElement} filerableItem
+	 * @return {boolean}
+	 */
+	isFilterableVisible: function ( filerableItem ) {
+		if ( filerableItem.classList.contains( this.hiddenCategoryClass ) ) {
+			return false;
+		} else {
+			const filterableChildren = this.getTopLevelFilterableItems( filerableItem );
+			return filterableChildren.length === 0 ? true : filterableChildren.some( this.isFilterableVisible, this );
+		}
 	}
 };
 
