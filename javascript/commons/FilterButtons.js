@@ -145,18 +145,16 @@ liquipedia.filterButtons = {
 			}
 		);
 
-		Array.from( document.querySelectorAll( '[data-filter-expansion-template]' ) ).forEach(
-			/** @param {HTMLElement} templateExpansion */
-			( templateExpansion ) => {
-				this.templateExpansions.push( {
-					element: templateExpansion,
-					groups: templateExpansion.dataset.filterGroups.split( ',' ),
-					template: templateExpansion.dataset.filterExpansionTemplate,
-					cache: {
-						default: templateExpansion.innerHTML
-					}
-				} );
-			}
+		this.templateExpansions = Array.from(
+			document.querySelectorAll( '[data-filter-expansion-template]' ),
+			( templateExpansion ) => ( {
+				element: templateExpansion,
+				groups: templateExpansion.dataset.filterGroups.split( ',' ),
+				template: templateExpansion.dataset.filterExpansionTemplate,
+				cache: {
+					default: templateExpansion.innerHTML
+				}
+			} )
 		);
 
 		this.hideableGroups = Array.from( document.querySelectorAll( '[data-filter-hideable-group]' ) );
