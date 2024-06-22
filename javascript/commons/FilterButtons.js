@@ -3,40 +3,56 @@
  Author(s): Elysienna (original), iMarbot (refactor), SyntacticSalt (template expansion)
  *******************************************************************************/
 /**
- * Usage of module:
- *
- * Filter buttons:
+ * ### Liquipedia Filter Buttons
+ * #### Filter buttons/groups
+ * ```html
  * <span data-filter data-filter-effect="fade" data-filter-group="group1">
  *   <span data-filter-on="all">All</span>
  *   <span data-filter-on="cat1" class="filter-button--active">Category 1</span>
  *   <span data-filter-on="cat2">Category 2</span>
  * </span>
+ * ```
  *
- * - data-filter (required): property on the container to group the buttons within into the given group
- * - data-filter-group (encouraged): a unique identifier given to this group, to be used later on the items so the controls know which items to filter.
+ * - `data-filter` (required): property on the container to group the buttons within into the given group
+ * - `data-filter-group` (encouraged): unique identifier for group, used to determine which items to filter on the page.
  *     Note: this attribute is technically not required as long as one instance of the module is being used.
  *           When using multiple on a single page, ALWAYS use this attribute to distinguish between button/item groups
- * - data-filter-effect (optional): options are [fade,bounce,none]. When omitted, no effect is used.
- * - data-filter-on (required): clicking this element will toggle the items with the passed category
- *     (matching on data-filter-category on the items). Can also be 'all' to toggle all items.
+ * - `data-filter-effect` (optional): options are [fade,bounce,none]. When omitted, no effect is used.
+ * - `data-filter-on` (required): clicking this element will toggle the items with the passed category
+ *     (matching on `data-filter-category` on the items). Can also be 'all' to toggle all items.
  * Note: the class 'filter-button--active' may be given to pre-filter items on load.
  *
- * Filterable items:
+ * #### Filterable items
+ * ```html
  * <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  * <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * ```
  *
- * - data-filter-group (encouraged): group identifier for which the button group can interact with the item.
+ * - `data-filter-group` (encouraged): group identifier for which the button group can interact with the item.
  *     Note: See data-filter-group in Filter buttons above as to why it is encouraged to always provide.
- * - data-filter-category (required): identifier for 'data-filter-on'
+ * - `data-filter-category` (required): identifier for 'data-filter-on'
  *
- * Replacement by Template with filter options:
+ * #### Replacement by template with filter options
+ * ```html
  * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1,group2">Default content</div>
+ * ```
  *
- * - data-filter-expansion-template (required): The template to expand with the current filter options.
+ * - `data-filter-expansion-template` (required): The template to expand with the current filter options.
  *   Expanded template will replace default content.
- * - data-filter-groups (required): Identify the groups of filterbuttons the template should receive the current parameters from.
+ * - `data-filter-groups` (required): Identify which filter groups the template will receive current parameters from.
  *   Should correspond to appropriate filter button groups used on the page.
  *   For each group, the template will receive a parameter groupName holding the currently active group settings.
+ *
+ * #### Self-hiding filterable item groups
+ * Just adding this data attribute (no actual value needed) will create a group of filterable items. This group will
+ * then hide itself entierly if all the items contained within it are also hidden. Useful to hide categorizing heading
+ * items. Optionally can also add an effect type as with items which will be used on the whole group as well.
+ * ```html
+ * <div data-filter-hideable-group data-filter-effect="fade">
+ *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * </div>
+ * ```
  */
 
 liquipedia.filterButtons = {
