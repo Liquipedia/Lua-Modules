@@ -33,17 +33,17 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.iconSize = self.args.iconSize or '27px'
-end)
 
-function CharacterGameTable:readConfig()
 	if not self.isCharacterTable then
+		self.readConfig = GameTable.readConfig
 		self.resultFromRecord = GameTable.resultFromRecord
 		self.buildConditions = GameTable.buildConditions
 		self.gameFromRecord = GameTable.gameFromRecord
 		self.statsFromMatches = GameTable.statsFromMatches
-		return GameTable.readConfig(self)
 	end
+end)
 
+function CharacterGameTable:readConfig()
 	self.args.showOnlyGameStats = true
 	self.config = self:_readDefaultConfig()
 	return self
