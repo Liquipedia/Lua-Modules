@@ -131,8 +131,8 @@ end
 ---@param game match2game
 ---@return match2game?
 function CharacterGameTable:gameFromRecord(game)
-	local game = GameTable.gameFromRecord(self, game)
-	if not game or Logic.isEmpty(game.extradata) then
+	local gameRecord = GameTable.gameFromRecord(self, game)
+	if not gameRecord or Logic.isEmpty(gameRecord.extradata) then
 		return nil
 	end
 
@@ -140,7 +140,7 @@ function CharacterGameTable:gameFromRecord(game)
 	---@param opponentIndex number
 	---@param playerIndex number
 	local findPick = function (opponentIndex, playerIndex)
-		if game.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
+		if gameRecord.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
 			pickedBy = opponentIndex
 		end
 	end
@@ -150,8 +150,8 @@ function CharacterGameTable:gameFromRecord(game)
 		self:_applyFunctionToPlayers(2, findPick)
 	end
 
-	game.extradata.pickedBy = pickedBy
-	return pickedBy ~= 0 and game or nil
+	gameRecord.extradata.pickedBy = pickedBy
+	return pickedBy ~= 0 and gameRecord or nil
 end
 
 ---@param record table
@@ -217,10 +217,10 @@ end
 function CharacterGameTable:_displayCharacters(game, opponentIndex, size, characterKeyGetter)
 	local characters = mw.html.create('td')
 
-	---@param opponentIndex number
+	---@param _opponentIndex number
 	---@param playerIndex number
-	local addCharacters = function (opponentIndex, playerIndex)
-		local key = characterKeyGetter(self, opponentIndex, playerIndex)
+	local addCharacters = function (_opponentIndex, playerIndex)
+		local key = characterKeyGetter(self, _opponentIndex, playerIndex)
 		characters:node(CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
 	end
 
