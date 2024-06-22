@@ -217,14 +217,10 @@ end
 function CharacterGameTable:_displayCharacters(game, opponentIndex, size, characterKeyGetter)
 	local characters = mw.html.create('td')
 
-	---@param _opponentIndex number
-	---@param playerIndex number
-	local addCharacters = function (_opponentIndex, playerIndex)
-		local key = characterKeyGetter(self, _opponentIndex, playerIndex)
+	self:_applyFunctionToPlayers(opponentIndex, function(_, playerIndex)
+		local key = characterKeyGetter(self, opponentIndex, playerIndex)
 		characters:node(CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
-	end
-
-	self:_applyFunctionToPlayers(opponentIndex, addCharacters)
+	end)
 
 	return characters
 end
