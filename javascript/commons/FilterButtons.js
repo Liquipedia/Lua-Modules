@@ -100,7 +100,8 @@ liquipedia.filterButtons = {
 			};
 
 			Array.from( buttonsDiv.querySelectorAll( ':scope > .filter-button' ) ).forEach(
-				( /** @type {HTMLElement} */ buttonElement ) => {
+				/** @param {HTMLElement} buttonElement */
+				( buttonElement ) => {
 					const filterOn = buttonElement.dataset.filterOn ?? '';
 					const defaultState = !(
 						buttonElement.dataset.filterDefault === 'false' ||
