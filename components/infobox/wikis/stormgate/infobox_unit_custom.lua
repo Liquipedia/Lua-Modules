@@ -25,7 +25,6 @@ local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
 
 ---@class Stormgate2UnitInfobox: UnitInfobox
 ---@field faction string?
