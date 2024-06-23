@@ -63,7 +63,6 @@ liquipedia.filterButtons = {
 
 	filterGroups: {},
 	templateExpansions: [],
-	/** @type {HTMLElement[]} */
 	hideableGroups: [],
 
 	init: function() {
@@ -157,7 +156,14 @@ liquipedia.filterButtons = {
 			} )
 		);
 
-		this.hideableGroups = Array.from( document.querySelectorAll( '[data-filter-hideable-group]' ) );
+		this.hideableGroups = Array.from(
+			document.querySelectorAll( '[data-filter-hideable-group]' ),
+			( hideableGroup ) => ( {
+				element: hideableGroup,
+				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
+				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' )
+			} )
+		);
 	},
 
 	initializeButtons: function() {
@@ -261,13 +267,15 @@ liquipedia.filterButtons = {
 		} );
 
 		this.hideableGroups.forEach( ( hideableGroup ) => {
-			const filerableItems = this.getTopLevelFilterableItems( hideableGroup );
-			const effectClass = 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect );
+			const groupElement = hideableGroup.element;
+			const filerableItems = this.getTopLevelFilterableItems( groupElement );
 			if ( !filerableItems.every( this.isFilterableVisible, this ) ) {
-				hideableGroup.classList.remove( effectClass );
-				hideableGroup.classList.add( this.hiddenCategoryClass );
+				groupElement.classList.remove( hideableGroup.effectClass );
+				groupElement.classList.add( 'filter-category--hidden-group' );
+				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
 			} else {
-				hideableGroup.classList.replace( this.hiddenCategoryClass, effectClass );
+				groupElement.classList.replace( 'filter-category--hidden-group', hideableGroup.effectClass );
+				hideableGroup.fallbackItem?.classList.remove( hideableGroup.effectClass );
 			}
 		} );
 
