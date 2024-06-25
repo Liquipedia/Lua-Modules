@@ -353,7 +353,6 @@ function Match:detailsRow()
 	return Details{
 		match = self.match,
 		hideTournament = self.config.hideTournament,
-		isBrMatch = isBrMatch,
 		onlyHighlightOnValue = self.config.onlyHighlightOnValue
 	}:create()
 end
