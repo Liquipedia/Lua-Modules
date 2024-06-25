@@ -7,13 +7,14 @@
 --
 
 -- Holds DisplayComponents for the MatchTicker module
+-- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
+-- Will most likely be expanded to other games in the future and other pages
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -35,8 +36,8 @@ local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---Display class for the header of a match ticker
----@class MatchTickerHeader
----@operator call(string|number|nil): MatchTickerHeader
+---@class NewMatchTickerHeader
+---@operator call(string|number|nil): NewMatchTickerHeader
 ---@field root Html
 local Header = Class.new(
 	function(self, text)
@@ -47,7 +48,7 @@ local Header = Class.new(
 )
 
 ---@param class string?
----@return MatchTickerHeader
+---@return NewMatchTickerHeader
 function Header:addClass(class)
 	self.root:addClass(class)
 	return self
@@ -59,8 +60,8 @@ function Header:create()
 end
 
 ---Display class for matches shown within a match ticker
----@class MatchTickerVersus
----@operator call(table): MatchTickerVersus
+---@class NewMatchTickerVersus
+---@operator call(table): NewMatchTickerVersus
 ---@field root Html
 ---@field match table
 local Versus = Class.new(
@@ -102,7 +103,7 @@ end
 function Versus:bestof()
 	local bestof = tonumber(self.match.bestof) or 0
 	if bestof > 0 then
-		return Abbreviation.make('(Bo' .. bestof .. ')', '(Best of ' .. bestof .. ')')
+		return Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof)
 	end
 end
 
@@ -126,8 +127,8 @@ function Versus:scores()
 end
 
 ---Display class for matches shown within a match ticker
----@class MatchTickerScoreBoard
----@operator call(table): MatchTickerScoreBoard
+---@class NewMatchTickerScoreBoard
+---@operator call(table): NewMatchTickerScoreBoard
 ---@field root Html
 ---@field match table
 local ScoreBoard = Class.new(
@@ -181,9 +182,9 @@ function ScoreBoard:versus()
 	return Versus(self.match):create()
 end
 
----Display class for matches shown within a match ticker
----@class MatchTickerDetails
----@operator call(table): MatchTickerMatch
+---Display class for the details of a match displayed at the bottom of a match ticker
+---@class NewMatchTickerDetails
+---@operator call(table): NewMatchTickerMatch
 ---@field root Html
 ---@field hideTournament boolean
 ---@field onlyHighlightOnValue string?
@@ -211,6 +212,7 @@ function Details:create()
 		:node(self:countdown())
 end
 
+---It will display both countdown and date of the match so the user can select which one to show
 ---@return Html
 function Details:countdown()
 	local match = self.match
@@ -223,8 +225,6 @@ function Details:countdown()
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. (Timezone.getTimezoneString('UTC'))
 	end
-
-	dateString = 'June 22, 2024 - 02:00' .. (Timezone.getTimezoneString('UTC'))
 
 	local countdownArgs = {
 		date = dateString,
@@ -241,33 +241,44 @@ end
 ---@return Html?
 function Details:streams()
 	local match = self.match
-	local streams = mw.html.create('div')
+	local links = mw.html.create('div')
 		:addClass('match-streams')
 
 	if Table.isNotEmpty(match.stream) then
 		local streams = {}
 
-		-- Copy from Module:Countdown
-		-- New format stream (twitch_en_2)
+		-- Standardize the stream data to always use the platform as key (because of the new format ex: twitch_en_2)
 		for rawHost, stream in pairs(match.stream) do
-			-- Check if its a new format stream
-			if #(mw.text.split(rawHost, '_', true)) == 3 then
-				-- Parse the string
+			local streamParts = mw.text.split(rawHost, '_', true)
+			if #streamParts == 3 then
 				local key = StreamLinks.StreamKey(rawHost)
-				-- Not allowed to add new keys while iterating it, add to another table
-				streams[key:toString()] = stream
+				streams[key.platform] = stream
 			else
 				streams[rawHost] = stream
 			end
 		end
 
+		local streamLinks = ''
+
+		-- Iterate over the streams and create the different links
 		for platformName, targetStream in pairs(streams) do
-			-- TODO
+			local streamLink = mw.ext.StreamPage.resolve_stream(platformName, targetStream)
+
+			if streamLink then
+				-- Default values
+				local url = 'Special:Stream/' .. platformName .. '/' .. streamLink
+				local icon = '<i class="lp-icon lp-icon-21 lp-' .. platformName .. '"></i>'
+
+				-- TL.net specific
+				if platformName == 'stream' then
+					url = 'https://tl.net/video/streams/' .. streamLink
+				end
+
+				streamLinks = streamLinks .. '[[' .. url .. '|' .. icon .. ']]'
+			end
 		end
-	else
-		links:node(mw.html.create('span')
-			:wikitext('no streams')
-		)
+
+		links:wikitext(streamLinks)
 	end
 
 	return links
@@ -296,7 +307,7 @@ function Details:tournament()
 	)
 
 	return mw.html.create('div')
-		:addClass('tournament')
+		:addClass('match-tournament')
 		:node(mw.html.create('div')
 			:addClass('tournament-icon')
 			:node(mw.html.create('div')
@@ -311,8 +322,8 @@ function Details:tournament()
 end
 
 ---Display class for matches shown within a match ticker
----@class MatchTickerMatch
----@operator call({config: MatchTickerConfig, match: table}): MatchTickerMatch
+---@class NewMatchTickerMatch
+---@operator call({config: MatchTickerConfig, match: table}): NewMatchTickerMatch
 ---@field root Html
 ---@field config MatchTickerConfig
 ---@field match table
@@ -330,32 +341,6 @@ function Match:create()
 	self.root:node(self:detailsRow())
 
 	return self.root
-end
-
----@param inheritedHeader string?
----@return string?
-function Match:_expandHeader(inheritedHeader)
-	if not inheritedHeader then
-		return
-	end
-
-	local headerArray = mw.text.split(inheritedHeader, '!')
-
-	local index = 1
-	if String.isEmpty(headerArray[1]) then
-		index = 2
-	end
-
-	local headerInput = 'brkts-header-' .. headerArray[index]
-	local expandedHeader = mw.message.new('brkts-header-' .. headerArray[index])
-			---@diagnostic disable-next-line: param-type-mismatch
-			:params(headerArray[index + 1] or ''):plain() --[[@as string]]
-	local failedExpandedHeader = '⧼' .. headerInput .. '⧽'
-	if Logic.isEmpty(expandedHeader) or failedExpandedHeader == expandedHeader then
-		return inheritedHeader
-	end
-
-	return expandedHeader
 end
 
 ---@return Html
