@@ -77,7 +77,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
 	config.showCountByFaction = Logic.readBool(args.showCountByRace or args.count)
-	config.isRandomEvent = Logic.readBool(args.is_random_event)
+	config.isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
 	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
