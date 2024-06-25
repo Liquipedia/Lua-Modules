@@ -120,7 +120,7 @@ function Import._getConfig(args, placements)
 		stageImportLimits = processStagesConfig('importLimit', tonumber),
 		stagePlacementsToSkip = processStagesConfig('placementsToSkip', tonumber),
 		stageImportWinners = processStagesConfig('importWinners', Logic.readBoolOrNil),
-		stageGroupElimStatuses = processStagesConfig('importLimit', function(val)
+		stageGroupElimStatuses = processStagesConfig('groupElimStatuses', function(val)
 			return Array.map(mw.text.split(val, ','), String.trim)
 		end),
 	}
