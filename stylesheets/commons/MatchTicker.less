@@ -2,7 +2,7 @@
 Template(s): Match Ticker
 Author(s): Nadox
 *******************************************************************************/
-.dota2-test {
+.new-match-style {
 	.match-section-header {
 		display: flex;
 		flex-direction: column;
@@ -14,117 +14,117 @@ Author(s): Nadox
 		border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
 		padding: 0.75rem 1rem;
 		font-size: 0.875rem;
-	}
 
-	.match-scoreboard {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		gap: 2rem;
-		margin-bottom: 0.5rem;
-
-		> div {
-			flex: 1;
-		}
-
-		.team-left {
+		.match-scoreboard {
 			display: flex;
-			justify-content: right;
-		}
-
-		.versus {
-			flex: 0 1 auto;
-			display: flex;
-			flex-direction: column;
 			justify-content: center;
 			align-items: center;
+			gap: 2rem;
+			margin-bottom: 0.5rem;
 
-			.versus-lower {
-				font-size: 0.75rem;
-				color: var( --clr-secondary );
+			> div {
+				flex: 1;
+			}
+
+			.team-left {
+				display: flex;
+				justify-content: right;
+			}
+
+			.versus {
+				flex: 0 1 auto;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+
+				.versus-lower {
+					font-size: 0.75rem;
+					color: var( --clr-secondary );
+				}
 			}
 		}
-	}
 
-	.match-details {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0.5rem 0.75rem;
-		border-radius: 0.5rem;
-		font-size: 0.75rem;
-
-		.theme--light & {
-			background-color: #0000000a;
-		}
-
-		.theme--dark & {
-			background-color: #ffffff0a;
-		}
-
-		.match-streams {
+		.match-details {
 			display: flex;
+			justify-content: space-between;
 			align-items: center;
-			justify-content: center;
-			gap: 0.25rem;
+			padding: 0.5rem 0.75rem;
+			border-radius: 0.5rem;
+			font-size: 0.75rem;
+
+			.theme--light & {
+				background-color: #0000000a;
+			}
+
+			.theme--dark & {
+				background-color: #ffffff0a;
+			}
+
+			.match-streams {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 0.25rem;
+			}
+
+			.timer-hidden {
+				display: none;
+			}
+
+			.match-tournament {
+				display: flex;
+				gap: 0.5rem;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.timer-object-countdown,
+			.timer-object-date {
+				padding: 0.25rem 0.5rem;
+				border-radius: 0.25rem;
+				font-weight: bold;
+
+				&.timer-object-countdown-live {
+					.theme--light & {
+						color: #ffffff;
+						background-color: #b81414;
+					}
+
+					.theme--dark & {
+						color: #2e0505;
+						background-color: #f5a3a3;
+					}
+				}
+
+				&.timer-object-countdown-completed {
+					.theme--light & {
+						color: #ffffff;
+						background-color: #1d7c1d;
+					}
+
+					.theme--dark & {
+						color: #0a290a;
+						background-color: #adebad;
+					}
+				}
+
+				&:not( .timer-object-countdown-live ) {
+					color: var( --clr-on-background );
+
+					.theme--light & {
+						background-color: #00000014;
+					}
+
+					.theme--dark & {
+						background-color: #ffffff14;
+					}
+				}
+			}
 		}
 
-		.timer-hidden {
+		.timer-object-separator {
 			display: none;
 		}
-
-		.match-tournament {
-			display: flex;
-			gap: 0.5rem;
-			justify-content: center;
-			align-items: center;
-		}
-
-		.timer-object-countdown,
-		.timer-object-date {
-			padding: 0.25rem 0.5rem;
-			border-radius: 0.25rem;
-			font-weight: bold;
-
-			&.timer-object-countdown-live {
-				.theme--light & {
-					color: #ffffff;
-					background-color: #b81414;
-				}
-
-				.theme--dark & {
-					color: #2e0505;
-					background-color: #f5a3a3;
-				}
-			}
-
-			&.timer-object-countdown-completed {
-				.theme--light & {
-					color: #ffffff;
-					background-color: #1d7c1d;
-				}
-
-				.theme--dark & {
-					color: #0a290a;
-					background-color: #adebad;
-				}
-			}
-
-			&:not( .timer-object-countdown-live ) {
-				color: var( --clr-on-background );
-
-				.theme--light & {
-					background-color: #00000014;
-				}
-
-				.theme--dark & {
-					background-color: #ffffff14;
-				}
-			}
-		}
-	}
-
-	.timer-object-separator {
-		display: none;
 	}
 }

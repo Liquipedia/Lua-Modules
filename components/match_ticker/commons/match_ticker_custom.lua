@@ -51,7 +51,7 @@ end
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
 	args.newStyle = true
-	return MatchTicker(args):query():create()
+	return MatchTicker(args):query():create():addClass('new-match-style')
 end
 
 ---Entry point for display on player pages
