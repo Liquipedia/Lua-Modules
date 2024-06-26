@@ -6,7 +6,7 @@ liquipedia.countdown = {
 	timeoutFunctions: null,
 	timerObjectNodes: null,
 	lastCountdownId: null,
-	init: function() {
+	init: function () {
 		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
 		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
 			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
@@ -45,6 +45,9 @@ liquipedia.countdown = {
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
+
+				liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
+
 				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
 				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
@@ -53,13 +56,35 @@ liquipedia.countdown = {
 			} );
 		}
 	},
-	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
+	setupCountdownsIfSwitchToggleExists: function () {
+		const switchElements = document.querySelectorAll( '.switch[data-trigger-event]' );
+
+		switchElements.forEach( ( switchElem ) => {
+			if ( switchElem.dataset && switchElem.dataset.triggerEvent === 'countdown' ) {
+				const isChecked = switchElem.classList.contains( 'switch-on' );
+				liquipedia.countdown.toggleCountdowns( isChecked );
+
+				document.addEventListener( 'switchTriggered', function ( event ) {
+					if ( event.detail.event === 'countdown' ) {
+						liquipedia.countdown.toggleCountdowns( event.detail.value );
+					}
+				} );
+			}
+		} );
+	},
+	toggleCountdowns: function ( isCountdownToggled ) {
+		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
+			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( 'timer-hidden', isCountdownToggled );
+			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( 'timer-hidden', !isCountdownToggled );
+		} );
+	},
+	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
 			return false;
 		}
 		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
 	},
-	runCountdown: function() {
+	runCountdown: function () {
 		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
@@ -69,38 +94,49 @@ liquipedia.countdown = {
 			1000
 		);
 	},
-	setCountdownString: function( timerObjectNode ) {
-		const streamsarr = [ ];
-		let datestr = '', live = 'LIVE!';
+	setCountdownString: function ( timerObjectNode ) {
+		const streamsarr = [];
+		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
+		let datestr = '', live = 'LIVE';
+
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
 			live = timerObjectNode.dataset.countdownEndText;
 		}
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const differenceInSeconds = Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
-			if ( differenceInSeconds <= 0 ) {
-				if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-					datestr = '<span class="timer-object-countdown-live">' + live + '</span>';
-				}
+			if ( timerObjectNode.dataset.finished === 'finished' ) {
+				countdownElem.classList.add( 'timer-object-countdown-completed' );
+				datestr = 'COMPLETED';
 			} else {
-				let differenceInSecondsMath = differenceInSeconds;
-				const weeks = Math.floor( differenceInSecondsMath / 604800 );
-				differenceInSecondsMath = differenceInSecondsMath % 604800;
-				const days = Math.floor( differenceInSecondsMath / 86400 );
-				differenceInSecondsMath = differenceInSecondsMath % 86400;
-				const hours = Math.floor( differenceInSecondsMath / 3600 );
-				differenceInSecondsMath = differenceInSecondsMath % 3600;
-				const minutes = Math.floor( differenceInSecondsMath / 60 );
-				const seconds = Math.floor( differenceInSecondsMath % 60 );
-				if ( differenceInSeconds >= 604800 ) {
-					datestr = weeks + 'w ' + days + 'd';
-				} else if ( differenceInSeconds >= 86400 ) {
-					datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
-				} else if ( differenceInSeconds >= 3600 ) {
-					datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
-				} else if ( differenceInSeconds >= 60 ) {
-					datestr = minutes + 'm ' + seconds + 's';
+				const differenceInSeconds = Math.floor(
+					parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 )
+				);
+
+				if ( differenceInSeconds <= 0 ) {
+					if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
+						countdownElem.classList.add( 'timer-object-countdown-live' );
+						datestr = live;
+					}
 				} else {
-					datestr = seconds + 's';
+					let differenceInSecondsMath = differenceInSeconds;
+					const weeks = Math.floor( differenceInSecondsMath / 604800 );
+					differenceInSecondsMath = differenceInSecondsMath % 604800;
+					const days = Math.floor( differenceInSecondsMath / 86400 );
+					differenceInSecondsMath = differenceInSecondsMath % 86400;
+					const hours = Math.floor( differenceInSecondsMath / 3600 );
+					differenceInSecondsMath = differenceInSecondsMath % 3600;
+					const minutes = Math.floor( differenceInSecondsMath / 60 );
+					const seconds = Math.floor( differenceInSecondsMath % 60 );
+					if ( differenceInSeconds >= 604800 ) {
+						datestr = weeks + 'w ' + days + 'd';
+					} else if ( differenceInSeconds >= 86400 ) {
+						datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
+					} else if ( differenceInSeconds >= 3600 ) {
+						datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
+					} else if ( differenceInSeconds >= 60 ) {
+						datestr = minutes + 'm ' + seconds + 's';
+					} else {
+						datestr = seconds + 's';
+					}
 				}
 			}
 		} else {
@@ -170,9 +206,9 @@ liquipedia.countdown = {
 		if ( timerObjectNode.dataset.finished !== 'finished' ) {
 			html += streamsarr.join( ' ' );
 		}
-		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
+		countdownElem.innerHTML = html;
 	},
-	getStreamName: function( url ) {
+	getStreamName: function ( url ) {
 		return url.replace( /\s/g, '_' );
 	},
 	timeZoneAbbr: new Map( [
@@ -294,11 +330,11 @@ liquipedia.countdown = {
 		[ 'Yakutsk Standard Time', 'YAKT' ],
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
-	getMonthNameFromMonthNumber: function( newFutureMonth ) {
+	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
 		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
-	getTimeZoneNameLong: function( dateObject ) {
+	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
 		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
@@ -319,7 +355,7 @@ liquipedia.countdown = {
 		}
 		return result;
 	},
-	getCorrectTimeZoneString: function( dateObject ) {
+	getCorrectTimeZoneString: function ( dateObject ) {
 		const userTime = {
 			localYear: dateObject.getFullYear(),
 			localMonth: dateObject.getMonth(),
