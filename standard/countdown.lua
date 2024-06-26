@@ -37,7 +37,7 @@ function Countdown._create(args)
 	end
 	if Logic.readBool(args.finished) then
 		wrapper:attr('data-finished', 'finished')
-	else
+	elseif not Logic.readBool(args.nostreams) then
 		wrapper:attr('data-streams', StreamLinks.display(StreamLinks.filterStreams(args)))
 	end
 
