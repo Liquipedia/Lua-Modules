@@ -17,6 +17,7 @@ local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
@@ -92,8 +93,11 @@ function Versus:create()
 		lowerText = VS
 	end
 
+	upperText = self:_applyMatchPage(upperText or VS)
+	lowerText = self:_applyMatchPage(lowerText)
+
 	if not lowerText then
-		return self.root:wikitext(VS)
+		return self.root:wikitext(self:_applyMatchPage(VS))
 	end
 
 	return self.root
@@ -149,6 +153,15 @@ function Versus:scores()
 	end
 
 	return table.concat(scores, ':')
+end
+
+---@param str string?
+---@return string?
+function Versus:_applyMatchPage(str)
+	local matchPage = (self.match.match2bracketdata or {}).matchpage
+	if Logic.isEmpty(matchPage) or Logic.isEmpty(str) then return str end
+
+	return Page.makeInternalLink({}, str, matchPage)
 end
 
 ---Display class for matches shown within a match ticker
