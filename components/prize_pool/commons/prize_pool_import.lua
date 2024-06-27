@@ -53,6 +53,7 @@ local Import = Class.new(function(self, ...) self:init(...) end)
 ---@field stagePlacementsToSkip table<integer, integer>
 ---@field stageImportWinners table<integer, boolean>
 ---@field stageGroupElimStatuses table<integer, string[]>
+---@field shiftPlacementsBy integer
 
 ---@class PrizePoolImportStageConfig
 ---@field importWinners boolean
@@ -123,6 +124,7 @@ function Import._getConfig(args, placements)
 		stageGroupElimStatuses = processStagesConfig('importLimit', function(val)
 			return Array.map(mw.text.split(val, ','), String.trim)
 		end),
+		shiftPlacementsBy = tonumber(args.shiftPlacementsBy) or 0,
 	}
 end
 
@@ -483,12 +485,17 @@ end
 ---@param placements PrizePoolPlacement[]
 ---@return PrizePoolPlacement[]
 function Import:_mergePlacements(lpdbEntries, placements)
-	for placementIndex, lpdbPlacement in ipairs(lpdbEntries) do
-		placements[placementIndex] = self:_mergePlacement(
+	Array.forEach(Array.range(1, self.config.shiftPlacementsBy), function(placementIndex)
+		placements[placementIndex] = placements[placementIndex] or self:_emptyPlacement(placements[placementIndex - 1], 1)
+	end)
+
+	Array.forEach(lpdbEntries, function(lpdbPlacement, placementIndex)
+		local shiftedPlacementIndex = placementIndex + self.config.shiftPlacementsBy
+		placements[shiftedPlacementIndex] = self:_mergePlacement(
 			lpdbPlacement,
-			placements[placementIndex] or self:_emptyPlacement(placements[placementIndex - 1], #lpdbPlacement)
+			placements[shiftedPlacementIndex] or self:_emptyPlacement(placements[shiftedPlacementIndex - 1], #lpdbPlacement)
 		)
-	end
+	end)
 
 	return placements
 end
