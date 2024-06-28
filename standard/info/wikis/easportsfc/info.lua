@@ -8,21 +8,21 @@
 
 return {
 	startYear = 2000,
-	wikiName = 'fifa',
-	name = 'FIFA',
-	defaultGame = 'fifa',
+	wikiName = 'easportsfc',
+	name = 'EA SPORTS FC',
+	defaultGame = 'easportsfc',
 	games = {
-		fifa = {
-			abbreviation = 'FIFA',
-			name = 'FIFA',
-			link = 'FIFA',
+		easportsfc = {
+			abbreviation = 'EA FC',
+			name = 'EA SPORTS FC',
+			link = 'EA SPORTS FC',
 			logo = {
-				darkMode = 'FIFA darkmode logo.png',
-				lightMode = 'FIFA lightmode logo.png',
+				darkMode = 'EA SPORTS FC darkmode.png',
+				lightMode = 'EA SPORTS FC lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'FIFA darkmode logo.png',
-				lightMode = 'FIFA lightmode logo.png',
+				darkMode = 'EA SPORTS FC darkmode.png',
+				lightMode = 'EA SPORTS FC lightmode.png',
 			},
 		},
 		['2000'] = {
