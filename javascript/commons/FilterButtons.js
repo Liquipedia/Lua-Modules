@@ -268,8 +268,8 @@ liquipedia.filterButtons = {
 
 		this.hideableGroups.forEach( ( hideableGroup ) => {
 			const groupElement = hideableGroup.element;
-			const filerableItems = this.getTopLevelFilterableItems( groupElement );
-			if ( !filerableItems.every( this.isFilterableVisible, this ) ) {
+			const filterableItems = this.getTopLevelFilterableItems( groupElement );
+			if ( !filterableItems.every( this.isFilterableVisible, this ) ) {
 				groupElement.classList.remove( hideableGroup.effectClass );
 				groupElement.classList.add( 'filter-category--hidden-group' );
 				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
@@ -372,14 +372,14 @@ liquipedia.filterButtons = {
 	},
 
 	/**
-	 * @param {HTMLElement} filerableItem
+	 * @param {HTMLElement} filterableItem
 	 * @return {boolean}
 	 */
-	isFilterableVisible: function ( filerableItem ) {
-		if ( filerableItem.classList.contains( this.hiddenCategoryClass ) ) {
+	isFilterableVisible: function ( filterableItem ) {
+		if ( filterableItem.classList.contains( this.hiddenCategoryClass ) ) {
 			return false;
 		} else {
-			const filterableChildren = this.getTopLevelFilterableItems( filerableItem );
+			const filterableChildren = this.getTopLevelFilterableItems( filterableItem );
 			return filterableChildren.length === 0 ? true : filterableChildren.some( this.isFilterableVisible, this );
 		}
 	}
