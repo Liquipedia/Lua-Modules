@@ -46,11 +46,15 @@
  * #### Self-hiding filterable item groups
  * Just adding this data attribute (no actual value needed) will create a group of filterable items. This group will
  * then hide itself entierly if all the items contained within it are also hidden. Useful to hide categorizing heading
- * items. Optionally can also add an effect type as with items which will be used on the whole group as well.
+ * items. Optionally can also add an effect type as with items which will be used on the whole group as well. The groups
+ * can also be nested, but, this will still check filterable items and not whether child groups themselves are hidden.
+ * Can also add a fallback item as a direct child of the group using `data-filter-hideable-group-fallback`; this item
+ * will instead be shown when the group is determined to be hidden instead of hiding the actual group element.
  * ```html
  * <div data-filter-hideable-group data-filter-effect="fade">
  *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ *   <span data-filter-hideable-group-fallback>DEFAULT CONTENT</span>
  * </div>
  * ```
  */
