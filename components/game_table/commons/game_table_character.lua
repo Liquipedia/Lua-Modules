@@ -236,14 +236,19 @@ end
 ---@param characterKeyGetter fun(self: CharacterGameTable, opponentIndex: number, playerIndex): string
 ---@return Html?
 function CharacterGameTable:_displayCharacters(game, opponentIndex, size, characterKeyGetter)
-	local characters = mw.html.create('td')
+	local charactersDiv = mw.html.create('div')
+		:addClass(self:getSideClass(game.extradata, opponentIndex))
+		:css('display', 'flex')
 
+
+	local icons = {}
 	self:_applyFunctionToPlayers(opponentIndex, function(_, playerIndex)
 		local key = characterKeyGetter(self, opponentIndex, playerIndex)
-		characters:node(CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
+		table.insert(icons, CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
 	end)
 
-	return characters
+	return mw.html.create('td')
+		:node(#icons > 0 and charactersDiv:node(table.concat(icons, '')) or nil)
 end
 
 ---@param match GameTableMatch
@@ -278,9 +283,7 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 
 	local opponentIndex = opponentRecord.id
 
-	local sideClass = self:getSideClass(game.extradata, opponentIndex)
 	local characters = self:_displayCharacters(game, opponentIndex, self.iconSize, self.getCharacterKey)
-		:addClass(sideClass)
 
 	local draft = mw.html.create()
 	if self.isCharacterTable then
@@ -292,7 +295,6 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 		draft
 			:node(characters)
 			:node(self:_displayCharacters(game, opponentIndex, self.iconSize, self.getCharacterBanKey)
-				:addClass(sideClass)
 				:addClass('lor-graycard')
 			)
 		end
