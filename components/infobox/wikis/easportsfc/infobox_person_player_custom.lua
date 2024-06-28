@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,7 +16,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class FifaInfoboxPlayer: Person
+---@class EAFCInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 

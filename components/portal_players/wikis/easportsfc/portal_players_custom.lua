@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:PortalPlayers/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

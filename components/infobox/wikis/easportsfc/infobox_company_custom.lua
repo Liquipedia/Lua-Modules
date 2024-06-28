@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,7 +15,7 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class FifaCompanyInfobox: CompanyInfobox
+---@class EAFCCompanyInfobox: CompanyInfobox
 local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
 
