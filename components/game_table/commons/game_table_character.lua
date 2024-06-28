@@ -23,6 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local DRAW = 'draw'
 local CHARACTER_MODE = 'character'
 local MAX_NUM_PLAYERS = 5
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
@@ -174,7 +175,10 @@ function CharacterGameTable:statsFromMatches()
 		---@cast match GameTableMatch
 		Array.forEach(match.games, function (game, index)
 			local winner = tonumber(game.winner)
-			if game.extradata.pickedBy == winner then
+
+			if game.resulttype == DRAW then
+				totalGames.d = totalGames.d + 1
+			elseif game.extradata.pickedBy == winner then
 				totalGames.w = totalGames.w + 1
 			else
 				totalGames.l = totalGames.l + 1
