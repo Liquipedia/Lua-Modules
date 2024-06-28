@@ -176,7 +176,7 @@ function CharacterGameTable:statsFromMatches()
 			local winner = tonumber(game.winner)
 			if game.extradata.pickedBy == winner then
 				totalGames.w = totalGames.w + 1
-			elseif game.extradata.pickedBy == 2 then
+			else
 				totalGames.l = totalGames.l + 1
 			end
 		end)
