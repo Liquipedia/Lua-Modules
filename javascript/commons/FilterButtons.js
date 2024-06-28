@@ -269,7 +269,7 @@ liquipedia.filterButtons = {
 		this.hideableGroups.forEach( ( hideableGroup ) => {
 			const groupElement = hideableGroup.element;
 			const filterableItems = this.getTopLevelFilterableItems( groupElement );
-			if ( !filterableItems.every( this.isFilterableVisible, this ) ) {
+			if ( !filterableItems.some( this.isFilterableVisible, this ) ) {
 				groupElement.classList.remove( hideableGroup.effectClass );
 				groupElement.classList.add( 'filter-category--hidden-group' );
 				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
