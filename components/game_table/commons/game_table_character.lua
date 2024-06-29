@@ -25,6 +25,7 @@ local ColumnName = Condition.ColumnName
 
 local DRAW = 'draw'
 local CHARACTER_MODE = 'character'
+local CHARACTER_NOT_FOUND = 0
 local MAX_NUM_PLAYERS = 5
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
@@ -130,29 +131,40 @@ function CharacterGameTable:buildConditions()
 end
 
 ---@param game match2game
----@return match2game?
-function CharacterGameTable:gameFromRecord(game)
-	local gameRecord = GameTable.gameFromRecord(self, game)
-	if not gameRecord or Logic.isEmpty(gameRecord.extradata) then
-		return nil
+---@return integer
+function CharacterGameTable:getCharacterOpponentIndex(game)
+	if Logic.isEmpty(game.extradata) then
+		return CHARACTER_NOT_FOUND
 	end
 
-	local pickedBy = 0
+	local pickedBy = CHARACTER_NOT_FOUND
 	---@param opponentIndex number
 	---@param playerIndex number
 	local findPick = function (opponentIndex, playerIndex)
-		if gameRecord.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
+		if game.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
 			pickedBy = opponentIndex
 		end
 	end
 
 	self:_applyFunctionToPlayers(1, findPick)
-	if pickedBy == 0 then
+	if pickedBy == CHARACTER_NOT_FOUND then
 		self:_applyFunctionToPlayers(2, findPick)
 	end
 
+	return pickedBy
+end
+
+---@param game match2game
+---@return match2game?
+function CharacterGameTable:gameFromRecord(game)
+	local gameRecord = GameTable.gameFromRecord(self, game)
+	if not gameRecord then
+		return nil
+	end
+
+	local pickedBy = self:getCharacterOpponentIndex(game)
 	gameRecord.extradata.pickedBy = pickedBy
-	return pickedBy ~= 0 and gameRecord or nil
+	return pickedBy ~= CHARACTER_NOT_FOUND and gameRecord or nil
 end
 
 ---@param record table
