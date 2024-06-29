@@ -75,7 +75,7 @@ end
 
 ---@param opponentIndex number
 ---@param funct fun(opponentIndex: number, playerIndex: number)
-function CharacterGameTable:_applyFunctionToPlayers(opponentIndex, funct)
+function CharacterGameTable:_applyFuncToOpponentPlayers(opponentIndex, funct)
 	Array.forEach(Array.range(1, MAX_NUM_PLAYERS), function (playerIndex)
 		funct(opponentIndex, playerIndex)
 	end)
@@ -106,8 +106,8 @@ function CharacterGameTable:_buildCharacterConditions()
 		))
 	end
 
-	self:_applyFunctionToPlayers(1, addCondtions)
-	self:_applyFunctionToPlayers(2, addCondtions)
+	self:_applyFuncToOpponentPlayers(1, addCondtions)
+	self:_applyFuncToOpponentPlayers(2, addCondtions)
 
 	return characterConditions
 end
@@ -146,9 +146,9 @@ function CharacterGameTable:getCharacterOpponentIndex(game)
 		end
 	end
 
-	self:_applyFunctionToPlayers(1, findPick)
+	self:_applyFuncToOpponentPlayers(1, findPick)
 	if pickedBy == CHARACTER_NOT_FOUND then
-		self:_applyFunctionToPlayers(2, findPick)
+		self:_applyFuncToOpponentPlayers(2, findPick)
 	end
 
 	return pickedBy
@@ -258,7 +258,7 @@ function CharacterGameTable:_displayCharacters(game, opponentIndex, size, charac
 
 
 	local icons = {}
-	self:_applyFunctionToPlayers(opponentIndex, function(_, playerIndex)
+	self:_applyFuncToOpponentPlayers(opponentIndex, function(_, playerIndex)
 		local key = characterKeyGetter(self, opponentIndex, playerIndex)
 		table.insert(icons, CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
 	end)
