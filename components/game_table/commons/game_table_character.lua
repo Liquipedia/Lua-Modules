@@ -131,27 +131,29 @@ function CharacterGameTable:buildConditions()
 end
 
 ---@param game match2game
----@return integer
-function CharacterGameTable:getCharacterOpponentIndex(game)
+---@return integer, integer
+function CharacterGameTable:getCharacterPick(game)
 	if Logic.isEmpty(game.extradata) then
-		return CHARACTER_NOT_FOUND
+		return CHARACTER_NOT_FOUND, CHARACTER_NOT_FOUND
 	end
 
-	local pickedBy = CHARACTER_NOT_FOUND
+	local pickedByOpponent = CHARACTER_NOT_FOUND
+	local pickedByPlayer = CHARACTER_NOT_FOUND
 	---@param opponentIndex number
 	---@param playerIndex number
 	local findPick = function (opponentIndex, playerIndex)
 		if game.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
-			pickedBy = opponentIndex
+			pickedByOpponent = opponentIndex
+			pickedByPlayer = playerIndex
 		end
 	end
 
 	self:_applyFuncToOpponentPlayers(1, findPick)
-	if pickedBy == CHARACTER_NOT_FOUND then
+	if pickedByOpponent == CHARACTER_NOT_FOUND then
 		self:_applyFuncToOpponentPlayers(2, findPick)
 	end
 
-	return pickedBy
+	return pickedByOpponent, pickedByPlayer
 end
 
 ---@param game match2game
@@ -162,7 +164,7 @@ function CharacterGameTable:gameFromRecord(game)
 		return nil
 	end
 
-	local pickedBy = self:getCharacterOpponentIndex(game)
+	local pickedBy = self:getCharacterPick(game)
 	gameRecord.extradata.pickedBy = pickedBy
 	return pickedBy ~= CHARACTER_NOT_FOUND and gameRecord or nil
 end
