@@ -76,9 +76,9 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
-	for _, player in pairs(record.players or {}) do
+	Array.forEach(record.players or {}, function (player)
 		player.name = player.name:gsub(' ', '_')
-	end
+	end)
 
 	if record.name then
 		record.name = record.name:gsub(' ', '_')
