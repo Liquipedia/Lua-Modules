@@ -44,33 +44,28 @@ end
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-
-    local bans = Logic.readBool(args.bans)
+	local bans = Logic.readBool(args.bans)
 	local needsWinner = Logic.readBool(args.needsWinner)
-    local streams = Logic.readBool(args.streams)
+	local streams = Logic.readBool(args.streams)
+	local showScore = Logic.readBool(args.score) or bestof == 0
 
-    if bestof == 0 then
-		args.score = true
-	end
-	local score = Logic.readBool(args.score) and '|score=' or ''
-
-    local lines = Array.extend(
+	local lines = Array.extend(
 		'{{Match',
-        index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-        needsWinner == 'true' and INDENT .. '|winner=' or nil,
+		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		needsWinner == 'true' and INDENT .. '|winner=' or nil,
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil
 	)
 
-    for opponentIndex = 1, opponents do
+	for opponentIndex = 1, opponents do
 		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, score))
 	end
 
-    if bans then
+	if bans then
 		table.insert(lines, INDENT .. '|t1bans={{Cards|}}|t2bans={{Cards|}}')
 	end
 
-    return table.concat(lines, '\n')
+	return table.concat(lines, '\n')
 end
 
 function WikiCopyPaste._getOpponent(mode, score)
