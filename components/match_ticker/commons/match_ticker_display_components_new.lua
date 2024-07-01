@@ -10,8 +10,6 @@
 -- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
 -- Will most likely be expanded to other games in the future and other pages
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
@@ -21,6 +19,8 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local StreamLinks = require('Module:Links/Stream')
+local Page = require('Module:Page')
+local DefaultMatchTickerDisplayComponents = require('Module:MatchTicker/DisplayComponents')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
@@ -28,103 +28,9 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local VS = 'VS'
-local SCORE_STATUS = 'S'
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
-local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
-
----Display class for the header of a match ticker
----@class NewMatchTickerHeader
----@operator call(string|number|nil): NewMatchTickerHeader
----@field root Html
-local Header = Class.new(
-	function(self, text)
-		self.root = mw.html.create('div')
-			:addClass('infobox-header')
-			:wikitext(text)
-	end
-)
-
----@param class string?
----@return NewMatchTickerHeader
-function Header:addClass(class)
-	self.root:addClass(class)
-	return self
-end
-
----@return Html
-function Header:create()
-	return mw.html.create('div'):node(self.root)
-end
-
----Display class for matches shown within a match ticker
----@class NewMatchTickerVersus
----@operator call(table): NewMatchTickerVersus
----@field root Html
----@field match table
-local Versus = Class.new(
-	function(self, match)
-		self.root = mw.html.create('div'):addClass('versus')
-		self.match = match
-	end
-)
-
----@return Html
-function Versus:create()
-	local bestof = self:bestof()
-	local scores = self:scores()
-	local upperText, lowerText
-
-	if bestof then
-		upperText = scores or VS
-		lowerText = bestof
-	elseif scores then
-		upperText = scores
-		lowerText = VS
-	end
-
-	if not lowerText then
-		return self.root:wikitext(VS)
-	end
-
-	return self.root
-		:node(mw.html.create('div')
-			:addClass('versus-upper')
-			:node(upperText or VS)
-		):node(mw.html.create('div')
-			:addClass('versus-lower')
-			:wikitext('(' .. lowerText .. ')')
-		)
-end
-
----@return string?
-function Versus:bestof()
-	local bestof = tonumber(self.match.bestof) or 0
-	if bestof > 0 then
-		return Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof)
-	end
-end
-
----@return string?
----@return string?
-function Versus:scores()
-	if self.match.date > NOW then
-		return
-	end
-
-	local scores = {}
-
-	Array.forEach(self.match.match2opponents, function(opponent, opponentIndex)
-		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
-			or tonumber(opponent.score) or -1
-
-		table.insert(scores, score)
-	end)
-
-	return table.concat(scores, ' : ')
-end
 
 ---Display class for matches shown within a match ticker
 ---@class NewMatchTickerScoreBoard
@@ -174,12 +80,18 @@ function ScoreBoard:opponent(opponentData, isWinner, flip)
 			showLink = opponentName:gsub('_', ' ') ~= CURRENT_PAGE
 		})
 
+	if isWinner then
+		opponentDisplay:addClass('match-winner')
+	end
+
 	return opponentDisplay
 end
 
 ---@return Html
 function ScoreBoard:versus()
-	return Versus(self.match):create()
+	return mw.html.create('div')
+	:addClass('versus')
+	:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker
@@ -316,7 +228,7 @@ function Details:tournament()
 		)
 		:node(mw.html.create('div')
 			:addClass('tournament-text')
-			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]')
+			:wikitext(Page.makeInternalLink({}, displayName, match.pagename))
 		)
 
 end
@@ -358,9 +270,7 @@ function Match:detailsRow()
 end
 
 return {
-	Header = Header,
 	Match = Match,
 	Details = Details,
 	ScoreBoard = ScoreBoard,
-	Versus = Versus,
 }

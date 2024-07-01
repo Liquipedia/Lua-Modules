@@ -2,6 +2,12 @@
 Template(s): Match Ticker
 Author(s): Nadox
 *******************************************************************************/
+
+// Backwards compatibility for previous display component
+.versus-upper {
+	line-height: 1.1;
+}
+
 .new-match-style {
 	.match-section-header {
 		display: flex;
@@ -11,7 +17,7 @@ Author(s): Nadox
 	}
 
 	.match {
-		border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) ) !important;
+		border-bottom: 1px solid var( --table-border-color, var( --clr-border, #bbbbbb ) );
 		padding: 0.75rem 1rem;
 		font-size: 0.875rem;
 
@@ -38,10 +44,22 @@ Author(s): Nadox
 				justify-content: center;
 				align-items: center;
 
+				.versus-upper {
+					display: flex;
+					gap: 0.25rem;
+					align-items: center;
+					justify-content: center;
+				}
+
 				.versus-lower {
 					font-size: 0.75rem;
 					color: var( --clr-secondary );
+					text-align: center;
 				}
+			}
+
+			.match-winner {
+				font-weight: bold;
 			}
 		}
 
@@ -66,10 +84,6 @@ Author(s): Nadox
 				align-items: center;
 				justify-content: center;
 				gap: 0.25rem;
-			}
-
-			.timer-hidden {
-				display: none;
 			}
 
 			.match-tournament {
