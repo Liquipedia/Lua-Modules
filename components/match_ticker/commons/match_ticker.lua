@@ -80,6 +80,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field onlyHighlightOnValue string?
 ---@field tiers string[]?
 ---@field tierTypes string[]?
+---@field newStyle boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -87,8 +88,6 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field config MatchTickerConfig
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
-
-MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 
 ---@param args table?
 ---@return table
@@ -124,6 +123,7 @@ function MatchTicker:init(args)
 		tierTypes = args.tiertypes and Array.filter(
 					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
 				) or nil,
+		newStyle = Logic.readBool(args.newStyle),
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -163,6 +163,12 @@ function MatchTicker:init(args)
 		end
 	end
 	config.wrapperClasses = wrapperClasses
+
+	if config.newStyle then
+		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents/New')
+	else
+		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
+	end
 
 	self.config = config
 

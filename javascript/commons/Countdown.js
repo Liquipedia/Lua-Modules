@@ -6,7 +6,7 @@ liquipedia.countdown = {
 	timeoutFunctions: null,
 	timerObjectNodes: null,
 	lastCountdownId: null,
-	init: function() {
+	init: function () {
 		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
 		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
 			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
@@ -53,13 +53,13 @@ liquipedia.countdown = {
 			} );
 		}
 	},
-	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
+	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
 			return false;
 		}
 		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
 	},
-	runCountdown: function() {
+	runCountdown: function () {
 		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
@@ -69,8 +69,8 @@ liquipedia.countdown = {
 			1000
 		);
 	},
-	setCountdownString: function( timerObjectNode ) {
-		const streamsarr = [ ];
+	setCountdownString: function ( timerObjectNode ) {
+		const streamsarr = [];
 		let datestr = '', live = 'LIVE!';
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
 			live = timerObjectNode.dataset.countdownEndText;
@@ -172,7 +172,7 @@ liquipedia.countdown = {
 		}
 		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
 	},
-	getStreamName: function( url ) {
+	getStreamName: function ( url ) {
 		return url.replace( /\s/g, '_' );
 	},
 	timeZoneAbbr: new Map( [
@@ -294,11 +294,11 @@ liquipedia.countdown = {
 		[ 'Yakutsk Standard Time', 'YAKT' ],
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
-	getMonthNameFromMonthNumber: function( newFutureMonth ) {
+	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
 		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
-	getTimeZoneNameLong: function( dateObject ) {
+	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
 		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
@@ -319,7 +319,7 @@ liquipedia.countdown = {
 		}
 		return result;
 	},
-	getCorrectTimeZoneString: function( dateObject ) {
+	getCorrectTimeZoneString: function ( dateObject ) {
 		const userTime = {
 			localYear: dateObject.getFullYear(),
 			localMonth: dateObject.getMonth(),

@@ -98,7 +98,7 @@ function Versus:create()
 
 	return self.root
 		:node(mw.html.create('div')
-			:css('line-height', '1.1'):node(upperText or VS)
+			:addClass('versus-upper'):node(upperText or VS)
 		):node(mw.html.create('div')
 			:addClass('versus-lower'):wikitext('(' .. lowerText .. ')')
 		)
@@ -123,6 +123,7 @@ function Versus:scores()
 
 	local scores, scores2 = {}, {}
 	local hasSecondScore
+	local delimiter = '<span>:</span>'
 
 	local setWinner = function(score, opponentIndex)
 		if winner == opponentIndex then
@@ -135,7 +136,7 @@ function Versus:scores()
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
-		table.insert(scores, setWinner(score ~= -1 and score or 0, opponentIndex))
+		table.insert(scores, '<span>' .. setWinner(score ~= -1 and score or 0, opponentIndex) .. '</span>' )
 
 		local score2 = tonumber((opponent.extradata or {}).score2) or 0
 		table.insert(scores2, setWinner(score2, opponentIndex))
@@ -145,10 +146,10 @@ function Versus:scores()
 	end)
 
 	if hasSecondScore then
-		return table.concat(scores, ':'), table.concat(scores2, ':')
+		return table.concat(scores, delimiter), table.concat(scores2, delimiter)
 	end
 
-	return table.concat(scores, ':')
+	return table.concat(scores, delimiter)
 end
 
 ---Display class for matches shown within a match ticker
