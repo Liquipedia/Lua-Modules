@@ -150,6 +150,7 @@ liquipedia.filterButtons = {
 
 		this.templateExpansions = Array.from(
 			document.querySelectorAll( '[data-filter-expansion-template]' ),
+			/** @param {HTMLElement} templateExpansion */
 			( templateExpansion ) => ( {
 				element: templateExpansion,
 				groups: templateExpansion.dataset.filterGroups.split( ',' ),
@@ -162,6 +163,7 @@ liquipedia.filterButtons = {
 
 		this.hideableGroups = Array.from(
 			document.querySelectorAll( '[data-filter-hideable-group]' ),
+			/** @param {HTMLElement} hideableGroup */
 			( hideableGroup ) => ( {
 				element: hideableGroup,
 				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
