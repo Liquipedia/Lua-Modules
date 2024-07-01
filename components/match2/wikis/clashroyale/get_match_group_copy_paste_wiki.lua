@@ -45,6 +45,7 @@ end
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local bans = Logic.readBool(args.bans)
+	local mvps = Logic.readBool(args.mvp)
 	local needsWinner = Logic.readBool(args.needsWinner)
 	local streams = Logic.readBool(args.streams)
 	local showScore = Logic.readBool(args.score) or bestof == 0
@@ -54,11 +55,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
 		needsWinner == 'true' and INDENT .. '|winner=' or nil,
 		INDENT .. '|date=',
-		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil
+		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		mvps and (INDENT .. '|mvp=') or nil
 	)
 
 	for opponentIndex = 1, opponents do
-		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, score))
+		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore))
 	end
 
 	if bans then
@@ -68,13 +70,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
-function WikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, showScore)
 	if mode == Opponent.solo then
-		return '{{SoloOpponent||flag=' .. (score or '') .. '}}'
+		return '{{SoloOpponent||flag=' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.duo then
-		return '{{2v2Opponent|p1=|p1flag=|p2=|p2flag=' .. (score or '') .. '}}'
+		return '{{2v2Opponent|p1=|p1flag=|p2=|p2flag=' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.team then
-		return '{{TeamOpponent|' .. (score or '') .. '}}'
+		return '{{TeamOpponent|' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end
