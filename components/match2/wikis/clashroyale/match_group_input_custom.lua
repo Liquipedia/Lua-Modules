@@ -243,7 +243,7 @@ function matchFunctions.getExtraData(match)
 		casters = match.casters,
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
-	}
+	} --[[@as table]]
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'subgroup' .. subGroupIndex
@@ -307,7 +307,7 @@ function CustomMatchGroupInput._matchWinnerProcessing(match)
 
 		-- set the score either from manual input or sumscore
 		opponent.score = Table.includes(ALLOWED_STATUSES, string.upper(opponent.score or ''))
-			and opponent.score:upper()
+			and string.upper(opponent.score)
 			or tonumber(opponent.score) or tonumber(opponent.sumscore) or NO_SCORE
 
 		return opponent.score
@@ -493,6 +493,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 		return match, subGroupIndex
 	end
 
+	map = MatchGroupInput.getCommonTournamentVars(map, match)
+
 	-- CR has no map names, use generic one instead
 	map.map = 'Set ' .. mapIndex
 
@@ -509,10 +511,10 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	-- set sumscore to 0 if it isn't a number
-	if String.isEmpty(match.opponent1.sumscore) then
+	if Logic.isEmpty(match.opponent1.sumscore) then
 		match.opponent1.sumscore = 0
 	end
-	if String.isEmpty(match.opponent2.sumscore) then
+	if Logic.isEmpty(match.opponent2.sumscore) then
 		match.opponent2.sumscore = 0
 	end
 
@@ -689,16 +691,13 @@ end
 ---@param input string
 ---@return table
 function CustomMatchGroupInput._readCards(input)
-	local cards = Json.parseIfString(input) or {}
 
-	for cardIndex, card in pairs(cards) do
-		if not CardNames[card:lower()] then
-			error('Invalid Card "' .. card .. '"')
-		end
-		cards[cardIndex] = CardNames[card]
-	end
-
-	return cards
+	return Array.map(Json.parseIfString(input) or {}, function(card)
+		if String.isEmpty(card) then return EMPTY_CARD end
+		local cleanedCard =  CardNames[card]
+		assert(cleanedCard, 'Invalid Card "' .. card .. '"')
+		return cleanedCard
+	end)
 end
 
 return CustomMatchGroupInput
