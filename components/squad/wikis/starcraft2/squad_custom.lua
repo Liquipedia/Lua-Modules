@@ -25,9 +25,18 @@ end
 
 ---@param playerList table[]
 ---@param squadType integer
+---@param customTitle string?
 ---@return Html?
-function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, CustomSquad._playerRow, nil, CustomSquad.personMapper)
+function CustomSquad.runAuto(playerList, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(
+		playerList,
+		squadType,
+		Squad,
+		CustomSquad._playerRow,
+		customTitle,
+		nil,
+		CustomSquad.personMapper
+	)
 end
 
 ---@param person table
