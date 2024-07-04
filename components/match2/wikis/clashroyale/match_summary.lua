@@ -87,11 +87,11 @@ function CustomMatchSummary.createBody(match)
 	-- Add Match MVP(s)
 	if match.extradata.mvp then
 		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
+		if Table.isNotEmpty(mvpData) and mvpData.players then
 			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
+			Array.forEach(mvpData.players, function(player)
 				mvp:addPlayer(player)
-			end
+			end)
 			mvp:setPoints(mvpData.points)
 			body:addRow(mvp)
 		end
