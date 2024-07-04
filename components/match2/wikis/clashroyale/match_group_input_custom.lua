@@ -211,7 +211,8 @@ end
 ---@param match table
 ---@return boolean True
 function CustomMatchGroupInput._hasTeamOpponent(match)
-	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
+	return Array.any(match.opponent1.type, Opponent.team) or Array.any(match.opponent2.type, Opponent.team)
+	--return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
 ---@param match table
@@ -240,7 +241,6 @@ end
 function matchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
-		casters = match.casters,
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
 	} --[[@as table]]
