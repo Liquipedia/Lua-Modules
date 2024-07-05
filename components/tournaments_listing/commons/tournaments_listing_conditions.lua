@@ -64,7 +64,7 @@ function TournamentsListingConditions.base(args)
 	if args.game then
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
 	end
-	
+
 	local seriesConditions = ConditionTree(BooleanOperator.any)
 	args.series1 = args.series1 or args.series
 	for _, series in Table.iter.pairsByPrefix(args, 'series') do
