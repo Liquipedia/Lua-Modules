@@ -182,6 +182,7 @@ function CustomSkill:addToLpdb(lpdbData, args)
 	lpdbData.extradata = {
 		deprecated = args.deprecated or '',
 		introduced = args.introduced or '',
+		subfaction = Array.parseCommaSeparatedString(args.subfaction),
 		luminite = tonumber(args.luminite),
 		totalluminite = tonumber(args.totalluminite),
 		therium = tonumber(args.therium),
