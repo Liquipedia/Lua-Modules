@@ -65,15 +65,16 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
 	end
 
-	local seriesConditions = ConditionTree(BooleanOperator.any)
-	args.series1 = args.series1 or args.series
-	for _, series in Table.iter.pairsByPrefix(args, 'series') do
-		seriesConditions:add{
-			ConditionNode(ColumnName('series'), Comparator.eq, series),
-			ConditionNode(ColumnName('extradata_series2'), Comparator.eq, series)
-		}
+	if args.series1 or args.series then
+		local seriesConditions = ConditionTree(BooleanOperator.any)
+		for _, series in Table.iter.pairsByPrefix(args, 'series', {requireIndex = false}) do
+			seriesConditions:add{
+				ConditionNode(ColumnName('series'), Comparator.eq, series),
+				ConditionNode(ColumnName('extradata_series2'), Comparator.eq, series)
+			}
+		end
+		conditions:add{seriesConditions}
 	end
-	conditions:add{seriesConditions}
 
 	if args.location then
 		local locationConditions = ConditionTree(BooleanOperator.any)
