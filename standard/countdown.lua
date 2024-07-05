@@ -9,7 +9,9 @@
 local Arguments = require('Module:Arguments')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
-local StreamLinks = require('Module:Links/Stream')
+local Lua = require('Module:Lua')
+
+local StreamLinks = Lua.import('Module:Links/Stream')
 
 local Countdown = {}
 
@@ -35,14 +37,17 @@ function Countdown._create(args)
 	if Logic.readBool(args.rawdatetime) then
 		wrapper:addClass('timer-object-datetime-only')
 	end
+
+	local streams
 	if Logic.readBool(args.finished) then
 		wrapper:attr('data-finished', 'finished')
 	elseif not Logic.readBool(args.nostreams) then
-		wrapper:attr('data-streams', StreamLinks.display(StreamLinks.filterStreams(args), {addSpace = true}))
+		streams = StreamLinks.display(StreamLinks.filterStreams(args), {addSpace = true})
 	end
 
 	-- Timestamp
-	wrapper:attr('data-timestamp', args.timestamp or DateExt.readTimestampOrNil(args.date) or 'error')
+	local timestamp = args.timestamp or DateExt.readTimestampOrNil(args.date) or 'error'
+	wrapper:attr('data-timestamp', timestamp)
 
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
@@ -53,7 +58,15 @@ function Countdown._create(args)
 
 	wrapper:wikitext(args.date)
 
-	return tostring(wrapper:done())
+	if Logic.isEmpty(streams) then
+		return tostring(wrapper)
+	end
+
+	return tostring(mw.html.create()
+		:node(wrapper)
+		:wikitext(Logic.isNumeric(timestamp) and ' - ' or nil)
+		:wikitext(streams)
+	)
 end
 
 return Countdown

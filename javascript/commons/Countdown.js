@@ -45,7 +45,8 @@ liquipedia.countdown = {
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
-				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
+				// Only run when the window is actually in the front,
+				// not in background tabs (on browsers that support it)
 				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
 					liquipedia.countdown.runCountdown();
@@ -105,12 +106,8 @@ liquipedia.countdown = {
 		} else {
 			datestr = ''; // DATE ERROR!
 		}
-		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
-		if ( datestr.length > 0 && timerObjectNode.dataset.streams.length > 0 ) {
-			html += ' - ';
-			html += timerObjectNode.dataset.streams;
-		}
-		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
+		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML =
+			'<span class="timer-object-countdown-time">' + datestr + '</span>';
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
