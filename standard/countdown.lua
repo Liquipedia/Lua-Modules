@@ -13,6 +13,8 @@ local Lua = require('Module:Lua')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
+local NOW = os.time()
+
 local Countdown = {}
 
 ---@param frame Frame
@@ -62,9 +64,12 @@ function Countdown._create(args)
 		return tostring(wrapper)
 	end
 
+	local sep = Logic.isNumeric(timestamp) and NOW < timestamp + 43200
+		and ' - ' or nil
+
 	return tostring(mw.html.create()
 		:node(wrapper)
-		:wikitext(Logic.isNumeric(timestamp) and ' - ' or nil)
+		:wikitext(sep)
 		:wikitext(streams)
 	)
 end
