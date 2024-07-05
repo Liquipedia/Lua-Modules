@@ -86,19 +86,15 @@ function StreamLinks.processStreams(forwardedInputArgs)
 		forwardedInputArgs.stream = nil
 	end
 
+	streams = Table.merge(
+		Table.filterByKey(forwardedInputArgs, StreamLinks.isStream),
+		Table.filterByKey(streams, StreamLinks.isStream)
+	)
+
 	local processedStreams = {}
-	for _, platformName in pairs(StreamLinks.countdownPlatformNames) do
-		local streamValues = Table.merge(
-			Table.filterByKey(forwardedInputArgs, StreamLinks.isStream),
-			Table.filterByKey(streams, StreamLinks.isStream)
-		)
-
-		if Table.isEmpty(streamValues) then
-			streamValues = {[platformName] = Variables.varDefault(platformName)}
-		end
-
-		Table.mergeInto(processedStreams, StreamLinks._processStreamsOfPlatform(streamValues, platformName))
-	end
+	Array.forEach(StreamLinks.countdownPlatformNames, function(platformName)
+		Table.mergeInto(processedStreams, StreamLinks._processStreamsOfPlatform(streams, platformName))
+	end)
 
 	return processedStreams
 end
@@ -135,6 +131,10 @@ function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
 			platformStreams[streamKey] = streamValue
 			platformStreams[platformName] = streamValue -- Legacy
 		end
+	end
+
+	if Logic.isEmpty(platformStreams) then
+		platformStreams = {[platformName] = Variables.varDefault(platformName)}
 	end
 
 	return platformStreams
