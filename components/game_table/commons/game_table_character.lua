@@ -25,14 +25,18 @@ local ColumnName = Condition.ColumnName
 
 local DRAW = 'draw'
 local CHARACTER_MODE = 'character'
-local CHARACTER_NOT_FOUND = 0
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class CharacterGameTableConfig: MatchTableConfig
 ---@field showGameWithoutCharacters boolean
 ---@field showBans boolean
----@field numPicks integer
----@field numBans integer
+---@field numPicks number
+---@field numBans number
+
+---@class CharacterGameTableGame: match2game
+---@field picks string[][]
+---@field bans string[][]?
+---@field pickedBy number?
 
 ---@class CharacterGameTable: GameTable
 ---@field isCharacterTable boolean
@@ -45,7 +49,6 @@ local CharacterGameTable = Class.new(GameTable, function (self)
 	if not self.isCharacterTable then
 		self.resultFromRecord = GameTable.resultFromRecord
 		self.buildConditions = GameTable.buildConditions
-		self.gameFromRecord = GameTable.gameFromRecord
 		self.statsFromMatches = GameTable.statsFromMatches
 	end
 end)
@@ -73,7 +76,7 @@ function CharacterGameTable:readConfig()
 		showGameWithoutCharacters = Logic.readBool(args.showGameWithoutCharacters),
 		showBans = Logic.nilOr(Logic.readBoolOrNil(args.showBans), true),
 		numPicks = self:getNumberOfPicks(),
-		banPicks = self:getNumberOfBans(),
+		numBans = self:getNumberOfBans(),
 	})
 
 	return self
@@ -101,14 +104,6 @@ function CharacterGameTable:getSideClass(extradata, opponentIndex)
 	return Logic.isNotEmpty(side) and 'brkts-popup-side-color-' .. side or nil
 end
 
----@param opponentIndex number
----@param funct fun(opponentIndex: number, playerIndex: number)
-function CharacterGameTable:_applyFuncToOpponentPlayers(opponentIndex, funct)
-	Array.forEach(Array.range(1, self.config.numPicks), function (playerIndex)
-		funct(opponentIndex, playerIndex)
-	end)
-end
-
 ---@return string
 function CharacterGameTable:_buildMatchConditions()
 	return ConditionTree(BooleanOperator.all)
@@ -125,17 +120,18 @@ function CharacterGameTable:_buildCharacterConditions()
 	local characterConditions = ConditionTree(BooleanOperator.any)
 
 	---@param opponentIndex number
-	---@param playerIndex number
-	local addCondtions = function (opponentIndex, playerIndex)
-		characterConditions:add(ConditionNode(
-			ColumnName(self:getCharacterKey(opponentIndex, playerIndex), 'extradata'),
+	local addCondtions = function (opponentIndex)
+		Array.forEach(Array.range(1, self.config.numPicks), function (index)
+			characterConditions:add(ConditionNode(
+			ColumnName(self:getCharacterKey(opponentIndex, index), 'extradata'),
 			Comparator.eq,
 			character
 		))
+		end)
 	end
 
-	self:_applyFuncToOpponentPlayers(1, addCondtions)
-	self:_applyFuncToOpponentPlayers(2, addCondtions)
+	addCondtions(1)
+	addCondtions(2)
 
 	return characterConditions
 end
@@ -158,30 +154,37 @@ function CharacterGameTable:buildConditions()
 	return conditions:toString()
 end
 
----@param game match2game
----@return integer, integer
-function CharacterGameTable:getCharacterPick(game)
-	if Logic.isEmpty(game.extradata) then
-		return CHARACTER_NOT_FOUND, CHARACTER_NOT_FOUND
-	end
-
-	local pickedByOpponent = CHARACTER_NOT_FOUND
-	local pickedByPlayer = CHARACTER_NOT_FOUND
+---@param game CharacterGameTableGame
+---@param maxNumber number
+---@param keyMaker fun(self, opponentIndex, playerIndex)
+function CharacterGameTable:getCharacters(game, maxNumber, keyMaker)
 	---@param opponentIndex number
-	---@param playerIndex number
-	local findPick = function (opponentIndex, playerIndex)
-		if game.extradata[self:getCharacterKey(opponentIndex, playerIndex)] == self.args.character then
-			pickedByOpponent = opponentIndex
-			pickedByPlayer = playerIndex
-		end
+	---@return table
+	local getOpponentCharacters = function (opponentIndex)
+		local characters = {}
+		Array.forEach(Array.range(1, maxNumber), function (characterIndex)
+			table.insert(characters, game.extradata[keyMaker(self, opponentIndex, characterIndex)])
+		end)
+		return characters
 	end
 
-	self:_applyFuncToOpponentPlayers(1, findPick)
-	if pickedByOpponent == CHARACTER_NOT_FOUND then
-		self:_applyFuncToOpponentPlayers(2, findPick)
-	end
+	return {getOpponentCharacters(1), getOpponentCharacters(2)}
+end
 
-	return pickedByOpponent, pickedByPlayer
+
+---@param picks string[][]
+---@return number?
+function CharacterGameTable:_getCharacterPick(picks)
+	---@param opponentIndex number
+	---@return number?
+	local findCharacter = function (opponentIndex)
+		local found = Array.find(picks[opponentIndex], function (character)
+			return character == self.args.character
+		end)
+
+		return found and opponentIndex or nil
+	end
+	return findCharacter(1) or findCharacter(2)
 end
 
 ---@param game match2game
@@ -192,9 +195,15 @@ function CharacterGameTable:gameFromRecord(game)
 		return nil
 	end
 
-	local pickedBy = self:getCharacterPick(game)
-	gameRecord.extradata.pickedBy = pickedBy
-	return pickedBy ~= CHARACTER_NOT_FOUND and gameRecord or nil
+	---@cast gameRecord CharacterGameTableGame
+	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
+	gameRecord.bans = self.config.showBans and self:getCharacters(gameRecord, self.config.numBans, self.getCharacterBanKey) or nil
+	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks) or nil
+
+	local foundPicks = Table.isEmpty(gameRecord.picks[1]) and Table.isEmpty(gameRecord.picks[2])
+	foundPicks = not self.isCharacterTable and foundPicks or Logic.isNotEmpty(gameRecord.pickedBy)
+
+	return (self.config.showGameWithoutCharacters or foundPicks) and gameRecord or nil
 end
 
 ---@param record table
@@ -220,7 +229,7 @@ function CharacterGameTable:statsFromMatches()
 
 			if game.resulttype == DRAW then
 				totalGames.d = totalGames.d + 1
-			elseif game.extradata.pickedBy == winner then
+			elseif game.pickedBy == winner then
 				totalGames.w = totalGames.w + 1
 			else
 				totalGames.l = totalGames.l + 1
@@ -257,9 +266,9 @@ function CharacterGameTable:headerRow()
 		nodes = Array.append(nodes,
 			makeHeaderCell('vs.', '80px'),
 			makeHeaderCell('Picks'):addClass('unsortable'),
-			makeHeaderCell('Bans'):addClass('unsortable'),
+			self.config.showBans and makeHeaderCell('Bans'):addClass('unsortable') or nil,
 			makeHeaderCell('vs. Picks'):addClass('unsortable'),
-			makeHeaderCell('vs. Bans'):addClass('unsortable')
+			self.config.showBans and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
 		)
 	end
 
@@ -276,33 +285,32 @@ function CharacterGameTable:headerRow()
 	return header
 end
 
----@param game match2game
+---@param game CharacterGameTableGame
 ---@param opponentIndex number
----@param size string
----@param characterKeyGetter fun(self: CharacterGameTable, opponentIndex: number, playerIndex): string
+---@param key string
 ---@return Html?
-function CharacterGameTable:_displayCharacters(game, opponentIndex, size, characterKeyGetter)
+function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local charactersDiv = mw.html.create('div')
 		:addClass(self:getSideClass(game.extradata, opponentIndex))
 		:css('display', 'flex')
 
+	local makeIcon = function(character)
+		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
+	end
 
-	local icons = {}
-	self:_applyFuncToOpponentPlayers(opponentIndex, function(_, playerIndex)
-		local key = characterKeyGetter(self, opponentIndex, playerIndex)
-		table.insert(icons, CharacterIcon.Icon{character = game.extradata[key], size = size, date = game.date})
-	end)
+	local icons = Array.map(game[key][opponentIndex] or {}, makeIcon)
 
 	return mw.html.create('td')
 		:node(#icons > 0 and charactersDiv:node(table.concat(icons, '')) or nil)
 end
 
 ---@param match GameTableMatch
----@param game match2game
+---@param game CharacterGameTableGame
 ---@return Html?
 function CharacterGameTable:_displayGame(match, game)
 	if self.isCharacterTable then
-		local pickedBy = game.extradata.pickedBy
+		local pickedBy = game.pickedBy
+		---@cast pickedBy -nil
 		local pickedVs = pickedBy == 1 and 2 or 1
 		local opponentRecords = {match.result.opponent, match.result.vs}
 		return mw.html.create()
@@ -318,18 +326,13 @@ function CharacterGameTable:_displayGame(match, game)
 	end
 end
 
----@param game match2game
+---@param game CharacterGameTableGame
 ---@param opponentRecord match2opponent
 ---@param flipped boolean?
 ---@return Html?
 function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
-	if Table.isEmpty(game.extradata) then
-		return nil
-	end
-
 	local opponentIndex = opponentRecord.id
-
-	local characters = self:_displayCharacters(game, opponentIndex, self.iconSize, self.getCharacterKey)
+	local characters = self:_displayCharacters(game, opponentIndex, 'picks')
 
 	local draft = mw.html.create()
 	if self.isCharacterTable then
@@ -340,7 +343,7 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	else
 		draft
 			:node(characters)
-			:node(self:_displayCharacters(game, opponentIndex, self.iconSize, self.getCharacterBanKey)
+			:node(self:_displayCharacters(game, opponentIndex, 'bans')
 				:addClass('lor-graycard')
 			)
 		end
@@ -376,10 +379,10 @@ function CharacterGameTable:_displayLength(game)
 end
 
 ---@param match GameTableMatch
----@param game match2game
+---@param game CharacterGameTableGame
 ---@return Html?
 function CharacterGameTable:gameRow(match, game)
-	local winner = (self.isCharacterTable and game.extradata.pickedBy or
+	local winner = (self.isCharacterTable and game.pickedBy or
 		match.result.opponent.id) == tonumber(game.winner) and 1 or 2
 
 	return mw.html.create('tr')
