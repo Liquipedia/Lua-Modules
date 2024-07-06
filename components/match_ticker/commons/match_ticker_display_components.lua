@@ -13,11 +13,11 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
@@ -39,6 +39,7 @@ local WINNER_TO_BG_CLASS = {
 	'recent-matches-right',
 }
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
+local MATCH_PAGE_ICON = 'Icon_Matchpage.png'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---Display class for the header of a match ticker
@@ -93,11 +94,8 @@ function Versus:create()
 		lowerText = VS
 	end
 
-	upperText = self:_applyMatchPage(upperText or VS)
-	lowerText = self:_applyMatchPage(lowerText)
-
 	if not lowerText then
-		return self.root:wikitext(self:_applyMatchPage(VS))
+		return self.root:wikitext(VS)
 	end
 
 	return self.root
@@ -153,15 +151,6 @@ function Versus:scores()
 	end
 
 	return table.concat(scores, ':')
-end
-
----@param str string?
----@return string?
-function Versus:_applyMatchPage(str)
-	local matchPage = (self.match.match2bracketdata or {}).matchpage
-	if Logic.isEmpty(matchPage) or Logic.isEmpty(str) then return str end
-
-	return Page.makeInternalLink({}, str, matchPage)
 end
 
 ---Display class for matches shown within a match ticker
@@ -321,17 +310,33 @@ function Details:tournament()
 		match.parent:gsub('_', ' ')
 	)
 
+	local matchPageIcon = self:_matchPageIcon()
+
 	return mw.html.create('div')
 		:addClass('tournament')
 		:node(mw.html.create('span')
 			:css('float', 'right')
+			:node(matchPageIcon)
 			:node(icon)
 		)
 		:node(mw.html.create('div')
 			:addClass('tournament-text')
+			:addClass(matchPageIcon and 'has-matchpage' or '')
 			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]&nbsp;&nbsp;')
 		)
+end
 
+---@return string?
+function Details:_matchPageIcon()
+	local matchPage = (self.match.match2bracketdata or {}).matchpage
+	if Logic.isEmpty(matchPage) then return end
+
+	return LeagueIcon.display{
+		icon = MATCH_PAGE_ICON,
+		link = matchPage,
+		name = 'Match Page',
+		options = {noTemplate = true},
+	} .. '&nbsp;'
 end
 
 ---Display class for matches shown within a match ticker
