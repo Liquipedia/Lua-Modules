@@ -197,7 +197,8 @@ function CharacterGameTable:gameFromRecord(game)
 
 	---@cast gameRecord CharacterGameTableGame
 	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
-	gameRecord.bans = self.config.showBans and self:getCharacters(gameRecord, self.config.numBans, self.getCharacterBanKey) or nil
+	gameRecord.bans = self.config.showBans and
+		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
 	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks) or nil
 
 	local foundPicks = Table.isEmpty(gameRecord.picks[1]) and Table.isEmpty(gameRecord.picks[2])
