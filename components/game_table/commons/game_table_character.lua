@@ -346,8 +346,8 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	else
 		draft
 			:node(characters)
-			:node(self:_displayCharacters(game, opponentIndex, 'bans')
-				:addClass('lor-graycard')
+			:node(self.config.showBans and self:_displayCharacters(game, opponentIndex, 'bans')
+				:addClass('lor-graycard') or nil
 			)
 		end
 
