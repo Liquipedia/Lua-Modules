@@ -263,21 +263,18 @@ function CharacterGameTable:headerRow()
 		config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil,
 		makeHeaderCell('Tournament')
 	)
-	if self.isCharacterTable then
-		nodes = Array.append(nodes,
+
+	if config.showResult then
+		local isCharTable = self.isCharacterTable
+		nodes = Array.appendWith(nodes,
+			not isCharTable and makeHeaderCell('vs.', '80px') or nil,
 			makeHeaderCell('Picks'):addClass('unsortable'),
-			makeHeaderCell(nil, '80px'),
-			makeHeaderCell('Score'),
-			makeHeaderCell(nil, '80px'),
-			makeHeaderCell('vs. Picks'):addClass('unsortable')
-		)
-	else
-		nodes = Array.append(nodes,
-			config.showResult and makeHeaderCell('vs.', '80px') or nil,
-			config.showResult and makeHeaderCell('Picks'):addClass('unsortable') or nil,
-			(config.showResult and config.showBans) and makeHeaderCell('Bans'):addClass('unsortable') or nil,
-			config.showResult and makeHeaderCell('vs. Picks'):addClass('unsortable'),
-			(config.showResult and config.showBans) and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
+			config.showBans and makeHeaderCell('Bans'):addClass('unsortable') or nil,
+			isCharTable and makeHeaderCell(nil, '80px') or nil,
+			isCharTable and makeHeaderCell('Score') or nil,
+			isCharTable and makeHeaderCell(nil, '80px') or nil,
+			makeHeaderCell('vs. Picks'):addClass('unsortable'),
+			config.showBans and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
 		)
 	end
 
@@ -345,23 +342,16 @@ end
 ---@return Html?
 function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	local opponentIndex = opponentRecord.id
-	local characters = self:_displayCharacters(game, opponentIndex, 'picks')
 
-	local draft = mw.html.create()
-	if self.isCharacterTable then
-		local opponent = self:_displayOpponent(opponentRecord, flipped)
-		draft
-			:node(flipped and opponent or characters)
-			:node(flipped and characters or opponent)
-	else
-		draft
-			:node(characters)
-			:node(self.config.showBans and self:_displayCharacters(game, opponentIndex, 'bans')
-				:addClass('lor-graycard') or nil
-			)
-		end
-
-	return draft
+	local isCharTable = self.isCharacterTable
+	local opponent = self:_displayOpponent(opponentRecord, flipped)
+	return mw.html.create()
+		:node((flipped and isCharTable) and opponent or nil)
+		:node(self:_displayCharacters(game, opponentIndex, 'picks'))
+		:node(self.config.showBans and
+			self:_displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
+		)
+		:node((not flipped and isCharTable) and opponent or nil)
 end
 
 ---@param game CharacterGameTableGame
