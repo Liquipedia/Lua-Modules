@@ -26,18 +26,23 @@ local ColumnName = Condition.ColumnName
 local DRAW = 'draw'
 local CHARACTER_MODE = 'character'
 local CHARACTER_NOT_FOUND = 0
-local MAX_NUM_PLAYERS = 5
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+
+---@class CharacterGameTableConfig: MatchTableConfig
+---@field showGameWithoutCharacters boolean
+---@field showBans boolean
+---@field numPicks integer
+---@field numBans integer
 
 ---@class CharacterGameTable: GameTable
 ---@field isCharacterTable boolean
 ---@field iconSize string
+---@field config CharacterGameTableConfig
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
 	self.iconSize = self.args.iconSize or '27px'
 
 	if not self.isCharacterTable then
-		self.readConfig = GameTable.readConfig
 		self.resultFromRecord = GameTable.resultFromRecord
 		self.buildConditions = GameTable.buildConditions
 		self.gameFromRecord = GameTable.gameFromRecord
@@ -45,9 +50,32 @@ local CharacterGameTable = Class.new(GameTable, function (self)
 	end
 end)
 
+---@return integer
+function CharacterGameTable:getNumberOfPicks()
+	return 5
+end
+
+---@return integer
+function CharacterGameTable:getNumberOfBans()
+	return 5
+end
+
 function CharacterGameTable:readConfig()
-	self.args.showOnlyGameStats = true
-	self.config = self:_readDefaultConfig()
+	local args = self.args
+
+	if self.isCharacterTable then
+		self.args.showOnlyGameStats = true
+		self.config = self:_readDefaultConfig()
+	else
+		GameTable.readConfig(self)
+	end
+	self.config = Table.merge(self.config, {
+		showGameWithoutCharacters = Logic.readBool(args.showGameWithoutCharacters),
+		showBans = Logic.nilOr(Logic.readBoolOrNil(args.showBans), true),
+		numPicks = self:getNumberOfPicks(),
+		banPicks = self:getNumberOfBans(),
+	})
+
 	return self
 end
 
@@ -76,7 +104,7 @@ end
 ---@param opponentIndex number
 ---@param funct fun(opponentIndex: number, playerIndex: number)
 function CharacterGameTable:_applyFuncToOpponentPlayers(opponentIndex, funct)
-	Array.forEach(Array.range(1, MAX_NUM_PLAYERS), function (playerIndex)
+	Array.forEach(Array.range(1, self.config.numPicks), function (playerIndex)
 		funct(opponentIndex, playerIndex)
 	end)
 end
