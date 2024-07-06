@@ -40,6 +40,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field pickedBy number?
 
 ---@class CharacterGameTable: GameTable
+---@field character string
 ---@field isCharacterTable boolean
 ---@field iconSize string
 ---@field config CharacterGameTableConfig
@@ -64,12 +65,26 @@ function CharacterGameTable:getNumberOfBans()
 	return 5
 end
 
+---@return self
+function CharacterGameTable:readCharacter()
+	if Logic.isNotEmpty(self.args.character) then
+		self.character = self.args.character
+	else
+		assert(self.title.namespace == 0, 'Required character= argument')
+		self.character = self.title.rootText
+	end
+
+	return self
+end
+
+---@return self
 function CharacterGameTable:readConfig()
 	local args = self.args
 
 	if self.isCharacterTable then
 		self.args.showOnlyGameStats = true
 		self.config = self:_readDefaultConfig()
+		self:readCharacter()
 	else
 		GameTable.readConfig(self)
 	end
@@ -118,7 +133,7 @@ end
 
 ---@return ConditionTree
 function CharacterGameTable:_buildCharacterConditions()
-	local character = self.args.character
+	local character = self.character
 	local characterConditions = ConditionTree(BooleanOperator.any)
 
 	---@param opponentIndex number
@@ -181,7 +196,7 @@ function CharacterGameTable:_getCharacterPick(picks)
 	---@return number?
 	local findCharacter = function (opponentIndex)
 		local found = Array.find(picks[opponentIndex], function (character)
-			return character == self.args.character
+			return character == self.character
 		end)
 
 		return found and opponentIndex or nil
