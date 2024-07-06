@@ -30,6 +30,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@class CharacterGameTableConfig: MatchTableConfig
 ---@field showGameWithoutCharacters boolean
 ---@field showBans boolean
+---@field showLength boolean
 ---@field numPicks number
 ---@field numBans number
 
@@ -75,6 +76,7 @@ function CharacterGameTable:readConfig()
 	self.config = Table.merge(self.config, {
 		showGameWithoutCharacters = Logic.readBool(args.showGameWithoutCharacters),
 		showBans = Logic.nilOr(Logic.readBoolOrNil(args.showBans), true),
+		showLength = Logic.readBool(args.length),
 		numPicks = self:getNumberOfPicks(),
 		numBans = self:getNumberOfBans(),
 	})
@@ -276,7 +278,7 @@ function CharacterGameTable:headerRow()
 	end
 
 	nodes = Array.append(nodes,
-		makeHeaderCell('Length'),
+		self.config.showLength and makeHeaderCell('Length') or nil,
 		self.config.showVod and makeHeaderCell('VOD', '60px') or nil
 	)
 
@@ -354,7 +356,7 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	return draft
 end
 
----@param game match2game
+---@param game CharacterGameTableGame
 ---@param pickedBy number
 ---@param pickedVs number
 ---@return Html
@@ -374,9 +376,11 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 		:node(toScore(pickedVs))
 end
 
----@param game match2game
+---@param game CharacterGameTableGame
 ---@return Html?
 function CharacterGameTable:_displayLength(game)
+	if not self.config.showLength then return end
+
 	return mw.html.create('td')
 		:node(game.length)
 end
