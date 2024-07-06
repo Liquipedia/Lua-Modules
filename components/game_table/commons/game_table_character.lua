@@ -265,11 +265,11 @@ function CharacterGameTable:headerRow()
 	)
 	if self.isCharacterTable then
 		nodes = Array.append(nodes,
-			makeHeaderCell('Team'):addClass('unsortable'),
+			makeHeaderCell('Picks'):addClass('unsortable'),
 			makeHeaderCell(nil, '80px'),
 			makeHeaderCell('Score'),
 			makeHeaderCell(nil, '80px'),
-			makeHeaderCell('vs. Team'):addClass('unsortable')
+			makeHeaderCell('vs. Picks'):addClass('unsortable')
 		)
 	else
 		nodes = Array.append(nodes,
