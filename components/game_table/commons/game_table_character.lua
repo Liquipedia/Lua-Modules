@@ -253,10 +253,14 @@ function CharacterGameTable:headerRow()
 		return mw.html.create('th'):css('max-width', width):node(text)
 	end
 
+	local config = self.config
+
 	local nodes = Array.append({},
 		makeHeaderCell('Date', '100px'),
-		makeHeaderCell(self.config.showTier and 'Tier', '70px') or nil,
-		makeHeaderCell(nil, '25px'):addClass('unsortable'),
+		config.showTier and makeHeaderCell('Tier', '70px') or nil,
+		config.showType and makeHeaderCell('Type', '70px') or nil,
+		config.displayGameIcons and makeHeaderCell(nil, '25px') or nil,
+		config.showIcon and makeHeaderCell(nil, '25px'):addClass('unsortable') or nil,
 		makeHeaderCell('Tournament')
 	)
 	if self.isCharacterTable then
@@ -269,17 +273,17 @@ function CharacterGameTable:headerRow()
 		)
 	else
 		nodes = Array.append(nodes,
-			makeHeaderCell('vs.', '80px'),
-			makeHeaderCell('Picks'):addClass('unsortable'),
-			self.config.showBans and makeHeaderCell('Bans'):addClass('unsortable') or nil,
-			makeHeaderCell('vs. Picks'):addClass('unsortable'),
-			self.config.showBans and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
+			config.showResult and makeHeaderCell('vs.', '80px') or nil,
+			config.showResult and makeHeaderCell('Picks'):addClass('unsortable') or nil,
+			(config.showResult and config.showBans) and makeHeaderCell('Bans'):addClass('unsortable') or nil,
+			config.showResult and makeHeaderCell('vs. Picks'):addClass('unsortable'),
+			(config.showResult and config.showBans) and makeHeaderCell('vs. Bans'):addClass('unsortable') or nil
 		)
 	end
 
 	nodes = Array.append(nodes,
-		self.config.showLength and makeHeaderCell('Length') or nil,
-		self.config.showVod and makeHeaderCell('VOD', '60px') or nil
+		config.showLength and makeHeaderCell('Length') or nil,
+		config.showVod and makeHeaderCell('VOD', '60px') or nil
 	)
 
 	local header = mw.html.create('tr')
@@ -313,6 +317,10 @@ end
 ---@param game CharacterGameTableGame
 ---@return Html?
 function CharacterGameTable:_displayGame(match, game)
+	if not self.config.showResult then
+		return
+	end
+
 	if self.isCharacterTable then
 		local pickedBy = game.pickedBy
 		---@cast pickedBy -nil
@@ -396,6 +404,8 @@ function CharacterGameTable:gameRow(match, game)
 		:addClass(self:_getBackgroundClass(winner))
 		:node(self:_displayDate(match))
 		:node(self:_displayTier(match))
+		:node(self:_displayType(match))
+		:node(self:_displayGameIconForGame(game))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
 		:node(self:_displayGame(match, game))
