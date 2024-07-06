@@ -201,10 +201,12 @@ function CharacterGameTable:gameFromRecord(game)
 		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
 	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks) or nil
 
-	local foundPicks = Table.isEmpty(gameRecord.picks[1]) and Table.isEmpty(gameRecord.picks[2])
-	foundPicks = not self.isCharacterTable and foundPicks or Logic.isNotEmpty(gameRecord.pickedBy)
+	if self.isCharacterTable then
+		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
+	end
 
-	return (self.config.showGameWithoutCharacters or foundPicks) and gameRecord or nil
+	local foundPicks = Table.isNotEmpty(gameRecord.picks[1]) or Table.isNotEmpty(gameRecord.picks[2])
+	return (foundPicks or self.config.showGameWithoutCharacters) and gameRecord or nil
 end
 
 ---@param record table
