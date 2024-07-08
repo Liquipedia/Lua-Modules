@@ -235,10 +235,12 @@ local Details = Class.new(
 
 ---@return Html
 function Details:create()
+	local matchPageIcon = self:_matchPageIcon()
 	local td = mw.html.create('td')
 		:addClass('match-filler')
-		:node(mw.html.create('span')
-			:node(self:countdown())
+		:node(mw.html.create('div')
+			:addClass(matchPageIcon and 'has-matchpage' or nil)
+			:node(self:countdown(matchPageIcon))
 			:node(self:tournament())
 		)
 
@@ -255,8 +257,22 @@ function Details:create()
 	return self.root:node(td)
 end
 
+---@return string?
+function Details:_matchPageIcon()
+	local matchPage = (self.match.match2bracketdata or {}).matchpage
+	if Logic.isEmpty(matchPage) then return end
+
+	return LeagueIcon.display{
+		icon = MATCH_PAGE_ICON,
+		link = matchPage,
+		name = 'Match Page',
+		options = {noTemplate = true},
+	}
+end
+
+---@param matchPageIcon string?
 ---@return Html
-function Details:countdown()
+function Details:countdown(matchPageIcon)
 	local match = self.match
 
 	local dateString
@@ -284,7 +300,10 @@ function Details:countdown()
 		countdownDisplay:node(VodLink.display{vod = match.vod})
 	end
 
-	return countdownDisplay
+	return mw.html.create('div')
+		:addClass('match-countdown-wrapper')
+		:node(countdownDisplay)
+		:node(matchPageIcon)
 end
 
 ---@return Html?
@@ -309,33 +328,15 @@ function Details:tournament()
 		match.parent:gsub('_', ' ')
 	)
 
-	local matchPageIcon = self:_matchPageIcon()
-
 	return mw.html.create('div')
-		:addClass('tournament')
-		:node(mw.html.create('span')
-			:css('float', 'right')
-			:node(matchPageIcon)
-			:node(icon)
-		)
+		:addClass('tournament-flex')
 		:node(mw.html.create('div')
-			:addClass('tournament-text')
-			:addClass(matchPageIcon and 'has-matchpage' or '')
+			:addClass('tournament-text-flex')
 			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]&nbsp;&nbsp;')
 		)
-end
-
----@return string?
-function Details:_matchPageIcon()
-	local matchPage = (self.match.match2bracketdata or {}).matchpage
-	if Logic.isEmpty(matchPage) then return end
-
-	return LeagueIcon.display{
-		icon = MATCH_PAGE_ICON,
-		link = matchPage,
-		name = 'Match Page',
-		options = {noTemplate = true},
-	} .. '&nbsp;'
+		:node(mw.html.create('span')
+			:node(icon)
+		)
 end
 
 ---Display class for matches shown within a match ticker
