@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local TL_STREAM = 'stream'
+local TLNET_STREAM = 'stream'
 
 --List of streaming platforms supported in Module:Countdown.
 StreamLinks.countdownPlatformNames = {
@@ -35,7 +35,7 @@ StreamLinks.countdownPlatformNames = {
 	'loco',
 	'mildom',
 	'nimo',
-	TL_STREAM,
+	TLNET_STREAM,
 	'tl',
 	'trovo',
 	'twitch',
@@ -108,7 +108,7 @@ function StreamLinks._processStreamsOfPlatform(streamValues, platformName)
 	local enCounter = 0
 
 	for key, streamValue in Table.iter.spairs(streamValues) do
-		if platformName ~= TL_STREAM then
+		if platformName ~= TLNET_STREAM then
 			streamValue = StreamLinks.resolve(platformName, streamValue)
 		end
 
@@ -145,7 +145,7 @@ end
 ---@return string?
 function StreamLinks.displaySingle(platform, streamValue)
 	local icon = '<i class="lp-icon lp-icon-21 lp-' .. (PLATFORM_TO_ICON[platform] or platform) .. '"></i>'
-	if platform == TL_STREAM then
+	if platform == TLNET_STREAM then
 		return Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamValue)
 	end
 
