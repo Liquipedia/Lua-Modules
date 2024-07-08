@@ -16,7 +16,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class EAFCInfoboxPlayer: Person
+---@class EafcInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
