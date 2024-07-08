@@ -59,5 +59,5 @@ return {
 			allowManual = true,
 		},
 	},
-	match2 = 1,
+	match2 = 2,
 }
