@@ -69,7 +69,7 @@ function Countdown._create(args)
 
 	return tostring(mw.html.create()
 		:node(wrapper)
-		:wikitext(sep)
+		:wikitext(isFinished and ' - ' or nil)
 		:wikitext(streams)
 	)
 end
