@@ -40,16 +40,19 @@ function Countdown._create(args)
 		wrapper:addClass('timer-object-datetime-only')
 	end
 
+	-- Timestamp
+	local timestamp = args.timestamp or DateExt.readTimestampOrNil(args.date) or 'error'
+	wrapper:attr('data-timestamp', timestamp)
+
 	local streams
-	if Logic.readBool(args.finished) then
+	local isFinished = Logic.readBool(args.finished)
+		-- the js assumes a match finished if the match is live for 12 hours
+		or (NOW >= timestamp + 43200)
+	if isFinished then
 		wrapper:attr('data-finished', 'finished')
 	elseif not Logic.readBool(args.nostreams) then
 		streams = StreamLinks.display(StreamLinks.filterStreams(args), {addSpace = true})
 	end
-
-	-- Timestamp
-	local timestamp = args.timestamp or DateExt.readTimestampOrNil(args.date) or 'error'
-	wrapper:attr('data-timestamp', timestamp)
 
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
@@ -63,9 +66,6 @@ function Countdown._create(args)
 	if Logic.isEmpty(streams) then
 		return tostring(wrapper)
 	end
-
-	local sep = Logic.isNumeric(timestamp) and NOW < timestamp + 43200
-		and ' - ' or nil
 
 	return tostring(mw.html.create()
 		:node(wrapper)
