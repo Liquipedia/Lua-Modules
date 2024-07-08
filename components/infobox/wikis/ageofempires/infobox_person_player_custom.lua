@@ -43,7 +43,6 @@ local CustomInjector = Class.new(Injector)
 
 local RATINGCONFIG = {
 	aoe2 = {
-		--{text = 'RM [[Age of Empires II/Definitive Edition|DE]]', id = 'aoe2net_id', game = 'aoe2de'},
 		{
 			text = Page.makeExternalLink('Tournament', 'https://aoe-elo.com/players'),
 			id = 'aoe-elo.com_id',
@@ -52,11 +51,7 @@ local RATINGCONFIG = {
 		{text = 'RM [[Voobly]]', id = 'voobly_elo'},
 	},
 	aoe3 = {
-		--{text = 'Supremacy [[Age of Empires III/Definitive Edition|DE]]', id = 'aoe3net_id', game = 'aoe3de'},
 		{text = 'Supremacy', id = 'aoe3_elo'},
-	},
-	aoe4 = {
-		--{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
 	},
 	aom = {
 		{text = 'Elo [[Voobly]]', id = 'aom_voobly_elo'},
