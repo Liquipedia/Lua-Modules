@@ -3,6 +3,7 @@
  * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
 liquipedia.countdown = {
+	timerHiddenClass: 'timer--hidden',
 	timeoutFunctions: null,
 	timerObjectNodes: null,
 	lastCountdownId: null,
@@ -57,25 +58,25 @@ liquipedia.countdown = {
 		}
 	},
 	setupCountdownsIfSwitchToggleExists: function () {
-		const switchElements = document.querySelectorAll( '.switch[data-trigger-event]' );
+		const switchToggleGroup = liquipedia.switchButtons.getSwitchGroup( 'countdown' );
+		if ( !switchToggleGroup || switchToggleGroup.type !== 'toggle' || switchToggleGroup.value === null ) {
+			return;
+		}
 
-		switchElements.forEach( ( switchElem ) => {
-			if ( switchElem.dataset && switchElem.dataset.triggerEvent === 'countdown' ) {
-				const isChecked = switchElem.classList.contains( 'switch-on' );
-				liquipedia.countdown.toggleCountdowns( isChecked );
+		// Default state
+		liquipedia.countdown.toggleCountdowns( switchToggleGroup.value );
 
-				document.addEventListener( 'switchTriggered', function ( event ) {
-					if ( event.detail.event === 'countdown' ) {
-						liquipedia.countdown.toggleCountdowns( event.detail.value );
-					}
-				} );
-			}
+		// Reacting state switch
+		switchToggleGroup.nodes.forEach( ( switchNode ) => {
+			switchNode.addEventListener( liquipedia.switchButtons.triggerEventName, ( event ) => {
+				liquipedia.countdown.toggleCountdowns( event.detail.value );
+			} );
 		} );
 	},
 	toggleCountdowns: function ( isCountdownToggled ) {
 		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( 'timer-hidden', isCountdownToggled );
-			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( 'timer-hidden', !isCountdownToggled );
+			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
+			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
 		} );
 	},
 	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {

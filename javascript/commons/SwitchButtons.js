@@ -7,6 +7,7 @@ liquipedia.switchButtons = {
 	isInitialized: false,
 	isBeingInitialized: false,
 	baseLocalStorageKey: null,
+	triggerEventName: 'switchButtonChanged',
 	switchGroups: {},
 
 	init: function () {
@@ -110,7 +111,7 @@ liquipedia.switchButtons = {
 						this.setLocalStorageValue( switchGroup.name, newValue );
 					}
 					this.updateDOM( switchGroup, newValue );
-					this.triggerCustomEvent( 'switchButtonChanged', switchGroup );
+					this.triggerCustomEvent( node, switchGroup );
 				}
 			} );
 		} );
@@ -148,9 +149,9 @@ liquipedia.switchButtons = {
 		window.localStorage.setItem( localStorageKey, value );
 	},
 
-	triggerCustomEvent: function ( eventName, switchGroup ) {
-		const customEvent = new CustomEvent( eventName, { detail: { switchGroup } } );
-		document.dispatchEvent( customEvent );
+	triggerCustomEvent: function ( node, data ) {
+		const customEvent = new CustomEvent( this.triggerEventName, { detail: { data } } );
+		node.dispatchEvent( customEvent );
 	},
 
 	// Accessed by other components, thus triggering init if necessary
