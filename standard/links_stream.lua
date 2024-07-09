@@ -214,7 +214,7 @@ local StreamKey = Class.new(
 )
 StreamLinks.StreamKey = StreamKey
 
----@param tbl string|StreamKey
+---@param tbl string
 ---@param languageCode string
 ---@param index integer
 ---@overload fun(self, tbl: StreamKey): StreamKey
