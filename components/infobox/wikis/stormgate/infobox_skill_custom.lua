@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local MessageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
@@ -28,6 +29,7 @@ local CustomSkill = Class.new(Skill)
 local CustomInjector = Class.new(Injector)
 
 local ENERGY_ICON = '[[File:EnergyIcon.gif|link=Energy]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_SKILLS = {
 	'Spell',
 	'Ability',
@@ -49,7 +51,14 @@ function CustomSkill.run(frame)
 	skill:_calculateDamageHealTotalAndDps('damage')
 	skill:_calculateDamageHealTotalAndDps('heal')
 
-	return skill:createInfobox()
+	skill:_processPatchFromId('introduced')
+	skill:_processPatchFromId('deprecated')
+
+	local builtInfobox = skill:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomSkill._deprecatedWarning(skill.args.deprecatedDisplay))
 end
 
 ---@param args table
@@ -109,6 +118,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Effect', content = makeArrayLinks(Array.parseCommaSeparatedString(args.effect), ' %(effect%)$')},
 				Cell{name = 'Trigger', content = {args.trigger}},
 				Cell{name = 'Invulnerable', content = makeArrayLinks(Array.parseCommaSeparatedString(args.invulnerable))},
+				Cell{name = 'Introduced', content = {args.introducedDisplay}}
 			},
 			caller:_damageHealDisplay('damage'),
 			caller:_damageHealDisplay('heal')
@@ -170,6 +180,9 @@ end
 function CustomSkill:addToLpdb(lpdbData, args)
 	lpdbData.information = self.faction
 	lpdbData.extradata = {
+		deprecated = args.deprecated or '',
+		introduced = args.introduced or '',
+		subfaction = Array.parseCommaSeparatedString(args.subfaction),
 		luminite = tonumber(args.luminite),
 		totalluminite = tonumber(args.totalluminite),
 		therium = tonumber(args.therium),
@@ -245,6 +258,37 @@ function CustomSkill._hotkeys(hotkey1, hotkey2)
 		return Hotkeys.hotkey(hotkey1)
 	end
 	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+end
+
+---@param key string
+function CustomSkill:_processPatchFromId(key)
+	local args = self.args
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
+
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input)
+	end)[1] or {}).pagename
+	assert(args[key], 'Invalid patch "' .. input .. '"')
+
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+end
+
+---@param patch string?
+---@return Html? -would need to check what warningbox actually returns ... am on phone ...
+function CustomSkill._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomSkill
