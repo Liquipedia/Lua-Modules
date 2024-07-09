@@ -207,11 +207,12 @@ end
 ---@param squadType integer
 ---@param squadClass Squad
 ---@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param customTitle string?
 ---@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
 ---@return Html?
-function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
-	local args = {type = squadType}
+function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, customTitle, injector, personMapper)
+	local args = {type = squadType, title = customTitle}
 	local injectorInstance = (injector and injector()) or
 		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
 		nil
