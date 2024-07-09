@@ -2,6 +2,54 @@
  Template(s): Switch button
  Author(s): Nadox (original)
  *******************************************************************************/
+/**
+ * Description:
+ * This module provides different types of switch buttons, which can be used to toggle between different states.
+ * As of right now, two types of switch buttons are supported:
+ * - Toggle: A single button that can be toggled on and off.
+ * - Pill: A set of buttons where only one can be active at a time.
+ *
+ * Both types of switch buttons can be stored in the local storage, so that the state is remembered between page loads.
+ *
+ * Example usage (toggle):
+ * <div class="switch-toggle-container">
+ *   <div class="switch-toggle" data-switch-group="countdown" data-store-value="true">
+ *      <div class="switch-toggle-slider"></div>
+ *   </div>
+ *   <div>Show Countdown</div>
+ * </div>
+ *
+ * Example usage (pill):
+ * <div class="switch-pill-container">
+ *   <div class="switch-pill" data-switch-group="matchType" data-store-value="true">
+ *       <div class="switch-pill-option switch-pill-active toggle-area-button" data-switch-value="upcoming">
+ *          Upcoming
+ *       </div>
+ *       <div class="switch-pill-option toggle-area-button" data-switch-value="completed">
+ *          Completed
+ *       </div>
+ *   </div>
+ * </div>
+ *
+ * HTML Attributes:
+ * - data-switch-group (required): The name of the switch group. Elements with the same switch group name are connected.
+ * - data-store-value (optional): If set to true, the state of the switch button will be stored in the local storage.
+ * - data-switch-value (only for pill): The value that the switch button will have when it is active.
+ *
+ * Events:
+ * The switch button will trigger a custom event 'switchButtonChanged' when the state is changed.
+ *
+ * Properties:
+ * The switch button can be easily accessed and manipulated by other components using the getSwitchGroup method.
+ *
+ * SwithGroup object contains the following properties:
+ * - type: The type of the switch group (toggle or pill).
+ * - name: The name of the switch group.
+ * - activeClassName: The class name that is added to the active switch button.
+ * - nodes: An array of the switch button nodes.
+ * - isStoredInLocalStorage: Whether the state of the switch button is stored in the local storage.
+ * - value: The current value of the switch button (null if not set).
+ */
 
 liquipedia.switchButtons = {
 	isInitialized: false,
