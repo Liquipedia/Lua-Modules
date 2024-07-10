@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -52,7 +53,14 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Number of players', content = {args.player_number}},
 		}
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Game', content = {Game.name{game = args.game}}}}
+		table.insert(widgets, Cell{
+			name = 'Patch',
+			content = {self.caller:_createPatchCell(args)}
+		})
+		table.insert(widgets, Cell{
+			name = 'Game',
+			content = {Game.name{game = args.game}}
+		})
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
@@ -68,7 +76,7 @@ end
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki Custom
-	Variables.varDefine('patch', args.patch or ''
+	Variables.varDefine('patch', args.patch or '')
 end
 
 ---@param lpdbData table
