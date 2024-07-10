@@ -65,6 +65,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args table
+function CustomLeague:defineCustomPageVariables(args)
+	-- Wiki Custom
+	Variables.varDefine('patch', args.patch or ''
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
@@ -77,6 +83,24 @@ end
 ---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
+end
+
+---@param args table
+---@return string?
+function CustomLeague:_createPatchCell(args)
+	if String.isEmpty(args.patch) then
+		return nil
+	end
+	local content
+
+	if String.isEmpty(args.epatch) then
+		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]'
+	else
+		content = '[[Patch ' .. args.patch .. '|'.. args.patch .. ']]' .. ' &ndash; ' ..
+		'[[Patch ' .. args.epatch .. '|'.. args.epatch .. ']]'
+	end
+
+	return content
 end
 
 ---@param args table
