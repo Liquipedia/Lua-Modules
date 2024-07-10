@@ -224,6 +224,7 @@ liquipedia.countdown = {
 		[ 'Eastern European Standard Time', 'EET' ],
 		[ 'Eastern European Summer Time', 'EEST' ],
 		[ 'Eastern Standard Time', 'EST' ],
+		[ 'Ecuador Time', 'ECT' ]
 		[ 'Fiji Standard Time', 'FJST' ],
 		[ 'French Guiana Time', 'GFT' ],
 		[ 'Georgia Standard Time', 'GET' ],
