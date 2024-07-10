@@ -42,7 +42,7 @@ local CachedTable = Class.new(function(self, tbl)
 end)
 
 ---@param key string|number
----@return unknown
+---@return string|number|nil
 function CachedTable:get(key)
 	if not self.results[key] then
 		self.results[key] = self.table:get(key)

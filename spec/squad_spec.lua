@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Squad', function()
-	allwikis('storage', function (args, wikiName)
+	allwikis('integration tests', function(args, wikiName)
 		local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 		local SquadCustom = require('Module:Squad/Custom')
@@ -49,4 +49,8 @@ insulate('Squad', function()
 			}
 		}
 	}})
+
+	insulate('bla', function ()
+
+	end)
 end)

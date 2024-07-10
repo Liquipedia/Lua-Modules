@@ -28,7 +28,7 @@ function CustomBracketDisplay.BracketContainer(props)
 end
 
 ---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
----@return unknown
+---@return Html
 function CustomBracketDisplay.OpponentEntry(props)
 	local opponentEntry = CustomOpponentDisplay.BracketOpponentEntry(props.opponent)
 	if props.displayType == 'bracket' then
