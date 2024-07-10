@@ -139,7 +139,7 @@ function Versus:scores()
 		table.insert(scores, '<span>' .. setWinner(score ~= -1 and score or 0, opponentIndex) .. '</span>' )
 
 		local score2 = tonumber((opponent.extradata or {}).score2) or 0
-		table.insert(scores2, setWinner(score2, opponentIndex))
+		table.insert(scores2, '<span>' .. setWinner(score2, opponentIndex) .. '</span>' )
 		if score2 > 0 then
 			hasSecondScore = true
 		end

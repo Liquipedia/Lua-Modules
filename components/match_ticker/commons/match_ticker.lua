@@ -164,11 +164,18 @@ function MatchTicker:init(args)
 	end
 	config.wrapperClasses = wrapperClasses
 
-	if config.newStyle then
-		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents/New')
-	else
-		MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
+	--- Extract externally if it grows
+	---@param matchTickerConfig MatchTickerConfig
+	---@return unknown # Todo: Add interface for MatchTickerDisplay
+	local MatchTickerDisplayFactory = function(matchTickerConfig)
+		if matchTickerConfig.newStyle then
+			return Lua.import('Module:MatchTicker/DisplayComponents/New')
+		else
+			return Lua.import('Module:MatchTicker/DisplayComponents')
+		end
 	end
+
+	MatchTicker.DisplayComponents = MatchTickerDisplayFactory(config)
 
 	self.config = config
 
