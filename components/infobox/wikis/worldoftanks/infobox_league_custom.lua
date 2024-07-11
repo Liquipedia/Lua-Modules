@@ -70,12 +70,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param args table
-function CustomLeague:defineCustomPageVariables(args)
-	Variables.varDefine('tournament_patch', args.patch)
-	Variables.varDefine('tournament_endpatch', args.epatch)
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
