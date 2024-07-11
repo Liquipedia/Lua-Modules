@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -21,6 +22,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local PRIZE_TYPE_POINTS = 'POINTS'
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
@@ -69,6 +71,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.circuit2 = Variables.varDefault('circuit2')
 	lpdbData.extradata.circuit2_tier = Variables.varDefault('circuit2_tier')
 
+	Array.forEach(Array.filter(placement.parent.prizes, function (prize)
+		return prize.type == PRIZE_TYPE_POINTS
+	end), function (prize)
+		CustomPrizePool.addPointsDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, prize.id))
+	end)
+
 	return lpdbData
 end
 
@@ -80,6 +88,28 @@ function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
 	return (tierValue * prizeMoney) / place
+end
+
+---@param data placement
+---@param prize string|number|boolean?
+function CustomPrizePool.addPointsDatapoint(data, prize)
+	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
+		type = 'points',
+		name = data.extradata.circuit,
+		information = data.participant,
+		date = data.date,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			points = prize,
+			placement = data.placement,
+			tournament = data.tournament,
+			parent = data.parent,
+			shortname = data.shortname,
+			participant = data.participant,
+			game = data.game,
+			type = data.type,
+			publishertier = data.extradata.circuit_tier or Variables.varDefault('tournament_region')
+		})
+	})
 end
 
 return CustomPrizePool
