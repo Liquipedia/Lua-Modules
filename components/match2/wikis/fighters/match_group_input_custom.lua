@@ -268,8 +268,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	end
 
 	if Logic.isEmpty(map.resulttype) and map.scores[1] and map.scores[2] then
-		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
-		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]
+		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + (map.winner == 1 and 1 or 0)
+		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + (map.winner == 2 and 1 or 0)
 	end
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
