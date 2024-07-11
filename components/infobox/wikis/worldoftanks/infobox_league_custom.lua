@@ -72,8 +72,8 @@ end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	-- Wiki Custom
-	Variables.varDefine('patch', args.patch or '')
+	Variables.varDefine('tournament_patch', args.patch)
+	Variables.varDefine('tournament_endpatch', args.epatch)
 end
 
 ---@param lpdbData table
