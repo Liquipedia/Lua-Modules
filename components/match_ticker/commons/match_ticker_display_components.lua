@@ -40,7 +40,6 @@ local WINNER_TO_BG_CLASS = {
 	'recent-matches-right',
 }
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
-local MATCH_PAGE_ICON = 'Icon_Matchpage.png'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 ---Display class for the header of a match ticker
