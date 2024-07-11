@@ -13,8 +13,6 @@ local Lua = require('Module:Lua')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
-local NOW = os.time()
-
 local Countdown = {}
 
 ---@param frame Frame
