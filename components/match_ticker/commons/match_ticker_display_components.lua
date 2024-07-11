@@ -13,9 +13,11 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local Icon = require('Module:Icon')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
@@ -262,12 +264,7 @@ function Details:_matchPageIcon()
 	local matchPage = (self.match.match2bracketdata or {}).matchpage
 	if Logic.isEmpty(matchPage) then return end
 
-	return LeagueIcon.display{
-		icon = MATCH_PAGE_ICON,
-		link = matchPage,
-		name = 'Match Page',
-		options = {noTemplate = true},
-	}
+	return Page.makeInternalLink(Icon.makeIcon{iconName = 'matchpopup'}, matchPage)
 end
 
 ---@param matchPageIcon string?
