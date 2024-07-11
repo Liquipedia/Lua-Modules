@@ -111,7 +111,8 @@ function CustomMatchSummary._createGame(row, game, props)
 	)
 	local chars2 = CustomMatchSummary._createCharacterDisplay(
 		Array.reverse(CustomMatchSummary._getPlayerData(game, '2_1').characters),
-		props.game
+		props.game,
+		true
 	)
 
 	row:addElement(chars1)
@@ -126,8 +127,9 @@ end
 
 ---@param characters {name: string, active: boolean}[]?
 ---@param game string?
+---@param reverse boolean?
 ---@return Html
-function CustomMatchSummary._createCharacterDisplay(characters, game)
+function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 
 	local wrapper = mw.html.create('div')
@@ -136,7 +138,11 @@ function CustomMatchSummary._createCharacterDisplay(characters, game)
 		if not character.active then
 			characterDisplay:css('opacity', '0.3')
 		end
-		characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
+		if reverse then
+			characterDisplay:wikitext(character.name):wikitext('&nbsp;'):wikitext(CharacterIcons[character.name])
+		else
+			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
+		end
 		wrapper:node(characterDisplay)
 	end)
 
