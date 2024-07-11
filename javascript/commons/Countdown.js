@@ -106,8 +106,11 @@ liquipedia.countdown = {
 		} else {
 			datestr = ''; // DATE ERROR!
 		}
-		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML =
-			'<span class="timer-object-countdown-time">' + datestr + '</span>';
+		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
+		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
+			html += ' - ';
+		}
+		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],

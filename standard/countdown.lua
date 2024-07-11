@@ -45,14 +45,15 @@ function Countdown._create(args)
 	wrapper:attr('data-timestamp', timestamp)
 
 	local streams
-	local isFinished = Logic.readBool(args.finished)
-		-- the js assumes a match finished if the match is live for 12 hours
-		or (NOW >= timestamp + 43200)
-	if isFinished then
+	if Logic.readBool(args.finished) then
 		wrapper:attr('data-finished', 'finished')
 	elseif not Logic.readBool(args.nostreams) then
 		streams = StreamLinks.display(StreamLinks.filterStreams(args), {addSpace = true})
 	end
+	if streams then
+		wrapper:attr('data-hasstreams', 'true')
+	end
+
 
 	if args.text then
 		wrapper:attr('data-countdown-end-text', args.text)
@@ -69,7 +70,6 @@ function Countdown._create(args)
 
 	return tostring(mw.html.create()
 		:node(wrapper)
-		:wikitext(not isFinished and ' - ' or nil)
 		:wikitext(streams)
 	)
 end
