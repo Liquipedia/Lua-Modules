@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local CharacterNames = require('Module:CharacterNames')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -324,10 +325,11 @@ function mapFunctions.getExtraData(map)
 		pick = map.pick
 	}
 
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, CharacterNames)
 	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		map.extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function (banIndex)
 			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
-			return CharacterNames[ban and ban:lower()] or ''
+			return getCharacterName(ban)
 		end)
 	end)
 	return map
