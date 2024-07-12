@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -546,6 +547,7 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		local teamShort = 't' .. opponentIndex
 		local team = 'team' .. opponentIndex
@@ -562,10 +564,10 @@ function mapFunctions.getParticipants(map, opponents)
 		end
 
 		Array.forEach(map[team].pick, function (hero, idx)
-			heroData[team .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
+			heroData[team .. 'champion' .. idx] = getCharacterName(hero)
 		end)
 		Array.forEach(map[team].ban, function (hero, idx)
-			heroData[team .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
+			heroData[team .. 'ban' .. idx] = getCharacterName(hero)
 		end)
 	end
 
