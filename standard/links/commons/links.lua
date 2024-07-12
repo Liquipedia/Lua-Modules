@@ -291,7 +291,7 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
-	douyin_page = 'douyib',
+	douyin_page = 'douyin',
 }
 
 ---@param links {[string]: string}
