@@ -74,6 +74,7 @@ local PREFIXES = {
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
 	douyin = {'https://live.douyin.com/'},
+	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -290,6 +291,7 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
+	douyin_page = 'douyin',
 }
 
 ---@param links {[string]: string}
