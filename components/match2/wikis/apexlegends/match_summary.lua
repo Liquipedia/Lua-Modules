@@ -22,6 +22,14 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
+---@field games ApexMatchGroupUtilGame[]
+
+---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
+---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
+---@field stream table
+
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local MATCH_STATUS_TO_ICON = {
@@ -265,7 +273,8 @@ local GAME_STANDINGS_COLUMNS = {
 ---@param args table
 ---@return string
 function CustomMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId) --[[@as table]]
+	---@class ApexMatchGroupUtilMatch
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	match.scoringTable = CustomMatchSummary._createScoringData(match)
 	Array.forEach(match.games, function(game)
