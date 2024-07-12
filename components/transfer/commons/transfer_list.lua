@@ -57,7 +57,7 @@ local DEFAULT_VALUES = {
 ---@field endDate string?
 ---@field date string?
 ---@field tournament string?
----@field positions string?
+---@field positions string[]?
 ---@field platform string?
 ---@field onlyNotableTransfers boolean
 
@@ -211,7 +211,7 @@ function TransferList:_buildConditions(config)
 	local conditions = self:_buildBaseConditions()
 		:add(self:_buildDateCondition(config.date))
 		:add(self:_buildTeamConditions(config.toTeam, config.fromTeam))
-		:add(self:_buildOrConditions('roles1', 'role1', config.roles1))
+		:add(self:_buildOrConditions('role1', config.roles1 or self.config.conditions.roles1))
 
 	return conditions:toString()
 end
@@ -221,10 +221,10 @@ function TransferList:_buildBaseConditions()
 	local config = self.config.conditions
 
 	self.baseConditions = ConditionTree(BooleanOperator.all)
-		:add(self:_buildOrConditions('players', 'player'))
-		:add(self:_buildOrConditions('nationalities', 'nationality'))
-		:add(self:_buildOrConditions('roles2', 'role2'))
-		:add(self:_buildOrConditions('positions', 'extradata_position'))
+		:add(self:_buildOrConditions('player', config.players))
+		:add(self:_buildOrConditions('nationality', config.nationalities))
+		:add(self:_buildOrConditions('role2', config.roles2))
+		:add(self:_buildOrConditions('extradata_position', config.positions))
 
 	if config.platform then
 		self.baseConditions:add{ConditionNode(ColumnName('extradata_platform'), Comparator.eq, config.platform)}
@@ -288,18 +288,16 @@ function TransferList:_buildTeamConditions(toTeam, fromTeam)
 	if Logic.isEmpty(self.config.conditions.teams) then return end
 
 	self.teamConditions = ConditionTree(BooleanOperator.any)
-		:add(self:_buildOrConditions('teams', 'fromteam'))
-		:add(self:_buildOrConditions('teams', 'toteam'))
+		:add(self:_buildOrConditions('fromteam', self.config.conditions.teams))
+		:add(self:_buildOrConditions('toteam', self.config.conditions.teams))
 
 	return self.teamConditions
 end
 
----@param configField string
 ---@param lpdbField string
----@param data string[]?
+---@param data string[]
 ---@return ConditionTree?
-function TransferList:_buildOrConditions(configField, lpdbField, data)
-	data = data or self.config.conditions[configField]
+function TransferList:_buildOrConditions(lpdbField, data)
 	if Logic.isEmpty(data) then return nil end
 	return ConditionTree(BooleanOperator.any)
 		:add(Array.map(data, function(item)
