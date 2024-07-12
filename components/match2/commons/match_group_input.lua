@@ -870,4 +870,13 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 	return opponents
 end
 
+---@param alias table<string, string>
+---@param character string
+---@return string?
+function MatchGroupInput.getCharacterName(alias, character)
+	if Logic.isEmpty(character) then return nil end
+	---@cast character -nil
+	return (assert(alias[character:lower()], 'Invalid character:' .. character))
+end
+
 return MatchGroupInput
