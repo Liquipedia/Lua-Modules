@@ -314,6 +314,7 @@ function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local charactersDiv = mw.html.create('div')
 		:addClass(self:getSideClass(game.extradata, opponentIndex))
 		:css('display', 'flex')
+		:css('padding', '3px')
 
 	local makeIcon = function(character)
 		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
