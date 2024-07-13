@@ -84,19 +84,6 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
 	end
 
-	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if Table.isNotEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			Array.forEach(mvpData.players, function(player)
-				mvp:addPlayer(player)
-			end)
-			mvp:setPoints(mvpData.points)
-			body:addRow(mvp)
-		end
-	end
-
 	return body
 end
 
