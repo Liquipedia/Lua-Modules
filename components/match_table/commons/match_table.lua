@@ -66,6 +66,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showType boolean
 ---@field showYearHeaders boolean
 ---@field useTickerName boolean
+---@field teamStyle teamStyle
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -151,7 +152,8 @@ function MatchTable:_readDefaultConfig()
 		showOnlyGameStats = Logic.nilOr(Logic.readBool(args.showOnlyGameStats), false),
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
-		useTickerName = Logic.readBool(args.useTickerName)
+		useTickerName = Logic.readBool(args.useTickerName),
+		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
 	}
 end
 
@@ -742,7 +744,7 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 			opponent = opponent,
 			flip = flipped,
 			overflow = 'wrap',
-			teamStyle = 'short',
+			teamStyle = self.config.teamStyle,
 		})
 		:attr('data-sort-value', opponent.name)
 end
