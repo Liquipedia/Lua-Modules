@@ -125,6 +125,13 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 			end
 			indexedScores = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 		else
+			--only has exactly 2 opponents, neither more or less
+			assert(#indexedScores == 2, 'Unexpected number of opponents when calculating winner')
+
+			local scores = Array.map(indexedScores, function(indexedScore)
+				return tonumber(indexedScore.score)
+			end)
+			data.winner = tonumber(data.winner) or scores[1] > scores[2] and 1 or 2
 			local winner
 			indexedScores, winner = MatchGroupInput.setPlacement(indexedScores, data.winner, 1, 2)
 			data.winner = data.winner or winner
@@ -137,50 +144,6 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	return data, indexedScores
-end
-
----@param opponents table[]
----@param winner integer?
----@param specialType string?
----@param finished boolean|string?
----@return table[]
----@return integer?
-function MatchGroupInput.setPlacement(opponents, winner, specialType, finished)
-	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
-			opponents[key].placement = 1
-		end
-	elseif specialType == 'default' then
-		for key, _ in pairs(opponents) do
-			if key == winner then
-				opponents[key].placement = 1
-			else
-				opponents[key].placement = 2
-			end
-		end
-	else
-		local temporaryScore
-		local temporaryPlace = -99
-		local counter = 0
-		for scoreIndex, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.placementSortFunction) do
-			local score = tonumber(opp.score) or ''
-			counter = counter + 1
-			if counter == 1 and Logic.isEmpty(winner) then
-				if finished then
-					winner = scoreIndex
-				end
-			end
-			if temporaryScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or temporaryPlace
-			else
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or counter
-				temporaryPlace = counter
-				temporaryScore = score
-			end
-		end
-	end
-
-	return opponents, winner
 end
 
 ---@param tbl table[]
