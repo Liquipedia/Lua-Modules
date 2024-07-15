@@ -63,6 +63,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
+	if not options.isStandalone then
+		match = matchFunctions.mergeWithStandalone(match)
+	end
+
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
@@ -73,10 +77,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	-- Adjust map data, especially set participants data
 	match = matchFunctions.adjustMapData(match)
-
-	if not options.isStandalone then
-		match = matchFunctions.mergeWithStandalone(match)
-	end
 
 	return match
 end
