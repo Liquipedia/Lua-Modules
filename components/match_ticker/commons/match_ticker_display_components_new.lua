@@ -186,17 +186,16 @@ function Details:streams()
 			local streamLink = mw.ext.StreamPage.resolve_stream(platformName, targetStream)
 
 			if streamLink then
-				local newStreamLink = nil
 				local icon = '<i class="lp-icon lp-icon-21 lp-' .. (PLATFORM_TO_ICON[platformName] or platformName) .. '"></i>'
 
 				-- TL.net specific
 				if platformName == 'stream' then
-					newStreamLink = Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamLink)
+					streamLinks = streamLinks ..
+						Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamLink)
 				else
-					newStreamLink = Page.makeInternalLink({}, icon, 'Special:Stream/' .. platformName .. '/' .. streamLink)
+					streamLinks = streamLinks ..
+						Page.makeInternalLink({}, icon, 'Special:Stream/' .. platformName .. '/' .. streamLink)
 				end
-
-				streamLinks = streamLinks .. newStreamLink
 			end
 		end
 
