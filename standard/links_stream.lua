@@ -25,27 +25,21 @@ local TLNET_STREAM = 'stream'
 StreamLinks.countdownPlatformNames = {
 	'afreeca',
 	'bilibili',
-	'cc163',
+	'cc',
 	'dailymotion',
 	'douyu',
 	'facebook',
-	'huomao',
-	'huya',
+	'huomaotv',
+	'huyatv',
 	'kick',
 	'loco',
 	'mildom',
-	'nimo',
+	'nimotv',
 	TLNET_STREAM,
 	'tl',
 	'trovo',
 	'twitch',
 	'youtube',
-}
-local PLATFORM_TO_ICON = {
-	cc163 = 'cc',
-	huomao = 'huomaotv',
-	huya = 'huyatv',
-	himo = 'nimotv',
 }
 
 ---@param key string
@@ -144,7 +138,7 @@ end
 ---@param streamValue string
 ---@return string?
 function StreamLinks.displaySingle(platform, streamValue)
-	local icon = '<i class="lp-icon lp-icon-21 lp-' .. (PLATFORM_TO_ICON[platform] or platform) .. '"></i>'
+	local icon = '<i class="lp-icon lp-icon-21 lp-' .. platform .. '"></i>'
 	if platform == TLNET_STREAM then
 		return Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamValue)
 	end
@@ -233,9 +227,7 @@ function StreamKey:new(tbl, languageCode, index)
 		local components = mw.text.split(tbl, '_', true)
 		-- Input is in legacy format (eg. twitch2)
 		if #components == 1 then
-			local tempIndex
-			platform, tempIndex = self:_fromLegacy(tbl)
-			index = tempIndex or index
+			platform, index = self:_fromLegacy(tbl)
 			languageCode = 'en'
 		-- Input is a StreamKey in string format
 		elseif #components == 3 then
@@ -253,7 +245,7 @@ function StreamKey:new(tbl, languageCode, index)
 end
 
 ---@param input string
----@return string?, integer?
+---@return string, integer
 function StreamKey:_fromLegacy(input)
 	for _, platform in pairs(StreamLinks.countdownPlatformNames) do
 		if string.find(input, platform .. '%d-$') then
@@ -262,10 +254,12 @@ function StreamKey:_fromLegacy(input)
 			-- Eg. In "twitch2", the 2 would be the index.
 			if #input > #platform then
 				index = tonumber(input:sub(#platform + 1)) or index
+				assert(index, '"' .. input .. '" is not a supported stream key')
 			end
 			return platform, index
 		end
 	end
+	error('"' .. input .. '" is not a supported stream key')
 end
 
 ---@return string
