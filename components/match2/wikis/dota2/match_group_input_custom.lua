@@ -7,6 +7,7 @@
 --
 
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -584,16 +585,17 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local heroData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			local hero = map['t' .. opponentIndex .. 'h' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
+			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = getCharacterName(hero)
 		end
 
 		local banIndex = 1
 		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		while nextBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
+			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(nextBan)
 			banIndex = banIndex + 1
 			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end

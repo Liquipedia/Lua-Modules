@@ -8,6 +8,7 @@
 
 local ChampionNames = mw.loadData('Module:ChampionNames')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -449,11 +450,11 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local championData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, ChampionNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			local champ = map['t' .. opponentIndex .. 'c' .. playerIndex]
-			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				ChampionNames[champ] or champ
+			championData['team' .. opponentIndex .. 'champion' .. playerIndex] = getCharacterName(champ)
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =
 				map['t' .. opponentIndex .. 'kda' .. playerIndex]
@@ -473,7 +474,7 @@ function mapFunctions.getParticipants(map, opponents)
 		local banIndex = 1
 		local currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		while currentBan do
-			championData['team' .. opponentIndex .. 'ban' .. banIndex] = ChampionNames[currentBan] or currentBan
+			championData['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(currentBan)
 			banIndex = banIndex + 1
 			currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end
