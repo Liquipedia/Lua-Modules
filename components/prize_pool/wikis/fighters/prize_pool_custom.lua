@@ -93,6 +93,10 @@ end
 ---@param data placement
 ---@param prize string|number|boolean?
 function CustomPrizePool.addPointsDatapoint(data, prize)
+	if data.opponenttype == Opponent.literal then
+		return
+	end
+
 	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
 		type = 'points',
 		name = data.extradata.circuit,
@@ -101,13 +105,16 @@ function CustomPrizePool.addPointsDatapoint(data, prize)
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			points = prize,
 			placement = data.placement,
-			tournament = data.tournament,
-			parent = data.parent,
-			shortname = data.shortname,
+			tournament = Variables.varDefault('tournament_link'),
+			parent = Variables.varDefault('tournament_parent'),
+			shortname = Variables.varDefault('tournament_name'),
 			participant = data.participant,
-			game = data.game,
-			type = data.type,
-			publishertier = data.extradata.circuit_tier or Variables.varDefault('tournament_region')
+			game = Variables.varDefault('tournament_game'),
+			type = Variables.varDefault('tournament_type'),
+			participantname = data.participant,
+			participantflag = data.participantflag,
+			publishertier = data.extradata.circuit_tier or Variables.varDefault('tournament_region'),
+			region = Variables.varDefault('tournament_region'),
 		})
 	})
 end
