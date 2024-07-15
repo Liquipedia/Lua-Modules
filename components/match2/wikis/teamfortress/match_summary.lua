@@ -156,13 +156,12 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param iconType strings?
+---@param icon strings?
 ---@return Html
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
+function CustomMatchSummary._createCheckMarkOrCross(showIcon, icon)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-
 	if showIcon then
-		return container:node(iconType)
+		return container:node(icon)
 	end
 	return container:node(Icons.EMPTY)
 end
