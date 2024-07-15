@@ -58,6 +58,17 @@ local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local DEFAULT_LIVE_HOURS = 8
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
+--- Extract externally if it grows
+---@param matchTickerConfig MatchTickerConfig
+---@return unknown # Todo: Add interface for MatchTickerDisplay
+local MatchTickerDisplayFactory = function (matchTickerConfig)
+	if matchTickerConfig.newStyle then
+		return Lua.import('Module:MatchTicker/DisplayComponents/New')
+	else
+		return Lua.import('Module:MatchTicker/DisplayComponents')
+	end
+end
+
 ---@class MatchTickerConfig
 ---@field tournaments string[]
 ---@field limit integer
@@ -164,21 +175,11 @@ function MatchTicker:init(args)
 	end
 	config.wrapperClasses = wrapperClasses
 
+	MatchTicker.DisplayComponents = MatchTickerDisplayFactory(config)
+
 	self.config = config
 
-	MatchTicker.DisplayComponents = self:displayFactory()
-
 	return self
-end
-
---- Extract externally if it grows
----@return unknown # Todo: Add interface for MatchTickerDisplay
-function MatchTicker:displayFactory()
-	if self.config.newStyle then
-		return Lua.import('Module:MatchTicker/DisplayComponents/New')
-	else
-		return Lua.import('Module:MatchTicker/DisplayComponents')
-	end
 end
 
 ---queries the matches and filters them for unwanted ones
