@@ -429,6 +429,9 @@ local byFactionAoEO = {
 	greeks = {
 		icon = 'File:AoEO Greek icon.png',
 	},
+	indians = {
+		icon = 'File:AoEO India icon.png',
+	},
 	norse = {
 		icon = 'File:AoEO Norse icon.png',
 	},
