@@ -156,9 +156,7 @@ function Details:streams()
 	local links = mw.html.create('div')
 		:addClass('match-streams')
 
-	if Table.isNotEmpty(match.stream) then
-		links:wikitext(StreamLinks.display(StreamLinks.filterStreams(match.stream)))
-	end
+	links:wikitext(table.concat(StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or {}))
 
 	return links
 end
