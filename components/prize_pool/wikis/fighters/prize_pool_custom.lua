@@ -58,10 +58,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	if opponent.opponentData.type == Opponent.duo then
 		lpdbData.mode = 'doubles'
-		lpdbData.players = {
-			p1 = opponent.opponentData.players[1].pageName,
-			p2 = opponent.opponentData.players[2].pageName,
-		}
 	end
 
 	lpdbData.extradata.matchid = opponent.additionalData.LASTVSMATCHID
