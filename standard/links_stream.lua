@@ -151,8 +151,8 @@ end
 
 ---@param streams {string: string[]}
 ---@param options {addSpace: boolean?}?
----@return string?
-function StreamLinks.display(streams, options)
+---@return string[]?
+function StreamLinks.buildDisplays(streams, options)
 	options = options or {}
 	local displays = {}
 	Array.forEach(StreamLinks.countdownPlatformNames, function(platform)
@@ -160,8 +160,7 @@ function StreamLinks.display(streams, options)
 			table.insert(displays, StreamLinks.displaySingle(platform, streamValue))
 		end)
 	end)
-	if Table.isEmpty(displays) then return nil end
-	return table.concat(displays, options.addSpace and ' ' or nil)
+	return Table.isNotEmpty(displays) and displays or nil
 end
 
 ---Filter non-english streams if english streams exists
