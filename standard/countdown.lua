@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local StreamLinks = Lua.import('Module:Links/Stream')
 
@@ -46,7 +47,10 @@ function Countdown._create(args)
 	if Logic.readBool(args.finished) then
 		wrapper:attr('data-finished', 'finished')
 	elseif not Logic.readBool(args.nostreams) then
-		streams = StreamLinks.buildDisplays(StreamLinks.filterStreams(args))
+		local streamArgs = Table.filterByKey(args, function(key)
+			return type(key) == 'string'
+		end) --[[@as {string: string}]]
+		streams = StreamLinks.buildDisplays(StreamLinks.filterStreams(streamArgs))
 	end
 	if streams then
 		streams = table.concat(streams, ' ')
