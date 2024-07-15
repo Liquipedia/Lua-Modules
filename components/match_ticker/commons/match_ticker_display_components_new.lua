@@ -32,6 +32,13 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 
+local PLATFORM_TO_ICON = {
+	cc163 = 'cc',
+	huomao = 'huomaotv',
+	huya = 'huyatv',
+	himo = 'nimotv',
+}
+
 ---Display class for matches shown within a match ticker
 ---@class NewMatchTickerScoreBoard
 ---@operator call(table): NewMatchTickerScoreBoard
@@ -156,6 +163,8 @@ function Details:streams()
 	local links = mw.html.create('div')
 		:addClass('match-streams')
 
+	mw.logObject(match.stream, 'match.stream')
+
 	if Table.isNotEmpty(match.stream) then
 		local streams = {}
 
@@ -177,16 +186,17 @@ function Details:streams()
 			local streamLink = mw.ext.StreamPage.resolve_stream(platformName, targetStream)
 
 			if streamLink then
-				-- Default values
-				local url = 'Special:Stream/' .. platformName .. '/' .. streamLink
-				local icon = '<i class="lp-icon lp-icon-21 lp-' .. platformName .. '"></i>'
+				local newStreamLink = nil
+				local icon = '<i class="lp-icon lp-icon-21 lp-' .. (PLATFORM_TO_ICON[platformName] or platformName) .. '"></i>'
 
 				-- TL.net specific
 				if platformName == 'stream' then
-					url = 'https://tl.net/video/streams/' .. streamLink
+					newStreamLink = Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamLink)
+				else
+					newStreamLink = Page.makeInternalLink({}, icon, 'Special:Stream/' .. platformName .. '/' .. streamLink)
 				end
 
-				streamLinks = streamLinks .. '[[' .. url .. '|' .. icon .. ']]'
+				streamLinks = streamLinks .. newStreamLink
 			end
 		end
 
