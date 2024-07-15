@@ -32,13 +32,6 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 
-local PLATFORM_TO_ICON = {
-	cc163 = 'cc',
-	huomao = 'huomaotv',
-	huya = 'huyatv',
-	himo = 'nimotv',
-}
-
 ---Display class for matches shown within a match ticker
 ---@class NewMatchTickerScoreBoard
 ---@operator call(table): NewMatchTickerScoreBoard
@@ -162,41 +155,9 @@ function Details:streams()
 	local match = self.match
 	local links = mw.html.create('div')
 		:addClass('match-streams')
+
 	if Table.isNotEmpty(match.stream) then
-		local streams = {}
-
-		-- Standardize the stream data to always use the platform as key (because of the new format ex: twitch_en_2)
-		for rawHost, stream in pairs(match.stream) do
-			local streamParts = mw.text.split(rawHost, '_', true)
-			if #streamParts == 3 then
-				local key = StreamLinks.StreamKey(rawHost)
-				streams[key.platform] = stream
-			else
-				streams[rawHost] = stream
-			end
-		end
-
-		local streamLinks = ''
-
-		-- Iterate over the streams and create the different links
-		for platformName, targetStream in pairs(streams) do
-			local streamLink = mw.ext.StreamPage.resolve_stream(platformName, targetStream)
-
-			if streamLink then
-				local icon = '<i class="lp-icon lp-icon-21 lp-' .. (PLATFORM_TO_ICON[platformName] or platformName) .. '"></i>'
-
-				-- TL.net specific
-				if platformName == 'stream' then
-					streamLinks = streamLinks ..
-						Page.makeExternalLink(icon, 'https://tl.net/video/streams/' .. streamLink)
-				else
-					streamLinks = streamLinks ..
-						Page.makeInternalLink({}, icon, 'Special:Stream/' .. platformName .. '/' .. streamLink)
-				end
-			end
-		end
-
-		links:wikitext(streamLinks)
+		links:wikitext(StreamLinks.display(StreamLinks.filterStreams(match.stream)))
 	end
 
 	return links
