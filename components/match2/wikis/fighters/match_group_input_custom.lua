@@ -373,7 +373,7 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {} ---@type string[]
 
 	local characters = Array.map(charInputs, function(characterInput)
-		local character = CharacterStandardizationData[characterInput:lower()]
+		local character = MatchGroupInput.getCharacterName(CharacterStandardizationData, characterInput)
 		if not character then
 			return nil
 		end
