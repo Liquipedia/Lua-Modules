@@ -122,6 +122,7 @@ function CustomLeague:displayPrizePool(args)
 	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 	Variables.varDefine('local prize', prizePool)
+	Variables.varDefine('tournament_prizepoollocal', prizePool)
 	Variables.varDefine('tournament_currency',
 		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
