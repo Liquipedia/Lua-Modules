@@ -263,7 +263,11 @@ function Details:_matchPageIcon()
 	local matchPage = (self.match.match2bracketdata or {}).matchpage
 	if Logic.isEmpty(matchPage) then return end
 
-	return Page.makeInternalLink(Icon.makeIcon{iconName = 'matchpopup'}, matchPage)
+	local display = mw.html.create('div')
+		:addClass('btn btn-secondary')
+		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
+
+	return Page.makeInternalLink(tostring(display), matchPage)
 end
 
 ---@param matchPageIcon string?
