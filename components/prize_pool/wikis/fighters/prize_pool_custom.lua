@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=brawlhalla
+-- wiki=fighters
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
@@ -21,6 +22,7 @@ local CustomLpdbInjector = Class.new(LpdbInjector)
 
 local CustomPrizePool = {}
 
+local PRIZE_TYPE_POINTS = 'POINTS'
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
@@ -60,6 +62,20 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata.matchid = opponent.additionalData.LASTVSMATCHID
 
+	lpdbData.extradata.circuit = Variables.varDefault('circuit')
+	lpdbData.extradata.circuit_tier = Variables.varDefault('circuit_tier')
+	lpdbData.extradata.circuit2 = Variables.varDefault('circuit2')
+	lpdbData.extradata.circuit2_tier = Variables.varDefault('circuit2_tier')
+
+	Array.forEach(Array.filter(placement.parent.prizes, function (prize)
+		return prize.type == PRIZE_TYPE_POINTS
+	end), function (prize)
+		if Opponent.isTbd(opponent.opponentData) then
+			return
+		end
+		CustomPrizePool.addPointsDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, prize.id))
+	end)
+
 	return lpdbData
 end
 
@@ -70,7 +86,32 @@ end
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
-	return (tierValue * Variables.varDefault('tournament_entrants', 0) + prizeMoney * 0.5) / (place*place)
+	return (tierValue * prizeMoney) / place
+end
+
+---@param data placement
+---@param prize string|number|boolean?
+function CustomPrizePool.addPointsDatapoint(data, prize)
+	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
+		type = 'points',
+		name = data.extradata.circuit,
+		information = data.participant,
+		date = data.date,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			points = prize,
+			placement = data.placement,
+			tournament = Variables.varDefault('tournament_link'),
+			parent = Variables.varDefault('tournament_parent'),
+			shortname = Variables.varDefault('tournament_name'),
+			participant = data.participant,
+			game = Variables.varDefault('tournament_game'),
+			type = Variables.varDefault('tournament_type'),
+			participantname = data.participant,
+			participantflag = data.participantflag,
+			publishertier = data.extradata.circuit_tier or Variables.varDefault('tournament_region'),
+			region = Variables.varDefault('tournament_region'),
+		})
+	})
 end
 
 return CustomPrizePool

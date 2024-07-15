@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=brawlhalla
+-- wiki=fighters
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +12,7 @@ local Table = require('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 
----@class BrawlHallaBrktsWikiSpecific: BrktsWikiSpecific
+---@class FightersBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 ---@param match table
