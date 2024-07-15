@@ -172,7 +172,8 @@ function SquadRow:newteam()
 			return content
 		end
 
-		local date = String.isNotEmpty(self.model.extradata.newteamdate) and self.model.extradata.newteamdate or self.model.leavedate
+		local date = String.isNotEmpty(self.model.extradata.newteamdate) and self.model.extradata.newteamdate
+			or self.model.leavedate
 		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
 
 		if hasNewTeamRole then
