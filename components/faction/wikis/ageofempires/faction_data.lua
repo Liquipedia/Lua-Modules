@@ -753,27 +753,33 @@ local factionPropsAoEO = {
 		pageName = 'Greeks' .. AOEO_SUFFIX,
 		faction = 'greeks',
 	},
-	norse = {
+	indians = {
 		index = 5,
+		name = 'Indians',
+		pageName = 'Indians' .. AOEO_SUFFIX,
+		faction = 'indians',
+	},
+	norse = {
+		index = 6,
 		name = 'Norse',
 		pageName = 'Norse' .. AOEO_SUFFIX,
 		faction = 'norse',
 	},
 	persians = {
-		index = 6,
+		index = 7,
 		name = 'Persians',
 		pageName = 'Persians' .. AOEO_SUFFIX,
 		faction = 'persians',
 	},
 	romans = {
-		index = 7,
+		index = 8,
 		name = 'Romans',
 		pageName = 'Romans' .. AOEO_SUFFIX,
 		faction = 'romans',
 	},
 
 	unknown = {
-        index = 8,
+        index = 9,
         name = 'Unknown',
         faction = 'unknown',
     },
