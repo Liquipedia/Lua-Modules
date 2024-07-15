@@ -162,9 +162,6 @@ function Details:streams()
 	local match = self.match
 	local links = mw.html.create('div')
 		:addClass('match-streams')
-
-	mw.logObject(match.stream, 'match.stream')
-
 	if Table.isNotEmpty(match.stream) then
 		local streams = {}
 
