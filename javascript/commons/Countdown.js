@@ -49,7 +49,8 @@ liquipedia.countdown = {
 
 				liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
 
-				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
+				// Only run when the window is actually in the front,
+				// not in background tabs (on browsers that support it)
 				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
 					liquipedia.countdown.runCountdown();
@@ -96,7 +97,6 @@ liquipedia.countdown = {
 		);
 	},
 	setCountdownString: function ( timerObjectNode ) {
-		const streamsarr = [];
 		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
 		let datestr = '', live = 'LIVE';
 
@@ -143,74 +143,11 @@ liquipedia.countdown = {
 		} else {
 			datestr = ''; // DATE ERROR!
 		}
-		if ( timerObjectNode.dataset.streamTwitch ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTwitch2 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch2 ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamYoutube ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/youtube/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamYoutube ) + '"><i class="lp-icon lp-icon-21 lp-youtube"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreeca ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreeca/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreeca ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreecatv ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreecatv/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreecatv ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBilibili ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/bilibili/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBilibili ) + '"><i class="lp-icon lp-icon-21 lp-bilibili"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBooyah ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/booyah/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBooyah ) + '"><i class="lp-icon lp-icon-21 lp-booyah"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamCc163 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/cc163/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamCc163 ) + '"><i class="lp-icon lp-icon-21 lp-cc"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDailymotion ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/dailymotion/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDailymotion ) + '"><i class="lp-icon lp-icon-21 lp-dailymotion"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDouyu ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/douyu/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDouyu ) + '"><i class="lp-icon lp-icon-21 lp-douyutv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamFacebook ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/facebook/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamFacebook ) + '"><i class="lp-icon lp-icon-21 lp-facebook"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuomao ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huomao/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuomao ) + '"><i class="lp-icon lp-icon-21 lp-huomaotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuya ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huya/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuya ) + '"><i class="lp-icon lp-icon-21 lp-huyatv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamKick ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/kick/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamKick ) + '"><i class="lp-icon lp-icon-21 lp-kick"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamLoco ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/loco/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamLoco ) + '"><i class="lp-icon lp-icon-21 lp-loco"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamMildom ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/mildom/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamMildom ) + '"><i class="lp-icon lp-icon-21 lp-mildom"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamNimo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/nimo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamNimo ) + '"><i class="lp-icon lp-icon-21 lp-nimotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTrovo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/trovo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTrovo ) + '"><i class="lp-icon lp-icon-21 lp-trovo"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTl ) {
-			streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset.streamTl + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
-		}
 		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
-		if ( datestr.length > 0 && streamsarr.length > 0 ) {
+		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
 			html += ' - ';
 		}
-		if ( timerObjectNode.dataset.finished !== 'finished' ) {
-			html += streamsarr.join( ' ' );
-		}
 		countdownElem.innerHTML = html;
-	},
-	getStreamName: function ( url ) {
-		return url.replace( /\s/g, '_' );
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
