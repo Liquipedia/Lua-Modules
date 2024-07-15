@@ -1,14 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=brawlhalla
+-- wiki=fighters
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -262,15 +262,14 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	-- Init score if match started and map info is present
 	if not match.opponent1.autoscore and not match.opponent2.autoscore
 			and map.map and map.map ~= 'TBD'
-			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]])
-			and String.isNotEmpty(map.char1) and String.isNotEmpty(map.char2) then
+			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]]) then
 		match.opponent1.autoscore = 0
 		match.opponent2.autoscore = 0
 	end
 
 	if Logic.isEmpty(map.resulttype) and map.scores[1] and map.scores[2] then
-		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + map.scores[1]
-		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + map.scores[2]
+		match.opponent1.autoscore = (match.opponent1.autoscore or 0) + (map.winner == 1 and 1 or 0)
+		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + (map.winner == 2 and 1 or 0)
 	end
 
 	-- get participants data for the map + get map mode + winnerfaction and loserfaction
@@ -368,10 +367,22 @@ end
 ---@param participants table<string, table>
 ---@return table<string, table>
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
-	local char = map['char' .. opponentIndex] or ''
+	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+
+	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {} ---@type string[]
+
+	local characters = Array.map(charInputs, function(characterInput)
+		local character = MatchGroupInput.getCharacterName(CharacterStandardizationData, characterInput)
+		if not character then
+			return nil
+		end
+
+		return {name = character, active = true}
+	end)
 
 	participants[opponentIndex .. '_1'] = {
-		char = MatchGroupInput.getCharacterName(CharacterStandardization, char),
+		characters = characters,
 		player = player.name,
 	}
 

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -440,18 +441,6 @@ function mapFunctions.getAdditionalExtraData(map)
 	return map
 end
 
----@param champion string?
----@return string?
-function mapFunctions.getChampionName(champion)
-	if Logic.isNotEmpty(champion) then
-		local championName = ChampionNames[champion and champion:lower()]
-		assert(championName, 'Invalid hero:' .. champion)
-		return championName
-	end
-
-	return nil
-end
-
 -- Parse participant information
 ---@param map table
 ---@param opponents table[]
@@ -459,11 +448,12 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local championData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, ChampionNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local pick = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'h' .. playerIndex])
+			local pick = getCharacterName(map['t' .. opponentIndex .. 'h' .. playerIndex])
 			championData['team' .. opponentIndex .. 'champion' .. playerIndex] = pick
-			local ban = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'b' .. playerIndex])
+			local ban = getCharacterName(map['t' .. opponentIndex .. 'b' .. playerIndex])
 			championData['team' .. opponentIndex .. 'ban' .. playerIndex] = ban
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =

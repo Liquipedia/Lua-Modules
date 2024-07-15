@@ -75,7 +75,8 @@ return {
 		'tiktok',
 		'twitter',
 		'vk',
-		'weibo'
+		'weibo',
+		'douyin_page',
 	},
 	streams = {
 		'twitch',

@@ -132,7 +132,7 @@ function CustomOpponentDisplay.BlockPlayers(props)
 	end)
 
 	local playersNode = mw.html.create('div')
-		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+		:addClass('block-players-wrapper')
 
 	for _, playerNode in ipairs(playerNodes) do
 		playersNode:node(playerNode)

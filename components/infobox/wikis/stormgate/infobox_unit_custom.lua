@@ -18,6 +18,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local MessageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -33,6 +34,7 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 
 ---@param frame Frame
 ---@return Html
@@ -43,7 +45,14 @@ function CustomUnit.run(frame)
 	unit.faction = Faction.read(unit.args.faction)
 	unit.args.informationType = unit.args.informationType or 'Unit'
 
-	return unit:createInfobox()
+	unit:_processPatchFromId('introduced')
+	unit:_processPatchFromId('deprecated')
+
+	local builtInfobox = unit:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay))
 end
 
 ---@param id string
@@ -102,7 +111,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
 			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)},
+			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
@@ -180,6 +190,13 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			deprecated = args.deprecated or '',
+			introduced = args.introduced or '',
+			subfaction = Array.parseCommaSeparatedString(args.subfaction),
+			veterancybonushealth = Array.parseCommaSeparatedString(args.veterancybonushealth),
+			veterancybonusdamage = Array.parseCommaSeparatedString(args.veterancybonusdamage),
+			veterancybonusattackspeed = Array.parseCommaSeparatedString(args.veterancybonusattackspeed),
+			veterancyxp = Array.parseCommaSeparatedString(args.veterancyxp),
 			type = Array.parseCommaSeparatedString(args.type),
 			builtfrom = Array.parseCommaSeparatedString(args.built),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
@@ -247,6 +264,37 @@ function CustomUnit:_displayCommaSeparatedString(inputString)
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
 		return Page.makeInternalLink({}, value)
 	end)
+end
+
+---@param key string
+function CustomUnit:_processPatchFromId(key)
+	local args = self.args
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
+
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input)
+	end)[1] or {}).pagename
+	assert(args[key], 'Invalid patch "' .. input .. '"')
+
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+end
+
+---@param patch string?
+---@return Html? -would need to check what warningbox actually returns ... am on phone ...
+function CustomUnit._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomUnit
