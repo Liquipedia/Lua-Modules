@@ -250,7 +250,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	return matches, warnings
 end
 
----@param bracketData MatchGroupUtilBracketData
+---@param bracketData table
 ---@param args table
 ---@param matchKey string
 ---@return string?
@@ -868,6 +868,15 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 	opponents[loserIdx].placement = placementLoser
 
 	return opponents
+end
+
+---@param alias table<string, string>
+---@param character string?
+---@return string?
+function MatchGroupInput.getCharacterName(alias, character)
+	if Logic.isEmpty(character) then return nil end
+	---@cast character -nil
+	return (assert(alias[character:lower()], 'Invalid character:' .. character))
 end
 
 return MatchGroupInput

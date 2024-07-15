@@ -60,6 +60,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showIcon boolean
 ---@field showVod boolean
 ---@field showStats boolean
+---@field showOnlyGameStats boolean
 ---@field showOpponent boolean
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
@@ -110,24 +111,12 @@ function MatchTable:readConfig()
 
 	local opponents = self:_readOpponents(mode)
 
-	self.config = {
-		mode = mode,
-		limit = tonumber(args.limit),
-		displayGameIcons = Logic.readBool(args.gameIcons),
-		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
-		timeRange = self:readTimeRange(),
+	self.config = Table.merge(self:_readDefaultConfig(), {
 		aliases = self:readAliases(mode),
 		vs = {},
-		title = args.title,
-		showTier = not Logic.readBool(args.hide_tier),
-		showIcon = not Logic.readBool(args.hide_icon),
-		showVod = Logic.readBool(args.vod),
-		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOpponent = Logic.nilOr(Logic.readBoolOrNil(args.showOpponent), #opponents > 1 or mode == Opponent.solo),
-		queryHistoricalAliases = not Logic.readBool(args.skipQueryingHistoricalAliases),
-		showType = Logic.readBool(args.showType),
-		showYearHeaders = Logic.readBool(args.showYearHeaders),
-	}
+		queryHistoricalAliases = not Logic.readBool(args.skipQueryingHistoricalAliases)
+	})
 
 	Array.forEach(opponents, function(opponent)
 		Table.mergeInto(self.config.aliases, self:getOpponentAliases(mode, opponent))
@@ -141,6 +130,26 @@ function MatchTable:readConfig()
 	end)
 
 	return self
+end
+
+function MatchTable:_readDefaultConfig()
+	local args = self.args
+
+	return {
+		mode = args.tableMode,
+		limit = tonumber(args.limit),
+		displayGameIcons = Logic.readBool(args.gameIcons),
+		showResult = Logic.nilOr(Logic.readBoolOrNil(args.showResult), true),
+		timeRange = self:readTimeRange(),
+		title = args.title,
+		showTier = not Logic.readBool(args.hide_tier),
+		showIcon = not Logic.readBool(args.hide_icon),
+		showVod = Logic.readBool(args.vod),
+		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
+		showOnlyGameStats = Logic.nilOr(Logic.readBool(args.showOnlyGameStats), false),
+		showType = Logic.readBool(args.showType),
+		showYearHeaders = Logic.readBool(args.showYearHeaders),
+	}
 end
 
 ---@param mode MatchTableMode
@@ -817,14 +826,14 @@ function MatchTable:displayStats()
 		:wikitext(titleText)
 
 	local stats = Array.append({},
-		displayScores(self.stats.matches, 'matches'),
+		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
 		displayScores(self.stats.games, 'games')
 	)
 
 	return mw.html.create('div')
 		:node(titleNode)
 		:tag('div')
-			:wikitext(table.concat(stats, ' and '))
+			:wikitext(table.concat(stats, self.config.showOnlyGameStats and '' or ' and '))
 			:wikitext()
 			:done()
 end

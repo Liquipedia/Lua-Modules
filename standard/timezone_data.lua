@@ -115,6 +115,10 @@ return {
 		name = 'East Africa Time',
 		offset = {3, 0},
 	},
+	ECT = {
+		name = 'Ecuador Time',
+		offset = {-5, 0}
+	},
 	EDT = {
 		name = 'Eastern Daylight Time',
 		offset = {-4, 0},
