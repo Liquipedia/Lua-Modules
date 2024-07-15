@@ -146,7 +146,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		extradata = {
 			loanedto = args.team,
 			loanedtorole = args.teamrole,
-			newteamdate = args.newteamdate,
+			newteamdate = ReferenceCleaner.clean(args.newteamdate),
 			faction = Faction.read(args.faction or args.race),
 		},
 	}
