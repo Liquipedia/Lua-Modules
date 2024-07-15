@@ -23,21 +23,20 @@ local Opponent = OpponentLibraries.Opponent
 
 
 function MatchLegacy.storeMatch(match2, options)
-
-	if options.storeMatch1 then
-		local match = MatchLegacy._convertParameters(match2)
-
-		return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
+	if not options.storeMatch1 then
+		return
 	end
+
+	local match = MatchLegacy._convertParameters(match2)
+
+	return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
 end
 
 function MatchLegacy._convertParameters(match2)
-	local match = Table.deepCopy(match2)
-	for key, _ in pairs(match) do
-		if String.startsWith(key, 'match2') then
-			match[key] = nil
-		end
-	end
+	---@type {[any]: any}
+	local match = Table.filterByKey(Table.deepCopy(match2), function (key)
+		return not String.startsWith(key, 'match2')
+	end)
 
 	if match.walkover == 'FF' or match.walkover == 'DQ' then
 		match.resulttype = match.walkover:lower()

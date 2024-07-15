@@ -17,7 +17,7 @@ local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 ---@param match table
 ---@return boolean
-function WikiSpecific.defaultMatchHasDetails(match)
+function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact
 		or Logic.isNotEmpty(match.vod)
 		or not Table.isEmpty(match.links)
