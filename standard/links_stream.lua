@@ -170,7 +170,7 @@ function StreamLinks.display(streams, options)
 	return table.concat(displays, options.addSpace and ' ' or nil)
 end
 
----filters streams so that if english streams are present only those are returned
+---Filter non-english streams if english streams exists
 ---@param streamsInput {string: string}
 ---@return {string: string[]}
 function StreamLinks.filterStreams(streamsInput)
