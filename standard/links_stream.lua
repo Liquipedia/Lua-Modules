@@ -150,10 +150,8 @@ function StreamLinks.displaySingle(platform, streamValue)
 end
 
 ---@param streams {string: string[]}
----@param options {addSpace: boolean?}?
 ---@return string[]?
-function StreamLinks.buildDisplays(streams, options)
-	options = options or {}
+function StreamLinks.buildDisplays(streams)
 	local displays = {}
 	Array.forEach(StreamLinks.countdownPlatformNames, function(platform)
 		Array.forEach(streams[platform] or {}, function(streamValue)

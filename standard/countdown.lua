@@ -46,7 +46,7 @@ function Countdown._create(args)
 	if Logic.readBool(args.finished) then
 		wrapper:attr('data-finished', 'finished')
 	elseif not Logic.readBool(args.nostreams) then
-		streams = StreamLinks.buildDisplays(StreamLinks.filterStreams(args), {addSpace = true})
+		streams = StreamLinks.buildDisplays(StreamLinks.filterStreams(args))
 	end
 	if streams then
 		streams = table.concat(streams, ' ')
