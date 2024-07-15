@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
@@ -53,9 +54,7 @@ function CustomMatchGroupInput.processMatch(match)
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
-	match = matchFunctions.getVodStuff(match)
-
-	return match
+	return matchFunctions.getVodStuff(match)
 end
 
 -- called from Module:Match/Subobjects
@@ -63,9 +62,7 @@ end
 ---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
-	map = mapFunctions.getScoresAndWinner(map)
-
-	return map
+	return mapFunctions.getScoresAndWinner(map)
 end
 
 ---@param record table
@@ -88,11 +85,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 end
 
 -- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
+CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param data table
 ---@param indexedScores table[]
@@ -314,9 +307,7 @@ function mapFunctions.getScoresAndWinner(map)
 		end
 	end
 
-	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
-
-	return map
+	return CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
 end
 
 return CustomMatchGroupInput
