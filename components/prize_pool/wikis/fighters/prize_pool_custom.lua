@@ -74,6 +74,9 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	Array.forEach(Array.filter(placement.parent.prizes, function (prize)
 		return prize.type == PRIZE_TYPE_POINTS
 	end), function (prize)
+		if Opponent.isTbd(opponent.opponentData) then
+			return
+		end
 		CustomPrizePool.addPointsDatapoint(lpdbData, placement:getPrizeRewardForOpponent(opponent, prize.id))
 	end)
 
@@ -93,10 +96,6 @@ end
 ---@param data placement
 ---@param prize string|number|boolean?
 function CustomPrizePool.addPointsDatapoint(data, prize)
-	if data.opponenttype == Opponent.literal then
-		return
-	end
-
 	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
 		type = 'points',
 		name = data.extradata.circuit,
