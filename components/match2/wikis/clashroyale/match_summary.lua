@@ -79,6 +79,21 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+
+	end
+
 	local extradata = match.extradata or {}
 	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
 		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))

@@ -242,6 +242,7 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
+		mvp = MatchGroupInput.readMvp(match),
 	} --[[@as table]]
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
