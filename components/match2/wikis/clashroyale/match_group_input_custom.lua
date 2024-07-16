@@ -692,7 +692,7 @@ end
 function CustomMatchGroupInput._readCards(input)
 
 	return Array.map(Json.parseIfString(input) or {}, function(card)
-		if String.isEmpty(card) then return EMPTY_CARD end
+		if String.isEmpty(card) then return '' end
 		local cleanedCard =  CardNames[card]
 		assert(cleanedCard, 'Invalid Card "' .. card .. '"')
 		return cleanedCard
