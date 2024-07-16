@@ -63,9 +63,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	if not options.isStandalone then
-		match = matchFunctions.mergeWithStandalone(match)
-	end
+	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
+	--set it already here so in winner and result type processing we know it will get enriched later on
+	match.standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
 
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
@@ -77,6 +77,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	-- Adjust map data, especially set participants data
 	match = matchFunctions.adjustMapData(match)
+
+	if not options.isStandalone then
+		match = matchFunctions.mergeWithStandalone(match)
+	end
 
 	return match
 end
@@ -419,7 +423,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(match.finished) then
+	if Logic.readBool(match.finished) and not match.standaloneMatch then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -488,8 +492,7 @@ end
 ---@param match table
 ---@return table
 function matchFunctions.mergeWithStandalone(match)
-	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
-	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+	local standaloneMatch = match.standaloneMatch
 	if not standaloneMatch then
 		return match
 	end
