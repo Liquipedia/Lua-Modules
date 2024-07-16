@@ -25,6 +25,7 @@ end
 ---@param args table
 ---@return string
 function Countdown._create(args)
+	args = args or {}
 	if Logic.isEmpty(args.date) and not args.timestamp then
 		return ''
 	end
@@ -40,7 +41,7 @@ function Countdown._create(args)
 	end
 
 	-- Timestamp
-	local timestamp = args.timestamp or DateExt.readTimestampOrNil(args.date) or 'error'
+	local timestamp = args.timestamp or args.date:find('data%-tz="[%+%-]?%d') and DateExt.readTimestampOrNil(args.date) or 'error'
 	wrapper:attr('data-timestamp', timestamp)
 
 	local streams
