@@ -42,7 +42,7 @@ function Countdown._create(args)
 
 	-- Timestamp
 	local timestamp = args.timestamp or
-		args.date:find('data%-tz="[%+%-]?%d') and DateExt.readTimestampOrNil(args.date) or
+		(args.date:find('data%-tz="[%+%-]?%d') and DateExt.readTimestampOrNil(args.date)) or
 		'error'
 	wrapper:attr('data-timestamp', timestamp)
 
