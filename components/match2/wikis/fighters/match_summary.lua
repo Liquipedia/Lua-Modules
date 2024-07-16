@@ -115,14 +115,14 @@ function CustomMatchSummary._createGame(row, game, props)
 		true
 	)
 
-	row:addElement(chars1)
+	row:addElement(chars1):css('flex-basis', '30%')
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced'):css('flex-grow', '1')
+			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
 			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-	row:addElement(chars2)
+	row:addElement(chars2):css('flex-basis', '30%'):css('text-align', 'right')
 end
 
 ---@param characters {name: string, active: boolean}[]?
