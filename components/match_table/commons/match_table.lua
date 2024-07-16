@@ -824,13 +824,21 @@ function MatchTable:displayStats()
 		return table.concat(parts, ' ')
 	end
 
-	local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
-	local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
-	local titleText = 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
+	local makeStatsTitle = function()
+		if startTimeStamp == DateExt.defaultTimestamp and endTimeStamp == DateExt.defaultTimestamp then
+			return 'For all matches:'
+		elseif startTimeStamp == DateExt.defaultTimestamp then
+			return 'For all matches until '.. DateExt.formatTimestamp('M d, Y', endTimeStamp) .. ':'
+		end
+
+		local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
+		local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
+		return'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
+	end
 
 	local titleNode = mw.html.create('div')
 		:css('font-weight', 'bold')
-		:wikitext(titleText)
+		:wikitext(makeStatsTitle())
 
 	local stats = Array.append({},
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
