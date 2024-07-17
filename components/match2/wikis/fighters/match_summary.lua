@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 
@@ -131,10 +132,15 @@ end
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
-
 	local wrapper = mw.html.create('div')
-	Array.forEach(characters or {}, function (character, index)
+
+	if not characters or #characters == 0 then
+		return wrapper
+	end
+
+	if #characters == 1 then
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
+		local character = characters[1]
 		if not character.active then
 			characterDisplay:css('opacity', '0.3')
 		end
@@ -143,8 +149,23 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 		else
 			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		end
-		wrapper:node(characterDisplay)
+		return characterDisplay
+	end
+
+	local characterDisplays = Array.map(characters, function (character, index)
+		local characterDisplay = mw.html.create('span'):addClass('draft faction')
+		if not character.active then
+			characterDisplay:css('opacity', '0.3')
+		end
+		characterDisplay:wikitext(CharacterIcons[character.name])
+		return characterDisplay
 	end)
+
+	if reverse then
+		characterDisplays = Array.reverse(characterDisplays)
+	end
+
+	Array.forEach(characterDisplays, FnUtil.curry(wrapper.node, wrapper))
 
 	return wrapper
 end
