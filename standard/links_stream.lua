@@ -44,7 +44,10 @@ StreamLinks.countdownPlatformNames = {
 
 ---@param key string
 ---@return boolean
+---@overload fun(key: any): false
 function StreamLinks.isStream(key)
+	if type(key) ~= 'string' then return false end
+
 	return Array.any(StreamLinks.countdownPlatformNames, function(platform)
 		return String.startsWith(key, platform)
 	end)
@@ -71,12 +74,12 @@ end
 Extracts the streaming platform args from an argument table or a nested stream table inside the arguments table.
 Uses variable fallbacks and resolves stream redirects.
 ]]
----@param forwardedInputArgs {[string]: string|{[string]: string}}
+---@param forwardedInputArgs table
 ---@return table
 function StreamLinks.processStreams(forwardedInputArgs)
 	local streams = {}
 	if type(forwardedInputArgs.stream) == 'table' then
-		streams = forwardedInputArgs.stream --[[@as {[string]: string}]]
+		streams = forwardedInputArgs.stream
 		forwardedInputArgs.stream = nil
 	end
 
