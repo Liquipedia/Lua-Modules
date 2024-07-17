@@ -11,6 +11,7 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -134,9 +135,10 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 	local wrapper = mw.html.create('div')
 
-	if not characters or #characters == 0 then
+	if Table.isEmpty(characters) then
 		return wrapper
 	end
+	---@cast characters -nil
 
 	if #characters == 1 then
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
