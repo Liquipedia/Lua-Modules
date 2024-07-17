@@ -272,9 +272,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 		match.opponent2.autoscore = (match.opponent2.autoscore or 0) + (map.winner == 2 and 1 or 0)
 	end
 
-	-- get participants data for the map + get map mode + winnerfaction and loserfaction
-	--(w/l faction stuff only for 1v1 maps)
-	CustomMatchGroupInput.processPlayerMapData(map, match, 2)
+	CustomMatchGroupInput.processPlayersMapData(map, match, 2)
 
 	match['map' .. mapIndex] = map
 end
@@ -349,12 +347,19 @@ end
 ---@param map table
 ---@param match table
 ---@param numberOfOpponents integer
-function CustomMatchGroupInput.processPlayerMapData(map, match, numberOfOpponents)
+function CustomMatchGroupInput.processPlayersMapData(map, match, numberOfOpponents)
 	local participants = {}
 	for opponentIndex = 1, numberOfOpponents do
 		local opponent = match['opponent' .. opponentIndex]
-		if opponent.type == Opponent.solo then
-			CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex, participants)
+		if opponent.type ~= Opponent.literal then
+			local playerCount = Opponent.partySize(opponent.type) or MAX_NUM_PLAYERS
+			for playerIndex = 1, playerCount do
+				local player = opponent.match2players[playerIndex]
+				if player then
+					local playerData = CustomMatchGroupInput._processPlayerMapData(player, map, opponentIndex, playerIndex)
+					participants[opponentIndex .. '_' .. playerIndex] = playerData
+				end
+			end
 		end
 	end
 
@@ -364,13 +369,13 @@ end
 ---@param player table
 ---@param map table
 ---@param opponentIndex integer
----@param participants table<string, table>
----@return table<string, table>
-function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
+---@param playerIndex integer
+---@return {characters: {name: string, active: boolean}[], player: string}
+function CustomMatchGroupInput._processPlayerMapData(player, map, opponentIndex, playerIndex)
 	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
-	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p1']) or {} ---@type string[]
+	local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p' .. playerIndex]) or {} ---@type string[]
 
 	local characters = Array.map(charInputs, function(characterInput)
 		local character = MatchGroupInput.getCharacterName(CharacterStandardizationData, characterInput)
@@ -381,12 +386,10 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 		return {name = character, active = true}
 	end)
 
-	participants[opponentIndex .. '_1'] = {
+	return {
 		characters = characters,
 		player = player.name,
 	}
-
-	return participants
 end
 
 -- function to sort out winner/placements
