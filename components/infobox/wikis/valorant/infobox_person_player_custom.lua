@@ -156,15 +156,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@param args table
----@return string[]
-function CustomPlayer._getStatusContents(args)
-	if String.isEmpty(args.status) then
-		return {}
-	end
-	return {Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status}
-end
-
 ---@param role string?
 ---@return boolean?
 function CustomPlayer._isNotPlayer(role)
