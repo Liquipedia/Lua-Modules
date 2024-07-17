@@ -87,16 +87,6 @@ function CustomMatchSummary.addToFooter(match, footer)
 	return footer
 end
 
----@param match MatchGroupUtilMatch
----@param opponentType OpponentType
----@return boolean
-function CustomMatchSummary._isType(match, opponentType)
-	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
-		return false
-	end
-	return match.opponents[1].type == opponentType and match.opponents[2].type == opponentType
-end
-
 ---@param game MatchGroupUtilGame
 ---@param teamIdx integer
 ---@return {name: string, active: boolean}[]
