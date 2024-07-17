@@ -13,14 +13,14 @@ html.theme--dark .componentsinvert {
 	background:linear-gradient(to right, #286323, #7AF03C);
 	color:#FFF;
 	text-shadow:1px 1px 2px #000;
-	font-weight:bold;
+	font-weight: bold;
 }
 
 .manabar {
 	background:linear-gradient(to right, #1056DB, #73F5FE);
 	color:#FFF;
 	text-shadow:1px 1px 2px #000;
-	font-weight:bold;
+	font-weight: bold;
 }
 
 /* Infobox Cosmetic */
@@ -104,42 +104,42 @@ The smaller sizes are for sub-sections. */
 }
 
 .target_autocast {
-  position: relative;
-  z-index: 0;
-  width: 80px;
-  height: 80px;
-  overflow: hidden;
-  padding: 6px;
-  outline: 1px solid #333;
-  outline-offset: -4px;
+	position: relative;
+	z-index: 0;
+	width: 80px;
+	height: 80px;
+	overflow: hidden;
+	padding: 6px;
+	outline: 1px solid #333;
+	outline-offset: -4px;
 }
 
 .target_autocast::before {
-  content: '';
-  position: absolute;
-  z-index: -2;
-  left: -50%;
-  top: -50%;
-  width: 200%;
-  height: 200%;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-image: linear-gradient(#000, #fbb300);
-  animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+	content: '';
+	position: absolute;
+	z-index: -2;
+	left: -50%;
+	top: -50%;
+	width: 200%;
+	height: 200%;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-image: linear-gradient(#000, #fbb300);
+	animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
 }
 
 .target_autocast::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  left: 6px;
-  top: 6px;
-  width: calc(100% - 12px);
-  height: calc(100% - 12px);
-  border-radius: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	content: '';
+	position: absolute;
+	z-index: -1;
+	left: 6px;
+	top: 6px;
+	width: calc(100% - 12px);
+	height: calc(100% - 12px);
+	border-radius: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .target_autocast-off {
@@ -177,52 +177,52 @@ The smaller sizes are for sub-sections. */
 }
 
 *, *::before, *::after {
-  box-sizing: border-box;
+	box-sizing: border-box;
 }
 
 @keyframes rotate {
-  100% {
-    transform: rotate(1turn);
-  }
+	100% {
+		transform: rotate(1turn);
+	}
 }
 
 .target_autocast1 {
-  position: relative;
-  z-index: 0;
-  width: 40px;
-  height: 40px;
-  overflow: hidden;
-  padding: 3px;
-  outline: 1px solid #333;
-  outline-offset: -4px;
+	position: relative;
+	z-index: 0;
+	width: 40px;
+	height: 40px;
+	overflow: hidden;
+	padding: 3px;
+	outline: 1px solid #333;
+	outline-offset: -4px;
 }
 
 .target_autocast1::before {
-  content: '';
-  position: absolute;
-  z-index: -2;
-  left: -50%;
-  top: -50%;
-  width: 200%;
-  height: 200%;
-  background-color: transparent;
-  background-repeat: no-repeat;
-  background-image: linear-gradient(#000, #fbb300);
-  animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+	content: '';
+	position: absolute;
+	z-index: -2;
+	left: -50%;
+	top: -50%;
+	width: 200%;
+	height: 200%;
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-image: linear-gradient(#000, #fbb300);
+	animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
 }
 
 .target_autocast1::after {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  left: 6px;
-  top: 6px;
-  width: calc(100% - 12px);
-  height: calc(100% - 12px);
-  border-radius: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+	content: '';
+	position: absolute;
+	z-index: -1;
+	left: 6px;
+	top: 6px;
+	width: calc(100% - 12px);
+	height: calc(100% - 12px);
+	border-radius: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .target_autocast-off1 {
@@ -255,26 +255,24 @@ The smaller sizes are for sub-sections. */
 	animation: abilityDowntime 2.5s linear infinite;
 }
 
-@keyframes abilityDowntime
-{
-	0%
-	{
+@keyframes abilityDowntime {
+	0% {
 		height: 0;
 	}
-	25%
-	{
+
+	25% {
 		height: 0;
 	}
-	50%
-	{
+
+	50% {
 		height: 0;
 	}
-	75%
-	{
+
+	75% {
 		height: 100%;
 	}
-  	100%
-	{
+
+	100% {
 		height: 100%;
 	}
 }
@@ -314,9 +312,9 @@ The smaller sizes are for sub-sections. */
 }
 
 .spellagh {
-    font-weight: bold;
-    color: #A885FF;
-    text-shadow: 1px 1px 2px #000;
+	font-weight: bold;
+	color: #A885FF;
+	text-shadow: 1px 1px 2px #000;
 }
 
 .spelldesc:hover {
@@ -421,18 +419,18 @@ The smaller sizes are for sub-sections. */
 
 /* Infobox-related */
 .ib-tooltip {
-    padding: 0.2px;
-    border-top: 3px solid;
-    border-left: 1px solid;
-    border-right: 1px solid;
-    border-bottom: 1px solid;
-    text-align: center;
-    font-size: 70%;
-    font-weight: bold;
+	padding: 0.2px;
+	border-top: 3px solid;
+	border-left: 1px solid;
+	border-right: 1px solid;
+	border-bottom: 1px solid;
+	text-align: center;
+	font-size: 70%;
+	font-weight: bold;
 }
 
 .ib-tooltip:hover {
-    background-color: rgba(255, 215, 0, 0.5);
+	background-color: rgba(255, 215, 0, 0.5);
 }
 
 /* Spellunit-related */
@@ -443,58 +441,58 @@ The smaller sizes are for sub-sections. */
 }
 
 .spellunit_topage {
-    color: #E2E2E6;
-   	text-shadow: 1px 1px 2px #000;
+	color: #E2E2E6;
+	text-shadow: 1px 1px 2px #000;
 	font-weight: bold;
 }
 
 .spellunit_topage:hover {
-    color: #DAA520;
+	color: #DAA520;
 }
 
 .spellunit_hp {
-    display: flex;
-    max-width: 128px;
-    height: 21px;
-    padding: 2px;
-    background: linear-gradient(to right, #286323, #7AF03C);
-    border-bottom:1px solid #333;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 80%;
-    text-shadow: 0.7px 0.7px 1.2px #000;
-    text-align: center;
+	display: flex;
+	max-width: 128px;
+	height: 21px;
+	padding: 2px;
+	background: linear-gradient(to right, #286323, #7AF03C);
+	border-bottom:1px solid #333;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 80%;
+	text-shadow: 0.7px 0.7px 1.2px #000;
+	text-align: center;
 }
 
 .spellunit_mp {
-    display: flex;
-    max-width: 128px;
-    height: 21px;
-    padding: 2px;
-    background:linear-gradient(to right, #1056DB, #73F5FE);
-    border-bottom:1px solid #333;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 80%;
-    text-shadow: 0.7px 0.7px 1.2px #000;
-    text-align: center;
+	display: flex;
+	max-width: 128px;
+	height: 21px;
+	padding: 2px;
+	background:linear-gradient(to right, #1056DB, #73F5FE);
+	border-bottom:1px solid #333;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 80%;
+	text-shadow: 0.7px 0.7px 1.2px #000;
+	text-align: center;
 }
 
 .spellunit_cellt {
-    display: table-cell;
-    width: 30px;
-    height: 21px;
-    text-align: right;
+	display: table-cell;
+	width: 30px;
+	height: 21px;
+	text-align: right;
 }
 
 .spellunit_cellv {
-    display: table-cell;
-    padding-left: 8px;
-    width: 200px;
-    height: 21px;
-    text-align: left;
+	display: table-cell;
+	padding-left: 8px;
+	width: 200px;
+	height: 21px;
+	text-align: left;
 }
 
 /* Invokecard */
@@ -550,7 +548,7 @@ The smaller sizes are for sub-sections. */
 	padding-right: 5px;
 	padding-top: 5px;
 	border: 1px solid #505050;
-    color: #D9E0E8;
+	color: #D9E0E8;
 }
 
 .aghupgTitle {
@@ -566,8 +564,8 @@ The smaller sizes are for sub-sections. */
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
-	background-color: #1C2E50;
-	text-shadow: 1px 1px 2px #000;
+	background-color: hsl(219, 48%, 21%);
+	text-shadow: 1px 1px 2px #000000;
 	border: 2px solid #505050;
 	padding-left: 2px;
 	padding-right: 2px;
@@ -575,9 +573,9 @@ The smaller sizes are for sub-sections. */
 
 .aghupgShadow {
 	display: inline-block;
-	background: rgba(18, 26, 33, 0.7);
+	background: rgba( 18, 26, 33, 0.7 );
 	text-align: left;
-	margin-top: 0px;
+	margin-top: 0;
 	margin-bottom: 5px;
 	padding: 5px;
 	border: 1px solid #505050;
@@ -596,112 +594,112 @@ The smaller sizes are for sub-sections. */
 
 /* HeroGameplay-related */
 .gameplay_ {
-    color: #227722;
-    font-weight: bold;
+	color: #227722;
+	font-weight: bold;
 }
 
 .gameplay_agh {
-    color: #A50F79;
-    font-weight: bold;
+	color: #A50F79;
+	font-weight: bold;
 }
 
 .gameplay_shd {
-    color: #4B69FF;
-    font-weight: bold;
+	color: #4B69FF;
+	font-weight: bold;
 }
 
 .gameplay_tal {
-    color: #CF6A32;
-    font-weight: bold;
+	color: #CF6A32;
+	font-weight: bold;
 }
 
 .gameplay_talbutton {
-    color: #f3e494;
+	color: #f3e494;
 }
 
 .gameplay_talbutton:hover {
-    text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-    cursor: default;
+	text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+	cursor: default;
 }
 
 .gameplay_tallvl {
-    max-width: 450px;
-    color: #f3e494;
-    text-shadow: 1px 1px 8px transparent, -1px -1px 8px transparent;
-    border-left: 2px solid #131313;
-    border-right: 2px solid #131313;
+	max-width: 450px;
+	color: #f3e494;
+	text-shadow: 1px 1px 8px transparent, -1px -1px 8px transparent;
+	border-left: 2px solid #131313;
+	border-right: 2px solid #131313;
 }
 
 .gameplay_tallvl:hover {
-    text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-    cursor: default;
-    border-left: 2px solid #f3e494;
-    border-right: 2px solid #f3e494;
+	text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+	cursor: default;
+	border-left: 2px solid #f3e494;
+	border-right: 2px solid #f3e494;
 }
 
 .gameplay_taldesc {
-    color: #e2e2e6;
-    display: table-cell;
-    min-width: 200px;
-    text-shadow: initial;
-    font-weight: initial;
+	color: #e2e2e6;
+	display: table-cell;
+	min-width: 200px;
+	text-shadow: initial;
+	font-weight: initial;
 }
 
 .gameplay_taldesc:hover {
-    color: #e2e2e6;
-    text-shadow: initial;
-    font-weight: initial;
+	color: #e2e2e6;
+	text-shadow: initial;
+	font-weight: initial;
 }
 
 /* these two styles are same for the talent level hover glow */
 div.gameplay_nav {
-    display: block;
-    font-size: 24px;
+	display: block;
+	font-size: 24px;
 }
 
 div.gameplay_nav ul {
-    margin: 0 !important;
+	margin: 0 !important;
 }
 
 div.gameplay_nav ul li {
-    list-style: none;
-    display: inline-block;
-    padding: 5px;
-    position: relative;
-    text-decoration: none;
-    text-align: center;
+	list-style: none;
+	display: inline-block;
+	padding: 5px;
+	position: relative;
+	text-decoration: none;
+	text-align: center;
 }
 
 div.gameplay_nav li:hover {
-    background-color: rgb(78, 85, 87, 0.5);
+	background-color: rgb(78, 85, 87, 0.5);
 }
 
 div.gameplay_nav ul li ul {
-    opacity: 0;
-    position: absolute;
-    padding-left: 0;
-    left: 0;
-    display: inline-block;
+	opacity: 0;
+	position: absolute;
+	padding-left: 0;
+	left: 0;
+	display: inline-block;
 }
 
 div.gameplay_nav ul li:hover > ul,
 div.gameplay_nav ul li ul:hover {
-    opacity: 1;
-    display: block;
-    min-width: 450px;
-    padding: 5px;
-    box-shadow: 0px 3px 5px -1px rgb(88, 88, 88, 0.5);
-    background-color: rgb(19, 19, 19);
-    color: #E2E2E6;
-    font-size: 13px;
+	opacity: 1;
+	display: block;
+	min-width: 450px;
+	padding: 5px;
+	box-shadow: 0px 3px 5px -1px rgb(88, 88, 88, 0.5);
+	background-color: rgb(19, 19, 19);
+	color: #e2e2e6;
+	font-size: 13px;
 }
 
 div.gameplay_nav ul li ul li {
-    clear: both;
-    width: 100%;
-    text-align: center;
-    padding: 5px;
-    border-style: none;
+	clear: both;
+	width: 100%;
+	text-align: center;
+	padding: 5px;
+	border-style: none;
 }
 
 /* {{pp-template}} */
@@ -735,23 +733,23 @@ div.gameplay_nav ul li ul li {
 
 /* HeroGameplay-related */
 .gameplay_ {
-    color: #227722;
-    font-weight:bold;
+	color: #227722;
+	font-weight: bold;
 }
 
 .gameplay_agh {
-    color: #A50F79;
-    font-weight:bold;
+	color: #A50F79;
+	font-weight: bold;
 }
 
 .gameplay_shd {
-    color: #4B69FF;
-    font-weight:bold;
+	color: #4B69FF;
+	font-weight: bold;
 }
 
 .gameplay_tal {
-    color: #CF6A32;
-    font-weight:bold;
+	color: #CF6A32;
+	font-weight: bold;
 }
 
 /* first line here deals with new situation after RemexHTML switch,
@@ -804,9 +802,8 @@ div.gameplay_nav ul li ul li {
 	margin-left: 50px;
 }
 
-
 .cosm-inf-setname {
-	background-color: var(--table-green-background-color);
+	background-color: var( --table-green-background-color );
 }
 
 /* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
@@ -1022,7 +1019,7 @@ div.heroentrytext {
 
 .mp-content-header {
 	padding: 0.5em 0;
-	/* Header background color  */
+	/* Header background color */
 	border: 0;
 	border-bottom: 1px solid #b44335;
 	background: #b44335;
@@ -1067,7 +1064,7 @@ div.heroentrytext {
 	min-width: 64px;
 	max-width: 128px;
 	width: 100%;
-	/* Image sizes.  Re-produce larger? */
+	/* Image sizes. Re-produce larger? */
 	height: auto;
 }
 
@@ -1625,7 +1622,7 @@ img.pixelart {
 	margin-left: -31px;
 	width: 24px;
 	height: 24px;
-// TODO: Steam icon
+	// TODO: Steam icon
 	content: "";
 	pointer-events: none;
 }
@@ -1635,7 +1632,7 @@ img.pixelart {
 	margin-left: -31px;
 	width: 24px;
 	height: 24px;
-// TODO: Steam icon
+	// TODO: Steam icon
 	content: "";
 	pointer-events: none;
 }
@@ -1647,6 +1644,7 @@ img.pixelart {
 html.theme--dark .patch-layout {
 	border: 1px solid #555;
 }
+
 .patch-layout {
 	width: 100%;
 	border: 1px solid #aaaaaa;
@@ -1657,6 +1655,7 @@ html.theme--dark .patch-layout {
 html.theme--dark .patch-layout-last {
 	background: #202d78;
 }
+
 .patch-layout-last {
 	background: #b2d7e9;
 }
@@ -1664,6 +1663,7 @@ html.theme--dark .patch-layout-last {
 html.theme--dark .patch-layout-all {
 	background: #313c7e;
 }
+
 .patch-layout-all {
 	width: 27%;
 	background: #dee8ed;
@@ -1673,6 +1673,7 @@ html.theme--dark .patch-layout-background {
 	background-color: rgba(41,41,41,0.7);
 	border: 1px solid #555;
 }
+
 .patch-layout-background {
 	background-color: #fdfaf8;
 	border: 1px solid #aaaaaa;
@@ -1735,6 +1736,7 @@ a.ext-audiobutton {
 	&[ data-state='pause' ]:before {
 		content: '\f28b' !important;
 	}
+
 	&[ data-state='error' ]:before {
 		color: #91663D;
 		content: '\f059' !important;
@@ -1746,6 +1748,7 @@ a.ext-audiobutton {
 	blockquote.quote::before {
 		top: -40px;
 	}
+
 	blockquote.quote::after {
 		top: -40px;
 		bottom: 0;
