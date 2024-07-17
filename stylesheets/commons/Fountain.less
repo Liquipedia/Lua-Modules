@@ -1,0 +1,1753 @@
+/* Temporary: Hide Errors from logged out users */
+.logged-out .scribunto-error {
+	display: none;
+}
+
+/* Invert colors for dark theme */
+html.theme--dark .componentsinvert {
+	filter: invert(1)
+}
+
+/* Infobox Hero */
+.healthbar {
+	background:linear-gradient(to right, #286323, #7AF03C);
+	color:#FFF;
+	text-shadow:1px 1px 2px #000;
+	font-weight:bold;
+}
+
+.manabar {
+	background:linear-gradient(to right, #1056DB, #73F5FE);
+	color:#FFF;
+	text-shadow:1px 1px 2px #000;
+	font-weight:bold;
+}
+
+/* Infobox Cosmetic */
+.infobox-cosmetic-tradeable, .infobox-cosmetic-marketable {
+	background: radial-gradient(50% 50% at 50% 50%, #03386F 0%, #030D1A 100%);
+	font-weight: 700;
+	color: #4898ED; // TODO: Need support for both true and false, this is the true color, false is #9f7669
+}
+
+.infobox-cosmetic-deletable {
+	background: radial-gradient(50% 50% at 50% 50%, #262A30 0%, #000000 100%);
+	font-weight: 700;
+	color: #747B82; // TODO: Need support for both true and false, this is the false color, true is not defined
+}
+
+/* Text Colors */
+.text-color {
+	&-gold {
+		color: #DAA520;
+	}
+}
+/* Template:Cf */
+a.cf {
+	font-weight: bold;
+	color: #FFF;
+	text-shadow: 1px 1px 2px #000;
+}
+
+
+/* Custom Diagrams */
+.diagram svg defs g path {
+	stroke: currentColor;
+	fill: currentColor;
+}
+
+.diagram svg defs g ellipse {
+	stroke: currentColor;
+	fill: currentColor;
+}
+
+/* Spellcard Ability Borders
+The smaller sizes are for sub-sections. */
+.target_passive,
+.target_aura {
+	border: 0px;
+} /* Passive ability will have an overlay instead. */
+
+.target_no,
+.target_unit,
+.target_area,
+.target_ground,
+.target_point {
+	border-top: 6px solid #899499;
+	border-bottom: 6px solid #212F3D;
+	border-right: 6px solid #595959;
+	border-left: 6px solid #A7A7A7;
+}
+
+.target_toggle {
+	border: 6px solid #FC9303;
+}
+
+.target_altcast {
+	outline: 4px solid #F5F5F5;
+	outline-offset: -6px;
+	border-top: 6px solid #899499;
+	border-bottom: 6px solid #212F3D;
+	border-right: 6px solid #595959;
+	border-left: 6px solid #A7A7A7;
+}
+
+/* Spellcard Ability Borders (Autocast Animations) */
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+@keyframes rotate {
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+.target_autocast {
+  position: relative;
+  z-index: 0;
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  padding: 6px;
+  outline: 1px solid #333;
+  outline-offset: -4px;
+}
+
+.target_autocast::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(#000, #fbb300);
+  animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+}
+
+.target_autocast::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 6px;
+  top: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  border-radius: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.target_autocast-off {
+	border: 6px ridge #899499;
+}
+
+.target_aam {
+	border: 6px solid #999;
+	border-image: linear-gradient(-45deg, #FC9303, #899499 73%);
+	border-image-slice: 1;
+}
+
+.target_no1,
+.target_unit1,
+.target_area1,
+.target_ground1,
+.target_point1 {
+	border-top: 3px solid #899499;
+	border-bottom: 3px solid #212F3D;
+	border-right: 3px solid #595959;
+	border-left: 3px solid #A7A7A7;
+}
+
+.target_toggle1 {
+	border: 3px solid #FC9303;
+}
+
+.target_altcast1 {
+	outline: 2px solid #F5F5F5;
+	outline-offset: -3px;
+	border-top: 3px solid #899499;
+	border-bottom: 3px solid #212F3D;
+	border-right: 3px solid #595959;
+	border-left: 3px solid #A7A7A7;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.target_autocast1 {
+  position: relative;
+  z-index: 0;
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  padding: 3px;
+  outline: 1px solid #333;
+  outline-offset: -4px;
+}
+
+.target_autocast1::before {
+  content: '';
+  position: absolute;
+  z-index: -2;
+  left: -50%;
+  top: -50%;
+  width: 200%;
+  height: 200%;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(#000, #fbb300);
+  animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+}
+
+.target_autocast1::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: 6px;
+  top: 6px;
+  width: calc(100% - 12px);
+  height: calc(100% - 12px);
+  border-radius: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.target_autocast-off1 {
+	border: 3px ridge #899499;
+}
+
+.target_aam1 {
+	border: 3px solid #999;
+	border-image: linear-gradient(-45deg, #FC9303, #899499 73%);
+	border-image-slice: 1;
+}
+
+.target_downtime1 {
+	width: 86px;
+	height: 86px;
+	box-sizing: border-box;
+	border: 0px;
+}
+
+.target_downtime1:before,
+.item_cdshare:before
+{
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(117, 117, 117, 0.55);
+	animation: abilityDowntime 2.5s linear infinite;
+}
+
+@keyframes abilityDowntime
+{
+	0%
+	{
+		height: 0;
+	}
+	25%
+	{
+		height: 0;
+	}
+	50%
+	{
+		height: 0;
+	}
+	75%
+	{
+		height: 100%;
+	}
+  	100%
+	{
+		height: 100%;
+	}
+}
+
+/* Spellcard Item-cooldown Sharing */
+.item_cdshare {
+	width: 88px;
+	height: 64px;
+	box-sizing: border-box;
+	border: 0px;
+}
+
+/* Spellcard-related */
+.irisbox {
+	max-width: 460px;
+	width: 100%;
+}
+
+.spelltad { /* Spellcard Target/Affect/Damage (TAD) */
+	display: inline-block;
+	font-size: 90%;
+	vertical-align: top;
+	width: 13%;
+	text-align: right;
+}
+
+.spelltad_value {
+	flex: 1 0 auto;
+	display: inline-block;
+	padding-left: 5px;
+	font-size: 90%;
+	vertical-align: top;
+}
+
+.spelldesc {
+	border-top:1px solid #333;
+}
+
+.spellagh {
+    font-weight: bold;
+    color: #A885FF;
+    text-shadow: 1px 1px 2px #000;
+}
+
+.spelldesc:hover {
+	border-top:1px solid #999;
+}
+
+.spelltrait_value {
+	vertical-align: middle;
+	font-size: 95%;
+	min-height: 23px;
+	height: auto;
+	width: 100%;
+	max-width: 450px;
+}
+
+.spellcost_icon {
+	vertical-align: text-top;
+	text-align: center;
+	width: 25px;
+	height: 25px;
+}
+
+.spellcost_value {
+	font-size: 90%;
+	vertical-align: text-top;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	padding-left: 1px;
+	padding-right: 1px;
+}
+
+.spelltype_mpcost {
+	border-top: 4px double #3590E8;
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+	max-width: 450px;
+}
+
+.spelltype_hpcost {
+	border-top: 4px double #55B231;
+	display: inline-block;
+	text-align: center;
+	width: 100%;
+	max-width: 450px;
+}
+
+.spelltype_sublink {
+	border-top: 1px solid #333;
+	width: 100%;
+	max-width: 450px;
+}
+
+.spelllore {
+	display: inline-block;
+	text-align: center;
+	background-color: #282828C4;
+	padding: 2px;
+	font-size: 85%;
+	font-style: italic;
+	color: #E2E2E2;
+	outline: 1px solid rgba(226, 226, 226, 0.2);
+	width: 100%;
+	max-width: 450px;
+}
+
+.spellintern {
+	cursor: default;
+	padding: 3px;
+	font-size: 70%;
+	border: 1px solid #7681968C;
+}
+
+.spellintern:hover {
+	border: 1px solid #768196;
+}
+
+.iconrotate {
+	transition: all 6s;
+}
+
+.iconrotate:hover {
+	transform: rotate(1080deg);
+}
+
+.spellvalueTable {
+	display: table;
+}
+
+.i-row,
+.spellvalueTableRow {
+	display: table-row;
+}
+
+.spellvalueTableCell {
+	display: table-cell;
+	text-align: center;
+	padding: 3px;
+	border-bottom: 1px solid;
+	height: 35px;
+}
+
+/* Infobox-related */
+.ib-tooltip {
+    padding: 0.2px;
+    border-top: 3px solid;
+    border-left: 1px solid;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
+    text-align: center;
+    font-size: 70%;
+    font-weight: bold;
+}
+
+.ib-tooltip:hover {
+    background-color: rgba(255, 215, 0, 0.5);
+}
+
+/* Spellunit-related */
+.spellunit_link {
+	color: #E2E2E6;
+	text-shadow: 1px 1px 2px #000;
+	font-weight: bold;
+}
+
+.spellunit_topage {
+    color: #E2E2E6;
+   	text-shadow: 1px 1px 2px #000;
+	font-weight: bold;
+}
+
+.spellunit_topage:hover {
+    color: #DAA520;
+}
+
+.spellunit_hp {
+    display: flex;
+    max-width: 128px;
+    height: 21px;
+    padding: 2px;
+    background: linear-gradient(to right, #286323, #7AF03C);
+    border-bottom:1px solid #333;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 80%;
+    text-shadow: 0.7px 0.7px 1.2px #000;
+    text-align: center;
+}
+
+.spellunit_mp {
+    display: flex;
+    max-width: 128px;
+    height: 21px;
+    padding: 2px;
+    background:linear-gradient(to right, #1056DB, #73F5FE);
+    border-bottom:1px solid #333;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 80%;
+    text-shadow: 0.7px 0.7px 1.2px #000;
+    text-align: center;
+}
+
+.spellunit_cellt {
+    display: table-cell;
+    width: 30px;
+    height: 21px;
+    text-align: right;
+}
+
+.spellunit_cellv {
+    display: table-cell;
+    padding-left: 8px;
+    width: 200px;
+    height: 21px;
+    text-align: left;
+}
+
+/* Invokecard */
+.invokeCard {
+	font-size: 85%;
+	width: 100px;
+	height: 100px;
+	margin: 5px;
+	border: 1px solid rgba(51, 51, 51, 0.5);
+	background-color: rgba(51, 51, 51, 0.5);
+}
+
+.invokeCard:hover {
+	border: 1px solid #F7F7F7;
+}
+
+.invokePad {
+	padding: 4px;
+}
+
+/* Facetcard-related */
+.facetBox {
+	background: rgba(35, 46, 52, 0.25);
+	padding: 5px;
+	border: 1px solid #505050;
+	color: white;
+	transition: 0.35s;
+}
+
+.facetBox:hover {
+	border: 1px solid #F7F7F7;
+}
+
+.facetTitle {
+	cursor: help;
+}
+
+.facetLink {
+	font-weight: bold;
+	color: #E2E2E6;
+	text-shadow: 1px 1px 2px #000;
+}
+
+/* Aghcard-related */
+.aghupgBody {
+	display: inline-block;
+	max-width: 460px;
+	width: 100%;
+	font-size: 90%;
+	background: rgba(35, 46, 52, 0.75);
+	text-align: left;
+	padding-left: 5px;
+	padding-right: 5px;
+	padding-top: 5px;
+	border: 1px solid #505050;
+    color: #D9E0E8;
+}
+
+.aghupgTitle {
+	font-weight: bold;
+	color: #A885FF;
+	text-shadow: 1px 1px 2px #000;
+	flex-grow: 1;
+}
+
+.aghupgNew {
+	text-align: center;
+	border-radius: 3px;
+	font-weight: bold;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	background-color: #1C2E50;
+	text-shadow: 1px 1px 2px #000;
+	border: 2px solid #505050;
+	padding-left: 2px;
+	padding-right: 2px;
+}
+
+.aghupgShadow {
+	display: inline-block;
+	background: rgba(18, 26, 33, 0.7);
+	text-align: left;
+	margin-top: 0px;
+	margin-bottom: 5px;
+	padding: 5px;
+	border: 1px solid #505050;
+	width: 100%;
+}
+
+.aghupgShadow:hover {
+	background-color: rgba(9, 13, 17, 1);
+	transition: 0.15s;
+}
+
+.aghupgDesc {
+	vertical-align: top;
+	padding: 0px;
+}
+
+/* HeroGameplay-related */
+.gameplay_ {
+    color: #227722;
+    font-weight: bold;
+}
+
+.gameplay_agh {
+    color: #A50F79;
+    font-weight: bold;
+}
+
+.gameplay_shd {
+    color: #4B69FF;
+    font-weight: bold;
+}
+
+.gameplay_tal {
+    color: #CF6A32;
+    font-weight: bold;
+}
+
+.gameplay_talbutton {
+    color: #f3e494;
+}
+
+.gameplay_talbutton:hover {
+    text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+    cursor: default;
+}
+
+.gameplay_tallvl {
+    max-width: 450px;
+    color: #f3e494;
+    text-shadow: 1px 1px 8px transparent, -1px -1px 8px transparent;
+    border-left: 2px solid #131313;
+    border-right: 2px solid #131313;
+}
+
+.gameplay_tallvl:hover {
+    text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+    cursor: default;
+    border-left: 2px solid #f3e494;
+    border-right: 2px solid #f3e494;
+}
+
+.gameplay_taldesc {
+    color: #e2e2e6;
+    display: table-cell;
+    min-width: 200px;
+    text-shadow: initial;
+    font-weight: initial;
+}
+
+.gameplay_taldesc:hover {
+    color: #e2e2e6;
+    text-shadow: initial;
+    font-weight: initial;
+}
+
+/* these two styles are same for the talent level hover glow */
+div.gameplay_nav {
+    display: block;
+    font-size: 24px;
+}
+
+div.gameplay_nav ul {
+    margin: 0 !important;
+}
+
+div.gameplay_nav ul li {
+    list-style: none;
+    display: inline-block;
+    padding: 5px;
+    position: relative;
+    text-decoration: none;
+    text-align: center;
+}
+
+div.gameplay_nav li:hover {
+    background-color: rgb(78, 85, 87, 0.5);
+}
+
+div.gameplay_nav ul li ul {
+    opacity: 0;
+    position: absolute;
+    padding-left: 0;
+    left: 0;
+    display: inline-block;
+}
+
+div.gameplay_nav ul li:hover > ul,
+div.gameplay_nav ul li ul:hover {
+    opacity: 1;
+    display: block;
+    min-width: 450px;
+    padding: 5px;
+    box-shadow: 0px 3px 5px -1px rgb(88, 88, 88, 0.5);
+    background-color: rgb(19, 19, 19);
+    color: #E2E2E6;
+    font-size: 13px;
+}
+
+div.gameplay_nav ul li ul li {
+    clear: both;
+    width: 100%;
+    text-align: center;
+    padding: 5px;
+    border-style: none;
+}
+
+/* {{pp-template}} */
+.treeview ul {
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+.treeview li {
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	list-style-image: none;
+}
+
+.treeview li::after {
+	display: block;
+	content: "";
+	clear: both;
+}
+
+.treeview li li {
+	/* @noflip */
+	padding-left: 21px;
+	text-indent: 0.3em;
+}
+
+.treeview li li:last-child {
+	background-position: 0 -5971px;
+}
+
+/* HeroGameplay-related */
+.gameplay_ {
+    color: #227722;
+    font-weight:bold;
+}
+
+.gameplay_agh {
+    color: #A50F79;
+    font-weight:bold;
+}
+
+.gameplay_shd {
+    color: #4B69FF;
+    font-weight:bold;
+}
+
+.gameplay_tal {
+    color: #CF6A32;
+    font-weight:bold;
+}
+
+/* first line here deals with new situation after RemexHTML switch,
+ * where emptyline cause the first child to become the 2nd child. Such a mess
+ */
+.treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
+.treeview li.emptyline > ul > li:first-child {
+	background-position: 0 9px;
+}
+
+/***************************
+* Used by [[Template:Key press]] *
+****************************/
+.key {
+	display: inline-block;
+	white-space: nowrap;
+}
+
+.key kbd {
+	padding: 0.1em 0.6em 0.1em 0.6em;
+	margin-right: 2px;
+	font-size: 85%;
+	font-family: inherit;
+	font-style: normal;
+	border-radius: 0.4em;
+}
+
+.keys {
+	border: 1px solid #111111;
+	box-shadow: 0 0.2em rgba( 0, 0, 0, 0.5 );
+	background-color: #505459;
+	background-image: linear-gradient( to bottom, #505459, #282828 );
+	color: #eeeeee;
+}
+
+/******************************
+* End Template:Key press coloration *
+*******************************/
+
+/* Recent Changes */
+.mw-rcfilters-ui-changesListWrapperWidget {
+	right: 50px;
+}
+
+.mw-rcfilters-ui-changesListWrapperWidget h4 {
+	padding-left: 50px;
+}
+
+.mw-rcfilters-ui-changesListWrapperWidget-previousChangesIndicator {
+	margin-left: 50px;
+}
+
+
+.cosm-inf-setname {
+	background-color: var(--table-green-background-color);
+}
+
+/* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
+.updatetablehead {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	border-top: 1px solid #aaaaaa;
+	border-right: 1px solid #aaaaaa;
+	border-left: 1px solid #aaaaaa;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablebody {
+	overflow-x: auto;
+	border: 1px solid #aaaaaa;
+	border-top: 0;
+}
+
+.updatetablehead #patch,
+.updatetablehead #version,
+.updatetablehead #date,
+.updatetablebody #patch,
+.updatetablebody #version {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 120px;
+	flex: 0 0 120px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablebody #date {
+	max-width: 100px;
+	text-align: center;
+	font-size: 85%;
+}
+
+.updatetablehead #description,
+.updatetablebody #description {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+}
+
+.updatetablebody #description {
+	padding: 4px 0;
+}
+
+.updatetablebody #entry {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	border-top: 1px solid #aaaaaa;
+}
+
+.updatetablebody ul {
+	margin: 0 0 0 1.6em;
+}
+
+/* Template:GameVersionTableElement */
+.gvt-el-significant {
+	background: #ffffcc !important;
+}
+
+/* Template:Talent table el */
+.tte-right-tal-slot {
+	height: 40px;
+	padding: 0;
+	border-bottom: solid 2px #000000;
+	background: #eff5ff !important;
+}
+
+/* Item Grid Styling on [[Item Grid]] */
+
+ul.shopnav {
+	margin: 0;
+	list-style: none;
+}
+
+ul.shopnav li {
+	margin: 4px;
+	-webkit-box-shadow: 0 0 1px 2px #008000;
+	box-shadow: 0 0 1px 2px #008000;
+}
+
+/* Item List Styling on [[Items]] */
+
+div.itemlist {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	font-weight: 500;
+}
+
+div.itemlist > div {
+	-ms-flex-preferred-size: 400px;
+	flex-basis: 400px;
+	padding: 3px 0;
+}
+
+/* Hero Infostrip */
+
+div.infostripe {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow: hidden;
+	-webkit-box-align: stretch;
+	-ms-flex-align: stretch;
+	align-items: stretch;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	color: #ffffff;
+	vertical-align: top;
+	text-align: center;
+	text-shadow: 0 0 5px #000000;
+	font-size: 20px;
+}
+
+div.infostripe a,
+div.infostripe a:link,
+div.infostripe a:visited,
+div.infostripe a:hover,
+div.infostripe a:active {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.gradient_gameplay {
+	background: -webkit-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	background: -o-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	background: linear-gradient( 15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+}
+
+.gradient_cosmetics {
+	background: -webkit-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	background: -o-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	background: linear-gradient( 15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+}
+
+.gradient_audio {
+	background: -webkit-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	background: -o-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	background: linear-gradient( 15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+}
+
+.gradient_history {
+	background: -webkit-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	background: -o-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	background: linear-gradient( 15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+}
+
+div.infostripe div {
+	margin: 0 -2px;
+	padding: 15px 25px 10px;
+	border-right: 4px solid rgba( 75, 75, 75, 0.5 );
+	border-left: 4px solid rgba( 75, 75, 75, 0.5 );
+}
+
+/* Hero entry - used in hero tables and cosmetic infoboxes */
+
+div.heroentry {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	margin: 1px;
+	width: 110px;
+	height: 62px;
+}
+
+div.heroentry div {
+	position: absolute;
+}
+
+div.heroentrytext {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: end;
+	-ms-flex-align: end;
+	align-items: flex-end;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
+	justify-content: center;
+	margin: 1px 2px;
+	width: 106px;
+	height: 60px;
+	color: #ffffff;
+	text-align: center;
+	text-shadow: -1px 0 0.2em #000000, 0 1px 0.2em #000000, 1px 0 0.2em #000000, 0 -1px 0.2em #000000;
+	font-size: 11px;
+	line-height: 15px;
+	pointer-events: none;
+}
+
+/* Main Page styling */
+
+.mp-content-table {
+	/* Main border color		*/
+	margin: 0.5em 0;
+	width: 100%;
+	/* Body background color	*/
+	border: 1px solid #b44335;
+	background: #fefeff;
+}
+
+.mp-content-header {
+	padding: 0.5em 0;
+	/* Header background color  */
+	border: 0;
+	border-bottom: 1px solid #b44335;
+	background: #b44335;
+	color: #ffffff;
+	font-size: 140%;
+	/* Main border color		*/
+}
+
+.mp-content-body {
+	padding: 0.5em;
+}
+
+/* Don't wordwrap top links on main page */
+
+.mp-content-table ul > li a.external.text,
+.mp-content-table ul > li > b > a {
+	white-space: nowrap;
+}
+
+.mp-content-header-alt,
+.mp-title-gradient {
+	background: #b44335;
+	color: #ffffff;
+}
+
+.mp-content-header-alt {
+	margin: -0.5em -0.5em 0;
+	padding: 0.5em;
+	padding-left: 0.75em;
+	border: 0;
+	border-bottom: 1px solid #b44335;
+	color: #ffffff;
+	/* Main border color		*/
+	text-align: left;
+	font-weight: bold;
+	font-size: 140%;
+}
+
+/* Auto-size main page index icons */
+
+.mp-index-icon {
+	min-width: 64px;
+	max-width: 128px;
+	width: 100%;
+	/* Image sizes.  Re-produce larger? */
+	height: auto;
+}
+
+/* The main page banner */
+
+.giant-banner {
+	margin-bottom: 20px;
+}
+
+.giant-banner img {
+	-o-object-fit: cover;
+	object-fit: cover;
+	-o-object-position: center;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
+
+#mw-js-message,
+.usermessage {
+	margin-bottom: 39px !important;
+}
+
+#mp-layout {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+}
+
+#mp-layout #mp-left {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	margin-right: 1em;
+}
+
+#mp-layout #mp-right {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 500px;
+	flex: 0 0 500px;
+}
+
+#mp-layout .mp-block {
+	margin-bottom: 1em;
+	padding: 1em;
+	border: solid 1px #660000;
+}
+
+#mp-layout .mp-block#battle-pass {
+	padding: 0;
+	border: 0;
+	background: #000000;
+	text-align: center;
+}
+
+#mp-layout .mp-heading {
+	height: 50px;
+	border-bottom: solid 1px #cccccc;
+	text-align: center;
+	font-weight: bold;
+	font-size: 170%;
+}
+
+#mp-layout #heroes .mp-content {
+	text-align: center;
+}
+
+.useful-articles-layout {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+}
+
+.useful-articles-layout > div {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 33%;
+	flex: 0 0 33%;
+	max-width: 33%;
+	word-wrap: break-word;
+}
+
+.useful-articles-layout > div > div:first-child {
+	text-align: center;
+	font-weight: bold;
+}
+
+/* End Main Page style */
+
+/* Sidebar */
+
+div#bodyContent2 {
+	margin-right: 320px;
+	min-height: 920px;
+	width: auto;
+	font-size: 0.8em;
+	line-height: 1.5em;
+}
+
+/* Fixing vector/main-ltr.css putting a white background on the Quotation template */
+
+table.quotation {
+	background: transparent !important;
+}
+
+/* Client-side image scaling */
+
+.images40pxwidth img {
+	width: 40px;
+	height: auto;
+}
+
+/* Cosmetic label styles [[Template:Cosmetic]] */
+
+.cosmetic-label {
+	display: inline-block;
+	margin: 7px 5px 0;
+	vertical-align: top;
+	text-align: center;
+	line-height: normal;
+}
+
+.cosmetic-label > div {
+	margin-bottom: 5px;
+}
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist {
+	width: 100%;
+}
+
+div.skilllist-title {
+	border: 1px solid #aaaaaa;
+	background-color: #ffaea3;
+	color: #000000;
+	text-align: center;
+	font-weight: bold;
+	font-size: 100%;
+}
+
+div.skilllist ul {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	overflow: hidden;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	margin: 0;
+	padding: 0;
+}
+
+li.skilllist-lite {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 3px;
+	border: 1px solid #aaaaaa;
+	color: #ffffff;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 110%;
+}
+
+li.skilllist-rich {
+	display: inline-block;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 3px;
+	border: 1px solid #aaaaaa;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
+}
+
+div.skilllist-rich-head {
+	padding: 3px 5px;
+	border-bottom: 1px solid #000000;
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 110%;
+}
+
+div.skilllist-rich-image {
+	display: inline-block;
+	width: 64px;
+	vertical-align: top;
+}
+
+div.skilllist-rich-desc {
+	display: inline-block;
+	padding: 3px 5px;
+	max-width: calc( ~"100% - 74px" );
+	vertical-align: top;
+}
+
+div.skilllist li.skilllist-lite a,
+div.skilllist li.skilllist-lite a:link,
+div.skilllist li.skilllist-lite a:visited,
+div.skilllist li.skilllist-lite a:hover,
+div.skilllist li.skilllist-lite a:active,
+li.skilllist-rich div.skilllist-rich-head a,
+li.skilllist-rich div.skilllist-rich-head a:link,
+li.skilllist-rich div.skilllist-rich-head a:visited,
+li.skilllist-rich div.skilllist-rich-head a:hover,
+li.skilllist-rich div.skilllist-rich-head a:active {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+/***************************
+* Desktop Specific Styles *
+***************************/
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist-col1 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 100%;
+	flex: 1 0 100%;
+	width: 100%;
+}
+
+div.skilllist-col2 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 50%;
+	flex: 1 0 50%;
+	width: 50%;
+}
+
+div.skilllist-col3 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 calc( 100%/3 );
+	flex: 1 0 calc( 100%/3 );
+	width: calc( 100%/3 );
+}
+
+div.skilllist-col4 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 25%;
+	flex: 1 0 25%;
+	width: 25%;
+}
+
+div.skilllist-col5 ul li {
+	-webkit-box-flex: 1;
+	-ms-flex: 1 0 20%;
+	flex: 1 0 20%;
+	width: 20%;
+}
+
+/******************************************
+* Custom Context Menu for Audio Download *
+*******************************************/
+
+#context-menu {
+	position: absolute;
+	display: none;
+}
+
+#context-menu ul,
+#context-menu li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: #ffaea3;
+}
+
+#context-menu {
+	border: solid 1px #cccccc;
+}
+
+#context-menu li {
+	border-bottom: solid 1px #cccccc;
+}
+
+#context-menu li:last-child {
+	border: 0;
+}
+
+#context-menu li a {
+	display: block;
+	padding: 2px 5px;
+	text-decoration: none;
+	color: #000000;
+	font-family: sans-serif;
+	font-size: 0.875em;
+}
+
+#context-menu li a:hover {
+	background: #b44335;
+	color: #ffffff;
+}
+
+.ability-description {
+	display: block;
+	float: right;
+	width: 312px;
+}
+
+.ability-description.adItemOrRune {
+	width: 450px;
+}
+
+.aml50 {
+	margin-left: 50px;
+}
+
+.talsymbolbg {
+	display: inline-block;
+	vertical-align: top;
+	background-color: #151515;
+	box-shadow: 1px 1px 1.5px #000000;
+	border-width: 1px;
+	border-radius: 50%;
+	padding: 0 0;
+	margin: 0 0;
+	overflow: hidden;
+}
+
+/* Import fonts */
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( "woff" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff ) format( "woff" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff ) format( "woff" );
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff ) format( "woff" );
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf ) format( "truetype" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf ) format( "truetype" );
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf ) format( "truetype" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf ) format( "truetype" );
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+/*
+* === Ability template ===
+*/
+.ability-background {
+	flex: 0 1 460px;
+	margin-right: 15px;
+	vertical-align: top;
+}
+
+/*
+* === Relics ===
+*/
+.relics {
+	width: 140px;
+	margin: 5px;
+	border: 1px solid #111111;
+	font-size: 80%;
+}
+
+/*
+* === FONTS ===
+*/
+
+@font-face {
+	font-family: "Open Sans Semibold";
+	src: local( "Open Sans Semibold" ), url( /media/hydra/fonts/OpenSans-Semibold.ttf ) format( "truetype" );
+}
+
+/*
+* === GENERAL STYLES ===
+*/
+
+/*
+* Horizontal list (.hlist) styles
+*/
+
+.hlist ul {
+	margin: 0;
+}
+
+.hlist li {
+	display: inline;
+	margin: 0;
+	white-space: nowrap;
+}
+
+/* Display nested lists inline */
+.hlist ul ul {
+	display: inline;
+}
+
+/* Generate interpuncts */
+.hlist li:after {
+	content: " ·";
+	font-weight: bold;
+}
+
+.hlist li:last-child:after {
+	content: none;
+}
+
+/* Add parens around nested lists */
+.hlist ul ul:before {
+	content: "(";
+}
+
+.hlist ul ul:after {
+	content: ")";
+}
+
+/*
+* Webm autoloop spacing fix
+*/
+
+.autoloop,
+.loop {
+	display: block;
+}
+
+td .autoloop,
+td .loop {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: unset;
+	max-width: 800px !important;
+}
+
+/*
+* Pixel-art images
+*/
+
+img.pixelart {
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
+
+/* Image links ([[Template:Ability ID]], [[Template:Hero ID]], ...) */
+.image-link {
+	white-space: nowrap;
+}
+
+/*
+* Animatrion styles ([[Template:Animate]])
+*/
+
+.animated > *:not( .animated-active ),
+.animated-paused > *:not( .animated-active ),
+.animated > .animated-subframe > *:not( .animated-active ),
+.animated-paused > .animated-subframe > *:not( .animated-active ) {
+	display: none;
+}
+
+/* Hero infobox styles ([[Template:Hero infobox]]) */
+
+/* Highlight the primary attribute icon */
+#primaryAttribute img, .primaryAttribute img {
+	border: 2px solid #ffffff;
+	border-radius: 50%;
+}
+
+/*
+* Cosmetic Item infobox styles ([[Template:Cosmetic item infobox]])
+*/
+
+.buynow_wrapper {
+	height: 24px;
+}
+
+.buynow_wrapper > a {
+	width: 100%;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.buynow_button {
+	display: block;
+	padding-left: 30px;
+	height: 24px;
+	background: linear-gradient( 0deg, #000000 0%, #666666 100% );
+	color: #ffffff;
+	text-align: left;
+	text-decoration: none;
+	font-size: 90%;
+	line-height: 24px;
+}
+
+.buynow_button:hover {
+	background: linear-gradient( 0deg, #000000 0%, #999999 100% );
+}
+
+.buynow_store:before {
+	position: absolute;
+	margin-left: -31px;
+	width: 24px;
+	height: 24px;
+// TODO: Steam icon
+	content: "";
+	pointer-events: none;
+}
+
+.buynow_market:before {
+	position: absolute;
+	margin-left: -31px;
+	width: 24px;
+	height: 24px;
+// TODO: Steam icon
+	content: "";
+	pointer-events: none;
+}
+
+/*
+* Patch styles ([[Template:Patch layout]])
+*/
+
+html.theme--dark .patch-layout {
+	border: 1px solid #555;
+}
+.patch-layout {
+	width: 100%;
+	border: 1px solid #aaaaaa;
+	border-collapse: unset;
+	text-align: center;
+}
+
+html.theme--dark .patch-layout-last {
+	background: #202d78;
+}
+.patch-layout-last {
+	background: #b2d7e9;
+}
+
+html.theme--dark .patch-layout-all {
+	background: #313c7e;
+}
+.patch-layout-all {
+	width: 27%;
+	background: #dee8ed;
+}
+
+html.theme--dark .patch-layout-background {
+	background-color: rgba(41,41,41,0.7);
+	border: 1px solid #555;
+}
+.patch-layout-background {
+	background-color: #fdfaf8;
+	border: 1px solid #aaaaaa;
+	margin: 0.75em 0;
+	padding: 0.75em 1em;
+	padding-bottom: 1em;
+}
+
+/*
+* Event Currency Colors
+*/
+
+.bp2020 {
+	color: #f0b000;
+}
+
+.bp2019 {
+	color: #8c1bcd;
+}
+
+.bp2018 {
+	color: #3ec415;
+}
+
+.bp2017 {
+	color: #08d8d8;
+}
+
+.bp2016 {
+	color: #e60000;
+}
+
+.dotaplus {
+	color: #d37708;
+}
+
+/* AudioButton extension styles */
+
+a.ext-audiobutton:before {
+	display: inline-block;
+	width: 1em;
+	vertical-align: middle;
+}
+
+a.ext-audiobutton {
+	font-family: 'Font Awesome 5 Pro';
+
+	&[ data-state='play' ]:before {
+		.theme--light & {
+			color: #131313;
+		}
+
+		.theme--dark & {
+			color: #E2E2E6;
+		}
+
+		content: '\f144' !important;
+	}
+
+	&[ data-state='pause' ]:before {
+		content: '\f28b' !important;
+	}
+	&[ data-state='error' ]:before {
+		color: #91663D;
+		content: '\f059' !important;
+	}
+}
+
+/* Quote.less overrides for RU lang */
+.wiki-dota2gameru & {
+	blockquote.quote::before {
+		top: -40px;
+	}
+	blockquote.quote::after {
+		top: -40px;
+		bottom: 0;
+	}
+}
