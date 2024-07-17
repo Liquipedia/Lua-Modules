@@ -701,7 +701,7 @@ end
 ---@param match MatchTableMatch
 ---@return Html
 function MatchTable:_displayTournament(match)
-	local displayName = (self.config.useTickerName and match.tickerName) and match.tickerName or match.displayName
+	local displayName = (self.config.useTickerName and match.tickerName) or match.displayName
 	return mw.html.create('td')
 		:css('text-align', 'left')
 		:wikitext(Page.makeInternalLink(displayName, match.pageName))
