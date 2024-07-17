@@ -452,21 +452,13 @@ function CustomMatchGroupInput._opponentInput(match)
 		opponent = Json.parseIfString(opponent) or Opponent.blank()
 
 		-- Convert byes to literals
-		if
-			string.lower(opponent.template or '') == 'bye'
-			or string.lower(opponent.name or '') == 'bye'
-		then
+		if Opponent.isBye(opponent) then
 			opponent = {type = Opponent.literal, name = 'BYE'}
 		end
 
 		--process input
-		if opponent.type == Opponent.team or opponent.type == Opponent.solo or
-			opponent.type == Opponent.duo or opponent.type == Opponent.literal then
-
-			opponent = CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
-		else
-			error('Unsupported Opponent Type')
-		end
+		assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type')
+		opponent = CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 		--set initial opponent sumscore
 		opponent.sumscore = 0
@@ -510,10 +502,10 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	-- set sumscore to 0 if it isn't a number
-	if Logic.isEmpty(match.opponent1.sumscore) then
+	if Logic.emptyOr(match.opponent1.sumscore) then
 		match.opponent1.sumscore = 0
 	end
-	if Logic.isEmpty(match.opponent2.sumscore) then
+	if Logic.emptyOr(match.opponent2.sumscore) then
 		match.opponent2.sumscore = 0
 	end
 
@@ -607,12 +599,12 @@ end
 ---@param map table
 ---@param participants table
 function CustomMatchGroupInput._processDefaultPlayerMapData(players, opponentIndex, map, participants)
-	for playerIndex = 1, #players do
+	Array.forEach(Array.range(1, #players), function(playerIndex)
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			played = true,
 			cards = CustomMatchGroupInput._readCards(map['t' .. opponentIndex .. 'p' .. playerIndex .. 'c']),
 		}
-	end
+	end)
 end
 
 ---@param players table
@@ -621,47 +613,33 @@ end
 ---@param participants table
 ---@return integer
 function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex, map, participants)
-	local tbdIndex = 0
-	local appendIndex = #players + 1
-
-	local playerIndex = 1
-	local playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
-	while playerIndex <= MAX_NUM_PLAYERS_PER_MAP and (String.isNotEmpty(map[playerKey]) or
-		String.isNotEmpty(map[playerKey .. 'link']) or String.isNotEmpty(map[playerKey .. 'c'])) do
-
-		local player = map[playerKey .. 'link'] or map[playerKey]
-		if String.isEmpty(player) or Table.includes({TBD, TBA}, player:lower()) then
-			tbdIndex = tbdIndex + 1
-			player = TBD .. tbdIndex
-		else
-			-- allows fetching the link of the player from preset wiki vars
-			player = mw.ext.TeamLiquidIntegration.resolve_redirect(
-				map[playerKey .. 'link'] or Variables.varDefault(map[playerKey] .. '_page') or map[playerKey]
-			)
-		end
+	local numberOfPlayersInMap = 0
+	for prefix, player, index in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+		numberOfPlayersInMap = numberOfPlayersInMap + 1
+		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(
+			map[prefix .. 'link'] or Variables.varDefault(player .. '_page') or player
+		)
 
 		local playerData = {
 			played = true,
-			cards = CustomMatchGroupInput._readCards(map[playerKey .. 'c']),
+			cards = CustomMatchGroupInput._readCards(map[prefix .. 'c']),
 		}
 
-		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, player)
+		local match2playerIndex = CustomMatchGroupInput._fetchMatch2PlayerIndexOfPlayer(players, link)
 
-		-- if we have the player not present in match2player add basic data here
 		if not match2playerIndex then
-			match2playerIndex = appendIndex
-			playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
-
-			appendIndex = appendIndex + 1
+			table.insert(players, {
+				--check the format in the existing players field please and adjust accordingly
+				name = link:gsub(' ', '_'),
+				displayname = player,
+			})
+			match2playerIndex = #players
 		end
 
 		participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
-
-		playerIndex = playerIndex + 1
-		playerKey = 't' .. opponentIndex .. 'p' .. playerIndex
 	end
 
-	return playerIndex - 1
+	return numberOfPlayersInMap
 end
 
 ---@param players table
@@ -690,12 +668,9 @@ end
 ---@param input string
 ---@return table
 function CustomMatchGroupInput._readCards(input)
-
 	return Array.map(Json.parseIfString(input) or {}, function(card)
-		if String.isEmpty(card) then return '' end
-		local cleanedCard =  CardNames[card]
-		assert(cleanedCard, 'Invalid Card "' .. card .. '"')
-		return cleanedCard
+		if String.isEmpty(card) then return nil end
+		return (assert(CardNames[card], 'Invalid Card "' .. card .. '"'))
 	end)
 end
 
