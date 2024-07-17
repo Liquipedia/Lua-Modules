@@ -5,67 +5,67 @@
 
 /* Invert colors for dark theme */
 html.theme--dark .componentsinvert {
-	filter: invert(1)
+	filter: invert( 1 );
 }
 
 /* Infobox Hero */
 .healthbar {
-	background:linear-gradient(to right, #286323, #7AF03C);
-	color:#FFF;
-	text-shadow:1px 1px 2px #000;
+	background: linear-gradient( to right, #286323, #7af03c );
+	color: #ffffff;
+	text-shadow: 1px 1px 2px #000000;
 	font-weight: bold;
 }
 
 .manabar {
-	background:linear-gradient(to right, #1056DB, #73F5FE);
-	color:#FFF;
-	text-shadow:1px 1px 2px #000;
+	background: linear-gradient( to right, #1056db, #73f5fe );
+	color: #ffffff;
+	text-shadow: 1px 1px 2px #000000;
 	font-weight: bold;
 }
 
 /* Infobox Cosmetic */
-.infobox-cosmetic-tradeable, .infobox-cosmetic-marketable {
-	background: radial-gradient(50% 50% at 50% 50%, #03386F 0%, #030D1A 100%);
+.infobox-cosmetic-tradeable,
+.infobox-cosmetic-marketable {
+	background: radial-gradient( 50% 50% at 50% 50%, #03386f 0%, #030d1a 100% );
 	font-weight: 700;
-	color: #4898ED; // TODO: Need support for both true and false, this is the true color, false is #9f7669
+	color: #4898ed; // TODO: Need support for both true and false, this is the true color, false is #9f7669
 }
 
 .infobox-cosmetic-deletable {
-	background: radial-gradient(50% 50% at 50% 50%, #262A30 0%, #000000 100%);
+	background: radial-gradient( 50% 50% at 50% 50%, #262a30 0%, #000000 100% );
 	font-weight: 700;
-	color: #747B82; // TODO: Need support for both true and false, this is the false color, true is not defined
+	color: #747b82; // TODO: Need support for both true and false, this is the false color, true is not defined
 }
 
 /* Text Colors */
 .text-color {
 	&-gold {
-		color: #DAA520;
+		color: #daa520;
 	}
 }
 /* Template:Cf */
 a.cf {
 	font-weight: bold;
-	color: #FFF;
-	text-shadow: 1px 1px 2px #000;
+	color: #ffffff;
+	text-shadow: 1px 1px 2px #000000;
 }
-
 
 /* Custom Diagrams */
 .diagram svg defs g path {
-	stroke: currentColor;
-	fill: currentColor;
+	stroke: currentcolor;
+	fill: currentcolor;
 }
 
 .diagram svg defs g ellipse {
-	stroke: currentColor;
-	fill: currentColor;
+	stroke: currentcolor;
+	fill: currentcolor;
 }
 
 /* Spellcard Ability Borders
 The smaller sizes are for sub-sections. */
 .target_passive,
 .target_aura {
-	border: 0px;
+	border: 0;
 } /* Passive ability will have an overlay instead. */
 
 .target_no,
@@ -74,32 +74,34 @@ The smaller sizes are for sub-sections. */
 .target_ground,
 .target_point {
 	border-top: 6px solid #899499;
-	border-bottom: 6px solid #212F3D;
+	border-bottom: 6px solid #212f3d;
 	border-right: 6px solid #595959;
-	border-left: 6px solid #A7A7A7;
+	border-left: 6px solid #a7a7a7;
 }
 
 .target_toggle {
-	border: 6px solid #FC9303;
+	border: 6px solid #fc9303;
 }
 
 .target_altcast {
-	outline: 4px solid #F5F5F5;
+	outline: 4px solid #f5f5f5;
 	outline-offset: -6px;
 	border-top: 6px solid #899499;
-	border-bottom: 6px solid #212F3D;
+	border-bottom: 6px solid #212f3d;
 	border-right: 6px solid #595959;
-	border-left: 6px solid #A7A7A7;
+	border-left: 6px solid #a7a7a7;
 }
 
 /* Spellcard Ability Borders (Autocast Animations) */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
 }
 
 @keyframes rotate {
 	100% {
-		transform: rotate(1turn);
+		transform: rotate( 1turn );
 	}
 }
 
@@ -110,12 +112,12 @@ The smaller sizes are for sub-sections. */
 	height: 80px;
 	overflow: hidden;
 	padding: 6px;
-	outline: 1px solid #333;
+	outline: 1px solid #333333;
 	outline-offset: -4px;
 }
 
 .target_autocast::before {
-	content: '';
+	content: "";
 	position: absolute;
 	z-index: -2;
 	left: -50%;
@@ -124,18 +126,18 @@ The smaller sizes are for sub-sections. */
 	height: 200%;
 	background-color: transparent;
 	background-repeat: no-repeat;
-	background-image: linear-gradient(#000, #fbb300);
-	animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+	background-image: linear-gradient( #000000, #fbb300 );
+	animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
 }
 
 .target_autocast::after {
-	content: '';
+	content: "";
 	position: absolute;
 	z-index: -1;
 	left: 6px;
 	top: 6px;
-	width: calc(100% - 12px);
-	height: calc(100% - 12px);
+	width: calc( 100% - 12px );
+	height: calc( 100% - 12px );
 	border-radius: 0;
 	display: flex;
 	justify-content: center;
@@ -147,8 +149,8 @@ The smaller sizes are for sub-sections. */
 }
 
 .target_aam {
-	border: 6px solid #999;
-	border-image: linear-gradient(-45deg, #FC9303, #899499 73%);
+	border: 6px solid #999999;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% );
 	border-image-slice: 1;
 }
 
@@ -158,31 +160,33 @@ The smaller sizes are for sub-sections. */
 .target_ground1,
 .target_point1 {
 	border-top: 3px solid #899499;
-	border-bottom: 3px solid #212F3D;
+	border-bottom: 3px solid #212f3d;
 	border-right: 3px solid #595959;
-	border-left: 3px solid #A7A7A7;
+	border-left: 3px solid #a7a7a7;
 }
 
 .target_toggle1 {
-	border: 3px solid #FC9303;
+	border: 3px solid #fc9303;
 }
 
 .target_altcast1 {
-	outline: 2px solid #F5F5F5;
+	outline: 2px solid #f5f5f5;
 	outline-offset: -3px;
 	border-top: 3px solid #899499;
-	border-bottom: 3px solid #212F3D;
+	border-bottom: 3px solid #212f3d;
 	border-right: 3px solid #595959;
-	border-left: 3px solid #A7A7A7;
+	border-left: 3px solid #a7a7a7;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
 	box-sizing: border-box;
 }
 
 @keyframes rotate {
 	100% {
-		transform: rotate(1turn);
+		transform: rotate( 1turn );
 	}
 }
 
@@ -193,12 +197,12 @@ The smaller sizes are for sub-sections. */
 	height: 40px;
 	overflow: hidden;
 	padding: 3px;
-	outline: 1px solid #333;
+	outline: 1px solid #333333;
 	outline-offset: -4px;
 }
 
 .target_autocast1::before {
-	content: '';
+	content: "";
 	position: absolute;
 	z-index: -2;
 	left: -50%;
@@ -207,18 +211,18 @@ The smaller sizes are for sub-sections. */
 	height: 200%;
 	background-color: transparent;
 	background-repeat: no-repeat;
-	background-image: linear-gradient(#000, #fbb300);
-	animation: rotate 1.2s cubic-bezier(.46,.03,.52,.96) infinite;
+	background-image: linear-gradient( #000000, #fbb300 );
+	animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
 }
 
 .target_autocast1::after {
-	content: '';
+	content: "";
 	position: absolute;
 	z-index: -1;
 	left: 6px;
 	top: 6px;
-	width: calc(100% - 12px);
-	height: calc(100% - 12px);
+	width: calc( 100% - 12px );
+	height: calc( 100% - 12px );
 	border-radius: 0;
 	display: flex;
 	justify-content: center;
@@ -230,8 +234,8 @@ The smaller sizes are for sub-sections. */
 }
 
 .target_aam1 {
-	border: 3px solid #999;
-	border-image: linear-gradient(-45deg, #FC9303, #899499 73%);
+	border: 3px solid #999999;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% );
 	border-image-slice: 1;
 }
 
@@ -239,19 +243,18 @@ The smaller sizes are for sub-sections. */
 	width: 86px;
 	height: 86px;
 	box-sizing: border-box;
-	border: 0px;
+	border: 0;
 }
 
 .target_downtime1:before,
-.item_cdshare:before
-{
-	content: '';
+.item_cdshare:before {
+	content: "";
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(117, 117, 117, 0.55);
+	background: rgba( 117, 117, 117, 0.55 );
 	animation: abilityDowntime 2.5s linear infinite;
 }
 
@@ -282,7 +285,7 @@ The smaller sizes are for sub-sections. */
 	width: 88px;
 	height: 64px;
 	box-sizing: border-box;
-	border: 0px;
+	border: 0;
 }
 
 /* Spellcard-related */
@@ -308,17 +311,17 @@ The smaller sizes are for sub-sections. */
 }
 
 .spelldesc {
-	border-top:1px solid #333;
+	border-top: 1px solid #333333;
 }
 
 .spellagh {
 	font-weight: bold;
-	color: #A885FF;
-	text-shadow: 1px 1px 2px #000;
+	color: #a885ff;
+	text-shadow: 1px 1px 2px #000000;
 }
 
 .spelldesc:hover {
-	border-top:1px solid #999;
+	border-top: 1px solid #999999;
 }
 
 .spelltrait_value {
@@ -340,14 +343,14 @@ The smaller sizes are for sub-sections. */
 .spellcost_value {
 	font-size: 90%;
 	vertical-align: text-top;
-	padding-top: 0px;
-	padding-bottom: 0px;
+	padding-top: 0;
+	padding-bottom: 0;
 	padding-left: 1px;
 	padding-right: 1px;
 }
 
 .spelltype_mpcost {
-	border-top: 4px double #3590E8;
+	border-top: 4px double #3590e8;
 	display: inline-block;
 	text-align: center;
 	width: 100%;
@@ -355,7 +358,7 @@ The smaller sizes are for sub-sections. */
 }
 
 .spelltype_hpcost {
-	border-top: 4px double #55B231;
+	border-top: 4px double #55b231;
 	display: inline-block;
 	text-align: center;
 	width: 100%;
@@ -363,7 +366,7 @@ The smaller sizes are for sub-sections. */
 }
 
 .spelltype_sublink {
-	border-top: 1px solid #333;
+	border-top: 1px solid #333333;
 	width: 100%;
 	max-width: 450px;
 }
@@ -371,12 +374,12 @@ The smaller sizes are for sub-sections. */
 .spelllore {
 	display: inline-block;
 	text-align: center;
-	background-color: #282828C4;
+	background-color: #282828c4;
 	padding: 2px;
 	font-size: 85%;
 	font-style: italic;
-	color: #E2E2E2;
-	outline: 1px solid rgba(226, 226, 226, 0.2);
+	color: #e2e2e2;
+	outline: 1px solid rgba( 226, 226, 226, 0.2 );
 	width: 100%;
 	max-width: 450px;
 }
@@ -385,7 +388,7 @@ The smaller sizes are for sub-sections. */
 	cursor: default;
 	padding: 3px;
 	font-size: 70%;
-	border: 1px solid #7681968C;
+	border: 1px solid #7681968c;
 }
 
 .spellintern:hover {
@@ -397,7 +400,7 @@ The smaller sizes are for sub-sections. */
 }
 
 .iconrotate:hover {
-	transform: rotate(1080deg);
+	transform: rotate( 1080deg );
 }
 
 .spellvalueTable {
@@ -430,24 +433,24 @@ The smaller sizes are for sub-sections. */
 }
 
 .ib-tooltip:hover {
-	background-color: rgba(255, 215, 0, 0.5);
+	background-color: rgba( 255, 215, 0, 0.5 );
 }
 
 /* Spellunit-related */
 .spellunit_link {
-	color: #E2E2E6;
-	text-shadow: 1px 1px 2px #000;
+	color: #e2e2e6;
+	text-shadow: 1px 1px 2px #000000;
 	font-weight: bold;
 }
 
 .spellunit_topage {
-	color: #E2E2E6;
-	text-shadow: 1px 1px 2px #000;
+	color: #e2e2e6;
+	text-shadow: 1px 1px 2px #000000;
 	font-weight: bold;
 }
 
 .spellunit_topage:hover {
-	color: #DAA520;
+	color: #daa520;
 }
 
 .spellunit_hp {
@@ -455,13 +458,13 @@ The smaller sizes are for sub-sections. */
 	max-width: 128px;
 	height: 21px;
 	padding: 2px;
-	background: linear-gradient(to right, #286323, #7AF03C);
-	border-bottom:1px solid #333;
+	background: linear-gradient( to right, #286323, #7af03c );
+	border-bottom: 1px solid #333333;
 	align-items: center;
 	justify-content: center;
 	font-weight: bold;
 	font-size: 80%;
-	text-shadow: 0.7px 0.7px 1.2px #000;
+	text-shadow: 0.7px 0.7px 1.2px #000000;
 	text-align: center;
 }
 
@@ -470,13 +473,13 @@ The smaller sizes are for sub-sections. */
 	max-width: 128px;
 	height: 21px;
 	padding: 2px;
-	background:linear-gradient(to right, #1056DB, #73F5FE);
-	border-bottom:1px solid #333;
+	background: linear-gradient( to right, #1056db, #73f5fe );
+	border-bottom: 1px solid #333333;
 	align-items: center;
 	justify-content: center;
 	font-weight: bold;
 	font-size: 80%;
-	text-shadow: 0.7px 0.7px 1.2px #000;
+	text-shadow: 0.7px 0.7px 1.2px #000000;
 	text-align: center;
 }
 
@@ -501,12 +504,12 @@ The smaller sizes are for sub-sections. */
 	width: 100px;
 	height: 100px;
 	margin: 5px;
-	border: 1px solid rgba(51, 51, 51, 0.5);
-	background-color: rgba(51, 51, 51, 0.5);
+	border: 1px solid rgba( 51, 51, 51, 0.5 );
+	background-color: rgba( 51, 51, 51, 0.5 );
 }
 
 .invokeCard:hover {
-	border: 1px solid #F7F7F7;
+	border: 1px solid #f7f7f7;
 }
 
 .invokePad {
@@ -515,15 +518,15 @@ The smaller sizes are for sub-sections. */
 
 /* Facetcard-related */
 .facetBox {
-	background: rgba(35, 46, 52, 0.25);
+	background: rgba( 35, 46, 52, 0.25 );
 	padding: 5px;
 	border: 1px solid #505050;
-	color: white;
+	color: #ffffff;
 	transition: 0.35s;
 }
 
 .facetBox:hover {
-	border: 1px solid #F7F7F7;
+	border: 1px solid #f7f7f7;
 }
 
 .facetTitle {
@@ -532,8 +535,8 @@ The smaller sizes are for sub-sections. */
 
 .facetLink {
 	font-weight: bold;
-	color: #E2E2E6;
-	text-shadow: 1px 1px 2px #000;
+	color: #e2e2e6;
+	text-shadow: 1px 1px 2px #000000;
 }
 
 /* Aghcard-related */
@@ -542,19 +545,19 @@ The smaller sizes are for sub-sections. */
 	max-width: 460px;
 	width: 100%;
 	font-size: 90%;
-	background: rgba(35, 46, 52, 0.75);
+	background: rgba( 35, 46, 52, 0.75 );
 	text-align: left;
 	padding-left: 5px;
 	padding-right: 5px;
 	padding-top: 5px;
 	border: 1px solid #505050;
-	color: #D9E0E8;
+	color: #d9e0e8;
 }
 
 .aghupgTitle {
 	font-weight: bold;
-	color: #A885FF;
-	text-shadow: 1px 1px 2px #000;
+	color: #a885ff;
+	text-shadow: 1px 1px 2px #000000;
 	flex-grow: 1;
 }
 
@@ -564,7 +567,7 @@ The smaller sizes are for sub-sections. */
 	font-weight: bold;
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
-	background-color: hsl(219, 48%, 21%);
+	background-color: #1c2e4f;
 	text-shadow: 1px 1px 2px #000000;
 	border: 2px solid #505050;
 	padding-left: 2px;
@@ -583,13 +586,13 @@ The smaller sizes are for sub-sections. */
 }
 
 .aghupgShadow:hover {
-	background-color: rgba(9, 13, 17, 1);
+	background-color: rgba( 9, 13, 17, 1 );
 	transition: 0.15s;
 }
 
 .aghupgDesc {
 	vertical-align: top;
-	padding: 0px;
+	padding: 0;
 }
 
 /* HeroGameplay-related */
@@ -599,17 +602,17 @@ The smaller sizes are for sub-sections. */
 }
 
 .gameplay_agh {
-	color: #A50F79;
+	color: #a50f79;
 	font-weight: bold;
 }
 
 .gameplay_shd {
-	color: #4B69FF;
+	color: #4b69ff;
 	font-weight: bold;
 }
 
 .gameplay_tal {
-	color: #CF6A32;
+	color: #cf6a32;
 	font-weight: bold;
 }
 
@@ -671,7 +674,7 @@ div.gameplay_nav ul li {
 }
 
 div.gameplay_nav li:hover {
-	background-color: rgb(78, 85, 87, 0.5);
+	background-color: rgba( 78, 85, 87, 0.5 );
 }
 
 div.gameplay_nav ul li ul {
@@ -688,8 +691,8 @@ div.gameplay_nav ul li ul:hover {
 	display: block;
 	min-width: 450px;
 	padding: 5px;
-	box-shadow: 0px 3px 5px -1px rgb(88, 88, 88, 0.5);
-	background-color: rgb(19, 19, 19);
+	box-shadow: 0 3px 5px -1px rgba( 88, 88, 88, 0.5 );
+	background-color: #131313;
 	color: #e2e2e6;
 	font-size: 13px;
 }
@@ -738,17 +741,17 @@ div.gameplay_nav ul li ul li {
 }
 
 .gameplay_agh {
-	color: #A50F79;
+	color: #a50f79;
 	font-weight: bold;
 }
 
 .gameplay_shd {
-	color: #4B69FF;
+	color: #4b69ff;
 	font-weight: bold;
 }
 
 .gameplay_tal {
-	color: #CF6A32;
+	color: #cf6a32;
 	font-weight: bold;
 }
 
@@ -1562,7 +1565,6 @@ img.pixelart {
 	-ms-interpolation-mode: nearest-neighbor;
 }
 
-
 /* Image links ([[Template:Ability ID]], [[Template:Hero ID]], ...) */
 .image-link {
 	white-space: nowrap;
@@ -1582,7 +1584,8 @@ img.pixelart {
 /* Hero infobox styles ([[Template:Hero infobox]]) */
 
 /* Highlight the primary attribute icon */
-#primaryAttribute img, .primaryAttribute img {
+#primaryAttribute img,
+.primaryAttribute img {
 	border: 2px solid #ffffff;
 	border-radius: 50%;
 }
@@ -1642,7 +1645,7 @@ img.pixelart {
 */
 
 html.theme--dark .patch-layout {
-	border: 1px solid #555;
+	border: 1px solid #555555;
 }
 
 .patch-layout {
@@ -1670,8 +1673,8 @@ html.theme--dark .patch-layout-all {
 }
 
 html.theme--dark .patch-layout-background {
-	background-color: rgba(41,41,41,0.7);
-	border: 1px solid #555;
+	background-color: rgba( 41, 41, 41, 0.7 );
+	border: 1px solid #555555;
 }
 
 .patch-layout-background {
@@ -1719,27 +1722,26 @@ a.ext-audiobutton:before {
 }
 
 a.ext-audiobutton {
-	font-family: 'Font Awesome 5 Pro';
+	font-family: "Font Awesome 5 Pro";
 
-	&[ data-state='play' ]:before {
+	&[ data-state="play" ]:before {
 		.theme--light & {
 			color: #131313;
 		}
 
 		.theme--dark & {
-			color: #E2E2E6;
+			color: #e2e2e6;
 		}
-
-		content: '\f144' !important;
+		content: "\f144" !important;
 	}
 
-	&[ data-state='pause' ]:before {
-		content: '\f28b' !important;
+	&[ data-state="pause" ]:before {
+		content: "\f28b" !important;
 	}
 
-	&[ data-state='error' ]:before {
-		color: #91663D;
-		content: '\f059' !important;
+	&[ data-state="error" ]:before {
+		color: #91663d;
+		content: "\f059" !important;
 	}
 }
 
