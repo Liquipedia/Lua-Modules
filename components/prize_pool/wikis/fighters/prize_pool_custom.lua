@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -33,9 +34,31 @@ function CustomPrizePool.run(frame)
 	args.syncPlayers = true
 	args.import = true
 
-	local prizePool = PrizePool(args)
+	local prizePool = PrizePool(args) ---@type PrizePool
 
-	return prizePool:create():setLpdbInjector(CustomLpdbInjector()):build()
+	local output = prizePool:create():setLpdbInjector(CustomLpdbInjector()):build()
+
+	local function placementData(placement)
+		local p = prizePool.placements[placement]
+		if not p or not p.opponents or not p.opponents[1] or not p.opponents[1].opponentData then
+			return
+		end
+		if not p.opponents[1].opponentData.players or not p.opponents[1].opponentData.players[1] then
+			return
+		end
+		local player = p.opponents[1].opponentData.players[1] --[[@as FightersStandardPlayer]]
+		return player.displayName, player.pageName, player.flag, table.concat(player.chars or {}, ',')
+	end
+	if prizePool.opponentType == Opponent.solo then
+		local tournament = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
+		tournament.winner, tournament.winnerlink, tournament.winnerflag, tournament.winnerheads = placementData(1)
+		tournament.runnerup, tournament.runneruplink, tournament.runnerupflag, tournament.runnerupheads = placementData(2)
+		mw.ext.LiquipediaDB.lpdb_tournament('tournament_' .. Variables.varDefault('tournament_name', ''), {
+			extradata = Json.stringify(tournament)
+		})
+	end
+
+	return output
 end
 
 ---@param lpdbData placement
