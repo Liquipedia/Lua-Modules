@@ -27,6 +27,8 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local DEFAULT_BESTOF = 99
 
+local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+
 local CustomMatchGroupInput = {}
 
 --- called from Module:MatchGroup
@@ -41,6 +43,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	}))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
+	CustomMatchGroupInput._verifyMaps(match)
 	CustomMatchGroupInput._processMaps(match)
 	CustomMatchGroupInput._calculateWinner(match)
 	CustomMatchGroupInput._updateFinished(match)
@@ -55,7 +58,6 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 function CustomMatchGroupInput._getTournamentVars(match)
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match.bestof = match.bestof
 	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
 
@@ -77,6 +79,30 @@ end
 function CustomMatchGroupInput._getVod(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod)
+end
+
+-- This function is used to discard maps that are none-relevant ones
+-- Template:Map sets a default map name because sometimes
+-- we have results without knowledge of which map it was planned on.
+---@param match table
+function CustomMatchGroupInput._verifyMaps(match)
+	for idx, map in Table.iter.pairsByPrefix(match, 'map') do
+		if CustomMatchGroupInput._discardMap(map) then
+			match['map' .. idx] = nil
+		elseif map.map == DUMMY_MAP_NAME then
+			map.map = ''
+		end
+	end
+
+	return match
+end
+
+-- Check if a map should be discarded due to being none-relevant data
+-- DUMMY_MAP_NAME variable must the match the default value in Template:Map
+---@param map table
+---@return boolean
+function CustomMatchGroupInput._discardMap(map)
+	return map.map == DUMMY_MAP_NAME and not map.score1 and not map.score2 and not map.winner
 end
 
 ---@param match table
