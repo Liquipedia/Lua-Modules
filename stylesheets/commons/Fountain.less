@@ -12,14 +12,14 @@ html.theme--dark .componentsinvert {
 .healthbar {
 	background: linear-gradient( to right, #286323, #7af03c );
 	color: #ffffff;
-	text-shadow: 1px 1px 2px #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 	font-weight: bold;
 }
 
 .manabar {
 	background: linear-gradient( to right, #1056db, #73f5fe );
 	color: #ffffff;
-	text-shadow: 1px 1px 2px #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 	font-weight: bold;
 }
 
@@ -38,24 +38,19 @@ html.theme--dark .componentsinvert {
 }
 
 /* Text Colors */
-.text-color {
-	&-gold {
+.text-color-gold {
 		color: #daa520;
-	}
 }
+
 /* Template:Cf */
 a.cf {
 	font-weight: bold;
 	color: #ffffff;
-	text-shadow: 1px 1px 2px #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 }
 
 /* Custom Diagrams */
-.diagram svg defs g path {
-	stroke: currentcolor;
-	fill: currentcolor;
-}
-
+.diagram svg defs g path,
 .diagram svg defs g ellipse {
 	stroke: currentcolor;
 	fill: currentcolor;
@@ -73,23 +68,23 @@ The smaller sizes are for sub-sections. */
 .target_area,
 .target_ground,
 .target_point {
-	border-top: 6px solid #899499;
-	border-bottom: 6px solid #212f3d;
-	border-right: 6px solid #595959;
-	border-left: 6px solid #a7a7a7;
+	border-top: 0.375rem solid #899499;
+	border-bottom: 0.375rem solid #212f3d;
+	border-right: 0.375rem solid #595959;
+	border-left: 0.375rem solid #a7a7a7;
 }
 
 .target_toggle {
-	border: 6px solid #fc9303;
+	border: 0.375rem solid #fc9303;
 }
 
 .target_altcast {
-	outline: 4px solid #f5f5f5;
-	outline-offset: -6px;
-	border-top: 6px solid #899499;
-	border-bottom: 6px solid #212f3d;
-	border-right: 6px solid #595959;
-	border-left: 6px solid #a7a7a7;
+	outline: 0.25rem solid #f5f5f5;
+	outline-offset: -0.375rem;
+	border-top: 0.375rem solid #899499;
+	border-bottom: 0.375rem solid #212f3d;
+	border-right: 0.375rem solid #595959;
+	border-left: 0.375rem solid #a7a7a7;
 }
 
 @keyframes rotate {
@@ -99,15 +94,15 @@ The smaller sizes are for sub-sections. */
 }
 
 .target_autocast {
-	width: 80px;
-	height: 80px;
-	padding: 6px;
+	width: 5rem; // 80px
+	height: 5rem; // 80px
+	padding: 0.375rem;
 }
 
 .target_autocast1 {
-	width: 40px;
-	height: 40px;
-	padding: 3px;
+	width: 2.5rem; //40px
+	height: 2.5rem; //40px
+	padding: 0.1875rem;
 }
 
 .target_autocast1,
@@ -115,8 +110,8 @@ The smaller sizes are for sub-sections. */
 	position: relative;
 	z-index: 0;
 	overflow: hidden;
-	outline: 1px solid #333333;
-	outline-offset: -4px;
+	outline: 0.0625rem solid #333333;
+	outline-offset: -0.25rem;
 
 	&::before {
 		content: "";
@@ -136,10 +131,10 @@ The smaller sizes are for sub-sections. */
 		content: "";
 		position: absolute;
 		z-index: -1;
-		left: 6px;
-		top: 6px;
-		width: calc( 100% - 12px );
-		height: calc( 100% - 12px );
+		left: 0.375rem;
+		top: 0.375rem;
+		width: calc( 100% - 0.75rem );
+		height: calc( 100% - 0.7rem );
 		border-radius: 0;
 		display: flex;
 		justify-content: center;
@@ -148,11 +143,11 @@ The smaller sizes are for sub-sections. */
 }
 
 .target_autocast-off {
-	border: 6px ridge #899499;
+	border: 0.375rem ridge #899499;
 }
 
 .target_aam {
-	border: 6px solid #999999;
+	border: 0.375rem solid #999999;
 	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
 }
 
@@ -161,38 +156,36 @@ The smaller sizes are for sub-sections. */
 .target_area1,
 .target_ground1,
 .target_point1 {
-	border-top: 3px solid #899499;
-	border-bottom: 3px solid #212f3d;
-	border-right: 3px solid #595959;
-	border-left: 3px solid #a7a7a7;
+	border-width: 0.1875rem;
+	border-style: solid;
+	border-color: #899499 #595959 #212f3d #a7a7a7;
 }
 
 .target_toggle1 {
-	border: 3px solid #fc9303;
+	border: 0.1875rem solid #fc9303;
 }
 
 .target_altcast1 {
-	outline: 2px solid #f5f5f5;
-	outline-offset: -3px;
-	border-top: 3px solid #899499;
-	border-bottom: 3px solid #212f3d;
-	border-right: 3px solid #595959;
-	border-left: 3px solid #a7a7a7;
+	outline: 0.125rem solid #f5f5f5;
+	outline-offset: -0.1875rem;
+	border-width: 0.1875rem;
+	border-style: solid;
+	border-color: #899499 #595959 #212f3d #a7a7a7;
 }
 
 .target_autocast-off1 {
-	border: 3px ridge #899499;
+	border: 0.1875rem ridge #899499;
 }
 
 .target_aam1 {
-	border: 3px solid #999999;
+	border: 0.1875rem solid #999999;
 	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
 }
 
 .target_downtime1 {
-	width: 86px;
-	height: 86px;
-	box-sizing: border-box;
+	width: 5.375rem; // 86px
+	height: 5.375rem; //86px
+	box-sizing: border-box; // shouldn't be necessary?
 	border: 0;
 }
 
@@ -200,10 +193,7 @@ The smaller sizes are for sub-sections. */
 .item_cdshare:before {
 	content: "";
 	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
+	inset: 0; /* Replaces top: 0; left: 0; right: 0; bottom: 0; */
 	background: rgba( 117, 117, 117, 0.55 );
 	animation: abilityDowntime 2.5s linear infinite;
 }
@@ -219,21 +209,21 @@ The smaller sizes are for sub-sections. */
 
 /* Spellcard Item-cooldown Sharing */
 .item_cdshare {
-	width: 88px;
-	height: 64px;
-	box-sizing: border-box;
+	width: 5.5rem; // 88px
+	height: 4rem; // 64px
+	box-sizing: border-box; // is this necessary?
 	border: 0;
 }
 
 /* Spellcard-related */
 .irisbox {
-	max-width: 460px;
+	max-width: 28.75rem; // 460px
 	width: 100%;
 }
 
 .spelltad { /* Spellcard Target/Affect/Damage (TAD) */
 	display: inline-block;
-	font-size: 90%;
+	font-size: 90%; // convert to rem
 	vertical-align: top;
 	width: 13%;
 	text-align: right;
@@ -242,90 +232,95 @@ The smaller sizes are for sub-sections. */
 .spelltad_value {
 	flex: 1 0 auto;
 	display: inline-block;
-	padding-left: 5px;
-	font-size: 90%;
+	padding-left: 0.3125rem;
+	font-size: 90%; // convert to rem
 	vertical-align: top;
 }
 
 .spelldesc {
-	border-top: 1px solid #333333;
+	border-top: 0.0625rem solid #333333;
 
 	&:hover {
-		border-top: 1px solid #999999;
+		border-top: 0.0625rem solid #999999;
 	}
 }
 
 .spellagh {
 	font-weight: bold;
 	color: #a885ff;
-	text-shadow: 1px 1px 2px #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 }
 
 .spelltrait_value {
 	vertical-align: middle;
-	font-size: 95%;
-	min-height: 23px;
+	font-size: 95%; // convert to rem
+	min-height: 1.4375rem; //23px
 	height: auto;
 	width: 100%;
-	max-width: 450px;
+	max-width: 28.125rem; // 450px
 }
 
-.spellcost_icon {
-	vertical-align: text-top;
-	text-align: center;
-	width: 25px;
-	height: 25px;
+.spellcost {
+	&_icon {
+		vertical-align: text-top;
+		text-align: center;
+		width: 1.5625rem; // 25px
+		height: 1.5625rem; // 25px
+	}
+
+	&_value {
+		font-size: 90%; // convert to rem
+		vertical-align: text-top;
+		padding: 0 0.0625rem;
+	}
 }
 
-.spellcost_value {
-	font-size: 90%;
-	vertical-align: text-top;
-	padding: 0 1px;
-}
+.spelltype {
+	&_mpcost,
+	&_hpcost {
+		border-top: 0.25rem double;
+		display: inline-block;
+		text-align: center;
+		width: 100%;
+		max-width: 28.125rem; // 450px
+	}
 
-.spelltype_mpcost {
-	border-top: 4px double #3590e8;
-	display: inline-block;
-	text-align: center;
-	width: 100%;
-	max-width: 450px;
-}
+	&_mpcost {
+		border-top-color: #3590e8;
+	}
 
-.spelltype_hpcost {
-	border-top: 4px double #55b231;
-	display: inline-block;
-	text-align: center;
-	width: 100%;
-	max-width: 450px;
-}
+	&_hpcost {
+		border-top-color: #55b231;
+	}
 
-.spelltype_sublink {
-	border-top: 1px solid #333333;
-	width: 100%;
-	max-width: 450px;
+	&_sublink {
+		border-top: 0.0625rem solid #333333;
+		width: 100%;
+		max-width: 28.125rem; // 450px
+	}
 }
 
 .spelllore {
 	display: inline-block;
 	text-align: center;
 	background-color: #282828c4;
-	padding: 2px;
-	font-size: 85%;
+	padding: 0.125rem;
+	font-size: 85%; // convert to rem
 	font-style: italic;
 	color: #e2e2e2;
-	outline: 1px solid rgba( 226, 226, 226, 0.2 );
+	outline: 0.0625rem solid rgba( 226, 226, 226, 0.2 );
 	width: 100%;
-	max-width: 450px;
+	max-width: 28.125rem; // 450px
 }
 
 .spellintern {
 	cursor: default;
-	padding: 3px;
-	font-size: 70%;
-	border: 1px solid #7681968c;
+	padding: 0.1875rem;
+	font-size: 70%; // convert to rem
+	border: 0.0625rem solid #7681968c;
 
 	&:hover {
-		border: 1px solid #768196;
+		border: 0.0625rem solid #768196;
 	}
 }
 
@@ -356,13 +351,11 @@ The smaller sizes are for sub-sections. */
 
 /* Infobox-related */
 .ib-tooltip {
-	padding: 0.2px;
-	border-top: 3px solid;
-	border-left: 1px solid;
-	border-right: 1px solid;
-	border-bottom: 1px solid;
+	padding: 0.2px; // is subpixel necessary?
+	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
+	border-style: solid;
 	text-align: center;
-	font-size: 70%;
+	font-size: 70%; // convert to rem
 	font-weight: bold;
 
 	&:hover {
@@ -371,95 +364,85 @@ The smaller sizes are for sub-sections. */
 }
 
 /* Spellunit-related */
-.spellunit_link {
-	color: #e2e2e6;
-	text-shadow: 1px 1px 2px #000000;
-	font-weight: bold;
-}
+.spellunit {
+	&_link,
+	&_topage {
+		color: #e2e2e6;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		font-weight: bold;
+	}
 
-.spellunit_topage {
-	color: #e2e2e6;
-	text-shadow: 1px 1px 2px #000000;
-	font-weight: bold;
-
-	&:hover {
+	&_topage:hover {
 		color: #daa520;
 	}
-}
 
-.spellunit_hp {
-	display: flex;
-	max-width: 128px;
-	height: 21px;
-	padding: 2px;
-	background: linear-gradient( to right, #286323, #7af03c );
-	border-bottom: 1px solid #333333;
-	align-items: center;
-	justify-content: center;
-	font-weight: bold;
-	font-size: 80%;
-	text-shadow: 0.7px 0.7px 1.2px #000000;
-	text-align: center;
-}
+	&_mp,
+	&_hp {
+		display: flex;
+		max-width: 8rem; // 128px
+		height: 1.3125rem; // 21px
+		padding: 0.125rem;
+		border-bottom: 0.0625rem solid #333333;
+		align-items: center;
+		justify-content: center;
+		font-weight: bold;
+		font-size: 80%; // convert to rem
+		text-shadow: 0.7px 0.7px 1.2px #000000; //subpixel necessary?
+		text-align: center;
+	}
 
-.spellunit_mp {
-	display: flex;
-	max-width: 128px;
-	height: 21px;
-	padding: 2px;
-	background: linear-gradient( to right, #1056db, #73f5fe );
-	border-bottom: 1px solid #333333;
-	align-items: center;
-	justify-content: center;
-	font-weight: bold;
-	font-size: 80%;
-	text-shadow: 0.7px 0.7px 1.2px #000000;
-	text-align: center;
-}
+	&_hp {
+		background: linear-gradient( to right, #286323, #7af03c );
+	}
 
-.spellunit_cellt {
-	display: table-cell;
-	width: 30px;
-	height: 21px;
-	text-align: right;
-}
+	&_mp {
+		background: linear-gradient( to right, #1056db, #73f5fe );
+	}
 
-.spellunit_cellv {
-	display: table-cell;
-	padding-left: 8px;
-	width: 200px;
-	height: 21px;
-	text-align: left;
+	&_cellt {
+		display: table-cell;
+		width: 1.875rem; // 30px
+		height: 1.3125rem; // 21px
+		text-align: right;
+	}
+
+	&_cellv {
+		display: table-cell;
+		padding-left: 0.5rem;
+		width: 12.5rem; // 200px
+		height: 1.3125rem; // 21px
+		text-align: left;
+	}
 }
 
 /* Invokecard */
 .invokeCard {
-	font-size: 85%;
-	width: 100px;
-	height: 100px;
-	margin: 5px;
-	border: 1px solid rgba( 51, 51, 51, 0.5 );
+	font-size: 85%; // convert to rem
+	width: 6.25rem; // 100px
+	height: 6.25rem; // 100px
+	margin: 0.3125rem;
+	border: 0.0625rem solid rgba( 51, 51, 51, 0.5 );
 	background-color: rgba( 51, 51, 51, 0.5 );
 
 	&:hover {
-		border: 1px solid #f7f7f7;
+		border: 0.0625rem solid #f7f7f7;
 	}
 }
 
 .invokePad {
-	padding: 4px;
+	padding: 0.25rem;
 }
 
 /* Facetcard-related */
 .facetBox {
 	background: rgba( 35, 46, 52, 0.25 );
-	padding: 5px;
-	border: 1px solid #505050;
+	padding: 0.3125rem;
+	border: 0.0625rem solid #505050;
 	color: #ffffff;
 	transition: 0.35s;
 
 	&:hover {
-		border: 1px solid #f7f7f7;
+		border: 0.0625rem solid #f7f7f7;
 	}
 }
 
@@ -470,21 +453,21 @@ The smaller sizes are for sub-sections. */
 .facetLink {
 	font-weight: bold;
 	color: #e2e2e6;
-	text-shadow: 1px 1px 2px #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 }
 
 /* Aghcard-related */
 .aghupgBody {
 	display: inline-block;
-	max-width: 460px;
+	max-width: 28.75rem; // 460px
 	width: 100%;
-	font-size: 90%;
+	font-size: 90%; // convert to rem
 	background: rgba( 35, 46, 52, 0.75 );
 	text-align: left;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-top: 5px;
-	border: 1px solid #505050;
+	padding-left: 0.3125rem;
+	padding-right: 0.3125rem;
+	padding-top: 0.3125rem;
+	border: 0.0625rem solid #505050;
 	color: #d9e0e8;
 }
 
