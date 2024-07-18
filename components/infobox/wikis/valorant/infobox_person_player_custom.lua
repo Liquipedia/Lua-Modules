@@ -94,6 +94,7 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}})
 		table.insert(widgets, Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}})
 		table.insert(widgets, Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}})
+
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
