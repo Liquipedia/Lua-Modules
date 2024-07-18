@@ -26,6 +26,7 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 
 ---@class FightersBlockPlayerProps: BlockPlayerProps
 ---@field player FightersStandardPlayer
+---@field oneLine boolean?
 
 ---@class FightersInlinePlayerProps: InlinePlayerProps
 ---@field player FightersStandardPlayer
@@ -56,9 +57,8 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	if props.showFlag ~= false and player.flag then
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
-	mw.logObject(player.chars, 'BlockPlayer')
 
-	local characterNode = mw.html.create()
+	local characterNode = mw.html.create('div')
 	if player.chars then
 		Array.forEach(player.chars, function (character)
 			characterNode:node(
@@ -74,13 +74,26 @@ function CustomPlayerDisplay.BlockPlayer(props)
 			:node(mw.ext.TeamTemplate.teampart(player.team))
 	end
 
-	return mw.html.create('div'):addClass('block-player starcraft-block-player')
-		:addClass(props.flip and 'flipped' or nil)
-		:addClass(props.showPlayerTeam and 'has-team' or nil)
-		:node(flagNode)
+	if props.oneLine then
+		return mw.html.create('div'):addClass('block-player starcraft-block-player')
+			:addClass(props.flip and 'flipped' or nil)
+			:addClass(props.showPlayerTeam and 'has-team' or nil)
+			:node(flagNode)
+			:node(characterNode)
+			:node(nameNode)
+			:node(teamNode)
+	end
+
+	return mw.html.create()
+		:node(
+			mw.html.create('div'):addClass('block-player starcraft-block-player')
+			:addClass(props.flip and 'flipped' or nil)
+			:addClass(props.showPlayerTeam and 'has-team' or nil)
+			:node(flagNode)
+			:node(nameNode)
+			:node(teamNode)
+		)
 		:node(characterNode)
-		:node(nameNode)
-		:node(teamNode)
 end
 
 ---@param props FightersInlinePlayerProps
