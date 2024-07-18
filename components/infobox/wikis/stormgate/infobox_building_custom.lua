@@ -8,7 +8,7 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local Attack = require('Module:Infobox/Extension/Attack/dev')
+local Attack = require('Module:Infobox/Extension/Attack')
 local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
@@ -84,7 +84,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
+			Cell{name = 'Building Requirements', content = 
+					caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		return {
@@ -202,7 +203,7 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
----@return string[]
+---@return string?
 function CustomBuilding:_getDefenseDisplay()
 	if not Logic.isNumeric(self.args.health) then return end
 	local armor = self.args.armor or '0'
@@ -219,7 +220,7 @@ function CustomBuilding:_getDefenseDisplay()
 end
 
 ---@param inputString string?
----@return string[]
+---@return string
 function CustomBuilding:_displayCommaSeparatedString(inputString)
 	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)

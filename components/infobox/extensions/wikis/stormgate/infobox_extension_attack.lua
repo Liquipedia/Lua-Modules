@@ -112,7 +112,7 @@ end
 
 
 ---@param inputString string?
----@return string[]
+---@return string
 function Attack._displayCommaSeparatedString(inputString)
 	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)

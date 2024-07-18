@@ -167,12 +167,12 @@ function CustomUnit:nameDisplay(args)
 end
 
 ---@param args table
----@return string
+---@return string?
 function CustomUnit:subHeaderDisplay(args)
 	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
 	return tostring(mw.html.create('span')
-	  :css('font-size', '90%')
-	  :wikitext('Hero: ' .. self:_displayCommaSeparatedString(args.subfaction))
+		:css('font-size', '90%')
+		:wikitext('Hero: ' .. self:_displayCommaSeparatedString(args.subfaction))
 	)
 end
 
@@ -283,7 +283,7 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 end
 
 ---@param inputString string?
----@return string[]
+---@return string
 function CustomUnit:_displayCommaSeparatedString(inputString)
 	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)
