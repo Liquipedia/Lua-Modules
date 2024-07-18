@@ -54,6 +54,9 @@ function MatchLegacy._convertParameters(match2)
 		matchsection = extradata.matchsection or '',
 	}
 
+	match.shortname = match.tournament
+	match.tournament = match.parent
+
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' and bracketData.inheritedheader then
 		match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
