@@ -19,7 +19,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local MessageBox = require('Module:Message box')
-
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
@@ -31,8 +30,8 @@ local Cell = Widgets.Cell
 local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 
@@ -61,60 +60,75 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
+	local SEP = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = caller:_displayCommaSeparatedString(args.type)},
+			Cell{name = 'Type', content = {caller:_displayCommaSeparatedString(args.type)}},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = caller:_displayCommaSeparatedString(args.built)},
+			Cell{name = 'Built From', content = {caller:_displayCommaSeparatedString(args.built)}},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
-			Cell{name = 'Building Requirement', content = caller:_displayCommaSeparatedString(args.building_requirement)},
+			Cell{name = 'Tech. Requirement', content = {caller:_displayCommaSeparatedString(args.tech_requirement)}},
+			Cell{name = 'Building Requirement', content = {caller:_displayCommaSeparatedString(args.building_requirement)}},
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
-				faction = caller.faction,
-				luminite = args.luminite,
-				luminiteTotal = args.totalluminite,
-				luminiteForced = true,
-				therium = args.therium,
-				theriumTotal = args.totaltherium,
-				theriumForced = true,
-				supply = args.supply,
-				supplyTotal = args.totalsupply,
-				supplyForced = true,
-				animus = args.animus,
-				animusTotal = args.totalanimus,
-			}}},
-			Cell{name = 'Build Time', content = {args.buildtime and (args.buildtime .. 's') or nil}},
-			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
+			Cell{
+				name = 'Cost', 
+				content = {
+					args.informationType ~= 'Hero' and CostDisplay.run{
+						faction = caller.faction,
+						luminite = args.luminite,
+						luminiteTotal = args.totalluminite,
+						luminiteForced = true,
+						therium = args.therium,
+						theriumTotal = args.totaltherium,
+						theriumForced = true,
+						supply = args.supply,
+						supplyTotal = args.totalsupply,
+						supplyForced = true,
+						animus = args.animus,
+						animusTotal = args.totalanimus,
+					} or nil
+				}
+			},
+			Cell{
+				name = args.charge_time and 'Built' .. SEP .. 'Recharge Time' or 'Built Time', 
+				content = {
+					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or 
+					args.buildtime and args.buildtime .. 's' or nil
+				}
+			},		
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = 'Hotkeys', content = {CustomUnit._hotkeys(args.hotkey, args.hotkey2)}},
-			Cell{name = 'Macrokeys', content = {CustomUnit._hotkeys(args.macro_key, args.macro_key2)}},
+			Cell{
+				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys', 
+				content = {
+					args.hotkey and args.macro_key and 
+						CustomUnit._hotkeys(args.hotkey, args.hotkey2) .. SEP .. CustomUnit._hotkeys(args.macro_key, args.macro_key2) or 
+					args.hotkey and {CustomUnit._hotkeys(args.hotkey, args.hotkey2)} or nil
+				}
+			},
 		}
 	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Health', content = {caller:_getHealthDisplay()}},
-			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
+			Cell{name = 'Defense', content = {caller:_getHealthDisplay()}},
+			Cell{name = 'Attributes', content = {caller:_displayCommaSeparatedString(args.armor_type)}}
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)},
+			Cell{name = 'Upgrades To', content = {caller:_displayCommaSeparatedString(args.upgrades_to)}},
 			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
-		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
@@ -126,21 +140,17 @@ end
 ---@return string?
 function CustomUnit:_getHealthDisplay()
 	if not Logic.isNumeric(self.args.health) then return end
+	local armor = self.args.armor or '0'
 
-	return table.concat({
+	local health = table.concat({
 		ICON_HP .. ' ' .. self.args.health,
 		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
 	}, '&nbsp;')
-end
 
----@return string[]
-function CustomUnit:_getArmorDisplay()
-	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
-
-	return Array.append({},
+	return table.concat({
+		health, 
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-		String.nilIfEmpty(table.concat(armorTypes, ', '))
-	)
+	}, '&nbsp;')
 end
 
 ---@param args table
@@ -150,6 +160,16 @@ function CustomUnit:nameDisplay(args)
 	factionIcon = factionIcon and (factionIcon .. '&nbsp;') or ''
 
 	return factionIcon .. (args.name or self.pagename)
+end
+
+---@param args table
+---@return string
+function CustomUnit:subHeaderDisplay(args)
+	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
+	return tostring(mw.html.create('span')
+	  :css('font-size', '90%')
+	  :wikitext('Hero: ' .. self:_displayCommaSeparatedString(args.subfaction))
+	)
 end
 
 ---@return string?
@@ -260,10 +280,12 @@ end
 
 ---@param inputString string?
 ---@return string[]
-function CustomUnit:_displayCommaSeparatedString(inputString)
-	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
-		return Page.makeInternalLink({}, value)
-	end)
+function CustomUnit:_displayCommaSeparatedString(inputString)	
+	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString), 
+		function(value)
+			return Page.makeInternalLink(value)
+		end	
+	), ', ')
 end
 
 ---@param key string
@@ -286,7 +308,7 @@ function CustomUnit:_processPatchFromId(key)
 end
 
 ---@param patch string?
----@return Html? -would need to check what warningbox actually returns ... am on phone ...
+---@return Html?
 function CustomUnit._deprecatedWarning(patch)
 	if not patch then return end
 
