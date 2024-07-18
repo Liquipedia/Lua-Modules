@@ -868,28 +868,22 @@ div.infostripe a:active {
 	text-decoration: none;
 }
 
-.gradient_gameplay {
-	background: -webkit-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
-	background: -o-linear-gradient( 75deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
-	background: linear-gradient( 15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
-}
+.gradient {
+	&_gameplay {
+		background: linear-gradient( 15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	}
 
-.gradient_cosmetics {
-	background: -webkit-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
-	background: -o-linear-gradient( 75deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
-	background: linear-gradient( 15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
-}
+	&_cosmetics {
+		background: linear-gradient( 15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	}
 
-.gradient_audio {
-	background: -webkit-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
-	background: -o-linear-gradient( 75deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
-	background: linear-gradient( 15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
-}
+	&_audio {
+		background: linear-gradient( 15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	}
 
-.gradient_history {
-	background: -webkit-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
-	background: -o-linear-gradient( 75deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
-	background: linear-gradient( 15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	&_history {
+		background: linear-gradient( 15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	}
 }
 
 div.infostripe div {
