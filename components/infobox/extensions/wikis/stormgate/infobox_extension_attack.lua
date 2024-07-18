@@ -48,27 +48,28 @@ function Attack.run(argsJson, attackIndex, faction)
 	return {
 		Title{name = 'Attack' .. attackIndex .. ': ' .. args.name},
 		Cell{name = 'Target', content = {Attack._displayCommaSeparatedString(args.target)}},
-		Cell{
-			name = 'Damage',
-			content = {
-				data.damagePercentage and data.damagePercentage .. '%' or
-				data.bonus and data.bonusDamage and data.damage .. ' (+' .. data.bonusDamage ..
-				' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')'  or
-				data.damage
-			}
-		},
+		Cell{name = 'Damage', content = {Attack._displayDamage(data)}},
 		Cell{name = 'Effect', content = {Attack._displayCommaSeparatedString(args.effect)}},
 		Cell{name = 'Attack Speed', content = {data.speed}},
-		Cell{
-			name = 'DPS',
-			content = {
-				data.bonus and data.bonusDps and data.dps and
-				data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')' or
-				data.dps
-			}
-		},
+		Cell{name = 'DPS', content = {Attack._displayDPS(data)}},
 		Cell{name = 'Range', content = {data.range}},
 	}
+end
+
+---@param data table?
+---@return string
+function Attack._displayDamage(data)
+	return data.damagePercentage and data.damagePercentage .. '%' or
+		data.bonus and data.bonusDamage and data.damage .. ' (+' .. data.bonusDamage ..
+		' vs ' .. Attack._displayCommaSeparatedString(data.bonus) .. ')'  or data.damage
+end
+
+---@param data table?
+---@return string
+function Attack._displayDPS(data)
+	return data.bonus and data.bonusDps and data.dps and
+		data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayCommaSeparatedString(data.bonus) .. ')' or
+		data.dps
 end
 
 ---@param args table
