@@ -97,9 +97,13 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{
-				name = args.charge_time and 'Built' .. SEP .. 'Recharge Time' or 'Built Time',
+				name = 
+					args.buildtime and args.charge_time and 'Built' .. SEP .. 'Recharge Time' or
+					args.charge_time and 'Recharge Time' or
+					'Built Time',					
 				content = {
-					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or
+					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or 
+					args.charge_time and args.charge_time .. 's' or
 					args.buildtime and args.buildtime .. 's' or nil
 				}
 			},
@@ -111,7 +115,7 @@ function CustomInjector:parse(id, widgets)
 				content = {
 					args.hotkey and args.macro_key and
 						CustomUnit._hotkeys(args.hotkey, args.hotkey2) .. SEP .. CustomUnit._hotkeys(args.macro_key, args.macro_key2) or
-					args.hotkey and {CustomUnit._hotkeys(args.hotkey, args.hotkey2)} or nil
+					args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2) or nil
 				}
 			},
 		}
