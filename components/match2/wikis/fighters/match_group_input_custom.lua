@@ -27,7 +27,7 @@ local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 10
 local DEFAULT_BESTOF = 99
 
-local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+local DUMMY_MAP_NAME = 'Null' -- Is set in Template:Map when |map= is empty.
 
 local CustomMatchGroupInput = {}
 
@@ -86,15 +86,13 @@ end
 -- we have results without knowledge of which map it was planned on.
 ---@param match table
 function CustomMatchGroupInput._verifyMaps(match)
-	for idx, map in Table.iter.pairsByPrefix(match, 'map') do
+	for key, map in Table.iter.pairsByPrefix(match, 'map') do
 		if CustomMatchGroupInput._discardMap(map) then
-			match['map' .. idx] = nil
+			match[key] = nil
 		elseif map.map == DUMMY_MAP_NAME then
-			map.map = ''
+			match[key].map = ''
 		end
 	end
-
-	return match
 end
 
 -- Check if a map should be discarded due to being none-relevant data
