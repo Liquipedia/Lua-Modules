@@ -92,13 +92,6 @@ The smaller sizes are for sub-sections. */
 	border-left: 6px solid #a7a7a7;
 }
 
-/* Spellcard Ability Borders (Autocast Animations) */
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
 @keyframes rotate {
 	100% {
 		transform: rotate( 1turn );
@@ -116,6 +109,7 @@ The smaller sizes are for sub-sections. */
 	outline-offset: -4px;
 }
 
+.target_autocast1::before,
 .target_autocast::before {
 	content: "";
 	position: absolute;
@@ -130,6 +124,7 @@ The smaller sizes are for sub-sections. */
 	animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
 }
 
+.target_autocast1::after,
 .target_autocast::after {
 	content: "";
 	position: absolute;
@@ -150,8 +145,7 @@ The smaller sizes are for sub-sections. */
 
 .target_aam {
 	border: 6px solid #999999;
-	border-image: linear-gradient( -45deg, #fc9303, #899499 73% );
-	border-image-slice: 1;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
 }
 
 .target_no1,
@@ -178,18 +172,6 @@ The smaller sizes are for sub-sections. */
 	border-left: 3px solid #a7a7a7;
 }
 
-*,
-*::before,
-*::after {
-	box-sizing: border-box;
-}
-
-@keyframes rotate {
-	100% {
-		transform: rotate( 1turn );
-	}
-}
-
 .target_autocast1 {
 	position: relative;
 	z-index: 0;
@@ -201,42 +183,13 @@ The smaller sizes are for sub-sections. */
 	outline-offset: -4px;
 }
 
-.target_autocast1::before {
-	content: "";
-	position: absolute;
-	z-index: -2;
-	left: -50%;
-	top: -50%;
-	width: 200%;
-	height: 200%;
-	background-color: transparent;
-	background-repeat: no-repeat;
-	background-image: linear-gradient( #000000, #fbb300 );
-	animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
-}
-
-.target_autocast1::after {
-	content: "";
-	position: absolute;
-	z-index: -1;
-	left: 6px;
-	top: 6px;
-	width: calc( 100% - 12px );
-	height: calc( 100% - 12px );
-	border-radius: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
 .target_autocast-off1 {
 	border: 3px ridge #899499;
 }
 
 .target_aam1 {
 	border: 3px solid #999999;
-	border-image: linear-gradient( -45deg, #fc9303, #899499 73% );
-	border-image-slice: 1;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
 }
 
 .target_downtime1 {
@@ -312,16 +265,16 @@ The smaller sizes are for sub-sections. */
 
 .spelldesc {
 	border-top: 1px solid #333333;
+
+	&:hover {
+		border-top: 1px solid #999999;
+	}
 }
 
 .spellagh {
 	font-weight: bold;
 	color: #a885ff;
 	text-shadow: 1px 1px 2px #000000;
-}
-
-.spelldesc:hover {
-	border-top: 1px solid #999999;
 }
 
 .spelltrait_value {
@@ -386,18 +339,18 @@ The smaller sizes are for sub-sections. */
 	padding: 3px;
 	font-size: 70%;
 	border: 1px solid #7681968c;
-}
 
-.spellintern:hover {
-	border: 1px solid #768196;
+	&:hover {
+		border: 1px solid #768196;
+	}
 }
 
 .iconrotate {
 	transition: all 6s;
-}
 
-.iconrotate:hover {
-	transform: rotate( 1080deg );
+	&:hover {
+		transform: rotate( 1080deg );
+	}
 }
 
 .spellvalueTable {
@@ -427,10 +380,10 @@ The smaller sizes are for sub-sections. */
 	text-align: center;
 	font-size: 70%;
 	font-weight: bold;
-}
 
-.ib-tooltip:hover {
-	background-color: rgba( 255, 215, 0, 0.5 );
+	&:hover {
+		background-color: rgba( 255, 215, 0, 0.5 );
+	}
 }
 
 /* Spellunit-related */
@@ -444,10 +397,10 @@ The smaller sizes are for sub-sections. */
 	color: #e2e2e6;
 	text-shadow: 1px 1px 2px #000000;
 	font-weight: bold;
-}
 
-.spellunit_topage:hover {
-	color: #daa520;
+	&:hover {
+		color: #daa520;
+	}
 }
 
 .spellunit_hp {
@@ -503,10 +456,10 @@ The smaller sizes are for sub-sections. */
 	margin: 5px;
 	border: 1px solid rgba( 51, 51, 51, 0.5 );
 	background-color: rgba( 51, 51, 51, 0.5 );
-}
 
-.invokeCard:hover {
-	border: 1px solid #f7f7f7;
+	&:hover {
+		border: 1px solid #f7f7f7;
+	}
 }
 
 .invokePad {
@@ -520,10 +473,10 @@ The smaller sizes are for sub-sections. */
 	border: 1px solid #505050;
 	color: #ffffff;
 	transition: 0.35s;
-}
 
-.facetBox:hover {
-	border: 1px solid #f7f7f7;
+	&:hover {
+		border: 1px solid #f7f7f7;
+	}
 }
 
 .facetTitle {
@@ -580,11 +533,11 @@ The smaller sizes are for sub-sections. */
 	padding: 5px;
 	border: 1px solid #505050;
 	width: 100%;
-}
 
-.aghupgShadow:hover {
-	background-color: rgba( 9, 13, 17, 1 );
-	transition: 0.15s;
+	&:hover {
+		background-color: rgba( 9, 13, 17, 1 );
+		transition: 0.15s;
+	}
 }
 
 .aghupgDesc {
@@ -615,11 +568,11 @@ The smaller sizes are for sub-sections. */
 
 .gameplay_talbutton {
 	color: #f3e494;
-}
 
-.gameplay_talbutton:hover {
-	text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-	cursor: default;
+	&:hover {
+		text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+		cursor: default;
+	}
 }
 
 .gameplay_tallvl {
@@ -628,13 +581,13 @@ The smaller sizes are for sub-sections. */
 	text-shadow: 1px 1px 8px transparent, -1px -1px 8px transparent;
 	border-left: 2px solid #131313;
 	border-right: 2px solid #131313;
-}
 
-.gameplay_tallvl:hover {
-	text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-	cursor: default;
-	border-left: 2px solid #f3e494;
-	border-right: 2px solid #f3e494;
+	&:hover {
+		text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
+		cursor: default;
+		border-left: 2px solid #f3e494;
+		border-right: 2px solid #f3e494;
+	}
 }
 
 .gameplay_taldesc {
@@ -643,12 +596,12 @@ The smaller sizes are for sub-sections. */
 	min-width: 200px;
 	text-shadow: initial;
 	font-weight: initial;
-}
 
-.gameplay_taldesc:hover {
-	color: #e2e2e6;
-	text-shadow: initial;
-	font-weight: initial;
+	&:hover {
+		color: #e2e2e6;
+		text-shadow: initial;
+		font-weight: initial;
+	}
 }
 
 /* these two styles are same for the talent level hover glow */
@@ -1363,11 +1316,11 @@ div.skilllist-col5 ul li {
 	color: #000000;
 	font-family: sans-serif;
 	font-size: 0.875em;
-}
 
-#context-menu li a:hover {
-	background: #b44335;
-	color: #ffffff;
+	&:hover {
+		background: #b44335;
+		color: #ffffff;
+	}
 }
 
 .ability-description {
@@ -1611,10 +1564,10 @@ img.pixelart {
 	text-decoration: none;
 	font-size: 90%;
 	line-height: 24px;
-}
 
-.buynow_button:hover {
-	background: linear-gradient( 0deg, #000000 0%, #999999 100% );
+	&:hover {
+		background: linear-gradient( 0deg, #000000 0%, #999999 100% );
+	}
 }
 
 .buynow_store:before {
