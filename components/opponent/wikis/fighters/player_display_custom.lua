@@ -58,7 +58,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
 
-	local characterNode = mw.html.create('div')
+	local characterNode = mw.html.create()
 	if player.chars then
 		Array.forEach(player.chars, function (character)
 			characterNode:node(
