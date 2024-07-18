@@ -695,14 +695,14 @@ div.gameplay_nav ul li ul li {
 /* Recent Changes */
 .mw-rcfilters-ui-changesListWrapperWidget {
 	right: 3.125rem; // 50px
-}
 
-.mw-rcfilters-ui-changesListWrapperWidget h4 {
-	padding-left: 3.125rem; // 50px
-}
+	h4 {
+		padding-left: 3.125rem; // 50px
+	}
 
-.mw-rcfilters-ui-changesListWrapperWidget-previousChangesIndicator {
-	margin-left: 3.125rem; // 50px
+	&-previousChangesIndicator {
+		margin-left: 3.125rem; // 50px
+	}
 }
 
 .cosm-inf-setname {
@@ -730,8 +730,6 @@ div.gameplay_nav ul li ul li {
 .updatetablehead #date,
 .updatetablebody #patch,
 .updatetablebody #version {
-	-webkit-box-flex: 0;
-	-ms-flex: 0 0 7.5rem;
 	flex: 0 0 7.5rem;
 	text-align: center;
 	font-weight: bold;
@@ -754,8 +752,6 @@ div.gameplay_nav ul li ul li {
 
 .updatetablebody #entry {
 	display: flex;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
 	align-items: center;
 	border-top: 0.0625rem solid #aaaaaa;
 }
@@ -782,11 +778,11 @@ div.gameplay_nav ul li ul li {
 ul.shopnav {
 	margin: 0;
 	list-style: none;
-}
 
-ul.shopnav li {
-	margin: 0.25rem;
-	box-shadow: 0 0 0.0625rem 0.125rem #008000;
+	li {
+		margin: 0.25rem;
+		box-shadow: 0 0 0.0625rem 0.125rem #008000;
+	}
 }
 
 /* Item List Styling on [[Items]] */
@@ -795,11 +791,11 @@ div.itemlist {
 	display: flex;
 	flex-wrap: wrap;
 	font-weight: 500;
-}
 
-div.itemlist > div {
-	flex-basis: 25rem; // 400px;
-	padding: 0.1875rem 0;
+	> div {
+		flex-basis: 25rem; // 400px;
+		padding: 0.1875rem 0;
+	}
 }
 
 /* Hero Infostrip */
@@ -814,15 +810,15 @@ div.infostripe {
 	text-align: center;
 	text-shadow: 0 0 0.3125rem #000000;
 	font-size: 1.25rem;
-}
 
-div.infostripe a,
-div.infostripe a:link,
-div.infostripe a:visited,
-div.infostripe a:hover,
-div.infostripe a:active {
-	color: #ffffff;
-	text-decoration: none;
+	a,
+	a:link,
+	a:visited,
+	a:hover,
+	a:active {
+		color: #ffffff;
+		text-decoration: none;
+	}
 }
 
 .gradient {
@@ -867,47 +863,43 @@ div.heroentry {
 
 div.heroentrytext {
 	display: flex;
-	-webkit-box-align: end;
-	-ms-flex-align: end;
 	align-items: flex-end;
-	-webkit-box-pack: center;
-	-ms-flex-pack: center;
 	justify-content: center;
 	margin: 0.0625rem 0.125rem;
-	width: 106px;
-	height: 60px;
+	width: 6.625rem; // 106px
+	height: 3.75rem; // 60px
 	color: #ffffff;
 	text-align: center;
 	text-shadow: -0.0625rem 0 0.2em #000000, 0 0.0625rem 0.2em #000000, 0.0625rem 0 0.2em #000000, 0 -0.0625rem 0.2em #000000;
-	font-size: 11px;
-	line-height: 15px;
+	font-size: 0.6875rem;
+	line-height: 0.9375rem;
 	pointer-events: none;
 }
 
 /* Main Page styling */
 
 .mp-content-table {
-	/* Main border color		*/
-	margin: 0.5em 0;
+	/* Main border color */
+	margin: 0.5em 0; // convert to rem
 	width: 100%;
-	/* Body background color	*/
+	/* Body background color */
 	border: 0.0625rem solid #b44335;
 	background: #fefeff;
 }
 
 .mp-content-header {
-	padding: 0.5em 0;
+	padding: 0.5em 0; // convert to rem
 	/* Header background color */
 	border: 0;
 	border-bottom: 0.0625rem solid #b44335;
 	background: #b44335;
 	color: #ffffff;
-	font-size: 140%;
+	font-size: 140%; // convert to rem
 	/* Main border color		*/
 }
 
 .mp-content-body {
-	padding: 0.5em;
+	padding: 0.5em; // convert to rem
 }
 
 /* Don't wordwrap top links on main page */
@@ -924,22 +916,22 @@ div.heroentrytext {
 }
 
 .mp-content-header-alt {
-	margin: -0.5em -0.5em 0;
-	padding: 0.5em 0.75em 0.5em  0.5em;
+	margin: -0.5em -0.5em 0; // convert to rem
+	padding: 0.5em 0.75em 0.5em  0.5em; // convert to rem
 	border: 0;
 	border-bottom: 0.0625rem solid #b44335;
 	color: #ffffff;
 	/* Main border color		*/
 	text-align: left;
 	font-weight: bold;
-	font-size: 140%;
+	font-size: 140%; // convert to rem
 }
 
 /* Auto-size main page index icons */
 
 .mp-index-icon {
-	min-width: 64px;
-	max-width: 128px;
+	min-width: 4rem; // 64px
+	max-width: 8rem; // 128px
 	width: 100%;
 	/* Image sizes. Re-produce larger? */
 	height: auto;
@@ -948,13 +940,11 @@ div.heroentrytext {
 /* The main page banner */
 
 .giant-banner {
-	margin-bottom: 20px;
+	margin-bottom: 1.25rem;
 }
 
 .giant-banner img {
-	-o-object-fit: cover;
 	object-fit: cover;
-	-o-object-position: center;
 	object-position: center;
 	width: 100%;
 	height: 100%;
@@ -962,35 +952,26 @@ div.heroentrytext {
 
 #mw-js-message,
 .usermessage {
-	margin-bottom: 39px !important;
+	margin-bottom: 2.4375rem !important; // 39px
 }
 
 #mp-layout {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
-	-webkit-box-orient: horizontal;
-	-webkit-box-direction: normal;
-	-ms-flex-direction: row;
 	flex-direction: row;
 }
 
 #mp-layout #mp-left {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 1 auto;
 	flex: 1 1 auto;
-	margin-right: 1em;
+	margin-right: 1em; // convert to rem
 }
 
 #mp-layout #mp-right {
-	-webkit-box-flex: 0;
-	-ms-flex: 0 0 500px;
-	flex: 0 0 500px;
+	flex: 0 0 31.25rem; // 500px
 }
 
 #mp-layout .mp-block {
-	margin-bottom: 1em;
-	padding: 1em;
+	margin-bottom: 1em; // convert to rem
+	padding: 1em; // convert to rem
 	border: solid 0.0625rem #660000;
 }
 
@@ -1002,11 +983,11 @@ div.heroentrytext {
 }
 
 #mp-layout .mp-heading {
-	height: 50px;
+	height: 3.125rem; // 50px
 	border-bottom: solid 0.0625rem #cccccc;
 	text-align: center;
 	font-weight: bold;
-	font-size: 170%;
+	font-size: 170%; // convert to rem
 }
 
 #mp-layout #heroes .mp-content {
@@ -1014,16 +995,11 @@ div.heroentrytext {
 }
 
 .useful-articles-layout {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
-	-ms-flex-wrap: wrap;
 	flex-wrap: wrap;
 }
 
 .useful-articles-layout > div {
-	-webkit-box-flex: 0;
-	-ms-flex: 0 0 33%;
 	flex: 0 0 33%;
 	max-width: 33%;
 	word-wrap: break-word;
@@ -1039,11 +1015,11 @@ div.heroentrytext {
 /* Sidebar */
 
 div#bodyContent2 {
-	margin-right: 320px;
-	min-height: 920px;
+	margin-right: 20rem; // 320px
+	min-height: 57.5rem; // 920px
 	width: auto;
-	font-size: 0.8em;
-	line-height: 1.5em;
+	font-size: 0.8em; // convert to rem
+	line-height: 1.5em; // convert to rem
 }
 
 /* Fixing vector/main-ltr.css putting a white background on the Quotation template */
@@ -1055,7 +1031,7 @@ table.quotation {
 /* Client-side image scaling */
 
 .images40pxwidth img {
-	width: 40px;
+	width: 2.5rem;
 	height: auto;
 }
 
@@ -1067,86 +1043,76 @@ table.quotation {
 	vertical-align: top;
 	text-align: center;
 	line-height: normal;
-}
 
-.cosmetic-label > div {
-	margin-bottom: 0.3125rem;
+	> div {
+		margin-bottom: 0.3125rem;
+	}
 }
 
 /* Skill list styles [[Template:SkillListRich]] */
 
 div.skilllist {
 	width: 100%;
+
+	&-title {
+		border: 0.0625rem solid #aaaaaa;
+		background-color: #ffaea3;
+		color: #000000;
+		text-align: center;
+		font-weight: bold;
+		font-size: 100%;
+	}
+
+	ul {
+		display: flex;
+		overflow: hidden;
+		flex-wrap: wrap;
+		margin: 0;
+		padding: 0;
+	}
 }
 
-div.skilllist-title {
-	border: 0.0625rem solid #aaaaaa;
-	background-color: #ffaea3;
-	color: #000000;
-	text-align: center;
-	font-weight: bold;
-	font-size: 100%;
-}
-
-div.skilllist ul {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	overflow: hidden;
-	-ms-flex-wrap: wrap;
-	flex-wrap: wrap;
+li.skilllist-lite,
+li.skilllist-rich {
+	display: inline-block;
+	box-sizing: border-box; // shouldn't be necessary?
 	margin: 0;
-	padding: 0;
+	padding: 0.1875rem;
+	border: 0.0625rem solid #aaaaaa;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
 }
 
 li.skilllist-lite {
-	display: inline-block;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0.1875rem;
-	border: 0.0625rem solid #aaaaaa;
-	color: #ffffff;
-	list-style: none;
-	vertical-align: top;
-	text-align: left;
-	text-decoration: none;
-	font-weight: bold;
-	font-size: 110%;
-}
-
-li.skilllist-rich {
-	display: inline-block;
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0.1875rem;
-	border: 0.0625rem solid #aaaaaa;
-	list-style: none;
-	vertical-align: top;
-	text-align: left;
-}
-
-div.skilllist-rich-head {
-	padding: 0.1875rem 0.3125rem;
-	border-bottom: 0.0625rem solid #000000;
 	color: #ffffff;
 	text-decoration: none;
 	font-weight: bold;
-	font-size: 110%;
+	font-size: 110%; // convert to rem
 }
 
-div.skilllist-rich-image {
-	display: inline-block;
-	width: 64px;
-	vertical-align: top;
-}
+div.skilllist-rich {
+	&-head {
+		padding: 0.1875rem 0.3125rem;
+		border-bottom: 0.0625rem solid #000000;
+		color: #ffffff;
+		text-decoration: none;
+		font-weight: bold;
+		font-size: 110%; // convert to rem
+	}
 
-div.skilllist-rich-desc {
-	display: inline-block;
-	padding: 0.1875rem 0.3125rem;
-	max-width: calc( ~"100% - 74px" );
-	vertical-align: top;
+	&-image {
+		display: inline-block;
+		width: 4rem; // 64px
+		vertical-align: top;
+	}
+
+	&-desc {
+		display: inline-block;
+		padding: 0.1875rem 0.3125rem;
+		max-width: calc( ~"100% - 74px" );
+		vertical-align: top;
+	}
 }
 
 div.skilllist li.skilllist-lite a,
@@ -1170,36 +1136,26 @@ li.skilllist-rich div.skilllist-rich-head a:active {
 /* Skill list styles [[Template:SkillListRich]] */
 
 div.skilllist-col1 ul li {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 0 100%;
 	flex: 1 0 100%;
 	width: 100%;
 }
 
 div.skilllist-col2 ul li {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 0 50%;
 	flex: 1 0 50%;
 	width: 50%;
 }
 
 div.skilllist-col3 ul li {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 0 calc( 100%/3 );
 	flex: 1 0 calc( 100%/3 );
 	width: calc( 100%/3 );
 }
 
 div.skilllist-col4 ul li {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 0 25%;
 	flex: 1 0 25%;
 	width: 25%;
 }
 
 div.skilllist-col5 ul li {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 0 20%;
 	flex: 1 0 20%;
 	width: 20%;
 }
@@ -1239,7 +1195,7 @@ div.skilllist-col5 ul li {
 	text-decoration: none;
 	color: #000000;
 	font-family: sans-serif;
-	font-size: 0.875em;
+	font-size: 0.875em; // convert to rem
 
 	&:hover {
 		background: #b44335;
@@ -1250,22 +1206,22 @@ div.skilllist-col5 ul li {
 .ability-description {
 	display: block;
 	float: right;
-	width: 312px;
-}
+	width: 19.5rem; // 312px
 
-.ability-description.adItemOrRune {
-	width: 450px;
+	&.adItemOrRune {
+		width: 28.125rem; // 450px
+	}
 }
 
 .aml50 {
-	margin-left: 50px;
+	margin-left: 3.125rem // 50px
 }
 
 .talsymbolbg {
 	display: inline-block;
 	vertical-align: top;
 	background-color: #151515;
-	box-shadow: 0.0625rem 0.0625rem 1.5px #000000;
+	box-shadow: 0.0625rem 0.0625rem 0.0625rem #000000;
 	border-width: 0.0625rem;
 	border-radius: 50%;
 	padding: 0 0;
@@ -1274,7 +1230,7 @@ div.skilllist-col5 ul li {
 }
 
 /* Import fonts */
-
+// Is it needed to import all these fonts? It's extra load time for the user
 @font-face {
 	font-family: "Radiance";
 	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( "woff" );
@@ -1343,8 +1299,8 @@ div.skilllist-col5 ul li {
 * === Ability template ===
 */
 .ability-background {
-	flex: 0 1 460px;
-	margin-right: 15px;
+	flex: 0 1 28.75rem; // 460px
+	margin-right: 0.9375rem;
 	vertical-align: top;
 }
 
@@ -1352,10 +1308,10 @@ div.skilllist-col5 ul li {
 * === Relics ===
 */
 .relics {
-	width: 140px;
+	width: 8.75rem; // 140px
 	margin: 0.3125rem;
 	border: 0.0625rem solid #111111;
-	font-size: 80%;
+	font-size: 80%; // convert to rem
 }
 
 /*
