@@ -26,6 +26,7 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 
 ---@class FightersBlockPlayerProps: BlockPlayerProps
 ---@field player FightersStandardPlayer
+---@field oneLine boolean?
 
 ---@class FightersInlinePlayerProps: InlinePlayerProps
 ---@field player FightersStandardPlayer
@@ -71,6 +72,16 @@ function CustomPlayerDisplay.BlockPlayer(props)
 		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(player.team))
+	end
+
+	if props.oneLine then
+		return mw.html.create('div'):addClass('block-player starcraft-block-player')
+			:addClass(props.flip and 'flipped' or nil)
+			:addClass(props.showPlayerTeam and 'has-team' or nil)
+			:node(flagNode)
+			:node(characterNode)
+			:node(nameNode)
+			:node(teamNode)
 	end
 
 	return mw.html.create()
