@@ -47,9 +47,8 @@ function CustomPrizePool.run(frame)
 			return
 		end
 		local player = p.opponents[1].opponentData.players[1] --[[@as FightersStandardPlayer]]
-		return player.displayName, player.pageName, player.flag, table.concat(player.chars, ',')
+		return player.displayName, player.pageName, player.flag, table.concat(player.chars or {}, ',')
 	end
-
 	if prizePool.opponentType == Opponent.solo then
 		local tournament = Json.parseIfTable(Variables.varDefault('tournament_extradata')) or {}
 		tournament.winner, tournament.winnerlink, tournament.winnerflag, tournament.winnerheads = placementData(1)
