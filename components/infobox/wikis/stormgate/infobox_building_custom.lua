@@ -89,16 +89,16 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'hotkey' then
 		return {
 			Cell{
-				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys', 
+				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys',
 				content = {
-					args.hotkey and args.macro_key and 
-						CustomBuilding._hotkeys(args.hotkey, args.hotkey2) .. SEP .. 
-						CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or 
-					args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2) or 
+					args.hotkey and args.macro_key and
+						CustomBuilding._hotkeys(args.hotkey, args.hotkey2) .. SEP ..
+						CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or
+					args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2) or
 					args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or nil
 				}
 			},
-		}			
+		}
 	elseif id == 'builds' then
 		return {
 			Cell{name = 'Builds', content = caller:_displayCommaSeparatedStringWithBreaks(args.builds)},
@@ -213,20 +213,20 @@ function CustomBuilding:_getDefenseDisplay()
 	}, '&nbsp;')
 
 	return table.concat({
-		health, 
+		health,
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
 	}, '&nbsp;')
 end
 
 ---@param inputString string?
 ---@return string[]
-function CustomBuilding:_displayCommaSeparatedString(inputString)	
-	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString), 
+function CustomBuilding:_displayCommaSeparatedString(inputString)
+	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)
 			return Page.makeInternalLink(value)
-		end	
+		end
 	), ', ')
-end	
+end
 
 ---@param inputString string?
 ---@return string[]
@@ -235,5 +235,5 @@ function CustomBuilding:_displayCommaSeparatedStringWithBreaks(inputString)
 		return Page.makeInternalLink({}, value)
 	end)
 end
-	
+
 return CustomBuilding
