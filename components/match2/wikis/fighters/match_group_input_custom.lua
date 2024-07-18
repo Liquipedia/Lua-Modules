@@ -95,12 +95,13 @@ function CustomMatchGroupInput._verifyMaps(match)
 	end
 end
 
--- Check if a map should be discarded due to being none-relevant data
+-- Check if a map should be discarded due to not containing anything relevant
 -- DUMMY_MAP_NAME variable must the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function CustomMatchGroupInput._discardMap(map)
-	return map.map == DUMMY_MAP_NAME and not map.score1 and not map.score2 and not map.winner
+	return map.map == DUMMY_MAP_NAME
+		and not map.score1 and not map.score2 and not map.winner and not map.o1p1 and not map.o2p1
 end
 
 ---@param match table
