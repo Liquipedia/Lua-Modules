@@ -39,7 +39,7 @@ html.theme--dark .componentsinvert {
 
 /* Text Colors */
 .text-color-gold {
-		color: #daa520;
+	color: #daa520;
 }
 
 /* Template:Cf */
@@ -199,10 +199,14 @@ The smaller sizes are for sub-sections. */
 }
 
 @keyframes abilityDowntime {
-	0%, 25%, 50% {
+	0%,
+	25%,
+	50% {
 		height: 0;
 	}
-	75%, 100% {
+
+	75%,
+	100% {
 		height: 100%;
 	}
 }
@@ -1370,7 +1374,7 @@ td .loop {
 	width: 100% !important;
 	height: 100% !important;
 	object-fit: unset;
-	max-width: 800px !important;
+	max-width: 50rem !important; // 800px
 }
 
 /*
@@ -1378,6 +1382,7 @@ td .loop {
 */
 
 img.pixelart {
+	// can be simplified to image-rendering: pixelated;
 	image-rendering: -moz-crisp-edges;
 	image-rendering: -o-crisp-edges;
 	image-rendering: -webkit-optimize-contrast;
@@ -1417,17 +1422,17 @@ img.pixelart {
 
 .buynow_wrapper {
 	height: 1.5rem; // 24px
-}
 
-.buynow_wrapper > a {
-	width: 100%;
-	color: #ffffff;
-	text-decoration: none;
+	> a {
+		width: 100%;
+		color: #ffffff;
+		text-decoration: none;
+	}
 }
 
 .buynow_button {
 	display: block;
-	padding-left: 30px;
+	padding-left: 1.875rem;
 	height: 1.5rem; // 24px
 	background: linear-gradient( 0deg, #000000 0%, #666666 100% );
 	color: #ffffff;
@@ -1441,19 +1446,10 @@ img.pixelart {
 	}
 }
 
-.buynow_store:before {
-	position: absolute;
-	margin-left: -31px;
-	width: 1.5rem; // 24px
-	height: 1.5rem; // 24px
-	// TODO: Steam icon
-	content: "";
-	pointer-events: none;
-}
-
+.buynow_store:before,
 .buynow_market:before {
 	position: absolute;
-	margin-left: -31px;
+	margin-left: -1.9375rem; // -31px;
 	width: 1.5rem; // 24px
 	height: 1.5rem; // 24px
 	// TODO: Steam icon
@@ -1476,34 +1472,33 @@ html.theme--dark .patch-layout {
 	text-align: center;
 }
 
-html.theme--dark .patch-layout-last {
-	background: #202d78;
-}
-
 .patch-layout-last {
 	background: #b2d7e9;
-}
 
-html.theme--dark .patch-layout-all {
-	background: #313c7e;
+	html.theme--dark & {
+		background: #202d78;
+	}
 }
 
 .patch-layout-all {
 	width: 27%;
 	background: #dee8ed;
-}
 
-html.theme--dark .patch-layout-background {
-	background-color: rgba( 41, 41, 41, 0.7 );
-	border: 0.0625rem solid #555555;
+	html.theme--dark & {
+		background: #313c7e;
+	}
 }
 
 .patch-layout-background {
 	background-color: #fdfaf8;
 	border: 0.0625rem solid #aaaaaa;
-	margin: 0.75em 0;
-	padding: 0.75em 1em;
-	padding-bottom: 1em;
+	margin: 0.75em 0; // convert to rem
+	padding: 0.75em 1em 1em 1em; // convert to rem
+
+	html.theme--dark & {
+		background-color: rgba( 41, 41, 41, 0.7 );
+		border: 0.0625rem solid #555555;
+	}
 }
 
 /*
@@ -1561,7 +1556,7 @@ a.ext-audiobutton {
 
 	&:before {
 		display: inline-block;
-		width: 1em;
+		width: 1em; // convert to rem
 		vertical-align: middle;
 	}
 }
@@ -1569,11 +1564,11 @@ a.ext-audiobutton {
 /* Quote.less overrides for RU lang */
 .wiki-dota2gameru & {
 	blockquote.quote::before {
-		top: -40px;
+		top: -2.5rem; // -40px
 	}
 
 	blockquote.quote::after {
-		top: -40px;
+		top: -2.5rem; // -40px
 		bottom: 0;
 	}
 }
