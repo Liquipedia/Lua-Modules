@@ -666,22 +666,22 @@ div.gameplay_nav ul li ul li {
 	margin: 0;
 	list-style-type: none;
 	list-style-image: none;
-}
 
-.treeview li::after {
-	display: block;
-	content: "";
-	clear: both;
+	&::after {
+		display: block;
+		content: "";
+		clear: both;
+	}
 }
 
 .treeview li li {
 	/* @noflip */
 	padding-left: 21px;
 	text-indent: 0.3em;
-}
 
-.treeview li li:last-child {
-	background-position: 0 -5971px;
+	&:last-child {
+		background-position: 0 -5971px;
+	}
 }
 
 /* first line here deals with new situation after RemexHTML switch,
@@ -1282,10 +1282,10 @@ div.skilllist-col5 ul li {
 
 #context-menu li {
 	border-bottom: solid 1px #cccccc;
-}
 
-#context-menu li:last-child {
-	border: 0;
+	&:last-child {
+		border: 0;
+	}
 }
 
 #context-menu li a {
@@ -1438,30 +1438,30 @@ div.skilllist-col5 ul li {
 	display: inline;
 	margin: 0;
 	white-space: nowrap;
+
+	/* Generate interpuncts */
+	&:after {
+		content: " ·";
+		font-weight: bold;
+	}
+
+	&:last-child:after {
+		content: none;
+	}
 }
 
 /* Display nested lists inline */
 .hlist ul ul {
 	display: inline;
-}
 
-/* Generate interpuncts */
-.hlist li:after {
-	content: " ·";
-	font-weight: bold;
-}
+	/* Add parens around nested lists */
+	&:before {
+		content: "(";
+	}
 
-.hlist li:last-child:after {
-	content: none;
-}
-
-/* Add parens around nested lists */
-.hlist ul ul:before {
-	content: "(";
-}
-
-.hlist ul ul:after {
-	content: ")";
+	&:after {
+		content: ")";
+	}
 }
 
 /*
@@ -1643,13 +1643,6 @@ html.theme--dark .patch-layout-background {
 }
 
 /* AudioButton extension styles */
-
-a.ext-audiobutton:before {
-	display: inline-block;
-	width: 1em;
-	vertical-align: middle;
-}
-
 a.ext-audiobutton {
 	/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
 	font-family: "Font Awesome 5 Pro";
@@ -1672,6 +1665,12 @@ a.ext-audiobutton {
 	&[ data-state="error" ]:before {
 		color: #91663d;
 		content: "\f059" !important;
+	}
+
+	&:before {
+		display: inline-block;
+		width: 1em;
+		vertical-align: middle;
 	}
 }
 
