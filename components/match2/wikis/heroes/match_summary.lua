@@ -374,6 +374,10 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
 
 	-- Add Comment
+	if Logic.isNotEmpty(game.length) then
+		local lengthComment = '<small>Match Duration: '.. game.length ..'</small>'
+		game.comment = game.comment and (lengthComment .. '<br>' .. game.comment) or lengthComment
+	end
 	if not Logic.isEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
 		local comment = mw.html.create('div')
