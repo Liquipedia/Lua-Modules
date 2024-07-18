@@ -206,8 +206,6 @@ end
 ---@return string?
 function CustomBuilding:_getDefenseDisplay()
 	if not Logic.isNumeric(self.args.health) then return end
-	local armor = self.args.armor or '0'
-
 	local health = table.concat({
 		ICON_HP .. ' ' .. self.args.health,
 		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
