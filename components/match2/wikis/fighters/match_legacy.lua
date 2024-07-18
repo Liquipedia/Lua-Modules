@@ -28,13 +28,53 @@ function MatchLegacy.storeMatch(match2, options)
 	end
 
 	local match = MatchLegacy._convertParameters(match2)
+	match.games = MatchLegacy._storeGames(match, match2)
 
 	return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
 end
 
+function MatchLegacy._storeGames(match, match2)
+	local games = Array.map(match2.match2games or {}, function(game2, gameIndex)
+		local game = Table.deepCopy(game2)
+		local participants = Json.parseIfString(game2.participants) or {}
+
+		-- Extradata
+		game.extradata = {}
+
+		if game.mode == 'singles' then
+			local player1 = participants['1_1'] or {}
+			local player2 = participants['2_1'] or {}
+			game.extradata.char1 = table.concat(Array.map(player1.characters or {}, Operator.property('name')), ',')
+			game.extradata.char2 = table.concat(Array.map(player2.characters or {}, Operator.property('name')), ',')
+		end
+
+		-- Other stuff
+		local winner = tonumber(game2.winner)
+		if winner == 1 then
+			game.winner = match.opponent1
+		elseif winner == 2 then
+			game.winner = match.opponent2
+		end
+
+		game.opponent1 = match.opponent1
+		game.opponent2 = match.opponent2
+		game.opponent1flag = match.opponent1flag
+		game.opponent2flag = match.opponent2flag
+
+		local scores = Json.parseIfString(game2.scores) or {}
+		game.opponent1score = scores[1] or 0
+		game.opponent2score = scores[2] or 0
+		return mw.ext.LiquipediaDB.lpdb_game(
+			'legacygame_' .. match2.match2id .. gameIndex,
+			Json.stringifySubTables(game)
+		)
+	end)
+	return table.concat(games)
+end
+
 function MatchLegacy._convertParameters(match2)
 	---@type {[any]: any}
-	local match = Table.filterByKey(Table.deepCopy(match2), function (key)
+	local match = Table.filterByKey(Table.deepCopy(match2), function(key)
 		return not String.startsWith(key, 'match2')
 	end)
 
@@ -63,7 +103,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	-- Handle Opponents
-	local headList = function (participant)
+	local headList = function(participant)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
 			local participants = Json.parseIfString(game.participants) or {}
@@ -93,7 +133,7 @@ function MatchLegacy._convertParameters(match2)
 			end
 		elseif opponent.type == Opponent.duo then
 			local teamPrefix = 'team' .. index
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentPlayers = {}
 			for i, player in pairs(opponentmatch2players) do
 				local playerPrefix = 'opponent' .. i
@@ -103,7 +143,7 @@ function MatchLegacy._convertParameters(match2)
 				match.extradata[teamPrefix .. playerPrefix .. 'displayname'] = player.displayname or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index .. '_' .. i), ',')
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
+			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
 			match[prefix] = table.concat(Array.extractValues(opponentPlayers), '/')
 			if match2.winner == index then
 				match.winner = opponentmatch2players[1].name
